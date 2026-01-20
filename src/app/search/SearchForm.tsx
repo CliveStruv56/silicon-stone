@@ -1,39 +1,54 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 
-type Props = {
-  initialQuery: string
+// Debounce hook
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState(value)
+  useEffect(() => {
+    const handler = setTimeout(() => setDebouncedValue(value), delay)
+    return () => clearTimeout(handler)
+  }, [value, delay])
+  return debouncedValue
 }
 
-export function SearchForm({ initialQuery }: Props) {
+export default function SearchForm() {
+  const searchParams = useSearchParams()
   const router = useRouter()
-  const [query, setQuery] = useState(initialQuery)
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (query.trim()) {
-      router.push(`/search?q=${encodeURIComponent(query.trim())}`)
+  const [term, setTerm] = useState(searchParams.get('q') || '')
+  const debouncedTerm = useDebounce(term, 300)
+
+  useEffect(() => {
+    // Only push if changed and not empty (or empty to clear)
+    if (debouncedTerm !== (searchParams.get('q') || '')) {
+      if (debouncedTerm) {
+        router.push(`/search?q=${encodeURIComponent(debouncedTerm)}`)
+      } else {
+        router.push('/search')
+      }
     }
-  }
+  }, [debouncedTerm, router, searchParams])
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-3 max-w-xl">
-      <input
-        type="search"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search articles..."
-        className="flex-1 rounded-md border border-border-subtle bg-stone-charcoal px-4 py-2.5 text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-stone-teal"
-      />
-      <Button
-        type="submit"
-        className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90"
-      >
-        Search
-      </Button>
-    </form>
+    <div className="relative max-w-lg w-full mx-auto mb-12">
+      <div className="relative">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <svg className="h-5 w-5 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+        <Input
+          type="search"
+          placeholder="Search analysis, signals, and method..."
+          className="pl-10 bg-stone-charcoal border-border-subtle focus:border-stone-teal text-text-primary w-full py-6 text-lg"
+          value={term}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTerm(e.target.value)}
+        />
+      </div>
+    </div>
   )
 }

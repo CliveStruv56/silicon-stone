@@ -95,10 +95,56 @@ export default async function CategoryPage({ params }: Props) {
               <span>/</span>
               <span className="text-text-primary">{category.title}</span>
             </div>
-            <h1 className="text-3xl font-bold text-text-primary mb-4">{category.title}</h1>
-            {category.description && (
-              <p className="text-lg text-text-muted max-w-2xl">{category.description}</p>
-            )}
+
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+              <div className="max-w-3xl">
+                <h1 className="text-3xl font-bold text-text-primary mb-4">{category.title}</h1>
+                {category.description && (
+                  <p className="text-lg text-text-muted max-w-2xl">{category.description}</p>
+                )}
+              </div>
+
+              {/* Regional Indicators Logic */}
+              {slug === 'us-technopolitics' && (
+                <div className="flex gap-4 p-4 bg-stone-charcoal/50 border border-border-subtle rounded-lg">
+                  <div>
+                    <div className="text-xs text-text-muted uppercase tracking-wider">Drift Score</div>
+                    <div className="text-xl font-bold text-alert-red">High</div>
+                  </div>
+                  <div className="w-px bg-border-subtle" />
+                  <div>
+                    <div className="text-xs text-text-muted uppercase tracking-wider">Focus</div>
+                    <div className="text-xl font-bold text-text-primary">Exec. Orders</div>
+                  </div>
+                </div>
+              )}
+              {slug === 'european-sovereignty' && (
+                <div className="flex gap-4 p-4 bg-stone-charcoal/50 border border-border-subtle rounded-lg">
+                  <div>
+                    <div className="text-xs text-text-muted uppercase tracking-wider">Compliance Load</div>
+                    <div className="text-xl font-bold text-stone-teal">Extreme</div>
+                  </div>
+                  <div className="w-px bg-border-subtle" />
+                  <div>
+                    <div className="text-xs text-text-muted uppercase tracking-wider">Next Deadline</div>
+                    <div className="text-xl font-bold text-text-primary">AI Act (Aug)</div>
+                  </div>
+                </div>
+              )}
+              {slug === 'asian-innovation' && (
+                <div className="flex gap-4 p-4 bg-stone-charcoal/50 border border-border-subtle rounded-lg">
+                  <div>
+                    <div className="text-xs text-text-muted uppercase tracking-wider">Supply Risk</div>
+                    <div className="text-xl font-bold text-silicon-amber">Critical</div>
+                  </div>
+                  <div className="w-px bg-border-subtle" />
+                  <div>
+                    <div className="text-xs text-text-muted uppercase tracking-wider">Hotspot</div>
+                    <div className="text-xl font-bold text-text-primary">Taiwan Strait</div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </section>
 
@@ -122,11 +168,10 @@ export default async function CategoryPage({ params }: Props) {
                     <Link
                       key={cat._id}
                       href={`/analysis/category/${cat.slug}`}
-                      className={`block py-2 px-3 rounded-md transition-colors ${
-                        cat.slug === slug
+                      className={`block py-2 px-3 rounded-md transition-colors ${cat.slug === slug
                           ? 'text-text-primary bg-stone-charcoal/50'
                           : 'text-text-muted hover:text-text-primary hover:bg-stone-charcoal/50'
-                      }`}
+                        }`}
                     >
                       {cat.title}
                     </Link>
@@ -171,7 +216,7 @@ export default async function CategoryPage({ params }: Props) {
                               className="text-text-muted border-text-muted/30 text-xs"
                             >
                               {article.contentType === 'deepdive' ? 'Deep Dive' :
-                               article.contentType === 'signal' ? 'Signal' : 'Guide'}
+                                article.contentType === 'signal' ? 'Signal' : 'Guide'}
                             </Badge>
                           )}
                         </div>
