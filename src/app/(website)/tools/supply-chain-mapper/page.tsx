@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   ComposableMap,
@@ -463,6 +464,15 @@ export default function SupplyChainMapperPage() {
                 )}
               </AnimatePresence>
             </div>
+          </div>
+
+          {/* CTA */}
+          <div className="flex justify-center pt-8">
+            <Link href="/services#contact">
+              <Button className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90">
+                Request Supply Chain Exposure Report
+              </Button>
+            </Link>
           </div>
         </section>
       </main>

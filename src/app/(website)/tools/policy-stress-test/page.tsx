@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Header, Footer } from '@/components/layout'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -468,10 +469,12 @@ export default function PolicyStressTestPage() {
 
                 {/* CTA */}
                 <div className="flex justify-center pt-6">
-                  <Button className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90">
-                    <FileText className="w-4 h-4 mr-2" />
-                    Request Detailed Compliance Assessment
-                  </Button>
+                  <Link href="/services#contact">
+                    <Button className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90">
+                      <FileText className="w-4 h-4 mr-2" />
+                      Request Detailed Compliance Assessment
+                    </Button>
+                  </Link>
                 </div>
               </motion.div>
             )}

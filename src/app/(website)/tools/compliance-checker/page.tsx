@@ -353,7 +353,7 @@ export default function ComplianceCheckerPage() {
                     <RotateCcw className="w-4 h-4 mr-2" />
                     Check Another System
                   </Button>
-                  <Link href="/contact">
+                  <Link href="/services#contact">
                     <Button className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90 w-full sm:w-auto">
                       Get Full Assessment
                     </Button>

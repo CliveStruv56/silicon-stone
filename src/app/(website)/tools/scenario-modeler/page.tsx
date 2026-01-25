@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Header, Footer } from '@/components/layout'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -364,9 +365,11 @@ export default function ScenarioModelerPage() {
 
               {/* CTA */}
               <div className="flex justify-center pt-6">
-                <Button className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90">
-                  Request Custom Scenario Analysis
-                </Button>
+                <Link href="/services#contact">
+                  <Button className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90">
+                    Request Custom Scenario Analysis
+                  </Button>
+                </Link>
               </div>
             </motion.div>
           </AnimatePresence>
