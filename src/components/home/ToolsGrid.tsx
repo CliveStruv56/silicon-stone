@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 
 const tools = [
   {
@@ -52,34 +51,23 @@ const tools = [
 export function ToolsGrid() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      {tools.map((tool) => {
-        const isComingSoon = tool.href === '/tools/scenario-modeler' || tool.href === '/tools/policy-stress-test'
-
-        const Content = (
-          <Card className={`h-full bg-stone-charcoal border-border-subtle transition-colors ${!isComingSoon ? 'hover:border-stone-teal/50 cursor-pointer' : 'opacity-70 bg-stone-charcoal/50'}`}>
+      {tools.map((tool) => (
+        <Link key={tool.name} href={tool.href}>
+          <Card className="h-full bg-stone-charcoal border-border-subtle transition-colors hover:border-stone-teal/50 cursor-pointer">
             <CardHeader className="pb-2">
               <div className="flex justify-between items-start">
                 <CardTitle className="text-base font-medium text-text-primary flex items-center gap-3">
                   <span className={tool.color}>{tool.icon}</span>
                   {tool.name}
                 </CardTitle>
-                {isComingSoon && <Badge variant="outline" className="text-[10px] h-5">Coming Soon</Badge>}
               </div>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-text-muted">{tool.description}</p>
             </CardContent>
           </Card>
-        )
-
-        return isComingSoon ? (
-          <div key={tool.name}>{Content}</div>
-        ) : (
-          <Link key={tool.name} href={tool.href}>
-            {Content}
-          </Link>
-        )
-      })}
+        </Link>
+      ))}
     </div>
   )
 }

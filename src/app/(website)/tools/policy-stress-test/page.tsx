@@ -1,0 +1,485 @@
+'use client'
+
+import { useState, useMemo } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Header, Footer } from '@/components/layout'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import {
+  POLICIES,
+  INDUSTRIES,
+  COMPANY_SIZES,
+  getPolicyById,
+  getIndustryImpact,
+  calculateCombinedFriction,
+  RELEVANCE_COLORS,
+  PRIORITY_COLORS,
+  JURISDICTION_COLORS,
+} from '@/lib/policy-data'
+import type { Policy, Jurisdiction, IndustryImpact } from '@/types/policy'
+import {
+  Scale,
+  FileText,
+  AlertTriangle,
+  CheckCircle2,
+  ChevronDown,
+  Building2,
+  Globe,
+  DollarSign,
+  Gavel,
+  ArrowRight,
+} from 'lucide-react'
+
+// Friction gauge component
+function FrictionGauge({ score, label }: { score: number; label: string }) {
+  const percentage = (score / 10) * 100
+  const color = score >= 7 ? '#ef4444' : score >= 4 ? '#f59e0b' : '#14b8a6'
+
+  return (
+    <div className="text-center">
+      <div className="relative w-32 h-32 mx-auto mb-3">
+        <svg className="w-full h-full transform -rotate-90">
+          <circle
+            cx="64"
+            cy="64"
+            r="56"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="12"
+            className="text-surface-elevated"
+          />
+          <motion.circle
+            cx="64"
+            cy="64"
+            r="56"
+            fill="none"
+            stroke={color}
+            strokeWidth="12"
+            strokeLinecap="round"
+            strokeDasharray={`${percentage * 3.52} 352`}
+            initial={{ strokeDasharray: '0 352' }}
+            animate={{ strokeDasharray: `${percentage * 3.52} 352` }}
+            transition={{ duration: 1, ease: 'easeOut' }}
+          />
+        </svg>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <motion.span
+            className="text-3xl font-bold"
+            style={{ color }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+          >
+            {score.toFixed(1)}
+          </motion.span>
+        </div>
+      </div>
+      <span className="text-sm text-text-muted">{label}</span>
+    </div>
+  )
+}
+
+// Policy comparison card
+function PolicyCard({
+  policy,
+  impact,
+  jurisdiction,
+}: {
+  policy: Policy
+  impact: IndustryImpact | undefined
+  jurisdiction: Jurisdiction
+}) {
+  const colors = JURISDICTION_COLORS[jurisdiction]
+
+  return (
+    <Card className={`bg-stone-charcoal border-border-subtle h-full ${impact ? '' : 'opacity-50'}`}>
+      <CardHeader className="pb-2">
+        <div className="flex items-center gap-2 mb-2">
+          <Badge className={`${colors.bg} ${colors.text} ${colors.border} border`}>
+            {jurisdiction}
+          </Badge>
+          <Badge variant="outline" className="text-xs">
+            {policy.status}
+          </Badge>
+        </div>
+        <CardTitle className="text-lg text-text-primary">{policy.name}</CardTitle>
+        <CardDescription className="text-sm">{policy.description}</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {impact ? (
+          <>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-surface-elevated rounded-lg p-3 border border-border-subtle">
+                <div className="text-xs text-text-muted mb-1">Friction Score</div>
+                <div
+                  className="text-2xl font-bold"
+                  style={{ color: RELEVANCE_COLORS[impact.relevance] }}
+                >
+                  {impact.frictionScore}/10
+                </div>
+              </div>
+              <div className="bg-surface-elevated rounded-lg p-3 border border-border-subtle">
+                <div className="text-xs text-text-muted mb-1">Est. Cost</div>
+                <div className="text-lg font-semibold text-text-primary">
+                  {impact.complianceCost}
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="text-xs font-mono text-stone-teal uppercase mb-2">Key Requirements</h4>
+              <ul className="space-y-2">
+                {impact.requirements.slice(0, 3).map((req, idx) => (
+                  <li key={idx} className="flex items-start gap-2 text-sm text-text-muted">
+                    <div className="w-1.5 h-1.5 rounded-full bg-stone-teal mt-2 flex-shrink-0" />
+                    {req}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {impact.keyDeadlines && impact.keyDeadlines.length > 0 && (
+              <div className="bg-silicon-amber/10 border border-silicon-amber/30 rounded-lg p-3">
+                <h4 className="text-xs font-mono text-silicon-amber uppercase mb-2">Key Deadlines</h4>
+                <ul className="space-y-1">
+                  {impact.keyDeadlines.map((deadline, idx) => (
+                    <li key={idx} className="text-xs text-text-primary">{deadline}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="text-center py-8 text-text-muted">
+            <p>No specific requirements for selected industry</p>
+          </div>
+        )}
+
+        <div className="pt-3 border-t border-border-subtle">
+          <div className="flex items-center gap-2 text-xs text-text-muted">
+            <Gavel className="w-3 h-3" />
+            <span>Penalty: {policy.penaltyRange}</span>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+export default function PolicyStressTestPage() {
+  const [selectedIndustry, setSelectedIndustry] = useState<string>('')
+  const [selectedSize, setSelectedSize] = useState<string>('enterprise')
+  const [selectedEuPolicy, setSelectedEuPolicy] = useState<string>('eu-ai-act')
+  const [selectedUsPolicy, setSelectedUsPolicy] = useState<string>('us-export-controls')
+  const [showResults, setShowResults] = useState(false)
+
+  const euPolicies = POLICIES.filter(p => p.jurisdiction === 'EU')
+  const usPolicies = POLICIES.filter(p => p.jurisdiction === 'US')
+
+  const euPolicy = useMemo(() => getPolicyById(selectedEuPolicy), [selectedEuPolicy])
+  const usPolicy = useMemo(() => getPolicyById(selectedUsPolicy), [selectedUsPolicy])
+
+  const euImpact = useMemo(
+    () => (selectedIndustry && selectedEuPolicy ? getIndustryImpact(selectedEuPolicy, selectedIndustry) : undefined),
+    [selectedEuPolicy, selectedIndustry]
+  )
+
+  const usImpact = useMemo(
+    () => (selectedIndustry && selectedUsPolicy ? getIndustryImpact(selectedUsPolicy, selectedIndustry) : undefined),
+    [selectedUsPolicy, selectedIndustry]
+  )
+
+  const combinedFriction = useMemo(
+    () => calculateCombinedFriction(selectedEuPolicy, selectedUsPolicy, selectedIndustry),
+    [selectedEuPolicy, selectedUsPolicy, selectedIndustry]
+  )
+
+  // Combine and prioritize actions
+  const allActions = useMemo(() => {
+    const actions = [
+      ...(euImpact?.actions || []).map(a => ({ ...a, source: 'EU' })),
+      ...(usImpact?.actions || []).map(a => ({ ...a, source: 'US' })),
+    ]
+    return actions.sort((a, b) => {
+      const order = { immediate: 0, '30-days': 1, '90-days': 2, '180-days': 3 }
+      return order[a.priority] - order[b.priority]
+    })
+  }, [euImpact, usImpact])
+
+  const handleAnalyze = () => {
+    if (selectedIndustry) {
+      setShowResults(true)
+    }
+  }
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Header />
+
+      <main className="flex-1 bg-background">
+        {/* Hero Section */}
+        <section className="bg-slate-deep border-b border-border-subtle py-12 md:py-16">
+          <div className="mx-auto max-w-7xl px-6 lg:px-8 text-center">
+            <Badge variant="outline" className="mb-4 border-stone-teal text-stone-teal">
+              Interactive Tool
+            </Badge>
+            <h1 className="text-3xl font-bold text-text-primary sm:text-4xl mb-4">
+              Policy Stress-Test
+            </h1>
+            <p className="text-lg text-text-muted max-w-2xl mx-auto">
+              Compare US and EU regulatory requirements for your industry.
+              Understand compliance friction and prioritize your response.
+            </p>
+          </div>
+        </section>
+
+        {/* Configuration Section */}
+        <section className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
+          <Card className="bg-stone-charcoal border-border-subtle mb-8">
+            <CardHeader>
+              <CardTitle className="text-lg text-text-primary flex items-center gap-2">
+                <Building2 className="w-5 h-5 text-stone-teal" />
+                Configure Your Context
+              </CardTitle>
+              <CardDescription>
+                Select your industry and the policies to analyze
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Industry Selection */}
+              <div>
+                <label className="text-sm font-medium text-text-primary mb-2 block">
+                  Industry
+                </label>
+                <div className="relative">
+                  <select
+                    value={selectedIndustry}
+                    onChange={(e) => {
+                      setSelectedIndustry(e.target.value)
+                      setShowResults(false)
+                    }}
+                    className="w-full bg-surface-elevated border border-border-subtle rounded-lg px-4 py-3 text-text-primary appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-stone-teal/50"
+                  >
+                    <option value="">Select your industry...</option>
+                    {INDUSTRIES.map(industry => (
+                      <option key={industry} value={industry}>{industry}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted pointer-events-none" />
+                </div>
+              </div>
+
+              {/* Policy Selection */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* EU Policy */}
+                <div>
+                  <label className="text-sm font-medium text-text-primary mb-2 block flex items-center gap-2">
+                    <Globe className="w-4 h-4 text-blue-400" />
+                    EU Policy
+                  </label>
+                  <div className="space-y-2">
+                    {euPolicies.map(policy => (
+                      <button
+                        key={policy.id}
+                        onClick={() => {
+                          setSelectedEuPolicy(policy.id)
+                          setShowResults(false)
+                        }}
+                        className={`w-full text-left p-3 rounded-lg border transition-all ${
+                          selectedEuPolicy === policy.id
+                            ? 'bg-blue-500/10 border-blue-500/40'
+                            : 'bg-surface-elevated border-border-subtle hover:border-blue-500/30'
+                        }`}
+                      >
+                        <div className="font-medium text-text-primary text-sm">{policy.shortName}</div>
+                        <div className="text-xs text-text-muted">{policy.effectiveDate}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* US Policy */}
+                <div>
+                  <label className="text-sm font-medium text-text-primary mb-2 block flex items-center gap-2">
+                    <Globe className="w-4 h-4 text-red-400" />
+                    US Policy
+                  </label>
+                  <div className="space-y-2">
+                    {usPolicies.map(policy => (
+                      <button
+                        key={policy.id}
+                        onClick={() => {
+                          setSelectedUsPolicy(policy.id)
+                          setShowResults(false)
+                        }}
+                        className={`w-full text-left p-3 rounded-lg border transition-all ${
+                          selectedUsPolicy === policy.id
+                            ? 'bg-red-500/10 border-red-500/40'
+                            : 'bg-surface-elevated border-border-subtle hover:border-red-500/30'
+                        }`}
+                      >
+                        <div className="font-medium text-text-primary text-sm">{policy.shortName}</div>
+                        <div className="text-xs text-text-muted">{policy.effectiveDate}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Company Size */}
+              <div>
+                <label className="text-sm font-medium text-text-primary mb-2 block">
+                  Company Size
+                </label>
+                <div className="flex gap-2">
+                  {COMPANY_SIZES.map(size => (
+                    <button
+                      key={size.value}
+                      onClick={() => setSelectedSize(size.value)}
+                      className={`flex-1 px-4 py-2 rounded-lg border text-sm transition-all ${
+                        selectedSize === size.value
+                          ? 'bg-stone-teal/20 border-stone-teal/40 text-stone-teal'
+                          : 'bg-surface-elevated border-border-subtle text-text-muted hover:text-text-primary'
+                      }`}
+                    >
+                      {size.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Analyze Button */}
+              <Button
+                onClick={handleAnalyze}
+                disabled={!selectedIndustry}
+                className="w-full bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90 disabled:opacity-50"
+              >
+                <Scale className="w-4 h-4 mr-2" />
+                Analyze Compliance Friction
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Results */}
+          <AnimatePresence>
+            {showResults && selectedIndustry && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="space-y-8"
+              >
+                {/* Friction Summary */}
+                <Card className="bg-stone-charcoal border-border-subtle">
+                  <CardHeader>
+                    <CardTitle className="text-lg text-text-primary flex items-center gap-2">
+                      <AlertTriangle className="w-5 h-5 text-silicon-amber" />
+                      Friction Analysis: {selectedIndustry}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+                      <FrictionGauge
+                        score={euImpact?.frictionScore || 0}
+                        label="EU Friction"
+                      />
+                      <FrictionGauge
+                        score={combinedFriction}
+                        label="Combined Friction"
+                      />
+                      <FrictionGauge
+                        score={usImpact?.frictionScore || 0}
+                        label="US Friction"
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Side by Side Comparison */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {euPolicy && (
+                    <PolicyCard
+                      policy={euPolicy}
+                      impact={euImpact}
+                      jurisdiction="EU"
+                    />
+                  )}
+                  {usPolicy && (
+                    <PolicyCard
+                      policy={usPolicy}
+                      impact={usImpact}
+                      jurisdiction="US"
+                    />
+                  )}
+                </div>
+
+                {/* Combined Action Plan */}
+                {allActions.length > 0 && (
+                  <Card className="bg-stone-charcoal border-border-subtle">
+                    <CardHeader>
+                      <CardTitle className="text-lg text-text-primary flex items-center gap-2">
+                        <CheckCircle2 className="w-5 h-5 text-stone-teal" />
+                        Prioritized Action Plan
+                      </CardTitle>
+                      <CardDescription>
+                        Combined compliance actions across both jurisdictions
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        {allActions.map((action, idx) => {
+                          const colors = PRIORITY_COLORS[action.priority]
+                          return (
+                            <motion.div
+                              key={idx}
+                              initial={{ opacity: 0, x: -20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: idx * 0.05 }}
+                              className={`flex items-start gap-4 p-4 rounded-lg border ${colors.bg} ${colors.border}`}
+                            >
+                              <Badge
+                                variant="outline"
+                                className={`flex-shrink-0 ${colors.text} ${colors.border}`}
+                              >
+                                {action.priority === 'immediate' ? 'Now' :
+                                  action.priority === '30-days' ? '30d' :
+                                    action.priority === '90-days' ? '90d' : '180d'}
+                              </Badge>
+                              <div className="flex-1">
+                                <span className="text-text-primary text-sm">{action.action}</span>
+                              </div>
+                              <Badge
+                                variant="outline"
+                                className={action.source === 'EU'
+                                  ? 'border-blue-500/40 text-blue-400'
+                                  : 'border-red-500/40 text-red-400'
+                                }
+                              >
+                                {action.source}
+                              </Badge>
+                            </motion.div>
+                          )
+                        })}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* CTA */}
+                <div className="flex justify-center pt-6">
+                  <Button className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90">
+                    <FileText className="w-4 h-4 mr-2" />
+                    Request Detailed Compliance Assessment
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </section>
+      </main>
+
+      <Footer />
+    </div>
+  )
+}
