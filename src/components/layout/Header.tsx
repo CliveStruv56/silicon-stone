@@ -1,24 +1,16 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 
-const navigation = [
-  {
-    name: 'Analysis',
-    href: '/analysis',
-    children: [
-      { name: 'Atlantic Drift', href: '/analysis/atlantic-drift' },
-      { name: 'US Technopolitics', href: '/analysis/category/us-technopolitics' },
-      { name: 'European Sovereignty', href: '/analysis/category/european-sovereignty' },
-      { name: 'Asian Innovation', href: '/analysis/category/asian-innovation' },
-      { name: 'AI Act & Compliance', href: '/analysis/ai-act' },
-      { name: 'Semiconductor Supply Chains', href: '/analysis/semiconductors' },
-      { name: 'Digital Sovereignty', href: '/analysis/digital-sovereignty' },
-      { name: 'Edge Economy', href: '/analysis/edge-economy' },
-    ],
-  },
+type Category = {
+  _id: string
+  title: string
+  slug: string
+}
+
+const staticNavigation = [
   {
     name: 'Tools',
     href: '/tools',
@@ -40,9 +32,45 @@ const navigation = [
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [categories, setCategories] = useState<Category[]>([])
+
+  // Fetch categories on mount
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const res = await fetch('/api/categories')
+        if (res.ok) {
+          const data = await res.json()
+          setCategories(data)
+        }
+      } catch (e) {
+        console.error('Failed to fetch categories', e)
+      }
+    }
+    fetchCategories()
+  }, [])
+
+  // Fallback categories when Sanity has none
+  const fallbackCategories = [
+    { name: 'All Analysis', href: '/analysis' },
+  ]
+
+  // Build navigation with dynamic Analysis dropdown
+  const analysisNav = {
+    name: 'Analysis',
+    href: '/analysis',
+    children: categories.length > 0
+      ? categories.map(cat => ({
+        name: cat.title,
+        href: `/analysis/category/${cat.slug}`
+      }))
+      : fallbackCategories
+  }
+
+  const navigation = [analysisNav, ...staticNavigation]
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border-subtle bg-slate-deep/95 backdrop-blur supports-[backdrop-filter]:bg-slate-deep/80">
+    <header className="sticky top-0 z-50 w-full border-b border-border-subtle glass-plate noise-overlay">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
         {/* Logo */}
         <div className="flex lg:flex-1">
@@ -85,22 +113,24 @@ export function Header() {
             <div key={item.name} className="relative group">
               <Link
                 href={item.href}
-                className="text-sm font-medium text-text-muted transition-colors hover:text-text-primary"
+                className="font-ui-mono text-text-muted transition-colors hover:text-text-primary"
               >
                 {item.name}
               </Link>
-              {item.children && (
-                <div className="absolute left-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
-                  <div className="rounded-lg bg-stone-charcoal p-2 shadow-xl ring-1 ring-border-subtle">
-                    {item.children.map((child) => (
-                      <Link
-                        key={child.name}
-                        href={child.href}
-                        className="block rounded-md px-3 py-2 text-sm text-text-muted transition-colors hover:bg-surface-elevated hover:text-text-primary whitespace-nowrap"
-                      >
-                        {child.name}
-                      </Link>
-                    ))}
+              {item.children && item.children.length > 0 && (
+                <div className="absolute left-0 top-full pt-0 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-150">
+                  <div className="pt-2">
+                    <div className="rounded-lg bg-stone-charcoal p-2 shadow-xl ring-1 ring-border-subtle">
+                      {item.children.map((child) => (
+                        <Link
+                          key={child.name}
+                          href={child.href}
+                          className="block rounded-md px-3 py-2 text-sm text-text-muted transition-colors hover:bg-surface-elevated hover:text-text-primary whitespace-nowrap"
+                        >
+                          {child.name}
+                        </Link>
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}
@@ -138,7 +168,7 @@ export function Header() {
                 >
                   {item.name}
                 </Link>
-                {item.children && (
+                {item.children && item.children.length > 0 && (
                   <div className="ml-4 space-y-1">
                     {item.children.map((child) => (
                       <Link

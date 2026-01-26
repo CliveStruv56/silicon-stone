@@ -74,26 +74,45 @@ export default async function AnalysisPage() {
             {/* Sidebar - Categories */}
             <aside className="lg:col-span-1">
               <div className="sticky top-24">
-                <h2 className="text-sm font-semibold text-text-muted uppercase tracking-wider mb-4">
-                  Categories
-                </h2>
-                <nav className="space-y-2">
-                  <Link
-                    href="/analysis"
-                    className="block py-2 px-3 rounded-md text-text-primary bg-stone-charcoal/50"
-                  >
-                    All Articles
-                  </Link>
-                  {categories?.map((category: Category) => (
+                <div className="mb-8">
+                  <h2 className="text-sm font-semibold text-text-muted uppercase tracking-wider mb-4">
+                    Categories
+                  </h2>
+                  <nav className="space-y-2">
                     <Link
-                      key={category._id}
-                      href={`/analysis/category/${category.slug}`}
-                      className="block py-2 px-3 rounded-md text-text-muted hover:text-text-primary hover:bg-stone-charcoal/50 transition-colors"
+                      href="/analysis"
+                      className="block py-2 px-3 rounded-md text-text-primary bg-stone-charcoal/50"
                     >
-                      {category.title}
+                      All Articles
                     </Link>
-                  ))}
-                </nav>
+                    {categories?.map((category: Category) => (
+                      <Link
+                        key={category._id}
+                        href={`/analysis/category/${category.slug}`}
+                        className="block py-2 px-3 rounded-md text-text-muted hover:text-text-primary hover:bg-stone-charcoal/50 transition-colors"
+                      >
+                        {category.title}
+                      </Link>
+                    ))}
+                  </nav>
+                </div>
+
+                <div>
+                  <h2 className="text-sm font-semibold text-text-muted uppercase tracking-wider mb-4">
+                    Articles
+                  </h2>
+                  <nav className="space-y-2">
+                    {articles?.slice(0, 10).map((article: Article) => (
+                      <Link
+                        key={article._id}
+                        href={`/analysis/${article.slug}`}
+                        className="block py-1.5 px-3 text-sm text-text-muted hover:text-stone-teal hover:border-l-2 hover:border-stone-teal transition-all truncate"
+                      >
+                        {article.title}
+                      </Link>
+                    ))}
+                  </nav>
+                </div>
               </div>
             </aside>
 
@@ -133,7 +152,7 @@ export default async function AnalysisPage() {
                               className="text-text-muted border-text-muted/30 text-xs"
                             >
                               {article.contentType === 'deepdive' ? 'Deep Dive' :
-                               article.contentType === 'signal' ? 'Signal' : 'Guide'}
+                                article.contentType === 'signal' ? 'Signal' : 'Guide'}
                             </Badge>
                           )}
                         </div>

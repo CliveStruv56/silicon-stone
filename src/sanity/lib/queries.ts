@@ -9,13 +9,7 @@ export const ARTICLES_QUERY = defineQuery(`
     excerpt,
     publishedAt,
     contentType,
-    mainImage {
-      asset->{
-        _id,
-        url
-      },
-      alt
-    },
+    mainImage,
     categories[]->{
       _id,
       title,
@@ -32,20 +26,14 @@ export const ARTICLES_QUERY = defineQuery(`
 `)
 
 export const FEATURED_ARTICLES_QUERY = defineQuery(`
-  *[_type == "article" && defined(slug.current)] | order(publishedAt desc) [0...4] {
+  *[_type == "article" && defined(slug.current)] | order(coalesce(publishedAt, _updatedAt) desc) [0...7] {
     _id,
     title,
     "slug": slug.current,
     excerpt,
     publishedAt,
     contentType,
-    mainImage {
-      asset->{
-        _id,
-        url
-      },
-      alt
-    },
+    mainImage,
     categories[]->{
       _id,
       title,
@@ -62,13 +50,7 @@ export const ARTICLE_QUERY = defineQuery(`
     excerpt,
     publishedAt,
     contentType,
-    mainImage {
-      asset->{
-        _id,
-        url
-      },
-      alt
-    },
+    mainImage,
     body,
     categories[]->{
       _id,
@@ -124,13 +106,7 @@ export const ARTICLES_BY_CATEGORY_QUERY = defineQuery(`
     excerpt,
     publishedAt,
     contentType,
-    mainImage {
-      asset->{
-        _id,
-        url
-      },
-      alt
-    },
+    mainImage,
     categories[]->{
       _id,
       title,
@@ -151,11 +127,21 @@ export const AUTHOR_QUERY = defineQuery(`
   }
 `)
 
+// Site Settings
+export const SITE_SETTINGS_QUERY = defineQuery(`
+  *[_type == "siteSettings"][0] {
+    heroImage,
+    heroTitle,
+    heroDescription
+  }
+`)
+
 // Search
 export const SEARCH_ARTICLES_QUERY = defineQuery(`
   *[_type == "article" && (
     title match $query + "*" ||
-    excerpt match $query + "*"
+    excerpt match $query + "*" ||
+    pt::text(body) match $query + "*"
   )] | order(publishedAt desc) [0...20] {
     _id,
     title,

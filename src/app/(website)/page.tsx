@@ -6,7 +6,7 @@ import { DeadlineCountdown, ToolsGrid, SubscribeCTA, HeroSection } from '@/compo
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { sanityFetch } from '@/sanity/lib/live'
-import { FEATURED_ARTICLES_QUERY } from '@/sanity/lib/queries'
+import { FEATURED_ARTICLES_QUERY, SITE_SETTINGS_QUERY } from '@/sanity/lib/queries'
 import { urlFor } from '@/sanity/lib/image'
 import { StaggerContainer, StaggerItem } from '@/components/ui/StaggerContainer'
 
@@ -46,7 +46,14 @@ function formatShortDate(dateString: string) {
 }
 
 export default async function Home() {
-  const { data: articles } = await sanityFetch({ query: FEATURED_ARTICLES_QUERY })
+  // Parallel fetching
+  const [articlesRes, settingsRes] = await Promise.all([
+    sanityFetch({ query: FEATURED_ARTICLES_QUERY }),
+    sanityFetch({ query: SITE_SETTINGS_QUERY })
+  ])
+
+  const articles = articlesRes.data
+  const siteSettings = settingsRes.data
 
   const featuredArticle = articles?.[0]
   const recentArticles = articles?.slice(1, 7) || []
@@ -57,7 +64,7 @@ export default async function Home() {
 
       <main className="flex-1">
         {/* Hero Section */}
-        <HeroSection />
+        <HeroSection settings={siteSettings} />
 
         {/* Status Bar */}
         {/* Status Bar */}

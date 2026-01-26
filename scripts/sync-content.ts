@@ -16,7 +16,7 @@ import * as path from 'path'
 import * as crypto from 'crypto'
 
 // Configuration
-const AI_WRITER_CONTENT_PATH = '/Users/clivestruver/Projects/AI-Writer-System/Content/substack'
+const AI_WRITER_CONTENT_PATH = process.env.AI_WRITER_CONTENT_PATH || path.join(process.cwd(), '../content/substack')
 const SANITY_PROJECT_ID = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || '3q59mpd7'
 const SANITY_DATASET = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production'
 const SANITY_WRITE_TOKEN = process.env.SANITY_API_WRITE_TOKEN
@@ -56,6 +56,30 @@ interface SanityArticle {
   publishedAt: string
   contentType: 'deepdive' | 'signal' | 'guide'
   sourceHash?: string
+}
+
+/**
+ * Recursively get all markdown files from a directory
+ */
+function getAllMarkdownFiles(dirPath: string, arrayOfFiles: string[] = []) {
+  const files = fs.readdirSync(dirPath)
+
+  files.forEach(function (file) {
+    // Skip hidden files/dirs (like .DS_Store, .git)
+    if (file.startsWith('.')) return
+
+    const fullPath = path.join(dirPath, file)
+
+    if (fs.statSync(fullPath).isDirectory()) {
+      getAllMarkdownFiles(fullPath, arrayOfFiles)
+    } else {
+      if (file.endsWith('.md')) {
+        arrayOfFiles.push(fullPath)
+      }
+    }
+  })
+
+  return arrayOfFiles
 }
 
 /**
@@ -357,10 +381,8 @@ async function main() {
     process.exit(1)
   }
 
-  // Get all markdown files
-  const files = fs.readdirSync(AI_WRITER_CONTENT_PATH)
-    .filter(f => f.endsWith('.md'))
-    .map(f => path.join(AI_WRITER_CONTENT_PATH, f))
+  // Get all markdown files recursively
+  const files = getAllMarkdownFiles(AI_WRITER_CONTENT_PATH)
 
   console.log(`📁 Found ${files.length} markdown files\n`)
 

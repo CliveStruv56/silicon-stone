@@ -333,6 +333,22 @@ All context profiles in `/context/core/` are complete and integrated:
 | **author** | name, slug, bio, role, image |
 | **category** | title, slug, description |
 | **persona** | name, role, slug, painPoints, contentNeeds, organizationTypes, keyConcerns |
+| **siteSettings** | heroImage, heroTitle, heroDescription |
+
+### Site Settings (Singleton)
+
+The Site Settings document type provides global configuration for the homepage hero section. Access via Sanity Studio at `/studio`.
+
+| Field | Purpose |
+|-------|---------|
+| **Hero Image** | Background image for homepage hero (displays with overlay effect) |
+| **Hero Title** | Override default "Forensic analysis..." headline |
+| **Hero Description** | Override default subheadline description |
+
+**Behavior:**
+- If an image is uploaded, it displays behind the hero text with a blend overlay effect
+- If text fields are provided, they replace the hardcoded default text
+- If nothing is set, the site displays the original defaults (safe fallback)
 
 ### Key Queries Defined (`src/sanity/lib/queries.ts`)
 
@@ -341,6 +357,7 @@ All context profiles in `/context/core/` are complete and integrated:
 - `ARTICLE_QUERY` - Single article by slug
 - `ARTICLES_BY_CATEGORY_QUERY` - Category filtering
 - `SEARCH_ARTICLES_QUERY` - Full-text search
+- `SITE_SETTINGS_QUERY` - Homepage hero settings (singleton)
 - `CATEGORIES_QUERY`, `AUTHOR_QUERY`
 
 ---
@@ -495,6 +512,7 @@ npm run lint             # Run ESLint
 
 | Date | Commit | Description |
 |------|--------|-------------|
+| 2026-01-26 | - | Add Site Settings singleton for homepage hero customization (image, title, description) |
 | 2026-01-26 | `5015f9f` | Fix build errors with type fixes and unescaped entities |
 | 2026-01-25 | `eb28a49` | Add services page and connect tool CTAs |
 | 2026-01-25 | `c7f7b9b` | Complete interactive tools section with 4 enhanced tools |

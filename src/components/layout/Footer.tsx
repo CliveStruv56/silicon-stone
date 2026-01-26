@@ -2,10 +2,10 @@ import Link from 'next/link'
 
 const footerNavigation = {
   analysis: [
-    { name: 'Atlantic Drift', href: '/analysis/atlantic-drift' },
-    { name: 'AI Act & Compliance', href: '/analysis/ai-act' },
-    { name: 'Semiconductors', href: '/analysis/semiconductors' },
-    { name: 'Digital Sovereignty', href: '/analysis/digital-sovereignty' },
+    { name: 'Atlantic Drift', href: '/analysis/category/atlantic-drift' },
+    { name: 'AI Act & Compliance', href: '/analysis/category/ai-act' },
+    { name: 'Semiconductors', href: '/analysis/category/semiconductors' },
+    { name: 'Digital Sovereignty', href: '/analysis/category/digital-sovereignty' },
   ],
   methodology: [
     { name: 'Supply Chain Forensics', href: '/methodology#supply-chain' },
