@@ -404,8 +404,8 @@ export default function ServicesPage() {
                 Start a Conversation
               </h2>
               <p className="text-text-muted mb-6">
-                Tell us about your situation and what you're trying to achieve.
-                We'll respond with initial thoughts and options for moving forward.
+                Tell us about your situation and what you&apos;re trying to achieve.
+                We&apos;ll respond with initial thoughts and options for moving forward.
               </p>
 
               <div className="space-y-4 text-sm">
@@ -445,7 +445,7 @@ export default function ServicesPage() {
                     Message Received
                   </h3>
                   <p className="text-text-muted">
-                    Thank you for reaching out. We'll review your inquiry and respond within 48 hours.
+                    Thank you for reaching out. We&apos;ll review your inquiry and respond within 48 hours.
                   </p>
                 </motion.div>
               ) : (

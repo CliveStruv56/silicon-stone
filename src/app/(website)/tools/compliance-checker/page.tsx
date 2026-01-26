@@ -79,7 +79,7 @@ export default function ComplianceCheckerPage() {
               EU AI Act Compliance Checker
             </h1>
             <p className="text-lg text-text-muted max-w-2xl mx-auto mb-6">
-              Determine your AI system's risk tier under the European Union's AI Act regulations with industry-specific guidance.
+              Determine your AI system&apos;s risk tier under the European Union&apos;s AI Act regulations with industry-specific guidance.
             </p>
 
             {/* Deadline Countdown */}
