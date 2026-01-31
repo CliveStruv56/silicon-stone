@@ -7,10 +7,16 @@ import type { Metadata } from 'next'
 import { Header, Footer } from '@/components/layout'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import { portableTextComponents } from '@/components/article/PortableTextComponents'
+import {
+  portableTextComponents,
+  PulseHeader,
+  MethodologyChecklist,
+  DynamicCTA,
+} from '@/components/article'
 import { sanityFetch } from '@/sanity/lib/live'
 import { ARTICLE_QUERY, ARTICLE_SLUGS_QUERY } from '@/sanity/lib/queries'
 import { urlFor } from '@/sanity/lib/image'
+import { getPersonaLabel } from '@/lib/personas'
 
 type Props = {
   params: Promise<{ slug: string }>
@@ -50,7 +56,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: article.seo?.metaTitle || `${article.title} | Silicon and Stone`,
-    description: article.seo?.metaDescription || article.excerpt,
+    description: article.seo?.metaDescription || article.stoneTruth || article.excerpt,
   }
 }
 
@@ -94,6 +100,8 @@ export default async function ArticlePage({ params }: Props) {
   }
 
   const readingTime = getReadingTime(article.body || [])
+  const primaryPersona = article.personas?.[0]
+  const hasIntelligenceFields = article.intelligenceTier || article.impactScore || article.stoneTruth
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -102,6 +110,18 @@ export default async function ArticlePage({ params }: Props) {
       <main className="flex-1">
         {/* Article Header */}
         <article className="mx-auto max-w-4xl px-6 py-12 lg:px-8 lg:py-16">
+          {/* Pulse Header - Intelligence Portal metadata */}
+          {hasIntelligenceFields && (
+            <PulseHeader
+              impactScore={article.impactScore}
+              stoneTruth={article.stoneTruth}
+              primaryPersona={primaryPersona}
+              intelligenceTier={article.intelligenceTier}
+              publishedAt={article.publishedAt}
+              readingTime={readingTime}
+            />
+          )}
+
           {/* Categories */}
           <div className="flex flex-wrap gap-2 mb-4">
             {article.categories?.map((category: Category) => (
@@ -127,38 +147,40 @@ export default async function ArticlePage({ params }: Props) {
             {article.title}
           </h1>
 
-          {/* Meta */}
-          <div className="flex flex-wrap items-center gap-4 text-sm text-text-muted mb-8">
-            {article.author && (
-              <div className="flex items-center gap-2">
-                {article.author.image && (
-                  <div className="relative w-8 h-8 rounded-full overflow-hidden">
-                    <Image
-                      src={urlFor(article.author.image).width(64).height(64).url()}
-                      alt={article.author.name}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                )}
-                <span className="text-text-primary">{article.author.name}</span>
-              </div>
-            )}
-            {article.publishedAt && (
-              <>
-                <span className="text-border-subtle">|</span>
-                <time dateTime={article.publishedAt}>
-                  {formatDate(article.publishedAt)}
-                </time>
-              </>
-            )}
-            {readingTime > 0 && (
-              <>
-                <span className="text-border-subtle">|</span>
-                <span>{readingTime} min read</span>
-              </>
-            )}
-          </div>
+          {/* Meta - only show if no PulseHeader */}
+          {!hasIntelligenceFields && (
+            <div className="flex flex-wrap items-center gap-4 text-sm text-text-muted mb-8">
+              {article.author && (
+                <div className="flex items-center gap-2">
+                  {article.author.image && (
+                    <div className="relative w-8 h-8 rounded-full overflow-hidden">
+                      <Image
+                        src={urlFor(article.author.image).width(64).height(64).url()}
+                        alt={article.author.name}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  )}
+                  <span className="text-text-primary">{article.author.name}</span>
+                </div>
+              )}
+              {article.publishedAt && (
+                <>
+                  <span className="text-border-subtle">|</span>
+                  <time dateTime={article.publishedAt}>
+                    {formatDate(article.publishedAt)}
+                  </time>
+                </>
+              )}
+              {readingTime > 0 && (
+                <>
+                  <span className="text-border-subtle">|</span>
+                  <span>{readingTime} min read</span>
+                </>
+              )}
+            </div>
+          )}
 
           {/* Main Image */}
           {article.mainImage?.asset && (
@@ -180,6 +202,32 @@ export default async function ArticlePage({ params }: Props) {
             </p>
           )}
 
+          {/* Methodology Checklist - if pillars are applied */}
+          {article.methodologyPillars && article.methodologyPillars.length > 0 && (
+            <MethodologyChecklist
+              pillars={article.methodologyPillars}
+              variant={article.intelligenceTier === 'audit' ? 'expanded' : 'compact'}
+              className="mb-8"
+            />
+          )}
+
+          {/* Actionable Insights - for Briefing tier */}
+          {article.actionableInsights && article.actionableInsights.length > 0 && (
+            <div className="glass-plate tech-corners rounded-lg p-6 mb-8 border border-tier-briefing/30">
+              <h2 className="font-ui-mono text-tier-briefing text-sm mb-4">Actionable Insights</h2>
+              <ul className="space-y-3">
+                {article.actionableInsights.map((insight: string, index: number) => (
+                  <li key={index} className="flex items-start gap-3">
+                    <span className="text-silicon-amber font-mono text-sm mt-0.5">
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                    <span className="text-text-primary">{insight}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           <Separator className="mb-10 bg-border-subtle" />
 
           {/* Article Body */}
@@ -193,7 +241,7 @@ export default async function ArticlePage({ params }: Props) {
 
           {/* Author Bio */}
           {article.author && (
-            <div className="bg-stone-charcoal rounded-lg p-6">
+            <div className="bg-stone-charcoal rounded-lg p-6 mb-8">
               <div className="flex items-start gap-4">
                 {article.author.image && (
                   <div className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
@@ -218,31 +266,29 @@ export default async function ArticlePage({ params }: Props) {
             </div>
           )}
 
-          {/* Personas */}
+          {/* Personas - show relevant personas */}
           {article.personas && article.personas.length > 0 && (
-            <div className="mt-8 p-4 bg-stone-charcoal/50 rounded-lg">
+            <div className="mb-8 p-4 bg-stone-charcoal/50 rounded-lg">
               <p className="text-sm text-text-muted mb-2">Relevant for:</p>
               <div className="flex flex-wrap gap-2">
-                {article.personas.map((persona: string) => {
-                  const personaLabels: Record<string, string> = {
-                    clara: 'Compliance Clara',
-                    ian: 'Industrial Ian',
-                    sofia: 'Sovereign Sofia',
-                    robert: 'Remote Robert',
-                  }
-                  return (
-                    <Badge
-                      key={persona}
-                      variant="outline"
-                      className="text-silicon-amber border-silicon-amber/30"
-                    >
-                      {personaLabels[persona] || persona}
-                    </Badge>
-                  )
-                })}
+                {article.personas.map((persona: string) => (
+                  <Badge
+                    key={persona}
+                    variant="outline"
+                    className="text-silicon-amber border-silicon-amber/30"
+                  >
+                    {getPersonaLabel(persona)}
+                  </Badge>
+                ))}
               </div>
             </div>
           )}
+
+          {/* Dynamic CTA - Newsletter with persona-aware copy */}
+          <DynamicCTA
+            primaryPersona={primaryPersona}
+            intelligenceTier={article.intelligenceTier}
+          />
         </article>
       </main>
 

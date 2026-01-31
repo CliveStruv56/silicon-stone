@@ -81,6 +81,58 @@ export const article = defineType({
       },
       initialValue: 'signal',
     }),
+    // === INTELLIGENCE PORTAL FIELDS ===
+    defineField({
+      name: 'intelligenceTier',
+      title: 'Intelligence Tier',
+      description: 'Reading speed tier for tiered content experience',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Pulse (30s scan)', value: 'pulse' },
+          { title: 'Briefing (5min read)', value: 'briefing' },
+          { title: 'Audit (deep analysis)', value: 'audit' },
+        ],
+        layout: 'radio',
+      },
+    }),
+    defineField({
+      name: 'impactScore',
+      title: 'Impact Score',
+      description: 'Significance rating 1-10 for urgency display',
+      type: 'number',
+      validation: (rule) => rule.min(1).max(10),
+    }),
+    defineField({
+      name: 'stoneTruth',
+      title: 'Stone Truth',
+      description: 'One-sentence "bottom line" summary (max 160 chars)',
+      type: 'text',
+      rows: 2,
+      validation: (rule) => rule.max(160).warning('Keep Stone Truth under 160 characters'),
+    }),
+    defineField({
+      name: 'methodologyPillars',
+      title: 'Methodology Pillars Applied',
+      description: 'Which analytical frameworks were used in this analysis?',
+      type: 'array',
+      of: [defineArrayMember({ type: 'string' })],
+      options: {
+        list: [
+          { title: 'Supply Chain Forensics', value: 'supply-chain-forensics' },
+          { title: 'Policy Stress-Testing', value: 'policy-stress-testing' },
+          { title: 'Scenario Modeling', value: 'scenario-modeling' },
+          { title: 'Signal Filtering', value: 'signal-filtering' },
+        ],
+      },
+    }),
+    defineField({
+      name: 'actionableInsights',
+      title: 'Actionable Insights',
+      description: 'Key takeaways for decision-makers (3-5 bullets)',
+      type: 'array',
+      of: [defineArrayMember({ type: 'text' })],
+    }),
     defineField({
       name: 'publishedAt',
       title: 'Published At',
@@ -179,13 +231,17 @@ export const article = defineType({
       author: 'author.name',
       media: 'mainImage',
       contentType: 'contentType',
+      intelligenceTier: 'intelligenceTier',
+      impactScore: 'impactScore',
     },
     prepare(selection) {
-      const { title, author, media, contentType } = selection
+      const { title, author, media, contentType, intelligenceTier, impactScore } = selection
       const typeLabel = contentType === 'deepdive' ? 'Deep Dive' : contentType === 'signal' ? 'Signal' : 'Guide'
+      const tierLabel = intelligenceTier ? ` [${intelligenceTier.toUpperCase()}]` : ''
+      const scoreLabel = impactScore ? ` Impact: ${impactScore}/10` : ''
       return {
         title,
-        subtitle: `${typeLabel} ${author ? `by ${author}` : ''}`,
+        subtitle: `${typeLabel}${tierLabel}${scoreLabel} ${author ? `by ${author}` : ''}`,
         media,
       }
     },

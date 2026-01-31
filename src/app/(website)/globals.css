@@ -16,6 +16,14 @@
   --surface-elevated: #374151;
   --border-subtle: #4b5563;
 
+  /* Silicon Cyan - Interactive/scan elements (from spec) */
+  --silicon-cyan: #00e5ff;
+
+  /* Intelligence tier accent colors */
+  --tier-pulse: #00e5ff;      /* silicon-cyan - urgent/scan */
+  --tier-briefing: #4a9b9b;   /* stone-teal - actionable */
+  --tier-audit: #f6ad55;      /* silicon-amber - comprehensive */
+
   --radius: 0.625rem;
 
   /* Light mode (rarely used, dark-first design) */
@@ -98,6 +106,10 @@
   --color-alert-red: var(--alert-red);
   --color-surface-elevated: var(--surface-elevated);
   --color-border-subtle: var(--border-subtle);
+  --color-silicon-cyan: var(--silicon-cyan);
+  --color-tier-pulse: var(--tier-pulse);
+  --color-tier-briefing: var(--tier-briefing);
+  --color-tier-audit: var(--tier-audit);
 
   /* shadcn/ui theme colors */
   --color-background: var(--background);

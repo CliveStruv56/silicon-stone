@@ -1,0 +1,135 @@
+'use client'
+
+import { Badge } from '@/components/ui/badge'
+import { cn } from '@/lib/utils'
+import { getPersonaLabel, getPersonaColor } from '@/lib/personas'
+
+interface PulseHeaderProps {
+  impactScore?: number
+  stoneTruth?: string
+  primaryPersona?: string
+  intelligenceTier?: 'pulse' | 'briefing' | 'audit'
+  publishedAt?: string
+  readingTime?: number
+  className?: string
+}
+
+function formatDate(dateString: string) {
+  return new Date(dateString).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
+}
+
+function getTierConfig(tier?: string) {
+  switch (tier) {
+    case 'pulse':
+      return {
+        label: 'PULSE',
+        color: 'bg-tier-pulse text-slate-deep',
+        borderColor: 'border-tier-pulse',
+      }
+    case 'briefing':
+      return {
+        label: 'BRIEFING',
+        color: 'bg-tier-briefing text-slate-deep',
+        borderColor: 'border-tier-briefing',
+      }
+    case 'audit':
+      return {
+        label: 'AUDIT',
+        color: 'bg-tier-audit text-slate-deep',
+        borderColor: 'border-tier-audit',
+      }
+    default:
+      return null
+  }
+}
+
+export function PulseHeader({
+  impactScore,
+  stoneTruth,
+  primaryPersona,
+  intelligenceTier,
+  publishedAt,
+  readingTime,
+  className,
+}: PulseHeaderProps) {
+  const tierConfig = getTierConfig(intelligenceTier)
+  const hasContent = impactScore || stoneTruth || tierConfig
+
+  if (!hasContent) {
+    return null
+  }
+
+  return (
+    <div
+      className={cn(
+        'glass-plate tech-corners rounded-lg p-4 mb-6 border',
+        tierConfig?.borderColor || 'border-border-subtle',
+        className
+      )}
+    >
+      {/* Impact Score Bar */}
+      {impactScore && (
+        <div className="mb-4">
+          <div className="flex items-center justify-between mb-2">
+            <span className="font-ui-mono text-xs text-text-muted">Impact Score</span>
+            <span className="font-ui-mono text-sm text-silicon-cyan">{impactScore}/10</span>
+          </div>
+          <div className="h-1.5 bg-stone-charcoal rounded-full overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-stone-teal to-silicon-cyan rounded-full transition-all duration-500"
+              style={{ width: `${(impactScore / 10) * 100}%` }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Stone Truth */}
+      {stoneTruth && (
+        <div className="mb-4">
+          <span className="font-ui-mono text-xs text-silicon-amber block mb-2">Stone Truth</span>
+          <p className="text-lg text-text-primary font-serif italic leading-relaxed">
+            &ldquo;{stoneTruth}&rdquo;
+          </p>
+        </div>
+      )}
+
+      {/* Meta Row: Tier, Persona, Date, Reading Time */}
+      <div className="flex flex-wrap items-center gap-2">
+        {tierConfig && (
+          <Badge className={cn('font-ui-mono text-[10px]', tierConfig.color)}>
+            {tierConfig.label}
+          </Badge>
+        )}
+
+        {primaryPersona && (
+          <Badge
+            variant="outline"
+            className={cn(
+              'text-xs',
+              `border-${getPersonaColor(primaryPersona)}/50 text-${getPersonaColor(primaryPersona)}`
+            )}
+          >
+            {getPersonaLabel(primaryPersona)}
+          </Badge>
+        )}
+
+        {publishedAt && (
+          <span className="text-xs text-text-muted">
+            {formatDate(publishedAt)}
+          </span>
+        )}
+
+        {readingTime && readingTime > 0 && (
+          <>
+            <span className="text-text-muted/50">&middot;</span>
+            <span className="text-xs text-text-muted">{readingTime} min read</span>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
