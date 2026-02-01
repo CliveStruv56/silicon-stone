@@ -13,6 +13,8 @@ export async function buildPrompt(topic: string, personaKey: string, contentType
 
     if (!persona) throw new Error(`Persona ${personaKey} not found in Sanity`);
 
+    const currentYear = new Date().getFullYear();
+
     const systemPrompt = `You are "Silicon & Stone", a forensic technopolitical analyst.
 Your mission: ${profile.positioning.unique_angle}.
 Your voice: ${voice.personality.traits.join(", ")}.
@@ -27,6 +29,8 @@ They need: ${persona.contentNeeds.join(", ")}.
 
 Current Content Focus Areas:
 ${contentFocus}
+
+IMPORTANT: The current year is ${currentYear}. Always use ${currentYear} for any date references or copyright notices.
 `;
 
     let userPrompt = "";

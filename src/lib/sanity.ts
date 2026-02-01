@@ -133,6 +133,48 @@ function markdownToPortableText(markdown: string): unknown[] {
             continue;
         }
 
+        if (line.startsWith('# ')) {
+            flushParagraph();
+            blocks.push({
+                _type: 'block',
+                _key: crypto.randomUUID().slice(0, 8),
+                style: 'h1',
+                markDefs: [],
+                children: [{ _type: 'span', _key: crypto.randomUUID().slice(0, 8), text: line.replace(/^#\s*/, ''), marks: [] }],
+            });
+            continue;
+        }
+
+        // Handle bullet lists
+        if (line.startsWith('- ') || line.startsWith('* ')) {
+            flushParagraph();
+            blocks.push({
+                _type: 'block',
+                _key: crypto.randomUUID().slice(0, 8),
+                style: 'normal',
+                listItem: 'bullet',
+                level: 1,
+                markDefs: [],
+                children: parseInlineMarkdown(line.replace(/^[-*]\s*/, '')),
+            });
+            continue;
+        }
+
+        // Handle numbered lists
+        if (/^\d+\.\s/.test(line)) {
+            flushParagraph();
+            blocks.push({
+                _type: 'block',
+                _key: crypto.randomUUID().slice(0, 8),
+                style: 'normal',
+                listItem: 'number',
+                level: 1,
+                markDefs: [],
+                children: parseInlineMarkdown(line.replace(/^\d+\.\s*/, '')),
+            });
+            continue;
+        }
+
         if (line.trim() === '') {
             flushParagraph();
             continue;
