@@ -9,6 +9,10 @@ export const ARTICLES_QUERY = defineQuery(`
     excerpt,
     publishedAt,
     contentType,
+    intelligenceTier,
+    impactScore,
+    stoneTruth,
+    methodologyPillars,
     mainImage,
     categories[]->{
       _id,
@@ -33,6 +37,9 @@ export const FEATURED_ARTICLES_QUERY = defineQuery(`
     excerpt,
     publishedAt,
     contentType,
+    intelligenceTier,
+    impactScore,
+    stoneTruth,
     mainImage,
     categories[]->{
       _id,
@@ -50,6 +57,11 @@ export const ARTICLE_QUERY = defineQuery(`
     excerpt,
     publishedAt,
     contentType,
+    intelligenceTier,
+    impactScore,
+    stoneTruth,
+    methodologyPillars,
+    actionableInsights,
     mainImage,
     body,
     categories[]->{
@@ -149,6 +161,54 @@ export const SEARCH_ARTICLES_QUERY = defineQuery(`
     excerpt,
     publishedAt,
     contentType,
+    intelligenceTier,
+    impactScore,
+    stoneTruth,
+    categories[]->{
+      _id,
+      title,
+      "slug": slug.current
+    }
+  }
+`)
+
+// Intelligence Portal - Tiered Content
+export const ARTICLES_BY_TIER_QUERY = defineQuery(`
+  *[_type == "article" && intelligenceTier == $tier && defined(slug.current)]
+  | order(coalesce(impactScore, 5) desc, publishedAt desc) [0...$limit] {
+    _id,
+    title,
+    "slug": slug.current,
+    excerpt,
+    stoneTruth,
+    impactScore,
+    intelligenceTier,
+    publishedAt,
+    personas,
+    methodologyPillars,
+    categories[]->{
+      _id,
+      title,
+      "slug": slug.current
+    }
+  }
+`)
+
+// Briefings - All tiered content for the intelligence portal
+export const BRIEFINGS_QUERY = defineQuery(`
+  *[_type == "article" && defined(intelligenceTier) && defined(slug.current)]
+  | order(coalesce(impactScore, 5) desc, publishedAt desc) {
+    _id,
+    title,
+    "slug": slug.current,
+    excerpt,
+    stoneTruth,
+    impactScore,
+    intelligenceTier,
+    publishedAt,
+    personas,
+    methodologyPillars,
+    mainImage,
     categories[]->{
       _id,
       title,

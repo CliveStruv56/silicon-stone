@@ -2,10 +2,9 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export function middleware(request: NextRequest) {
-    // Protect admin routes
+    // Protect admin routes (excluding /studio which uses Sanity's own auth)
     if (request.nextUrl.pathname.startsWith('/generate') ||
         request.nextUrl.pathname.startsWith('/research') ||
-        request.nextUrl.pathname.startsWith('/studio') ||
         request.nextUrl.pathname.startsWith('/context')) {
 
         // Check for auth cookie (simple password for MVP)
@@ -33,7 +32,6 @@ export const config = {
     matcher: [
         '/generate/:path*',
         '/research/:path*',
-        '/studio/:path*',
         '/context/:path*',
     ],
 }

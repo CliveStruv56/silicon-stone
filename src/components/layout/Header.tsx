@@ -10,7 +10,25 @@ type Category = {
   slug: string
 }
 
+type NavItem = {
+  name: string
+  href: string
+  highlight?: boolean
+  children?: { name: string; href: string }[]
+}
+
 const staticNavigation = [
+  {
+    name: 'Briefings',
+    href: '/briefings',
+    highlight: true,  // Mark as primary
+    children: [
+      { name: 'All Intelligence', href: '/briefings' },
+      { name: 'For Compliance', href: '/briefings?persona=clara' },
+      { name: 'For Operations', href: '/briefings?persona=ian' },
+      { name: 'For Policy', href: '/briefings?persona=sofia' },
+    ],
+  },
   {
     name: 'Tools',
     href: '/tools',
@@ -109,11 +127,15 @@ export function Header() {
 
         {/* Desktop navigation */}
         <div className="hidden lg:flex lg:gap-x-8">
-          {navigation.map((item) => (
+          {navigation.map((item: NavItem) => (
             <div key={item.name} className="relative group">
               <Link
                 href={item.href}
-                className="font-ui-mono text-text-muted transition-colors hover:text-text-primary"
+                className={`font-ui-mono transition-colors hover:text-text-primary ${
+                  item.highlight
+                    ? 'text-silicon-cyan'
+                    : 'text-text-muted'
+                }`}
               >
                 {item.name}
               </Link>
