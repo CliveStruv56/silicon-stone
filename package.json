@@ -7,9 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "sync-content": "export $(grep -v '^#' .env.local | xargs) && tsx scripts/sync-content.ts",
-    "sync-content:dry": "export $(grep -v '^#' .env.local | xargs) && tsx scripts/sync-content.ts --dry-run",
-    "sync-content:force": "export $(grep -v '^#' .env.local | xargs) && tsx scripts/sync-content.ts --force"
+    "sync-content": "tsx scripts/sync-content.ts",
+    "sync-content:dry": "tsx scripts/sync-content.ts --dry-run",
+    "sync-content:force": "tsx scripts/sync-content.ts --force"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
@@ -43,6 +43,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/react-simple-maps": "^3.0.6",
+    "dotenv": "^17.2.3",
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
     "tailwindcss": "^4",
