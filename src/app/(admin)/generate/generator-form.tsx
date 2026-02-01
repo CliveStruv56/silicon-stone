@@ -171,7 +171,7 @@ export default function GeneratorForm({ personas }: { personas: Persona[] }) {
                                     <div className="font-bold">Mission Complete</div>
                                     <div className="text-sm opacity-90">{state.message}</div>
                                     <a
-                                        href={`http://localhost:3000/studio/intent/edit/id=${state.id};type=article`}
+                                        href={`/studio/intent/edit/id=${state.id};type=article`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="inline-flex items-center gap-2 mt-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-4 py-2 rounded-full font-bold transition-colors"

@@ -26,6 +26,8 @@ interface Article {
     asset?: { _ref: string }
     alt?: string
   }
+  // Server-generated image URL (avoids exposing Sanity project ID)
+  mainImageUrl?: string
   categories?: Array<{
     _id: string
     title: string
@@ -168,11 +170,11 @@ function FeaturedArticle({ article }: { article: Article }) {
     >
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Image */}
-        {article.mainImage?.asset && (
+        {article.mainImageUrl && (
           <div className="relative aspect-[16/9] lg:aspect-square lg:w-48 rounded-lg overflow-hidden bg-stone-charcoal flex-shrink-0">
             <Image
-              src={`https://cdn.sanity.io/images/3q59mpd7/production/${article.mainImage.asset._ref.replace('image-', '').replace('-jpg', '.jpg').replace('-png', '.png').replace('-webp', '.webp')}`}
-              alt={article.mainImage.alt || article.title}
+              src={article.mainImageUrl}
+              alt={article.mainImage?.alt || article.title}
               fill
               className="object-cover"
             />
@@ -234,42 +236,29 @@ export default function BriefingsPage() {
   const [selectedPersona, setSelectedPersona] = useState<string | null>(null)
 
   useEffect(() => {
+    const controller = new AbortController()
+
     async function fetchArticles() {
       try {
-        // Fetch from Sanity API
-        const response = await fetch(
-          `https://3q59mpd7.api.sanity.io/v2024-08-01/data/query/production?query=${encodeURIComponent(`
-            *[_type == "article" && defined(slug.current)]
-            | order(coalesce(impactScore, 5) desc, publishedAt desc) [0...20] {
-              _id,
-              title,
-              "slug": slug.current,
-              excerpt,
-              stoneTruth,
-              impactScore,
-              intelligenceTier,
-              publishedAt,
-              personas,
-              methodologyPillars,
-              mainImage,
-              categories[]->{
-                _id,
-                title,
-                "slug": slug.current
-              }
-            }
-          `)}`
-        )
+        // Fetch from internal API route (avoids exposing Sanity credentials)
+        const response = await fetch('/api/briefings', {
+          signal: controller.signal,
+        })
         const data = await response.json()
         setArticles(data.result || [])
       } catch (error) {
-        console.error('Failed to fetch articles:', error)
+        if (error instanceof Error && error.name !== 'AbortError') {
+          console.error('Failed to fetch articles:', error)
+        }
       } finally {
         setLoading(false)
       }
     }
 
     fetchArticles()
+
+    // Cleanup: abort fetch on unmount
+    return () => controller.abort()
   }, [])
 
   // Filter articles by persona

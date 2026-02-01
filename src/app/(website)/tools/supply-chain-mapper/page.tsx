@@ -1,16 +1,12 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import {
-  ComposableMap,
-  Geographies,
-  Geography,
-  Marker,
-  Line,
-  ZoomableGroup,
-} from 'react-simple-maps'
+import Map, { Marker, Source, Layer, NavigationControl } from 'react-map-gl/maplibre'
+import type { FeatureCollection, Feature, LineString } from 'geojson'
+import type { LayerProps } from 'react-map-gl/maplibre'
+import 'maplibre-gl/dist/maplibre-gl.css'
 import { Tooltip } from 'react-tooltip'
 import { Header, Footer } from '@/components/layout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -33,9 +29,10 @@ import {
   type NodeType,
   type RiskLevel,
 } from '@/lib/supply-chain-data'
-import { AlertTriangle, ArrowRight, ArrowLeft, Network, ZoomIn, ZoomOut, RotateCcw, X } from 'lucide-react'
+import { AlertTriangle, ArrowRight, ArrowLeft, Network, X } from 'lucide-react'
 
-const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json"
+// Free dark map style from MapTiler (no API key required for limited use)
+const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
 
 export default function SupplyChainMapperPage() {
   const [selectedNode, setSelectedNode] = useState<SupplyChainNode | null>(null)
@@ -46,8 +43,6 @@ export default function SupplyChainMapperPage() {
     RISK_LEVEL_OPTIONS.map(opt => opt.value)
   )
   const [showConnections, setShowConnections] = useState(true)
-  const [zoom, setZoom] = useState(1)
-  const [center, setCenter] = useState<[number, number]>([20, 30])
 
   // Filter nodes based on active filters
   const filteredNodes = useMemo(() => {
@@ -88,34 +83,74 @@ export default function SupplyChainMapperPage() {
     return ids
   }, [selectedNode])
 
-  const handleToggleNodeType = (type: NodeType) => {
+  // Create GeoJSON for connection lines
+  const connectionsGeoJSON: FeatureCollection<LineString> = useMemo(() => {
+    const features: Feature<LineString>[] = []
+
+    for (const conn of visibleConnections) {
+      const fromNode = getNodeById(conn.from)
+      const toNode = getNodeById(conn.to)
+      if (!fromNode || !toNode) continue
+
+      const isHighlighted = highlightedConnections.has(`${conn.from}-${conn.to}`)
+
+      features.push({
+        type: 'Feature',
+        properties: {
+          id: `${conn.from}-${conn.to}`,
+          type: conn.type,
+          highlighted: isHighlighted,
+          color: CONNECTION_COLORS[conn.type],
+          opacity: selectedNode ? (isHighlighted ? 0.8 : 0.15) : 0.4,
+          width: isHighlighted ? 2 : 1,
+        },
+        geometry: {
+          type: 'LineString',
+          coordinates: [
+            fromNode.coordinates,
+            toNode.coordinates,
+          ],
+        },
+      })
+    }
+
+    return {
+      type: 'FeatureCollection',
+      features,
+    }
+  }, [visibleConnections, highlightedConnections, selectedNode])
+
+  const connectionLayerStyle: LayerProps = {
+    id: 'connections',
+    type: 'line',
+    paint: {
+      'line-color': ['get', 'color'],
+      'line-width': ['get', 'width'],
+      'line-opacity': ['get', 'opacity'],
+    },
+  }
+
+  const handleToggleNodeType = useCallback((type: NodeType) => {
     setActiveNodeTypes(prev =>
       prev.includes(type)
         ? prev.filter(t => t !== type)
         : [...prev, type]
     )
-  }
+  }, [])
 
-  const handleToggleRiskLevel = (level: RiskLevel) => {
+  const handleToggleRiskLevel = useCallback((level: RiskLevel) => {
     setActiveRiskLevels(prev =>
       prev.includes(level)
         ? prev.filter(l => l !== level)
         : [...prev, level]
     )
-  }
+  }, [])
 
-  const handleResetFilters = () => {
+  const handleResetFilters = useCallback(() => {
     setActiveNodeTypes(NODE_TYPE_OPTIONS.map(opt => opt.value))
     setActiveRiskLevels(RISK_LEVEL_OPTIONS.map(opt => opt.value))
     setShowConnections(true)
-  }
-
-  const handleZoomIn = () => setZoom(z => Math.min(z * 1.5, 8))
-  const handleZoomOut = () => setZoom(z => Math.max(z / 1.5, 1))
-  const handleResetView = () => {
-    setZoom(1)
-    setCenter([20, 30])
-  }
+  }, [])
 
   const upstreamNodes = selectedNode ? getUpstreamNodes(selectedNode.id) : []
   const downstreamNodes = selectedNode ? getDownstreamNodes(selectedNode.id) : []
@@ -157,153 +192,91 @@ export default function SupplyChainMapperPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Map Container */}
-            <div className="lg:col-span-2 bg-stone-charcoal/50 border border-border-subtle rounded-xl overflow-hidden relative h-[600px]">
-              <ComposableMap
-                projection="geoMercator"
-                projectionConfig={{
-                  scale: 140,
+            <div className="lg:col-span-2 bg-stone-charcoal/50 border border-border-subtle rounded-xl overflow-hidden relative h-[400px] md:h-[600px]">
+              <Map
+                initialViewState={{
+                  longitude: 20,
+                  latitude: 30,
+                  zoom: 1.5,
                 }}
-                className="w-full h-full"
+                style={{ width: '100%', height: '100%' }}
+                mapStyle={MAP_STYLE}
+                attributionControl={false}
               >
-                <ZoomableGroup
-                  zoom={zoom}
-                  center={center}
-                  onMoveEnd={({ coordinates, zoom: z }) => {
-                    setCenter(coordinates)
-                    setZoom(z)
-                  }}
-                >
-                  <Geographies geography={geoUrl}>
-                    {({ geographies }) =>
-                      geographies.map((geo) => (
-                        <Geography
-                          key={geo.rsmKey}
-                          geography={geo}
-                          fill="#334155"
-                          stroke="#1e293b"
-                          strokeWidth={0.5}
-                          style={{
-                            default: { outline: "none" },
-                            hover: { fill: "#475569", outline: "none" },
-                            pressed: { outline: "none" },
-                          }}
-                        />
-                      ))
-                    }
-                  </Geographies>
+                <NavigationControl position="top-right" />
 
-                  {/* Connection Lines */}
-                  {visibleConnections.map((conn) => {
-                    const fromNode = getNodeById(conn.from)
-                    const toNode = getNodeById(conn.to)
-                    if (!fromNode || !toNode) return null
+                {/* Connection Lines */}
+                <Source id="connections" type="geojson" data={connectionsGeoJSON}>
+                  <Layer {...connectionLayerStyle} />
+                </Source>
 
-                    const isHighlighted = highlightedConnections.has(`${conn.from}-${conn.to}`)
-                    const opacity = selectedNode
-                      ? isHighlighted ? 0.8 : 0.1
-                      : 0.3
+                {/* Node Markers */}
+                {filteredNodes.map((node) => {
+                  const isSelected = selectedNode?.id === node.id
+                  const isConnected = connectedNodeIds.has(node.id)
+                  const opacity = selectedNode
+                    ? (isSelected || isConnected) ? 1 : 0.3
+                    : 1
 
-                    return (
-                      <Line
-                        key={`${conn.from}-${conn.to}`}
-                        from={fromNode.coordinates}
-                        to={toNode.coordinates}
-                        stroke={CONNECTION_COLORS[conn.type]}
-                        strokeWidth={isHighlighted ? 2 : 1}
-                        strokeOpacity={opacity}
-                        strokeLinecap="round"
-                        style={{
-                          transition: 'all 0.3s ease',
-                        }}
-                      />
-                    )
-                  })}
-
-                  {/* Markers */}
-                  {filteredNodes.map((node) => {
-                    const isSelected = selectedNode?.id === node.id
-                    const isConnected = connectedNodeIds.has(node.id)
-                    const opacity = selectedNode
-                      ? (isSelected || isConnected) ? 1 : 0.3
-                      : 1
-
-                    return (
-                      <Marker
-                        key={node.id}
-                        coordinates={node.coordinates}
-                        onClick={() => setSelectedNode(node)}
-                        className="cursor-pointer"
+                  return (
+                    <Marker
+                      key={node.id}
+                      longitude={node.coordinates[0]}
+                      latitude={node.coordinates[1]}
+                      anchor="center"
+                      onClick={(e) => {
+                        e.originalEvent.stopPropagation()
+                        setSelectedNode(node)
+                      }}
+                    >
+                      <div
+                        className="cursor-pointer transition-all duration-300"
+                        style={{ opacity }}
+                        data-tooltip-id="map-tooltip"
+                        data-tooltip-content={`${node.name} (${node.type})`}
                       >
                         {/* Risk ring */}
-                        <circle
-                          r={isSelected ? 14 : 10}
-                          fill="transparent"
-                          stroke={RISK_COLORS[node.risk]}
-                          strokeWidth={2}
-                          opacity={opacity}
+                        <div
+                          className="absolute rounded-full transition-all duration-300"
                           style={{
-                            transition: 'all 0.3s ease',
+                            width: isSelected ? 28 : 20,
+                            height: isSelected ? 28 : 20,
+                            border: `2px solid ${RISK_COLORS[node.risk]}`,
+                            transform: 'translate(-50%, -50%)',
+                            left: '50%',
+                            top: '50%',
                           }}
                         />
                         {/* Node type fill */}
-                        <circle
-                          r={isSelected ? 10 : 7}
-                          fill={NODE_COLORS[node.type]}
-                          stroke="#fff"
-                          strokeWidth={1.5}
-                          opacity={opacity}
-                          data-tooltip-id="map-tooltip"
-                          data-tooltip-content={`${node.name} (${node.type})`}
+                        <div
+                          className="rounded-full border-2 border-white transition-all duration-300"
                           style={{
-                            transition: 'all 0.3s ease',
+                            width: isSelected ? 20 : 14,
+                            height: isSelected ? 20 : 14,
+                            backgroundColor: NODE_COLORS[node.type],
                           }}
                         />
                         {/* Selection indicator */}
                         {isSelected && (
-                          <circle
-                            r={18}
-                            fill="transparent"
-                            stroke="#fff"
-                            strokeWidth={1}
-                            strokeDasharray="4 2"
-                            className="animate-spin"
-                            style={{ animationDuration: '8s' }}
+                          <div
+                            className="absolute rounded-full border border-white animate-spin"
+                            style={{
+                              width: 36,
+                              height: 36,
+                              borderStyle: 'dashed',
+                              animationDuration: '8s',
+                              transform: 'translate(-50%, -50%)',
+                              left: '50%',
+                              top: '50%',
+                            }}
                           />
                         )}
-                      </Marker>
-                    )
-                  })}
-                </ZoomableGroup>
-              </ComposableMap>
+                      </div>
+                    </Marker>
+                  )
+                })}
+              </Map>
               <Tooltip id="map-tooltip" />
-
-              {/* Zoom Controls */}
-              <div className="absolute top-4 right-4 flex flex-col gap-2">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={handleZoomIn}
-                  className="bg-stone-charcoal/90 border-border-subtle h-8 w-8"
-                >
-                  <ZoomIn className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={handleZoomOut}
-                  className="bg-stone-charcoal/90 border-border-subtle h-8 w-8"
-                >
-                  <ZoomOut className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={handleResetView}
-                  className="bg-stone-charcoal/90 border-border-subtle h-8 w-8"
-                >
-                  <RotateCcw className="w-4 h-4" />
-                </Button>
-              </div>
 
               {/* Legend */}
               <div className="absolute bottom-4 left-4">

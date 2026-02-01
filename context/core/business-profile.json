@@ -1,0 +1,29 @@
+{
+  "positioning": {
+    "unique_angle": "Forensic technopolitics - deep analysis at the intersection of technology, policy, and geopolitics",
+    "your_methodology": "Combining 30 years of industry experience with rigorous analytical frameworks"
+  },
+  "content_focus": {
+    "content_pillars": {
+      "ai_governance": {
+        "description": "AI regulation, compliance, and policy analysis",
+        "categories": [
+          {"name": "AI Act", "slug": "ai-act", "focus": "EU AI regulation implementation"},
+          {"name": "Global AI Policy", "slug": "global-ai-policy", "focus": "International AI governance"}
+        ]
+      },
+      "supply_chains": {
+        "description": "Semiconductor supply chain analysis and risk assessment",
+        "categories": [
+          {"name": "Chip Geopolitics", "slug": "chip-geopolitics", "focus": "Semiconductor industry dynamics"},
+          {"name": "Chokepoints", "slug": "chokepoints", "focus": "Critical supply chain vulnerabilities"}
+        ]
+      }
+    },
+    "content_types": [
+      {"name": "Deep Dive", "purpose": "Comprehensive analysis of complex topics"},
+      {"name": "Signal", "purpose": "Quick takes on breaking developments"},
+      {"name": "Briefing", "purpose": "Regular updates on key areas"}
+    ]
+  }
+}

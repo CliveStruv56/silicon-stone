@@ -1,0 +1,16 @@
+{
+  "profile_overview": {
+    "name": "Silicon and Stone ICP",
+    "one_line_description": "Technology policy professionals and decision-makers"
+  },
+  "personas": {
+    "policy_analyst": {
+      "role": "Policy Analyst",
+      "organization_types": ["Government", "Think Tank", "Consulting Firm"],
+      "example": "EU Digital Policy Unit analyst tracking AI Act implementation",
+      "key_concerns": ["Regulatory compliance", "Technology trends", "Geopolitical implications"],
+      "content_needs": ["Deep analysis", "Timeline tracking", "Expert commentary"],
+      "pain_point": "Difficulty keeping up with rapid regulatory changes across jurisdictions"
+    }
+  }
+}

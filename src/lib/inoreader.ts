@@ -7,11 +7,23 @@ export interface InoreaderConfig {
     redirectUri: string;
 }
 
+/**
+ * Get the base URL for the application.
+ * Uses NEXT_PUBLIC_APP_URL in production, falls back to localhost in development.
+ */
+function getBaseUrl(): string {
+    if (process.env.NEXT_PUBLIC_APP_URL) {
+        return process.env.NEXT_PUBLIC_APP_URL;
+    }
+    // In development, use localhost
+    return 'http://localhost:3000';
+}
+
 export function getConfig(): InoreaderConfig {
     return {
         clientId: process.env.INOREADER_APP_ID || '',
         clientSecret: process.env.INOREADER_APP_KEY || '',
-        redirectUri: 'http://localhost:3000/api/auth/callback/inoreader'
+        redirectUri: `${getBaseUrl()}/api/auth/callback/inoreader`
     };
 }
 

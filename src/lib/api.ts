@@ -1,13 +1,44 @@
 import fs from 'fs/promises';
-import path from 'path';
+import nodePath from 'path';
 import { ICP, VoiceDNA, BusinessProfile } from '@/types/context';
 
 const ROOT = process.env.AI_WRITER_ROOT || process.cwd();
 
+// Allowed directories for file operations
+const ALLOWED_DIRECTORIES = [
+    'content',
+    'context',
+    'knowledge',
+];
+
+/**
+ * Validates that a path is safe and within allowed directories.
+ * Prevents directory traversal attacks.
+ */
+function validatePath(relativePath: string): void {
+    const normalizedPath = nodePath.normalize(relativePath);
+
+    // Check for path traversal attempts
+    if (normalizedPath.includes('..') || normalizedPath.startsWith('/') || normalizedPath.startsWith('\\')) {
+        throw new Error('Invalid path: Path traversal not allowed');
+    }
+
+    // Check if path starts with an allowed directory
+    const isAllowed = ALLOWED_DIRECTORIES.some(dir =>
+        normalizedPath.startsWith(dir + '/') ||
+        normalizedPath.startsWith(dir + '\\') ||
+        normalizedPath === dir
+    );
+
+    if (!isAllowed) {
+        throw new Error('Invalid path: Directory not allowed');
+    }
+}
+
 async function readJson<T>(relativePath: string): Promise<T> {
     // If we are in the web-platform dir, we need to go up if env var is not set correctly
     // But we assume AI_WRITER_ROOT is set to the project root.
-    const fullPath = path.join(ROOT, relativePath);
+    const fullPath = nodePath.join(ROOT, relativePath);
     try {
         const data = await fs.readFile(fullPath, 'utf-8');
         return JSON.parse(data) as T;
@@ -30,7 +61,7 @@ export async function getBusinessProfile(): Promise<BusinessProfile> {
 }
 
 export async function getContentFocus(): Promise<string> {
-    const fullPath = path.join(ROOT, 'knowledge/company/content-focus.md');
+    const fullPath = nodePath.join(ROOT, 'knowledge/company/content-focus.md');
     try {
         return await fs.readFile(fullPath, 'utf-8');
     } catch {
@@ -59,20 +90,20 @@ export async function listContentFiles(): Promise<ContentFile[]> {
     ];
 
     for (const d of dirs) {
-        const fullPath = path.join(ROOT, d.path);
+        const fullPath = nodePath.join(ROOT, d.path);
         try {
             const files = await fs.readdir(fullPath);
             for (const f of files) {
                 if (!f.endsWith('.md')) continue;
 
-                const stats = await fs.stat(path.join(fullPath, f));
+                const stats = await fs.stat(nodePath.join(fullPath, f));
                 // name format is typically YYYY-MM-DD-slug.md
                 // let's try to extract a pretty name
                 const cleanName = f.replace('.md', '').split('-').slice(3).join(' ') || f;
 
                 results.push({
                     name: cleanName,
-                    path: path.join(d.path, f),
+                    path: nodePath.join(d.path, f),
                     type: d.type,
                     date: stats.mtime.toISOString().split('T')[0],
                     excerpt: "Loading..." // In real app, read first few lines
@@ -88,7 +119,7 @@ export async function listContentFiles(): Promise<ContentFile[]> {
 }
 
 export async function saveICP(data: ICP): Promise<void> {
-    const fullPath = path.join(ROOT, 'context/core/icp.json');
+    const fullPath = nodePath.join(ROOT, 'context/core/icp.json');
     try {
         await fs.writeFile(fullPath, JSON.stringify(data, null, 2), 'utf-8');
     } catch {
@@ -97,7 +128,10 @@ export async function saveICP(data: ICP): Promise<void> {
 }
 
 export async function getContent(relativePath: string): Promise<string> {
-    const fullPath = path.join(ROOT, relativePath);
+    // Validate path to prevent directory traversal attacks
+    validatePath(relativePath);
+
+    const fullPath = nodePath.join(ROOT, relativePath);
     try {
         return await fs.readFile(fullPath, 'utf-8');
     } catch {
@@ -106,7 +140,10 @@ export async function getContent(relativePath: string): Promise<string> {
 }
 
 export async function saveContent(relativePath: string, content: string): Promise<void> {
-    const fullPath = path.join(ROOT, relativePath);
+    // Validate path to prevent directory traversal attacks
+    validatePath(relativePath);
+
+    const fullPath = nodePath.join(ROOT, relativePath);
     try {
         await fs.writeFile(fullPath, content, 'utf-8');
     } catch {
@@ -115,7 +152,10 @@ export async function saveContent(relativePath: string, content: string): Promis
 }
 
 export async function deleteLocalContent(relativePath: string): Promise<void> {
-    const fullPath = path.join(ROOT, relativePath);
+    // Validate path to prevent directory traversal attacks
+    validatePath(relativePath);
+
+    const fullPath = nodePath.join(ROOT, relativePath);
     try {
         await fs.unlink(fullPath);
     } catch {
