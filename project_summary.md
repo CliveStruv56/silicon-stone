@@ -1,48 +1,41 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-01-26
-> Status: **Working Application (Local Development)**
+> Last Updated: 2026-02-14
+> Status: **Working Application (Local Development) — Build Passing, 0 Vulnerabilities**
 
-**Current State**: Application fully functional with all 4 interactive tools complete. Services page added. Build passing. Ready for production deployment.
+**Current State**: All features functional. Research pipeline verified end-to-end (Inoreader + Exa + Claude). Public site navigation fixed. Ready for production deployment.
 
 ---
 
 ## Quick Context for New Sessions
 
-This is the **integrated AI-Writer-System + Silicon-and-Stone-Web platform** with Sanity CMS. The application is functional and running. This document provides continuity between Claude Code sessions.
+This is the **Silicon & Stone intelligence portal** — a Next.js 15 + Sanity CMS platform for "Forensic Technopolitics" analysis. It combines a public website, admin research/authoring tools, and an embedded CMS Studio.
+
+**Key facts:**
+- Build passes cleanly (`npm run build` — 31 pages, 0 errors)
+- 0 npm audit vulnerabilities
+- All API integrations verified working: Anthropic, Exa.ai, Inoreader, Sanity
+- Admin login: `studio123`
+- Inoreader connected as user `clive4`
+- Git repo: `github.com/CliveStruv56/silicon-stone`
 
 ---
 
-## 1. What We Have Built
-
-### System Architecture Overview
+## 1. System Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  AI-WRITER-SYSTEM (Root Directory)                               │
-│  Content creation context, voice profiles, research              │
-├─────────────────────────────────────────────────────────────────┤
-│  /context/core/          Context profiles (voice, ICP, business) │
-│  /knowledge/             Content library, research, company docs  │
-│  /content/substack/      Markdown articles for sync               │
-│  /.claude/skills/        Reusable content creation skills         │
-│  CLAUDE.md               AI co-writer system instructions         │
-└──────────────────────────┬──────────────────────────────────────┘
-                           │
-              npm run sync-content
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  WEB-PLATFORM (Next.js 15 + Sanity)                              │
+│  WEB-PLATFORM (Next.js 15.5.12 + Sanity 4.22.0)                │
 │  Public website + Admin dashboard + Embedded Studio              │
 ├─────────────────────────────────────────────────────────────────┤
-│  /src/app/(website)/     Public routes (analysis, tools, search) │
+│  /src/app/(website)/     Public routes (analysis, tools, etc.)   │
 │  /src/app/(admin)/       Protected admin routes (generate, etc.) │
 │  /src/app/(auth)/        Authentication routes (login)           │
 │  /src/app/studio/        Embedded Sanity Studio                  │
 │  /src/sanity/            Schema definitions, queries, client      │
-│  /scripts/               sync-content.ts, seed scripts            │
+│  /context/core/          Voice DNA, ICP, business profile         │
+│  /scripts/               sync-content.ts                         │
 └──────────────────────────┬──────────────────────────────────────┘
                            │
                    GROQ queries
@@ -52,7 +45,7 @@ This is the **integrated AI-Writer-System + Silicon-and-Stone-Web platform** wit
 │  SANITY CMS (Cloud)                                              │
 │  Project ID: 3q59mpd7 | Dataset: production                      │
 ├─────────────────────────────────────────────────────────────────┤
-│  Articles, Authors, Categories, Personas                         │
+│  Articles, Authors, Categories, Personas, Site Settings           │
 │  Portable Text content, Images on CDN                            │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -61,81 +54,148 @@ This is the **integrated AI-Writer-System + Silicon-and-Stone-Web platform** wit
 
 | Layer | Technology | Version |
 |-------|------------|---------|
-| Framework | Next.js (App Router) | 15.5.9 |
+| Framework | Next.js (App Router) | 15.5.12 |
 | UI | React + Tailwind CSS + Shadcn/Radix | React 19.2.3, Tailwind 4 |
 | CMS | Sanity (Headless) | 4.22.0 |
 | Frontend Client | next-sanity | 11.6.12 |
 | AI | Anthropic Claude SDK | 0.71.2 |
-| Search | Exa.js | 2.1.1 |
-| Feed Aggregation | Inoreader API | - |
+| Web Search | Exa.js | 2.2.0 |
+| Feed Aggregation | Inoreader API (OAuth2) | - |
 | Animation | Framer Motion | 12.27.2 |
-| Maps | react-simple-maps | 3.0.0 |
-| Charts | d3-scale | - |
+| Maps | MapLibre GL + react-map-gl | 5.17.0 / 8.1.0 |
+| Charts | d3-scale | 4.0.2 |
 
-### Key Integrations Completed
+### Upgrade Constraints
 
-1. **Content Sync Pipeline** (`scripts/sync-content.ts`)
-   - Markdown → Portable Text conversion
-   - Hash-based change detection (MD5)
-   - Image upload to Sanity CDN
-   - Dry-run and force modes
-
-2. **AI Content Generation** (`/generate` route)
-   - Claude 3.7 Sonnet integration
-   - Persona-aware prompt building
-   - Direct Sanity draft creation
-
-3. **Research Aggregation** (`/research` route)
-   - Inoreader feed integration
-   - Exa.ai neural web search
-   - Claude synthesis of sources
-
-4. **Embedded Sanity Studio** (`/studio` route)
-   - Full CMS editing capabilities
-   - Custom schema for articles, authors, categories, personas
-
-5. **Interactive Tools Suite** (4 tools complete)
-   - EU AI Act Compliance Checker
-   - Supply Chain Mapper
-   - Scenario Modeler
-   - Policy Stress-Test
+Sanity v5 (5.9.0), next-sanity v12, and @sanity/vision v5 are available but **cannot be upgraded yet**:
+- Sanity v5 requires React `useEffectEvent` which isn't available in Next.js 15's React bundle
+- next-sanity v12 requires Next.js 16 (`^16.0.0-0`) which is not yet stable
+- **Upgrade path**: Wait for Next.js 16 stable → upgrade all Sanity packages together
 
 ---
 
-## 2. What We Have Decided
+## 2. Research Pipeline (Verified Working)
 
-### Content Strategy
+The research pipeline is the core content creation engine:
+
+```
+User Query (e.g. "EU AI Act enforcement August 2026")
+       │
+       ├─ Step 1: Inoreader search (if connected)
+       │   └─ Searches user's reading list, returns up to 20 items
+       │
+       ├─ Step 2: Exa.AI web search (with mock fallback)
+       │   └─ Broader web results to supplement feeds
+       │
+       └─ Step 3: Claude synthesis
+           └─ Produces: forensic summary, cited sources,
+              suggested keywords, persona pain points
+               │
+               └─ "Create Draft" → Claude generates full Signal article
+                   └─ Creates unpublished draft in Sanity CMS
+```
+
+**Inoreader OAuth**: App ID `1000008617`, redirect URI `http://localhost:3000/api/auth/callback/inoreader`. Connected as `clive4`. Tokens stored in httpOnly cookies.
+
+**Key files:**
+- `src/lib/inoreader.ts` — OAuth config, API client
+- `src/lib/research.ts` — Research pipeline orchestration
+- `src/app/(admin)/research/actions.ts` — Draft creation from research
+- `src/app/api/auth/callback/inoreader/route.ts` — OAuth callback
+
+---
+
+## 3. Application Routes
+
+### Public Website (`(website)` group)
+
+| Route | Status | Description |
+|-------|--------|-------------|
+| `/` | ✅ | Landing page with hero, Intelligence Stream, tools grid, deadline countdown, subscribe CTA |
+| `/briefings` | ✅ | Intelligence portal with persona filtering, tiered display (Pulse/Briefing/Audit), impact scores |
+| `/analysis` | ✅ | Article listing with category sidebar |
+| `/analysis/[slug]` | ✅ | Individual article pages |
+| `/analysis/category/[slug]` | ✅ | Category-filtered articles |
+| `/methodology` | ✅ | Four Analytical Lenses with practice details and questions |
+| `/services` | ✅ | Advisory services, assessment offerings, contact form (`#contact` anchor) |
+| `/about` | ✅ | Credentials, principles, focus areas (`#edge`, `#long-view` anchors) |
+| `/search` | ✅ | Full-text article search |
+| `/tools` | ✅ | Interactive tools hub |
+| `/tools/compliance-checker` | ✅ | EU AI Act risk classification |
+| `/tools/supply-chain-mapper` | ✅ | Semiconductor supply chain visualization |
+| `/tools/scenario-modeler` | ✅ | Geopolitical scenario comparison |
+| `/tools/policy-stress-test` | ✅ | US vs EU regulatory friction scoring |
+
+**Navigation**: Analysis, Briefings (cyan highlight), Tools, Methodology, Services, About, Search icon, Subscribe button (→ `/#subscribe`)
+
+### Admin Routes (`(admin)` group) — Password: `studio123`
+
+| Route | Status | Description |
+|-------|--------|-------------|
+| `/admin` | ✅ | Dashboard with mission status, voice DNA, personas |
+| `/generate` | ✅ | AI content generation with Claude |
+| `/research` | ✅ | Research pipeline (Inoreader + Exa + Claude) |
+| `/context` | ✅ | View context profiles |
+| `/context/edit` | ✅ | Edit voice DNA, ICP, business profile |
+| `/content` | ✅ | Content sync management |
+| `/editor` | ✅ | Raw article editor |
+
+### API Routes
+
+| Route | Description |
+|-------|-------------|
+| `/api/categories` | GET categories from Sanity |
+| `/api/briefings` | GET articles for briefings page |
+| `/api/revalidate` | Webhook for Sanity revalidation |
+| `/api/auth/callback/inoreader` | OAuth callback for Inoreader |
+
+---
+
+## 4. Environment Configuration
+
+### Required `.env.local` Variables
+
+```env
+# Sanity
+NEXT_PUBLIC_SANITY_PROJECT_ID=3q59mpd7
+NEXT_PUBLIC_SANITY_DATASET=production
+SANITY_API_WRITE_TOKEN=<token>
+SANITY_API_READ_TOKEN=<token>
+
+# AI & Search
+ANTHROPIC_API_KEY=<key>        # ✅ Working
+EXA_API_KEY=<key>              # ✅ Working
+
+# Feed Integration
+INOREADER_APP_ID=1000008617    # ✅ Working (connected as clive4)
+INOREADER_APP_KEY=<key>
+
+# Admin Auth
+ADMIN_PASSWORD=studio123
+```
+
+All API integrations verified working as of 2026-02-14.
+
+---
+
+## 5. Content Strategy
 
 | Decision | Details |
 |----------|---------|
-| **Mission** | Forensic Technopolitics—cutting through complexity for decision-makers |
+| **Mission** | Forensic Technopolitics — cutting through complexity for decision-makers |
 | **Tagline** | "The Long View from the Edge" |
-| **Voice** | The Sage from the Edge—authoritative, clinical, grounded, dry-witted |
-| **Target** | European decision-makers (5 personas defined) |
+| **Voice** | The Sage from the Edge — authoritative, clinical, grounded, dry-witted |
+| **Target** | European decision-makers (5 personas) |
 
 ### Content Types
 
 | Type | Length | Purpose |
 |------|--------|---------|
-| **Signal** | 800-1,500 words | Breaking analysis, 24-72 hour turnaround |
-| **Deep Dive** | 3,000-6,000 words | Comprehensive long-form analysis |
+| **Signal** | 800-1,500 words | Breaking analysis, 24-72h turnaround |
+| **Deep Dive** | 3,000-6,000 words | Comprehensive forensic report |
 | **Tool Guide** | 500-2,000 words | Instructions for interactive tools |
 
-### Content Pillars
-
-**Regional Technopolitics:**
-- Atlantic Drift (US-EU divergence)
-- US Technopolitics (CHIPS Act, export controls)
-- European Sovereignty (AI Act, GDPR, DMA)
-- Asian Innovation (Taiwan, China, Japan/Korea)
-
-**Thematic Deep Dives:**
-- AI Act & Compliance
-- Semiconductor Supply Chains
-- Digital Sovereignty
-- Edge Economy
-
-### Persona Tags for Content
+### Personas
 
 | Persona | Slug | Role |
 |---------|------|------|
@@ -145,283 +205,67 @@ This is the **integrated AI-Writer-System + Silicon-and-Stone-Web platform** wit
 | Remote Robert | `robert` | Regional development strategists |
 | Global Citizen | `citizen` | Informed general public |
 
-### Design Decisions
+---
 
-- **Theme**: Dark-mode-first with `slate-deep` background
-- **Accent Colors**: `silicon-amber`, `stone-teal`, `alert-red`
-- **Layout**: Bento Grid for home, structured cards for articles
-- **Icons**: Lucide React
-- **Typography**: Clean, professional, scannable
+## 6. Key File Locations
+
+| Purpose | Path |
+|---------|------|
+| Root layout | `src/app/layout.tsx` |
+| Website layout | `src/app/(website)/layout.tsx` |
+| Home page | `src/app/(website)/page.tsx` |
+| Header (nav) | `src/components/layout/Header.tsx` |
+| Footer | `src/components/layout/Footer.tsx` |
+| Article page | `src/app/(website)/analysis/[slug]/page.tsx` |
+| Briefings page | `src/app/(website)/briefings/page.tsx` |
+| Services page | `src/app/(website)/services/page.tsx` |
+| Tool pages | `src/app/(website)/tools/*/page.tsx` |
+| Tool data | `src/lib/*-data.ts` |
+| Admin routes | `src/app/(admin)/*/` |
+| Inoreader client | `src/lib/inoreader.ts` |
+| Research pipeline | `src/lib/research.ts` |
+| AI prompts | `src/lib/prompts.ts` |
+| Sanity schemas | `src/sanity/schemaTypes/` |
+| Sanity queries | `src/sanity/lib/queries.ts` |
+| Content sync | `scripts/sync-content.ts` |
+| Middleware (auth) | `src/middleware.ts` |
+| Context profiles | `context/core/` |
+| Business overview | `business-overview.json` |
+| Favicon | `src/app/icon.svg` |
 
 ---
 
-## 3. Application Routes & Features
+## 7. Recent Changes (Feb 2026 Session)
 
-### Public Website (`(website)` group)
-
-| Route | Status | Description |
-|-------|--------|-------------|
-| `/` | ✅ Complete | Landing page with hero, featured articles, tools grid, deadline countdown |
-| `/analysis` | ✅ Complete | Article listing hub |
-| `/analysis/[slug]` | ✅ Complete | Individual article pages |
-| `/analysis/category/[slug]` | ✅ Complete | Category-filtered articles |
-| `/methodology` | ✅ Complete | Platform methodology explanation (4 analytical lenses) |
-| `/about` | ✅ Complete | About page with credentials, principles, focus areas |
-| `/services` | ✅ Complete | Strategic advisory services with assessment offerings and contact form |
-| `/search` | ✅ Complete | Full-text article search with debounced input |
-| `/tools` | ✅ Complete | Interactive tools hub |
-| `/tools/compliance-checker` | ✅ Complete | EU AI Act risk classification with industry-specific paths |
-| `/tools/supply-chain-mapper` | ✅ Complete | 20+ node semiconductor supply chain visualization with filters |
-| `/tools/scenario-modeler` | ✅ Complete | Geopolitical scenario comparison with impact metrics |
-| `/tools/policy-stress-test` | ✅ Complete | US vs EU regulatory comparison with friction scoring |
-
-### Admin Routes (`(admin)` group) - Password Protected
-
-| Route | Status | Description |
-|-------|--------|-------------|
-| `/admin` | ✅ Complete | Admin dashboard |
-| `/generate` | ✅ Complete | AI content generation with Claude |
-| `/research` | ✅ Complete | Research aggregation (Inoreader + Exa) |
-| `/context` | ✅ Complete | View context profiles |
-| `/context/edit` | ✅ Complete | Edit voice DNA, ICP, business profile |
-| `/content` | ✅ Complete | Content sync management |
-| `/editor` | ✅ Complete | Raw article editor |
-
-### Auth Routes (`(auth)` group)
-
-| Route | Status | Description |
-|-------|--------|-------------|
-| `/login` | ✅ Complete | Admin login page |
-
-### Studio Route
-
-| Route | Status | Description |
-|-------|--------|-------------|
-| `/studio` | ✅ Complete | Embedded Sanity Studio for CMS |
-
-### API Routes
-
-| Route | Status | Description |
-|-------|--------|-------------|
-| `/api/categories` | ✅ Complete | GET categories from Sanity |
-| `/api/revalidate` | ✅ Complete | Webhook endpoint for Sanity revalidation |
+| Commit | Description |
+|--------|-------------|
+| `2d2b73b` | Add Services to nav, connect Subscribe button, fix footer dead links, add SVG favicon |
+| `96f5cbf` | Suppress hydration warnings from browser extensions (html/body suppressHydrationWarning) |
+| `1e255f0` | Resolve all npm audit vulnerabilities via lockfile update (0 remaining) |
+| `95ae71a` | Fix high severity brace-expansion and moderate markdown-it vulnerabilities |
+| `64f0669` | Update Next.js 15.5.9 → 15.5.12 to resolve @next/swc version mismatch |
+| `c54fbd5` | Add authoring guide, agent skills, debug log, intelligence-stream-bg image |
+| `3981e1b` | Populate business-overview.json, fix dotenv in sync script, clean up homepage |
 
 ---
 
-## 4. Interactive Tools (Fully Implemented)
+## 8. Known Issues / Technical Debt
 
-### Compliance Checker (`/tools/compliance-checker`)
-
-**Features:**
-- Industry-specific question paths (Automotive, Fintech, Healthcare, Manufacturing, General)
-- Multi-step decision tree with 15+ questions
-- Risk tier outcomes: Unacceptable, High, Limited, Minimal
-- Detailed results with:
-  - Key deadlines (August 2, 2026 prominently featured)
-  - Compliance checklists by category
-  - Prioritized next steps (Immediate/30-days/90-days)
-  - Documentation estimates
-
-**Data file:** `src/lib/compliance-data.ts`
-
-### Supply Chain Mapper (`/tools/supply-chain-mapper`)
-
-**Features:**
-- 20+ nodes across categories: Fabs, Materials, Equipment, Design
-- Interactive world map with react-simple-maps
-- ZoomableGroup for pan/zoom functionality
-- Filter panel (MapFilters component):
-  - Filter by node type
-  - Filter by risk level (High/Medium/Low)
-  - Toggle connection visibility
-- Curved connection lines showing supply relationships
-- Risk-based color coding (amber/teal/red)
-- Detailed tooltips with node information
-
-**Data file:** `src/lib/supply-chain-data.ts`
-**Component:** `src/components/tools/MapFilters.tsx`
-
-### Scenario Modeler (`/tools/scenario-modeler`)
-
-**Features:**
-- 5 geopolitical scenarios:
-  1. Taiwan Strait Disruption (High friction)
-  2. US Export Control Expansion (Medium friction)
-  3. EU Strategic Autonomy Acceleration (Low friction)
-  4. AI Act Full Enforcement (Medium friction)
-  5. Atlantic Tech Bifurcation (High friction)
-- Scenario details panel with trigger events and timeframes
-- Impact chart showing Value at Stake by sector
-- Cascade effects flow diagram (Primary → Secondary → Tertiary)
-- Animated transitions with Framer Motion
-
-**Data file:** `src/lib/scenario-data.ts`
-**Types:** `src/types/scenario.ts`
-
-### Policy Stress-Test (`/tools/policy-stress-test`)
-
-**Features:**
-- 6 policies analyzed:
-  - EU: AI Act, Chips Act, GDPR, Digital Markets Act
-  - US: Semiconductor Export Controls, CHIPS and Science Act
-- Industry context selection (8 industries)
-- Combined friction score calculation (0-10 scale)
-- Side-by-side US vs EU comparison
-- Prioritized action recommendations with timelines
-- Key requirements breakdown by jurisdiction
-
-**Data file:** `src/lib/policy-data.ts`
-**Types:** `src/types/policy.ts`
+| Issue | Notes | Priority |
+|-------|-------|----------|
+| Contact form needs backend | Services page form is client-side only | Medium |
+| Subscribe form needs backend | SubscribeCTA is a placeholder (no ConvertKit/Buttondown) | Medium |
+| Privacy & Terms pages missing | Removed from footer; need real legal content before adding back | Medium |
+| Article cards lack images | Most articles in Intelligence Stream show no cover images | Medium |
+| About page has placeholder content | "Selected Coverage & Speaking" section has fake logos (WIRED, FT, etc.) | Low |
+| ICP only has 1 persona in context | `icp.json` only defines policy_analyst; other 4 are in Sanity schema only | Low |
+| No automated tests | Test suite not yet implemented | Low |
+| No CI/CD pipeline | Manual deployment currently | Low |
+| 2 ESLint warnings | Unused `_prevState`, `_formData` in `content/actions.ts` | Cosmetic |
 
 ---
 
-## 5. Services Page (`/services`)
-
-### Four Analytical Frameworks
-1. Supply Chain Forensics
-2. Comparative Policy Stress-Testing
-3. Scenario-Based Drift Modeling
-4. Experience-Led Signal Filtering
-
-### Assessment Offerings
-- AI Act Readiness Assessment
-- Supply Chain Exposure Report
-- Scenario Impact Analysis
-- Regulatory Friction Assessment
-
-### Engagement Tiers
-- Advisory Briefing (consultation)
-- Focused Assessment (single-framework report)
-- Strategic Assessment (multi-framework enterprise package)
-
-### Contact Form
-- Name, Email, Company fields
-- Interest area selection
-- Message textarea
-- Client-side form handling (ready for backend integration)
-
----
-
-## 6. Context Profiles (Fully Configured)
-
-All context profiles in `/context/core/` are complete and integrated:
-
-| Profile | Path | Status |
-|---------|------|--------|
-| Voice DNA | `voice-dna.json` | ✅ Complete—tone, style, phrases, boundaries defined |
-| ICP | `icp.json` | ✅ Complete—5 personas with pain points, needs, language |
-| Business Profile | `business-profile.json` | ✅ Complete—positioning, methodology, content pillars |
-
-### Company Documentation (`/knowledge/company/`)
-
-| Document | Status |
-|----------|--------|
-| `elevator-pitch.md` | ✅ Complete—pitch variations, Silicon/Stone dichotomy |
-| `content-focus.md` | ✅ Complete—pillars, personas, content types |
-| `foundation-for-the-channel.md` | ✅ Complete—strategic foundation |
-| `style-guide.md` | ✅ Complete—voice matrix, formatting, quality checklist |
-
----
-
-## 7. Sanity CMS Schema
-
-### Document Types
-
-| Type | Fields |
-|------|--------|
-| **article** | title, slug, author (ref), personas[], contentType (signal/deepdive/guide), body (Portable Text), categories[], mainImage, metaTitle, metaDescription, publishedAt |
-| **author** | name, slug, bio, role, image |
-| **category** | title, slug, description |
-| **persona** | name, role, slug, painPoints, contentNeeds, organizationTypes, keyConcerns |
-| **siteSettings** | heroImage, heroTitle, heroDescription |
-
-### Site Settings (Singleton)
-
-The Site Settings document type provides global configuration for the homepage hero section. Access via Sanity Studio at `/studio`.
-
-| Field | Purpose |
-|-------|---------|
-| **Hero Image** | Background image for homepage hero (displays with overlay effect) |
-| **Hero Title** | Override default "Forensic analysis..." headline |
-| **Hero Description** | Override default subheadline description |
-
-**Behavior:**
-- If an image is uploaded, it displays behind the hero text with a blend overlay effect
-- If text fields are provided, they replace the hardcoded default text
-- If nothing is set, the site displays the original defaults (safe fallback)
-
-### Key Queries Defined (`src/sanity/lib/queries.ts`)
-
-- `ARTICLES_QUERY` - Recent 10 articles
-- `FEATURED_ARTICLES_QUERY` - Top 7 articles
-- `ARTICLE_QUERY` - Single article by slug
-- `ARTICLES_BY_CATEGORY_QUERY` - Category filtering
-- `SEARCH_ARTICLES_QUERY` - Full-text search
-- `SITE_SETTINGS_QUERY` - Homepage hero settings (singleton)
-- `CATEGORIES_QUERY`, `AUTHOR_QUERY`
-
----
-
-## 8. Content Workflow
-
-### Option A: Markdown Sync (Primary)
-
-```bash
-# Write markdown in /content/substack/
-# Then sync to Sanity:
-npm run sync-content          # Normal sync
-npm run sync-content:dry      # Preview changes
-npm run sync-content:force    # Force overwrite
-```
-
-### Option B: AI-Assisted Generation
-
-1. Navigate to `/generate`
-2. Select topic, persona, content type
-3. Claude generates markdown with context from profiles
-4. Auto-creates Sanity draft
-5. Review & publish in Studio
-
-### Option C: Direct Studio Editing
-
-1. Navigate to `/studio`
-2. Create/edit articles directly in Sanity CMS
-3. Publish when ready
-
----
-
-## 9. Environment Configuration
-
-### Required `.env.local` Variables
-
-```env
-# Sanity
-NEXT_PUBLIC_SANITY_PROJECT_ID=3q59mpd7
-NEXT_PUBLIC_SANITY_DATASET=production
-NEXT_PUBLIC_SANITY_API_VERSION=2026-01-13
-SANITY_API_WRITE_TOKEN=<token>
-SANITY_API_READ_TOKEN=<token>
-SANITY_REVALIDATE_SECRET=<secret>
-
-# AI & Search
-ANTHROPIC_API_KEY=<key>        # ✅ Configured
-EXA_API_KEY=<key>              # ⚠️ Status unknown
-
-# Feed Integration
-INOREADER_API_KEY=<key>        # ✅ Configured
-
-# Admin Auth
-ADMIN_PASSWORD=<password>
-
-# Project Root (for context files)
-AI_WRITER_ROOT=/path/to/AI-Writer-System
-```
-
-**Note**: Anthropic and Inoreader APIs are confirmed working. Exa API key status uncertain.
-
----
-
-## 10. What's Next (Current Priorities)
+## 9. What's Next (Current Priorities)
 
 ### Priority 1: Deploy to Production
 
@@ -430,6 +274,7 @@ AI_WRITER_ROOT=/path/to/AI-Writer-System
 | **Deploy to Vercel** | Next.js optimized hosting |
 | **Configure Domain** | Set up custom domain |
 | **Environment Variables** | Configure production env vars |
+| **Update Inoreader redirect URI** | Change from localhost to production URL |
 | **Publish Content** | Move draft articles to published state |
 
 ### Priority 2: Backend Integration
@@ -437,47 +282,47 @@ AI_WRITER_ROOT=/path/to/AI-Writer-System
 | Task | Description |
 |------|-------------|
 | **Contact Form Backend** | Connect services page form to email/CRM |
-| **Newsletter Integration** | Add email subscription functionality |
+| **Newsletter Integration** | Connect SubscribeCTA to ConvertKit/Buttondown |
 | **Analytics** | Privacy-friendly analytics (Plausible, Fathom) |
 
 ### Priority 3: Content & Assets
 
 | Task | Description |
 |------|-------------|
-| **Hero/Banner Images** | Replace placeholder images with branded visuals |
+| **Article Cover Images** | Add images to existing articles |
 | **OG Images** | Create Open Graph images for social sharing |
-| **Tool Illustrations** | Add visual assets for interactive tools |
-| **Initial Content** | Publish first batch of analysis articles |
+| **Privacy & Terms Pages** | Create legal pages and restore footer links |
+| **Remove Placeholder Logos** | About page "Selected Coverage" section |
+| **Complete ICP Personas** | Add remaining 4 personas to `context/core/icp.json` |
 
 ### Future Enhancements
 
 | Task | Description |
 |------|-------------|
+| **Sanity v5 Upgrade** | When Next.js 16 is stable (all packages together) |
 | **Advanced Search** | Faceted search with filters |
 | **User Accounts** | Client login for premium content |
-| **API Access** | Tool data via API endpoints |
 | **Automated Tests** | Test suite implementation |
 | **CI/CD Pipeline** | Automated deployment |
 
 ---
 
-## 11. Development Commands
+## 10. Development Commands
 
 ```bash
-# Navigate to web-platform
-cd web-platform
-
 # Development
 npm run dev              # Start dev server on localhost:3000
 
 # Production
-npm run build            # Build for production
+npm run build            # Build for production (verify: 31 pages, 0 errors)
 npm start                # Start production server
 
 # Content Sync
 npm run sync-content     # Sync markdown to Sanity
 npm run sync-content:dry # Preview sync changes
-npm run sync-content:force # Force re-sync all
+
+# Audit
+npm audit                # Should show 0 vulnerabilities
 
 # Linting
 npm run lint             # Run ESLint
@@ -485,79 +330,25 @@ npm run lint             # Run ESLint
 
 ---
 
-## 12. Key File Locations
-
-| Purpose | Path |
-|---------|------|
-| Main layout | `src/app/(website)/layout.tsx` |
-| Home page | `src/app/(website)/page.tsx` |
-| Article page | `src/app/(website)/analysis/[slug]/page.tsx` |
-| Services page | `src/app/(website)/services/page.tsx` |
-| Tool pages | `src/app/(website)/tools/*/page.tsx` |
-| Tool data | `src/lib/*-data.ts` |
-| Admin routes | `src/app/(admin)/*/` |
-| Sanity schemas | `src/sanity/schemaTypes/` |
-| Sanity queries | `src/sanity/lib/queries.ts` |
-| Content sync script | `scripts/sync-content.ts` |
-| AI prompts | `src/lib/prompts.ts` |
-| Server actions | `src/app/actions.ts` |
-| Middleware (auth) | `src/middleware.ts` |
-| Context profiles | `/context/core/` (root) |
-| Company docs | `/knowledge/company/` (root) |
-| Type definitions | `src/types/` |
-
----
-
-## 13. Recent Changes (Session History)
-
-| Date | Commit | Description |
-|------|--------|-------------|
-| 2026-01-26 | - | Add Site Settings singleton for homepage hero customization (image, title, description) |
-| 2026-01-26 | `5015f9f` | Fix build errors with type fixes and unescaped entities |
-| 2026-01-25 | `eb28a49` | Add services page and connect tool CTAs |
-| 2026-01-25 | `c7f7b9b` | Complete interactive tools section with 4 enhanced tools |
-| 2026-01-24 | `636ecc7` | Implement interactive tools, search, and regional hubs |
-| 2026-01-24 | `5dc9b42` | Audience expansion, Sanity personas, and Business Overview alignment |
-
----
-
-## 14. Known Issues / Technical Debt
-
-| Issue | Notes | Priority |
-|-------|-------|----------|
-| Contact form needs backend | Currently client-side only | Medium |
-| Exa API status unknown | May need verification/replacement | Low |
-| No automated tests | Test suite not yet implemented | Low |
-| No CI/CD pipeline | Manual deployment currently | Low |
-| Unused variable warnings | `_prevState`, `_formData` in content/actions.ts | Cosmetic |
-
----
-
-## 15. Session Continuity Notes
+## 11. Session Continuity Checklist
 
 When starting a new Claude Code session:
 
 1. **Read this document first** for full context
-2. **The app is working**—build passes, all tools functional
-3. **Context profiles are complete**—reference them for any content creation
-4. **Skills are available**—check `.claude/skills/` for content type instructions
-5. **Sanity is the source of truth**—published content lives there
-6. **All 4 tools are complete**—no more "Coming Soon" badges
+2. **The app builds cleanly** — `npm run build` should produce 31 pages, 0 errors
+3. **0 npm vulnerabilities** — `npm audit` should show 0
+4. **All APIs are working** — Anthropic, Exa, Inoreader, Sanity
+5. **Admin password** is `studio123`
+6. **Inoreader** is connected as `clive4` (tokens in cookies, may need re-auth)
+7. **Do NOT upgrade Sanity to v5** until Next.js 16 is stable
+8. **Git is clean** — all work committed and pushed to `origin/main`
 
-### Quick Commands to Verify State
+### Quick Verification
 
 ```bash
-# Check if dev server runs
-cd web-platform && npm run dev
-
-# Check build passes
-npm run build
-
-# Check Sanity connection
-# Visit http://localhost:3000/studio
-
-# Check content sync
-npm run sync-content:dry
+npm run build            # Should pass with 31 pages
+npm audit                # Should show 0 vulnerabilities
+npm run dev              # Start dev server, visit localhost:3000
 ```
 
 ---
