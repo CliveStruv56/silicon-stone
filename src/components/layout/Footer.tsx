@@ -17,11 +17,10 @@ const footerNavigation = {
     { name: 'About', href: '/about' },
     { name: 'Why the Edge', href: '/about#edge' },
     { name: 'The Long View', href: '/about#long-view' },
-    { name: 'Contact', href: '/contact' },
+    { name: 'Services', href: '/services' },
   ],
   legal: [
-    { name: 'Privacy', href: '/privacy' },
-    { name: 'Terms', href: '/terms' },
+    { name: 'Contact', href: '/services#contact' },
   ],
 }
 

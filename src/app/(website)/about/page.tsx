@@ -98,7 +98,7 @@ export default function AboutPage() {
         </section>
 
         {/* Why the Edge */}
-        <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+        <section id="edge" className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
           <div className="max-w-3xl">
             <h2 className="text-2xl font-semibold text-text-primary mb-6">
               Why the Edge?
@@ -128,7 +128,7 @@ export default function AboutPage() {
         <Separator className="mx-auto max-w-7xl bg-border-subtle" />
 
         {/* The Long View - Timeline */}
-        <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+        <section id="long-view" className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
           <h2 className="text-2xl font-semibold text-text-primary mb-8">
             The Long View: 30 Years of Perspective
           </h2>

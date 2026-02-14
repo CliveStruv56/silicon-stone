@@ -43,6 +43,10 @@ const staticNavigation = [
     href: '/methodology',
   },
   {
+    name: 'Services',
+    href: '/services',
+  },
+  {
     name: 'About',
     href: '/about',
   },
@@ -171,9 +175,11 @@ export function Header() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </Link>
-          <Button variant="default" className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90">
-            Subscribe
-          </Button>
+          <Link href="/#subscribe">
+            <Button variant="default" className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90">
+              Subscribe
+            </Button>
+          </Link>
         </div>
       </nav>
 
@@ -214,9 +220,11 @@ export function Header() {
               Search
             </Link>
             <div className="pt-4">
-              <Button variant="default" className="w-full bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90">
-                Subscribe
-              </Button>
+              <Link href="/#subscribe" onClick={() => setMobileMenuOpen(false)}>
+                <Button variant="default" className="w-full bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90">
+                  Subscribe
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

@@ -21,7 +21,7 @@ export function SubscribeCTA() {
   }
 
   return (
-    <Card className="bg-gradient-to-br from-stone-charcoal to-slate-deep border-silicon-amber/30">
+    <Card id="subscribe" className="bg-gradient-to-br from-stone-charcoal to-slate-deep border-silicon-amber/30">
       <CardHeader>
         <CardTitle className="text-lg font-semibold text-text-primary">
           Get the Signal
