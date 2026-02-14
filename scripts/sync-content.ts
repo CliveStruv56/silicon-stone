@@ -14,6 +14,10 @@ import { createClient } from '@sanity/client'
 import * as fs from 'fs'
 import * as path from 'path'
 import * as crypto from 'crypto'
+import * as dotenv from 'dotenv'
+
+// Load environment variables from .env.local
+dotenv.config({ path: path.join(process.cwd(), '.env.local') })
 
 // Configuration
 const AI_WRITER_CONTENT_PATH = process.env.AI_WRITER_CONTENT_PATH || path.join(process.cwd(), '../content/substack')

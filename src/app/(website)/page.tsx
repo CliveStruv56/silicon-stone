@@ -75,7 +75,6 @@ export default async function Home() {
         </section>
 
         {/* Strategies & Analysis */}
-        {/* Strategies & Analysis */}
         <section className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-2xl font-bold text-text-primary tracking-tight">Intelligence Stream</h2>
@@ -97,7 +96,12 @@ export default async function Home() {
                       className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                     />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-surface-elevated to-stone-charcoal" />
+                    <Image
+                      src="/intelligence-stream-bg.png"
+                      alt="Intelligence Stream - Forensic Technopolitics"
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out opacity-90"
+                    />
                   )}
                   {/* Scanline overlay for featured */}
                   <div className="scanlines absolute inset-0 opacity-10 pointer-events-none" />

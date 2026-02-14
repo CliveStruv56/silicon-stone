@@ -1,0 +1,70 @@
+{
+  "_instructions": "Fill this out to document what you offer and how you're positioned. AI uses this for CTAs and accurate mentions of your business.",
+
+  "overview": {
+    "_instructions": "The big picture of what you do.",
+    "business_name": "Silicon and Stone",
+    "what_you_do": "Essentially, we provide the 'Long View' on whether European industry can survive the fallout and achieve true digital sovereignty. We sit at the intersection of the Silicon that disrupts us and the Stone that grounds us",
+    "who_you_serve": "The target audience for Silicon and Stone is a distinct niche of \"Informed decision-makers.\" These are people who aren't looking for a tutorial on how to use a chatbot, but rather an analysis of how that chatbot—and the hardware it runs on—is reshaping the world’s power structures.",
+    "primary_transformation": "A clear and-or deeper understanding of the issues relating to AI and the relationships beteen Europe and the US and the impleactions of reulations, technology advances etc?"
+  },
+
+  "positioning": {
+    "_instructions": "How you're different from everyone else.",
+    "unique_angle": "What makes the offering unique is the specific collision of vantage point, experience, and timing. In 2026, the market is flooded with \"prompt engineers\" and AI hype-merchants. We differentiate by providing the Long-View from the Edge.",
+    "what_makes_you_different": "What makes the offering unique is the specific collision of vantage point, experience, and timing. In 2026, the market is flooded with \"prompt engineers\" and AI hype-merchants. We differentiate by providing the Long-View from the Edge.",
+    "your_philosophy": "The philosophy of Silicon and Stone is built on Digital Realism. It is a mindset that rejects both the blind \"techno-optimism\" of Silicon Valley and the paralyzing \"regulatory pessimism\" often found in Brussels.\n\nInstead, it advocates for a grounded, long-term view of technology—one that understands that while code moves at the speed of light, human values, laws, and the physical earth are as unmoving as stone.",
+    "your_methodology": "The methodology of Silicon and Stone is built on Forensic Technopolitics. We don't just review technology; we perform an autopsy on the systems of power that technology enables. By combining 30 years of industrial experience with rigorous geopolitical forecasting, we apply four distinct analytical frameworks to every topic we cover.\n\n1. Supply Chain Forensics\nWe treat the global semiconductor and AI infrastructure not as a market, but as a biological system with critical chokepoints.\n\nThe Process: We trace the journey of a single component—from a neon gas supplier in Ukraine to a lithography machine in the Netherlands and a foundry in Taiwan.\n\nThe Goal: To identify the Day Zero failure points for European industry before they appear on a news ticker.\n\n2. Comparative Policy Stress-Testing\nWe analyze the Atlantic Drift by systematically contrasting US and EU developments.\n\nThe Process: We take a single technological advancement (e.g., Agentic AI) and run it through two operating systems: the US Innovation-First model and the EU Rights-Driven model.\n\nThe Goal: To predict where regulation will stifle growth and where innovation will violate sovereignty, providing a roadmap for transatlantic compliance.\n\n3. Scenario-Based Drift Modeling\nWe use Value at Stake methodology to quantify the impact of geopolitical shifts.\n\nThe Process: We build three-tier scenarios (Low/Medium/High friction) for specific 2026 events, such as the full enforcement of the AI Act or a shift in the Donroe Doctrine.\n\nThe Goal: To move from narrative to metrics, showing exactly how many billions of Euros are at risk for specific industrial sectors like Automotive or Aerospace.\n\n4. Experience-Led Signal Filtering\nThis is our Long-Memory filter. We apply a 30-year historical lens to modern hype.\n\nThe Process: We compare 2026 AI trends to the Dot-com boom, the Mobile shift, and the Cloud expansion.\n\nThe Goal: To separate the Silicon Hype (temporary noise) from the Stone Truth (structural change). If we've seen a pattern fail three times in 30 years, we tell you why the fourth time is no different."
+  },
+
+  "offerings": {
+    "_instructions": "What can people buy or access?",
+
+    "free_offerings": [
+      {
+        "name": "",
+        "description": "",
+        "where_to_get_it": ""
+      }
+    ],
+
+    "paid_offerings": [
+      {
+        "name": "",
+        "description": "",
+        "price": "",
+        "who_its_for": "",
+        "main_outcome": ""
+      }
+    ]
+  },
+
+  "content_focus": {
+    "_instructions": "What topics do you cover?",
+    "main_topics": "1. The Silicon: High-Velocity Disruption\nThese topics cover the Engine of the 2026 economy—the technologies that are moving faster than our ability to govern them.\n\nAgentic AI & The Autonomous Workforce: Moving beyond chatbots into agents that execute multi-step workflows, manage budgets, and make autonomous decisions.\n\nThe 2nm Race: Monitoring the bleeding edge of semiconductor fabrication and the transition to next-generation lithography.\n\nEdge Intelligence: How processing power is moving out of the centralized US cloud and onto the Stone of local devices and European soil.\n\nHyper-Deflationary Intelligence: Analyzing the collapsing cost of tokens and what happens to business models when intelligence becomes a commodity.\n\n2. The Stone: Foundational Realities\nThese topics cover the Anchor—the geopolitical and regulatory frameworks that determine whether technology succeeds or fails in the European theater.\n\nThe Donroe Doctrine & The Atlantic Drift: Analyzing the US pivot to Western Hemisphere First and the resulting security vacuum in European tech supply chains.\n\nThe Taiwan Choke Point: Forensic tracking of the semiconductor supply chain and the 2026 Vulnerability Gap facing the German and French industrial heartlands.\n\nThe EU AI Act & Regulatory Sovereignty: Navigating the August 2026 enforcement cliff and the rise of High-Risk compliance as a competitive advantage.\n\nEnergy & Resource Sovereignty: Why Scotland's green grid and Europe's critical mineral strategy are the literal bedrock of the AI revolution.",
+    "subtopics": [],
+    "topics_you_avoid": []
+  },
+
+  "brand_voice_in_business_context": {
+    "_instructions": "How do you talk about your business?",
+    "how_you_mention_offerings": " Direct but Subtle",
+    "cta_style": "Convince them to subscribe or sign up without being pushy.",
+    "sales_philosophy": "Value first and informative?"
+  },
+
+  "social_proof": {
+    "_instructions": "Evidence that you know what you're talking about.",
+    "credentials": "For 30 years, I lived in the heart of the tech engine room—building, scaling, and navigating the shifts from Mobile to Cloud. Moving from engineer to senior management in European and US based companies Today, I’ve moved to an island off the north coast of Scotland to find the signal in the noise.",
+    "results_achieved": [],
+    "notable_clients_or_features": []
+  },
+
+  "links": {
+    "_instructions": "Where to send people.",
+    "website": "",
+    "newsletter": "",
+    "social_profiles": {},
+    "product_pages": {}
+  }
+}
