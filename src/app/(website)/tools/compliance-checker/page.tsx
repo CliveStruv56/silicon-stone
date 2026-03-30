@@ -15,22 +15,40 @@ import {
   type Question
 } from '@/lib/compliance-data'
 import { AlertTriangle, CheckCircle2, Clock, FileText, ChevronRight, RotateCcw } from 'lucide-react'
+import { EmailGateOverlay } from '@/components/tools/EmailGateOverlay'
 
 export default function ComplianceCheckerPage() {
   const [currentStep, setCurrentStep] = useState<string>('start')
   const [history, setHistory] = useState<string[]>([])
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [result, setResult] = useState<RiskLevel | null>(null)
+  const [isUnlocked, setIsUnlocked] = useState(false)
+  const [showGate, setShowGate] = useState(false)
+  const [pendingResult, setPendingResult] = useState<RiskLevel | null>(null)
 
   const handleOptionClick = (option: Question['options'][0], questionId: string) => {
     const newAnswers = { ...answers, [questionId]: option.label }
     setAnswers(newAnswers)
 
     if (option.riskOutcome) {
-      setResult(option.riskOutcome)
+      if (isUnlocked) {
+        setResult(option.riskOutcome)
+      } else {
+        setPendingResult(option.riskOutcome)
+        setShowGate(true)
+      }
     } else if (option.nextStep) {
       setHistory([...history, currentStep])
       setCurrentStep(option.nextStep)
+    }
+  }
+
+  const handleGateUnlock = () => {
+    setIsUnlocked(true)
+    setShowGate(false)
+    if (pendingResult) {
+      setResult(pendingResult)
+      setPendingResult(null)
     }
   }
 
@@ -39,6 +57,7 @@ export default function ComplianceCheckerPage() {
     setHistory([])
     setAnswers({})
     setResult(null)
+    setPendingResult(null)
   }
 
   const handleBack = () => {
@@ -366,6 +385,12 @@ export default function ComplianceCheckerPage() {
       </main>
 
       <Footer />
+      <EmailGateOverlay
+        isOpen={showGate}
+        onUnlock={handleGateUnlock}
+        toolName="Compliance Checker"
+        resultLabel="your risk classification"
+      />
     </div>
   )
 }

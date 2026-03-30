@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Header, Footer } from '@/components/layout'
+import { EmailGateOverlay } from '@/components/tools/EmailGateOverlay'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -172,6 +173,8 @@ export default function PolicyStressTestPage() {
   const [selectedEuPolicy, setSelectedEuPolicy] = useState<string>('eu-ai-act')
   const [selectedUsPolicy, setSelectedUsPolicy] = useState<string>('us-export-controls')
   const [showResults, setShowResults] = useState(false)
+  const [isUnlocked, setIsUnlocked] = useState(false)
+  const [showGate, setShowGate] = useState(false)
 
   const euPolicies = POLICIES.filter(p => p.jurisdiction === 'EU')
   const usPolicies = POLICIES.filter(p => p.jurisdiction === 'US')
@@ -209,8 +212,18 @@ export default function PolicyStressTestPage() {
 
   const handleAnalyze = () => {
     if (selectedIndustry) {
-      setShowResults(true)
+      if (isUnlocked) {
+        setShowResults(true)
+      } else {
+        setShowGate(true)
+      }
     }
+  }
+
+  const handleGateUnlock = () => {
+    setIsUnlocked(true)
+    setShowGate(false)
+    setShowResults(true)
   }
 
   return (
@@ -482,6 +495,12 @@ export default function PolicyStressTestPage() {
       </main>
 
       <Footer />
+      <EmailGateOverlay
+        isOpen={showGate}
+        onUnlock={handleGateUnlock}
+        toolName="Policy Stress-Test"
+        resultLabel="your friction analysis"
+      />
     </div>
   )
 }

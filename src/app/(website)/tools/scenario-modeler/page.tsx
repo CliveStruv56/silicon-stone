@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Header, Footer } from '@/components/layout'
+import { EmailGateOverlay } from '@/components/tools/EmailGateOverlay'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -122,6 +123,21 @@ function CascadeFlow({ cascade }: { cascade: Scenario['cascade'] }) {
 
 export default function ScenarioModelerPage() {
   const [selectedScenario, setSelectedScenario] = useState<Scenario>(SCENARIOS[0])
+  const [isUnlocked, setIsUnlocked] = useState(false)
+  const [showGate, setShowGate] = useState(false)
+
+  const handleSelectScenario = (scenario: Scenario) => {
+    setSelectedScenario(scenario)
+    if (!isUnlocked) {
+      setShowGate(true)
+    }
+  }
+
+  const handleGateUnlock = () => {
+    setIsUnlocked(true)
+    setShowGate(false)
+  }
+
   const maxImpactValue = useMemo(() => getMaxImpactValue(), [])
 
   const totalValueAtStake = useMemo(() => {
@@ -160,7 +176,7 @@ export default function ScenarioModelerPage() {
               return (
                 <button
                   key={scenario.id}
-                  onClick={() => setSelectedScenario(scenario)}
+                  onClick={() => handleSelectScenario(scenario)}
                   className={`
                     text-left p-4 rounded-lg border transition-all duration-200
                     ${isSelected
@@ -186,6 +202,24 @@ export default function ScenarioModelerPage() {
             })}
           </div>
 
+          {!isUnlocked ? (
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-deep/70 to-slate-deep z-10 flex items-center justify-center">
+                <div className="text-center p-8">
+                  <div className="w-12 h-12 rounded-full bg-silicon-amber/10 border border-silicon-amber/30 flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-6 h-6 text-silicon-amber" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                  </div>
+                  <p className="text-text-primary font-semibold mb-2">Select a scenario to unlock the full analysis</p>
+                  <p className="text-text-muted text-sm">Click any scenario above to begin</p>
+                </div>
+              </div>
+              <div className="blur-sm pointer-events-none opacity-40 space-y-6 min-h-[400px]">
+                <div className="bg-stone-charcoal rounded-xl p-6 h-32" />
+                <div className="bg-stone-charcoal rounded-xl p-6 h-48" />
+                <div className="bg-stone-charcoal rounded-xl p-6 h-32" />
+              </div>
+            </div>
+          ) : (
           <AnimatePresence mode="wait">
             <motion.div
               key={selectedScenario.id}
@@ -373,10 +407,17 @@ export default function ScenarioModelerPage() {
               </div>
             </motion.div>
           </AnimatePresence>
+          )}
         </section>
       </main>
 
       <Footer />
+      <EmailGateOverlay
+        isOpen={showGate}
+        onUnlock={handleGateUnlock}
+        toolName="Scenario Modeler"
+        resultLabel="the scenario analysis"
+      />
     </div>
   )
 }

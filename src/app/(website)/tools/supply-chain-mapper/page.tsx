@@ -9,6 +9,7 @@ import type { LayerProps } from 'react-map-gl/maplibre'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { Tooltip } from 'react-tooltip'
 import { Header, Footer } from '@/components/layout'
+import { EmailGateOverlay } from '@/components/tools/EmailGateOverlay'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -36,6 +37,28 @@ const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.j
 
 export default function SupplyChainMapperPage() {
   const [selectedNode, setSelectedNode] = useState<SupplyChainNode | null>(null)
+  const [isUnlocked, setIsUnlocked] = useState(false)
+  const [showGate, setShowGate] = useState(false)
+  const [pendingNode, setPendingNode] = useState<SupplyChainNode | null>(null)
+
+  const handleSelectNode = useCallback((node: SupplyChainNode) => {
+    if (isUnlocked) {
+      setSelectedNode(node)
+    } else {
+      setPendingNode(node)
+      setShowGate(true)
+    }
+  }, [isUnlocked])
+
+  const handleGateUnlock = () => {
+    setIsUnlocked(true)
+    setShowGate(false)
+    if (pendingNode) {
+      setSelectedNode(pendingNode)
+      setPendingNode(null)
+    }
+  }
+
   const [activeNodeTypes, setActiveNodeTypes] = useState<NodeType[]>(
     NODE_TYPE_OPTIONS.map(opt => opt.value)
   )
@@ -226,7 +249,7 @@ export default function SupplyChainMapperPage() {
                       anchor="center"
                       onClick={(e) => {
                         e.originalEvent.stopPropagation()
-                        setSelectedNode(node)
+                        handleSelectNode(node)
                       }}
                     >
                       <div
@@ -379,7 +402,7 @@ export default function SupplyChainMapperPage() {
                                 {upstreamNodes.map(node => (
                                   <button
                                     key={node.id}
-                                    onClick={() => setSelectedNode(node)}
+                                    onClick={() => handleSelectNode(node)}
                                     className="flex items-center gap-1.5 px-2 py-1 bg-surface-elevated rounded text-xs text-text-primary hover:bg-stone-teal/20 transition-colors"
                                   >
                                     <div
@@ -403,7 +426,7 @@ export default function SupplyChainMapperPage() {
                                 {downstreamNodes.map(node => (
                                   <button
                                     key={node.id}
-                                    onClick={() => setSelectedNode(node)}
+                                    onClick={() => handleSelectNode(node)}
                                     className="flex items-center gap-1.5 px-2 py-1 bg-surface-elevated rounded text-xs text-text-primary hover:bg-stone-teal/20 transition-colors"
                                   >
                                     <div
@@ -451,6 +474,12 @@ export default function SupplyChainMapperPage() {
       </main>
 
       <Footer />
+      <EmailGateOverlay
+        isOpen={showGate}
+        onUnlock={handleGateUnlock}
+        toolName="Supply Chain Mapper"
+        resultLabel="the node analysis"
+      />
     </div>
   )
 }
