@@ -8,16 +8,31 @@ export function SubscribeCTA() {
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
 
+  const [errorMsg, setErrorMsg] = useState('')
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setStatus('loading')
+    setErrorMsg('')
 
-    // Placeholder for actual subscription logic
-    // In production, this would call your ConvertKit/Buttondown API
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    try {
+      const res = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
 
-    setStatus('success')
-    setEmail('')
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error || 'Failed to subscribe')
+      }
+
+      setStatus('success')
+      setEmail('')
+    } catch (err) {
+      setStatus('error')
+      setErrorMsg(err instanceof Error ? err.message : 'Something went wrong')
+    }
   }
 
   return (
@@ -55,6 +70,12 @@ export function SubscribeCTA() {
               {status === 'loading' ? 'Subscribing...' : 'Subscribe'}
             </Button>
           </form>
+        )}
+
+        {status === 'error' && (
+          <p className="text-sm text-alert-red mt-2">
+            {errorMsg || 'Something went wrong. Please try again.'}
+          </p>
         )}
 
         <p className="text-xs text-text-muted mt-3">

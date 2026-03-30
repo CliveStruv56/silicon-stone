@@ -185,12 +185,32 @@ export default function ServicesPage() {
     message: '',
   })
   const [formSubmitted, setFormSubmitted] = useState(false)
+  const [formLoading, setFormLoading] = useState(false)
+  const [formError, setFormError] = useState('')
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // For now, just show success message
-    // In production, this would send to an API endpoint
-    setFormSubmitted(true)
+    setFormLoading(true)
+    setFormError('')
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
+
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error || 'Failed to send inquiry')
+      }
+
+      setFormSubmitted(true)
+    } catch (err) {
+      setFormError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
+    } finally {
+      setFormLoading(false)
+    }
   }
 
   return (
@@ -531,12 +551,19 @@ export default function ServicesPage() {
                     />
                   </div>
 
+                  {formError && (
+                    <p className="text-sm text-alert-red text-center">
+                      {formError}
+                    </p>
+                  )}
+
                   <Button
                     type="submit"
+                    disabled={formLoading}
                     className="w-full bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90"
                   >
-                    Send Inquiry
-                    <ArrowRight className="w-4 h-4 ml-2" />
+                    {formLoading ? 'Sending...' : 'Send Inquiry'}
+                    {!formLoading && <ArrowRight className="w-4 h-4 ml-2" />}
                   </Button>
 
                   <p className="text-xs text-text-muted text-center">
