@@ -498,6 +498,7 @@ export default function PolicyStressTestPage() {
       <EmailGateOverlay
         isOpen={showGate}
         onUnlock={handleGateUnlock}
+        onDismiss={() => setShowGate(false)}
         toolName="Policy Stress-Test"
         resultLabel="your friction analysis"
       />

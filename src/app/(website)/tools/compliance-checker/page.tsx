@@ -388,6 +388,7 @@ export default function ComplianceCheckerPage() {
       <EmailGateOverlay
         isOpen={showGate}
         onUnlock={handleGateUnlock}
+        onDismiss={() => { setShowGate(false); setPendingResult(null); handleReset(); }}
         toolName="Compliance Checker"
         resultLabel="your risk classification"
       />

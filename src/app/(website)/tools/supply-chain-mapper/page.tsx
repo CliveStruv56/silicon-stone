@@ -477,6 +477,7 @@ export default function SupplyChainMapperPage() {
       <EmailGateOverlay
         isOpen={showGate}
         onUnlock={handleGateUnlock}
+        onDismiss={() => { setShowGate(false); setPendingNode(null); }}
         toolName="Supply Chain Mapper"
         resultLabel="the node analysis"
       />

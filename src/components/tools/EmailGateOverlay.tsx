@@ -9,11 +9,12 @@ import { Shield, Loader2, CheckCircle, Lock } from 'lucide-react'
 interface EmailGateOverlayProps {
   isOpen: boolean
   onUnlock: () => void
+  onDismiss: () => void
   toolName: string
   resultLabel?: string
 }
 
-export function EmailGateOverlay({ isOpen, onUnlock, toolName, resultLabel = "your results" }: EmailGateOverlayProps) {
+export function EmailGateOverlay({ isOpen, onUnlock, onDismiss, toolName, resultLabel = "your results" }: EmailGateOverlayProps) {
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
@@ -120,6 +121,14 @@ export function EmailGateOverlay({ isOpen, onUnlock, toolName, resultLabel = "yo
                       No spam. Unsubscribe anytime. We never store your tool input data.
                     </p>
                   </form>
+                )}
+                {status !== 'success' && (
+                  <button
+                    onClick={onDismiss}
+                    className="w-full mt-3 text-xs text-text-muted hover:text-text-primary transition-colors text-center"
+                  >
+                    No thanks, go back
+                  </button>
                 )}
               </CardContent>
             </Card>

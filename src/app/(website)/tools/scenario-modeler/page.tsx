@@ -415,6 +415,7 @@ export default function ScenarioModelerPage() {
       <EmailGateOverlay
         isOpen={showGate}
         onUnlock={handleGateUnlock}
+        onDismiss={() => setShowGate(false)}
         toolName="Scenario Modeler"
         resultLabel="the scenario analysis"
       />
