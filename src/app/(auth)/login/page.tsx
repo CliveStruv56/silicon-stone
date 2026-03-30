@@ -11,7 +11,7 @@ export default function LoginPage() {
         <div className="flex min-h-screen items-center justify-center bg-stone-950 text-white">
             <div className="w-full max-w-sm p-8 space-y-6 bg-stone-900 border border-stone-800 rounded-xl">
                 <h1 className="text-2xl font-bold text-center">Writer Access</h1>
-                <form action={formAction} className="space-y-4">
+                <form action={formAction} className="space-y-4" suppressHydrationWarning>
                     <input
                         type="password"
                         name="password"

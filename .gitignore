@@ -45,3 +45,6 @@ next-env.d.ts
 
 # Playwright MCP logs
 .playwright-mcp/
+
+# Debug logs
+debug_error.log
