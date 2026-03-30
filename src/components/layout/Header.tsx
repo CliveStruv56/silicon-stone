@@ -39,6 +39,15 @@ const staticNavigation = [
     ],
   },
   {
+    name: 'Products',
+    href: '/products',
+    children: [
+      { name: 'AI Act Compliance Toolkit', href: '/products/ai-act-toolkit' },
+      { name: 'AI Audit Checklist Pack', href: '/products/ai-audit-checklist' },
+      { name: 'Sector Briefings', href: '/products/briefings' },
+    ],
+  },
+  {
     name: 'Methodology',
     href: '/methodology',
   },
