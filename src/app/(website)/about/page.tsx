@@ -240,18 +240,18 @@ export default function AboutPage() {
               </Card>
             </div>
 
-            {/* Social Proof */}
-            <div className="border-t border-border-subtle pt-12">
-              <h3 className="text-sm font-semibold text-text-muted uppercase tracking-wider mb-8 text-center">
-                Selected Coverage & Speaking
+            {/* Products CTA */}
+            <div className="border-t border-border-subtle pt-12 text-center">
+              <h3 className="text-sm font-semibold text-text-muted uppercase tracking-wider mb-4">
+                Practical Tools
               </h3>
-              <div className="flex flex-wrap justify-center gap-8 md:gap-16 opacity-50 grayscale">
-                {/* Placeholders for logos - Text for now */}
-                <span className="text-xl font-serif text-text-muted font-bold">WIRED</span>
-                <span className="text-xl font-serif text-text-muted font-bold">Financial Times</span>
-                <span className="text-xl font-serif text-text-muted font-bold">The Guardian</span>
-                <span className="text-xl font-serif text-text-muted font-bold">TechCrunch</span>
-              </div>
+              <p className="text-text-muted text-sm mb-4 max-w-xl mx-auto">
+                Our analysis is also available as actionable digital products —
+                compliance toolkits, audit checklists, and sector briefings.
+              </p>
+              <Link href="/products" className="text-sm text-stone-teal hover:underline">
+                View Products &rarr;
+              </Link>
             </div>
           </div>
         </section>

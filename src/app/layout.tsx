@@ -24,6 +24,25 @@ export const metadata: Metadata = {
   title: "Silicon and Stone | Forensic Technopolitics",
   description:
     "Deep analysis at the intersection of technology policy, supply chains, and geopolitics. Cutting through complexity with 30 years of experience from the edge.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://siliconandstone.com"),
+  openGraph: {
+    title: "Silicon and Stone | Forensic Technopolitics",
+    description:
+      "AI regulation, semiconductor supply chains, and digital sovereignty. Analysis for European decision-makers from 30 years at the edge.",
+    siteName: "Silicon and Stone",
+    locale: "en_GB",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Silicon and Stone | Forensic Technopolitics",
+    description:
+      "AI regulation, semiconductor supply chains, and digital sovereignty. Analysis for European decision-makers.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
