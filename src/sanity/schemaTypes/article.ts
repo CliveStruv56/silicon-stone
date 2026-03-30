@@ -76,6 +76,7 @@ export const article = defineType({
           { title: 'Signal (Breaking Analysis)', value: 'signal' },
           { title: 'Deep Dive (Long-form)', value: 'deepdive' },
           { title: 'Tool Guide', value: 'guide' },
+          { title: 'YouTube Script', value: 'youtube' },
         ],
         layout: 'radio',
       },
@@ -236,7 +237,7 @@ export const article = defineType({
     },
     prepare(selection) {
       const { title, author, media, contentType, intelligenceTier, impactScore } = selection
-      const typeLabel = contentType === 'deepdive' ? 'Deep Dive' : contentType === 'signal' ? 'Signal' : 'Guide'
+      const typeLabel = contentType === 'deepdive' ? 'Deep Dive' : contentType === 'signal' ? 'Signal' : contentType === 'youtube' ? 'YouTube' : 'Guide'
       const tierLabel = intelligenceTier ? ` [${intelligenceTier.toUpperCase()}]` : ''
       const scoreLabel = impactScore ? ` Impact: ${impactScore}/10` : ''
       return {

@@ -7,13 +7,13 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Zap, FileText, Search, BrainCircuit, ExternalLink, Activity } from "lucide-react";
+import { Loader2, Zap, FileText, Search, BrainCircuit, ExternalLink, Activity, Video } from "lucide-react";
 import { performResearch, createDraftFromResearch } from "./actions";
 import { PersonaData } from "@/lib/sanity";
 
 import { ResearchResult, ResearchSource } from "@/types/research";
 
-export type FormatType = "signal" | "deep_dive" | "research";
+export type FormatType = "signal" | "deep_dive" | "youtube" | "research";
 
 interface CreateFormProps {
     initialPersonas: PersonaData[];
@@ -51,8 +51,7 @@ export function CreateForm({ initialPersonas }: CreateFormProps) {
 
         setIsGenerating(true);
         try {
-            await createDraftFromResearch(researchResult, format as "signal" | "deep_dive", personaSlug);
-            // Wait for the redirect inside the action to happen
+            await createDraftFromResearch(researchResult, format as "signal" | "deep_dive" | "youtube", personaSlug, topic);
         } catch (error) {
             console.error("Generation failed:", error);
             alert("Failed to generate draft. Please try again.");
@@ -79,7 +78,7 @@ export function CreateForm({ initialPersonas }: CreateFormProps) {
                             <span className="flex items-center justify-center w-5 h-5 rounded-full bg-primary/10 text-primary text-xs">1</span>
                             Format
                         </Label>
-                        <RadioGroup defaultValue={format} onValueChange={(v: string) => setFormat(v as FormatType)} className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <RadioGroup defaultValue={format} onValueChange={(v: string) => setFormat(v as FormatType)} className="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div>
                                 <RadioGroupItem value="signal" id="format-signal" className="peer sr-only" />
                                 <Label
@@ -100,6 +99,17 @@ export function CreateForm({ initialPersonas }: CreateFormProps) {
                                     <FileText className="mb-3 h-6 w-6 text-emerald-500" />
                                     <div className="font-semibold mb-1">Deep Dive</div>
                                     <div className="text-xs text-muted-foreground text-center">3000+ word forensic report</div>
+                                </Label>
+                            </div>
+                            <div>
+                                <RadioGroupItem value="youtube" id="format-youtube" className="peer sr-only" />
+                                <Label
+                                    htmlFor="format-youtube"
+                                    className="flex flex-col items-center justify-between rounded-xl border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-red-500 [&:has([data-state=checked])]:border-red-500 cursor-pointer"
+                                >
+                                    <Video className="mb-3 h-6 w-6 text-red-500" />
+                                    <div className="font-semibold mb-1">YouTube Script</div>
+                                    <div className="text-xs text-muted-foreground text-center">12-18 min video outline</div>
                                 </Label>
                             </div>
                             <div>
@@ -211,7 +221,7 @@ export function CreateForm({ initialPersonas }: CreateFormProps) {
                                         {isGenerating ? (
                                             <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Writing Draft...</>
                                         ) : (
-                                            <><FileText className="mr-2 h-4 w-4" /> Generate {format === 'signal' ? 'Signal' : 'Deep Dive'}</>
+                                            <>{format === 'youtube' ? <Video className="mr-2 h-4 w-4" /> : <FileText className="mr-2 h-4 w-4" />} Generate {format === 'signal' ? 'Signal' : format === 'youtube' ? 'YouTube Script' : 'Deep Dive'}</>
                                         )}
                                     </Button>
                                 )}

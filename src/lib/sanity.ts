@@ -22,7 +22,7 @@ export interface ArticleData {
     slug: string;
     excerpt: string;
     body: string; // Markdown
-    contentType: 'signal' | 'deepdive' | 'guide';
+    contentType: 'signal' | 'deepdive' | 'guide' | 'youtube';
     persona: string;
 }
 

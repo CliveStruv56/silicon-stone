@@ -6,7 +6,7 @@ const anthropic = new Anthropic({
     apiKey: API_KEY,
 });
 
-export async function callClaude(system: string, user: string) {
+export async function callClaude(system: string, user: string, temperature: number = 0.4) {
     if (!API_KEY) {
         console.warn("No ANTHROPIC_API_KEY found. Returning mock response.");
         // Mock response for dev/demo if no key
@@ -33,6 +33,7 @@ export async function callClaude(system: string, user: string) {
         const msg = await anthropic.messages.create({
             model: "claude-3-7-sonnet-latest",
             max_tokens: 4096,
+            temperature,
             system: system,
             messages: [
                 { role: "user", content: user }
