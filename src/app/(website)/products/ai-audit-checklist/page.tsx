@@ -49,6 +49,8 @@ const contents = [
   },
 ]
 
+const checkoutUrl = process.env.NEXT_PUBLIC_LEMONSQUEEZY_CHECKLIST_URL
+
 export default function AIAuditChecklistPage() {
   return (
     <div className="min-h-screen flex flex-col">
@@ -77,8 +79,10 @@ export default function AIAuditChecklistPage() {
                     Instant digital delivery
                   </div>
                 </div>
-                <Button size="lg" className="bg-stone-teal text-slate-deep hover:bg-stone-teal/90 font-semibold">
-                  Buy Checklist Pack — £24
+                <Button size="lg" className="bg-stone-teal text-slate-deep hover:bg-stone-teal/90 font-semibold" asChild>
+                  <a href={checkoutUrl || '#'} target="_blank" rel="noopener noreferrer">
+                    Buy Checklist Pack — £24
+                  </a>
                 </Button>
                 <p className="text-xs text-text-muted mt-3">
                   Includes a £20 discount code for the full AI Act Compliance Toolkit.
@@ -189,8 +193,10 @@ export default function AIAuditChecklistPage() {
                 At £24, this is less than the cost of a business book — and it gives you
                 an actionable picture of your AI exposure in a single afternoon.
               </p>
-              <Button size="lg" className="bg-stone-teal text-slate-deep hover:bg-stone-teal/90 font-semibold">
-                Buy Checklist Pack — £24
+              <Button size="lg" className="bg-stone-teal text-slate-deep hover:bg-stone-teal/90 font-semibold" asChild>
+                <a href={checkoutUrl || '#'} target="_blank" rel="noopener noreferrer">
+                  Buy Checklist Pack — £24
+                </a>
               </Button>
               <div className="flex items-center justify-center gap-6 mt-6 text-xs text-text-muted">
                 <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> Instant delivery</span>

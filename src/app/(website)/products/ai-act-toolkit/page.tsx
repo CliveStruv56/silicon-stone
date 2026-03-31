@@ -63,6 +63,11 @@ const sections = [
   },
 ]
 
+const checkoutUrls = {
+  standard: process.env.NEXT_PUBLIC_LEMONSQUEEZY_TOOLKIT_STANDARD_URL,
+  professional: process.env.NEXT_PUBLIC_LEMONSQUEEZY_TOOLKIT_PROFESSIONAL_URL,
+}
+
 export default function AIActToolkitPage() {
   return (
     <div className="min-h-screen flex flex-col">
@@ -92,11 +97,15 @@ export default function AIActToolkitPage() {
                   </div>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <Button size="lg" className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90 font-semibold">
-                    Buy Standard — £79
+                  <Button size="lg" className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90 font-semibold" asChild>
+                    <a href={checkoutUrls.standard || '#'} target="_blank" rel="noopener noreferrer">
+                      Buy Standard — £79
+                    </a>
                   </Button>
-                  <Button size="lg" variant="outline" className="border-stone-teal text-stone-teal hover:bg-stone-teal/10">
-                    Buy Professional — £149
+                  <Button size="lg" variant="outline" className="border-stone-teal text-stone-teal hover:bg-stone-teal/10" asChild>
+                    <a href={checkoutUrls.professional || '#'} target="_blank" rel="noopener noreferrer">
+                      Buy Professional — £149
+                    </a>
                   </Button>
                 </div>
                 <p className="text-xs text-text-muted mt-3">
@@ -229,11 +238,15 @@ export default function AIActToolkitPage() {
                 and it gives your team a structured path forward they can act on immediately.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
-                <Button size="lg" className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90 font-semibold">
-                  Buy Standard — £79
+                <Button size="lg" className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90 font-semibold" asChild>
+                  <a href={checkoutUrls.standard || '#'} target="_blank" rel="noopener noreferrer">
+                    Buy Standard — £79
+                  </a>
                 </Button>
-                <Button size="lg" variant="outline" className="border-stone-teal text-stone-teal hover:bg-stone-teal/10">
-                  Buy Professional — £149
+                <Button size="lg" variant="outline" className="border-stone-teal text-stone-teal hover:bg-stone-teal/10" asChild>
+                  <a href={checkoutUrls.professional || '#'} target="_blank" rel="noopener noreferrer">
+                    Buy Professional — £149
+                  </a>
                 </Button>
               </div>
               <p className="text-sm text-text-muted">
