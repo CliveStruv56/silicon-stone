@@ -148,7 +148,7 @@ export default async function Home() {
               {recentArticles.map((article: Article) => (
                 <StaggerItem key={article._id}>
                   <article className="flex flex-col group h-full grid-hover p-4 -m-4 rounded-xl transition-colors hover:bg-white/[0.02]">
-                    {article.mainImage?.asset && (
+                    {article.mainImage?.asset ? (
                       <div className="relative aspect-[3/2] rounded-md overflow-hidden bg-stone-charcoal mb-4 border border-border-subtle/50 group-hover:border-stone-teal/50 transition-colors">
                         <Image
                           src={urlFor(article.mainImage).width(600).height(400).url()}
@@ -156,6 +156,13 @@ export default async function Home() {
                           fill
                           className="object-cover group-hover:scale-105 transition-transform duration-500"
                         />
+                      </div>
+                    ) : (
+                      <div className="relative aspect-[3/2] rounded-md overflow-hidden bg-gradient-to-br from-stone-charcoal to-slate-deep mb-4 border border-border-subtle/50 group-hover:border-stone-teal/50 transition-colors flex items-center justify-center">
+                        <div className="text-center">
+                          <div className="text-2xl font-mono font-bold text-silicon-amber/20">S&amp;S</div>
+                          <div className="text-[10px] font-mono uppercase tracking-widest text-text-muted/30 mt-1">Forensic Technopolitics</div>
+                        </div>
                       </div>
                     )}
 

@@ -1,36 +1,145 @@
 {
   "profile_overview": {
     "name": "Silicon and Stone ICP",
-    "one_line_description": "Technology policy professionals and decision-makers"
+    "one_line_description": "Technology policy professionals and decision-makers navigating EU AI regulation, semiconductor supply chains, and digital sovereignty"
   },
   "personas": {
-    "policy_analyst": {
-      "role": "Policy Analyst",
+    "compliance_clara": {
+      "role": "Legal / Compliance Counsel",
+      "slug": "clara",
       "organization_types": [
-        "Government",
-        "Think Tank",
-        "Consulting Firm"
+        "Mid-to-large tech companies",
+        "SaaS providers operating in EU",
+        "Regulated industries (finance, healthcare)"
       ],
-      "example": "EU Digital Policy Unit analyst tracking AI Act implementation",
+      "example": "In-house counsel at a B2B SaaS firm assessing AI Act obligations across product lines",
       "key_concerns": [
-        "Regulatory compliance",
-        "Technology trends",
-        "Geopolitical implications"
+        "AI Act risk classification for existing products",
+        "Cross-jurisdictional compliance (US vs EU divergence)",
+        "Documentation and audit trail requirements",
+        "Vendor liability and supply chain compliance"
       ],
       "content_needs": [
-        "Deep analysis",
-        "Timeline tracking",
-        "Expert commentary"
+        "Regulatory timelines with specific milestones",
+        "Practical compliance checklists",
+        "Template documents and frameworks",
+        "Worked examples of risk classification"
       ],
-      "pain_point": "Difficulty keeping up with rapid regulatory changes across jurisdictions"
+      "pain_point": "Needs to translate dense regulatory text into actionable compliance plans under time pressure, often without dedicated AI governance resources"
+    },
+    "industrial_ian": {
+      "role": "Supply Chain / Operations Director",
+      "slug": "ian",
+      "organization_types": [
+        "European manufacturers",
+        "Automotive and electronics OEMs",
+        "Industrial technology companies"
+      ],
+      "example": "VP Operations at a German automotive supplier managing semiconductor procurement and AI-assisted production",
+      "key_concerns": [
+        "Semiconductor supply chain concentration risk",
+        "US-China decoupling impact on component sourcing",
+        "AI adoption in manufacturing under regulatory constraints",
+        "Vendor dependency and single-source exposure"
+      ],
+      "content_needs": [
+        "Supply chain risk mapping and analysis",
+        "Geopolitical scenario modelling",
+        "Vendor assessment frameworks",
+        "Early warning indicators for disruption"
+      ],
+      "pain_point": "Caught between pressure to adopt AI for efficiency and uncertainty about regulatory obligations, while managing fragile global supply chains"
+    },
+    "sovereign_sofia": {
+      "role": "Policy Analyst / Advisor",
+      "slug": "sofia",
+      "organization_types": [
+        "Government digital policy units",
+        "Think tanks and research institutes",
+        "EU institutions and advisory bodies"
+      ],
+      "example": "EU Digital Policy Unit analyst tracking AI Act implementation across member states",
+      "key_concerns": [
+        "Digital sovereignty and strategic autonomy",
+        "Transatlantic regulatory divergence",
+        "Technology standards and governance frameworks",
+        "Democratic accountability in AI deployment"
+      ],
+      "content_needs": [
+        "Deep comparative analysis across jurisdictions",
+        "Timeline tracking for regulatory milestones",
+        "Expert commentary with cited sources",
+        "Scenario analysis for policy options"
+      ],
+      "pain_point": "Difficulty keeping up with rapid regulatory changes across jurisdictions while maintaining analytical rigour and policy relevance"
+    },
+    "remote_robert": {
+      "role": "Regional Development Strategist",
+      "slug": "robert",
+      "organization_types": [
+        "Regional development agencies",
+        "Economic development boards",
+        "Local government innovation units"
+      ],
+      "example": "Head of digital strategy at a Scottish regional development agency positioning the region for AI and semiconductor investment",
+      "key_concerns": [
+        "Attracting technology investment to peripheral regions",
+        "Workforce development for AI and advanced manufacturing",
+        "Infrastructure gaps (connectivity, compute, talent)",
+        "Competing with established tech hubs for funding"
+      ],
+      "content_needs": [
+        "Case studies of successful regional tech strategies",
+        "Investment trend analysis and opportunity mapping",
+        "Policy frameworks for regional AI governance",
+        "Skills gap analysis and workforce planning data"
+      ],
+      "pain_point": "Needs to build compelling cases for technology investment in regions that don't appear on most tech maps, competing against larger metropolitan centres with more resources"
+    },
+    "global_citizen": {
+      "role": "Informed General Public",
+      "slug": "citizen",
+      "organization_types": [
+        "Independent professionals",
+        "Journalists and commentators",
+        "Educators and researchers",
+        "Engaged citizens"
+      ],
+      "example": "Technology journalist or informed professional who follows AI regulation debates and wants analysis beyond headline takes",
+      "key_concerns": [
+        "Understanding real-world impact of AI regulation",
+        "Cutting through hype and vendor narratives",
+        "Democratic implications of AI governance decisions",
+        "Making sense of complex geopolitical technology dynamics"
+      ],
+      "content_needs": [
+        "Accessible but rigorous analysis",
+        "Context and background for emerging stories",
+        "Clear explanations of technical and legal concepts",
+        "Independent perspective free from industry bias"
+      ],
+      "pain_point": "Wants substantive analysis but finds most coverage either too superficial (mainstream media) or too captured by industry interests (trade press)"
     }
   },
   "psychographics": {
-    "frustrations": {
-      "list": [
-        "Potential workforce displacement concerns",
-        "Lack of coordinated US-EU resource strategy"
-      ]
-    }
+    "shared_values": [
+      "Evidence-based decision making",
+      "European strategic autonomy",
+      "Pragmatism over ideology",
+      "Long-term thinking over reactive policy"
+    ],
+    "frustrations": [
+      "AI hype drowning out substantive analysis",
+      "Potential workforce displacement concerns",
+      "Lack of coordinated US-EU resource strategy",
+      "Regulatory complexity outpacing organisational capacity",
+      "Vendor-captured analysis masquerading as independent research"
+    ],
+    "information_sources": [
+      "Policy briefings and think tank reports",
+      "Industry conferences and working groups",
+      "Curated newsletters and intelligence services",
+      "Peer networks and professional communities"
+    ]
   }
 }

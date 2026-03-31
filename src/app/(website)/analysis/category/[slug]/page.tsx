@@ -189,7 +189,7 @@ export default async function CategoryPage({ params }: Props) {
                       key={article._id}
                       className="bg-stone-charcoal border-border-subtle overflow-hidden hover:border-stone-teal/50 transition-colors"
                     >
-                      {article.mainImage?.asset && (
+                      {article.mainImage?.asset ? (
                         <div className="relative aspect-[16/9]">
                           <Image
                             src={urlFor(article.mainImage).width(600).height(338).url()}
@@ -197,6 +197,13 @@ export default async function CategoryPage({ params }: Props) {
                             fill
                             className="object-cover"
                           />
+                        </div>
+                      ) : (
+                        <div className="relative aspect-[16/9] bg-gradient-to-br from-stone-charcoal to-slate-deep flex items-center justify-center border-b border-border-subtle">
+                          <div className="text-center">
+                            <div className="text-2xl font-mono font-bold text-silicon-amber/20">S&amp;S</div>
+                            <div className="text-[10px] font-mono uppercase tracking-widest text-text-muted/30 mt-1">Forensic Technopolitics</div>
+                          </div>
                         </div>
                       )}
                       <CardHeader className="pb-2">
