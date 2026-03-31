@@ -206,6 +206,7 @@ export default function ServicesPage() {
       }
 
       setFormSubmitted(true)
+      window.plausible?.('Contact+Form+Submit')
     } catch (err) {
       setFormError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
     } finally {

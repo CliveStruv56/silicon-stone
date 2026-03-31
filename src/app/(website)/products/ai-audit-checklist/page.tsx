@@ -80,7 +80,7 @@ export default function AIAuditChecklistPage() {
                   </div>
                 </div>
                 <Button size="lg" className="bg-stone-teal text-slate-deep hover:bg-stone-teal/90 font-semibold" asChild>
-                  <a href={checkoutUrl || '#'} target="_blank" rel="noopener noreferrer">
+                  <a href={checkoutUrl || '#'} target="_blank" rel="noopener noreferrer" className="plausible-event-name=Buy+Checklist+Pack">
                     Buy Checklist Pack — £24
                   </a>
                 </Button>

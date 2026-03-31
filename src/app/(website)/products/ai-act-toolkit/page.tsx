@@ -98,12 +98,12 @@ export default function AIActToolkitPage() {
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3">
                   <Button size="lg" className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90 font-semibold" asChild>
-                    <a href={checkoutUrls.standard || '#'} target="_blank" rel="noopener noreferrer">
+                    <a href={checkoutUrls.standard || '#'} target="_blank" rel="noopener noreferrer" className="plausible-event-name=Buy+Toolkit+Standard">
                       Buy Standard — £79
                     </a>
                   </Button>
                   <Button size="lg" variant="outline" className="border-stone-teal text-stone-teal hover:bg-stone-teal/10" asChild>
-                    <a href={checkoutUrls.professional || '#'} target="_blank" rel="noopener noreferrer">
+                    <a href={checkoutUrls.professional || '#'} target="_blank" rel="noopener noreferrer" className="plausible-event-name=Buy+Toolkit+Professional">
                       Buy Professional — £149
                     </a>
                   </Button>
