@@ -2,9 +2,9 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-03-31
-> Status: **Working Application (Local Development) — Build Passing (41 routes), 10 npm vulnerabilities (5 moderate, 5 high)**
+> Status: **Live in Production — siliconandstone.com on Vercel, Build Passing (41 routes), 0 npm vulnerabilities**
 
-**Current State**: Full-featured intelligence portal with public website, 4 interactive tools (email-gated for lead capture), product/commerce pages, ConvertKit newsletter & contact integration, AI content creation pipeline (Signal, Deep Dive, Research, YouTube Script), and embedded CMS Studio. Not yet deployed to production.
+**Current State**: Full-featured intelligence portal live at siliconandstone.com. Public website, 4 interactive tools (email-gated for lead capture), product/commerce pages with Lemon Squeezy checkout links, ConvertKit newsletter & contact integration, Plausible analytics (6 custom events), AI content creation pipeline (Signal, Deep Dive, Research, YouTube Script), and embedded CMS Studio. Awaiting Lemon Squeezy store setup, Plausible account, and content publishing.
 
 ---
 
@@ -14,12 +14,12 @@ This is the **Silicon & Stone intelligence portal** — a Next.js 15 + Sanity CM
 
 **Key facts:**
 - Build passes cleanly (`npm run build` — 41 routes, 0 errors)
-- 10 npm audit vulnerabilities (5 moderate, 5 high) — needs attention
+- 0 npm audit vulnerabilities
 - All API integrations verified working: Anthropic, Exa.ai, Inoreader, Sanity, ConvertKit
 - Admin login: `studio123`
 - Inoreader connected as user `clive4`
 - Git repo: `github.com/CliveStruv56/silicon-stone`
-- Not yet deployed — no Vercel/hosting config exists
+- **Live at siliconandstone.com** — deployed on Vercel, auto-deploys from main branch
 
 ---
 
@@ -240,6 +240,14 @@ CONVERTKIT_FORM_ID=<id>
 CONVERTKIT_CONTACT_TAG_ID=<id>      # Optional: tag for contact form submissions
 CONVERTKIT_TOOL_LEAD_TAG_ID=<id>    # Optional: tag for tool email captures
 
+# Payments (Lemon Squeezy checkout URLs)
+NEXT_PUBLIC_LEMONSQUEEZY_TOOLKIT_STANDARD_URL=<url>       # Toolkit Standard £79
+NEXT_PUBLIC_LEMONSQUEEZY_TOOLKIT_PROFESSIONAL_URL=<url>   # Toolkit Professional £149
+NEXT_PUBLIC_LEMONSQUEEZY_CHECKLIST_URL=<url>              # Checklist Pack £24
+
+# Analytics
+NEXT_PUBLIC_PLAUSIBLE_DOMAIN=siliconandstone.com          # Enables Plausible tracking
+
 # Admin Auth
 ADMIN_PASSWORD=studio123
 ```
@@ -289,7 +297,7 @@ ADMIN_PASSWORD=studio123
 | Briefings page | `src/app/(website)/briefings/page.tsx` |
 | Services page | `src/app/(website)/services/page.tsx` |
 | Tool pages | `src/app/(website)/tools/*/page.tsx` |
-| Email gate overlay | `src/components/EmailGateOverlay.tsx` |
+| Email gate overlay | `src/components/tools/EmailGateOverlay.tsx` |
 | Tool data | `src/lib/*-data.ts` |
 | Product pages | `src/app/(website)/products/*/page.tsx` |
 | Legal pages | `src/app/(website)/privacy/`, `src/app/(website)/terms/` |
@@ -305,6 +313,7 @@ ADMIN_PASSWORD=studio123
 | Context profiles | `context/core/` |
 | Business overview | `business-overview.json` |
 | Strategy docs | `docs/` |
+| Plausible types | `src/types/plausible.d.ts` |
 | Favicon | `src/app/icon.svg` |
 
 ---
@@ -313,6 +322,10 @@ ADMIN_PASSWORD=studio123
 
 | Commit | Description |
 |--------|-------------|
+| `5bfb611` | Complete ICP personas (all 5) and add branded article card image placeholders |
+| `9d9a68e` | Add Plausible analytics with 6 custom event goals |
+| `e9a685d` | Wire up Lemon Squeezy checkout links on product buy buttons |
+| `0b029b7` | Fix all npm vulnerabilities (0 remaining) and update project summary |
 | `b4c8ab2` | Add platform overview Word document for stakeholder presentations |
 | `b9a4e5c` | Add dismiss button to email gate overlay |
 | `19760a1` | Add email gate to all 4 interactive tools for lead capture |
@@ -328,44 +341,41 @@ ADMIN_PASSWORD=studio123
 
 | Issue | Notes | Priority |
 |-------|-------|----------|
-| 10 npm vulnerabilities | 5 moderate, 5 high — run `npm audit fix` | High |
-| No payment processing | Product sales pages have no Stripe/payment integration | High |
-| No deployment/hosting | Not deployed anywhere — no Vercel config | High |
-| Inoreader redirect URI | Still points to localhost, needs production URL | Medium |
-| Article cards lack images | Most articles in Intelligence Stream show no cover images | Medium |
-| ICP only has 1 persona in context | `icp.json` only defines policy_analyst; other 4 are in Sanity schema only | Low |
+| Inoreader redirect URI | Still points to localhost — user needs to update in Inoreader dev portal | Medium |
+| Lemon Squeezy not configured | Checkout links wired but env vars not yet set (no store created) | Medium |
+| Plausible not configured | Script deployed but env var not set (no account created) | Medium |
+| Draft articles unpublished | Content exists in Sanity but needs publishing + cover images | Medium |
 | No automated tests | Test suite not yet implemented | Low |
-| No CI/CD pipeline | Manual deployment currently | Low |
+| No CI/CD pipeline | Vercel auto-deploys from main, but no test/lint gates | Low |
 
 ---
 
 ## 11. What's Next (Current Priorities)
 
-### Priority 1: Deploy to Production
+### Priority 1: User Configuration (No Code Changes Needed)
+
+| Task | Status | Description |
+|------|--------|-------------|
+| **Update Inoreader redirect URI** | Pending | Change to `https://siliconandstone.com/api/auth/callback/inoreader` in Inoreader dev portal |
+| **Create Lemon Squeezy store** | Pending | Create store, 3 products, add checkout URLs as env vars in Vercel |
+| **Set up Plausible** | Pending | Sign up, add site, create 6 custom event goals, add `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` env var in Vercel |
+| **Publish content** | Pending | Move draft articles to published in Sanity Studio, add cover images |
+
+### Priority 2: Content & Growth
 
 | Task | Description |
 |------|-------------|
-| **Fix npm vulnerabilities** | Run `npm audit fix` to clear 10 vulnerabilities |
-| **Deploy to Vercel** | Next.js optimized hosting |
-| **Configure Domain** | Set up custom domain |
-| **Environment Variables** | Configure production env vars in Vercel |
-| **Update Inoreader redirect URI** | Change from localhost to production URL |
-| **Publish Content** | Move draft articles to published state |
+| **Create digital products** | Write/assemble the actual Toolkit PDF, spreadsheets, and Checklist pack files |
+| **Article cover images** | Upload real images to articles in Sanity (placeholders show until then) |
+| **Consulting booking** | Embed Calendly or Cal.com on Services page |
 
-### Priority 2: Payment & Commerce
+### Priority 3: Premium Tier (Future)
 
 | Task | Description |
 |------|-------------|
-| **Payment Integration** | Connect product pages to Stripe/Gumroad/Lemon Squeezy |
-| **Digital Product Delivery** | Automated file/access delivery after purchase |
-
-### Priority 3: Analytics & Growth
-
-| Task | Description |
-|------|-------------|
-| **Analytics** | Privacy-friendly analytics (Plausible, Fathom) |
-| **Article Cover Images** | Add images to existing articles |
-| **Complete ICP Personas** | Add remaining 4 personas to `context/core/icp.json` |
+| **Authentication** | Supabase Auth with social login for premium content access |
+| **Subscription billing** | Recurring subscription for premium content tier |
+| **Content gating** | Audit-tier articles locked for non-subscribers |
 
 ### Future Enhancements
 
@@ -373,9 +383,8 @@ ADMIN_PASSWORD=studio123
 |------|-------------|
 | **Sanity v5 Upgrade** | When Next.js 16 is stable (all packages together) |
 | **Advanced Search** | Faceted search with filters |
-| **User Accounts** | Client login for premium content |
 | **Automated Tests** | Test suite implementation |
-| **CI/CD Pipeline** | Automated deployment |
+| **CI/CD Pipeline** | Add test/lint gates before deploy |
 
 ---
 
@@ -394,7 +403,7 @@ npm run sync-content     # Sync markdown to Sanity
 npm run sync-content:dry # Preview sync changes
 
 # Audit
-npm audit                # Currently shows 10 vulnerabilities
+npm audit                # Should show 0 vulnerabilities
 
 # Linting
 npm run lint             # Run ESLint
@@ -408,19 +417,20 @@ When starting a new Claude Code session:
 
 1. **Read this document first** for full context
 2. **The app builds cleanly** — `npm run build` should produce 41 routes, 0 errors
-3. **10 npm vulnerabilities** — need `npm audit fix`
+3. **0 npm vulnerabilities** — `npm audit` should show 0
 4. **All APIs are working** — Anthropic, Exa, Inoreader, Sanity, ConvertKit
 5. **Admin password** is `studio123`
 6. **Inoreader** is connected as `clive4` (tokens in cookies, may need re-auth)
 7. **Do NOT upgrade Sanity to v5** until Next.js 16 is stable
-8. **Products have no payment integration** — sales pages only
-9. **Not deployed yet** — local development only
+8. **Live at siliconandstone.com** — Vercel auto-deploys from main branch
+9. **Lemon Squeezy** — checkout links wired but may not yet have URLs configured
+10. **Plausible** — script deployed but may not yet have account/env var configured
 
 ### Quick Verification
 
 ```bash
 npm run build            # Should pass with 41 routes
-npm audit                # Currently 10 vulnerabilities
+npm audit                # Should show 0 vulnerabilities
 npm run dev              # Start dev server, visit localhost:3000
 ```
 
