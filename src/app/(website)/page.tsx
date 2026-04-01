@@ -15,9 +15,9 @@ import { sanityFetch } from '@/sanity/lib/live'
 import { SITE_SETTINGS_QUERY, ARTICLES_BY_TIER_QUERY } from '@/sanity/lib/queries'
 
 export const metadata: Metadata = {
-  title: 'Silicon and Stone | Strategic Intelligence for the Orchestration Age',
+  title: 'Silicon and Stone | AI Career Infrastructure for Mid-Career Leaders',
   description:
-    'Navigate the collision of AI regulation, semiconductor supply chains, and digital sovereignty. Strategic intelligence for mid-career European leaders from 30 years at the edge.',
+    'AI literacy is no longer optional. Strategic intelligence and orchestration frameworks for mid-career professionals (35-55) navigating AI regulation, semiconductor supply chains, and digital sovereignty.',
 }
 
 export default async function Home() {
@@ -40,13 +40,34 @@ export default async function Home() {
         '@type': 'WebSite',
         name: 'Silicon and Stone',
         url: 'https://siliconandstone.com',
-        description: 'Strategic intelligence for the collision of AI regulation, semiconductor supply chains, and digital sovereignty.',
+        description: 'AI career infrastructure for mid-career professionals. Strategic intelligence on EU AI Act compliance, semiconductor supply chains, and digital sovereignty from 30 years of technology industry experience.',
       },
       {
         '@type': 'Organization',
         name: 'Silicon and Stone',
         url: 'https://siliconandstone.com',
-        description: 'Forensic technopolitics. 30 years of technology industry experience distilled from the edge of Europe.',
+        description: 'Forensic technopolitics intelligence platform providing AI orchestration frameworks, compliance tools, and career transition resources for European decision-makers.',
+        foundingDate: '2024',
+        areaServed: 'Europe',
+        knowsAbout: [
+          'EU AI Act compliance',
+          'AI orchestration frameworks',
+          'Semiconductor supply chain analysis',
+          'Digital sovereignty',
+          'Mid-career AI transition',
+          'European technology policy',
+        ],
+      },
+      {
+        '@type': 'WebPage',
+        name: 'AI Career Infrastructure for Mid-Career Leaders',
+        description: 'AI literacy is no longer optional for leaders aged 35-55. Silicon and Stone provides forensic intelligence and orchestration frameworks to secure your position in the AI-driven economy.',
+        url: 'https://siliconandstone.com',
+        about: {
+          '@type': 'Thing',
+          name: 'AI Career Resilience',
+          description: 'Strategic frameworks for mid-career professionals transitioning from AI users to AI architects.',
+        },
       },
     ],
   }

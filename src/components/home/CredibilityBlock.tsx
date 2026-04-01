@@ -8,38 +8,62 @@ export function CredibilityBlock() {
       <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-24">
         <StaggerContainer className="max-w-4xl mx-auto">
           <StaggerItem>
-            <div className="relative tech-corners p-8 lg:p-12 border-l-4 border-silicon-amber">
-              <h2 id="credibility-heading" className="sr-only">The View from the Edge</h2>
+            <div className="text-center mb-8">
+              <h2 id="credibility-heading" className="text-3xl lg:text-4xl font-bold text-text-primary mb-2">
+                The View from the Edge
+              </h2>
+              <p className="font-mono text-xs uppercase tracking-widest text-stone-teal">
+                30 Years in the Making
+              </p>
+            </div>
+          </StaggerItem>
 
-              {/* Data points bar */}
-              <div className="flex items-center gap-6 mb-8">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-silicon-amber" />
-                  <span className="font-mono text-xs uppercase tracking-widest text-silicon-amber">
-                    30 Years in Tech
-                  </span>
-                </div>
-                <div className="h-4 w-px bg-border-subtle" />
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-stone-teal" />
-                  <span className="font-mono text-xs uppercase tracking-widest text-stone-teal">
-                    Edge of Europe
-                  </span>
+          <StaggerItem>
+            <div className="relative tech-corners p-8 lg:p-12">
+              {/* Founder authority frame */}
+              <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-8 lg:gap-12 items-start">
+                <blockquote className="space-y-5">
+                  <p className="text-xl lg:text-2xl leading-relaxed text-text-primary font-light">
+                    Distilled from <span className="text-silicon-amber font-medium">three decades at the heart
+                    of the tech industry</span> and observed from a vantage point on the
+                    north coast of Scotland.
+                  </p>
+                  <p className="text-lg leading-relaxed text-text-muted">
+                    While the mainland reacts to the noise, we identify the
+                    &lsquo;Drift&rsquo;&mdash;the structural shifts in policy and supply
+                    chains that define your professional future.
+                  </p>
+                  <p className="text-lg leading-relaxed text-text-muted">
+                    In an era of synthetic expertise, Silicon and Stone provides something
+                    AI cannot replicate: <span className="text-stone-teal font-medium">the human-in-the-loop
+                    perspective</span> built on real-world experience, not training data.
+                  </p>
+                </blockquote>
+
+                {/* Stone-inspired data column */}
+                <div className="lg:border-l lg:border-border-subtle lg:pl-8 space-y-6">
+                  <div>
+                    <div className="font-mono text-3xl font-bold text-silicon-amber">30</div>
+                    <div className="font-mono text-xs uppercase tracking-wider text-text-muted mt-1">
+                      Years in Tech
+                    </div>
+                  </div>
+                  <div className="h-px bg-border-subtle" />
+                  <div>
+                    <div className="font-mono text-sm text-stone-teal">Scotland</div>
+                    <div className="font-mono text-xs uppercase tracking-wider text-text-muted mt-1">
+                      The Edge of Europe
+                    </div>
+                  </div>
+                  <div className="h-px bg-border-subtle" />
+                  <div>
+                    <div className="font-mono text-sm text-text-primary">Human-in-the-Loop</div>
+                    <div className="font-mono text-xs uppercase tracking-wider text-text-muted mt-1">
+                      Not AI-Generated
+                    </div>
+                  </div>
                 </div>
               </div>
-
-              {/* Pull quote */}
-              <blockquote className="space-y-4">
-                <p className="text-xl lg:text-2xl leading-relaxed text-text-primary font-light">
-                  Distilled from <span className="text-silicon-amber font-medium">30 years in the tech industry</span> and
-                  observed from the <span className="text-stone-teal font-medium">edge of Europe</span>.
-                </p>
-                <p className="text-lg lg:text-xl leading-relaxed text-text-muted">
-                  Silicon and Stone provides the detached, forensic perspective required to see through
-                  the mainland hype and identify the &lsquo;Drift&rsquo;&mdash;the structural shifts in policy
-                  and supply chains that define your professional future.
-                </p>
-              </blockquote>
             </div>
           </StaggerItem>
         </StaggerContainer>

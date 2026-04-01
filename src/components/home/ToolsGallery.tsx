@@ -22,9 +22,8 @@ function CompliancePreview() {
   ]
 
   return (
-    <div ref={ref} className="relative h-32 overflow-hidden">
+    <div ref={ref} className="relative h-28 overflow-hidden">
       <svg viewBox="0 0 100 70" className="w-full h-full" preserveAspectRatio="xMidYMid meet">
-        {/* Connection lines */}
         {[10, 37, 63, 90].map((x, i) => (
           <motion.line
             key={x}
@@ -36,7 +35,6 @@ function CompliancePreview() {
             transition={{ duration: 0.5, delay: 0.3 + i * 0.1 }}
           />
         ))}
-        {/* Nodes */}
         {nodes.map((node, i) => (
           <motion.g
             key={node.label}
@@ -90,14 +88,11 @@ function SupplyChainPreview() {
   ]
 
   return (
-    <div ref={ref} className="relative h-32 overflow-hidden">
+    <div ref={ref} className="relative h-28 overflow-hidden">
       <svg viewBox="0 0 100 65" className="w-full h-full" preserveAspectRatio="xMidYMid meet">
-        {/* Simplified continent outlines */}
         <ellipse cx="25" cy="35" rx="18" ry="14" fill="none" stroke="var(--border-subtle)" strokeWidth="0.3" opacity="0.3" />
         <ellipse cx="50" cy="30" rx="12" ry="16" fill="none" stroke="var(--border-subtle)" strokeWidth="0.3" opacity="0.3" />
         <ellipse cx="78" cy="38" rx="16" ry="14" fill="none" stroke="var(--border-subtle)" strokeWidth="0.3" opacity="0.3" />
-
-        {/* Connection lines */}
         {connections.map(([x1, y1, x2, y2], i) => (
           <motion.line
             key={i}
@@ -110,8 +105,6 @@ function SupplyChainPreview() {
             transition={{ duration: 0.8, delay: 0.5 + i * 0.15 }}
           />
         ))}
-
-        {/* Chokepoint nodes */}
         {chokepoints.map((node, i) => (
           <motion.g
             key={node.label}
@@ -119,7 +112,6 @@ function SupplyChainPreview() {
             animate={inView ? { opacity: 1, scale: 1 } : {}}
             transition={{ duration: 0.3, delay: 0.3 + i * 0.1 }}
           >
-            {/* Pulse ring */}
             <motion.circle
               cx={node.x} cy={node.y} r="3"
               fill="none" stroke={node.color} strokeWidth="0.3"
@@ -156,7 +148,7 @@ function ScenarioPreview() {
   ]
 
   return (
-    <div ref={ref} className="h-32 flex items-end justify-center gap-4 px-4 pb-2">
+    <div ref={ref} className="h-28 flex items-end justify-center gap-4 px-4 pb-2">
       {scenarios.map((s, i) => (
         <div key={s.label} className="flex flex-col items-center gap-1 flex-1">
           <motion.div
@@ -179,7 +171,7 @@ function StressTestPreview() {
   const inView = useInView(ref, { once: true, margin: '-50px' })
 
   return (
-    <div ref={ref} className="h-32 flex items-center justify-center gap-6">
+    <div ref={ref} className="h-28 flex items-center justify-center gap-6">
       {[
         { label: 'US', score: 3.2, color: 'var(--stone-teal)' },
         { label: 'EU', score: 7.8, color: 'var(--silicon-amber)' },
@@ -219,30 +211,34 @@ function StressTestPreview() {
 const tools = [
   {
     name: 'Compliance Checker',
-    tagline: 'Know your AI Act risk classification in 60 seconds',
+    scenario: 'Monday, 9:14am. The board asks: "Are we compliant?" You answer in 60 seconds.',
+    tagline: 'Classify your AI systems against the EU AI Act\u2014before your auditor does.',
     href: '/tools/compliance-checker',
-    color: 'silicon-amber' as const,
+    accent: 'amber' as const,
     Preview: CompliancePreview,
   },
   {
     name: 'Supply Chain Mapper',
-    tagline: 'Visualise semiconductor chokepoints before they hit your operations',
+    scenario: 'A TSMC facility reports delays. You already know which products are exposed.',
+    tagline: 'Visualise semiconductor chokepoints and trace upstream dependency in real time.',
     href: '/tools/supply-chain-mapper',
-    color: 'stone-teal' as const,
+    accent: 'teal' as const,
     Preview: SupplyChainPreview,
   },
   {
     name: 'Scenario Modeler',
-    tagline: 'Compare strategic outcomes under three geopolitical futures',
+    scenario: 'The CFO wants three futures modelled by Thursday. You have them by lunch.',
+    tagline: 'Compare strategic outcomes under competing geopolitical scenarios.',
     href: '/tools/scenario-modeler',
-    color: 'silicon-amber' as const,
+    accent: 'amber' as const,
     Preview: ScenarioPreview,
   },
   {
     name: 'Policy Stress-Test',
-    tagline: 'Score the regulatory friction between US and EU approaches',
+    scenario: 'New US export controls drop. You score the friction against EU operations in minutes.',
+    tagline: 'Measure regulatory divergence between US and EU policy positions.',
     href: '/tools/policy-stress-test',
-    color: 'stone-teal' as const,
+    accent: 'teal' as const,
     Preview: StressTestPreview,
   },
 ]
@@ -256,13 +252,14 @@ export function ToolsGallery() {
           <StaggerItem>
             <div className="text-center max-w-2xl mx-auto mb-12">
               <Badge variant="outline" className="mb-4 border-silicon-amber text-silicon-amber font-mono text-xs">
-                Immediate Wins
+                Execution Engines
               </Badge>
               <h2 id="tools-heading" className="text-3xl lg:text-4xl font-bold text-text-primary mb-4">
-                Your Execution Toolkit
+                From Analysis to Action
               </h2>
               <p className="text-lg text-text-muted">
-                Transform analysis into action. Four tools that deliver value in your first session.
+                Four tools that solve high-stakes problems in your first session.
+                Not theory&mdash;execution.
               </p>
             </div>
           </StaggerItem>
@@ -274,12 +271,17 @@ export function ToolsGallery() {
                 <StaggerItem key={tool.name}>
                   <Link href={tool.href} className="block h-full">
                     <ForensicCard
-                      accent={tool.color === 'silicon-amber' ? 'amber' : 'teal'}
+                      accent={tool.accent}
                       showMarkers={true}
                       gridHover={true}
                       delay={0}
                       className="h-full cursor-pointer"
                     >
+                      {/* POV scenario line */}
+                      <p className="text-xs text-text-muted italic mb-3 font-mono leading-relaxed">
+                        &ldquo;{tool.scenario}&rdquo;
+                      </p>
+
                       {/* Mini preview */}
                       <div className="rounded-md bg-slate-deep/50 border border-border-subtle/50 mb-4 overflow-hidden">
                         <Preview />
@@ -290,8 +292,8 @@ export function ToolsGallery() {
                       <p className="text-sm text-text-muted mb-4">{tool.tagline}</p>
 
                       {/* CTA */}
-                      <div className={`flex items-center gap-1.5 text-sm font-medium ${tool.color === 'silicon-amber' ? 'text-silicon-amber' : 'text-stone-teal'}`}>
-                        <span>Launch Tool</span>
+                      <div className={`flex items-center gap-1.5 text-sm font-medium ${tool.accent === 'amber' ? 'text-silicon-amber' : 'text-stone-teal'}`}>
+                        <span>Launch Engine</span>
                         <ArrowRight className="w-4 h-4" />
                       </div>
                     </ForensicCard>

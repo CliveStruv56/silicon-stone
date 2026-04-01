@@ -6,30 +6,30 @@ import { Badge } from '@/components/ui/badge'
 import {
   Lock,
   ShieldAlert,
-  Eye,
+  TrendingDown,
   ServerCrash,
-  FileWarning,
+  UserX,
   Layers,
   ShieldCheck,
   Globe,
   GitBranch,
-  Scale,
+  Crown,
 } from 'lucide-react'
 
 const dependentItems = [
-  { icon: Lock, text: 'Locked to a single vendor\'s API and pricing model' },
-  { icon: ShieldAlert, text: 'Training data jurisdiction unknown or non-EU' },
-  { icon: ServerCrash, text: 'No fallback when the primary service degrades' },
-  { icon: Eye, text: 'Compliance gaps invisible until external audit' },
-  { icon: FileWarning, text: 'Vendor\'s roadmap dictates your capabilities' },
+  { icon: Lock, text: 'Locked to one vendor\u2019s AI stack\u2014their roadmap dictates your capabilities' },
+  { icon: ShieldAlert, text: 'No visibility into how models are trained, updated, or deprecated' },
+  { icon: ServerCrash, text: 'Single point of failure when the provider changes terms or pricing' },
+  { icon: TrendingDown, text: 'Skills plateau at \u201Cprompt user\u201D\u2014no structural career advantage' },
+  { icon: UserX, text: 'Replaceable by anyone with the same subscription' },
 ]
 
 const orchestratorItems = [
-  { icon: Layers, text: 'Multi-model routing with automatic fallback' },
-  { icon: Globe, text: 'Data residency and sovereignty by design' },
-  { icon: ShieldCheck, text: 'Continuous compliance monitoring across models' },
-  { icon: GitBranch, text: 'Vendor-agnostic architecture, zero lock-in' },
-  { icon: Scale, text: 'Full audit trail for every AI decision path' },
+  { icon: Layers, text: 'Route tasks across multiple models\u2014own the decision layer, not the model' },
+  { icon: ShieldCheck, text: 'Evaluate, audit, and switch providers without operational disruption' },
+  { icon: Globe, text: 'Ensure data sovereignty and compliance by design, not by accident' },
+  { icon: GitBranch, text: 'Build institutional AI capability that compounds over time' },
+  { icon: Crown, text: 'Position yourself as the leader who architects AI strategy, not just uses it' },
 ]
 
 export function OrchestrationFramework() {
@@ -39,15 +39,17 @@ export function OrchestrationFramework() {
         <StaggerItem>
           <div className="text-center max-w-3xl mx-auto mb-12">
             <Badge variant="outline" className="mb-4 border-stone-teal text-stone-teal font-mono text-xs">
-              The Orchestration Layer
+              Career Insurance
             </Badge>
             <h2 id="orchestration-heading" className="text-3xl lg:text-4xl font-bold text-text-primary mb-4">
-              From AI User to AI Architect
+              Move Beyond Being an AI User.{' '}
+              <span className="text-silicon-amber">Become an AI Architect.</span>
             </h2>
             <p className="text-lg text-text-muted leading-relaxed">
-              European resilience is not built at the model layer. It&apos;s built at the
-              Orchestration Layer&mdash;where you manage multiple models to ensure digital
-              sovereignty and zero vendor lock-in.
+              Mastering the orchestration layer is a strategic executive skill, not a
+              technical coding task. It&apos;s the difference between managing AI and
+              being managed by it&mdash;and it&apos;s the key to securing your next
+              leadership position.
             </p>
           </div>
         </StaggerItem>
@@ -61,13 +63,16 @@ export function OrchestrationFramework() {
                 </Badge>
                 <h3 className="text-lg font-semibold text-text-primary">Model Dependent</h3>
               </div>
+              <p className="text-sm text-text-muted mb-5 italic">
+                &ldquo;I use the tools my company provides.&rdquo;
+              </p>
               <ul className="space-y-4">
                 {dependentItems.map((item) => {
                   const Icon = item.icon
                   return (
                     <li key={item.text} className="flex items-start gap-3">
                       <Icon className="w-5 h-5 text-alert-red flex-shrink-0 mt-0.5" />
-                      <span className="text-text-muted">{item.text}</span>
+                      <span className="text-sm text-text-muted">{item.text}</span>
                     </li>
                   )
                 })}
@@ -81,15 +86,18 @@ export function OrchestrationFramework() {
                 <Badge className="bg-stone-teal/20 text-stone-teal border-stone-teal/30">
                   High Resilience
                 </Badge>
-                <h3 className="text-lg font-semibold text-text-primary">Sovereign Orchestrator</h3>
+                <h3 className="text-lg font-semibold text-text-primary">Model Orchestrator</h3>
               </div>
+              <p className="text-sm text-text-muted mb-5 italic">
+                &ldquo;I architect how AI serves our strategic objectives.&rdquo;
+              </p>
               <ul className="space-y-4">
                 {orchestratorItems.map((item) => {
                   const Icon = item.icon
                   return (
                     <li key={item.text} className="flex items-start gap-3">
                       <Icon className="w-5 h-5 text-stone-teal flex-shrink-0 mt-0.5" />
-                      <span className="text-text-muted">{item.text}</span>
+                      <span className="text-sm text-text-muted">{item.text}</span>
                     </li>
                   )
                 })}

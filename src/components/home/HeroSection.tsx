@@ -89,40 +89,42 @@ export function HeroSection({ settings }: HeroSectionProps) {
                 initial="hidden"
                 animate="visible"
             >
-                <div className="max-w-3xl">
+                <div className="max-w-4xl">
                     <motion.div variants={itemVariants}>
-                        <Badge variant="outline" className="mb-6 border-stone-teal text-stone-teal font-mono text-xs bg-stone-teal/5">
-                            Strategic Intelligence
+                        <Badge variant="outline" className="mb-6 border-silicon-amber text-silicon-amber font-mono text-xs bg-silicon-amber/5">
+                            Career Infrastructure for the AI Age
                         </Badge>
                     </motion.div>
 
                     <motion.h1
                         variants={itemVariants}
-                        className="text-4xl font-bold tracking-tight text-text-primary sm:text-5xl lg:text-6xl leading-tight mb-6"
+                        className="text-4xl font-bold tracking-tight text-text-primary sm:text-5xl lg:text-6xl leading-[1.1] mb-8"
                     >
                         {settings?.heroTitle || (
                             <>
-                                Navigate the Collision.{' '}
-                                <span className="text-silicon-amber">Own the Orchestration Layer.</span>
+                                AI Literacy is No Longer Optional.{' '}
+                                <span className="block mt-2 text-silicon-amber">
+                                    It&apos;s Your Career Infrastructure.
+                                </span>
                             </>
                         )}
                     </motion.h1>
 
                     <motion.p
                         variants={itemVariants}
-                        className="mt-4 text-xl text-text-muted leading-relaxed max-w-2xl"
+                        className="text-xl text-text-muted leading-relaxed max-w-3xl"
                     >
                         {settings?.heroDescription ||
-                            "Strategic intelligence for mid-career leaders. We bridge the gap between silicon speed and the stone reality of European tech sovereignty."}
+                            "For leaders in their prime (35\u201355), the risk isn\u2019t just disruption\u2014it\u2019s obsolescence. We provide the forensic intelligence and orchestration frameworks you need to secure your seat in the AI-driven economy."}
                     </motion.p>
 
                     <motion.div
                         variants={itemVariants}
                         className="mt-10"
                     >
-                        <Link href="/briefings">
+                        <Link href="/#subscribe">
                             <Button size="lg" className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90 transition-transform hover:scale-105 font-semibold text-base px-8">
-                                Enter the Intelligence Stream
+                                Get Your Career Readiness Audit
                             </Button>
                         </Link>
                     </motion.div>

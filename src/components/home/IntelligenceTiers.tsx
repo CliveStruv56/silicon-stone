@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { StaggerContainer, StaggerItem } from '@/components/ui/StaggerContainer'
 import { ForensicCard } from '@/components/ui/ForensicCard'
 import { Badge } from '@/components/ui/badge'
-import { Zap, BookOpen, Search, ArrowRight } from 'lucide-react'
+import { Zap, BookOpen, RefreshCw, Search, ArrowRight } from 'lucide-react'
 
 interface Article {
   _id: string
@@ -24,35 +24,50 @@ const tiers = [
   {
     key: 'pulse' as const,
     label: 'The Pulse',
-    time: '30s Scan',
+    time: '30s',
     icon: Zap,
-    description: 'The essential signal. Why it matters to your seat right now.',
+    description: 'Essential signals for the daily move-makers.',
     accent: 'teal' as const,
     badgeClass: 'bg-silicon-cyan/20 text-silicon-cyan border-silicon-cyan/30',
     textColor: 'text-silicon-cyan',
     href: '/briefings',
+    hasArticle: true,
   },
   {
     key: 'briefing' as const,
     label: 'The Briefing',
-    time: '5min Read',
+    time: '5min',
     icon: BookOpen,
-    description: 'Actionable context. Strategic recommendations for managers and operators.',
+    description: 'Operational intelligence for managers and directors.',
     accent: 'teal' as const,
     badgeClass: 'bg-stone-teal/20 text-stone-teal border-stone-teal/30',
     textColor: 'text-stone-teal',
     href: '/briefings',
+    hasArticle: true,
+  },
+  {
+    key: 'transition' as const,
+    label: 'The Transition',
+    time: 'Skill-Up',
+    icon: RefreshCw,
+    description: 'Skill-upgrade frameworks for the 35\u201355 career pivot. From AI user to AI architect.',
+    accent: 'amber' as const,
+    badgeClass: 'bg-silicon-amber/20 text-silicon-amber border-silicon-amber/30',
+    textColor: 'text-silicon-amber',
+    href: '/briefings',
+    hasArticle: false,
   },
   {
     key: 'audit' as const,
     label: 'The Audit',
     time: 'Deep Dive',
     icon: Search,
-    description: 'Forensic investigation. The operating manual for complex technical shifts.',
+    description: 'Forensic deep-dives into tech-policy and supply chain friction.',
     accent: 'amber' as const,
     badgeClass: 'bg-silicon-amber/20 text-silicon-amber border-silicon-amber/30',
     textColor: 'text-silicon-amber',
     href: '/briefings',
+    hasArticle: true,
   },
 ]
 
@@ -69,6 +84,7 @@ export function IntelligenceTiers({ pulseArticle, briefingArticle, auditArticle 
     pulse: pulseArticle,
     briefing: briefingArticle,
     audit: auditArticle,
+    transition: null,
   }
 
   return (
@@ -77,15 +93,16 @@ export function IntelligenceTiers({ pulseArticle, briefingArticle, auditArticle 
         <StaggerItem>
           <div className="text-center max-w-2xl mx-auto mb-12">
             <h2 id="tiers-heading" className="text-3xl lg:text-4xl font-bold text-text-primary mb-4">
-              Read at Your Speed
+              Intelligence at Your Pace
             </h2>
             <p className="text-lg text-text-muted">
-              Three tiers of intelligence. From a 30-second scan to a forensic deep dive.
+              Four tiers. From a 30-second signal to a forensic deep dive&mdash;plus
+              dedicated career transition frameworks.
             </p>
           </div>
         </StaggerItem>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {tiers.map((tier) => {
             const Icon = tier.icon
             const article = articles[tier.key]
@@ -94,37 +111,28 @@ export function IntelligenceTiers({ pulseArticle, briefingArticle, auditArticle 
               <StaggerItem key={tier.key}>
                 <ForensicCard accent={tier.accent} showMarkers={true} gridHover={false} delay={0} className="h-full">
                   {/* Tier header */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                      <Icon className={`w-5 h-5 ${tier.textColor}`} />
-                      <h3 className="text-lg font-semibold text-text-primary">{tier.label}</h3>
-                    </div>
+                  <div className="flex items-center justify-between mb-3">
+                    <Icon className={`w-5 h-5 ${tier.textColor}`} />
                     <Badge className={tier.badgeClass}>
                       {tier.time}
                     </Badge>
                   </div>
 
+                  <h3 className="text-base font-semibold text-text-primary mb-2">{tier.label}</h3>
+
                   {/* Description */}
-                  <p className="text-sm text-text-muted mb-6">
+                  <p className="text-sm text-text-muted mb-5">
                     {tier.description}
                   </p>
 
                   {/* Article preview or placeholder */}
-                  <div className="border-t border-border-subtle pt-4">
+                  <div className="border-t border-border-subtle pt-4 mt-auto">
                     {article ? (
-                      <Link
-                        href={`/analysis/${article.slug}`}
-                        className="block group"
-                      >
+                      <Link href={`/analysis/${article.slug}`} className="block group">
                         <article>
-                          <h4 className="text-sm font-medium text-text-primary group-hover:text-stone-teal transition-colors line-clamp-2 mb-2">
+                          <h4 className="text-sm font-medium text-text-primary group-hover:text-stone-teal transition-colors line-clamp-2 mb-1">
                             {article.title}
                           </h4>
-                          {article.excerpt && (
-                            <p className="text-xs text-text-muted line-clamp-2 mb-2">
-                              {article.excerpt}
-                            </p>
-                          )}
                           {article.publishedAt && (
                             <span className="text-xs font-mono text-text-muted">
                               {formatDate(article.publishedAt)}
@@ -133,8 +141,10 @@ export function IntelligenceTiers({ pulseArticle, briefingArticle, auditArticle 
                         </article>
                       </Link>
                     ) : (
-                      <div className="text-center py-4">
-                        <p className="text-xs text-text-muted font-mono">Coming soon</p>
+                      <div className="text-center py-2">
+                        <p className="text-xs text-text-muted font-mono">
+                          {tier.key === 'transition' ? 'Launching soon' : 'Coming soon'}
+                        </p>
                       </div>
                     )}
                   </div>
@@ -142,9 +152,9 @@ export function IntelligenceTiers({ pulseArticle, briefingArticle, auditArticle 
                   {/* Browse link */}
                   <Link
                     href={tier.href}
-                    className={`flex items-center gap-1 mt-4 text-xs font-medium ${tier.textColor} hover:underline`}
+                    className={`flex items-center gap-1 mt-3 text-xs font-medium ${tier.textColor} hover:underline`}
                   >
-                    <span>Browse all {tier.label.toLowerCase().replace('the ', '')} articles</span>
+                    <span>Browse</span>
                     <ArrowRight className="w-3 h-3" />
                   </Link>
                 </ForensicCard>
