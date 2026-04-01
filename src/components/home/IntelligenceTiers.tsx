@@ -54,7 +54,7 @@ const tiers = [
     accent: 'amber' as const,
     badgeClass: 'bg-silicon-amber/20 text-silicon-amber border-silicon-amber/30',
     textColor: 'text-silicon-amber',
-    href: '/briefings',
+    href: '/waymarkpath',
     hasArticle: false,
   },
   {
@@ -142,9 +142,14 @@ export function IntelligenceTiers({ pulseArticle, briefingArticle, auditArticle 
                       </Link>
                     ) : (
                       <div className="text-center py-2">
-                        <p className="text-xs text-text-muted font-mono">
-                          {tier.key === 'transition' ? 'Launching soon' : 'Coming soon'}
-                        </p>
+                        {tier.key === 'transition' ? (
+                          <div>
+                            <p className="text-xs font-semibold text-silicon-amber mb-1">WaymarkPath</p>
+                            <p className="text-xs text-text-muted">AI-powered career transition companion. Early access opening soon.</p>
+                          </div>
+                        ) : (
+                          <p className="text-xs text-text-muted font-mono">Coming soon</p>
+                        )}
                       </div>
                     )}
                   </div>
@@ -154,7 +159,7 @@ export function IntelligenceTiers({ pulseArticle, briefingArticle, auditArticle 
                     href={tier.href}
                     className={`flex items-center gap-1 mt-3 text-xs font-medium ${tier.textColor} hover:underline`}
                   >
-                    <span>Browse</span>
+                    <span>{tier.key === 'transition' ? 'Get early access' : 'Browse'}</span>
                     <ArrowRight className="w-3 h-3" />
                   </Link>
                 </ForensicCard>

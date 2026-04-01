@@ -54,24 +54,27 @@ export async function POST(request: NextRequest) {
     }
 
     // If a tag name was provided and we have a tag ID mapping, apply it
-    if (tag === "Tool_Lead") {
-      const toolTagId = process.env.CONVERTKIT_TOOL_LEAD_TAG_ID;
-      if (toolTagId) {
-        const formData = await response.json();
-        const subscriberId = formData.subscriber?.id;
-        if (subscriberId) {
-          await fetch(
-            `https://api.kit.com/v4/tags/${toolTagId}/subscribers/${subscriberId}`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "X-Kit-Api-Key": KIT_API_KEY,
-              },
-              body: JSON.stringify({}),
-            }
-          );
-        }
+    const tagIdMap: Record<string, string | undefined> = {
+      Tool_Lead: process.env.CONVERTKIT_TOOL_LEAD_TAG_ID,
+      WaymarkPath_Early_Access: process.env.CONVERTKIT_WAYMARKPATH_TAG_ID,
+    };
+
+    const tagId = tag ? tagIdMap[tag] : undefined;
+    if (tagId) {
+      const formData = await response.json();
+      const subscriberId = formData.subscriber?.id;
+      if (subscriberId) {
+        await fetch(
+          `https://api.kit.com/v4/tags/${tagId}/subscribers/${subscriberId}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Kit-Api-Key": KIT_API_KEY,
+            },
+            body: JSON.stringify({}),
+          }
+        );
       }
     }
 

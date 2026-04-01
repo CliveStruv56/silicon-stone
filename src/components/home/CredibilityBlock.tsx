@@ -25,8 +25,8 @@ export function CredibilityBlock() {
                 <blockquote className="space-y-5">
                   <p className="text-xl lg:text-2xl leading-relaxed text-text-primary font-light">
                     Distilled from <span className="text-silicon-amber font-medium">three decades at the heart
-                    of the tech industry</span> and observed from a vantage point on the
-                    north coast of Scotland.
+                    of the tech industry</span> and observed from a small island fifty miles
+                    north of the Scottish mainland.
                   </p>
                   <p className="text-lg leading-relaxed text-text-muted">
                     While the mainland reacts to the noise, we identify the
@@ -50,9 +50,9 @@ export function CredibilityBlock() {
                   </div>
                   <div className="h-px bg-border-subtle" />
                   <div>
-                    <div className="font-mono text-sm text-stone-teal">Scotland</div>
+                    <div className="font-mono text-sm text-stone-teal">50 Miles North</div>
                     <div className="font-mono text-xs uppercase tracking-wider text-text-muted mt-1">
-                      The Edge of Europe
+                      Beyond the Mainland
                     </div>
                   </div>
                   <div className="h-px bg-border-subtle" />
