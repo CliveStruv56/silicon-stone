@@ -1,235 +1,103 @@
-import Link from 'next/link'
-import Image from 'next/image'
+import type { Metadata } from 'next'
 
 import { Header, Footer } from '@/components/layout'
-import { DeadlineCountdown, ToolsGrid, SubscribeCTA, HeroSection } from '@/components/home'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import {
+  HeroSection,
+  DeadlineCountdown,
+  CredibilityBlock,
+  OrchestrationFramework,
+  IntelligenceTiers,
+  ToolsGallery,
+  PersonaNavigator,
+  SubscribeCTA,
+} from '@/components/home'
 import { sanityFetch } from '@/sanity/lib/live'
-import { FEATURED_ARTICLES_QUERY, SITE_SETTINGS_QUERY } from '@/sanity/lib/queries'
-import { urlFor } from '@/sanity/lib/image'
-import { StaggerContainer, StaggerItem } from '@/components/ui/StaggerContainer'
+import { SITE_SETTINGS_QUERY, ARTICLES_BY_TIER_QUERY } from '@/sanity/lib/queries'
 
-type Category = {
-  _id: string
-  title: string
-  slug: string
-}
-
-type Article = {
-  _id: string
-  title: string
-  slug: string
-  excerpt?: string
-  publishedAt?: string
-  contentType?: string
-  mainImage?: {
-    asset?: { _ref: string }
-    alt?: string
-  }
-  categories?: Category[]
-}
-
-function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  })
-}
-
-function formatShortDate(dateString: string) {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-  })
+export const metadata: Metadata = {
+  title: 'Silicon and Stone | Strategic Intelligence for the Orchestration Age',
+  description:
+    'Navigate the collision of AI regulation, semiconductor supply chains, and digital sovereignty. Strategic intelligence for mid-career European leaders from 30 years at the edge.',
 }
 
 export default async function Home() {
-  // Parallel fetching
-  const [articlesRes, settingsRes] = await Promise.all([
-    sanityFetch({ query: FEATURED_ARTICLES_QUERY }),
-    sanityFetch({ query: SITE_SETTINGS_QUERY })
+  const [settingsRes, pulseRes, briefingRes, auditRes] = await Promise.all([
+    sanityFetch({ query: SITE_SETTINGS_QUERY }),
+    sanityFetch({ query: ARTICLES_BY_TIER_QUERY, params: { tier: 'pulse', limit: 1 } }),
+    sanityFetch({ query: ARTICLES_BY_TIER_QUERY, params: { tier: 'briefing', limit: 1 } }),
+    sanityFetch({ query: ARTICLES_BY_TIER_QUERY, params: { tier: 'audit', limit: 1 } }),
   ])
 
-  const articles = articlesRes.data
   const siteSettings = settingsRes.data
+  const pulseArticle = pulseRes.data?.[0] ?? null
+  const briefingArticle = briefingRes.data?.[0] ?? null
+  const auditArticle = auditRes.data?.[0] ?? null
 
-  const featuredArticle = articles?.[0]
-  const recentArticles = articles?.slice(1, 7) || []
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebSite',
+        name: 'Silicon and Stone',
+        url: 'https://siliconandstone.com',
+        description: 'Strategic intelligence for the collision of AI regulation, semiconductor supply chains, and digital sovereignty.',
+      },
+      {
+        '@type': 'Organization',
+        name: 'Silicon and Stone',
+        url: 'https://siliconandstone.com',
+        description: 'Forensic technopolitics. 30 years of technology industry experience distilled from the edge of Europe.',
+      },
+    ],
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
 
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       <main className="flex-1">
-        {/* Hero Section */}
+        {/* 1. Hero — The Vantage Point */}
         <HeroSection settings={siteSettings} />
 
-        {/* Status Bar */}
-        {/* Status Bar */}
-        <section className="bg-stone-charcoal z-10 relative">
-          <div className="mx-auto max-w-7xl">
+        {/* 2. Deadline Countdown */}
+        <div className="bg-slate-deep border-y border-border-subtle">
+          <div className="mx-auto max-w-7xl px-6 py-3 lg:px-8">
             <DeadlineCountdown />
           </div>
-        </section>
+        </div>
 
-        {/* Strategies & Analysis */}
-        <section className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-bold text-text-primary tracking-tight">Intelligence Stream</h2>
-            <Link href="/analysis" className="text-sm font-medium text-stone-teal hover:text-silicon-amber transition-colors font-ui-mono">
-              View content archive &rarr;
-            </Link>
-          </div>
+        {/* 3. Credibility — The View from the Edge */}
+        <CredibilityBlock />
 
-          <StaggerContainer className="space-y-12">
-            {/* Featured Article - Cinematic Layout */}
-            {featuredArticle && (
-              <StaggerItem className="group relative grid lg:grid-cols-12 gap-6 lg:gap-8 items-start">
-                <div className="lg:col-span-8 relative aspect-video rounded-lg overflow-hidden bg-stone-charcoal border border-border-subtle tech-corners">
-                  {featuredArticle.mainImage?.asset ? (
-                    <Image
-                      src={urlFor(featuredArticle.mainImage).width(1200).height(675).url()}
-                      alt={featuredArticle.mainImage.alt || featuredArticle.title}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                    />
-                  ) : (
-                    <Image
-                      src="/intelligence-stream-bg.png"
-                      alt="Intelligence Stream - Forensic Technopolitics"
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out opacity-90"
-                    />
-                  )}
-                  {/* Scanline overlay for featured */}
-                  <div className="scanlines absolute inset-0 opacity-10 pointer-events-none" />
-                </div>
+        {/* 4. Orchestration Framework — Model Independence */}
+        <OrchestrationFramework />
 
-                <div className="lg:col-span-4 flex flex-col justify-center h-full space-y-4">
-                  <div className="flex items-center gap-3">
-                    {featuredArticle.categories?.[0] && (
-                      <Badge variant="secondary" className="bg-silicon-amber/10 text-silicon-amber border border-silicon-amber/20 hover:bg-silicon-amber/20">
-                        {featuredArticle.categories[0].title}
-                      </Badge>
-                    )}
-                    {featuredArticle.contentType && (
-                      <span className="text-xs font-mono text-text-muted uppercase tracking-wider">
-                        {featuredArticle.contentType === 'deepdive' ? 'Deep Dive' :
-                          featuredArticle.contentType === 'signal' ? 'Signal' : 'Guide'}
-                      </span>
-                    )}
-                  </div>
+        {/* 5. Intelligence Tiers — Education + Execution */}
+        <IntelligenceTiers
+          pulseArticle={pulseArticle}
+          briefingArticle={briefingArticle}
+          auditArticle={auditArticle}
+        />
 
-                  <h3 className="text-2xl lg:text-3xl font-bold text-text-primary leading-tight group-hover:text-stone-teal transition-colors">
-                    <Link href={`/analysis/${featuredArticle.slug}`}>
-                      {featuredArticle.title}
-                    </Link>
-                  </h3>
+        {/* 6. Tool Gallery — Real-World Utility */}
+        <ToolsGallery />
 
-                  {featuredArticle.excerpt && (
-                    <p className="text-text-muted text-lg leading-relaxed">
-                      {featuredArticle.excerpt}
-                    </p>
-                  )}
+        {/* 7. Persona Navigator — Find Your Perspective */}
+        <PersonaNavigator />
 
-                  {featuredArticle.publishedAt && (
-                    <div className="text-sm text-border-subtle font-mono pt-2 border-t border-border-subtle/30 mt-4 w-full">
-                      {formatDate(featuredArticle.publishedAt)}
-                    </div>
-                  )}
-                </div>
-              </StaggerItem>
-            )}
-
-            {/* Recent Articles Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10 border-t border-border-subtle pt-12">
-              {recentArticles.map((article: Article) => (
-                <StaggerItem key={article._id}>
-                  <article className="flex flex-col group h-full grid-hover p-4 -m-4 rounded-xl transition-colors hover:bg-white/[0.02]">
-                    {article.mainImage?.asset ? (
-                      <div className="relative aspect-[3/2] rounded-md overflow-hidden bg-stone-charcoal mb-4 border border-border-subtle/50 group-hover:border-stone-teal/50 transition-colors">
-                        <Image
-                          src={urlFor(article.mainImage).width(600).height(400).url()}
-                          alt={article.mainImage.alt || article.title}
-                          fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      </div>
-                    ) : (
-                      <div className="relative aspect-[3/2] rounded-md overflow-hidden bg-gradient-to-br from-stone-charcoal to-slate-deep mb-4 border border-border-subtle/50 group-hover:border-stone-teal/50 transition-colors flex items-center justify-center">
-                        <div className="text-center">
-                          <div className="text-2xl font-mono font-bold text-silicon-amber/20">S&amp;S</div>
-                          <div className="text-[10px] font-mono uppercase tracking-widest text-text-muted/30 mt-1">Forensic Technopolitics</div>
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="flex items-center gap-2 mb-3">
-                      {article.categories?.[0] && (
-                        <span className="text-xs font-bold text-stone-teal uppercase tracking-wide font-ui-mono">
-                          {article.categories[0].title}
-                        </span>
-                      )}
-                      <span className="text-border-subtle text-xs">•</span>
-                      {article.publishedAt && (
-                        <span className="text-xs text-text-muted font-mono">
-                          {formatShortDate(article.publishedAt)}
-                        </span>
-                      )}
-                    </div>
-
-                    <h3 className="text-lg font-bold text-text-primary leading-snug mb-2 group-hover:text-stone-teal transition-colors">
-                      <Link href={`/analysis/${article.slug}`}>
-                        {article.title}
-                      </Link>
-                    </h3>
-
-                    {article.excerpt && (
-                      <p className="text-sm text-text-muted line-clamp-3 leading-relaxed">
-                        {article.excerpt}
-                      </p>
-                    )}
-                  </article>
-                </StaggerItem>
-              ))}
-            </div>
-
-            <div className="flex justify-center pt-8">
-              <Link href="/analysis">
-                <Button variant="outline" className="min-w-[200px] border-border-subtle hover:bg-surface-elevated text-text-primary relative overflow-hidden group">
-                  <span className="relative z-10">View All Analysis &rarr;</span>
-                  <div className="absolute inset-0 bg-stone-teal/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-                </Button>
-              </Link>
-            </div>
-          </StaggerContainer>
-        </section>
-
-        {/* Tools Section */}
-        <section className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
-          <StaggerContainer delay={0.2}>
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-bold text-text-primary tracking-tight">Interactive Tools</h2>
-              <Link href="/tools" className="text-sm font-medium text-stone-teal hover:text-silicon-amber transition-colors font-ui-mono">
-                Access toolbox &rarr;
-              </Link>
-            </div>
-            <ToolsGrid />
-          </StaggerContainer>
-        </section>
-
-
-
-        {/* Subscribe Band */}
-        <section className="bg-surface-elevated border-y border-border-subtle relative">
-          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
-            <div className="max-w-2xl">
+        {/* 8. Subscribe CTA */}
+        <div className="bg-stone-charcoal/30 border-t border-border-subtle">
+          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+            <div className="max-w-md mx-auto">
               <SubscribeCTA />
             </div>
           </div>
-        </section>
+        </div>
       </main>
 
       <Footer />
