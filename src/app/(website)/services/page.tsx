@@ -417,6 +417,41 @@ export default function ServicesPage() {
           </div>
         </section>
 
+        {/* WaymarkPath CTA */}
+        <section className="bg-stone-charcoal/50 border-y border-border-subtle">
+          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+            <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8 items-center">
+              <div>
+                <Badge className="mb-3 bg-silicon-amber/20 text-silicon-amber border-silicon-amber/30">
+                  Coming Soon
+                </Badge>
+                <h2 className="text-2xl font-bold text-text-primary mb-3">
+                  WaymarkPath: AI-Powered Career Transition
+                </h2>
+                <p className="text-text-muted mb-4">
+                  For mid-career professionals navigating significant career changes. Personalised AI coaching,
+                  skills gap analysis, structured roadmaps, and daily accountability check-ins&mdash;transforming
+                  an overwhelming career pivot into a clear, achievable path.
+                </p>
+                <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-text-muted">
+                  <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> Skills gap analysis</span>
+                  <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> AI coaching</span>
+                  <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> CV optimisation</span>
+                  <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> Daily check-ins</span>
+                </div>
+              </div>
+              <div className="text-center lg:text-right">
+                <Link href="/waymarkpath">
+                  <Button size="lg" className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90 font-semibold">
+                    Get Early Access
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Contact Form */}
         <section id="contact" className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -521,7 +556,7 @@ export default function ServicesPage() {
                       Area of Interest
                     </label>
                     <div className="grid grid-cols-2 gap-2">
-                      {['AI Act Compliance', 'Supply Chain Risk', 'Scenario Planning', 'Policy Analysis'].map((option) => (
+                      {['AI Act Compliance', 'Supply Chain Risk', 'Scenario Planning', 'Policy Analysis', 'Career Transition'].map((option) => (
                         <button
                           key={option}
                           type="button"

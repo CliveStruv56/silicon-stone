@@ -36,6 +36,7 @@ const staticNavigation = [
       { name: 'Compliance Checker', href: '/tools/compliance-checker' },
       { name: 'Supply Chain Mapper', href: '/tools/supply-chain-mapper' },
       { name: 'Scenario Modeler', href: '/tools/scenario-modeler' },
+      { name: 'Policy Stress-Test', href: '/tools/policy-stress-test' },
     ],
   },
   {
@@ -45,6 +46,7 @@ const staticNavigation = [
       { name: 'AI Act Compliance Toolkit', href: '/products/ai-act-toolkit' },
       { name: 'AI Audit Checklist Pack', href: '/products/ai-audit-checklist' },
       { name: 'Sector Briefings', href: '/products/briefings' },
+      { name: 'WaymarkPath', href: '/waymarkpath' },
     ],
   },
   {

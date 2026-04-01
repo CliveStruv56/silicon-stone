@@ -9,6 +9,7 @@ import {
   Shield,
   ClipboardCheck,
   FileText,
+  RefreshCw,
   ArrowRight,
   CheckCircle,
 } from 'lucide-react'
@@ -57,6 +58,25 @@ const products = [
       'Includes £20 discount on full Toolkit',
     ],
     cta: 'View Checklist Pack',
+  },
+  {
+    title: 'WaymarkPath',
+    slug: 'waymarkpath',
+    description: 'AI-powered career transition companion for mid-career professionals. Personalised coaching, skills gap analysis, and daily accountability.',
+    price: 'Free Early Access',
+    badge: 'Coming Soon',
+    badgeColor: 'bg-silicon-amber/20 text-silicon-amber',
+    icon: RefreshCw,
+    iconColor: 'text-silicon-amber',
+    iconBg: 'bg-silicon-amber/10',
+    highlights: [
+      'Skills inventory with proficiency mapping',
+      'AI-powered gap analysis ranked by priority',
+      'Personalised learning path and roadmap',
+      'ATS-optimised CV generation',
+      'Daily AI coaching check-ins with streaks',
+    ],
+    cta: 'Get Early Access',
   },
   {
     title: 'Sector Intelligence Briefings',
@@ -151,7 +171,7 @@ export default function ProductsPage() {
                         </li>
                       ))}
                     </ul>
-                    <Link href={`/products/${product.slug}`} className="mt-6">
+                    <Link href={product.slug === 'waymarkpath' ? '/waymarkpath' : `/products/${product.slug}`} className="mt-6">
                       <Button className="w-full bg-surface-elevated text-text-primary hover:bg-surface-elevated/80">
                         {product.cta}
                         <ArrowRight className="w-4 h-4 ml-2" />
