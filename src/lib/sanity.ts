@@ -28,6 +28,40 @@ export interface ArticleData {
     metaDescription?: string;
     stoneTruth?: string;
     actionableInsights?: string[];
+    categorySlugs?: string[];
+}
+
+export interface CategoryOption {
+    _id: string;
+    title: string;
+    slug: string;
+    description?: string;
+}
+
+export async function listSanityCategories(): Promise<CategoryOption[]> {
+    if (!token) return [];
+    const query = `*[_type == "category"] | order(title asc) {
+        _id,
+        title,
+        "slug": slug.current,
+        description
+    }`;
+    return await writeClient.fetch(query);
+}
+
+async function resolveCategoryRefs(slugs: string[]): Promise<{ _type: 'reference'; _ref: string; _key: string }[]> {
+    if (!slugs.length) return [];
+    const query = `*[_type == "category" && slug.current in $slugs]{ _id, "slug": slug.current }`;
+    const rows: { _id: string; slug: string }[] = await writeClient.fetch(query, { slugs });
+    const bySlug = new Map(rows.map(r => [r.slug, r._id]));
+    return slugs
+        .map(s => bySlug.get(s))
+        .filter((id): id is string => !!id)
+        .map(id => ({
+            _type: 'reference' as const,
+            _ref: id,
+            _key: crypto.randomUUID().slice(0, 8),
+        }));
 }
 
 export async function createArticleInSanity(data: ArticleData) {
@@ -77,6 +111,10 @@ export async function createArticleInSanity(data: ArticleData) {
             ...(data.seoTitle ? { metaTitle: data.seoTitle } : {}),
             ...(data.metaDescription ? { metaDescription: data.metaDescription } : {}),
         };
+    }
+    if (data.categorySlugs && data.categorySlugs.length > 0) {
+        const refs = await resolveCategoryRefs(data.categorySlugs);
+        if (refs.length > 0) doc.categories = refs;
     }
 
     return await writeClient.createOrReplace(doc);

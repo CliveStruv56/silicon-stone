@@ -1,8 +1,8 @@
 'use server';
 
-import { buildPrompt, buildMetadataPrompt } from "@/lib/prompts";
+import { buildPrompt, buildMetadataPrompt, type CategoryChoice } from "@/lib/prompts";
 import { callClaude } from "@/lib/anthropic";
-import { createArticleInSanity } from "@/lib/sanity";
+import { createArticleInSanity, listSanityCategories } from "@/lib/sanity";
 import { logErrorToFile } from "@/lib/debug";
 
 type ContentType = 'signal' | 'deepdive' | 'guide';
@@ -12,12 +12,18 @@ interface ArticleMetadata {
     metaDescription?: string;
     stoneTruth?: string;
     actionableInsights?: string[];
+    categorySlugs?: string[];
 }
 
-async function extractArticleMetadata(title: string, body: string, personaKey: string): Promise<ArticleMetadata | null> {
+async function extractArticleMetadata(
+    title: string,
+    body: string,
+    personaKey: string,
+    categories: CategoryChoice[],
+): Promise<ArticleMetadata | null> {
     let raw = "";
     try {
-        const { systemPrompt, userPrompt } = await buildMetadataPrompt(title, body, personaKey);
+        const { systemPrompt, userPrompt } = await buildMetadataPrompt(title, body, personaKey, categories);
         raw = await callClaude(systemPrompt, userPrompt);
 
         const firstOpen = raw.indexOf('{');
@@ -40,11 +46,20 @@ async function extractArticleMetadata(title: string, body: string, personaKey: s
                 .slice(0, 5)
             : [];
 
+        const allowedSlugs = new Set(categories.map(c => c.slug));
+        const rawSlugs = Array.isArray(parsed.categorySlugs)
+            ? parsed.categorySlugs
+                .map((s: unknown) => (typeof s === 'string' ? s.trim() : ''))
+                .filter((s: string) => allowedSlugs.has(s))
+                .slice(0, 2)
+            : [];
+
         return {
             seoTitle: clamp(parsed.seoTitle, 60),
             metaDescription: clamp(parsed.metaDescription, 160),
             stoneTruth: clamp(parsed.stoneTruth, 160),
             actionableInsights: insights.length >= 3 ? insights : undefined,
+            categorySlugs: rawSlugs.length > 0 ? rawSlugs : undefined,
         };
     } catch (err) {
         const message = err instanceof Error ? err.message : 'Unknown error';
@@ -105,9 +120,16 @@ export async function generateContent(_prevState: ActionState, formData: FormDat
         // Generate Slug
         const slug = topic.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').substring(0, 50) + '-' + Date.now().toString().slice(-4);
 
-        // 3b. Extract SEO metadata + actionable insights from the finished draft.
+        // 3b. Fetch category taxonomy, then extract SEO metadata + actionable
+        // insights + category picks from the finished draft.
         // Best-effort: on failure the draft still saves without the extras.
-        const metadata = await extractArticleMetadata(title, content, personaKey);
+        const categoryOptions = await listSanityCategories();
+        const metadata = await extractArticleMetadata(
+            title,
+            content,
+            personaKey,
+            categoryOptions.map(c => ({ slug: c.slug, title: c.title, description: c.description })),
+        );
 
         // Prefer the metadata call's meta description as the excerpt — it's tuned for <=160 chars.
         const finalExcerpt = metadata?.metaDescription ?? excerpt;
@@ -124,6 +146,7 @@ export async function generateContent(_prevState: ActionState, formData: FormDat
             metaDescription: metadata?.metaDescription,
             stoneTruth: metadata?.stoneTruth,
             actionableInsights: metadata?.actionableInsights,
+            categorySlugs: metadata?.categorySlugs,
         });
 
         return {
