@@ -1,8 +1,8 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-03-31
-> Status: **Live in Production — siliconandstone.com on Vercel, Build Passing (41 routes), 0 npm vulnerabilities**
+> Last Updated: 2026-04-14
+> Status: **Live in Production — siliconandstone.com on Vercel, Build Passing, 0 npm vulnerabilities**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com. Public website, 4 interactive tools (email-gated for lead capture), product/commerce pages with Lemon Squeezy checkout links, ConvertKit newsletter & contact integration, Plausible analytics (6 custom events), AI content creation pipeline (Signal, Deep Dive, Research, YouTube Script), and embedded CMS Studio. Awaiting Lemon Squeezy store setup, Plausible account, and content publishing.
 
@@ -318,7 +318,20 @@ ADMIN_PASSWORD=studio123
 
 ---
 
-## 9. Recent Changes (March 2026 Sessions)
+## 9. Recent Changes
+
+### April 14, 2026 — Generator pipeline repair + auto-classification
+
+| Commit | Description |
+|--------|-------------|
+| `d8c4875` | Auto-classify generated articles into Sanity categories (metadata prompt picks 1–2 category slugs from live taxonomy, resolved to references in createArticleInSanity) |
+| `6093bdc` | Fix Vercel context loading: import `context/core/*.json` as static modules so webpack bundles them (was failing with `fs.readFile` at runtime) |
+| `88ea280` | SEO metadata extraction pass + model/source fixes: second Claude call extracts seoTitle/metaDescription/stoneTruth/actionableInsights; generator model upgraded to `claude-sonnet-4-6` (old id 404'd); Inoreader search scoped to `S&S Approved` tag; generator form content-type ids aligned; error banner on failure |
+| `261a7b8` | Sanity → Pinecone vector integration for semantic search and RAG (built earlier same day — see `project_pinecone_integration.md`) |
+
+**Open gap:** existing articles that pre-date `d8c4875` have no `categories[]` assigned and won't show on category pages until backfilled (the Helium semiconductor article was already fixed manually via Sanity MCP).
+
+### March 2026 Sessions
 
 | Commit | Description |
 |--------|-------------|
@@ -341,10 +354,12 @@ ADMIN_PASSWORD=studio123
 
 | Issue | Notes | Priority |
 |-------|-------|----------|
+| Legacy articles have no categories | Anything generated before commit `d8c4875` has empty `categories[]` and won't appear on `/analysis/category/*` pages. Backfill manually in Studio or via a one-off script. | Medium |
 | Inoreader redirect URI | Still points to localhost — user needs to update in Inoreader dev portal | Medium |
 | Lemon Squeezy not configured | Checkout links wired but env vars not yet set (no store created) | Medium |
 | Plausible not configured | Script deployed but env var not set (no account created) | Medium |
 | Draft articles unpublished | Content exists in Sanity but needs publishing + cover images | Medium |
+| Studio reference-array UX trap | Clicking "Add item" in a Sanity reference array and saving without picking a doc leaves an orphan row (`_type`/`_key` but no `_ref`). One of these was found and cleaned up on the Helium article draft on 2026-04-14. | Low |
 | No automated tests | Test suite not yet implemented | Low |
 | No CI/CD pipeline | Vercel auto-deploys from main, but no test/lint gates | Low |
 
