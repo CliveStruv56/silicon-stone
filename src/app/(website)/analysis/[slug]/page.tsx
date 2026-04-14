@@ -12,8 +12,8 @@ import {
   PulseHeader,
   MethodologyChecklist,
   DynamicCTA,
-  RelatedArticles,
 } from '@/components/article'
+import { RelatedArticles } from '@/components/article/RelatedArticles'
 import { sanityFetch } from '@/sanity/lib/live'
 import { ARTICLE_QUERY, ARTICLE_SLUGS_QUERY } from '@/sanity/lib/queries'
 import { urlFor } from '@/sanity/lib/image'
