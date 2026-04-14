@@ -1,6 +1,9 @@
 import fs from 'fs/promises';
 import nodePath from 'path';
 import { ICP, VoiceDNA, BusinessProfile } from '@/types/context';
+import icpJson from '../../context/core/icp.json';
+import voiceDnaJson from '../../context/core/voice-dna.json';
+import businessProfileJson from '../../context/core/business-profile.json';
 
 const ROOT = process.env.AI_WRITER_ROOT || process.cwd();
 
@@ -35,29 +38,16 @@ function validatePath(relativePath: string): void {
     }
 }
 
-async function readJson<T>(relativePath: string): Promise<T> {
-    // If we are in the web-platform dir, we need to go up if env var is not set correctly
-    // But we assume AI_WRITER_ROOT is set to the project root.
-    const fullPath = nodePath.join(ROOT, relativePath);
-    try {
-        const data = await fs.readFile(fullPath, 'utf-8');
-        return JSON.parse(data) as T;
-    } catch (error) {
-        console.error(`Error reading ${relativePath} from ${fullPath}:`, error);
-        throw new Error(`Failed to load context file: ${relativePath}`);
-    }
-}
-
 export async function getICP(): Promise<ICP> {
-    return readJson<ICP>('context/core/icp.json');
+    return icpJson as ICP;
 }
 
 export async function getVoiceDNA(): Promise<VoiceDNA> {
-    return readJson<VoiceDNA>('context/core/voice-dna.json');
+    return voiceDnaJson as VoiceDNA;
 }
 
 export async function getBusinessProfile(): Promise<BusinessProfile> {
-    return readJson<BusinessProfile>('context/core/business-profile.json');
+    return businessProfileJson as BusinessProfile;
 }
 
 export async function getContentFocus(): Promise<string> {
