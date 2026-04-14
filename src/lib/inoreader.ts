@@ -86,8 +86,9 @@ export interface InoreaderItem {
 }
 
 export async function searchItems(token: string, query: string): Promise<InoreaderItem[]> {
-    // Search the user's reading list (global search for user)
-    const url = `${API_BASE}/stream/contents/user/-/state/com.google/reading-list?q=${encodeURIComponent(query)}&n=20`;
+    // Search only within the curated tag "S&S Approved" instead of the entire reading list
+    const TARGET_TAG = 'S&S Approved';
+    const url = `${API_BASE}/stream/contents/user/-/label/${encodeURIComponent(TARGET_TAG)}?q=${encodeURIComponent(query)}&n=20`;
 
     const res = await fetch(url, {
         headers: {

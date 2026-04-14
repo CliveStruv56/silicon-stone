@@ -24,6 +24,10 @@ export interface ArticleData {
     body: string; // Markdown
     contentType: 'signal' | 'deepdive' | 'guide' | 'youtube';
     persona: string;
+    seoTitle?: string;
+    metaDescription?: string;
+    stoneTruth?: string;
+    actionableInsights?: string[];
 }
 
 export async function createArticleInSanity(data: ArticleData) {
@@ -52,7 +56,7 @@ export async function createArticleInSanity(data: ArticleData) {
 
     const docId = data.id || `drafts.${crypto.randomUUID()}`;
 
-    const doc = {
+    const doc: { _id: string; _type: string; [key: string]: unknown } = {
         _id: docId,
         _type: 'article',
         title: data.title,
@@ -63,6 +67,17 @@ export async function createArticleInSanity(data: ArticleData) {
         personas: [personaValue],
         // publisedAt removed to keep as draft
     };
+
+    if (data.stoneTruth) doc.stoneTruth = data.stoneTruth;
+    if (data.actionableInsights && data.actionableInsights.length > 0) {
+        doc.actionableInsights = data.actionableInsights;
+    }
+    if (data.seoTitle || data.metaDescription) {
+        doc.seo = {
+            ...(data.seoTitle ? { metaTitle: data.seoTitle } : {}),
+            ...(data.metaDescription ? { metaDescription: data.metaDescription } : {}),
+        };
+    }
 
     return await writeClient.createOrReplace(doc);
 }

@@ -1,10 +1,57 @@
 'use server';
 
-import { buildPrompt } from "@/lib/prompts";
+import { buildPrompt, buildMetadataPrompt } from "@/lib/prompts";
 import { callClaude } from "@/lib/anthropic";
 import { createArticleInSanity } from "@/lib/sanity";
+import { logErrorToFile } from "@/lib/debug";
 
 type ContentType = 'signal' | 'deepdive' | 'guide';
+
+interface ArticleMetadata {
+    seoTitle?: string;
+    metaDescription?: string;
+    stoneTruth?: string;
+    actionableInsights?: string[];
+}
+
+async function extractArticleMetadata(title: string, body: string, personaKey: string): Promise<ArticleMetadata | null> {
+    let raw = "";
+    try {
+        const { systemPrompt, userPrompt } = await buildMetadataPrompt(title, body, personaKey);
+        raw = await callClaude(systemPrompt, userPrompt);
+
+        const firstOpen = raw.indexOf('{');
+        const lastClose = raw.lastIndexOf('}');
+        if (firstOpen === -1 || lastClose === -1) throw new Error("No JSON object in metadata response");
+
+        const parsed = JSON.parse(raw.substring(firstOpen, lastClose + 1));
+
+        const clamp = (s: unknown, max: number): string | undefined => {
+            if (typeof s !== 'string') return undefined;
+            const trimmed = s.trim();
+            if (!trimmed) return undefined;
+            return trimmed.length > max ? trimmed.slice(0, max).trimEnd() : trimmed;
+        };
+
+        const insights = Array.isArray(parsed.actionableInsights)
+            ? parsed.actionableInsights
+                .map((i: unknown) => (typeof i === 'string' ? i.trim() : ''))
+                .filter((i: string) => i.length > 0)
+                .slice(0, 5)
+            : [];
+
+        return {
+            seoTitle: clamp(parsed.seoTitle, 60),
+            metaDescription: clamp(parsed.metaDescription, 160),
+            stoneTruth: clamp(parsed.stoneTruth, 160),
+            actionableInsights: insights.length >= 3 ? insights : undefined,
+        };
+    } catch (err) {
+        const message = err instanceof Error ? err.message : 'Unknown error';
+        logErrorToFile(`METADATA EXTRACTION FAILED: ${message}\n\nRAW:\n${raw}`);
+        return null;
+    }
+}
 
 interface ActionState {
     success: boolean;
@@ -58,14 +105,25 @@ export async function generateContent(_prevState: ActionState, formData: FormDat
         // Generate Slug
         const slug = topic.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').substring(0, 50) + '-' + Date.now().toString().slice(-4);
 
+        // 3b. Extract SEO metadata + actionable insights from the finished draft.
+        // Best-effort: on failure the draft still saves without the extras.
+        const metadata = await extractArticleMetadata(title, content, personaKey);
+
+        // Prefer the metadata call's meta description as the excerpt — it's tuned for <=160 chars.
+        const finalExcerpt = metadata?.metaDescription ?? excerpt;
+
         // 4. Publish to Sanity
         const result = await createArticleInSanity({
             title,
             slug,
-            excerpt,
+            excerpt: finalExcerpt,
             body: content, // The adapter converts this to blocks
             contentType: contentType as ContentType,
             persona: personaKey,
+            seoTitle: metadata?.seoTitle,
+            metaDescription: metadata?.metaDescription,
+            stoneTruth: metadata?.stoneTruth,
+            actionableInsights: metadata?.actionableInsights,
         });
 
         return {

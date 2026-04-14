@@ -8,7 +8,8 @@ import {
     Sparkles,
     ArrowRight,
     CheckCircle,
-    Loader2
+    Loader2,
+    AlertCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -26,8 +27,8 @@ function getPersonaColor(index: number) {
 
 const TYPES = [
     { id: 'signal', name: 'Signal', desc: 'Rapid response (800 words)', icon: Sparkles },
-    { id: 'deep_dive', name: 'Deep Dive', desc: 'Forensic report (3000w)', icon: FileText },
-    { id: 'linkedin', name: 'LinkedIn Post', desc: 'Executive summary', icon: Users },
+    { id: 'deepdive', name: 'Deep Dive', desc: 'Forensic report (3000w)', icon: FileText },
+    { id: 'guide', name: 'LinkedIn Post', desc: 'Executive summary', icon: Users },
 ];
 
 const INITIAL_STATE = { success: false, message: '', path: '', id: '' };
@@ -179,6 +180,16 @@ export default function GeneratorForm({ personas }: { personas: Persona[] }) {
                                         <FileText className="w-3 h-3" />
                                         Open in Sanity Studio
                                     </a>
+                                </div>
+                            </div>
+                        )}
+
+                        {state && !state.success && state.message && (
+                            <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-lg flex items-start gap-3">
+                                <AlertCircle className="w-5 h-5 mt-0.5 shrink-0" />
+                                <div>
+                                    <div className="font-bold">Generation Failed</div>
+                                    <div className="text-sm opacity-90 break-words">{state.message}</div>
                                 </div>
                             </div>
                         )}

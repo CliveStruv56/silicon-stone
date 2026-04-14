@@ -1,5 +1,6 @@
 import { getVoiceDNA, getBusinessProfile, getContentFocus } from "./api";
 import { getSanityPersona } from "./sanity";
+import type { VoiceDNA } from "@/types/context";
 
 type ContentType = 'signal' | 'deepdive' | 'guide';
 
@@ -117,6 +118,50 @@ Cite key regulations (e.g. AI Act Articles) or specific technologies.
 Tone: Academic but accessible. "The Adult in the Room".
 `;
     }
+
+    return { systemPrompt, userPrompt };
+}
+
+export async function buildMetadataPrompt(title: string, body: string, personaKey: string, voice?: VoiceDNA) {
+    const [persona, voiceDNA] = await Promise.all([
+        getSanityPersona(personaKey),
+        voice ? Promise.resolve(voice) : getVoiceDNA(),
+    ]);
+
+    if (!persona) throw new Error(`Persona ${personaKey} not found in Sanity`);
+
+    const systemPrompt = `You are an SEO editor for "Silicon & Stone", a forensic technopolitical intelligence brand.
+Voice traits: ${voiceDNA.personality.traits.join(", ")}.
+Never use these hype phrases: ${voiceDNA.voice_boundaries.never_uses_phrases.join(", ")}.
+Primary tone: ${voiceDNA.tone.primary_tone}.
+
+Your job is to read a finished draft article and produce structured SEO metadata and actionable insights.
+You MUST output a single valid JSON object and NOTHING ELSE — no markdown fences, no prose, no preamble.
+
+Schema (all fields required):
+{
+  "seoTitle": string,           // 50–60 chars. Front-load the primary keyword. No brand suffix.
+  "metaDescription": string,    // 150–160 chars. Specific, compelling, includes primary keyword. No clickbait.
+  "stoneTruth": string,         // <160 chars. One-sentence bottom line in the brand voice. The "if you read nothing else, read this" line.
+  "actionableInsights": string[]  // 3–5 items. Each a complete imperative sentence aimed at ${persona.role}. No filler, no restating the body.
+}
+
+Hard constraints:
+- seoTitle MUST be <= 60 characters.
+- metaDescription MUST be <= 160 characters.
+- stoneTruth MUST be <= 160 characters.
+- actionableInsights MUST contain between 3 and 5 items.
+- Return JSON only. No \`\`\`json fences.`;
+
+    const userPrompt = `Extract SEO metadata and actionable insights for this draft.
+
+TITLE:
+${title}
+
+BODY:
+${body}
+
+Return the JSON object now.`;
 
     return { systemPrompt, userPrompt };
 }
