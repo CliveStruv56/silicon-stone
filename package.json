@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
+    "@pinecone-database/pinecone": "^7.2.0",
     "@portabletext/toolkit": "^5.0.1",
     "@radix-ui/react-navigation-menu": "^1.2.14",
     "@radix-ui/react-separator": "^1.1.8",
@@ -28,6 +29,7 @@
     "maplibre-gl": "^5.17.0",
     "next": "^15.5.12",
     "next-sanity": "^11.6.12",
+    "openai": "^6.34.0",
     "radix-ui": "^1.4.3",
     "react": "19.2.3",
     "react-dom": "19.2.3",

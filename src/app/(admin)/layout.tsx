@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Terminal, Zap, Search, Users, Database, Home } from 'lucide-react';
+import { Terminal, Zap, Search, Users, Database, Home, BrainCircuit } from 'lucide-react';
 
 export const metadata = {
     title: 'Writer Studio',
@@ -11,6 +11,7 @@ const NAV_ITEMS = [
     { href: '/generate', label: 'Generate', icon: Zap },
     { href: '/research', label: 'Research', icon: Search },
     { href: '/context', label: 'Context', icon: Users },
+    { href: '/knowledge', label: 'Knowledge', icon: BrainCircuit },
     { href: '/studio', label: 'Studio', icon: Database },
 ];
 

@@ -12,6 +12,7 @@ import {
   PulseHeader,
   MethodologyChecklist,
   DynamicCTA,
+  RelatedArticles,
 } from '@/components/article'
 import { sanityFetch } from '@/sanity/lib/live'
 import { ARTICLE_QUERY, ARTICLE_SLUGS_QUERY } from '@/sanity/lib/queries'
@@ -288,6 +289,14 @@ export default async function ArticlePage({ params }: Props) {
           <DynamicCTA
             primaryPersona={primaryPersona}
             intelligenceTier={article.intelligenceTier}
+          />
+
+          {/* Related Articles - semantic similarity via Pinecone */}
+          <RelatedArticles
+            currentId={article._id}
+            title={article.title}
+            excerpt={article.excerpt}
+            stoneTruth={article.stoneTruth}
           />
         </article>
       </main>

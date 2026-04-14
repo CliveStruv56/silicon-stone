@@ -5,6 +5,8 @@ import { performResearch as researchPipeline } from "@/lib/research";
 import { callClaude } from "@/lib/anthropic";
 import { createArticleInSanity } from "@/lib/sanity";
 import { ResearchResult } from "@/types/research";
+import { generateEmbedding } from "@/lib/embeddings";
+import { searchSimilar } from "@/lib/pinecone";
 
 export async function performResearch(topic: string) {
     try {
@@ -101,6 +103,21 @@ export async function createDraftFromResearch(
             ? getYouTubeSystemPrompt(personaSlug)
             : getArticleSystemPrompt(format, personaSlug);
 
+        // Retrieve semantically similar prior articles from Pinecone (RAG)
+        let priorCoverageBlock = ''
+        try {
+            const topicVector = await generateEmbedding(topic)
+            const similar = await searchSimilar(topicVector, 5)
+            if (similar.length > 0) {
+                const lines = similar.map(
+                    (r) => `- "${r.metadata.title}": ${r.metadata.excerpt} (/analysis/${r.metadata.slug})`
+                )
+                priorCoverageBlock = `\n=== PRIOR COVERAGE IN YOUR KNOWLEDGE BASE ===\nYou have already written on related topics. Reference, extend, or differentiate from this prior work rather than repeating it:\n${lines.join('\n')}\n`
+            }
+        } catch {
+            // Pinecone not configured — skip silently
+        }
+
         const userMessage = `
 === TOPIC ===
 ${topic}
@@ -113,7 +130,7 @@ ${researchResult.sources.map(s => `- ${s.title}: ${s.snippet} (${s.url})`).join(
 
 === PAIN POINTS & KEYWORDS ===
 ${[...researchResult.suggestedContext.pain_points, ...researchResult.suggestedContext.keywords].join(', ')}
-`;
+${priorCoverageBlock}`;
 
         // Temperature 0.4 for controlled, on-brand output
         const responseText = await callClaude(systemPrompt, userMessage, 0.4);
