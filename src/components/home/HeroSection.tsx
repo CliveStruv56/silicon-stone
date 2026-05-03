@@ -2,9 +2,10 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import Image from 'next/image'
+import { ArrowRight } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import Image from 'next/image'
 import { urlFor } from '@/sanity/lib/image'
 
 const containerVariants = {
@@ -30,6 +31,22 @@ const itemVariants = {
     },
 }
 
+const HERO_IMAGE_ALT =
+    'A figure on a Sanday clifftop, looking out across the North Atlantic — the view from the edge'
+
+const HERO_OVERLAY_BACKGROUND = `
+    linear-gradient(to right,
+        rgba(11,17,23,0.50) 0%,
+        rgba(11,17,23,0.18) 32%,
+        rgba(11,17,23,0.55) 72%,
+        rgba(11,17,23,0.88) 100%
+    ),
+    linear-gradient(to top,
+        rgba(11,17,23,0.70) 0%,
+        rgba(11,17,23,0) 38%
+    )
+`
+
 export interface HeroSectionProps {
     settings?: {
         heroTitle?: string
@@ -44,90 +61,126 @@ export interface HeroSectionProps {
 export function HeroSection({ settings }: HeroSectionProps) {
     return (
         <section className="relative overflow-hidden bg-slate-deep noise-overlay">
-            {/* Background Image */}
-            {settings?.heroImage?.asset ? (
-                <div className="absolute inset-0 z-0 select-none">
+            {/* Background Image — full opacity. The directional overlay holds type legibility. */}
+            <div className="absolute inset-0 z-0 select-none">
+                {settings?.heroImage?.asset ? (
                     <Image
                         src={urlFor(settings.heroImage).width(1920).height(1080).quality(85).url()}
-                        alt={settings.heroImage.alt || "The view from the edge of Europe"}
+                        alt={settings.heroImage.alt || HERO_IMAGE_ALT}
                         fill
                         priority
-                        className="object-cover opacity-30 grayscale mix-blend-luminosity"
+                        sizes="100vw"
+                        className="object-cover object-[center_30%] md:object-[center_30%]"
                     />
-                </div>
-            ) : (
-                <div className="absolute inset-0 z-0 select-none">
+                ) : (
                     <Image
                         src="/intelligence-stream-bg.png"
-                        alt="The view from the edge of Europe"
+                        alt={HERO_IMAGE_ALT}
                         fill
                         priority
-                        className="object-cover opacity-30 grayscale mix-blend-luminosity"
+                        sizes="100vw"
+                        className="object-cover object-[left_center] md:object-[center_30%]"
                     />
-                </div>
-            )}
+                )}
+            </div>
 
-            {/* Gradient overlays */}
-            <div className="absolute inset-0 bg-gradient-to-br from-slate-deep/80 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-deep via-transparent to-transparent" />
-
-            {/* Subtle grid overlay */}
+            {/* Directional gradient overlay — preserves figure on the left, darkens the right for type. */}
             <div
-                className="absolute inset-0 opacity-[0.02]"
+                className="absolute inset-0 z-[1] pointer-events-none"
+                style={{ background: HERO_OVERLAY_BACKGROUND }}
+            />
+
+            {/* Subtle teal grid — quiet brand cohesion */}
+            <div
+                className="absolute inset-0 z-[2] opacity-[0.025] pointer-events-none mix-blend-overlay"
                 style={{
                     backgroundImage: `
                         linear-gradient(to right, rgba(74, 155, 155, 0.5) 1px, transparent 1px),
                         linear-gradient(to bottom, rgba(74, 155, 155, 0.5) 1px, transparent 1px)
                     `,
-                    backgroundSize: '60px 60px',
+                    backgroundSize: '80px 80px',
                 }}
             />
 
             <motion.div
-                className="relative mx-auto max-w-7xl px-6 py-20 lg:py-32"
+                className="relative z-10 mx-auto max-w-7xl px-6 py-24 lg:py-36"
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
             >
-                <div className="max-w-4xl">
-                    <motion.div variants={itemVariants}>
-                        <Badge variant="outline" className="mb-6 border-silicon-amber text-silicon-amber font-mono text-xs bg-silicon-amber/5">
-                            Career Infrastructure for the AI Age
-                        </Badge>
-                    </motion.div>
+                <div className="lg:grid lg:grid-cols-3 lg:gap-8">
+                    <div className="lg:col-start-2 lg:col-span-2">
+                        <motion.div variants={itemVariants}>
+                            <Badge
+                                variant="outline"
+                                className="mb-8 border-silicon-amber/60 text-silicon-amber font-mono text-[11px] tracking-[0.10em] uppercase bg-silicon-amber/5"
+                            >
+                                Forensic Technopolitics · Sanday, Orkney
+                            </Badge>
+                        </motion.div>
 
-                    <motion.h1
-                        variants={itemVariants}
-                        className="text-4xl font-bold tracking-tight text-text-primary sm:text-5xl lg:text-6xl leading-[1.1] mb-8"
-                    >
-                        {settings?.heroTitle || (
-                            <>
-                                AI Literacy is No Longer Optional.{' '}
-                                <span className="block mt-2 text-silicon-amber">
-                                    It&apos;s Your Career Infrastructure.
-                                </span>
-                            </>
-                        )}
-                    </motion.h1>
+                        <motion.h1
+                            variants={itemVariants}
+                            className="font-bold text-text-primary mb-6"
+                            style={{
+                                fontSize: 'clamp(44px, 6vw, 80px)',
+                                letterSpacing: '-0.028em',
+                                lineHeight: 1.02,
+                            }}
+                        >
+                            {settings?.heroTitle || 'AI. Policy. Power. Leadership.'}
+                        </motion.h1>
 
-                    <motion.p
-                        variants={itemVariants}
-                        className="text-xl text-text-muted leading-relaxed max-w-3xl"
-                    >
-                        {settings?.heroDescription ||
-                            "For leaders in their prime (35\u201355), the risk isn\u2019t just disruption\u2014it\u2019s obsolescence. We provide the forensic intelligence and orchestration frameworks you need to secure your seat in the AI-driven economy."}
-                    </motion.p>
+                        <motion.p
+                            variants={itemVariants}
+                            className="text-silicon-amber font-medium mb-8 max-w-2xl"
+                            style={{
+                                fontSize: 'clamp(20px, 2vw, 26px)',
+                                letterSpacing: '-0.005em',
+                                lineHeight: 1.38,
+                            }}
+                        >
+                            Decision-grade intelligence on the technology power shift — for the senior leaders who&apos;ll be defining it, not defined by it.
+                        </motion.p>
 
-                    <motion.div
-                        variants={itemVariants}
-                        className="mt-10"
-                    >
-                        <Link href="/#subscribe">
-                            <Button size="lg" className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90 transition-transform hover:scale-105 font-semibold text-base px-8">
-                                Get Your Career Readiness Audit
-                            </Button>
-                        </Link>
-                    </motion.div>
+                        <motion.p
+                            variants={itemVariants}
+                            className="text-base text-text-muted leading-relaxed max-w-xl"
+                        >
+                            {settings?.heroDescription ||
+                                'Calibrated, practitioner-grade analysis from someone who spent thirty years inside the industry. Published twice a week from Sanday — fifty miles north of mainland Scotland — because the view from the edge is structurally clearer than the view from any centre.'}
+                        </motion.p>
+
+                        <motion.div
+                            variants={itemVariants}
+                            className="mt-10 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6"
+                        >
+                            <Link href="/#subscribe">
+                                <Button
+                                    size="lg"
+                                    className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90 transition-transform hover:scale-105 font-semibold text-base px-8"
+                                >
+                                    Get the Atlantic Drift Briefing
+                                </Button>
+                            </Link>
+
+                            <Link
+                                href="/methodology"
+                                className="group inline-flex items-center gap-2 text-text-primary hover:text-silicon-amber transition-colors font-medium"
+                            >
+                                Read the methodology
+                                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                            </Link>
+                        </motion.div>
+
+                        <motion.p
+                            variants={itemVariants}
+                            className="mt-10 font-mono text-xs uppercase tracking-[0.10em] text-text-muted flex items-center gap-2"
+                        >
+                            <span className="text-stone-teal" aria-hidden="true">●</span>
+                            Two briefings a week · Tuesday Stone Briefing · Friday Practical Move
+                        </motion.p>
+                    </div>
                 </div>
             </motion.div>
         </section>
