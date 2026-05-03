@@ -1,10 +1,10 @@
 'use client'
 
 import Link from 'next/link'
+import { ArrowRight } from 'lucide-react'
 import { StaggerContainer, StaggerItem } from '@/components/ui/StaggerContainer'
 import { ForensicCard } from '@/components/ui/ForensicCard'
 import { Badge } from '@/components/ui/badge'
-import { Zap, BookOpen, RefreshCw, Search, ArrowRight } from 'lucide-react'
 
 interface Article {
   _id: string
@@ -20,54 +20,49 @@ interface IntelligenceTiersProps {
   auditArticle: Article | null
 }
 
-const tiers = [
+type TierKey = 'pulse' | 'briefing' | 'audit'
+
+interface Tier {
+  key: TierKey
+  timer: string
+  title: string
+  description: string
+  href: string
+  browseLabel: string
+  fallbackLatestStatus?: string
+  featured?: boolean
+}
+
+const tiers: Tier[] = [
   {
-    key: 'pulse' as const,
-    label: 'The Pulse',
-    time: '30s',
-    icon: Zap,
-    description: 'Essential signals for the daily move-makers.',
-    accent: 'teal' as const,
-    badgeClass: 'bg-silicon-cyan/20 text-silicon-cyan border-silicon-cyan/30',
-    textColor: 'text-silicon-cyan',
+    key: 'pulse',
+    timer: '30 sec · The Pulse',
+    title: 'The shortest read on what just shifted',
+    description:
+      'Essential signals on AI policy, semiconductors, supply chains, and sovereignty. Read in 30 seconds; act on it before the news cycle catches up.',
     href: '/briefings',
-    hasArticle: true,
+    browseLabel: 'Browse Pulse',
+    fallbackLatestStatus: 'Coming soon',
   },
   {
-    key: 'briefing' as const,
-    label: 'The Briefing',
-    time: '5min',
-    icon: BookOpen,
-    description: 'Operational intelligence for managers and directors.',
-    accent: 'teal' as const,
-    badgeClass: 'bg-stone-teal/20 text-stone-teal border-stone-teal/30',
-    textColor: 'text-stone-teal',
+    key: 'briefing',
+    timer: '5 min · The Stone Briefing',
+    title: 'Operational intelligence for managers and directors',
+    description:
+      'Tuesday Stone Briefing on what just shifted. Friday Practical Move on what to do about it. Calibrated, practitioner-grade — never glib, never breathless.',
     href: '/briefings',
-    hasArticle: true,
+    browseLabel: 'Browse Briefings',
+    featured: true,
   },
   {
-    key: 'transition' as const,
-    label: 'The Transition',
-    time: 'Skill-Up',
-    icon: RefreshCw,
-    description: 'Skill-upgrade frameworks for the 35\u201355 career pivot. From AI user to AI architect.',
-    accent: 'amber' as const,
-    badgeClass: 'bg-silicon-amber/20 text-silicon-amber border-silicon-amber/30',
-    textColor: 'text-silicon-amber',
-    href: '/waymarkpath',
-    hasArticle: false,
-  },
-  {
-    key: 'audit' as const,
-    label: 'The Audit',
-    time: 'Deep Dive',
-    icon: Search,
-    description: 'Forensic deep-dives into tech-policy and supply chain friction.',
-    accent: 'amber' as const,
-    badgeClass: 'bg-silicon-amber/20 text-silicon-amber border-silicon-amber/30',
-    textColor: 'text-silicon-amber',
+    key: 'audit',
+    timer: 'Deep Dive · The Audit',
+    title: 'Forensic deep-dives into structural friction',
+    description:
+      'Quarterly long-form analyses applying the full 3×2 Forensic Technopolitics matrix to a single high-stakes question. For decision-makers who need the analysis their industry is missing.',
     href: '/briefings',
-    hasArticle: true,
+    browseLabel: 'Browse Audits',
+    fallbackLatestStatus: 'Q1 2026 Audit in production',
   },
 ]
 
@@ -79,90 +74,137 @@ function formatDate(dateString: string): string {
   })
 }
 
-export function IntelligenceTiers({ pulseArticle, briefingArticle, auditArticle }: IntelligenceTiersProps) {
-  const articles: Record<string, Article | null> = {
+function calculateReadTime(excerpt?: string): string | null {
+  if (!excerpt) return null
+  const words = excerpt.trim().split(/\s+/).length
+  const minutes = Math.max(1, Math.round(words / 200))
+  return `${minutes} min read`
+}
+
+export function IntelligenceTiers({
+  pulseArticle,
+  briefingArticle,
+  auditArticle,
+}: IntelligenceTiersProps) {
+  const articles: Record<TierKey, Article | null> = {
     pulse: pulseArticle,
     briefing: briefingArticle,
     audit: auditArticle,
-    transition: null,
   }
 
   return (
-    <section aria-labelledby="tiers-heading" className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-24">
+    <section
+      aria-labelledby="tiers-heading"
+      className="mx-auto max-w-7xl px-6 py-20 lg:px-8 lg:py-28"
+    >
       <StaggerContainer>
         <StaggerItem>
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <h2 id="tiers-heading" className="text-3xl lg:text-4xl font-bold text-text-primary mb-4">
+          <div className="max-w-3xl mb-12">
+            <Badge
+              variant="outline"
+              className="mb-6 border-silicon-amber/60 text-silicon-amber font-mono text-[11px] tracking-[0.10em] uppercase bg-silicon-amber/5"
+            >
+              Subscription Tiers
+            </Badge>
+            <h2
+              id="tiers-heading"
+              className="font-bold text-text-primary mb-4"
+              style={{
+                fontSize: 'clamp(32px, 4vw, 48px)',
+                letterSpacing: '-0.02em',
+                lineHeight: 1.1,
+              }}
+            >
               Intelligence at Your Pace
             </h2>
-            <p className="text-lg text-text-muted">
-              Four tiers. From a 30-second signal to a forensic deep dive&mdash;plus
-              dedicated career transition frameworks.
+            <p className="text-base text-text-muted leading-relaxed">
+              Three tiers. From a 30-second signal to a forensic deep dive.
             </p>
           </div>
         </StaggerItem>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {tiers.map((tier) => {
-            const Icon = tier.icon
             const article = articles[tier.key]
+            const featured = tier.featured === true
 
             return (
               <StaggerItem key={tier.key}>
-                <ForensicCard accent={tier.accent} showMarkers={true} gridHover={false} delay={0} className="h-full">
-                  {/* Tier header */}
-                  <div className="flex items-center justify-between mb-3">
-                    <Icon className={`w-5 h-5 ${tier.textColor}`} />
-                    <Badge className={tier.badgeClass}>
-                      {tier.time}
-                    </Badge>
-                  </div>
+                <div
+                  className={
+                    featured
+                      ? 'h-full rounded-xl p-[1px] bg-gradient-to-b from-silicon-amber/40 to-silicon-amber/10'
+                      : 'h-full'
+                  }
+                >
+                  <ForensicCard
+                    accent={featured ? 'amber' : 'subtle'}
+                    showMarkers={true}
+                    gridHover={false}
+                    delay={0}
+                    className={`h-full flex flex-col ${
+                      featured
+                        ? 'bg-gradient-to-b from-silicon-amber/[0.04] to-white/[0.015]'
+                        : ''
+                    }`}
+                  >
+                    <div
+                      className={`font-mono text-[11px] tracking-[0.10em] uppercase mb-4 ${
+                        featured ? 'text-silicon-amber' : 'text-text-muted'
+                      }`}
+                    >
+                      {tier.timer}
+                    </div>
 
-                  <h3 className="text-base font-semibold text-text-primary mb-2">{tier.label}</h3>
+                    <h3 className="text-lg font-semibold text-text-primary mb-3 leading-snug">
+                      {tier.title}
+                    </h3>
 
-                  {/* Description */}
-                  <p className="text-sm text-text-muted mb-5">
-                    {tier.description}
-                  </p>
+                    <p className="text-sm text-text-muted leading-relaxed mb-6">
+                      {tier.description}
+                    </p>
 
-                  {/* Article preview or placeholder */}
-                  <div className="border-t border-border-subtle pt-4 mt-auto">
-                    {article ? (
-                      <Link href={`/analysis/${article.slug}`} className="block group">
-                        <article>
-                          <h4 className="text-sm font-medium text-text-primary group-hover:text-stone-teal transition-colors line-clamp-2 mb-1">
+                    <div className="border-t border-border-subtle pt-4 mt-auto">
+                      {article ? (
+                        <Link href={`/analysis/${article.slug}`} className="block group">
+                          <div className="font-mono text-[10px] tracking-[0.10em] uppercase text-text-muted mb-2">
+                            Latest
+                          </div>
+                          <h4 className="text-sm font-medium text-text-primary group-hover:text-silicon-amber transition-colors line-clamp-2 mb-1.5">
                             {article.title}
                           </h4>
-                          {article.publishedAt && (
-                            <span className="text-xs font-mono text-text-muted">
-                              {formatDate(article.publishedAt)}
-                            </span>
-                          )}
-                        </article>
-                      </Link>
-                    ) : (
-                      <div className="text-center py-2">
-                        {tier.key === 'transition' ? (
-                          <div>
-                            <p className="text-xs font-semibold text-silicon-amber mb-1">WaymarkPath</p>
-                            <p className="text-xs text-text-muted">AI-powered career transition companion. Early access opening soon.</p>
+                          <div className="flex items-center gap-2 text-xs font-mono text-text-muted">
+                            {article.publishedAt && (
+                              <span>{formatDate(article.publishedAt)}</span>
+                            )}
+                            {calculateReadTime(article.excerpt) && (
+                              <>
+                                <span aria-hidden="true">·</span>
+                                <span>{calculateReadTime(article.excerpt)}</span>
+                              </>
+                            )}
                           </div>
-                        ) : (
-                          <p className="text-xs text-text-muted font-mono">Coming soon</p>
-                        )}
-                      </div>
-                    )}
-                  </div>
+                        </Link>
+                      ) : (
+                        <p className="text-sm italic text-text-muted">
+                          {tier.fallbackLatestStatus}
+                        </p>
+                      )}
+                    </div>
 
-                  {/* Browse link */}
-                  <Link
-                    href={tier.href}
-                    className={`flex items-center gap-1 mt-3 text-xs font-medium ${tier.textColor} hover:underline`}
-                  >
-                    <span>{tier.key === 'transition' ? 'Get early access' : 'Browse'}</span>
-                    <ArrowRight className="w-3 h-3" />
-                  </Link>
-                </ForensicCard>
+                    <Link
+                      href={tier.href}
+                      className={`group inline-flex items-center gap-1.5 mt-5 text-sm font-medium transition-colors ${
+                        featured
+                          ? 'text-silicon-amber hover:text-silicon-amber/80'
+                          : 'text-text-primary hover:text-silicon-amber'
+                      }`}
+                    >
+                      <span>{tier.browseLabel}</span>
+                      <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+                    </Link>
+                  </ForensicCard>
+                </div>
               </StaggerItem>
             )
           })}

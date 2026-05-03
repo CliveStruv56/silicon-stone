@@ -1,5 +1,8 @@
 import Link from 'next/link'
 
+const WAYMARKPATH_URL =
+  process.env.NEXT_PUBLIC_WAYMARKPATH_URL ?? 'https://waymarkpath.vercel.app'
+
 const footerNavigation = {
   analysis: [
     { name: 'Atlantic Drift', href: '/analysis/category/atlantic-drift' },
@@ -118,10 +121,19 @@ export function Footer() {
         </div>
 
         {/* Bottom */}
-        <div className="mt-12 border-t border-border-subtle pt-8">
+        <div className="mt-12 border-t border-border-subtle pt-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <p className="text-xs text-text-muted">
             &copy; {new Date().getFullYear()} Silicon and Stone. All rights reserved.
           </p>
+          <Link
+            href={WAYMARKPATH_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-[0.10em] text-sister-indigo border border-sister-indigo/40 hover:bg-sister-indigo/10 transition-colors px-3 py-1.5 rounded"
+          >
+            WaymarkPath
+            <span aria-hidden="true">→</span>
+          </Link>
         </div>
       </div>
     </footer>

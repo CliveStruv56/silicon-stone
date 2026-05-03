@@ -7,6 +7,7 @@ import {
   CredibilityBlock,
   OrchestrationBattleground,
   IntelligenceTiers,
+  AdjacentBlock,
   ToolsGallery,
   PersonaNavigator,
   SubscribeCTA,
@@ -98,12 +99,15 @@ export default async function Home() {
         {/* 4. Orchestration Battleground — Model-Dependent vs Orchestration-Side */}
         <OrchestrationBattleground settings={siteSettings?.orchestrationBattleground} />
 
-        {/* 5. Intelligence Tiers — Education + Execution */}
+        {/* 5. Intelligence Tiers — three-tier ladder */}
         <IntelligenceTiers
           pulseArticle={pulseArticle}
           briefingArticle={briefingArticle}
           auditArticle={auditArticle}
         />
+
+        {/* 5b. Adjacent Block — sister-product cross-link to WaymarkPath */}
+        <AdjacentBlock />
 
         {/* 6. Tool Gallery — Real-World Utility */}
         <ToolsGallery />

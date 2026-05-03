@@ -17,6 +17,29 @@
 
 ---
 
+## 2026-05-03 — §3 Intelligence Tiers + §4b Adjacent Block shipped (bundled)
+
+- Files changed:
+  - `src/components/home/IntelligenceTiers.tsx` (rewritten — 4 tiers → 3)
+  - `src/components/home/AdjacentBlock.tsx` (NEW — sister-product cross-link)
+  - `src/components/home/index.ts` (re-export AdjacentBlock)
+  - `src/app/(website)/page.tsx` (import + render `<AdjacentBlock />` after `<IntelligenceTiers />`)
+  - `src/components/layout/Footer.tsx` (small WaymarkPath cross-link button on the bottom strip)
+  - `src/app/(website)/globals.css` (added `--sister-indigo` token + `--color-sister-indigo` Tailwind alias)
+- Sanity content entered by: not applicable — both sections hardcoded per call on the §3/§4b briefing
+- Reviewed by: Clive (voice + structure)
+- Notes:
+  - §3 + §4b shipped together because dropping the Transition tier would have removed WaymarkPath from the homepage; the AdjacentBlock is the structural replacement
+  - Tier ladder: Pulse / Briefing (featured) / Audit. Grid was `lg:grid-cols-4`, now `lg:grid-cols-3`
+  - Featured tier highlight: amber-bordered ForensicCard with a subtle gradient backdrop (`silicon-amber/[0.04] → white/[0.015]`) and amber timer/CTA
+  - Tier icons removed (Zap/BookOpen/Search) per redesign register — text-led only
+  - Section eyebrow `Subscription Tiers` added; H2 unchanged from `Intelligence at Your Pace`; subhead simplified to "Three tiers. From a 30-second signal to a forensic deep dive."
+  - Per-tier `fallbackLatestStatus` (`Coming soon`, `Q1 2026 Audit in production`) renders in italic muted when no Sanity article is returned
+  - WaymarkPath URL: env-var driven (`NEXT_PUBLIC_WAYMARKPATH_URL`) with `https://waymarkpath.vercel.app` fallback. Single point of change at domain switch
+  - Adjacent Block visual: 1px dashed indigo border + indigo→amber-faint gradient bg per DESIGN-TOKENS. No animation (quiet by design)
+  - `sister-indigo` (#6366f1) added to `globals.css` `:root` block and `@theme inline` Tailwind alias — Tailwind utilities like `text-sister-indigo`, `border-sister-indigo` now work
+  - Footer cross-link: small mono indigo button on the bottom strip alongside the copyright. Same env-var URL
+
 ## 2026-05-03 — §2 Orchestration Battleground shipped
 
 - Files changed:
