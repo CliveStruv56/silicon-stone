@@ -17,6 +17,21 @@
 
 ---
 
+## 2026-05-03 — §6 Get the Signal shipped
+
+- Files changed: `src/components/home/SubscribeCTA.tsx`
+- Sanity content entered by: not applicable — section has no Sanity backing
+- Reviewed by: Clive (voice + structure)
+- Notes:
+  - Added `Newsletter` eyebrow badge above H2 (matches §2/§3/§5 redesign pattern)
+  - H2 typography updated to clamp(24px, 2.6vw, 30px) — slightly smaller than full-section H2s because the form sits in `max-w-md`
+  - Lede rewritten: cadence-first, with `Twice a week from Sanday` (silicon-amber medium) and `Practitioner-grade analysis from thirty years inside the industry.` (text-primary semibold) as `<strong>`
+  - Added `○ Get the Atlantic Drift Briefing` mini-eyebrow above the input field — mirrors the hero CTA so subscribers know they're getting the same lead magnet
+  - Input placeholder: `your@email.com` → `your.email@company.com` (per COPY.md)
+  - Footnote: `No spam. Unsubscribe anytime.` → `Free. Unsubscribe anytime.`
+  - Voice fix: success message exclamation removed (`Thanks for subscribing!` → `Subscribed.`) per brand voice rule #1 (no exclamation marks anywhere)
+  - Focus ring colour changed from stone-teal to silicon-amber for visual cohesion with the amber CTA
+
 ## 2026-05-03 — §5 View from the Edge shipped
 
 - Files changed: `src/components/home/CredibilityBlock.tsx` (rewrite of inline copy + stat cards)

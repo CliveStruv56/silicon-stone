@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -37,40 +38,69 @@ export function SubscribeCTA() {
   }
 
   return (
-    <Card id="subscribe" className="bg-gradient-to-br from-stone-charcoal to-slate-deep border-silicon-amber/30">
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold text-text-primary">
+    <Card
+      id="subscribe"
+      className="bg-gradient-to-br from-stone-charcoal to-slate-deep border-silicon-amber/30"
+    >
+      <CardHeader className="space-y-3">
+        <Badge
+          variant="outline"
+          className="self-start border-silicon-amber/60 text-silicon-amber font-mono text-[11px] tracking-[0.10em] uppercase bg-silicon-amber/5"
+        >
+          Newsletter
+        </Badge>
+        <CardTitle
+          className="font-bold text-text-primary"
+          style={{
+            fontSize: 'clamp(24px, 2.6vw, 30px)',
+            letterSpacing: '-0.01em',
+            lineHeight: 1.15,
+          }}
+        >
           Get the Signal
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-sm text-text-muted mb-4">
-          Weekly analysis on AI regulation, semiconductor supply chains, and digital sovereignty.
-          Cut through the noise with insights from 30 years at the edge.
+        <p className="text-sm text-text-muted mb-5 leading-relaxed">
+          <strong className="text-silicon-amber font-medium">
+            Twice a week from Sanday
+          </strong>
+          {' '}— Tuesday Stone Briefing on what just shifted in AI policy,
+          semiconductors, supply chains, and digital sovereignty. Friday
+          Practical Move on what to do about it.{' '}
+          <strong className="text-text-primary font-semibold">
+            Practitioner-grade analysis from thirty years inside the industry.
+          </strong>
         </p>
 
         {status === 'success' ? (
           <div className="text-sm text-stone-teal">
-            Thanks for subscribing! Check your inbox to confirm.
+            Subscribed. Check your inbox to confirm.
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="flex gap-2">
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="your@email.com"
-              required
-              className="flex-1 rounded-md border border-border-subtle bg-slate-deep px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-stone-teal"
-            />
-            <Button
-              type="submit"
-              disabled={status === 'loading'}
-              className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90"
-            >
-              {status === 'loading' ? 'Subscribing...' : 'Subscribe'}
-            </Button>
-          </form>
+          <>
+            <div className="font-mono text-[11px] tracking-[0.10em] uppercase text-silicon-amber mb-2 flex items-center gap-1.5">
+              <span aria-hidden="true">○</span>
+              Get the Atlantic Drift Briefing
+            </div>
+            <form onSubmit={handleSubmit} className="flex gap-2">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="your.email@company.com"
+                required
+                className="flex-1 rounded-md border border-border-subtle bg-slate-deep px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-silicon-amber"
+              />
+              <Button
+                type="submit"
+                disabled={status === 'loading'}
+                className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90"
+              >
+                {status === 'loading' ? 'Subscribing...' : 'Subscribe'}
+              </Button>
+            </form>
+          </>
         )}
 
         {status === 'error' && (
@@ -80,7 +110,7 @@ export function SubscribeCTA() {
         )}
 
         <p className="text-xs text-text-muted mt-3">
-          No spam. Unsubscribe anytime.
+          Free. Unsubscribe anytime.
         </p>
       </CardContent>
     </Card>
