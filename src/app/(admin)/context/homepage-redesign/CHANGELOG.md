@@ -17,6 +17,24 @@
 
 ---
 
+## 2026-05-03 — §5 View from the Edge shipped
+
+- Files changed: `src/components/home/CredibilityBlock.tsx` (rewrite of inline copy + stat cards)
+- Sanity content entered by: not applicable — section has no Sanity backing
+- Reviewed by: Clive (voice + structure)
+- Notes:
+  - Three resolved SPEC-vs-COPY discrepancies (followed COPY.md as source-of-truth in all three):
+    1. Added `Brand Position` eyebrow badge above H2 (COPY.md lists it; SPEC didn't mention)
+    2. Added descriptions to stat cards 1 and 2 (COPY.md gives all three; SPEC said cards 1+2 unchanged)
+    3. Body p1 wording: `tech industry` → `technology industry` (per COPY fidelity rule)
+  - Subhead changed `30 Years in the Making` → `Thirty years inside. Fifty miles north.` (also recoloured stone-teal → silicon-amber to match the eyebrow rhythm)
+  - Body p2 rewritten: `the Drift` (silicon-amber medium) and `European industry's next decade` (text-primary semibold) marked as `<strong>`; "policy and supply chains" → "policy, capital, and supply chains"
+  - Body p3 fully replaced; italic clause "Calibrated where the evidence supports it, hedged where it doesn't." rendered as `<em>` in silicon-amber medium
+  - Stat card 3: value `Human-in-the-Loop` → `PRACTITIONER‑GRADE` (UTF-8 `e2 80 91` = U+2011 non-breaking hyphen, verified); label `Not AI-Generated` → `Calibrated by Default`; description added
+  - Stat card 2 value: `50 Miles North` → `50 mi N` (per COPY format)
+  - Tightened the data column to `lg:max-w-[220px]` so the descriptions wrap cleanly without expanding the column
+  - Layout left centered (per SPEC "copy edits only" — not converted to the left-aligned eyebrow→H2→subhead pattern from §2/§3)
+
 ## 2026-05-03 — §3 Intelligence Tiers + §4b Adjacent Block shipped (bundled)
 
 - Files changed:
