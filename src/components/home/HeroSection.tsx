@@ -74,7 +74,7 @@ export function HeroSection({ settings }: HeroSectionProps) {
                     />
                 ) : (
                     <Image
-                        src="/intelligence-stream-bg.png"
+                        src="/homepage-redesign-2026/the-watcher.png"
                         alt={HERO_IMAGE_ALT}
                         fill
                         priority
