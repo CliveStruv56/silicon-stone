@@ -212,7 +212,7 @@ const tools = [
   {
     name: 'Compliance Checker',
     scenario: 'Monday, 9:14am. The board asks: "Are we compliant?" You answer in 60 seconds.',
-    tagline: 'Classify your AI systems against the EU AI Act\u2014before your auditor does.',
+    tagline: 'Classify your AI systems against the EU AI Act \u2014 before your auditor does.',
     href: '/tools/compliance-checker',
     accent: 'amber' as const,
     Preview: CompliancePreview,
@@ -247,19 +247,31 @@ const tools = [
 export function ToolsGallery() {
   return (
     <section aria-labelledby="tools-heading" className="bg-stone-charcoal/50">
-      <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-24">
+      <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8 lg:py-28">
         <StaggerContainer>
           <StaggerItem>
             <div className="text-center max-w-2xl mx-auto mb-12">
-              <Badge variant="outline" className="mb-4 border-silicon-amber text-silicon-amber font-mono text-xs">
-                Execution Engines
+              <Badge
+                variant="outline"
+                className="mb-5 border-silicon-amber/60 text-silicon-amber font-mono text-[11px] tracking-[0.10em] uppercase bg-silicon-amber/5"
+              >
+                Decision Tools
               </Badge>
-              <h2 id="tools-heading" className="text-3xl lg:text-4xl font-bold text-text-primary mb-4">
+              <h2
+                id="tools-heading"
+                className="font-bold text-text-primary mb-4"
+                style={{
+                  fontSize: 'clamp(32px, 4vw, 48px)',
+                  letterSpacing: '-0.02em',
+                  lineHeight: 1.1,
+                }}
+              >
                 From Analysis to Action
               </h2>
-              <p className="text-lg text-text-muted">
-                Four tools that solve high-stakes problems in your first session.
-                Not theory&mdash;execution.
+              <p className="text-base text-text-muted leading-relaxed">
+                Four tools that solve high-stakes problems in the first session
+                — calibrated against the same intelligence the briefings draw
+                from.
               </p>
             </div>
           </StaggerItem>
@@ -293,7 +305,7 @@ export function ToolsGallery() {
 
                       {/* CTA */}
                       <div className={`flex items-center gap-1.5 text-sm font-medium ${tool.accent === 'amber' ? 'text-silicon-amber' : 'text-stone-teal'}`}>
-                        <span>Launch Engine</span>
+                        <span>Launch tool</span>
                         <ArrowRight className="w-4 h-4" />
                       </div>
                     </ForensicCard>

@@ -17,6 +17,23 @@
 
 ---
 
+## 2026-05-03 — §7 Tools shipped
+
+- Files changed: `src/components/home/ToolsGallery.tsx`
+- Sanity content entered by: not applicable — section has no Sanity backing
+- Reviewed by: Clive (voice + structure)
+- Notes:
+  - Eyebrow renamed `Execution Engines` → `Decision Tools` (per COPY.md; SPEC §5 listed it as optional)
+  - H2 stays `From Analysis to Action`
+  - Subhead replaced — "Not theory — execution" SaaS tagline removed; new line ties tools to the briefings ("calibrated against the same intelligence the briefings draw from")
+  - Per-card CTA `Launch Engine` → `Launch tool` (lowercase tool per COPY)
+  - Tool 1 tagline em-dash spacing fix: `EU AI Act—before` → `EU AI Act — before` (spaced em-dash per voice punctuation rule)
+  - Eyebrow visual switched to amber-tinted variant matching §2/§3/§5/§6
+  - H2 typography updated to redesign clamp(32px, 4vw, 48px) + tracking + leading
+  - Section padding bumped `py-16/24` → `py-20/28` matching the rest of the redesign
+  - Tools 2–4 vignettes/taglines/scenarios unchanged (already on register per COPY.md)
+  - `ToolsGrid.tsx` not edited — used only on `/tools` page (out of homepage scope)
+
 ## 2026-05-03 — §6 Get the Signal shipped
 
 - Files changed: `src/components/home/SubscribeCTA.tsx`
