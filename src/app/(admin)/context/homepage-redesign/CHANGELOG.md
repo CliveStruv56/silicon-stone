@@ -17,6 +17,27 @@
 
 ---
 
+## 2026-05-03 — §2 Orchestration Battleground shipped
+
+- Files changed:
+  - `src/components/home/OrchestrationBattleground.tsx` (NEW — replaces OrchestrationFramework.tsx)
+  - `src/components/home/OrchestrationFramework.tsx` (DELETED)
+  - `src/components/home/index.ts` (re-export rename)
+  - `src/app/(website)/page.tsx` (import rename + pass `settings.orchestrationBattleground`)
+  - `src/sanity/schemaTypes/siteSettings.ts` (extended with `orchestrationBattleground` object field)
+  - `src/sanity/lib/queries.ts` (extended SITE_SETTINGS_QUERY)
+- Sanity content entered by: not yet — Studio fields exist, all empty; hardcoded fallback carries the redesign copy
+- Reviewed by: Clive (voice + structure)
+- Notes:
+  - Component renamed from OrchestrationFramework → OrchestrationBattleground (semantic accuracy)
+  - Red/green moral coding removed: Stance 01 uses `accent="subtle"`, Stance 02 uses `accent="amber"`
+  - Bullet markers: removed all lucide icons (ShieldAlert, Lock etc.); replaced with neutral muted dots
+  - Stance 01 emphasis: bold (text-primary, font-semibold) on the consequence clause
+  - Stance 02 emphasis: silicon-amber medium (rendered with `not-italic` so the colour does the work, not italic-on-italic)
+  - Stone Truth callout: max-width 880px, gradient amber-bg → teal-bg, 3px silicon-amber left border, no animation
+  - Schema uses block content for bullets and Stone Truth body so Jane gets a proper rich-text editor with strong/em decorators
+  - Component has the same fallback pattern as §1 Hero — Sanity-driven settings with hardcoded JSX fallback
+
 ## 2026-05-03 — §1 Hero shipped
 
 - Files changed: `src/components/home/HeroSection.tsx`

@@ -5,7 +5,7 @@ import {
   HeroSection,
   DeadlineCountdown,
   CredibilityBlock,
-  OrchestrationFramework,
+  OrchestrationBattleground,
   IntelligenceTiers,
   ToolsGallery,
   PersonaNavigator,
@@ -95,8 +95,8 @@ export default async function Home() {
         {/* 3. Credibility — The View from the Edge */}
         <CredibilityBlock />
 
-        {/* 4. Orchestration Framework — Model Independence */}
-        <OrchestrationFramework />
+        {/* 4. Orchestration Battleground — Model-Dependent vs Orchestration-Side */}
+        <OrchestrationBattleground settings={siteSettings?.orchestrationBattleground} />
 
         {/* 5. Intelligence Tiers — Education + Execution */}
         <IntelligenceTiers

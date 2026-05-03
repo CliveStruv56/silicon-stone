@@ -144,7 +144,32 @@ export const SITE_SETTINGS_QUERY = defineQuery(`
   *[_type == "siteSettings"][0] {
     heroImage,
     heroTitle,
-    heroDescription
+    heroDescription,
+    orchestrationBattleground {
+      enabled,
+      eyebrow,
+      h2,
+      subhead,
+      intro,
+      stance01 {
+        tag,
+        title,
+        descriptor,
+        voice,
+        bullets
+      },
+      stance02 {
+        tag,
+        title,
+        descriptor,
+        voice,
+        bullets
+      },
+      stoneTruth {
+        label,
+        body
+      }
+    }
   }
 `)
 
