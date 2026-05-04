@@ -23,6 +23,7 @@ const methodologies = [
       'Identifying single points of failure and geographic concentration risks',
       'Tracking capacity investments, yields, and timeline slippages',
       'Understanding the human capital bottlenecks often overlooked in analysis',
+      'Tracing how semiconductor supply chain disruptions propagate downstream into dependent industries',
     ],
     questions: [
       'Where does the neon for chip lithography actually come from?',
@@ -49,7 +50,7 @@ const methodologies = [
     ],
     questions: [
       'Can you comply with both the AI Act and US export controls?',
-      'What does "adequate" data protection mean post-Schrems II?',
+      'What does "adequate" data protection mean after Schrems II — the 2020 EU-US data-transfer ruling?',
       'How do CHIPS Act and EU Chips Act subsidies interact?',
     ],
     link: '/analysis/ai-act',
@@ -137,7 +138,7 @@ export default function MethodologyPage() {
               </h1>
               <p className="text-xl text-text-muted leading-relaxed">
                 Analysis that starts with physical reality, stress-tests against policy friction,
-                models compound futures, and filters through three decades of technology industry experience.
+                models how today&apos;s tensions compound into different futures, and filters through three decades of technology industry experience.
               </p>
             </div>
           </div>

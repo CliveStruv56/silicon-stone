@@ -2,6 +2,11 @@
 
 > Track every change shipped as part of the 2026 homepage redesign here. Append-only.
 
+## §O — Methodology page review (Jane and Clive's first-pass)
+- §I Clarified "models compound futures" in the methodology hero subhead — replaced with "models how today's tensions compound into different futures". Picks up the Scenario lens's own vocabulary ("today's tensions could evolve into…") and resolves the noun-phrase / verb-phrase ambiguity of the original three-word compression.
+- §J Added bullet to Supply Chain Forensics "What this means in practice" (appended last): "Tracing how semiconductor supply chain disruptions propagate downstream into dependent industries". Bullets 1–4 trace inward (materials → fab → capacity → labour); the new bullet broadens outward to downstream blast radius.
+- §L Resolved the Schrems II question. Path (i) hybrid: kept the technical name (in-group recognition) but anchored it for outsiders. Final wording: `What does "adequate" data protection mean after Schrems II — the 2020 EU-US data-transfer ruling?`. Em-dash U+2014; "data-transfer" hyphenated as a compound adjective. Note: the briefing's "post-SREMs2" was a transcription of "post-Schrems II"; the actual phrase in the code was already "post-Schrems II".
+
 ## §Q — Footer + legal positioning + disclaimer (Jane and Clive's first-pass review)
 - §M.1 Footer column heading "Legal" → "Terms" (single word, on-register).
 - §M.2 Contact link moved from Terms section to Company section (now last in the Company list). The `legal` array key renamed to `terms` to match the heading and avoid stale identifiers.
