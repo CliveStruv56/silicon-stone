@@ -77,11 +77,11 @@ export default function TermsPage() {
             </div>
 
             <div>
-              <h2 className="text-xl font-semibold text-text-primary mb-3">Not Legal Advice</h2>
+              <h2 className="text-xl font-semibold text-text-primary mb-3">Analysis, Not Formal Advice</h2>
               <p className="text-text-muted leading-relaxed">
                 Our products and analysis discuss regulatory frameworks including the EU AI Act,
                 GDPR, and other legislation. This content is analytical and educational in nature.
-                It does not constitute legal advice and should not be relied upon as such.
+                It does not constitute formal advice and should not be relied upon as such.
                 For specific legal obligations, consult qualified legal counsel in your jurisdiction.
               </p>
             </div>

@@ -21,9 +21,9 @@ const footerNavigation = {
     { name: 'Why the Edge', href: '/about#edge' },
     { name: 'The Long View', href: '/about#long-view' },
     { name: 'Services', href: '/services' },
-  ],
-  legal: [
     { name: 'Contact', href: '/services#contact' },
+  ],
+  terms: [
     { name: 'Privacy Policy', href: '/privacy' },
     { name: 'Terms of Service', href: '/terms' },
   ],
@@ -102,9 +102,9 @@ export function Footer() {
                 </ul>
               </div>
               <div className="mt-10 md:mt-0">
-                <h3 className="text-sm font-semibold text-text-primary">Legal</h3>
+                <h3 className="text-sm font-semibold text-text-primary">Terms</h3>
                 <ul className="mt-4 space-y-3">
-                  {footerNavigation.legal.map((item) => (
+                  {footerNavigation.terms.map((item) => (
                     <li key={item.name}>
                       <Link
                         href={item.href}
@@ -121,19 +121,24 @@ export function Footer() {
         </div>
 
         {/* Bottom */}
-        <div className="mt-12 border-t border-border-subtle pt-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <p className="text-xs text-text-muted">
-            &copy; {new Date().getFullYear()} Silicon and Stone. All rights reserved.
+        <div className="mt-12 border-t border-border-subtle pt-8">
+          <p className="text-xs text-text-muted leading-relaxed max-w-3xl mb-6">
+            What we publish is analysis, not instruction. We aim to inform; the decisions are yours. The publication is not responsible for outcomes.
           </p>
-          <Link
-            href={WAYMARKPATH_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-[0.10em] text-sister-indigo border border-sister-indigo/40 hover:bg-sister-indigo/10 transition-colors px-3 py-1.5 rounded"
-          >
-            WaymarkPath
-            <span aria-hidden="true">→</span>
-          </Link>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <p className="text-xs text-text-muted">
+              &copy; {new Date().getFullYear()} Silicon and Stone. All rights reserved.
+            </p>
+            <Link
+              href={WAYMARKPATH_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-[0.10em] text-sister-indigo border border-sister-indigo/40 hover:bg-sister-indigo/10 transition-colors px-3 py-1.5 rounded"
+            >
+              WaymarkPath
+              <span aria-hidden="true">→</span>
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

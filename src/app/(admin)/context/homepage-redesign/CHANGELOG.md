@@ -2,6 +2,15 @@
 
 > Track every change shipped as part of the 2026 homepage redesign here. Append-only.
 
+## §Q — Footer + legal positioning + disclaimer (Jane and Clive's first-pass review)
+- §M.1 Footer column heading "Legal" → "Terms" (single word, on-register).
+- §M.2 Contact link moved from Terms section to Company section (now last in the Company list). The `legal` array key renamed to `terms` to match the heading and avoid stale identifiers.
+- §M.3 "legal advice" softened in three files (context-sensitive judgement, not a blanket sub):
+  - `src/app/(website)/tools/compliance-checker/page.tsx` — disclaimer line: `does not constitute legal advice` → `not formal advice`.
+  - `src/app/(website)/products/ai-act-toolkit/page.tsx` — pricing comparator: `less than a single hour of legal advice` → `less than a single hour of formal counsel` (kept the comparator's punch, which a plain "advice" would have lost).
+  - `src/app/(website)/terms/page.tsx` — H2 `Not Legal Advice` → `Analysis, Not Formal Advice`; body `does not constitute legal advice` → `does not constitute formal advice`. Kept the "qualified legal counsel" redirect sentence — that names a third party the reader should consult, not what S&S provides.
+- §M.4 Disclaimer added to footer bottom strip, above the copyright/WaymarkPath row: "What we publish is analysis, not instruction. We aim to inform; the decisions are yours. The publication is not responsible for outcomes." — `text-xs leading-relaxed max-w-3xl`, no italic (sober register, not preachy).
+
 ## §N — Homepage review fixes (Jane and Clive's first-pass review)
 - §D Hero readability: strengthened right-side gradient overlay (final stop 0.88 → 0.95, ramp pulled to 60%); switched hero subhead colour from silicon-amber to text-primary cream for legibility against The Watcher image.
 - §F Practitioner-grade → decision-grade in user-facing copy (hero lede, CredibilityBlock body + stat card 3, IntelligenceTiers Tier 2). "Practitioner-grade" remains in the brand voice spec as internal positioning lens — not surfaced to readers.

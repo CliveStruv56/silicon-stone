@@ -234,7 +234,7 @@ export default function AIActToolkitPage() {
                 Start Your Compliance Journey
               </h2>
               <p className="text-text-muted mb-8">
-                At £79, this toolkit costs less than a single hour of legal advice —
+                At £79, this toolkit costs less than a single hour of formal counsel —
                 and it gives your team a structured path forward they can act on immediately.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">

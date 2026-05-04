@@ -110,7 +110,7 @@ export default function ComplianceCheckerPage() {
             </div>
 
             <p className="text-sm italic text-text-muted mt-4 opacity-70">
-              For informational purposes only; does not constitute legal advice.
+              For informational purposes only; not formal advice.
             </p>
           </div>
         </section>
