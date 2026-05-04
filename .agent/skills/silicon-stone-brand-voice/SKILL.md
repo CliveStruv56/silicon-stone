@@ -68,7 +68,7 @@ The voice is intelligence-briefing register — sober, considered, weighty. It i
 - **The view from the edge** — the brand thesis (clearer than the view from any centre)
 - **Forensic Technopolitics** — the methodology
 - **Decision-grade**, **Calibrated by default**, **Hedged on purpose**
-- **Sanday**, **Orkney**, **fifty miles north of mainland Scotland**, **the Atlantic edge**
+- **Sanday**, **Orkney**, **sixty miles north of mainland Scotland**, **the Atlantic edge**
 - **Thirty years inside the industry** (the credential)
 - **Senior leaders** / **senior decision-makers** / **senior leaders in European industry** (the audience)
 

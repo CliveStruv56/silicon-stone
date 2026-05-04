@@ -26,7 +26,7 @@
 | `eyebrow` (badge) | `Forensic Technopolitics · Sanday, Orkney` |
 | `headline` | `AI. Policy. Power. Leadership.` |
 | `subhead` | `Decision-grade intelligence on the technology power shift — for the senior leaders who'll be defining it, not defined by it.` |
-| `lede` | `Calibrated, practitioner-grade analysis from someone who spent thirty years inside the industry. Published twice a week from Sanday — fifty miles north of mainland Scotland — because the view from the edge is structurally clearer than the view from any centre.` |
+| `lede` | `Calibrated, practitioner-grade analysis from someone who spent thirty years inside the industry. Published twice a week from Sanday — sixty miles north of mainland Scotland — because the view from the edge is structurally clearer than the view from any centre.` |
 | `primaryCtaLabel` | `Get the Atlantic Drift Briefing` |
 | `primaryCtaHref` | `/#subscribe` *(or wherever the lead-magnet capture lives)* |
 | `secondaryCtaLabel` | `Read the methodology` |
@@ -53,7 +53,7 @@ No copy changes. (`AI Act Deadline · 91D 05H 12M 58S · Implementation Phase` �
 ### Body — three paragraphs
 
 **Paragraph 1**:
-> Distilled from three decades at the heart of the technology industry and observed from a small island fifty miles north of the Scottish mainland.
+> Distilled from three decades at the heart of the technology industry and observed from a small island sixty miles north of the Scottish mainland.
 
 **Paragraph 2** (note `**bold**` on "the Drift"):
 > While the mainland reacts to the noise, we identify **the Drift** — the structural shifts in policy, capital, and supply chains that will define European industry's next decade.

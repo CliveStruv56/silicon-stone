@@ -45,7 +45,7 @@ export function CredibilityBlock() {
                     <span className="text-silicon-amber font-medium">
                       three decades at the heart of the technology industry
                     </span>{' '}
-                    and observed from a small island fifty miles north of the
+                    and observed from a small island sixty miles north of the
                     Scottish mainland.
                   </p>
                   <p className="text-lg leading-relaxed text-text-muted">

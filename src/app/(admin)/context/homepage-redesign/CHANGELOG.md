@@ -17,6 +17,16 @@
 
 ---
 
+## §C — Brand voice spec correction
+- Corrected Sanday-to-Scotland distance: "fifty miles" → "sixty miles" (factual fix; Sanday is approximately 60 miles north of mainland Scotland).
+- Updated in:
+  - `.agent/skills/silicon-stone-brand-voice/SKILL.md` (canonical phrasing list)
+  - `src/app/(admin)/context/homepage-redesign/COPY.md` (hero lede + View-from-the-Edge body p1 source-of-truth, two occurrences)
+  - `src/components/home/HeroSection.tsx` (live hero fallback)
+  - `src/components/home/CredibilityBlock.tsx` (live View-from-the-Edge fallback)
+- Surrounding phrasing preserved exactly. "Atlantic edge" framing retained — separately confirmed as on-brand structural framing despite Sanday geographically having Atlantic to the west and North Sea to the east.
+- Out-of-scope match left intact: `.claude/settings.local.json:73` Bash permission allowlist entry. Untracked tooling config, not user-facing.
+
 ## §A — Methodology page visual refresh
 - Typography: H1 upgraded to redesign clamp convention (clamp 44/6vw/80, tracking -0.028em, leading 1.02). Mirrors HeroSection.tsx.
 - Eyebrow: "Our Approach" → "Forensic Technopolitics" (mb-5, border-silicon-amber/60, font-mono text-[11px], tracking-[0.10em], uppercase, bg-silicon-amber/5). Mirrors redesign-canonical Badge pattern.

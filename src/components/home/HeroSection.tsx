@@ -148,7 +148,7 @@ export function HeroSection({ settings }: HeroSectionProps) {
                             className="text-base text-text-muted leading-relaxed max-w-xl"
                         >
                             {settings?.heroDescription ||
-                                'Calibrated, practitioner-grade analysis from someone who spent thirty years inside the industry. Published twice a week from Sanday — fifty miles north of mainland Scotland — because the view from the edge is structurally clearer than the view from any centre.'}
+                                'Calibrated, practitioner-grade analysis from someone who spent thirty years inside the industry. Published twice a week from Sanday — sixty miles north of mainland Scotland — because the view from the edge is structurally clearer than the view from any centre.'}
                         </motion.p>
 
                         <motion.div
