@@ -17,6 +17,20 @@
 
 ---
 
+## 2026-05-04 — JSON-LD structured-data alignment (post-redesign cleanup)
+
+- Files changed: `src/app/(website)/page.tsx` (jsonLd constant only)
+- Reviewed by: Clive (voice + structure)
+- Notes:
+  - WebSite, Organization, and WebPage descriptions rewritten to forensic-intelligence register, matching the metadata block shipped in `e923590`
+  - Organization.knowsAbout: dropped `Mid-career AI transition` (legitimate only on WaymarkPath surfaces, not in the S&S Organization schema), added `The Atlantic Drift`. Also tightened `AI orchestration frameworks` → `AI orchestration architecture` and `Semiconductor supply chain analysis` → `Semiconductor supply chain forensics` to match the methodology vocabulary
+  - WebPage.about replaced the fictitious `AI Career Resilience` entry with `The Orchestration Battleground` — pointing search engines at a real homepage section instead of a category that doesn't exist on the site
+  - Open Graph keys still implicit (Next.js fallback to title/description). Explicit OG handling deferred
+  - Repo-wide grep audit (career-readiness phrasing) run alongside this fix:
+    - 3 user-facing matches in `products/page.tsx`, `services/page.tsx`, `waymarkpath/page.tsx` — all verified as WaymarkPath product copy. Legitimate per the brand voice rule that WaymarkPath has its own register. Left alone.
+    - Remaining matches in `CHANGELOG.md` and `SPEC.md` are intentional historical reference (the redesign's "WAS" descriptions). Left alone.
+  - Closes the post-redesign cleanup. No further career-readiness language remains in homepage user-facing surfaces.
+
 ## 2026-05-04 — §8 Personas + §9 Page meta-title shipped (redesign complete)
 
 - Files changed:
