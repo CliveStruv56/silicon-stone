@@ -16,9 +16,9 @@ import { sanityFetch } from '@/sanity/lib/live'
 import { SITE_SETTINGS_QUERY, ARTICLES_BY_TIER_QUERY } from '@/sanity/lib/queries'
 
 export const metadata: Metadata = {
-  title: 'Silicon and Stone | AI Career Infrastructure for Mid-Career Leaders',
+  title: 'Silicon and Stone | Forensic Technopolitics for the Senior Leaders Defining the AI Power Shift',
   description:
-    'AI literacy is no longer optional. Strategic intelligence and orchestration frameworks for mid-career professionals (35-55) navigating AI regulation, semiconductor supply chains, and digital sovereignty.',
+    "Decision-grade intelligence on the technology power shift, for the senior leaders who'll be defining it, not defined by it. Twice a week from Sanday, Orkney.",
 }
 
 export default async function Home() {

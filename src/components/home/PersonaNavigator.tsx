@@ -33,14 +33,28 @@ const hoverBorderMap: Record<string, string> = {
 
 export function PersonaNavigator() {
   return (
-    <section aria-labelledby="persona-heading" className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-24">
+    <section aria-labelledby="persona-heading" className="mx-auto max-w-7xl px-6 py-20 lg:px-8 lg:py-28">
       <StaggerContainer>
         <StaggerItem>
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <h2 id="persona-heading" className="text-3xl lg:text-4xl font-bold text-text-primary mb-4">
+            <Badge
+              variant="outline"
+              className="mb-5 border-silicon-amber/60 text-silicon-amber font-mono text-[11px] tracking-[0.10em] uppercase bg-silicon-amber/5"
+            >
+              Persona Routing
+            </Badge>
+            <h2
+              id="persona-heading"
+              className="font-bold text-text-primary mb-4"
+              style={{
+                fontSize: 'clamp(32px, 4vw, 48px)',
+                letterSpacing: '-0.02em',
+                lineHeight: 1.1,
+              }}
+            >
               Find Your Perspective
             </h2>
-            <p className="text-lg text-text-muted">
+            <p className="text-base text-text-muted leading-relaxed">
               Intelligence tailored to your seat at the table.
             </p>
           </div>

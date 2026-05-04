@@ -17,6 +17,28 @@
 
 ---
 
+## 2026-05-04 — §8 Personas + §9 Page meta-title shipped (redesign complete)
+
+- Files changed:
+  - `src/lib/personas.ts` (two `ctaCopy` updates — Robert and Citizen)
+  - `src/components/home/PersonaNavigator.tsx` (eyebrow + typography update)
+  - `src/app/(website)/page.tsx` (metadata title + description)
+- Sanity content entered by: not applicable — persona content is hardcoded in `src/lib/personas.ts`, not in Sanity (verified by reading PersonaNavigator.tsx)
+- Reviewed by: Clive (voice + structure)
+- Notes:
+  - §8 Personas:
+    - Robert (Regional Director) ctaCopy: `Regional impact analysis you won't find elsewhere` → `Where regional implications get read first`
+    - Citizen (Global Citizen) ctaCopy: `Cut through the noise with weekly analysis` → `The weekly read for those tracking the bigger picture`
+    - Drops the second occurrence of "Cut through the noise" on the homepage (the brand voice doc lists this as a cliché to avoid)
+    - Other three personas (Clara, Ian, Sofia) keep their current copy per SPEC §6
+    - Same SPEC-vs-COPY judgment call as §5: added `Persona Routing` eyebrow per COPY (SPEC §6 didn't mention) and updated H2 typography for redesign consistency
+    - Section padding bumped `py-16/24` → `py-20/28`
+  - §9 Page meta-title:
+    - title: `Silicon and Stone | AI Career Infrastructure for Mid-Career Leaders` → `Silicon and Stone | Forensic Technopolitics for the Senior Leaders Defining the AI Power Shift`
+    - description: career-readiness frame → `Decision-grade intelligence on the technology power shift, for the senior leaders who'll be defining it, not defined by it. Twice a week from Sanday, Orkney.`
+    - Open Graph keys not set explicitly — Next.js falls back to title/description. Explicit OG handling deferred (COPY.md flagged a shorter og:title variant as optional)
+  - Closes the eight-section homepage redesign. JSON-LD block in page.tsx still references career-readiness framing — flagging for follow-up.
+
 ## 2026-05-03 — §7 Tools shipped
 
 - Files changed: `src/components/home/ToolsGallery.tsx`

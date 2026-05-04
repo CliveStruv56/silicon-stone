@@ -68,7 +68,7 @@ export const PERSONAS: Record<PersonaSlug, Persona> = {
     role: 'Regional Development Director',
     icon: 'map-pin',
     color: 'alert-red',
-    ctaCopy: 'Regional impact analysis you won\'t find elsewhere',
+    ctaCopy: 'Where regional implications get read first',
     description: 'Building regional technology capacity and resilience',
     contentNeeds: [
       'Regional case studies',
@@ -83,7 +83,7 @@ export const PERSONAS: Record<PersonaSlug, Persona> = {
     role: 'Informed Observer',
     icon: 'user',
     color: 'text-muted',
-    ctaCopy: 'Cut through the noise with weekly analysis',
+    ctaCopy: 'The weekly read for those tracking the bigger picture',
     description: 'Seeking accessible understanding of complex tech-policy issues',
     contentNeeds: [
       'Accessible explainers',
