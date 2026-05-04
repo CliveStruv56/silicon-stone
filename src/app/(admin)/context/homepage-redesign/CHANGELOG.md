@@ -17,6 +17,29 @@
 
 ---
 
+## 2026-05-04 — Homepage redesign 2026: scope complete
+
+All sections aligned to the forensic-intelligence register. No remaining redesign-scope items.
+
+Section status (closed):
+- §1 Hero (HeroSection.tsx) — shipped commit f82f314
+- §2 View from the Edge (CredibilityBlock.tsx) — shipped
+- §3 Orchestration Battleground (renamed from OrchestrationFramework) — shipped
+- §4 Intelligence Tiers (three-tier ladder, Transition tier dropped) — shipped
+- §4b Adjacent Block (sister-product cross-link to WaymarkPath) — shipped
+- §5 Decision Tools (was Execution Engines) — shipped
+- §6 Personas — shipped commit e923590 (Robert + Citizen ctaCopy, Persona Routing eyebrow, H2 typography, section padding)
+- §7 Get the Signal (cadence reconciled, CTA aligned, Free footnote) — shipped
+- §8 AI Act Deadline — kept untouched per spec
+- §9 Page metadata — shipped commit e923590
+- JSON-LD structured data alignment — shipped commit 0123cd0
+
+Out of scope (deferred):
+- Sanity schema gaps for hero subhead/badge/CTAs/strap and AdjacentBlock
+- Persona role-chip and title rendering mismatch with COPY.md (component uses persona.role.split('/')[0] and persona.name.split(' ')[0]; COPY.md specifies different display titles)
+- Methodology page register audit
+- Atlantic Drift Briefing lead-magnet flow verification
+
 ## 2026-05-04 — JSON-LD structured-data alignment (post-redesign cleanup)
 
 - Files changed: `src/app/(website)/page.tsx` (jsonLd constant only)
