@@ -41,33 +41,37 @@ export default async function Home() {
         '@type': 'WebSite',
         name: 'Silicon and Stone',
         url: 'https://siliconandstone.com',
-        description: 'AI career infrastructure for mid-career professionals. Strategic intelligence on EU AI Act compliance, semiconductor supply chains, and digital sovereignty from 30 years of technology industry experience.',
+        description:
+          'Forensic Technopolitics for the senior leaders defining the AI power shift. Decision-grade intelligence on AI policy, semiconductor supply chains, and digital sovereignty, twice a week from Sanday, Orkney.',
       },
       {
         '@type': 'Organization',
         name: 'Silicon and Stone',
         url: 'https://siliconandstone.com',
-        description: 'Forensic technopolitics intelligence platform providing AI orchestration frameworks, compliance tools, and career transition resources for European decision-makers.',
+        description:
+          'Forensic Technopolitics intelligence service for senior decision-makers in European industry. Calibrated, practitioner-grade analysis from thirty years inside the technology industry. Published from Sanday, Orkney.',
         foundingDate: '2024',
         areaServed: 'Europe',
         knowsAbout: [
           'EU AI Act compliance',
-          'AI orchestration frameworks',
-          'Semiconductor supply chain analysis',
+          'AI orchestration architecture',
+          'Semiconductor supply chain forensics',
           'Digital sovereignty',
-          'Mid-career AI transition',
           'European technology policy',
+          'The Atlantic Drift',
         ],
       },
       {
         '@type': 'WebPage',
-        name: 'AI Career Infrastructure for Mid-Career Leaders',
-        description: 'AI literacy is no longer optional for leaders aged 35-55. Silicon and Stone provides forensic intelligence and orchestration frameworks to secure your position in the AI-driven economy.',
+        name: 'Forensic Technopolitics for the AI Power Shift',
+        description:
+          "Decision-grade intelligence on the technology power shift, for the senior leaders who'll be defining it, not defined by it. Twice a week from Sanday, Orkney.",
         url: 'https://siliconandstone.com',
         about: {
           '@type': 'Thing',
-          name: 'AI Career Resilience',
-          description: 'Strategic frameworks for mid-career professionals transitioning from AI users to AI architects.',
+          name: 'The Orchestration Battleground',
+          description:
+            'The structural divide between organisations that own the AI decision layer and those that rent capability from vendors.',
         },
       },
     ],
