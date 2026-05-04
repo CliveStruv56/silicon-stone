@@ -17,6 +17,12 @@
 
 ---
 
+## §A — Methodology page visual refresh
+- Typography: H1 upgraded to redesign clamp convention (clamp 44/6vw/80, tracking -0.028em, leading 1.02). Mirrors HeroSection.tsx.
+- Eyebrow: "Our Approach" → "Forensic Technopolitics" (mb-5, border-silicon-amber/60, font-mono text-[11px], tracking-[0.10em], uppercase, bg-silicon-amber/5). Mirrors redesign-canonical Badge pattern.
+- British English spelling pass (six replacements: Analyzing → Analysing, Modeling → Modelling x2, Recognizing → Recognising, organizational → organisational, organizations → organisations). Slug `scenario-modeling` left URL-stable; display text changed to British. Inline comment added so a future cleanup pass doesn't "fix" the perceived inconsistency.
+- Stone Truth callout added at page close, between lens cards and CTA section. Mirrors OrchestrationBattleground.tsx canonical pattern (max-w-880 rounded-xl card with mono "Stone Truth" label, gradient backdrop, amber accent on second clause). Line: "Hedging is not weakness. It is the calibration." — page-specific selection that converts the reader's likely objection ("why all the hedging?") into stated discipline at the moment it lands.
+
 ## 2026-05-04 — Homepage redesign 2026: scope complete
 
 All sections aligned to the forensic-intelligence register. No remaining redesign-scope items.

@@ -9,7 +9,7 @@ import { Separator } from '@/components/ui/separator'
 
 export const metadata: Metadata = {
   title: 'Methodology | Silicon and Stone',
-  description: 'Forensic Technopolitics: Our analytical framework combining supply chain forensics, policy stress-testing, scenario modeling, and experience-led signal filtering.',
+  description: 'Forensic Technopolitics: Our analytical framework combining supply chain forensics, policy stress-testing, scenario modelling, and experience-led signal filtering.',
 }
 
 const methodologies = [
@@ -40,7 +40,7 @@ const methodologies = [
     id: 'policy-stress-testing',
     title: 'Comparative Policy Stress-Testing',
     tagline: 'What breaks when regulations collide',
-    description: 'Analyzing how regulatory frameworks interact, conflict, and create unintended consequences for organizations operating across jurisdictions.',
+    description: 'Analysing how regulatory frameworks interact, conflict, and create unintended consequences for organisations operating across jurisdictions.',
     details: [
       'Side-by-side comparison of US and EU regulatory approaches',
       'Identifying compliance conflicts and impossible positions',
@@ -60,13 +60,14 @@ const methodologies = [
     ),
   },
   {
+    // Slug intentionally American spelling for URL stability — display text uses British (Modelling)
     id: 'scenario-modeling',
-    title: 'Scenario-Based Drift Modeling',
+    title: 'Scenario-Based Drift Modelling',
     tagline: 'Futures that compound, not extrapolate',
     description: 'Moving beyond linear forecasting to model how today\'s tensions could evolve into fundamentally different operating environments.',
     details: [
       'Three core scenarios: Managed Friction, Bifurcation, and Escalation',
-      'Modeling cascade effects across supply chains and regulations',
+      'Modelling cascade effects across supply chains and regulations',
       'Identifying trigger events and decision points',
       'Stress-testing strategies against multiple futures',
     ],
@@ -88,9 +89,9 @@ const methodologies = [
     tagline: 'Thirty years of pattern recognition',
     description: 'Applying three decades of technology industry experience to separate genuine signals from noise, hype, and motivated reasoning.',
     details: [
-      'Recognizing patterns from previous technology transitions',
+      'Recognising patterns from previous technology transitions',
       'Identifying overconfident projections and hidden dependencies',
-      'Understanding organizational and political dynamics behind announcements',
+      'Understanding organisational and political dynamics behind announcements',
       'Calibrating urgency: what matters now vs. what can wait',
     ],
     questions: [
@@ -118,10 +119,20 @@ export default function MethodologyPage() {
         <section className="bg-slate-deep border-b border-border-subtle">
           <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-24">
             <div className="max-w-3xl">
-              <Badge variant="outline" className="mb-4 border-silicon-amber text-silicon-amber">
-                Our Approach
+              <Badge
+                variant="outline"
+                className="mb-5 border-silicon-amber/60 text-silicon-amber font-mono text-[11px] tracking-[0.10em] uppercase bg-silicon-amber/5"
+              >
+                Forensic Technopolitics
               </Badge>
-              <h1 className="text-4xl font-bold text-text-primary sm:text-5xl mb-6">
+              <h1
+                className="font-bold text-text-primary mb-6"
+                style={{
+                  fontSize: 'clamp(44px, 6vw, 80px)',
+                  letterSpacing: '-0.028em',
+                  lineHeight: 1.02,
+                }}
+              >
                 Forensic Technopolitics
               </h1>
               <p className="text-xl text-text-muted leading-relaxed">
@@ -234,6 +245,27 @@ export default function MethodologyPage() {
                 </Card>
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* Stone Truth — verdict closing the four lenses, before action */}
+        <section className="mx-auto max-w-7xl px-6 lg:px-8 mt-12 mb-12">
+          <div
+            className="max-w-[880px] rounded-xl px-9 py-8 border border-border-subtle border-l-[3px] border-l-silicon-amber"
+            style={{
+              background:
+                'linear-gradient(to right, rgba(232,154,60,0.06), rgba(74,155,155,0.04))',
+            }}
+          >
+            <div className="font-mono text-[11px] tracking-[0.10em] uppercase text-silicon-amber mb-3">
+              Stone Truth
+            </div>
+            <p className="text-base leading-relaxed text-text-primary">
+              Hedging is not weakness.{' '}
+              <em className="text-silicon-amber not-italic font-medium">
+                It is the calibration.
+              </em>
+            </p>
           </div>
         </section>
 
