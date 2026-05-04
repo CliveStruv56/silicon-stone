@@ -59,7 +59,7 @@ export function CredibilityBlock() {
                     .
                   </p>
                   <p className="text-lg leading-relaxed text-text-muted">
-                    Practitioner-grade analysis from thirty years inside the
+                    Decision-grade analysis from thirty years inside the
                     industry.{' '}
                     <em className="text-silicon-amber font-medium">
                       Calibrated where the evidence supports it, hedged where
@@ -97,7 +97,7 @@ export function CredibilityBlock() {
                   <div className="h-px bg-border-subtle" />
                   <div>
                     <div className="font-mono text-sm font-bold text-text-primary leading-tight whitespace-nowrap">
-                      PRACTITIONER‑GRADE
+                      DECISION‑GRADE
                     </div>
                     <div className="font-mono text-xs uppercase tracking-[0.10em] text-text-muted mt-2">
                       Calibrated by Default

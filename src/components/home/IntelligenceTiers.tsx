@@ -49,7 +49,7 @@ const tiers: Tier[] = [
     timer: '5 min · The Stone Briefing',
     title: 'Operational intelligence for managers and directors',
     description:
-      'Tuesday Stone Briefing on what just shifted. Friday Practical Move on what to do about it. Calibrated, practitioner-grade — never glib, never breathless.',
+      'Tuesday Stone Briefing on what just shifted. Friday Practical Move on what to do about it. Calibrated, decision-grade — never glib, never breathless.',
     href: '/briefings',
     browseLabel: 'Browse Briefings',
     featured: true,

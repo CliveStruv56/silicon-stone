@@ -2,6 +2,13 @@
 
 > Track every change shipped as part of the 2026 homepage redesign here. Append-only.
 
+## §N — Homepage review fixes (Jane and Clive's first-pass review)
+- §D Hero readability: strengthened right-side gradient overlay (final stop 0.88 → 0.95, ramp pulled to 60%); switched hero subhead colour from silicon-amber to text-primary cream for legibility against The Watcher image.
+- §F Practitioner-grade → decision-grade in user-facing copy (hero lede, CredibilityBlock body + stat card 3, IntelligenceTiers Tier 2). "Practitioner-grade" remains in the brand voice spec as internal positioning lens — not surfaced to readers.
+- §G Added italicised epigraph above the subscribe form: "The view from the edge is structurally clearer than the view from any centre."
+- §H Renamed §Get the Signal section to §Get the Atlantic Drift Briefing; section H2 + lede rewritten to align with hero CTA promise; "Twice a week from Sanday" → "Twice a week from the edge of Europe"; added "A welcome Atlantic Drift Briefing arrives on signup" closer to set expectation.
+- Sanity flag: `siteSettings.heroDescription`, if populated in Studio, overrides the hardcoded hero-lede fallback — needs the same practitioner-grade → decision-grade swap entered in Studio. Schema unchanged.
+
 ## 2026-05-02 — Specification finalised
 
 - Brand voice rules locked in `.agent/skills/silicon-stone-brand-voice.md`

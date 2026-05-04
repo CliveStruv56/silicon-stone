@@ -38,8 +38,8 @@ const HERO_OVERLAY_BACKGROUND = `
     linear-gradient(to right,
         rgba(11,17,23,0.50) 0%,
         rgba(11,17,23,0.18) 32%,
-        rgba(11,17,23,0.55) 72%,
-        rgba(11,17,23,0.88) 100%
+        rgba(11,17,23,0.62) 60%,
+        rgba(11,17,23,0.95) 100%
     ),
     linear-gradient(to top,
         rgba(11,17,23,0.70) 0%,
@@ -133,7 +133,7 @@ export function HeroSection({ settings }: HeroSectionProps) {
 
                         <motion.p
                             variants={itemVariants}
-                            className="text-silicon-amber font-medium mb-8 max-w-2xl"
+                            className="text-text-primary font-medium mb-8 max-w-2xl"
                             style={{
                                 fontSize: 'clamp(20px, 2vw, 26px)',
                                 letterSpacing: '-0.005em',
@@ -148,7 +148,7 @@ export function HeroSection({ settings }: HeroSectionProps) {
                             className="text-base text-text-muted leading-relaxed max-w-xl"
                         >
                             {settings?.heroDescription ||
-                                'Calibrated, practitioner-grade analysis from someone who spent thirty years inside the industry. Published twice a week from Sanday — sixty miles north of mainland Scotland — because the view from the edge is structurally clearer than the view from any centre.'}
+                                'Calibrated, decision-grade analysis from someone who spent thirty years inside the industry. Published twice a week from Sanday — sixty miles north of mainland Scotland — because the view from the edge is structurally clearer than the view from any centre.'}
                         </motion.p>
 
                         <motion.div
