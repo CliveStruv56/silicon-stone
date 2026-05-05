@@ -13,6 +13,8 @@ interface ArticleMetadata {
     stoneTruth?: string;
     actionableInsights?: string[];
     categorySlugs?: string[];
+    intelligenceTier?: 'pulse' | 'briefing' | 'audit';
+    methodologyPillars?: string[];
 }
 
 async function extractArticleMetadata(
@@ -54,12 +56,39 @@ async function extractArticleMetadata(
                 .slice(0, 2)
             : [];
 
+        const VALID_TIERS = ['pulse', 'briefing', 'audit'] as const;
+        type IntelligenceTier = typeof VALID_TIERS[number];
+        const intelligenceTier: IntelligenceTier | undefined =
+            (VALID_TIERS as readonly string[]).includes(parsed.intelligenceTier)
+                ? (parsed.intelligenceTier as IntelligenceTier)
+                : undefined;
+
+        const VALID_CELLS = [
+            'supply-chain-scenario-modelling',
+            'supply-chain-long-memory-filter',
+            'policy-scenario-modelling',
+            'policy-long-memory-filter',
+            'talent-scenario-modelling',
+            'talent-long-memory-filter',
+        ];
+        const methodologyPillars: string[] | undefined = (() => {
+            if (!Array.isArray(parsed.methodologyPillars)) return undefined;
+            const filtered = (parsed.methodologyPillars as unknown[]).filter(
+                (p: unknown): p is string =>
+                    typeof p === 'string' && VALID_CELLS.includes(p)
+            );
+            const cells = Array.from(new Set<string>(filtered)).slice(0, 6);
+            return cells.length > 0 ? cells : undefined;
+        })();
+
         return {
             seoTitle: clamp(parsed.seoTitle, 60),
             metaDescription: clamp(parsed.metaDescription, 160),
             stoneTruth: clamp(parsed.stoneTruth, 160),
             actionableInsights: insights.length >= 3 ? insights : undefined,
             categorySlugs: rawSlugs.length > 0 ? rawSlugs : undefined,
+            intelligenceTier,
+            methodologyPillars,
         };
     } catch (err) {
         const message = err instanceof Error ? err.message : 'Unknown error';
@@ -147,6 +176,8 @@ export async function generateContent(_prevState: ActionState, formData: FormDat
             stoneTruth: metadata?.stoneTruth,
             actionableInsights: metadata?.actionableInsights,
             categorySlugs: metadata?.categorySlugs,
+            intelligenceTier: metadata?.intelligenceTier,
+            methodologyPillars: metadata?.methodologyPillars,
         });
 
         return {

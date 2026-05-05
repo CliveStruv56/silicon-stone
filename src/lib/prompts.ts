@@ -165,7 +165,9 @@ Schema (all fields required):
   "metaDescription": string,    // 150–160 chars. Specific, compelling, includes primary keyword. No clickbait.
   "stoneTruth": string,         // <160 chars. One-sentence bottom line in the brand voice. The "if you read nothing else, read this" line.
   "actionableInsights": string[],  // 3–5 items. Each a complete imperative sentence aimed at ${persona.role}. No filler, no restating the body.
-  "categorySlugs": string[]     // 1–2 slugs from this exact set: ${slugEnum}. Pick the single best match first; only add a second if the draft spans two categories roughly equally.
+  "categorySlugs": string[],    // 1–2 slugs from this exact set: ${slugEnum}. Pick the single best match first; only add a second if the draft spans two categories roughly equally.
+  "intelligenceTier": "pulse" | "briefing" | "audit",
+  "methodologyPillars": string[]
 }
 
 Hard constraints:
@@ -174,6 +176,36 @@ Hard constraints:
 - stoneTruth MUST be <= 160 characters.
 - actionableInsights MUST contain between 3 and 5 items.
 - categorySlugs MUST contain 1 or 2 items, each from the exact list above. Do not invent slugs.
+- intelligenceTier MUST be exactly one of: "pulse", "briefing", "audit".
+  - "pulse"    = 30-second scan; bite-sized signal under ~600 words.
+  - "briefing" = 5-minute read; standard analysis, 800–2000 words.
+  - "audit"    = forensic long-form deep analysis, 2000+ words.
+  Choose based on the actual depth and rigour of the body, not on the
+  contentType requested by the writer.
+- methodologyPillars MUST contain values drawn ONLY from this exact list
+  of slugs (no other strings allowed):
+    supply-chain-scenario-modelling
+    supply-chain-long-memory-filter
+    policy-scenario-modelling
+    policy-long-memory-filter
+    talent-scenario-modelling
+    talent-long-memory-filter
+
+  These are cells of the 3×2 Forensic Technopolitics matrix —
+  the rows are Scenario Modelling and Long-Memory Filter, the
+  columns are Supply Chain, Policy, and Talent. A cell applies
+  if the body genuinely uses that analytical move (forward-looking
+  scenario in the supply-chain domain, historical-pattern read in
+  the policy domain, etc.).
+
+  Cell-count rule by intelligenceTier:
+    - pulse:    exactly 1 cell.
+    - briefing: 2–4 cells.
+    - audit:    all 6 cells (this is the methodology rule for Deep
+                Dives — apply all 6 unless one analytical lane is
+                genuinely absent from the body).
+
+  Pick only cells that are visible as analytical moves; do not pad.
 - Return JSON only. No \`\`\`json fences.`;
 
     const userPrompt = `Extract SEO metadata, actionable insights, and taxonomy for this draft.

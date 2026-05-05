@@ -2,6 +2,25 @@
 
 > Track every change shipped as part of the 2026 homepage redesign here. Append-only.
 
+## §D Path 2 — methodologyPillars 3×2 matrix + Claude pass-2 auto-population
+- Schema: replaced `methodologyPillars` enum in `src/sanity/schemaTypes/article.ts`. Old four-pillar abstraction (Supply Chain Forensics / Policy Stress-Testing / Scenario Modelling / Signal Filtering) → six matrix cells: 3 columns (Supply Chain, Policy, Talent) × 2 rows (Scenario Modelling, Long-Memory Filter). Field name unchanged — GROQ queries and TS references still resolve. Title now "Methodology Audit (3×2 matrix cells)"; layout `tags`; `validation: rule.max(6)`.
+- Claude pass-2 prompt extension in `src/lib/prompts.ts` `buildMetadataPrompt()`: added `intelligenceTier` and `methodologyPillars` to the JSON schema block; appended hard constraints with the per-tier cell-count rule (pulse=1, briefing=2–4, audit=all 6 unless a lane is genuinely absent).
+- Validation extension in `src/app/actions.ts` `extractArticleMetadata()`: best-effort drop-invalids pattern matching the existing fields (no throws on bad data; the draft still saves). Filters `methodologyPillars` against the canonical 6-cell list, dedupes via Set, caps at 6.
+- Plumbing: `ArticleData` interface in `src/lib/sanity.ts` extended; conditional doc construction in `createArticleInSanity()` adds the two fields only when present. Pass-through wired in the actions.ts call site.
+- Pre-flight (Sanity MCP query): 3 articles using `methodologyPillars` (1 draft, 2 published). 2 distinct legacy values in use: `policy-stress-testing` and `supply-chain-forensics`. Below the 10-doc threshold — hand-map path chosen, **migration script not generated**.
+- Build: `npm run build` clean (22s compile, no TS errors). Initial draft of the validator failed type-narrowing through `new Set(...)` on a filtered `any`-typed array; fixed by intermediate `(parsed.methodologyPillars as unknown[]).filter(...)` step before the Set wrap.
+
+Post-deploy hand-map (Clive's task in Studio):
+- `2oGVswEwQBfyYUvi889ioS` — *Atlantic Fault Lines Deepen: US Tech Policies Threaten EU Digital Autonomy* — legacy `policy-stress-testing`. Likely fits `policy-scenario-modelling` and/or `policy-long-memory-filter`.
+- `3063586d-13da-493d-95b6-577f8b17d394` — *Helium Scarcity Is Quietly Strangling Semiconductor Production* — legacy `supply-chain-forensics`. Likely fits `supply-chain-scenario-modelling` and/or `supply-chain-long-memory-filter`.
+- `drafts.1344add1-6e0b-4042-a6c9-af393da6040e` — *Iran Conflict Reshapes European Semiconductor Supply Chains* (draft) — legacy `supply-chain-forensics`. Same likely fit as above.
+
+User-driven smoke tests (deferred from automated test plan because they side-effect Claude API + Sanity drafts):
+- Studio: open methodologyPillars multi-select on a draft, confirm 6 options with × notation, tags layout.
+- /admin/generate: Signal on a clear supply-chain topic → expect intelligenceTier in {pulse, briefing}, methodologyPillars 1–4 cells incl. at least one supply-chain cell.
+- /admin/generate: Deep Dive on same topic → expect intelligenceTier="audit", methodologyPillars 5–6 cells.
+- Resilience: temporarily break metadata prompt JSON, confirm draft still saves with title/slug/body/persona/contentType only, revert.
+
 ## §P — Sitewide terminology + spelling pass
 - §E Sanday → context-driven replacements per the per-surface mapping:
   - HeroSection.tsx: hero badge, hero lede, image alt — `Sanday, Orkney` / `from Sanday` / `Sanday clifftop` → `an Outer Orkney isle` / `from an Outer Orkney isle` / `clifftop on an Outer Orkney isle`.

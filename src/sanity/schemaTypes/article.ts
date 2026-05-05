@@ -114,18 +114,24 @@ export const article = defineType({
     }),
     defineField({
       name: 'methodologyPillars',
-      title: 'Methodology Pillars Applied',
-      description: 'Which analytical frameworks were used in this analysis?',
+      title: 'Methodology Audit (3×2 matrix cells)',
+      description:
+        'Cells of the 3×2 Forensic Technopolitics matrix that this piece ' +
+        'applies. Pulses use 1 cell; Briefings 2–4 cells; Audits all 6.',
       type: 'array',
-      of: [defineArrayMember({ type: 'string' })],
+      of: [{ type: 'string' }],
       options: {
         list: [
-          { title: 'Supply Chain Forensics', value: 'supply-chain-forensics' },
-          { title: 'Policy Stress-Testing', value: 'policy-stress-testing' },
-          { title: 'Scenario Modelling', value: 'scenario-modeling' },
-          { title: 'Signal Filtering', value: 'signal-filtering' },
+          { title: 'Supply Chain × Scenario Modelling', value: 'supply-chain-scenario-modelling' },
+          { title: 'Supply Chain × Long-Memory Filter', value: 'supply-chain-long-memory-filter' },
+          { title: 'Policy × Scenario Modelling',       value: 'policy-scenario-modelling'       },
+          { title: 'Policy × Long-Memory Filter',       value: 'policy-long-memory-filter'       },
+          { title: 'Talent × Scenario Modelling',       value: 'talent-scenario-modelling'       },
+          { title: 'Talent × Long-Memory Filter',       value: 'talent-long-memory-filter'       },
         ],
+        layout: 'tags',
       },
+      validation: (rule) => rule.max(6),
     }),
     defineField({
       name: 'actionableInsights',

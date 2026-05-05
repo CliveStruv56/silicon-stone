@@ -29,6 +29,8 @@ export interface ArticleData {
     stoneTruth?: string;
     actionableInsights?: string[];
     categorySlugs?: string[];
+    intelligenceTier?: 'pulse' | 'briefing' | 'audit';
+    methodologyPillars?: string[];   // matrix-cell slugs
 }
 
 export interface CategoryOption {
@@ -115,6 +117,12 @@ export async function createArticleInSanity(data: ArticleData) {
     if (data.categorySlugs && data.categorySlugs.length > 0) {
         const refs = await resolveCategoryRefs(data.categorySlugs);
         if (refs.length > 0) doc.categories = refs;
+    }
+    if (data.intelligenceTier) {
+        doc.intelligenceTier = data.intelligenceTier;
+    }
+    if (data.methodologyPillars && data.methodologyPillars.length > 0) {
+        doc.methodologyPillars = data.methodologyPillars;
     }
 
     return await writeClient.createOrReplace(doc);
