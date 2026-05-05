@@ -200,14 +200,33 @@ Hard constraints:
   scenario in the supply-chain domain, historical-pattern read in
   the policy domain, etc.).
 
-  Cell-count rule by intelligenceTier:
+  PER-CELL EVALUATION (this is the primary test — apply it to every
+  one of the six cells before settling on a final list):
+
+    For each candidate cell, ask: "Does the body actually use this
+    analytical move? Is there a paragraph or argument in the body
+    that visibly applies the [Supply Chain | Policy | Talent] lens
+    using [forward-looking Scenario Modelling | historical Long-
+    Memory Filter] reasoning?"
+
+    If yes — include the cell.
+    If no — exclude it. Do not include a cell because the topic
+    "involves" that domain in passing; the analytical MOVE has to
+    be visible.
+
+  Cell-count guardrails by intelligenceTier (sanity ranges, not
+  mandates — the per-cell test above is the actual selector):
     - pulse:    exactly 1 cell.
     - briefing: 2–4 cells.
-    - audit:    all 6 cells (this is the methodology rule for Deep
-                Dives — apply all 6 unless one analytical lane is
-                genuinely absent from the body).
+    - audit:    4–6 cells. Audits are wider in scope so naturally
+                touch more lenses, but never auto-select all 6 —
+                drop any lens the body does not actually use.
 
-  Pick only cells that are visible as analytical moves; do not pad.
+  Do not pad. An audit on, say, semiconductor supply-chain capacity
+  allocation should NOT include the Talent cells unless the body
+  genuinely analyses talent dynamics through that lens. A piece
+  that mentions a topic in passing without applying the lens does
+  not justify the cell.
 - Return JSON only. No \`\`\`json fences.`;
 
     const userPrompt = `Extract SEO metadata, actionable insights, and taxonomy for this draft.

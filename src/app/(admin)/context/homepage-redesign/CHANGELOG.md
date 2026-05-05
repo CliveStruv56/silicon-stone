@@ -2,6 +2,11 @@
 
 > Track every change shipped as part of the 2026 homepage redesign here. Append-only.
 
+## §D fix-up #2 — Audit cell selection: tighten prompt to per-cell evaluation
+- The original §D prompt told Claude `audit: all 6 cells … apply all 6 unless one analytical lane is genuinely absent from the body`. That phrasing biased Claude toward the all-6 default with a weak escape hatch — and it played out exactly that way: a Korean memory-fab capacity Audit returned with all 6 cells checked, including Talent × Scenario Modelling and Talent × Long-Memory Filter that the body doesn't genuinely apply.
+- Restructured the methodologyPillars rule so per-cell evaluation is the primary test, not the tier count. For each of the six cells, Claude must now answer "is there a paragraph or argument in the body that visibly applies this [domain × method] move?" — yes includes, no excludes. Tier ranges stay as sanity guardrails (pulse=1, briefing=2–4, audit=4–6) but are framed as "ranges, not mandates". Added the explicit "audit on supply-chain capacity should NOT include Talent unless the body genuinely analyses talent dynamics" worked example.
+- Build clean. No schema or code changes — prompt-only fix.
+
 ## §D fix-up — methodologyPillars Studio rendering
 - Removed `layout: 'tags'` from the `methodologyPillars` field options. With tags layout, Sanity rendered the field as a freeform tag input ("Enter tag and press ENTER…") and only surfaced the 6 enum options as autocomplete suggestions on focus — not what the user wanted to see. Default rendering for an `array of string` with `options.list` is a checkbox grid showing all 6 cells visibly, which is the right UX for a closed enum.
 - Normalised `of: [{ type: 'string' }]` → `of: [defineArrayMember({ type: 'string' })]` for consistency with every other array field in the schema.
