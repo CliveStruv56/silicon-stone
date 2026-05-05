@@ -119,7 +119,7 @@ export const article = defineType({
         'Cells of the 3×2 Forensic Technopolitics matrix that this piece ' +
         'applies. Pulses use 1 cell; Briefings 2–4 cells; Audits all 6.',
       type: 'array',
-      of: [{ type: 'string' }],
+      of: [defineArrayMember({ type: 'string' })],
       options: {
         list: [
           { title: 'Supply Chain × Scenario Modelling', value: 'supply-chain-scenario-modelling' },
@@ -129,7 +129,6 @@ export const article = defineType({
           { title: 'Talent × Scenario Modelling',       value: 'talent-scenario-modelling'       },
           { title: 'Talent × Long-Memory Filter',       value: 'talent-long-memory-filter'       },
         ],
-        layout: 'tags',
       },
       validation: (rule) => rule.max(6),
     }),

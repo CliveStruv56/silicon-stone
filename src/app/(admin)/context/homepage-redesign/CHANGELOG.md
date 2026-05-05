@@ -2,6 +2,11 @@
 
 > Track every change shipped as part of the 2026 homepage redesign here. Append-only.
 
+## §D fix-up — methodologyPillars Studio rendering
+- Removed `layout: 'tags'` from the `methodologyPillars` field options. With tags layout, Sanity rendered the field as a freeform tag input ("Enter tag and press ENTER…") and only surfaced the 6 enum options as autocomplete suggestions on focus — not what the user wanted to see. Default rendering for an `array of string` with `options.list` is a checkbox grid showing all 6 cells visibly, which is the right UX for a closed enum.
+- Normalised `of: [{ type: 'string' }]` → `of: [defineArrayMember({ type: 'string' })]` for consistency with every other array field in the schema.
+- Build clean. Same field title, description, list, and validation rule.
+
 ## §E — Port metadata extraction into /create's createDraftFromResearch (Architecture A Phase 1)
 - /create's research-grounded pipeline now runs the same Pass-2 metadata extraction that /generate already does. Both pipelines now produce identical Sanity-ready field sets — drafts gain seo.metaTitle, seo.metaDescription, stoneTruth, actionableInsights, categories (resolved refs), intelligenceTier, and methodologyPillars matrix cells. Excerpt is set to metaDescription when present (SEO-tuned 150–160 char) with parsed.excerpt as fallback, matching /generate.
 - Structural change beyond the paste-block's stated scope: `extractArticleMetadata` and the `ArticleMetadata` interface were moved from `src/app/actions.ts` (where they were defined locally and not exported) to `src/lib/prompts.ts` so both pipelines can import from the same location. The paste-block's import line `import { extractArticleMetadata } from '@/lib/prompts'` only works after this move. Zero behavioural change at /generate's call site.
