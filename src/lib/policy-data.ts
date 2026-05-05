@@ -138,7 +138,7 @@ export const POLICIES: Policy[] = [
       'Semiconductors': {
         relevance: 'high',
         requirements: [
-          'Export license requirements for advanced chips',
+          'Export licence requirements for advanced chips',
           'End-use and end-user verification',
           'Technology transfer restrictions',
         ],

@@ -41,7 +41,7 @@ export const QUESTIONS: Record<string, Question> = {
   start: {
     id: 'start',
     text: 'What industry does your AI system operate in?',
-    description: 'Select the sector that best describes your organization to get tailored compliance guidance.',
+    description: 'Select the sector that best describes your organisation to get tailored compliance guidance.',
     options: [
       { label: 'Automotive / Mobility', value: 'automotive', nextStep: 'automotive_function' },
       { label: 'Financial Services / Fintech', value: 'fintech', nextStep: 'fintech_function' },
@@ -71,7 +71,7 @@ export const QUESTIONS: Record<string, Question> = {
     options: [
       { label: 'Yes, facial recognition for driver identification', value: 'facial', riskOutcome: 'High' },
       { label: 'Yes, emotion/drowsiness detection', value: 'emotion', riskOutcome: 'High' },
-      { label: 'No, only behavioral patterns (steering, speed)', value: 'behavioral', riskOutcome: 'Limited' },
+      { label: 'No, only behavioural patterns (steering, speed)', value: 'behavioral', riskOutcome: 'Limited' },
     ],
   },
   automotive_infrastructure: {
@@ -298,7 +298,7 @@ export const RISK_DETAILS: Record<RiskLevel, RiskDetail> = {
         category: 'Risk Management',
         items: [
           'Establish risk management system',
-          'Identify and analyze known/foreseeable risks',
+          'Identify and analyse known/foreseeable risks',
           'Implement risk mitigation measures',
           'Document residual risk acceptance criteria',
         ],

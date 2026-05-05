@@ -198,7 +198,7 @@ export function CreateForm({ initialPersonas }: CreateFormProps) {
                             Intelligence Gathered
                         </CardTitle>
                         <CardDescription>
-                            {researchResult.sources.length} sources analyzed.
+                            {researchResult.sources.length} sources analysed.
                         </CardDescription>
                     </CardHeader>
 

@@ -453,7 +453,7 @@ export default function SupplyChainMapperPage() {
                       <Network className="w-12 h-12 mx-auto mb-4 opacity-50" />
                       <p className="text-xl mb-2">Select a Node</p>
                       <p className="text-sm">
-                        Click on any supply chain node on the map to analyze its strategic significance and dependencies.
+                        Click on any supply chain node on the map to analyse its strategic significance and dependencies.
                       </p>
                     </div>
                   </motion.div>

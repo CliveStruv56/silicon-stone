@@ -18,7 +18,7 @@ import { SITE_SETTINGS_QUERY, ARTICLES_BY_TIER_QUERY } from '@/sanity/lib/querie
 export const metadata: Metadata = {
   title: 'Silicon and Stone | Forensic Technopolitics for the Senior Leaders Defining the AI Power Shift',
   description:
-    "Decision-grade intelligence on the technology power shift, for the senior leaders who'll be defining it, not defined by it. Twice a week from Sanday, Orkney.",
+    "Decision-grade intelligence on the technology power shift, for the senior leaders who'll be defining it, not defined by it. Twice a week from the edge of Europe.",
 }
 
 export default async function Home() {
@@ -42,14 +42,14 @@ export default async function Home() {
         name: 'Silicon and Stone',
         url: 'https://siliconandstone.com',
         description:
-          'Forensic Technopolitics for the senior leaders defining the AI power shift. Decision-grade intelligence on AI policy, semiconductor supply chains, and digital sovereignty, twice a week from Sanday, Orkney.',
+          'Forensic Technopolitics for the senior leaders defining the AI power shift. Decision-grade intelligence on AI policy, semiconductor supply chains, and digital sovereignty, twice a week from the edge of Europe.',
       },
       {
         '@type': 'Organization',
         name: 'Silicon and Stone',
         url: 'https://siliconandstone.com',
         description:
-          'Forensic Technopolitics intelligence service for senior decision-makers in European industry. Calibrated, practitioner-grade analysis from thirty years inside the technology industry. Published from Sanday, Orkney.',
+          'Forensic Technopolitics intelligence service for senior decision-makers in European industry. Calibrated, practitioner-grade analysis from thirty years inside the technology industry. Published from the edge of Europe.',
         foundingDate: '2024',
         areaServed: 'Europe',
         knowsAbout: [
@@ -65,7 +65,7 @@ export default async function Home() {
         '@type': 'WebPage',
         name: 'Forensic Technopolitics for the AI Power Shift',
         description:
-          "Decision-grade intelligence on the technology power shift, for the senior leaders who'll be defining it, not defined by it. Twice a week from Sanday, Orkney.",
+          "Decision-grade intelligence on the technology power shift, for the senior leaders who'll be defining it, not defined by it. Twice a week from the edge of Europe.",
         url: 'https://siliconandstone.com',
         about: {
           '@type': 'Thing',

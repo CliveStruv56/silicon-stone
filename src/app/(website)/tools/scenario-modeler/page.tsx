@@ -161,7 +161,7 @@ export default function ScenarioModelerPage() {
             </h1>
             <p className="text-lg text-text-muted max-w-2xl mx-auto">
               Explore geopolitical futures and their impact on technology value chains.
-              Select a scenario to analyze sector-by-sector exposure and cascade effects.
+              Select a scenario to analyse sector-by-sector exposure and cascade effects.
             </p>
           </div>
         </section>

@@ -42,7 +42,7 @@ const frameworks = [
   {
     id: 'policy-stress',
     title: 'Comparative Policy Stress-Testing',
-    description: 'We analyze the Atlantic Drift by systematically contrasting US and EU regulatory approaches to predict where compliance friction will emerge.',
+    description: 'We analyse the Atlantic Drift by systematically contrasting US and EU regulatory approaches to predict where compliance friction will emerge.',
     icon: Scale,
     color: 'text-silicon-amber',
     bgColor: 'bg-silicon-amber/10',
@@ -106,7 +106,7 @@ const assessments = [
   },
   {
     title: 'Scenario Impact Analysis',
-    description: 'Custom geopolitical scenario modeling for your industry and geography with quantified value-at-stake metrics.',
+    description: 'Custom geopolitical scenario modelling for your industry and geography with quantified value-at-stake metrics.',
     deliverables: [
       'Custom scenario development for your context',
       'Value-at-stake quantification by business unit',
@@ -230,7 +230,7 @@ export default function ServicesPage() {
                 Strategic Advisory for the Technopolitical Age
               </h1>
               <p className="text-xl text-text-muted leading-relaxed mb-6">
-                From AI Act compliance to supply chain resilience, we help organizations
+                From AI Act compliance to supply chain resilience, we help organisations
                 navigate the intersection of technology, regulation, and geopolitics.
               </p>
               <p className="text-text-muted leading-relaxed">
@@ -547,7 +547,7 @@ export default function ServicesPage() {
                       value={formData.company}
                       onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                       className="bg-stone-charcoal border-border-subtle text-text-primary placeholder:text-text-muted/50 focus:border-stone-teal"
-                      placeholder="Your organization"
+                      placeholder="Your organisation"
                     />
                   </div>
 

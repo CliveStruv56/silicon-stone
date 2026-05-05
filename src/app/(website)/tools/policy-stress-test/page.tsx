@@ -256,7 +256,7 @@ export default function PolicyStressTestPage() {
                 Configure Your Context
               </CardTitle>
               <CardDescription>
-                Select your industry and the policies to analyze
+                Select your industry and the policies to analyse
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">

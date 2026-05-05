@@ -32,7 +32,7 @@ const itemVariants = {
 }
 
 const HERO_IMAGE_ALT =
-    'A figure on a Sanday clifftop, looking out across the North Atlantic — the view from the edge'
+    'A figure on a clifftop on an Outer Orkney isle, looking out across the North Atlantic — the view from the edge'
 
 const HERO_OVERLAY_BACKGROUND = `
     linear-gradient(to right,
@@ -115,7 +115,7 @@ export function HeroSection({ settings }: HeroSectionProps) {
                                 variant="outline"
                                 className="mb-8 border-silicon-amber/60 text-silicon-amber font-mono text-[11px] tracking-[0.10em] uppercase bg-silicon-amber/5"
                             >
-                                Forensic Technopolitics · Sanday, Orkney
+                                Forensic Technopolitics · an Outer Orkney isle
                             </Badge>
                         </motion.div>
 
@@ -148,7 +148,7 @@ export function HeroSection({ settings }: HeroSectionProps) {
                             className="text-base text-text-muted leading-relaxed max-w-xl"
                         >
                             {settings?.heroDescription ||
-                                'Calibrated, decision-grade analysis from someone who spent thirty years inside the industry. Published twice a week from Sanday — sixty miles north of mainland Scotland — because the view from the edge is structurally clearer than the view from any centre.'}
+                                'Calibrated, decision-grade analysis from someone who spent thirty years inside the industry. Published twice a week from an Outer Orkney isle — sixty miles north of mainland Scotland — because the view from the edge is structurally clearer than the view from any centre.'}
                         </motion.p>
 
                         <motion.div

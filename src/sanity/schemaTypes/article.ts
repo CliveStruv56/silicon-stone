@@ -122,7 +122,7 @@ export const article = defineType({
         list: [
           { title: 'Supply Chain Forensics', value: 'supply-chain-forensics' },
           { title: 'Policy Stress-Testing', value: 'policy-stress-testing' },
-          { title: 'Scenario Modeling', value: 'scenario-modeling' },
+          { title: 'Scenario Modelling', value: 'scenario-modeling' },
           { title: 'Signal Filtering', value: 'signal-filtering' },
         ],
       },

@@ -87,7 +87,7 @@ export default function AboutPage() {
                     <div className="text-center p-8">
                       <div className="text-6xl mb-4 opacity-50">🏴󠁧󠁢󠁳󠁣󠁴󠁿</div>
                       <p className="text-text-muted text-sm italic">
-                        &ldquo;The edge is where you see what the center misses&rdquo;
+                        &ldquo;The edge is where you see what the centre misses&rdquo;
                       </p>
                     </div>
                   </div>
@@ -106,7 +106,7 @@ export default function AboutPage() {
             <div className="prose prose-lg prose-invert">
               <p className="text-text-muted leading-relaxed mb-4">
                 There&apos;s a reason the most interesting analysis often comes from outside the major
-                technology centers. Silicon Valley, London, Beijing—these places generate enormous
+                technology centres. Silicon Valley, London, Beijing—these places generate enormous
                 amounts of information, but they also generate enormous amounts of noise.
                 Consensus forms quickly. Dissent gets drowned out. Everyone reads the same takes
                 from the same sources.
@@ -119,7 +119,7 @@ export default function AboutPage() {
               </p>
               <p className="text-text-muted leading-relaxed">
                 The edge isn&apos;t about being contrarian for its own sake. It&apos;s about having the
-                space to see what the center is too busy to notice.
+                space to see what the centre is too busy to notice.
               </p>
             </div>
           </div>
@@ -200,7 +200,7 @@ export default function AboutPage() {
                   </h3>
                   <p className="text-text-muted text-sm">
                     The EU AI Act, US executive orders, and the emerging global patchwork.
-                    What it means for organizations deploying AI systems.
+                    What it means for organisations deploying AI systems.
                   </p>
                 </CardContent>
               </Card>
@@ -234,7 +234,7 @@ export default function AboutPage() {
                   </h3>
                   <p className="text-text-muted text-sm">
                     The Atlantic drift between US and EU approaches, and what it means
-                    for organizations operating in both spheres.
+                    for organisations operating in both spheres.
                   </p>
                 </CardContent>
               </Card>

@@ -28,7 +28,7 @@ const methodologies = [
     questions: [
       'Where does the neon for chip lithography actually come from?',
       'What happens when a single Taiwanese fab goes offline?',
-      'Which European investments are on track, and which are vapor?',
+      'Which European investments are on track, and which are vapour?',
     ],
     link: '/analysis/semiconductors',
     icon: (

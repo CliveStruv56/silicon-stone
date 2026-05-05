@@ -128,7 +128,7 @@ export default function GeneratorForm({ personas }: { personas: Persona[] }) {
                     <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
                         <h2 className="text-xl font-semibold flex items-center gap-2">
                             <Sparkles className="w-5 h-5 text-blue-500" />
-                            What are we analyzing?
+                            What are we analysing?
                         </h2>
 
                         <div className="bg-muted/20 p-6 rounded-xl border border-border">

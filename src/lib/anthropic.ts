@@ -14,7 +14,7 @@ export async function callClaude(system: string, user: string, temperature: numb
 
         // Return valid JSON structure that matches ResearchResult
         return JSON.stringify({
-            summary: "This is a SIMULATED analysis because the Anthropic API Key is missing. The system detected your Inoreader content but cannot analyze it without Claude.",
+            summary: "This is a SIMULATED analysis because the Anthropic API Key is missing. The system detected your Inoreader content but cannot analyse it without Claude.",
             sources: [
                 {
                     title: "Missing API Key",

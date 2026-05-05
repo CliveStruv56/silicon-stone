@@ -2,6 +2,29 @@
 
 > Track every change shipped as part of the 2026 homepage redesign here. Append-only.
 
+## §P — Sitewide terminology + spelling pass
+- §E Sanday → context-driven replacements per the per-surface mapping:
+  - HeroSection.tsx: hero badge, hero lede, image alt — `Sanday, Orkney` / `from Sanday` / `Sanday clifftop` → `an Outer Orkney isle` / `from an Outer Orkney isle` / `clifftop on an Outer Orkney isle`.
+  - page.tsx: page meta description, JSON-LD WebSite/Organization/WebPage descriptions — all `Sanday, Orkney` instances → `the edge of Europe` (matches §H newsletter framing and avoids structured-data fragility around the place name).
+  - SKILL.md: line 71 canonical phrasing list updated per spec; line 15 positioning sentence updated for spec coherence (`Published from Sanday, Orkney.` → `Published from an Outer Orkney isle.`).
+- §K British English spelling pass (17 changes across 13 files):
+  - `analyze` → `analyse` (×8): policy-stress-test, scenario-modeler, supply-chain-mapper, services, anthropic.ts, compliance-data.ts, plus admin UI in create-form.tsx + generator-form.tsx.
+  - `modeling` → `modelling` (×3 in this commit; ×4 in working tree): types/scenario.ts comment, services Tool 3 description, Sanity Studio option title in article.ts (only the `title` display label; `value: 'scenario-modeling'` slug preserved per §A). The same one-line title swap was also applied to `src/sanity/schemaTypes/youtubeScript.ts`, but that file is untracked (pre-dates this session) and excluded from this commit — the working-copy edit will land when youtubeScript.ts is first committed.
+  - `organization`/`organize` → `organisation`/`organise` (×5): about (×2), services (×2 incl. form placeholder), compliance-data.ts.
+  - `center`/`centers` → `centre`/`centres` (×4): about (×3 — singular quote at line 90, "the center" at line 122, "technology centers" at line 109), supply-chain-data.ts data centres.
+  - `vapor` → `vapour` (×1): methodology Supply Chain question.
+  - `behavioral` → `behavioural` (×1, label only): compliance-data.ts AI risk classification option. The `value: 'behavioral'` identifier preserved for form-state stability — same rationale as the §A `scenario-modeling` slug.
+  - `license` (noun) → `licence` (×1): policy-data.ts export-control requirement.
+  - Color, Tailwind utility classes, CSS custom properties, JSON-LD identifiers, and URL slugs all preserved untouched. Code/CSS comments left American (internal-facing).
+- §C "fifty miles" → "sixty miles": already done in earlier §C commit; the only remaining match is a historical CHANGELOG line documenting that fix. No edits needed.
+
+Out-of-scope (deferred):
+- `src/app/(admin)/context/homepage-redesign/COPY.md` and `SPEC.md` still contain Sanday references (5 + 2 occurrences). These are admin/source-of-truth docs, not in the §P spec scope. Future Sanity entry by Jane against COPY.md could re-introduce "Sanday, Orkney" — needs a follow-up cleanup commit.
+- `public/homepage-redesign-2026/HERO-IMAGE.md` retains Sanday references — image-brief documentation describing where the photograph was actually shot. Out of scope, factually accurate as record.
+- CHANGELOG.md historical entries — never edited; record stays as-is.
+- Atlantic Drift welcome email body — no source file in repo (ConvertKit holds it externally). Clive to update in the Kit dashboard.
+- JSON-LD Organization description still contains "practitioner-grade" (line 52 of page.tsx). Outside §P scope; flagged as a §F-extension follow-up since structured data is SEO-indexed.
+
 ## §O — Methodology page review (Jane and Clive's first-pass)
 - §I Clarified "models compound futures" in the methodology hero subhead — replaced with "models how today's tensions compound into different futures". Picks up the Scenario lens's own vocabulary ("today's tensions could evolve into…") and resolves the noun-phrase / verb-phrase ambiguity of the original three-word compression.
 - §J Added bullet to Supply Chain Forensics "What this means in practice" (appended last): "Tracing how semiconductor supply chain disruptions propagate downstream into dependent industries". Bullets 1–4 trace inward (materials → fab → capacity → labour); the new bullet broadens outward to downstream blast radius.

@@ -12,7 +12,7 @@ description: Voice rules for any text rendered on Silicon and Stone surfaces —
 
 ## The publication's positioning, in one sentence
 
-Silicon and Stone is a strategic intelligence service for senior European professionals navigating the 2026 technology power shift — semiconductors, AI policy, supply chains, digital sovereignty. Published from Sanday, Orkney. Practitioner-grade, calibrated, never glib.
+Silicon and Stone is a strategic intelligence service for senior European professionals navigating the 2026 technology power shift — semiconductors, AI policy, supply chains, digital sovereignty. Published from an Outer Orkney isle. Practitioner-grade, calibrated, never glib.
 
 The voice exists to serve that positioning, not to perform a tone for its own sake.
 
@@ -68,7 +68,7 @@ The voice is intelligence-briefing register — sober, considered, weighty. It i
 - **The view from the edge** — the brand thesis (clearer than the view from any centre)
 - **Forensic Technopolitics** — the methodology
 - **Decision-grade**, **Calibrated by default**, **Hedged on purpose**
-- **Sanday**, **Orkney**, **sixty miles north of mainland Scotland**, **the Atlantic edge**
+- **an Outer Orkney isle**, **sixty miles north of mainland Scotland**, **the Atlantic edge**
 - **Thirty years inside the industry** (the credential)
 - **Senior leaders** / **senior decision-makers** / **senior leaders in European industry** (the audience)
 

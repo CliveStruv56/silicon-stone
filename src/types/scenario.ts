@@ -1,5 +1,5 @@
 // Scenario Modeler Types
-// Geopolitical scenario modeling aligned with "Scenario-Based Drift Modeling" methodology
+// Geopolitical scenario modelling aligned with "Scenario-Based Drift Modelling" methodology
 
 export type FrictionLevel = 'low' | 'medium' | 'high'
 export type ImpactSeverity = 'positive' | 'neutral' | 'negative' | 'severe'
