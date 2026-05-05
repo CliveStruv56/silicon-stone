@@ -1,5 +1,7 @@
 import { getVoiceDNA, getBusinessProfile, getContentFocus } from "./api";
 import { getSanityPersona } from "./sanity";
+import { callClaude } from "./anthropic";
+import { logErrorToFile } from "./debug";
 import type { VoiceDNA } from "@/types/context";
 
 type ContentType = 'signal' | 'deepdive' | 'guide';
@@ -219,4 +221,100 @@ ${body}
 Return the JSON object now.`;
 
     return { systemPrompt, userPrompt };
+}
+
+export interface ArticleMetadata {
+    seoTitle?: string;
+    metaDescription?: string;
+    stoneTruth?: string;
+    actionableInsights?: string[];
+    categorySlugs?: string[];
+    intelligenceTier?: 'pulse' | 'briefing' | 'audit';
+    methodologyPillars?: string[];
+}
+
+/**
+ * Pass-2 of the article generator: read a finished draft and produce
+ * structured SEO metadata, actionable insights, taxonomy, intelligence tier,
+ * and methodology-matrix cells. Best-effort — returns null if the metadata
+ * call fails so the upstream pipeline can still save the draft.
+ */
+export async function extractArticleMetadata(
+    title: string,
+    body: string,
+    personaKey: string,
+    categories: CategoryChoice[],
+): Promise<ArticleMetadata | null> {
+    let raw = "";
+    try {
+        const { systemPrompt, userPrompt } = await buildMetadataPrompt(title, body, personaKey, categories);
+        raw = await callClaude(systemPrompt, userPrompt);
+
+        const firstOpen = raw.indexOf('{');
+        const lastClose = raw.lastIndexOf('}');
+        if (firstOpen === -1 || lastClose === -1) throw new Error("No JSON object in metadata response");
+
+        const parsed = JSON.parse(raw.substring(firstOpen, lastClose + 1));
+
+        const clamp = (s: unknown, max: number): string | undefined => {
+            if (typeof s !== 'string') return undefined;
+            const trimmed = s.trim();
+            if (!trimmed) return undefined;
+            return trimmed.length > max ? trimmed.slice(0, max).trimEnd() : trimmed;
+        };
+
+        const insights = Array.isArray(parsed.actionableInsights)
+            ? parsed.actionableInsights
+                .map((i: unknown) => (typeof i === 'string' ? i.trim() : ''))
+                .filter((i: string) => i.length > 0)
+                .slice(0, 5)
+            : [];
+
+        const allowedSlugs = new Set(categories.map(c => c.slug));
+        const rawSlugs = Array.isArray(parsed.categorySlugs)
+            ? parsed.categorySlugs
+                .map((s: unknown) => (typeof s === 'string' ? s.trim() : ''))
+                .filter((s: string) => allowedSlugs.has(s))
+                .slice(0, 2)
+            : [];
+
+        const VALID_TIERS = ['pulse', 'briefing', 'audit'] as const;
+        type IntelligenceTier = typeof VALID_TIERS[number];
+        const intelligenceTier: IntelligenceTier | undefined =
+            (VALID_TIERS as readonly string[]).includes(parsed.intelligenceTier)
+                ? (parsed.intelligenceTier as IntelligenceTier)
+                : undefined;
+
+        const VALID_CELLS = [
+            'supply-chain-scenario-modelling',
+            'supply-chain-long-memory-filter',
+            'policy-scenario-modelling',
+            'policy-long-memory-filter',
+            'talent-scenario-modelling',
+            'talent-long-memory-filter',
+        ];
+        const methodologyPillars: string[] | undefined = (() => {
+            if (!Array.isArray(parsed.methodologyPillars)) return undefined;
+            const filtered = (parsed.methodologyPillars as unknown[]).filter(
+                (p: unknown): p is string =>
+                    typeof p === 'string' && VALID_CELLS.includes(p)
+            );
+            const cells = Array.from(new Set<string>(filtered)).slice(0, 6);
+            return cells.length > 0 ? cells : undefined;
+        })();
+
+        return {
+            seoTitle: clamp(parsed.seoTitle, 60),
+            metaDescription: clamp(parsed.metaDescription, 160),
+            stoneTruth: clamp(parsed.stoneTruth, 160),
+            actionableInsights: insights.length >= 3 ? insights : undefined,
+            categorySlugs: rawSlugs.length > 0 ? rawSlugs : undefined,
+            intelligenceTier,
+            methodologyPillars,
+        };
+    } catch (err) {
+        const message = err instanceof Error ? err.message : 'Unknown error';
+        logErrorToFile(`METADATA EXTRACTION FAILED: ${message}\n\nRAW:\n${raw}`);
+        return null;
+    }
 }

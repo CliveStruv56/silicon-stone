@@ -3,7 +3,8 @@
 import { redirect } from "next/navigation";
 import { performResearch as researchPipeline } from "@/lib/research";
 import { callClaude } from "@/lib/anthropic";
-import { createArticleInSanity } from "@/lib/sanity";
+import { createArticleInSanity, listSanityCategories } from "@/lib/sanity";
+import { extractArticleMetadata } from "@/lib/prompts";
 import { ResearchResult } from "@/types/research";
 import { generateEmbedding } from "@/lib/embeddings";
 import { searchSimilar } from "@/lib/pinecone";
@@ -147,13 +148,36 @@ ${priorCoverageBlock}`;
 
         const contentType = isYouTube ? "youtube" : (format === "deep_dive" ? "deepdive" : "signal");
 
+        // Pass-2: SEO/insights/taxonomy/tier/matrix-cells extraction.
+        // Best-effort — if it fails the draft still saves, just without
+        // the metadata fields. Same pattern as /generate.
+        let metadata: Awaited<ReturnType<typeof extractArticleMetadata>> | undefined;
+        try {
+            const categoryOptions = await listSanityCategories();
+            metadata = await extractArticleMetadata(
+                parsedData.title,
+                parsedData.content,
+                personaSlug,
+                categoryOptions,
+            );
+        } catch (err) {
+            console.error('[/create] Metadata extraction failed:', err);
+        }
+
         const sanityArticle = {
             title: parsedData.title,
             slug: parsedData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''),
-            excerpt: parsedData.excerpt,
+            excerpt: metadata?.metaDescription ?? parsedData.excerpt,
             body: parsedData.content,
             contentType: contentType as "signal" | "deepdive" | "guide" | "youtube",
-            persona: personaSlug
+            persona: personaSlug,
+            seoTitle: metadata?.seoTitle,
+            metaDescription: metadata?.metaDescription,
+            stoneTruth: metadata?.stoneTruth,
+            actionableInsights: metadata?.actionableInsights,
+            categorySlugs: metadata?.categorySlugs,
+            intelligenceTier: metadata?.intelligenceTier,
+            methodologyPillars: metadata?.methodologyPillars,
         };
 
         await createArticleInSanity(sanityArticle);

@@ -2,6 +2,19 @@
 
 > Track every change shipped as part of the 2026 homepage redesign here. Append-only.
 
+## §E — Port metadata extraction into /create's createDraftFromResearch (Architecture A Phase 1)
+- /create's research-grounded pipeline now runs the same Pass-2 metadata extraction that /generate already does. Both pipelines now produce identical Sanity-ready field sets — drafts gain seo.metaTitle, seo.metaDescription, stoneTruth, actionableInsights, categories (resolved refs), intelligenceTier, and methodologyPillars matrix cells. Excerpt is set to metaDescription when present (SEO-tuned 150–160 char) with parsed.excerpt as fallback, matching /generate.
+- Structural change beyond the paste-block's stated scope: `extractArticleMetadata` and the `ArticleMetadata` interface were moved from `src/app/actions.ts` (where they were defined locally and not exported) to `src/lib/prompts.ts` so both pipelines can import from the same location. The paste-block's import line `import { extractArticleMetadata } from '@/lib/prompts'` only works after this move. Zero behavioural change at /generate's call site.
+- Pre-existing imports cleaned up while in actions.ts: dropped `buildMetadataPrompt`, `CategoryChoice`, `callClaude`, `logErrorToFile` (no longer referenced after the move). `listSanityCategories` retained for the call site.
+- Best-effort error handling preserved per the paste-block: extractArticleMetadata wrapped in try/catch in /create; on failure the draft still saves with title/slug/excerpt/body/contentType/persona only. Same pattern as the existing Pinecone RAG block in createDraftFromResearch.
+- Build: `npm run build` clean.
+
+User-driven smoke tests (deferred — same reason as §D):
+- /research → "Create Draft" flow → confirm draft in Studio populates the full field set (existing + 7 new fields), not just the previous handful.
+- Side-by-side compare a /generate draft and a /create draft in Studio — same metadata field coverage, content quality differences only.
+- Resilience: temporarily make extractArticleMetadata throw; confirm /create draft still saves with the basic fields; revert.
+- Production smoke: throwaway research query post-deploy; tell Claude the slug for cleanup.
+
 ## §D Path 2 — methodologyPillars 3×2 matrix + Claude pass-2 auto-population
 - Schema: replaced `methodologyPillars` enum in `src/sanity/schemaTypes/article.ts`. Old four-pillar abstraction (Supply Chain Forensics / Policy Stress-Testing / Scenario Modelling / Signal Filtering) → six matrix cells: 3 columns (Supply Chain, Policy, Talent) × 2 rows (Scenario Modelling, Long-Memory Filter). Field name unchanged — GROQ queries and TS references still resolve. Title now "Methodology Audit (3×2 matrix cells)"; layout `tags`; `validation: rule.max(6)`.
 - Claude pass-2 prompt extension in `src/lib/prompts.ts` `buildMetadataPrompt()`: added `intelligenceTier` and `methodologyPillars` to the JSON schema block; appended hard constraints with the per-tier cell-count rule (pulse=1, briefing=2–4, audit=all 6 unless a lane is genuinely absent).
