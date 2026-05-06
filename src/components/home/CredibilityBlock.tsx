@@ -31,7 +31,7 @@ export function CredibilityBlock() {
                 The View from the Edge
               </h2>
               <p className="font-mono text-xs uppercase tracking-[0.10em] text-silicon-amber">
-                Thirty years inside. Fifty miles north.
+                Thirty years inside. Sixty miles north.
               </p>
             </div>
           </StaggerItem>
@@ -84,7 +84,7 @@ export function CredibilityBlock() {
                   <div className="h-px bg-border-subtle" />
                   <div>
                     <div className="font-mono text-2xl font-bold text-stone-teal leading-none">
-                      50 mi N
+                      60 mi N
                     </div>
                     <div className="font-mono text-xs uppercase tracking-[0.10em] text-text-muted mt-2">
                       Beyond the Mainland

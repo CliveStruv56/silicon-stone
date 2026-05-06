@@ -48,7 +48,7 @@ No copy changes. (`AI Act Deadline · 91D 05H 12M 58S · Implementation Phase` �
 |---|---|
 | `eyebrow` | `Brand Position` |
 | `h2` | `The View from the Edge` |
-| `subhead` | `Thirty years inside. Fifty miles north.` |
+| `subhead` | `Thirty years inside. Sixty miles north.` |
 
 ### Body — three paragraphs
 
@@ -66,7 +66,7 @@ No copy changes. (`AI Act Deadline · 91D 05H 12M 58S · Implementation Phase` �
 | # | Number | Label | Description |
 |---|---|---|---|
 | 1 | `30` | `Years in Tech` | `From inside the industry, not observing it from outside.` |
-| 2 | `50 mi N` | `Beyond the Mainland` | `The view from the edge is structurally clearer than the view from any centre.` |
+| 2 | `60 mi N` | `Beyond the Mainland` | `The view from the edge is structurally clearer than the view from any centre.` |
 | 3 | `PRACTITIONER‑GRADE` *(non-breaking hyphen, U+2011)* | `Calibrated by Default` | `Hedged on purpose. Not pundit takes, not consensus reading.` |
 
 ---
