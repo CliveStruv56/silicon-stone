@@ -30,7 +30,7 @@ const methodologies = [
       'What happens when a single Taiwanese fab goes offline?',
       'Which European investments are on track, and which are vapour?',
     ],
-    link: '/analysis/semiconductors',
+    link: '/analysis/category/semiconductors',
     icon: (
       <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
@@ -53,7 +53,7 @@ const methodologies = [
       'What does "adequate" data protection mean after Schrems II — the 2020 EU-US data-transfer ruling?',
       'How do CHIPS Act and EU Chips Act subsidies interact?',
     ],
-    link: '/analysis/ai-act',
+    link: '/analysis/category/ai-act',
     icon: (
       <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
@@ -77,7 +77,7 @@ const methodologies = [
       'How does European strategic autonomy reshape supplier relationships?',
       'What triggers the shift from friction to bifurcation?',
     ],
-    link: '/analysis/digital-sovereignty',
+    link: '/analysis/category/digital-sovereignty',
     icon: (
       <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
@@ -100,7 +100,7 @@ const methodologies = [
       'Who benefits from this narrative?',
       'What are they not telling us, and why?',
     ],
-    link: '/analysis/atlantic-drift',
+    link: '/analysis/category/atlantic-drift',
     icon: (
       <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
