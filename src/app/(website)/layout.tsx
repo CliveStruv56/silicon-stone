@@ -1,4 +1,5 @@
 import { SanityLive } from "@/sanity/lib/live";
+import { DraftModeBanner } from "@/components/DraftModeBanner";
 
 export default function WebsiteLayout({
   children,
@@ -9,6 +10,7 @@ export default function WebsiteLayout({
     <div className="noise-overlay">
       {children}
       <SanityLive />
+      <DraftModeBanner />
     </div>
   );
 }

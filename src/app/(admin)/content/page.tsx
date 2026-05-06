@@ -66,7 +66,11 @@ export default async function ContentPage() {
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <Link
-                                        href={`/analysis/${article.slug?.current}`}
+                                        href={
+                                            article._id.startsWith('drafts.')
+                                                ? `/api/draft-mode/enable?slug=${encodeURIComponent(article.slug?.current ?? '')}`
+                                                : `/analysis/${article.slug?.current}`
+                                        }
                                         className="text-sm font-medium hover:text-primary flex items-center gap-1"
                                     >
                                         <ExternalLink className="w-3 h-3" /> Preview

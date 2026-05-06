@@ -34,6 +34,7 @@ export async function middleware(request: NextRequest) {
         '/context',
         '/content',
         '/editor',
+        '/api/draft-mode/enable',
     ]
 
     const isProtectedRoute = protectedPaths.some(path =>
@@ -72,5 +73,6 @@ export const config = {
         '/context/:path*',
         '/content/:path*',
         '/editor/:path*',
+        '/api/draft-mode/enable',
     ],
 }
