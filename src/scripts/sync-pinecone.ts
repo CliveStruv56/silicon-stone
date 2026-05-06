@@ -85,9 +85,9 @@ async function main() {
   } else {
     console.log(`Found ${orphans.length} orphaned vector(s) — deleting:`)
     for (const id of orphans) console.log(`  - ${id}`)
-    // Pinecone deleteMany accepts up to 1000 ids per call
+    // Pinecone SDK v7 takes options objects ({ id } / { ids }) rather than bare strings/arrays.
     for (let i = 0; i < orphans.length; i += 1000) {
-      await index.deleteMany(orphans.slice(i, i + 1000))
+      await index.deleteMany({ ids: orphans.slice(i, i + 1000) })
     }
     console.log(`Deleted ${orphans.length} orphan(s).`)
   }
