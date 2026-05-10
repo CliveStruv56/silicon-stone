@@ -61,7 +61,7 @@ export function PersonaNavigator() {
         </StaggerItem>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          {PERSONA_ORDER.map((slug: PersonaSlug, idx: number) => {
+          {PERSONA_ORDER.map((slug: PersonaSlug) => {
             const persona = PERSONAS[slug]
             const Icon = iconMap[persona.icon] || User
             const colorClass = colorMap[persona.color] || 'text-text-muted'

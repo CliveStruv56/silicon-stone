@@ -9,6 +9,7 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit --incremental false",
     "check": "npm run lint && npm run typecheck",
+    "test:security": "tsx scripts/security-checks.ts",
     "sync-content": "tsx scripts/sync-content.ts",
     "sync-content:dry": "tsx scripts/sync-content.ts --dry-run",
     "sync-content:force": "tsx scripts/sync-content.ts --force"

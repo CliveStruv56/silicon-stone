@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 
 import { Header, Footer } from '@/components/layout'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -14,7 +14,6 @@ import {
   Landmark,
   Briefcase,
   Building2,
-  ArrowRight,
 } from 'lucide-react'
 
 const briefings = [

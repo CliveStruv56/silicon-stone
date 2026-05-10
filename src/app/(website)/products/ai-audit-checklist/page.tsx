@@ -7,10 +7,8 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import {
-  ClipboardCheck,
   CheckCircle,
   FileSpreadsheet,
-  FileText,
   ArrowRight,
   BarChart3,
   AlertTriangle,

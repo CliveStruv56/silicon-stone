@@ -1,6 +1,6 @@
 'use server';
 
-import { listContentFiles, getContent, deleteLocalContent } from "@/lib/api";
+import { listContentFiles, getContent, deleteLocalContent, validateManagedContentPath } from "@/lib/api";
 import { createArticleInSanity, deleteArticleInSanity } from "@/lib/sanity";
 import { requireAdmin } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
@@ -11,6 +11,9 @@ interface ActionState {
 }
 
 export async function syncContent(_prevState: ActionState, _formData: FormData): Promise<ActionState> {
+    void _prevState;
+    void _formData;
+
     try {
         await requireAdmin();
         const files = await listContentFiles();
@@ -87,13 +90,14 @@ export async function deleteDraft(_prevState: ActionState, formData: FormData): 
 
     try {
         await requireAdmin();
+        const safePath = validateManagedContentPath(path);
         // 1. Delete Local
-        await deleteLocalContent(path);
+        await deleteLocalContent(safePath);
 
         // 2. Delete from Sanity
         // path is like "content/drafts/2026-01-22-slug.md"
         // we need to extract the slug part for the ID: "2026-01-22-slug"
-        const fileSlug = path.split('/').pop()?.replace('.md', '') || '';
+        const fileSlug = safePath.split('/').pop()?.replace('.md', '') || '';
         if (fileSlug) {
             await deleteArticleInSanity(fileSlug);
         }

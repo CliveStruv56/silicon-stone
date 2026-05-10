@@ -192,7 +192,6 @@ export default function PolicyStressTestPage() {
     [selectedUsPolicy, selectedIndustry]
   )
 
-  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const combinedFriction = useMemo(
     () => calculateCombinedFriction(selectedEuPolicy, selectedUsPolicy, selectedIndustry),
     [selectedEuPolicy, selectedUsPolicy, selectedIndustry]

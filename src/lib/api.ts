@@ -14,6 +14,16 @@ const ALLOWED_DIRECTORIES = [
     'knowledge',
 ];
 
+const MANAGED_CONTENT_DIRECTORIES = [
+    'content/drafts',
+    'content/substack/signals',
+    'content/substack/deep-dives',
+    'content/social/linkedin',
+    'knowledge',
+];
+
+const MANAGED_CONTENT_EXTENSIONS = new Set(['.md', '.json', '.txt']);
+
 /**
  * Validates that a path is safe and within allowed directories.
  * Prevents directory traversal attacks.
@@ -36,6 +46,30 @@ function validatePath(relativePath: string): void {
     if (!isAllowed) {
         throw new Error('Invalid path: Directory not allowed');
     }
+}
+
+export function validateManagedContentPath(relativePath: string): string {
+    const normalizedPath = nodePath.normalize(relativePath);
+
+    if (normalizedPath.includes('..') || normalizedPath.startsWith('/') || normalizedPath.startsWith('\\')) {
+        throw new Error('Invalid path: Path traversal not allowed');
+    }
+
+    const isAllowed = MANAGED_CONTENT_DIRECTORIES.some(dir =>
+        normalizedPath.startsWith(dir + '/') ||
+        normalizedPath.startsWith(dir + '\\')
+    );
+
+    if (!isAllowed) {
+        throw new Error('Invalid path: Directory not allowed');
+    }
+
+    const ext = nodePath.extname(normalizedPath).toLowerCase();
+    if (!MANAGED_CONTENT_EXTENSIONS.has(ext)) {
+        throw new Error('Invalid path: File type not allowed');
+    }
+
+    return normalizedPath;
 }
 
 export async function getICP(): Promise<ICP> {
@@ -131,9 +165,9 @@ export async function getContent(relativePath: string): Promise<string> {
 
 export async function saveContent(relativePath: string, content: string): Promise<void> {
     // Validate path to prevent directory traversal attacks
-    validatePath(relativePath);
+    const normalizedPath = validateManagedContentPath(relativePath);
 
-    const fullPath = nodePath.join(ROOT, relativePath);
+    const fullPath = nodePath.join(ROOT, normalizedPath);
     try {
         await fs.writeFile(fullPath, content, 'utf-8');
     } catch {

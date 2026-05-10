@@ -15,6 +15,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as crypto from 'crypto'
 import * as dotenv from 'dotenv'
+import { markdownToPortableText } from '../src/lib/markdown-to-portable-text'
 
 // Load environment variables from .env.local
 dotenv.config({ path: path.join(process.cwd(), '.env.local') })
@@ -96,11 +97,9 @@ function parseMarkdownFile(filePath: string): ParsedArticle | null {
 
   // Extract title (first line starting with #)
   let title = ''
-  let titleLineIndex = 0
   for (let i = 0; i < lines.length; i++) {
     if (lines[i].startsWith('# ')) {
       title = lines[i].replace(/^#\s*/, '').trim()
-      titleLineIndex = i
       break
     }
   }
@@ -171,138 +170,6 @@ function parseMarkdownFile(filePath: string): ParsedArticle | null {
     filename,
     hash,
   }
-}
-
-/**
- * Convert markdown to Sanity Portable Text blocks
- * This is a simplified converter - handles basic markdown
- */
-function markdownToPortableText(markdown: string): unknown[] {
-  const blocks: unknown[] = []
-  const lines = markdown.split('\n')
-  let currentParagraph: string[] = []
-
-  const flushParagraph = () => {
-    if (currentParagraph.length > 0) {
-      const text = currentParagraph.join(' ').trim()
-      if (text) {
-        blocks.push({
-          _type: 'block',
-          _key: crypto.randomUUID().slice(0, 8),
-          style: 'normal',
-          markDefs: [],
-          children: parseInlineMarkdown(text),
-        })
-      }
-      currentParagraph = []
-    }
-  }
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i]
-
-    // Horizontal rule
-    if (line.trim() === '---') {
-      flushParagraph()
-      continue // Skip horizontal rules
-    }
-
-    // Headings
-    if (line.startsWith('### ')) {
-      flushParagraph()
-      blocks.push({
-        _type: 'block',
-        _key: crypto.randomUUID().slice(0, 8),
-        style: 'h3',
-        markDefs: [],
-        children: [{ _type: 'span', _key: crypto.randomUUID().slice(0, 8), text: line.replace(/^###\s*/, ''), marks: [] }],
-      })
-      continue
-    }
-
-    if (line.startsWith('## ')) {
-      flushParagraph()
-      blocks.push({
-        _type: 'block',
-        _key: crypto.randomUUID().slice(0, 8),
-        style: 'h2',
-        markDefs: [],
-        children: [{ _type: 'span', _key: crypto.randomUUID().slice(0, 8), text: line.replace(/^##\s*/, ''), marks: [] }],
-      })
-      continue
-    }
-
-    // Empty line = paragraph break
-    if (line.trim() === '') {
-      flushParagraph()
-      continue
-    }
-
-    // Blockquote
-    if (line.startsWith('> ')) {
-      flushParagraph()
-      blocks.push({
-        _type: 'block',
-        _key: crypto.randomUUID().slice(0, 8),
-        style: 'blockquote',
-        markDefs: [],
-        children: parseInlineMarkdown(line.replace(/^>\s*/, '')),
-      })
-      continue
-    }
-
-    // Regular paragraph content
-    currentParagraph.push(line)
-  }
-
-  flushParagraph()
-  return blocks
-}
-
-/**
- * Parse inline markdown (bold, italic, links) into Portable Text spans
- */
-function parseInlineMarkdown(text: string): unknown[] {
-  const spans: unknown[] = []
-
-  // Simplified: just handle bold (**text**) and create plain spans
-  // A full implementation would handle links, italic, etc.
-  const boldRegex = /\*\*(.+?)\*\*/g
-  let match
-  const parts: { text: string; bold: boolean }[] = []
-  let currentIndex = 0
-
-  while ((match = boldRegex.exec(text)) !== null) {
-    // Add text before the match
-    if (match.index > currentIndex) {
-      parts.push({ text: text.slice(currentIndex, match.index), bold: false })
-    }
-    // Add the bold text
-    parts.push({ text: match[1], bold: true })
-    currentIndex = match.index + match[0].length
-  }
-
-  // Add remaining text
-  if (currentIndex < text.length) {
-    parts.push({ text: text.slice(currentIndex), bold: false })
-  }
-
-  // If no bold found, just return the whole text
-  if (parts.length === 0) {
-    return [{ _type: 'span', _key: crypto.randomUUID().slice(0, 8), text, marks: [] }]
-  }
-
-  // Convert parts to spans
-  for (const part of parts) {
-    spans.push({
-      _type: 'span',
-      _key: crypto.randomUUID().slice(0, 8),
-      text: part.text,
-      marks: part.bold ? ['strong'] : [],
-    })
-  }
-
-  return spans
 }
 
 /**

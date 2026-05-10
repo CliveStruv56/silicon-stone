@@ -1,11 +1,40 @@
 import { NextRequest, NextResponse } from "next/server";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const KIT_API_KEY = process.env.CONVERTKIT_API_KEY || "";
 const KIT_FORM_ID = process.env.CONVERTKIT_FORM_ID || "";
+const MAX_BODY_BYTES = 2_000;
+const ALLOWED_TAGS = new Set(["Tool_Lead", "WaymarkPath_Early_Access"]);
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, tag } = await request.json();
+    const ip = getClientIp(request);
+    const rateLimit = checkRateLimit(`subscribe:${ip}`, {
+      limit: 10,
+      windowMs: 15 * 60 * 1000,
+    });
+
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: "Too many requests" },
+        {
+          status: 429,
+          headers: { "Retry-After": String(rateLimit.retryAfter) },
+        }
+      );
+    }
+
+    const contentLength = Number(request.headers.get("content-length") || 0);
+    if (contentLength > MAX_BODY_BYTES) {
+      return NextResponse.json(
+        { error: "Request too large" },
+        { status: 413 }
+      );
+    }
+
+    const body = await request.json();
+    const email = typeof body.email === "string" ? body.email.trim().slice(0, 254).toLowerCase() : "";
+    const tag = typeof body.tag === "string" && ALLOWED_TAGS.has(body.tag) ? body.tag : undefined;
 
     if (!email || typeof email !== "string") {
       return NextResponse.json(

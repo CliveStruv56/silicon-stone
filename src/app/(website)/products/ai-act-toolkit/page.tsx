@@ -12,7 +12,6 @@ import {
   FileSpreadsheet,
   FileText,
   Clock,
-  ArrowRight,
   BookOpen,
   ListChecks,
   FileCheck2,

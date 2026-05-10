@@ -1,11 +1,54 @@
 import { NextRequest, NextResponse } from "next/server";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const KIT_API_KEY = process.env.CONVERTKIT_API_KEY || "";
 const KIT_FORM_ID = process.env.CONVERTKIT_FORM_ID || "";
+const MAX_BODY_BYTES = 10_000;
+const MAX_FIELD_LENGTHS = {
+  name: 120,
+  email: 254,
+  company: 160,
+  interest: 160,
+  message: 2_000,
+};
+
+function normalizeField(value: unknown, maxLength: number): string {
+  if (typeof value !== "string") return "";
+  return value.trim().slice(0, maxLength);
+}
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, email, company, interest, message } = await request.json();
+    const ip = getClientIp(request);
+    const rateLimit = checkRateLimit(`contact:${ip}`, {
+      limit: 5,
+      windowMs: 15 * 60 * 1000,
+    });
+
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: "Too many requests" },
+        {
+          status: 429,
+          headers: { "Retry-After": String(rateLimit.retryAfter) },
+        }
+      );
+    }
+
+    const contentLength = Number(request.headers.get("content-length") || 0);
+    if (contentLength > MAX_BODY_BYTES) {
+      return NextResponse.json(
+        { error: "Request too large" },
+        { status: 413 }
+      );
+    }
+
+    const body = await request.json();
+    const name = normalizeField(body.name, MAX_FIELD_LENGTHS.name);
+    const email = normalizeField(body.email, MAX_FIELD_LENGTHS.email).toLowerCase();
+    const company = normalizeField(body.company, MAX_FIELD_LENGTHS.company);
+    const interest = normalizeField(body.interest, MAX_FIELD_LENGTHS.interest);
+    const message = normalizeField(body.message, MAX_FIELD_LENGTHS.message);
 
     if (!email || typeof email !== "string") {
       return NextResponse.json(
@@ -14,7 +57,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!name || typeof name !== "string") {
+    if (!name) {
       return NextResponse.json(
         { error: "Name is required" },
         { status: 400 }

@@ -6,6 +6,10 @@ import { searchExa } from "@/lib/exa";
 
 // Mock search function if no API key or Exa fails
 async function searchWeb(query: string): Promise<string> {
+    if (process.env.NODE_ENV === 'production') {
+        throw new Error(`Live web search unavailable for query: ${query}`);
+    }
+
     console.log(`Searching web (MOCK) for: ${query}`);
     await new Promise(r => setTimeout(r, 1000));
 
@@ -75,11 +79,17 @@ export async function performResearch(topic: string, inoreaderToken?: string): P
         if (exaResults && exaResults.length > 0) {
             searchContext += `\n--- WEB RESULTS (EXA.AI) ---\n${formatExaResults(exaResults)}`;
         } else {
+            if (process.env.NODE_ENV === 'production') {
+                throw new Error("Exa returned no results or is not configured.");
+            }
             console.log("Exa returned no results or failed, falling back to mock.");
             searchContext += `\n--- WEB RESULTS (MOCK FALLBACK) ---\n${await searchWeb(topic)}`;
         }
     } catch (e) {
         console.error("Exa search error in main flow", e);
+        if (process.env.NODE_ENV === 'production') {
+            throw new Error("Live web search failed.");
+        }
         searchContext += `\n--- WEB RESULTS (MOCK FALLBACK) ---\n${await searchWeb(topic)}`;
     }
 

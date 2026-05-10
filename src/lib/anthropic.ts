@@ -8,6 +8,10 @@ const anthropic = new Anthropic({
 
 export async function callClaude(system: string, user: string, temperature: number = 0.4) {
     if (!API_KEY) {
+        if (process.env.NODE_ENV === 'production') {
+            throw new Error("ANTHROPIC_API_KEY is not configured.");
+        }
+
         console.warn("No ANTHROPIC_API_KEY found. Returning mock response.");
         // Mock response for dev/demo if no key
         await new Promise(r => setTimeout(r, 2000));
