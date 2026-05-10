@@ -1,18 +1,17 @@
-import crypto from 'crypto'
 import { cookies } from 'next/headers'
+import { SESSION_COOKIE_NAME, verifySession } from '@/lib/session'
 
+/**
+ * Boolean variant of the admin auth check, for callers that want to branch
+ * rather than throw (e.g., the draft-mode enable route returning 401).
+ *
+ * Source of truth is verifySession in @/lib/session — do not reimplement
+ * the cookie validation here.
+ */
 export async function isAuthenticatedAdmin(): Promise<boolean> {
   const cookieStore = await cookies()
-  const authCookie = cookieStore.get('ai-writer-auth')?.value
-  const adminPassword = process.env.ADMIN_PASSWORD
-  if (!authCookie || !adminPassword) return false
-
-  const expectedHash = crypto
-    .createHmac('sha256', adminPassword)
-    .update('session-valid')
-    .digest('hex')
-    .slice(0, 32)
-
-  if (authCookie.length !== expectedHash.length) return false
-  return crypto.timingSafeEqual(Buffer.from(authCookie), Buffer.from(expectedHash))
+  const authCookie = cookieStore.get(SESSION_COOKIE_NAME)?.value
+  if (!authCookie) return false
+  const session = await verifySession(authCookie)
+  return session !== null
 }
