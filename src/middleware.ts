@@ -35,7 +35,9 @@ export async function middleware(request: NextRequest) {
         '/content',
         '/editor',
         '/create',
+        '/knowledge',
         '/api/draft-mode/enable',
+        '/api/search/semantic',
     ]
 
     const isProtectedRoute = protectedPaths.some(path =>
@@ -75,6 +77,8 @@ export const config = {
         '/content/:path*',
         '/editor/:path*',
         '/create/:path*',
+        '/knowledge/:path*',
         '/api/draft-mode/enable',
+        '/api/search/semantic',
     ],
 }
