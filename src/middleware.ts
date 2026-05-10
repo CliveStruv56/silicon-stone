@@ -34,6 +34,7 @@ export async function middleware(request: NextRequest) {
         '/context',
         '/content',
         '/editor',
+        '/create',
         '/api/draft-mode/enable',
     ]
 
@@ -73,6 +74,7 @@ export const config = {
         '/context/:path*',
         '/content/:path*',
         '/editor/:path*',
+        '/create/:path*',
         '/api/draft-mode/enable',
     ],
 }
