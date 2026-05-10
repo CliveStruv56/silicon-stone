@@ -3,6 +3,7 @@
 import { buildPrompt, extractArticleMetadata } from "@/lib/prompts";
 import { callClaude } from "@/lib/anthropic";
 import { createArticleInSanity, listSanityCategories } from "@/lib/sanity";
+import { requireAdmin } from "@/lib/auth";
 
 type ContentType = 'signal' | 'deepdive' | 'guide';
 
@@ -23,6 +24,7 @@ export async function generateContent(_prevState: ActionState, formData: FormDat
     }
 
     try {
+        await requireAdmin();
         // 1. Build Prompts
         const { systemPrompt, userPrompt } = await buildPrompt(topic, personaKey, contentType as ContentType);
 

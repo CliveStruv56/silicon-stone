@@ -1,6 +1,7 @@
 'use server';
 
 import { saveICP, getICP } from "@/lib/api";
+import { requireAdmin } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { ICP } from "@/types/context";
 
@@ -26,6 +27,7 @@ interface ExtendedICP extends ICP {
 // Action 1: Update Context from Research (Keywords/Pain Points)
 export async function updateContext(type: UpdateType, value: string): Promise<ActionState> {
     try {
+        await requireAdmin();
         const icp = await getICP() as ExtendedICP;
 
         let modified = false;
@@ -74,6 +76,7 @@ export async function updatePersona(_prevState: ActionState, formData: FormData)
     }
 
     try {
+        await requireAdmin();
         const icp = await getICP() as ExtendedICP;
 
         if (!icp.personas || !icp.personas[originalKey]) {

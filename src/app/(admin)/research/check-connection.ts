@@ -1,10 +1,12 @@
 'use server';
 
 import { getUserInfo } from "@/lib/inoreader";
+import { requireAdmin } from "@/lib/auth";
 import { cookies } from "next/headers";
 
 export async function checkInoreaderConnection() {
     try {
+        await requireAdmin();
         const cookieStore = await cookies();
         const token = cookieStore.get('inoreader_access_token')?.value;
 

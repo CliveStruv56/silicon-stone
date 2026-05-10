@@ -2,6 +2,7 @@
 
 import { listContentFiles, getContent, deleteLocalContent } from "@/lib/api";
 import { createArticleInSanity, deleteArticleInSanity } from "@/lib/sanity";
+import { requireAdmin } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
 interface ActionState {
@@ -11,6 +12,7 @@ interface ActionState {
 
 export async function syncContent(_prevState: ActionState, _formData: FormData): Promise<ActionState> {
     try {
+        await requireAdmin();
         const files = await listContentFiles();
         let count = 0;
 
@@ -84,6 +86,7 @@ export async function deleteDraft(_prevState: ActionState, formData: FormData): 
     if (!path) return { success: false, message: "Missing path" };
 
     try {
+        await requireAdmin();
         // 1. Delete Local
         await deleteLocalContent(path);
 

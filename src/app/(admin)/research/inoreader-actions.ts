@@ -1,11 +1,13 @@
 'use server';
 
 import { getAuthUrl } from "@/lib/inoreader";
+import { requireAdmin } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import crypto from "crypto";
 
 export async function loginToInoreader() {
+    await requireAdmin();
     // Generate cryptographically secure state token for CSRF protection
     const state = crypto.randomBytes(32).toString('hex');
 

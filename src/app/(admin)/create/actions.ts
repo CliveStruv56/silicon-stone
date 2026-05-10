@@ -5,12 +5,14 @@ import { performResearch as researchPipeline } from "@/lib/research";
 import { callClaude } from "@/lib/anthropic";
 import { createArticleInSanity, listSanityCategories } from "@/lib/sanity";
 import { extractArticleMetadata } from "@/lib/prompts";
+import { requireAdmin } from "@/lib/auth";
 import { ResearchResult } from "@/types/research";
 import { generateEmbedding } from "@/lib/embeddings";
 import { searchSimilar } from "@/lib/pinecone";
 
 export async function performResearch(topic: string) {
     try {
+        await requireAdmin();
         const result = await researchPipeline(topic);
         return result;
     } catch (error) {
@@ -99,6 +101,7 @@ export async function createDraftFromResearch(
     topic: string = ""
 ) {
     try {
+        await requireAdmin();
         const isYouTube = format === "youtube";
         const systemPrompt = isYouTube
             ? getYouTubeSystemPrompt(personaSlug)

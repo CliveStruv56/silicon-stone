@@ -1,6 +1,7 @@
 'use server';
 
 import { saveContent } from "@/lib/api";
+import { requireAdmin } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import path from "path";
 
@@ -64,6 +65,7 @@ export async function updateContent(_prevState: ActionState, formData: FormData)
     }
 
     try {
+        await requireAdmin();
         await saveContent(filePath, content);
         revalidatePath('/content');
         return { success: true, message: "Saved successfully" };

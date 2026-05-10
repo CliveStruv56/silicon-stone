@@ -3,6 +3,7 @@
 import { performResearch } from "@/lib/research";
 import { cookies } from "next/headers";
 import { createArticleInSanity } from "@/lib/sanity";
+import { requireAdmin } from "@/lib/auth";
 import { slugify } from "@/lib/utils";
 import { ResearchResult, ResearchSource } from "@/types/research";
 
@@ -18,6 +19,7 @@ export async function researchTopic(_prevState: ResearchState, formData: FormDat
     }
 
     try {
+        await requireAdmin();
         const cookieStore = await cookies();
         const token = cookieStore.get('inoreader_access_token')?.value;
 
@@ -33,6 +35,7 @@ export async function createDraftFromResearch(summary: string, topic: string, so
     if (!summary || !topic) return { success: false, message: "Missing data" };
 
     try {
+        await requireAdmin();
         // Import dynamically to avoid circular deps
         const { callClaude } = await import("@/lib/anthropic");
         const { getVoiceDNA, getBusinessProfile } = await import("@/lib/api");
