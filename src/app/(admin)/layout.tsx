@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { Terminal, Zap, Search, Users, Database, Home, BrainCircuit } from 'lucide-react';
+import { Terminal, Zap, Search, Users, Database, Home, BrainCircuit, LogOut } from 'lucide-react';
+import { logout } from '@/app/(auth)/login/actions';
 
 export const metadata = {
     title: 'Writer Studio',
@@ -41,9 +42,21 @@ export default function AdminLayout({
                             </Link>
                         ))}
                     </nav>
-                    <Link href="/" className="text-xs text-muted-foreground hover:text-foreground">
-                        ← Public Site
-                    </Link>
+                    <div className="flex items-center gap-3">
+                        <Link href="/" className="text-xs text-muted-foreground hover:text-foreground">
+                            ← Public Site
+                        </Link>
+                        <form action={logout}>
+                            <button
+                                type="submit"
+                                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+                                title="Log out"
+                            >
+                                <LogOut className="w-3 h-3" />
+                                <span className="hidden sm:inline">Log out</span>
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </header>
             {/* Main Content */}
