@@ -264,14 +264,9 @@ function markdownToPortableText(markdown: string): unknown[] {
  */
 function parseInlineMarkdown(text: string): unknown[] {
   const spans: unknown[] = []
-  const markDefs: unknown[] = []
 
   // Simplified: just handle bold (**text**) and create plain spans
   // A full implementation would handle links, italic, etc.
-  let remaining = text
-  let lastIndex = 0
-
-  // Match bold text
   const boldRegex = /\*\*(.+?)\*\*/g
   let match
   const parts: { text: string; bold: boolean }[] = []
