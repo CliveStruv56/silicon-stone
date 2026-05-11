@@ -109,6 +109,16 @@ const highImpactDecisions = new Set([
   'safety-control',
 ])
 
+const primaryUseAnnexIII: Record<string, true> = {
+  employment: true,
+  education: true,
+  healthcare: true,
+  financial: true,
+  biometrics: true,
+  'critical-infrastructure': true,
+  'law-justice': true,
+}
+
 const prohibitedPractices = new Set([
   'social-scoring',
   'manipulation',
@@ -409,10 +419,20 @@ export function evaluateAssessment(answers: AssessmentAnswers): AssessmentResult
     obligations.add('Document the use case, affected people, and vendor/system behaviour before any further deployment.')
   }
 
-  const annexIIIHit = hasAny(answers, 'sensitive_domains', sensitiveDomains)
-  if (annexIIIHit) {
+  const primaryUse = values(answers, 'primary_use')[0]
+  const annexIIIFromSensitiveDomains = hasAny(answers, 'sensitive_domains', sensitiveDomains)
+  const annexIIIFromPrimaryUse = primaryUse ? Boolean(primaryUseAnnexIII[primaryUse]) : false
+  const annexIIIHit = annexIIIFromSensitiveDomains || annexIIIFromPrimaryUse
+
+  if (annexIIIFromSensitiveDomains) {
     score += 4
     reasons.push(`The use touches sensitive AI Act areas: ${selectedLabels('sensitive_domains', answers).filter((item) => item !== 'None of these').join(', ')}.`)
+  } else if (annexIIIFromPrimaryUse) {
+    score += 4
+    const primaryUseQuestion = assessmentQuestions.find((item) => item.id === 'primary_use')
+    const primaryUseLabel = primaryUseQuestion ? labelFor(primaryUseQuestion, primaryUse) : primaryUse
+    reasons.push(`The primary use (${primaryUseLabel}) sits inside an Annex III high-risk area, even though no specific sensitive-domain box was ticked.`)
+    missingFacts.push('Confirm the specific sensitive-domain breakdown — the primary use suggests Annex III applicability that should be cross-checked against the actual workflow.')
   }
 
   if (hasAny(answers, 'decision_impact', highImpactDecisions)) {
