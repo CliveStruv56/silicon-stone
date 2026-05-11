@@ -1,397 +1,523 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Header, Footer } from '@/components/layout'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import {
-  QUESTIONS,
-  RISK_DETAILS,
-  KEY_DEADLINE,
-  type RiskLevel,
-  type Question
-} from '@/lib/compliance-data'
-import { AlertTriangle, CheckCircle2, Clock, FileText, ChevronRight, RotateCcw } from 'lucide-react'
-import { EmailGateOverlay } from '@/components/tools/EmailGateOverlay'
+  AlertTriangle,
+  ArrowLeft,
+  ArrowRight,
+  CheckCircle2,
+  ClipboardCheck,
+  FileText,
+  Gauge,
+  LockKeyhole,
+  RefreshCcw,
+  ShieldCheck,
+} from 'lucide-react'
+import { Header, Footer } from '@/components/layout'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import {
+  type AssessmentAnswers,
+  type AssessmentQuestion,
+  type AssessmentValue,
+  evaluateAssessment,
+  getVisibleQuestions,
+} from '@/lib/ai-act-assessment'
+
+function values(value: AssessmentValue | undefined): string[] {
+  if (!value) return []
+  return Array.isArray(value) ? value : [value]
+}
+
+function resultTone(classification: string) {
+  if (classification === 'Prohibited practice') {
+    return {
+      border: 'border-alert-red/40',
+      bg: 'bg-alert-red/10',
+      text: 'text-alert-red',
+      badge: 'border-alert-red text-alert-red',
+    }
+  }
+
+  if (classification === 'Likely high-risk' || classification === 'Uncertain') {
+    return {
+      border: 'border-silicon-amber/40',
+      bg: 'bg-silicon-amber/10',
+      text: 'text-silicon-amber',
+      badge: 'border-silicon-amber text-silicon-amber',
+    }
+  }
+
+  if (classification === 'Out of EU scope') {
+    return {
+      border: 'border-text-muted/40',
+      bg: 'bg-text-muted/10',
+      text: 'text-text-primary',
+      badge: 'border-text-muted text-text-muted',
+    }
+  }
+
+  return {
+    border: 'border-stone-teal/40',
+    bg: 'bg-stone-teal/10',
+    text: 'text-stone-teal',
+    badge: 'border-stone-teal text-stone-teal',
+  }
+}
+
+function optionIsSelected(question: AssessmentQuestion, answers: AssessmentAnswers, value: string) {
+  return values(answers[question.id]).includes(value)
+}
 
 export default function ComplianceCheckerPage() {
-  const [currentStep, setCurrentStep] = useState<string>('start')
-  const [history, setHistory] = useState<string[]>([])
-  const [answers, setAnswers] = useState<Record<string, string>>({})
-  const [result, setResult] = useState<RiskLevel | null>(null)
-  const [isUnlocked, setIsUnlocked] = useState(false)
-  const [showGate, setShowGate] = useState(false)
-  const [pendingResult, setPendingResult] = useState<RiskLevel | null>(null)
+  const [answers, setAnswers] = useState<AssessmentAnswers>({})
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [showResult, setShowResult] = useState(false)
 
-  const handleOptionClick = (option: Question['options'][0], questionId: string) => {
-    const newAnswers = { ...answers, [questionId]: option.label }
-    setAnswers(newAnswers)
+  const visibleQuestions = useMemo(() => getVisibleQuestions(answers), [answers])
+  const currentQuestion = visibleQuestions[currentIndex] ?? visibleQuestions[visibleQuestions.length - 1]
+  const result = useMemo(() => evaluateAssessment(answers), [answers])
+  const tone = resultTone(result.classification)
+  const progress = Math.round(((currentIndex + 1) / visibleQuestions.length) * 100)
+  const currentValue = currentQuestion ? answers[currentQuestion.id] : undefined
+  const canContinue = !currentQuestion?.required || values(currentValue).length > 0
 
-    if (option.riskOutcome) {
-      if (isUnlocked) {
-        setResult(option.riskOutcome)
-      } else {
-        setPendingResult(option.riskOutcome)
-        setShowGate(true)
-      }
-    } else if (option.nextStep) {
-      setHistory([...history, currentStep])
-      setCurrentStep(option.nextStep)
-    }
+  const setAnswer = (question: AssessmentQuestion, value: AssessmentValue) => {
+    setAnswers((prev) => ({ ...prev, [question.id]: value }))
   }
 
-  const handleGateUnlock = () => {
-    setIsUnlocked(true)
-    setShowGate(false)
-    if (pendingResult) {
-      setResult(pendingResult)
-      setPendingResult(null)
-    }
+  const toggleMulti = (question: AssessmentQuestion, value: string) => {
+    const previous = values(answers[question.id])
+    const next = previous.includes(value)
+      ? previous.filter((item) => item !== value)
+      : [...previous, value]
+
+    const cleaned = value === 'none' || value === 'not-sure'
+      ? [value]
+      : next.filter((item) => item !== 'none' && item !== 'not-sure')
+
+    setAnswer(question, cleaned)
   }
 
-  const handleReset = () => {
-    setCurrentStep('start')
-    setHistory([])
+  const goNext = () => {
+    if (!canContinue) return
+    if (currentIndex >= visibleQuestions.length - 1) {
+      setShowResult(true)
+      return
+    }
+    setCurrentIndex((index) => Math.min(index + 1, visibleQuestions.length - 1))
+  }
+
+  const goBack = () => {
+    if (showResult) {
+      setShowResult(false)
+      return
+    }
+    setCurrentIndex((index) => Math.max(index - 1, 0))
+  }
+
+  const reset = () => {
     setAnswers({})
-    setResult(null)
-    setPendingResult(null)
+    setCurrentIndex(0)
+    setShowResult(false)
   }
-
-  const handleBack = () => {
-    if (history.length > 0) {
-      const prev = history[history.length - 1]
-      setHistory(history.slice(0, -1))
-      setCurrentStep(prev)
-      // Remove the last answer
-      const questionIds = Object.keys(answers)
-      if (questionIds.length > 0) {
-        const newAnswers = { ...answers }
-        delete newAnswers[questionIds[questionIds.length - 1]]
-        setAnswers(newAnswers)
-      }
-    }
-  }
-
-  const currentQuestion = QUESTIONS[currentStep]
-  const resultData = result ? RISK_DETAILS[result] : null
-
-  // Calculate days until key deadline
-  const deadlineDate = new Date('2026-08-02')
-  const today = new Date()
-  const daysUntil = Math.ceil((deadlineDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
 
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
 
       <main className="flex-1 bg-background">
-        {/* Hero Section */}
-        <section className="bg-slate-deep border-b border-border-subtle py-12 md:py-16">
-          <div className="mx-auto max-w-7xl px-6 lg:px-8 text-center">
-            <Badge variant="outline" className="mb-4 border-stone-teal text-stone-teal">
-              Interactive Tool
-            </Badge>
-            <h1 className="text-3xl font-bold text-text-primary sm:text-4xl mb-4">
-              EU AI Act Compliance Checker
-            </h1>
-            <p className="text-lg text-text-muted max-w-2xl mx-auto mb-6">
-              Determine your AI system&apos;s risk tier under the European Union&apos;s AI Act regulations with industry-specific guidance.
-            </p>
-
-            {/* Deadline Countdown */}
-            <div className="inline-flex items-center gap-3 bg-silicon-amber/10 border border-silicon-amber/30 rounded-lg px-4 py-2">
-              <Clock className="w-5 h-5 text-silicon-amber" />
-              <span className="text-silicon-amber font-medium">
-                {daysUntil} days until {KEY_DEADLINE.label}
-              </span>
+        <section className="bg-slate-deep border-b border-border-subtle py-10 md:py-14">
+          <div className="mx-auto max-w-7xl px-6 lg:px-8">
+            <div className="max-w-4xl">
+              <Badge variant="outline" className="mb-4 border-stone-teal text-stone-teal">
+                AI Act Risk & Readiness
+              </Badge>
+              <h1 className="text-3xl font-bold text-text-primary sm:text-4xl mb-4">
+                Create a first-pass AI system record
+              </h1>
+              <p className="text-lg text-text-muted max-w-3xl">
+                Classify a third-party AI tool or product use case, identify likely obligations,
+                capture missing vendor evidence, and set review triggers for ongoing governance.
+              </p>
+              <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                {[
+                  ['Classification', 'Likely AI Act risk tier with confidence'],
+                  ['Vendor evidence', 'Questions to ask before relying on the tool'],
+                  ['Ongoing review', 'Triggers for reassessment after launch'],
+                ].map(([title, copy]) => (
+                  <div key={title} className="border border-border-subtle bg-stone-charcoal/60 rounded-lg p-4">
+                    <div className="text-sm font-semibold text-text-primary">{title}</div>
+                    <div className="text-xs text-text-muted mt-1">{copy}</div>
+                  </div>
+                ))}
+              </div>
+              <p className="text-sm italic text-text-muted mt-5 opacity-80">
+                Informational triage only; not formal legal advice.
+              </p>
             </div>
-
-            <p className="text-sm italic text-text-muted mt-4 opacity-70">
-              For informational purposes only; not formal advice.
-            </p>
           </div>
         </section>
 
-        {/* Main Content */}
-        <section className="mx-auto max-w-4xl px-6 py-12">
-          <AnimatePresence mode="wait">
-            {!result ? (
+        <section className="mx-auto max-w-5xl px-6 py-10">
+          {!showResult && currentQuestion ? (
+            <AnimatePresence mode="wait">
               <motion.div
-                key={currentStep}
-                initial={{ opacity: 0, x: 20 }}
+                key={currentQuestion.id}
+                initial={{ opacity: 0, x: 18 }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
+                exit={{ opacity: 0, x: -18 }}
+                transition={{ duration: 0.22 }}
+                className="grid gap-6 lg:grid-cols-[240px_1fr]"
               >
-                {/* Progress Indicator */}
-                {history.length > 0 && (
-                  <div className="mb-6">
-                    <div className="flex items-center gap-2 text-sm text-text-muted mb-2">
-                      {history.map((_, idx) => (
-                        <div key={idx} className="flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full bg-stone-teal" />
-                          {idx < history.length - 1 && <ChevronRight className="w-3 h-3" />}
-                        </div>
-                      ))}
-                      <ChevronRight className="w-3 h-3" />
-                      <div className="w-2 h-2 rounded-full bg-silicon-amber animate-pulse" />
-                    </div>
-                  </div>
-                )}
+                <aside className="space-y-4">
+                  <Card className="bg-stone-charcoal border-border-subtle">
+                    <CardContent className="pt-6">
+                      <div className="flex items-center justify-between text-xs text-text-muted mb-2">
+                        <span>Assessment progress</span>
+                        <span>{progress}%</span>
+                      </div>
+                      <div className="h-2 rounded-full bg-surface-elevated overflow-hidden">
+                        <div
+                          className="h-full bg-stone-teal transition-all"
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
+                      <div className="mt-4 text-xs font-mono uppercase text-stone-teal">
+                        {currentQuestion.section}
+                      </div>
+                      <div className="text-sm text-text-muted mt-1">
+                        Step {currentIndex + 1} of {visibleQuestions.length}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-surface-elevated border-border-subtle">
+                    <CardContent className="pt-6 space-y-3 text-sm text-text-muted">
+                      <div className="flex gap-2">
+                        <ClipboardCheck className="w-4 h-4 text-stone-teal mt-0.5 flex-shrink-0" />
+                        <span>Your answers form a reusable AI system record.</span>
+                      </div>
+                      <div className="flex gap-2">
+                        <Gauge className="w-4 h-4 text-silicon-amber mt-0.5 flex-shrink-0" />
+                        <span>The result uses rule-based triage, not a model guess.</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </aside>
 
                 <Card className="bg-stone-charcoal border-border-subtle shadow-xl">
                   <CardHeader>
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-xs font-mono text-stone-teal uppercase">
-                        Step {history.length + 1}
-                      </span>
-                      {history.length > 0 && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={handleBack}
-                          className="text-text-muted hover:text-text-primary h-auto p-0"
-                        >
-                          &larr; Back
-                        </Button>
-                      )}
-                    </div>
-                    <CardTitle className="text-xl text-text-primary leading-tight">
+                    <CardTitle className="text-2xl text-text-primary leading-tight">
                       {currentQuestion.text}
                     </CardTitle>
-                    {currentQuestion.description && (
+                    {currentQuestion.help && (
                       <CardDescription className="text-text-muted text-base">
-                        {currentQuestion.description}
+                        {currentQuestion.help}
                       </CardDescription>
                     )}
                   </CardHeader>
-                  <CardContent className="space-y-3">
-                    {currentQuestion.options.map((option, idx) => (
-                      <Button
-                        key={idx}
-                        variant="outline"
-                        className="w-full justify-start text-left h-auto py-4 px-6 border-border-subtle hover:bg-surface-elevated hover:border-silicon-amber/50 hover:text-silicon-amber group transition-all"
-                        onClick={() => handleOptionClick(option, currentQuestion.id)}
-                      >
-                        <span className="flex items-center w-full">
-                          <span className="flex-1 text-base font-medium">{option.label}</span>
-                          <span className="opacity-0 group-hover:opacity-100 transition-opacity ml-2">
-                            &rarr;
-                          </span>
-                        </span>
-                      </Button>
-                    ))}
-                  </CardContent>
-                </Card>
-
-                {/* Answer Summary */}
-                {Object.keys(answers).length > 0 && (
-                  <div className="mt-6 p-4 bg-surface-elevated rounded-lg border border-border-subtle">
-                    <h4 className="text-xs font-mono text-stone-teal uppercase mb-3">Your Selections</h4>
-                    <div className="space-y-2">
-                      {Object.entries(answers).map(([, answer], idx) => (
-                        <div key={idx} className="flex items-center gap-2 text-sm text-text-muted">
-                          <CheckCircle2 className="w-4 h-4 text-stone-teal flex-shrink-0" />
-                          <span>{answer}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </motion.div>
-            ) : (
-              <motion.div
-                key="result"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4 }}
-                className="space-y-6"
-              >
-                {/* Result Header Card */}
-                <Card className="bg-stone-charcoal border-border-subtle shadow-2xl overflow-hidden">
-                  <div className={`h-2 w-full ${resultData?.bgColor}`} />
-                  <CardHeader className="text-center pb-2">
-                    <div className="mb-4 inline-flex items-center justify-center w-16 h-16 rounded-full bg-surface-elevated border border-border-subtle mx-auto">
-                      <span className="text-3xl">
-                        {result === 'Unacceptable' ? '🚫' :
-                          result === 'High' ? '⚠️' :
-                            result === 'Limited' ? '👁️' : '✅'}
-                      </span>
-                    </div>
-                    <CardTitle className={`text-3xl font-bold ${resultData?.color} mb-2`}>
-                      {resultData?.title}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="text-center space-y-6">
-                    <p className="text-lg text-text-primary font-medium">
-                      {resultData?.desc}
-                    </p>
-
-                    {/* Key Deadlines */}
-                    {resultData?.deadlines && resultData.deadlines.length > 0 && (
-                      <div className="bg-surface-elevated rounded-lg p-4 border border-border-subtle text-left">
-                        <h4 className="text-sm font-semibold text-text-muted uppercase tracking-wider mb-3 flex items-center gap-2">
-                          <Clock className="w-4 h-4" />
-                          Key Deadlines
-                        </h4>
-                        <div className="space-y-2">
-                          {resultData.deadlines.map((deadline, i) => (
-                            <div key={i} className="flex items-start gap-3">
-                              <span className={`font-mono text-sm ${resultData.color} font-medium min-w-[120px]`}>
-                                {deadline.date}
-                              </span>
-                              <span className="text-text-primary text-sm">{deadline.description}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
+                  <CardContent className="space-y-5">
+                    {currentQuestion.type === 'text' && (
+                      <Input
+                        value={typeof currentValue === 'string' ? currentValue : ''}
+                        onChange={(event) => setAnswer(currentQuestion, event.target.value)}
+                        placeholder={currentQuestion.placeholder}
+                        className="h-12 border-border-subtle bg-slate-deep text-text-primary"
+                      />
                     )}
 
-                    {/* Key Obligations */}
-                    <div className="bg-surface-elevated rounded-lg p-6 text-left border border-border-subtle">
-                      <h4 className="text-sm font-semibold text-text-muted uppercase tracking-wider mb-4 border-b border-border-subtle pb-2 flex items-center gap-2">
-                        <AlertTriangle className="w-4 h-4" />
-                        Key Obligations
-                      </h4>
-                      <ul className="space-y-3">
-                        {resultData?.obligations.map((item, i) => (
-                          <li key={i} className="flex items-start gap-3 text-text-primary">
-                            <span className={`mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 ${resultData.bgColor}`} />
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Compliance Checklist */}
-                {resultData?.checklist && resultData.checklist.length > 0 && (
-                  <Card className="bg-stone-charcoal border-border-subtle">
-                    <CardHeader>
-                      <CardTitle className="text-lg text-text-primary flex items-center gap-2">
-                        <CheckCircle2 className="w-5 h-5 text-stone-teal" />
-                        Compliance Checklist
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid gap-6 md:grid-cols-2">
-                        {resultData.checklist.map((section, i) => (
-                          <div key={i} className="bg-surface-elevated rounded-lg p-4 border border-border-subtle">
-                            <h5 className="text-sm font-semibold text-stone-teal uppercase tracking-wider mb-3">
-                              {section.category}
-                            </h5>
-                            <ul className="space-y-2">
-                              {section.items.map((item, j) => (
-                                <li key={j} className="flex items-start gap-2 text-sm text-text-muted">
-                                  <div className="w-4 h-4 rounded border border-border-subtle flex-shrink-0 mt-0.5" />
-                                  <span>{item}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-
-                {/* Next Steps */}
-                {resultData?.nextSteps && resultData.nextSteps.length > 0 && (
-                  <Card className="bg-stone-charcoal border-border-subtle">
-                    <CardHeader>
-                      <CardTitle className="text-lg text-text-primary flex items-center gap-2">
-                        <FileText className="w-5 h-5 text-silicon-amber" />
-                        Recommended Next Steps
-                      </CardTitle>
-                      <CardDescription>
-                        Documentation estimate: {resultData.documentationEstimate}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3">
-                        {resultData.nextSteps.map((step, i) => (
-                          <div
-                            key={i}
-                            className={`flex items-start gap-4 p-3 rounded-lg border ${
-                              step.priority === 'immediate'
-                                ? 'bg-alert-red/5 border-alert-red/20'
-                                : step.priority === '30-days'
-                                  ? 'bg-silicon-amber/5 border-silicon-amber/20'
-                                  : 'bg-stone-teal/5 border-stone-teal/20'
-                            }`}
-                          >
-                            <Badge
-                              variant="outline"
-                              className={`flex-shrink-0 text-xs ${
-                                step.priority === 'immediate'
-                                  ? 'border-alert-red text-alert-red'
-                                  : step.priority === '30-days'
-                                    ? 'border-silicon-amber text-silicon-amber'
-                                    : 'border-stone-teal text-stone-teal'
+                    {currentQuestion.type === 'single' && (
+                      <div className="grid gap-3">
+                        {currentQuestion.options?.map((option) => {
+                          const selected = optionIsSelected(currentQuestion, answers, option.value)
+                          return (
+                            <button
+                              key={option.value}
+                              type="button"
+                              onClick={() => setAnswer(currentQuestion, option.value)}
+                              className={`text-left rounded-lg border p-4 transition-all ${
+                                selected
+                                  ? 'border-silicon-amber bg-silicon-amber/10'
+                                  : 'border-border-subtle bg-surface-elevated hover:border-stone-teal/70'
                               }`}
                             >
-                              {step.priority === 'immediate' ? 'Immediate' : step.priority === '30-days' ? '30 Days' : '90 Days'}
-                            </Badge>
-                            <span className="text-text-primary text-sm">{step.action}</span>
-                          </div>
-                        ))}
+                              <span className="flex items-start gap-3">
+                                <span className={`mt-1 h-4 w-4 rounded-full border flex-shrink-0 ${
+                                  selected ? 'border-silicon-amber bg-silicon-amber' : 'border-text-muted'
+                                }`} />
+                                <span>
+                                  <span className="block font-medium text-text-primary">{option.label}</span>
+                                  {option.description && (
+                                    <span className="block text-sm text-text-muted mt-1">{option.description}</span>
+                                  )}
+                                </span>
+                              </span>
+                            </button>
+                          )
+                        })}
                       </div>
-                    </CardContent>
-                  </Card>
-                )}
+                    )}
 
-                {/* Assessment Summary */}
-                <Card className="bg-surface-elevated border-border-subtle">
-                  <CardHeader>
-                    <CardTitle className="text-sm text-text-muted uppercase tracking-wider">
-                      Your Assessment Path
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex flex-wrap gap-2">
-                      {Object.values(answers).map((answer, idx) => (
-                        <Badge key={idx} variant="outline" className="text-xs">
-                          {answer}
-                        </Badge>
-                      ))}
+                    {currentQuestion.type === 'multi' && (
+                      <div className="grid gap-3">
+                        {currentQuestion.options?.map((option) => {
+                          const selected = optionIsSelected(currentQuestion, answers, option.value)
+                          return (
+                            <button
+                              key={option.value}
+                              type="button"
+                              onClick={() => toggleMulti(currentQuestion, option.value)}
+                              className={`text-left rounded-lg border p-4 transition-all ${
+                                selected
+                                  ? 'border-stone-teal bg-stone-teal/10'
+                                  : 'border-border-subtle bg-surface-elevated hover:border-stone-teal/70'
+                              }`}
+                            >
+                              <span className="flex items-start gap-3">
+                                <span className={`mt-1 h-4 w-4 rounded border flex items-center justify-center flex-shrink-0 ${
+                                  selected ? 'border-stone-teal bg-stone-teal' : 'border-text-muted'
+                                }`}>
+                                  {selected && <CheckCircle2 className="w-3 h-3 text-slate-deep" />}
+                                </span>
+                                <span className="font-medium text-text-primary">{option.label}</span>
+                              </span>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-between pt-3 border-t border-border-subtle">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={goBack}
+                        disabled={currentIndex === 0}
+                        className="text-text-muted hover:text-text-primary"
+                      >
+                        <ArrowLeft className="w-4 h-4" />
+                        Back
+                      </Button>
+                      <Button
+                        type="button"
+                        onClick={goNext}
+                        disabled={!canContinue}
+                        className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90"
+                      >
+                        {currentIndex >= visibleQuestions.length - 1 ? 'Generate result' : 'Continue'}
+                        <ArrowRight className="w-4 h-4" />
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
-
-                {/* Action Buttons */}
-                <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-                  <Button
-                    onClick={handleReset}
-                    variant="outline"
-                    className="border-text-muted text-text-muted"
-                  >
-                    <RotateCcw className="w-4 h-4 mr-2" />
-                    Check Another System
-                  </Button>
-                  <Link href="/services#contact">
-                    <Button className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90 w-full sm:w-auto">
-                      Get Full Assessment
-                    </Button>
-                  </Link>
-                </div>
               </motion.div>
-            )}
-          </AnimatePresence>
+            </AnimatePresence>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25 }}
+              className="space-y-6"
+            >
+              <Card className={`bg-stone-charcoal ${tone.border} shadow-2xl overflow-hidden`}>
+                <div className={`h-2 ${tone.bg}`} />
+                <CardHeader>
+                  <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                    <div>
+                      <Badge variant="outline" className={tone.badge}>
+                        {result.confidence} confidence
+                      </Badge>
+                      <CardTitle className={`mt-4 text-3xl ${tone.text}`}>
+                        {result.classification}
+                      </CardTitle>
+                      <CardDescription className="mt-3 text-base text-text-muted max-w-3xl">
+                        {result.summary}
+                      </CardDescription>
+                    </div>
+                    <div className="rounded-lg border border-border-subtle bg-surface-elevated p-4 min-w-[180px]">
+                      <div className="text-xs uppercase tracking-wider text-text-muted">Likely role</div>
+                      <div className="text-xl font-semibold text-text-primary mt-1">{result.role}</div>
+                    </div>
+                  </div>
+                </CardHeader>
+              </Card>
+
+              <div className="grid gap-6 lg:grid-cols-2">
+                <ResultCard
+                  icon={<ShieldCheck className="w-5 h-5 text-stone-teal" />}
+                  title="Why this result"
+                  items={result.reasons}
+                />
+                <ResultCard
+                  icon={<AlertTriangle className="w-5 h-5 text-silicon-amber" />}
+                  title="Missing evidence"
+                  items={result.missingFacts.length ? result.missingFacts : ['No critical missing facts were identified from this answer set.']}
+                />
+                <ResultCard
+                  icon={<ClipboardCheck className="w-5 h-5 text-stone-teal" />}
+                  title="Immediate obligations"
+                  items={result.obligations}
+                />
+                <ResultCard
+                  icon={<FileText className="w-5 h-5 text-silicon-amber" />}
+                  title="Vendor questions"
+                  items={result.vendorQuestions.length ? result.vendorQuestions : ['Keep current vendor evidence on file and refresh it when the system changes.']}
+                />
+              </div>
+
+              <Card className="bg-stone-charcoal border-border-subtle">
+                <CardHeader>
+                  <CardTitle className="text-lg text-text-primary">Adjacent GDPR and vendor-risk signals</CardTitle>
+                  <CardDescription>
+                    These do not automatically change the AI Act classification, but they indicate where human consulting may be valuable.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {result.adjacentRisks.length ? (
+                    <ul className="grid gap-3 md:grid-cols-2">
+                      {result.adjacentRisks.map((risk) => (
+                        <li key={risk} className="rounded-lg border border-border-subtle bg-surface-elevated p-4 text-sm text-text-primary">
+                          {risk}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-text-muted">No adjacent GDPR or vendor-risk flags were triggered by these answers.</p>
+                  )}
+                </CardContent>
+              </Card>
+
+              <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
+                <Card className="bg-stone-charcoal border-border-subtle">
+                  <CardHeader>
+                    <CardTitle className="text-lg text-text-primary">Ongoing review triggers</CardTitle>
+                    <CardDescription>
+                      Use these triggers to keep the assessment useful after AI Act implementation dates pass.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-3">
+                      {result.reviewTriggers.map((trigger) => (
+                        <li key={trigger} className="flex items-start gap-3 text-text-primary">
+                          <RefreshCcw className="w-4 h-4 text-stone-teal mt-1 flex-shrink-0" />
+                          <span>{trigger}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-surface-elevated border-silicon-amber/30">
+                  <CardHeader>
+                    <div className="flex items-center gap-2 text-silicon-amber">
+                      <LockKeyhole className="w-5 h-5" />
+                      <CardTitle className="text-lg">Full report module</CardTitle>
+                    </div>
+                    <CardDescription>
+                      The paid self-serve report should expand this assessment into an exportable evidence pack.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <ul className="space-y-2">
+                      {result.reportSections.map((section) => (
+                        <li key={section} className="flex items-start gap-2 text-sm text-text-primary">
+                          <CheckCircle2 className="w-4 h-4 text-stone-teal mt-0.5 flex-shrink-0" />
+                          <span>{section}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <Link href="/products/ai-act-toolkit">
+                      <Button className="w-full bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90">
+                        View compliance toolkit
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <Card className="bg-stone-charcoal border-border-subtle">
+                <CardHeader>
+                  <CardTitle className="text-sm uppercase tracking-wider text-text-muted">
+                    Source basis
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-2 md:grid-cols-2">
+                    {result.sourceReferences.map((source) => (
+                      <a
+                        key={source.url}
+                        href={source.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-sm text-stone-teal hover:text-silicon-amber"
+                      >
+                        {source.label}
+                      </a>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+                <Button
+                  variant="outline"
+                  onClick={goBack}
+                  className="border-text-muted text-text-muted"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Edit answers
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={reset}
+                  className="border-stone-teal text-stone-teal"
+                >
+                  <RefreshCcw className="w-4 h-4" />
+                  Assess another system
+                </Button>
+              </div>
+            </motion.div>
+          )}
         </section>
       </main>
 
       <Footer />
-      <EmailGateOverlay
-        isOpen={showGate}
-        onUnlock={handleGateUnlock}
-        onDismiss={() => { setShowGate(false); setPendingResult(null); handleReset(); }}
-        toolName="Compliance Checker"
-        resultLabel="your risk classification"
-      />
     </div>
+  )
+}
+
+function ResultCard({
+  icon,
+  title,
+  items,
+}: {
+  icon: React.ReactNode
+  title: string
+  items: string[]
+}) {
+  return (
+    <Card className="bg-stone-charcoal border-border-subtle">
+      <CardHeader>
+        <CardTitle className="text-lg text-text-primary flex items-center gap-2">
+          {icon}
+          {title}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <ul className="space-y-3">
+          {items.map((item) => (
+            <li key={item} className="flex items-start gap-3 text-sm text-text-primary">
+              <span className="mt-2 h-1.5 w-1.5 rounded-full bg-stone-teal flex-shrink-0" />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </CardContent>
+    </Card>
   )
 }
