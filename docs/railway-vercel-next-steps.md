@@ -70,6 +70,9 @@ In the Railway backend service variables, add:
 ```text
 ALLOWED_ORIGINS=https://siliconandstone.com,https://YOUR-VERCEL-PREVIEW-OR-PRODUCTION-DOMAIN
 ENABLE_API_DOCS=false
+NEXT_PUBLIC_SANITY_PROJECT_ID=your_sanity_project_id
+NEXT_PUBLIC_SANITY_DATASET=production
+NEXT_PUBLIC_SANITY_API_VERSION=2026-01-13
 ```
 
 For the first test, you can temporarily include localhost:
@@ -81,6 +84,7 @@ ALLOWED_ORIGINS=http://localhost:3000,https://siliconandstone.com,https://YOUR-V
 Later, remove origins you do not need.
 
 You do not need to add OpenAI, Anthropic, Pinecone, Sanity, Redis, or PostgreSQL variables to this backend yet unless you start migrating real logic into it.
+For the first migrated route, `/v1/categories`, the Sanity public project values are required. If the dataset is private, also add `SANITY_API_READ_TOKEN`.
 
 ## 5. Generate A Public Railway Domain
 

@@ -71,10 +71,17 @@ export function Header() {
   useEffect(() => {
     async function fetchCategories() {
       try {
-        const res = await fetch('/api/categories')
+        const categoriesUrl = process.env.NEXT_PUBLIC_API_URL
+          ? `${process.env.NEXT_PUBLIC_API_URL}/v1/categories`
+          : '/api/categories'
+        const res = await fetch(categoriesUrl)
         if (res.ok) {
           const data = await res.json()
-          setCategories(data)
+          setCategories(data.map((category: Category & { id?: string }) => ({
+            _id: category._id ?? category.id ?? category.slug,
+            title: category.title,
+            slug: category.slug,
+          })))
         }
       } catch (e) {
         console.error('Failed to fetch categories', e)

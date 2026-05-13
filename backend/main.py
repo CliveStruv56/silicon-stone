@@ -1,9 +1,18 @@
 import os
 from typing import Any
 
+import httpx
 from fastapi import FastAPI
+from fastapi import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+
+
+SANITY_CATEGORIES_QUERY = """*[_type == "category"] | order(title asc) {
+  _id,
+  title,
+  "slug": slug.current
+}"""
 
 
 class ServiceRoute(BaseModel):
@@ -14,8 +23,26 @@ class ServiceRoute(BaseModel):
     status: str
 
 
+class Category(BaseModel):
+    id: str
+    title: str
+    slug: str
+
+
 def _split_csv(value: str) -> list[str]:
     return [item.strip() for item in value.split(",") if item.strip()]
+
+
+def _sanity_env() -> tuple[str, str, str, str | None]:
+    project_id = os.getenv("NEXT_PUBLIC_SANITY_PROJECT_ID", "")
+    dataset = os.getenv("NEXT_PUBLIC_SANITY_DATASET", "production")
+    api_version = os.getenv("NEXT_PUBLIC_SANITY_API_VERSION", "2026-01-13")
+    token = os.getenv("SANITY_API_READ_TOKEN")
+
+    if not project_id:
+        raise HTTPException(status_code=503, detail="Sanity project is not configured")
+
+    return project_id, dataset, api_version, token
 
 
 service_routes = [
@@ -85,6 +112,36 @@ def health() -> dict[str, str]:
 @app.get("/v1/topology", response_model=list[ServiceRoute])
 def topology() -> list[ServiceRoute]:
     return service_routes
+
+
+@app.get("/v1/categories", response_model=list[Category])
+def categories() -> list[Category]:
+    project_id, dataset, api_version, token = _sanity_env()
+    headers = {"Authorization": f"Bearer {token}"} if token else {}
+    url = f"https://{project_id}.api.sanity.io/v{api_version}/data/query/{dataset}"
+
+    try:
+        response = httpx.get(
+            url,
+            params={"query": SANITY_CATEGORIES_QUERY},
+            headers=headers,
+            timeout=10,
+        )
+        response.raise_for_status()
+    except httpx.HTTPStatusError as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Sanity returned {exc.response.status_code}",
+        ) from exc
+    except httpx.HTTPError as exc:
+        raise HTTPException(status_code=502, detail="Sanity request failed") from exc
+
+    result = response.json().get("result", [])
+    return [
+        Category(id=item.get("_id", ""), title=item.get("title", ""), slug=item.get("slug", ""))
+        for item in result
+        if item.get("_id") and item.get("title") and item.get("slug")
+    ]
 
 
 @app.post("/v1/hermes/events")

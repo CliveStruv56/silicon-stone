@@ -19,6 +19,7 @@ Last updated: 2026-05-13
 - Added FastAPI endpoints:
   - `GET /health`
   - `GET /v1/topology`
+  - `GET /v1/categories`
   - `POST /v1/hermes/events`
 - Added `NEXT_PUBLIC_API_URL` and Railway backend variables to `.env.example`.
 

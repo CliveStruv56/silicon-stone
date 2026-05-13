@@ -21,6 +21,12 @@ Health check:
 curl http://localhost:8000/health
 ```
 
+Migrated category route:
+
+```bash
+curl http://localhost:8000/v1/categories
+```
+
 ## Railway Settings
 
 - Root Directory: `/backend`
@@ -34,3 +40,13 @@ example:
 ```text
 ALLOWED_ORIGINS=https://siliconandstone.com,https://silicon-and-stone.vercel.app
 ```
+
+The `/v1/categories` route also needs the Sanity public project variables:
+
+```text
+NEXT_PUBLIC_SANITY_PROJECT_ID=your_sanity_project_id
+NEXT_PUBLIC_SANITY_DATASET=production
+NEXT_PUBLIC_SANITY_API_VERSION=2026-01-13
+```
+
+If the Sanity dataset is private, set `SANITY_API_READ_TOKEN` as well.
