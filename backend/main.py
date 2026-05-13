@@ -1,4 +1,6 @@
 import os
+import re
+import time
 from typing import Any
 
 import httpx
@@ -49,8 +51,43 @@ class Category(BaseModel):
     slug: str
 
 
+class SubscribeRequest(BaseModel):
+    email: str
+    tag: str | None = None
+
+
+RATE_LIMITS: dict[str, list[float]] = {}
+ALLOWED_SUBSCRIBE_TAGS = {"Tool_Lead", "WaymarkPath_Early_Access"}
+EMAIL_RE = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
+
+
 def _split_csv(value: str) -> list[str]:
     return [item.strip() for item in value.split(",") if item.strip()]
+
+
+def _check_rate_limit(key: str, limit: int, window_seconds: int) -> int | None:
+    now = time.time()
+    window_start = now - window_seconds
+    requests = [timestamp for timestamp in RATE_LIMITS.get(key, []) if timestamp > window_start]
+
+    if len(requests) >= limit:
+        retry_after = max(1, int(window_seconds - (now - requests[0])))
+        RATE_LIMITS[key] = requests
+        return retry_after
+
+    requests.append(now)
+    RATE_LIMITS[key] = requests
+    return None
+
+
+def _kit_env() -> tuple[str, str]:
+    api_key = os.getenv("CONVERTKIT_API_KEY", "")
+    form_id = os.getenv("CONVERTKIT_FORM_ID", "")
+
+    if not api_key or not form_id:
+        raise HTTPException(status_code=503, detail="Newsletter service not configured")
+
+    return api_key, form_id
 
 
 def _sanity_env() -> tuple[str, str, str, str | None]:
@@ -196,6 +233,69 @@ def briefings() -> dict[str, list[dict[str, Any]]]:
         if isinstance(article, dict)
     ]
     return {"result": articles_with_images}
+
+
+@app.post("/v1/subscribe")
+def subscribe(payload: SubscribeRequest) -> dict[str, bool]:
+    email = payload.email.strip()[:254].lower() if isinstance(payload.email, str) else ""
+    tag = payload.tag if payload.tag in ALLOWED_SUBSCRIBE_TAGS else None
+
+    retry_after = _check_rate_limit(f"subscribe:{email}", limit=10, window_seconds=15 * 60)
+    if retry_after is not None:
+        raise HTTPException(
+            status_code=429,
+            detail="Too many requests",
+            headers={"Retry-After": str(retry_after)},
+        )
+
+    if not email:
+        raise HTTPException(status_code=400, detail="Email is required")
+
+    if not EMAIL_RE.match(email):
+        raise HTTPException(status_code=400, detail="Invalid email format")
+
+    api_key, form_id = _kit_env()
+    headers = {
+        "Content-Type": "application/json",
+        "X-Kit-Api-Key": api_key,
+    }
+
+    try:
+        response = httpx.post(
+            f"https://api.kit.com/v4/forms/{form_id}/subscribers",
+            headers=headers,
+            json={"email_address": email},
+            timeout=10,
+        )
+        response.raise_for_status()
+    except httpx.HTTPStatusError as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Kit returned {exc.response.status_code}",
+        ) from exc
+    except httpx.HTTPError as exc:
+        raise HTTPException(status_code=502, detail="Kit request failed") from exc
+
+    tag_id_map = {
+        "Tool_Lead": os.getenv("CONVERTKIT_TOOL_LEAD_TAG_ID"),
+        "WaymarkPath_Early_Access": os.getenv("CONVERTKIT_WAYMARKPATH_TAG_ID"),
+    }
+    tag_id = tag_id_map.get(tag) if tag else None
+    subscriber_id = response.json().get("subscriber", {}).get("id")
+
+    if tag_id and subscriber_id:
+        try:
+            httpx.post(
+                f"https://api.kit.com/v4/tags/{tag_id}/subscribers/{subscriber_id}",
+                headers=headers,
+                json={},
+                timeout=10,
+            ).raise_for_status()
+        except httpx.HTTPError:
+            # The subscription succeeded; don't fail the user-visible request for tag issues.
+            pass
+
+    return {"success": True}
 
 
 @app.post("/v1/hermes/events")

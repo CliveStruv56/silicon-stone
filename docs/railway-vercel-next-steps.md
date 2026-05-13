@@ -86,6 +86,15 @@ Later, remove origins you do not need.
 You do not need to add OpenAI, Anthropic, Pinecone, Sanity, Redis, or PostgreSQL variables to this backend yet unless you start migrating real logic into it.
 For the migrated `/v1/categories` and `/v1/briefings` routes, the Sanity public project values are required. If the dataset is private, also add `SANITY_API_READ_TOKEN`.
 
+For the migrated `/v1/subscribe` route, add the Kit variables to Railway:
+
+```text
+CONVERTKIT_API_KEY=your_kit_api_key
+CONVERTKIT_FORM_ID=your_kit_form_id
+CONVERTKIT_TOOL_LEAD_TAG_ID=your_tool_lead_tag_id
+CONVERTKIT_WAYMARKPATH_TAG_ID=your_waymarkpath_tag_id
+```
+
 ## 5. Generate A Public Railway Domain
 
 In the Railway backend service:

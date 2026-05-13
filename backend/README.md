@@ -33,6 +33,14 @@ Migrated briefings route:
 curl http://localhost:8000/v1/briefings
 ```
 
+Migrated subscribe route:
+
+```bash
+curl -X POST http://localhost:8000/v1/subscribe \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","tag":"Tool_Lead"}'
+```
+
 ## Railway Settings
 
 - Root Directory: `/backend`
@@ -56,3 +64,12 @@ NEXT_PUBLIC_SANITY_API_VERSION=2026-01-13
 ```
 
 If the Sanity dataset is private, set `SANITY_API_READ_TOKEN` as well.
+
+The `/v1/subscribe` route needs Kit variables:
+
+```text
+CONVERTKIT_API_KEY=your_kit_api_key
+CONVERTKIT_FORM_ID=your_kit_form_id
+CONVERTKIT_TOOL_LEAD_TAG_ID=your_tool_lead_tag_id
+CONVERTKIT_WAYMARKPATH_TAG_ID=your_waymarkpath_tag_id
+```

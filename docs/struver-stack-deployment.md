@@ -21,6 +21,7 @@ Last updated: 2026-05-13
   - `GET /v1/topology`
   - `GET /v1/categories`
   - `GET /v1/briefings`
+  - `POST /v1/subscribe`
   - `POST /v1/hermes/events`
 - Added `NEXT_PUBLIC_API_URL` and Railway backend variables to `.env.example`.
 

@@ -6,6 +6,40 @@ const KIT_FORM_ID = process.env.CONVERTKIT_FORM_ID || "";
 const MAX_BODY_BYTES = 2_000;
 const ALLOWED_TAGS = new Set(["Tool_Lead", "WaymarkPath_Early_Access"]);
 
+function getBackendApiUrl() {
+  const value = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_API_URL || "";
+  return value.replace(/\/$/, "");
+}
+
+async function proxySubscribe(body: { email: string; tag?: string }) {
+  const backendApiUrl = getBackendApiUrl();
+  if (!backendApiUrl) return null;
+
+  try {
+    const response = await fetch(`${backendApiUrl}/v1/subscribe`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(body),
+      cache: "no-store",
+    });
+
+    const responseBody = await response.json().catch(() => ({}));
+
+    if (response.status < 500) {
+      return NextResponse.json(responseBody, { status: response.status });
+    }
+
+    console.error("Railway subscribe proxy error:", response.status, responseBody);
+    return null;
+  } catch (error) {
+    console.error("Railway subscribe proxy failed:", error);
+    return null;
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const ip = getClientIp(request);
@@ -50,6 +84,11 @@ export async function POST(request: NextRequest) {
         { error: "Invalid email format" },
         { status: 400 }
       );
+    }
+
+    const railwayResponse = await proxySubscribe({ email, tag });
+    if (railwayResponse) {
+      return railwayResponse;
     }
 
     if (!KIT_API_KEY || !KIT_FORM_ID) {
