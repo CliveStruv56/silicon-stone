@@ -1,3 +1,5 @@
+import { evaluateRuleLibrary, type RuleFinding } from './ai-act-rules'
+
 export type AssessmentValue = string | string[]
 
 export type AssessmentAnswers = Record<string, AssessmentValue>
@@ -52,80 +54,8 @@ export interface AssessmentResult {
   reviewTriggers: string[]
   reportSections: string[]
   sourceReferences: SourceReference[]
+  firedRules: RuleFinding[]
 }
-
-const sourceReferences: SourceReference[] = [
-  {
-    label: 'European Commission AI Act overview',
-    url: 'https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai',
-  },
-  {
-    label: 'AI Act Service Desk: Article 2 territorial scope',
-    url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-2',
-  },
-  {
-    label: 'AI Act Service Desk: Article 5 prohibited AI practices',
-    url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-5',
-  },
-  {
-    label: 'AI Act Service Desk: Article 6 high-risk classification',
-    url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-6',
-  },
-  {
-    label: 'AI Act Service Desk: Annex III high-risk areas',
-    url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/annex-3',
-  },
-  {
-    label: 'AI Act Service Desk: Article 26 deployer obligations',
-    url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-26',
-  },
-  {
-    label: 'AI Act Service Desk: Article 50 transparency obligations',
-    url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-50',
-  },
-  {
-    label: 'AI Act Service Desk: Article 51 GPAI systemic risk',
-    url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-51',
-  },
-]
-
-const sensitiveDomains = new Set([
-  'employment',
-  'education',
-  'healthcare',
-  'credit',
-  'insurance',
-  'public-services',
-  'biometrics',
-  'critical-infrastructure',
-  'law-migration',
-  'justice-democracy',
-])
-
-const highImpactDecisions = new Set([
-  'automated-adverse',
-  'ranking',
-  'eligibility',
-  'safety-control',
-])
-
-const primaryUseAnnexIII: Record<string, true> = {
-  employment: true,
-  education: true,
-  healthcare: true,
-  financial: true,
-  biometrics: true,
-  'critical-infrastructure': true,
-  'law-justice': true,
-}
-
-const prohibitedPractices = new Set([
-  'social-scoring',
-  'manipulation',
-  'workplace-emotion',
-  'public-biometric-id',
-  'facial-scraping',
-])
 
 export const assessmentQuestions: AssessmentQuestion[] = [
   {
@@ -337,237 +267,34 @@ export const assessmentQuestions: AssessmentQuestion[] = [
   },
 ]
 
-function values(answers: AssessmentAnswers, id: string): string[] {
-  const value = answers[id]
-  if (!value) return []
-  return Array.isArray(value) ? value : [value]
-}
-
-function has(answers: AssessmentAnswers, id: string, value: string): boolean {
-  return values(answers, id).includes(value)
-}
-
-function hasAny(answers: AssessmentAnswers, id: string, check: Set<string> | string[]): boolean {
-  const wanted = Array.isArray(check) ? new Set(check) : check
-  return values(answers, id).some((value) => wanted.has(value))
-}
-
-function labelFor(question: AssessmentQuestion, value: string): string {
-  return question.options?.find((option) => option.value === value)?.label ?? value
-}
-
-function selectedLabels(questionId: string, answers: AssessmentAnswers): string[] {
-  const question = assessmentQuestions.find((item) => item.id === questionId)
-  if (!question) return values(answers, questionId)
-  return values(answers, questionId).map((value) => labelFor(question, value))
-}
-
 export function getVisibleQuestions(answers: AssessmentAnswers): AssessmentQuestion[] {
   return assessmentQuestions.filter((question) => !question.showIf || question.showIf(answers))
 }
 
 export function evaluateAssessment(answers: AssessmentAnswers): AssessmentResult {
-  let score = 0
-  const reasons: string[] = []
-  const missingFacts: string[] = []
-  const obligations = new Set<string>()
-  const vendorQuestions = new Set<string>()
-  const adjacentRisks = new Set<string>()
-  const reviewTriggers = new Set<string>()
-  const reportSections = new Set<string>()
-
-  const origin = values(answers, 'origin')[0]
-  const impact = values(answers, 'decision_impact')[0]
-  const oversight = values(answers, 'human_oversight')[0]
-  const euScope = values(answers, 'eu_scope')
-  const vendorDocs = values(answers, 'vendor_docs')
+  const ruleEvaluation = evaluateRuleLibrary(answers)
   const toolName = typeof answers.tool_name === 'string' && answers.tool_name.trim()
     ? answers.tool_name.trim()
     : 'this AI system'
 
-  const onlyNoEuScope = euScope.length === 1 && euScope[0] === 'none'
-
-  if (!euScope.length || has(answers, 'eu_scope', 'not-sure')) {
-    missingFacts.push('Confirm whether the system is used in the EU, placed on the EU market, or affects people in the EU.')
-  }
-
-  if (has(answers, 'eu_scope', 'none')) {
-    reasons.push('You selected no clear EU connection, so AI Act scope should be confirmed before treating this as an EU compliance issue.')
-    score -= 2
-  }
-
-  let role: UserRole = 'Deployer'
-  if (origin === 'own-product' || origin === 'modified-or-resold') {
-    role = origin === 'modified-or-resold' ? 'Both' : 'Provider'
-    score += 2
-    reasons.push('You may have provider-side responsibilities because you build, materially modify, rebrand, resell, or place an AI product on the market.')
-  } else if (origin === 'integrated-third-party') {
-    role = 'Both'
-    score += 1
-    reasons.push('You are using a third-party system, but integration choices may create deployer duties and could create provider-like responsibilities if the intended purpose changes.')
-  } else if (origin === 'not-sure') {
-    role = 'Unclear'
-    missingFacts.push('Clarify whether you are only using the tool, or whether you modify, rebrand, resell, or set a new intended purpose for it.')
-  } else {
-    reasons.push('You appear primarily to be a deployer using a third-party AI system.')
-  }
-
-  if (hasAny(answers, 'prohibited_screen', prohibitedPractices)) {
-    score = Math.max(score, 100)
-    reasons.push('One or more selected practices maps to a prohibited-practice red flag and needs immediate human/legal review.')
-    obligations.add('Stop or pause the affected use until the prohibited-practice position is reviewed.')
-    obligations.add('Document the use case, affected people, and vendor/system behaviour before any further deployment.')
-  }
-
-  const primaryUse = values(answers, 'primary_use')[0]
-  const annexIIIFromSensitiveDomains = hasAny(answers, 'sensitive_domains', sensitiveDomains)
-  const annexIIIFromPrimaryUse = primaryUse ? Boolean(primaryUseAnnexIII[primaryUse]) : false
-  const annexIIIHit = annexIIIFromSensitiveDomains || annexIIIFromPrimaryUse
-
-  if (annexIIIFromSensitiveDomains) {
-    score += 4
-    reasons.push(`The use touches sensitive AI Act areas: ${selectedLabels('sensitive_domains', answers).filter((item) => item !== 'None of these').join(', ')}.`)
-  } else if (annexIIIFromPrimaryUse) {
-    score += 4
-    const primaryUseQuestion = assessmentQuestions.find((item) => item.id === 'primary_use')
-    const primaryUseLabel = primaryUseQuestion ? labelFor(primaryUseQuestion, primaryUse) : primaryUse
-    reasons.push(`The primary use (${primaryUseLabel}) sits inside an Annex III high-risk area, even though no specific sensitive-domain box was ticked.`)
-    missingFacts.push('Confirm the specific sensitive-domain breakdown — the primary use suggests Annex III applicability that should be cross-checked against the actual workflow.')
-  }
-
-  if (hasAny(answers, 'decision_impact', highImpactDecisions)) {
-    score += 3
-    reasons.push('The output can rank, determine eligibility, automate adverse action, or control safety-related activity.')
-  } else if (impact === 'recommendation') {
-    score += 1
-    reasons.push('The system influences a human decision, so the intended purpose and oversight model matter.')
-  }
-
-  if (oversight === 'none' || oversight === 'rubber-stamp') {
-    score += 2
-    reasons.push('Human oversight appears weak, which increases operational and compliance risk.')
-    obligations.add('Define who reviews outputs, what they must check, and when they can override the system.')
-  } else if (oversight === 'not-sure') {
-    missingFacts.push('Confirm whether human review is meaningful and whether reviewers have authority to override the AI output.')
-  }
-
-  if (hasAny(answers, 'transparency', ['chatbot', 'synthetic-media', 'published-text', 'emotion-biometric'])) {
-    score += 1
-    reasons.push('The system may trigger transparency duties because it interacts with people, generates content, or detects emotion/biometric categories.')
-    obligations.add('Ensure users are told when they interact with AI and label AI-generated or synthetic content where required.')
-  }
-
-  if (hasAny(answers, 'data_types', ['personal', 'employee', 'health', 'children', 'biometric', 'special-category'])) {
-    adjacentRisks.add('Personal or sensitive data is involved; check GDPR lawful basis, minimisation, retention, security, and DPIA requirements.')
-  }
-  if (hasAny(answers, 'data_types', ['employee', 'health', 'children', 'biometric', 'special-category'])) {
-    adjacentRisks.add('Sensitive data context detected; a human data protection review is recommended alongside AI Act triage.')
-  }
-  if (hasAny(answers, 'sensitive_domains', ['employment', 'healthcare', 'credit', 'insurance', 'biometrics'])) {
-    adjacentRisks.add('This use sits in a sector where vendor contracts, audit rights, and evidence quality matter materially.')
-  }
-
-  if (!vendorDocs.length || has(answers, 'vendor_docs', 'none') || has(answers, 'vendor_docs', 'not-sure')) {
-    missingFacts.push('Obtain the vendor intended-purpose statement, AI Act classification, instructions for use, oversight guidance, and data processing terms.')
-  }
-  if (!vendorDocs.includes('classification')) {
-    vendorQuestions.add('What AI Act classification and intended purpose does the vendor assign to this system?')
-  }
-  if (!vendorDocs.includes('instructions')) {
-    vendorQuestions.add('What instructions for use, limitations, human oversight guidance, and misuse warnings does the vendor provide?')
-  }
-  if (!vendorDocs.includes('dpa')) {
-    vendorQuestions.add('Does the vendor provide a DPA, data retention terms, sub-processor list, and position on training with customer data?')
-  }
-  if (!vendorDocs.includes('logs')) {
-    vendorQuestions.add('Can you export logs, decisions, prompts, outputs, user actions, and configuration history for audit or incident review?')
-  }
-  if (!vendorDocs.includes('change-policy')) {
-    vendorQuestions.add('How will the vendor notify you about model, feature, policy, or performance changes?')
-  }
-
-  values(answers, 'change_control').forEach((trigger) => {
-    const question = assessmentQuestions.find((item) => item.id === 'change_control')
-    reviewTriggers.add(labelFor(question!, trigger))
-  })
-
-  if (!reviewTriggers.size) {
-    reviewTriggers.add('Annual AI register review')
-    reviewTriggers.add('Vendor model, terms, or feature changes')
-    reviewTriggers.add('Less human review or more automation')
-  }
-
-  obligations.add('Maintain an AI system record covering intended purpose, owner, users, affected people, data, vendor, and review date.')
-  obligations.add('Keep evidence of vendor documentation, internal oversight decisions, and material changes.')
-
-  if (score >= 4 && score < 100) {
-    obligations.add('Treat this as a likely high-risk candidate until the vendor classification and intended-purpose evidence are confirmed.')
-  }
-
-  reportSections.add('AI system record')
-  reportSections.add('Classification rationale and confidence')
-  reportSections.add('Role analysis: deployer/provider/both')
-  reportSections.add('Vendor due diligence questionnaire')
-  reportSections.add('Evidence register')
-  reportSections.add('Adjacent GDPR and vendor-risk addendum')
-  reportSections.add('30/60/90-day action plan')
-
-  let classification: Classification = 'Likely minimal-risk'
-  if (score >= 100) {
-    classification = 'Prohibited practice'
-  } else if (onlyNoEuScope) {
-    classification = 'Out of EU scope'
-    reasons.push('You indicated no EU users, market presence, or affected people, so the AI Act may not apply. Article 2 still catches providers placing AI systems on the EU market and outputs used by people in the EU.')
-    obligations.add('Confirm and document the territorial scope position before deprioritising AI Act work; revisit if EU usage, customers, or outputs change.')
-    adjacentRisks.add('Local AI rules (UK, US state laws, sector-specific regimes) may still apply even when the EU AI Act does not.')
-  } else if (has(answers, 'primary_use', 'gpai-product')) {
-    classification = annexIIIHit || score >= 4 ? 'Likely high-risk' : 'GPAI-related'
-    reasons.push('A generative AI product or model route may create GPAI or provider-side obligations separate from deployer duties.')
-  } else if (annexIIIHit || score >= 5) {
-    classification = 'Likely high-risk'
-  } else if (score >= 2) {
-    classification = 'Likely limited-risk'
-  }
-
-  if (annexIIIHit && classification === 'Likely high-risk') {
-    missingFacts.push('Annex III use cases default to high-risk under the AI Act. Article 6(3) offers a narrow-task exemption (narrow procedural tasks, improving prior human activity, etc.) — confirm the vendor classification and intended purpose before assuming a lower tier applies.')
-  }
-
-  if (role === 'Unclear' || has(answers, 'prohibited_screen', 'not-sure')) {
-    classification = classification === 'Likely minimal-risk' ? 'Uncertain' : classification
-  }
-
-  const uncertainty = missingFacts.length + (role === 'Unclear' ? 1 : 0)
-  let confidence: 'High' | 'Medium' | 'Low'
-  if (score >= 100) {
-    confidence = 'High'
-  } else if (onlyNoEuScope) {
-    confidence = 'High'
-  } else if (uncertainty >= 3) {
-    confidence = 'Low'
-  } else if (uncertainty >= 1) {
-    confidence = 'Medium'
-  } else {
-    confidence = 'High'
-  }
-
-  const summary = classification === 'Out of EU scope'
+  const summary = ruleEvaluation.classification === 'Out of EU scope'
     ? `${toolName} appears to be outside EU AI Act territorial scope on this first-pass assessment. Document the reasoning and re-check if EU users, customers, or outputs are added.`
-    : `${toolName} is classified as ${classification.toLowerCase()} on this first-pass assessment. The result should be treated as an AI system record and reviewed when the use case, vendor, data, or level of automation changes.`
+    : `${toolName} is classified as ${ruleEvaluation.classification.toLowerCase()} on this first-pass assessment. The result should be treated as an AI system record and reviewed when the use case, vendor, data, or level of automation changes.`
 
   return {
-    classification,
-    role,
-    confidence,
-    score,
+    classification: ruleEvaluation.classification,
+    role: ruleEvaluation.role,
+    confidence: ruleEvaluation.confidence,
+    score: ruleEvaluation.score,
     summary,
-    reasons: reasons.length ? reasons : ['No high-risk or prohibited-practice trigger was selected, based on the answers provided.'],
-    missingFacts,
-    obligations: [...obligations],
-    vendorQuestions: [...vendorQuestions],
-    adjacentRisks: [...adjacentRisks],
-    reviewTriggers: [...reviewTriggers],
-    reportSections: [...reportSections],
-    sourceReferences,
+    reasons: ruleEvaluation.reasons,
+    missingFacts: ruleEvaluation.missingFacts,
+    obligations: ruleEvaluation.obligations,
+    vendorQuestions: ruleEvaluation.vendorQuestions,
+    adjacentRisks: ruleEvaluation.adjacentRisks,
+    reviewTriggers: ruleEvaluation.reviewTriggers,
+    reportSections: ruleEvaluation.reportSections,
+    sourceReferences: ruleEvaluation.sourceReferences,
+    firedRules: ruleEvaluation.firedRules,
   }
 }

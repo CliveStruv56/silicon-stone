@@ -33,6 +33,9 @@ export interface Policy {
   penaltyRange: string
   enforcementBody: string
   relatedPolicies: string[]    // IDs of related policies
+  sourceUrl?: string
+  sourceLabel?: string
+  lastReviewed?: string
 }
 
 export interface UserContext {

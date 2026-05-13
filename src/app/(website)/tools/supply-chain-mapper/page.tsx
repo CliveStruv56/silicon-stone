@@ -10,17 +10,25 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import { Tooltip } from 'react-tooltip'
 import { Header, Footer } from '@/components/layout'
 import { EmailGateOverlay } from '@/components/tools/EmailGateOverlay'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { CopyMarkdownButton } from '@/components/tools/CopyMarkdownButton'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { MapFilters, MapLegend } from '@/components/tools/MapFilters'
 import {
   SUPPLY_CHAIN_NODES,
   SUPPLY_CHAIN_CONNECTIONS,
+  SUPPLY_CHAIN_SCENARIOS,
+  INDUSTRY_SECTOR_OPTIONS,
+  getIndustrySectorLabel,
   getNodeById,
   getConnectionsForNode,
   getUpstreamNodes,
   getDownstreamNodes,
+  getNodeRiskProfile,
+  getScenarioAdjustedScore,
+  getTopExposureNodes,
+  scoreNodeForExposure,
   NODE_COLORS,
   RISK_COLORS,
   CONNECTION_COLORS,
@@ -29,34 +37,82 @@ import {
   type SupplyChainNode,
   type NodeType,
   type RiskLevel,
+  type ScenarioId,
+  type ExposureProfile,
+  type ChipExposure,
+  type IndustrySector,
+  type SourcingFlexibility,
 } from '@/lib/supply-chain-data'
-import { AlertTriangle, ArrowRight, ArrowLeft, Network, X } from 'lucide-react'
+import { supplyChainMapperMarkdown } from '@/lib/tools-markdown'
+import {
+  AlertTriangle,
+  ArrowRight,
+  ArrowLeft,
+  Network,
+  X,
+  Gauge,
+  ClipboardList,
+  Activity,
+  ExternalLink,
+  ShieldCheck,
+  FileText,
+  Mail,
+} from 'lucide-react'
 
 // Free dark map style from MapTiler (no API key required for limited use)
 const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
 
+const CHIP_EXPOSURE_OPTIONS: { value: ChipExposure; label: string }[] = [
+  { value: 'ai-accelerators', label: 'AI accelerators / GPUs' },
+  { value: 'automotive-mcus', label: 'Automotive electronics' },
+  { value: 'industrial-control', label: 'Industrial control systems' },
+  { value: 'networking', label: 'Networking / infrastructure' },
+  { value: 'consumer-devices', label: 'Consumer devices' },
+]
+
+const SOURCING_OPTIONS: { value: SourcingFlexibility; label: string }[] = [
+  { value: 'single-source', label: 'Single-source or unclear' },
+  { value: 'dual-source', label: 'Dual-source for key parts' },
+  { value: 'multi-source', label: 'Multi-source with qualified alternates' },
+]
+
+const GEOGRAPHY_OPTIONS = [
+  { value: 'europe', label: 'Europe-facing operations' },
+  { value: 'asia', label: 'Asia-heavy supply base' },
+  { value: 'global', label: 'Global / mixed exposure' },
+]
+
 export default function SupplyChainMapperPage() {
   const [selectedNode, setSelectedNode] = useState<SupplyChainNode | null>(null)
+  // Email gate is now triggered only by the "Email me the brief" export action.
+  // The interactive map and node detail are free to use.
   const [isUnlocked, setIsUnlocked] = useState(false)
   const [showGate, setShowGate] = useState(false)
-  const [pendingNode, setPendingNode] = useState<SupplyChainNode | null>(null)
+  const [selectedScenarioId, setSelectedScenarioId] = useState<ScenarioId>('baseline')
+  const [exposureProfile, setExposureProfile] = useState<ExposureProfile>({
+    industry: 'industrial-manufacturing',
+    chipExposure: 'ai-accelerators',
+    sourcingFlexibility: 'single-source',
+    geography: 'europe',
+  })
 
   const handleSelectNode = useCallback((node: SupplyChainNode) => {
+    setSelectedNode(node)
+  }, [])
+
+  const handleRequestEmailBrief = () => {
     if (isUnlocked) {
-      setSelectedNode(node)
+      window.print()
     } else {
-      setPendingNode(node)
       setShowGate(true)
     }
-  }, [isUnlocked])
+  }
 
   const handleGateUnlock = () => {
     setIsUnlocked(true)
     setShowGate(false)
-    if (pendingNode) {
-      setSelectedNode(pendingNode)
-      setPendingNode(null)
-    }
+    // After unlocking, kick off the print/save flow they came here for.
+    setTimeout(() => window.print(), 200)
   }
 
   const [activeNodeTypes, setActiveNodeTypes] = useState<NodeType[]>(
@@ -66,6 +122,22 @@ export default function SupplyChainMapperPage() {
     RISK_LEVEL_OPTIONS.map(opt => opt.value)
   )
   const [showConnections, setShowConnections] = useState(true)
+
+  const selectedScenario = SUPPLY_CHAIN_SCENARIOS.find(
+    scenario => scenario.id === selectedScenarioId
+  ) ?? SUPPLY_CHAIN_SCENARIOS[0]
+
+  const topExposureNodes = useMemo(() => {
+    return getTopExposureNodes(exposureProfile, selectedScenarioId, 5)
+  }, [exposureProfile, selectedScenarioId])
+
+  const selectedNodeRiskProfile = selectedNode ? getNodeRiskProfile(selectedNode) : null
+  const selectedNodeScenarioScore = selectedNode
+    ? getScenarioAdjustedScore(selectedNode, selectedScenarioId)
+    : null
+  const selectedNodeExposureScore = selectedNode
+    ? scoreNodeForExposure(selectedNode, exposureProfile, selectedScenarioId)
+    : null
 
   // Filter nodes based on active filters
   const filteredNodes = useMemo(() => {
@@ -200,6 +272,113 @@ export default function SupplyChainMapperPage() {
 
         {/* Main Content */}
         <section className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
+          <div className="mb-6 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+            <Card className="bg-stone-charcoal border-border-subtle py-5">
+              <CardHeader className="pb-0">
+                <CardTitle className="flex items-center gap-2 text-text-primary">
+                  <ClipboardList className="w-5 h-5 text-stone-teal" />
+                  Exposure Diagnostic
+                </CardTitle>
+                <CardDescription>
+                  Adjust the operating context to see which chokepoints matter most for this organisation.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                <label className="space-y-1.5">
+                  <span className="text-xs uppercase tracking-wider text-text-muted">Industry context</span>
+                  <select
+                    value={exposureProfile.industry}
+                    onChange={(event) => setExposureProfile(prev => ({
+                      ...prev,
+                      industry: event.target.value as IndustrySector,
+                    }))}
+                    className="h-10 w-full rounded-md border border-border-subtle bg-slate-deep px-3 text-sm text-text-primary outline-none focus:ring-2 focus:ring-silicon-amber"
+                  >
+                    {INDUSTRY_SECTOR_OPTIONS.map(option => (
+                      <option key={option.value} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="space-y-1.5">
+                  <span className="text-xs uppercase tracking-wider text-text-muted">Critical chip class</span>
+                  <select
+                    value={exposureProfile.chipExposure}
+                    onChange={(event) => setExposureProfile(prev => ({
+                      ...prev,
+                      chipExposure: event.target.value as ChipExposure,
+                    }))}
+                    className="h-10 w-full rounded-md border border-border-subtle bg-slate-deep px-3 text-sm text-text-primary outline-none focus:ring-2 focus:ring-silicon-amber"
+                  >
+                    {CHIP_EXPOSURE_OPTIONS.map(option => (
+                      <option key={option.value} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="space-y-1.5">
+                  <span className="text-xs uppercase tracking-wider text-text-muted">Sourcing posture</span>
+                  <select
+                    value={exposureProfile.sourcingFlexibility}
+                    onChange={(event) => setExposureProfile(prev => ({
+                      ...prev,
+                      sourcingFlexibility: event.target.value as SourcingFlexibility,
+                    }))}
+                    className="h-10 w-full rounded-md border border-border-subtle bg-slate-deep px-3 text-sm text-text-primary outline-none focus:ring-2 focus:ring-silicon-amber"
+                  >
+                    {SOURCING_OPTIONS.map(option => (
+                      <option key={option.value} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="space-y-1.5">
+                  <span className="text-xs uppercase tracking-wider text-text-muted">Supply footprint</span>
+                  <select
+                    value={exposureProfile.geography}
+                    onChange={(event) => setExposureProfile(prev => ({
+                      ...prev,
+                      geography: event.target.value,
+                    }))}
+                    className="h-10 w-full rounded-md border border-border-subtle bg-slate-deep px-3 text-sm text-text-primary outline-none focus:ring-2 focus:ring-silicon-amber"
+                  >
+                    {GEOGRAPHY_OPTIONS.map(option => (
+                      <option key={option.value} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                </label>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-stone-charcoal border-border-subtle py-5">
+              <CardHeader className="pb-0">
+                <CardTitle className="flex items-center gap-2 text-text-primary">
+                  <Activity className="w-5 h-5 text-silicon-amber" />
+                  Stress Scenario
+                </CardTitle>
+                <CardDescription>{selectedScenario.summary}</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <select
+                  value={selectedScenarioId}
+                  onChange={(event) => setSelectedScenarioId(event.target.value as ScenarioId)}
+                  className="h-10 w-full rounded-md border border-border-subtle bg-slate-deep px-3 text-sm text-text-primary outline-none focus:ring-2 focus:ring-silicon-amber"
+                >
+                  {SUPPLY_CHAIN_SCENARIOS.map(scenario => (
+                    <option key={scenario.id} value={scenario.id}>{scenario.name}</option>
+                  ))}
+                </select>
+                <div className="grid gap-2 sm:grid-cols-3">
+                  {selectedScenario.responseMoves.slice(0, 3).map(move => (
+                    <div key={move} className="rounded-md border border-border-subtle bg-surface-elevated px-3 py-2 text-xs text-text-muted">
+                      {move}
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
           {/* Filters */}
           <div className="mb-6">
             <MapFilters
@@ -237,6 +416,9 @@ export default function SupplyChainMapperPage() {
                 {filteredNodes.map((node) => {
                   const isSelected = selectedNode?.id === node.id
                   const isConnected = connectedNodeIds.has(node.id)
+                  const nodeExposureScore = scoreNodeForExposure(node, exposureProfile, selectedScenarioId)
+                  const markerSize = isSelected ? 22 : nodeExposureScore >= 8 ? 17 : 14
+                  const ringSize = isSelected ? 30 : nodeExposureScore >= 8 ? 24 : 20
                   const opacity = selectedNode
                     ? (isSelected || isConnected) ? 1 : 0.3
                     : 1
@@ -256,14 +438,14 @@ export default function SupplyChainMapperPage() {
                         className="cursor-pointer transition-all duration-300"
                         style={{ opacity }}
                         data-tooltip-id="map-tooltip"
-                        data-tooltip-content={`${node.name} (${node.type})`}
+                        data-tooltip-content={`${node.name} (${node.type}) · exposure ${nodeExposureScore}/10`}
                       >
                         {/* Risk ring */}
                         <div
                           className="absolute rounded-full transition-all duration-300"
                           style={{
-                            width: isSelected ? 28 : 20,
-                            height: isSelected ? 28 : 20,
+                            width: ringSize,
+                            height: ringSize,
                             border: `2px solid ${RISK_COLORS[node.risk]}`,
                             transform: 'translate(-50%, -50%)',
                             left: '50%',
@@ -274,8 +456,8 @@ export default function SupplyChainMapperPage() {
                         <div
                           className="rounded-full border-2 border-white transition-all duration-300"
                           style={{
-                            width: isSelected ? 20 : 14,
-                            height: isSelected ? 20 : 14,
+                            width: markerSize,
+                            height: markerSize,
                             backgroundColor: NODE_COLORS[node.type],
                           }}
                         />
@@ -317,6 +499,39 @@ export default function SupplyChainMapperPage() {
 
             {/* Details Panel */}
             <div className="lg:col-span-1">
+              <Card className="mb-4 bg-stone-charcoal border-border-subtle py-5">
+                <CardHeader className="pb-0">
+                  <CardTitle className="flex items-center gap-2 text-sm uppercase tracking-wider text-text-muted">
+                    <Gauge className="w-4 h-4 text-silicon-amber" />
+                    Top Exposure Nodes
+                  </CardTitle>
+                  <CardDescription>
+                    {getIndustrySectorLabel(exposureProfile.industry)} under {selectedScenario.name.toLowerCase()} conditions.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  {topExposureNodes.map(node => (
+                    <button
+                      key={node.id}
+                      onClick={() => handleSelectNode(node)}
+                      className="w-full rounded-md border border-border-subtle bg-surface-elevated px-3 py-2 text-left transition-colors hover:border-stone-teal/60 hover:bg-stone-teal/10"
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-sm font-medium text-text-primary">{node.name}</span>
+                        <span className="font-mono text-sm text-silicon-amber">{node.exposureScore}/10</span>
+                      </div>
+                      <div className="mt-1 flex items-center gap-2 text-xs text-text-muted">
+                        <span
+                          className="h-2 w-2 rounded-full"
+                          style={{ backgroundColor: NODE_COLORS[node.type] }}
+                        />
+                        {node.type} · {node.country}
+                      </div>
+                    </button>
+                  ))}
+                </CardContent>
+              </Card>
+
               <AnimatePresence mode="wait">
                 {selectedNode ? (
                   <motion.div
@@ -372,12 +587,137 @@ export default function SupplyChainMapperPage() {
                           </div>
                         )}
 
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="rounded-lg border border-border-subtle bg-surface-elevated px-3 py-2">
+                            <span className="text-xs uppercase text-text-muted">Scenario Score</span>
+                            <p className="font-mono text-2xl text-silicon-amber">{selectedNodeScenarioScore}/10</p>
+                          </div>
+                          <div className="rounded-lg border border-border-subtle bg-surface-elevated px-3 py-2">
+                            <span className="text-xs uppercase text-text-muted">Your Exposure</span>
+                            <p className="font-mono text-2xl text-stone-teal">{selectedNodeExposureScore}/10</p>
+                          </div>
+                        </div>
+
+                        {selectedNodeRiskProfile && (
+                          <div className="space-y-2 rounded-lg border border-border-subtle bg-surface-elevated p-3">
+                            {[
+                              ['Exposure', selectedNodeRiskProfile.exposure],
+                              ['Substitution difficulty', selectedNodeRiskProfile.substitutability],
+                              ['Lead-time pressure', selectedNodeRiskProfile.leadTime],
+                              ['Geopolitical pressure', selectedNodeRiskProfile.geopolitical],
+                            ].map(([label, value]) => (
+                              <div key={label}>
+                                <div className="mb-1 flex justify-between text-xs text-text-muted">
+                                  <span>{label}</span>
+                                  <span>{value}/10</span>
+                                </div>
+                                <div className="h-1.5 rounded-full bg-slate-deep">
+                                  <div
+                                    className="h-1.5 rounded-full bg-silicon-amber"
+                                    style={{ width: `${Number(value) * 10}%` }}
+                                  />
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
                         <div className="bg-alert-red/10 border border-alert-red/20 p-4 rounded-lg">
                           <h4 className="text-sm font-semibold text-alert-red uppercase tracking-wider mb-2 flex items-center gap-2">
                             <AlertTriangle className="w-4 h-4" />
                             Failure Impact
                           </h4>
                           <p className="text-text-primary">{selectedNode.impact}</p>
+                        </div>
+
+                        {(selectedNode.leadTime || selectedNode.substitutability) && (
+                          <div className="grid gap-2">
+                            {selectedNode.leadTime && (
+                              <div className="rounded-lg border border-border-subtle bg-surface-elevated p-3">
+                                <span className="text-xs uppercase text-text-muted">Lead-Time Reality</span>
+                                <p className="mt-1 text-sm text-text-primary">{selectedNode.leadTime}</p>
+                              </div>
+                            )}
+                            {selectedNode.substitutability && (
+                              <div className="rounded-lg border border-border-subtle bg-surface-elevated p-3">
+                                <span className="text-xs uppercase text-text-muted">Substitutability</span>
+                                <p className="mt-1 text-sm text-text-primary">{selectedNode.substitutability}</p>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {selectedNode.mitigationOptions && (
+                          <div>
+                            <h4 className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-stone-teal">
+                              <ShieldCheck className="w-4 h-4" />
+                              Mitigation Moves
+                            </h4>
+                            <ul className="space-y-2">
+                              {selectedNode.mitigationOptions.map(item => (
+                                <li key={item} className="rounded-md bg-surface-elevated px-3 py-2 text-sm text-text-primary">
+                                  {item}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
+                        {selectedNode.supplierQuestions && (
+                          <div>
+                            <h4 className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-silicon-amber">
+                              <FileText className="w-4 h-4" />
+                              Supplier Questions
+                            </h4>
+                            <ul className="space-y-2">
+                              {selectedNode.supplierQuestions.map(item => (
+                                <li key={item} className="rounded-md border border-border-subtle px-3 py-2 text-sm text-text-primary">
+                                  {item}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
+                        {selectedNode.signalsToWatch && (
+                          <div>
+                            <h4 className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-text-muted">
+                              <Activity className="w-4 h-4" />
+                              Signals To Watch
+                            </h4>
+                            <div className="flex flex-wrap gap-2">
+                              {selectedNode.signalsToWatch.map(item => (
+                                <Badge key={item} variant="outline" className="border-border-subtle text-text-muted">
+                                  {item}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="border-t border-border-subtle pt-3">
+                          <div className="mb-2 flex items-center justify-between text-xs text-text-muted">
+                            <span>Evidence</span>
+                            <span>{selectedNode.confidence ?? 'Medium'} confidence · reviewed {selectedNode.lastReviewed ?? '2026-05-11'}</span>
+                          </div>
+                          {selectedNode.evidence?.length ? (
+                            <div className="space-y-1">
+                              {selectedNode.evidence.map(source => (
+                                <a
+                                  key={source.url}
+                                  href={source.url}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="flex items-center gap-1.5 text-xs text-stone-teal hover:text-silicon-amber"
+                                >
+                                  <ExternalLink className="w-3 h-3" />
+                                  {source.label}
+                                </a>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-xs text-text-muted">Curated Silicon & Stone assessment. Source references pending detailed review.</p>
+                          )}
                         </div>
                       </CardContent>
                     </Card>
@@ -462,6 +802,81 @@ export default function SupplyChainMapperPage() {
             </div>
           </div>
 
+          <Card className="mt-6 bg-stone-charcoal border-border-subtle">
+            <CardHeader>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <CardTitle className="text-text-primary">Exposure Report Snapshot</CardTitle>
+                  <CardDescription>
+                    A concise starting point for the supply-chain conversation. Scores are directional and designed to identify where to ask better questions.
+                  </CardDescription>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <CopyMarkdownButton
+                    toolName="Supply Chain Mapper"
+                    filename={`supply-chain-snapshot-${new Date().toISOString().slice(0, 10)}.md`}
+                    getMarkdown={() => supplyChainMapperMarkdown({
+                      profile: exposureProfile,
+                      scenario: selectedScenario,
+                      topNodes: topExposureNodes,
+                      selectedNode,
+                      selectedNodeExposureScore,
+                    })}
+                  />
+                  <Button
+                    variant="outline"
+                    onClick={handleRequestEmailBrief}
+                    className="border-silicon-amber text-silicon-amber hover:bg-silicon-amber/10"
+                  >
+                    <Mail className="w-4 h-4" />
+                    Email me the brief
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="grid gap-4 lg:grid-cols-3">
+              <div>
+                <h3 className="mb-2 text-xs uppercase tracking-wider text-text-muted">Highest Exposure</h3>
+                <div className="space-y-2">
+                  {topExposureNodes.slice(0, 3).map(node => (
+                    <div key={node.id} className="rounded-md border border-border-subtle bg-surface-elevated px-3 py-2">
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-sm font-medium text-text-primary">{node.name}</span>
+                        <span className="font-mono text-sm text-silicon-amber">{node.exposureScore}/10</span>
+                      </div>
+                      <p className="mt-1 text-xs text-text-muted">{node.impact}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h3 className="mb-2 text-xs uppercase tracking-wider text-text-muted">First Response Moves</h3>
+                <ul className="space-y-2">
+                  {selectedScenario.responseMoves.map(move => (
+                    <li key={move} className="rounded-md border border-border-subtle px-3 py-2 text-sm text-text-primary">
+                      {move}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="mb-2 text-xs uppercase tracking-wider text-text-muted">Questions For Procurement</h3>
+                <ul className="space-y-2">
+                  {topExposureNodes
+                    .flatMap(node => node.supplierQuestions ?? [])
+                    .slice(0, 3)
+                    .map(question => (
+                      <li key={question} className="rounded-md bg-surface-elevated px-3 py-2 text-sm text-text-primary">
+                        {question}
+                      </li>
+                    ))}
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* CTA */}
           <div className="flex justify-center pt-8">
             <Link href="/services#contact">
@@ -477,9 +892,9 @@ export default function SupplyChainMapperPage() {
       <EmailGateOverlay
         isOpen={showGate}
         onUnlock={handleGateUnlock}
-        onDismiss={() => { setShowGate(false); setPendingNode(null); }}
+        onDismiss={() => setShowGate(false)}
         toolName="Supply Chain Mapper"
-        resultLabel="the node analysis"
+        resultLabel="the printable brief"
       />
     </div>
   )

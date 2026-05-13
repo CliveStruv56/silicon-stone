@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Header, Footer } from '@/components/layout'
+import { CopyMarkdownButton } from '@/components/tools/CopyMarkdownButton'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -12,11 +13,13 @@ import {
   SCENARIOS,
   FRICTION_COLORS,
   SEVERITY_COLORS,
+  getAdjustedBoardBrief,
   getAdjustedImpacts,
   getExposureBand,
   getExposureMultiplier,
   getMaxImpactValue,
 } from '@/lib/scenario-data'
+import { scenarioModelerMarkdown, scenarioCompareMarkdown } from '@/lib/tools-markdown'
 import type {
   ExposureDependency,
   ExposureGeography,
@@ -40,6 +43,8 @@ import {
   Layers,
   MapPin,
   Radar,
+  GitCompareArrows,
+  X,
 } from 'lucide-react'
 
 const SECTOR_OPTIONS: Array<{ value: ExposureSector; label: string }> = [
@@ -206,37 +211,59 @@ function ProfileSelect<T extends string>({
   )
 }
 
-export default function ScenarioModelerPage() {
-  const [selectedScenarioId, setSelectedScenarioId] = useState(SCENARIOS[0].id)
-  const [exposureProfile, setExposureProfile] = useState<ExposureProfile>(DEFAULT_EXPOSURE_PROFILE)
+function useScenarioDerived(scenarioId: string | null, profile: ExposureProfile) {
+  const scenario = useMemo(() => {
+    if (!scenarioId) return null
+    return SCENARIOS.find(s => s.id === scenarioId) ?? null
+  }, [scenarioId])
 
-  const selectedScenario = useMemo(() => {
-    return SCENARIOS.find(scenario => scenario.id === selectedScenarioId) ?? SCENARIOS[0]
-  }, [selectedScenarioId])
+  const exposureMultiplier = useMemo(() => {
+    return scenario ? getExposureMultiplier(scenario, profile) : 1
+  }, [scenario, profile])
 
-  const exposureMultiplier = useMemo(
-    () => getExposureMultiplier(selectedScenario, exposureProfile),
-    [selectedScenario, exposureProfile]
-  )
+  const exposureBand = useMemo(() => getExposureBand(exposureMultiplier), [exposureMultiplier])
 
-  const exposureBand = useMemo(
-    () => getExposureBand(exposureMultiplier),
-    [exposureMultiplier]
-  )
-
-  const adjustedImpacts = useMemo(
-    () => getAdjustedImpacts(selectedScenario, exposureProfile),
-    [selectedScenario, exposureProfile]
-  )
-
-  const maxImpactValue = useMemo(() => {
-    return Math.max(getMaxImpactValue(), ...adjustedImpacts.map(impact => impact.valueNumeric))
-  }, [adjustedImpacts])
+  const adjustedImpacts = useMemo(() => {
+    return scenario ? getAdjustedImpacts(scenario, profile) : []
+  }, [scenario, profile])
 
   const totalValueAtStake = useMemo(() => {
     const total = adjustedImpacts.reduce((sum, i) => sum + i.valueNumeric, 0)
     return `€${total}B`
   }, [adjustedImpacts])
+
+  const boardBrief = useMemo(() => {
+    return scenario ? getAdjustedBoardBrief(scenario, profile) : null
+  }, [scenario, profile])
+
+  return { scenario, exposureMultiplier, exposureBand, adjustedImpacts, totalValueAtStake, boardBrief }
+}
+
+export default function ScenarioModelerPage() {
+  const [selectedScenarioId, setSelectedScenarioId] = useState(SCENARIOS[0].id)
+  const [compareScenarioId, setCompareScenarioId] = useState<string | null>(null)
+  const [exposureProfile, setExposureProfile] = useState<ExposureProfile>(DEFAULT_EXPOSURE_PROFILE)
+
+  const primary = useScenarioDerived(selectedScenarioId, exposureProfile)
+  const secondary = useScenarioDerived(compareScenarioId, exposureProfile)
+
+  const selectedScenario = primary.scenario ?? SCENARIOS[0]
+  const exposureMultiplier = primary.exposureMultiplier
+  const exposureBand = primary.exposureBand
+  const adjustedImpacts = primary.adjustedImpacts
+  const totalValueAtStake = primary.totalValueAtStake
+  const adjustedBoardBrief = primary.boardBrief ?? selectedScenario.boardBrief
+
+  const maxImpactValue = useMemo(() => {
+    const all = [...adjustedImpacts, ...secondary.adjustedImpacts]
+    return Math.max(getMaxImpactValue(), ...all.map(impact => impact.valueNumeric))
+  }, [adjustedImpacts, secondary.adjustedImpacts])
+
+  const compareOptions = useMemo(() => {
+    return SCENARIOS
+      .filter(s => s.id !== selectedScenarioId)
+      .map(s => ({ value: s.id, label: s.name }))
+  }, [selectedScenarioId])
 
   const updateExposureProfile = <K extends keyof ExposureProfile>(
     key: K,
@@ -342,6 +369,43 @@ export default function ScenarioModelerPage() {
                     {selectedScenario.triggerEvent}
                   </p>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-stone-charcoal border-border-subtle mb-6">
+            <CardHeader>
+              <CardTitle className="text-lg text-text-primary flex items-center gap-2">
+                <GitCompareArrows className="w-5 h-5 text-silicon-amber" />
+                Compare a second scenario
+              </CardTitle>
+              <CardDescription>
+                Optional. Pick another scenario to see both under the same exposure lens, side by side.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <select
+                  value={compareScenarioId ?? ''}
+                  onChange={(event) => setCompareScenarioId(event.target.value || null)}
+                  className="h-10 flex-1 rounded-md border border-border-subtle bg-surface-elevated px-3 text-sm text-text-primary outline-none transition-colors focus:border-silicon-amber"
+                >
+                  <option value="">No comparison</option>
+                  {compareOptions.map(option => (
+                    <option key={option.value} value={option.value}>{option.label}</option>
+                  ))}
+                </select>
+                {compareScenarioId && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => setCompareScenarioId(null)}
+                    className="text-text-muted hover:text-text-primary"
+                  >
+                    <X className="w-4 h-4" />
+                    Clear comparison
+                  </Button>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -510,19 +574,19 @@ export default function ScenarioModelerPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div className="bg-surface-elevated rounded-lg border border-border-subtle p-4">
                       <div className="text-xs font-mono text-alert-red uppercase mb-2">First Impact</div>
-                      <p className="text-sm text-text-primary">{selectedScenario.boardBrief.firstImpact}</p>
+                      <p className="text-sm text-text-primary">{adjustedBoardBrief.firstImpact}</p>
                     </div>
                     <div className="bg-surface-elevated rounded-lg border border-border-subtle p-4">
                       <div className="text-xs font-mono text-silicon-amber uppercase mb-2">90-Day Action</div>
-                      <p className="text-sm text-text-primary">{selectedScenario.boardBrief.ninetyDayAction}</p>
+                      <p className="text-sm text-text-primary">{adjustedBoardBrief.ninetyDayAction}</p>
                     </div>
                     <div className="bg-surface-elevated rounded-lg border border-border-subtle p-4">
                       <div className="text-xs font-mono text-stone-teal uppercase mb-2">12-Month Hedge</div>
-                      <p className="text-sm text-text-primary">{selectedScenario.boardBrief.twelveMonthHedge}</p>
+                      <p className="text-sm text-text-primary">{adjustedBoardBrief.twelveMonthHedge}</p>
                     </div>
                     <div className="bg-surface-elevated rounded-lg border border-border-subtle p-4">
                       <div className="text-xs font-mono text-text-muted uppercase mb-2">Escalate When</div>
-                      <p className="text-sm text-text-primary">{selectedScenario.boardBrief.escalationTrigger}</p>
+                      <p className="text-sm text-text-primary">{adjustedBoardBrief.escalationTrigger}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -634,8 +698,118 @@ export default function ScenarioModelerPage() {
                 </CardContent>
               </Card>
 
-              {/* CTA */}
-              <div className="flex justify-center pt-6">
+              {/* Comparison */}
+              {secondary.scenario && (
+                <Card className="bg-stone-charcoal border-silicon-amber/30">
+                  <CardHeader>
+                    <CardTitle className="text-lg text-text-primary flex items-center gap-2">
+                      <GitCompareArrows className="w-5 h-5 text-silicon-amber" />
+                      {selectedScenario.shortName} vs {secondary.scenario.shortName}
+                    </CardTitle>
+                    <CardDescription>
+                      Both scenarios under the same exposure lens. Numbers are profile-adjusted.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-border-subtle">
+                            <th className="p-3 text-left text-xs uppercase tracking-wider text-text-muted font-medium"></th>
+                            <th className="p-3 text-left text-xs uppercase tracking-wider text-text-muted font-medium">
+                              {selectedScenario.shortName}
+                            </th>
+                            <th className="p-3 text-left text-xs uppercase tracking-wider text-text-muted font-medium">
+                              {secondary.scenario.shortName}
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-border-subtle">
+                          <tr>
+                            <td className="p-3 text-text-muted">Friction</td>
+                            <td className="p-3 text-text-primary">{selectedScenario.frictionLevel.toUpperCase()}</td>
+                            <td className="p-3 text-text-primary">{secondary.scenario.frictionLevel.toUpperCase()}</td>
+                          </tr>
+                          <tr>
+                            <td className="p-3 text-text-muted">Timeframe</td>
+                            <td className="p-3 text-text-primary">{selectedScenario.timeframe}</td>
+                            <td className="p-3 text-text-primary">{secondary.scenario.timeframe}</td>
+                          </tr>
+                          <tr>
+                            <td className="p-3 text-text-muted">Base probability</td>
+                            <td className="p-3 text-text-primary">{selectedScenario.probability}</td>
+                            <td className="p-3 text-text-primary">{secondary.scenario.probability}</td>
+                          </tr>
+                          <tr>
+                            <td className="p-3 text-text-muted">Profile-adjusted value at stake</td>
+                            <td className="p-3 font-mono text-silicon-amber">{totalValueAtStake}</td>
+                            <td className="p-3 font-mono text-silicon-amber">{secondary.totalValueAtStake}</td>
+                          </tr>
+                          <tr>
+                            <td className="p-3 text-text-muted">Exposure band</td>
+                            <td className="p-3 text-text-primary">{exposureBand}</td>
+                            <td className="p-3 text-text-primary">{secondary.exposureBand}</td>
+                          </tr>
+                          <tr>
+                            <td className="p-3 text-text-muted align-top">First impact</td>
+                            <td className="p-3 text-text-primary">{adjustedBoardBrief.firstImpact}</td>
+                            <td className="p-3 text-text-primary">{secondary.boardBrief?.firstImpact}</td>
+                          </tr>
+                          <tr>
+                            <td className="p-3 text-text-muted align-top">90-day action</td>
+                            <td className="p-3 text-text-primary">{adjustedBoardBrief.ninetyDayAction}</td>
+                            <td className="p-3 text-text-primary">{secondary.boardBrief?.ninetyDayAction}</td>
+                          </tr>
+                          <tr>
+                            <td className="p-3 text-text-muted align-top">12-month hedge</td>
+                            <td className="p-3 text-text-primary">{adjustedBoardBrief.twelveMonthHedge}</td>
+                            <td className="p-3 text-text-primary">{secondary.boardBrief?.twelveMonthHedge}</td>
+                          </tr>
+                          <tr>
+                            <td className="p-3 text-text-muted align-top">Escalate when</td>
+                            <td className="p-3 text-text-primary">{adjustedBoardBrief.escalationTrigger}</td>
+                            <td className="p-3 text-text-primary">{secondary.boardBrief?.escalationTrigger}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Export + CTA */}
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-center pt-6">
+                <CopyMarkdownButton
+                  toolName="Scenario Modeler"
+                  filename={
+                    secondary.scenario
+                      ? `scenario-compare-${new Date().toISOString().slice(0, 10)}.md`
+                      : `scenario-brief-${new Date().toISOString().slice(0, 10)}.md`
+                  }
+                  getMarkdown={() => {
+                    const primaryArgs = {
+                      scenario: selectedScenario,
+                      profile: exposureProfile,
+                      adjustedImpacts,
+                      totalValueAtStake,
+                      exposureMultiplier,
+                      exposureBand,
+                      boardBrief: adjustedBoardBrief,
+                    }
+                    if (secondary.scenario && secondary.boardBrief) {
+                      return scenarioCompareMarkdown(primaryArgs, {
+                        scenario: secondary.scenario,
+                        profile: exposureProfile,
+                        adjustedImpacts: secondary.adjustedImpacts,
+                        totalValueAtStake: secondary.totalValueAtStake,
+                        exposureMultiplier: secondary.exposureMultiplier,
+                        exposureBand: secondary.exposureBand,
+                        boardBrief: secondary.boardBrief,
+                      })
+                    }
+                    return scenarioModelerMarkdown(primaryArgs)
+                  }}
+                />
                 <Link href="/services#contact">
                   <Button className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90">
                     Request Custom Scenario Analysis

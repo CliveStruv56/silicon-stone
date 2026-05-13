@@ -21,12 +21,15 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import {
+  assessmentQuestions,
   type AssessmentAnswers,
   type AssessmentQuestion,
   type AssessmentValue,
   evaluateAssessment,
   getVisibleQuestions,
 } from '@/lib/ai-act-assessment'
+import { CopyMarkdownButton } from '@/components/tools/CopyMarkdownButton'
+import { complianceCheckerMarkdown } from '@/lib/tools-markdown'
 
 function values(value: AssessmentValue | undefined): string[] {
   if (!value) return []
@@ -463,7 +466,43 @@ export default function ComplianceCheckerPage() {
                 </CardContent>
               </Card>
 
-              <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+              <Card className="bg-stone-charcoal border-border-subtle">
+                <CardHeader>
+                  <CardTitle className="text-lg text-text-primary">Rules fired</CardTitle>
+                  <CardDescription>
+                    These versioned rules are the evidence trail behind the result and paid report.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-3">
+                    {result.firedRules.map((rule) => (
+                      <div key={rule.id} className="rounded-lg border border-border-subtle bg-surface-elevated p-4">
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                          <div>
+                            <div className="text-sm font-semibold text-text-primary">{rule.title}</div>
+                            <div className="mt-1 text-xs font-mono text-text-muted">{rule.id} · v{rule.version}</div>
+                          </div>
+                          <Badge variant="outline" className="w-fit border-stone-teal text-stone-teal">
+                            {rule.source.article}
+                          </Badge>
+                        </div>
+                        <p className="mt-3 text-sm text-text-muted">{rule.explanation}</p>
+                        {rule.evidence.length > 0 && (
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            {rule.evidence.map((item) => (
+                              <Badge key={item} variant="outline" className="text-xs border-border-subtle text-text-muted">
+                                {item}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-center">
                 <Button
                   variant="outline"
                   onClick={goBack}
@@ -480,6 +519,11 @@ export default function ComplianceCheckerPage() {
                   <RefreshCcw className="w-4 h-4" />
                   Assess another system
                 </Button>
+                <CopyMarkdownButton
+                  toolName="Compliance Checker"
+                  filename={`ai-act-assessment-${new Date().toISOString().slice(0, 10)}.md`}
+                  getMarkdown={() => complianceCheckerMarkdown(result, answers, assessmentQuestions)}
+                />
               </div>
             </motion.div>
           )}

@@ -2,7 +2,10 @@
 // Geopolitical scenarios aligned with "Scenario-Based Drift Modelling" methodology.
 
 import type {
+  BoardBrief,
+  ExposureDependency,
   ExposureProfile,
+  ExposureSector,
   FrictionLevel,
   Scenario,
   SectorImpact,
@@ -516,6 +519,75 @@ export function getExposureBand(multiplier: number): 'Low' | 'Moderate' | 'Eleva
   if (multiplier >= 1.15) return 'Elevated'
   if (multiplier >= 0.9) return 'Moderate'
   return 'Low'
+}
+
+// Per-dependency overrides for the "first impact" line of the board brief.
+// Keeps the rest of the brief stable while making the chosen dependency feel
+// like it actually changes the read. Falls back to the scenario default.
+const DEPENDENCY_FIRST_IMPACT: Record<string, Partial<Record<ExposureDependency, string>>> = {
+  'taiwan-strait': {
+    'advanced-chips': 'Foundry allocation freezes on leading-edge logic; orders shift to long lead-time qualified alternates.',
+    'cloud-ai': 'Accelerator deliveries stall as logic, HBM, and advanced packaging cannot be recombined elsewhere quickly.',
+    'connected-products': 'Bill-of-materials gaps appear in connected and automotive electronics within one to two quarters.',
+    'regulated-ai': 'Customers escalate AI service-availability and continuity assurances tied to Taiwan-linked compute.',
+    'data-services': 'Hyperscaler capacity tightens around AI workloads; pricing and SLA negotiations harden.',
+  },
+  'us-export-controls': {
+    'advanced-chips': 'License delays and customer-eligibility reviews on advanced compute, HBM, and equipment.',
+    'cloud-ai': 'AI deployment, model-weight, and cloud-region exposure require fresh end-use and customer screening.',
+    'connected-products': 'Connected-product BOMs and aftermarket parts hit restricted-party and end-use friction.',
+    'regulated-ai': 'AI customer due-diligence and end-use review become a release-gate, not just a sales check.',
+    'data-services': 'Cloud, model, and analytics customer screening tightens; restricted-country exposure surfaces in audits.',
+  },
+  'eu-autonomy': {
+    'advanced-chips': 'Procurement demands proof that European resilience covers your actual node, package, and volume.',
+    'cloud-ai': 'Public procurement and customer assurance ask whether AI infrastructure is sovereign-eligible.',
+    'connected-products': 'Industrial and automotive buyers ask for evidence of European supply for control and power electronics.',
+    'regulated-ai': 'Regulated-AI customers ask whether the underlying stack is EU-sourced and audit-ready.',
+    'data-services': 'Sovereign-cloud and data-residency questions appear in tenders earlier than expected.',
+  },
+  'ai-act-enforcement': {
+    'regulated-ai': 'High-risk classification questions land first — from customers, partners, and procurement teams.',
+    'cloud-ai': 'GPAI documentation, transparency, and provider-vs-deployer evidence requests arrive from EU customers.',
+    'advanced-chips': 'Customer assurance for AI hardware now asks about Article 53 GPAI evidence, not only performance.',
+    'connected-products': 'Embedded AI in regulated products triggers conformity, technical-file, and post-market obligations.',
+    'data-services': 'AI Act overlay on data and analytics services creates new contractual evidence demands.',
+  },
+  'atlantic-bifurcation': {
+    'data-services': 'EU-US data transfer, residency, and lawful-access questions recur in every renewal cycle.',
+    'cloud-ai': 'EU cloud-sovereignty, AI safety, and procurement evidence demands force EU-specific control planes.',
+    'regulated-ai': 'AI safety, transparency, and governance demands diverge from US-style expectations in EU sales.',
+    'connected-products': 'Connected products face EU-specific consent, data-access, and update-management obligations.',
+    'advanced-chips': 'Hardware exports get caught in selective tariff and procurement bargaining despite framework deals.',
+  },
+}
+
+// Sector context line appended to the 90-day action so the brief feels tuned
+// without rewriting the whole scenario every time the lens changes.
+const SECTOR_CONTEXT: Partial<Record<ExposureSector, string>> = {
+  industrial: 'Treat industrial automation, controls, and power-electronics suppliers as the first ask.',
+  automotive: 'Frame the work around the BOM, tier-1 disclosure, and homologation calendar.',
+  'ai-cloud': 'Anchor the work on AI accelerator allocation, model assets, and cloud-region exposure.',
+  healthcare: 'Tie the work into MDR/IVDR evidence and clinical-risk governance, not only IT compliance.',
+  'financial-services': 'Run this through the model-risk, third-party, and regulatory-engagement governance you already have.',
+  'consumer-tech': 'Sequence around launch windows, channel partners, and content/transparency obligations.',
+}
+
+export function getAdjustedBoardBrief(
+  scenario: Scenario,
+  profile: ExposureProfile,
+): BoardBrief {
+  const firstImpact =
+    DEPENDENCY_FIRST_IMPACT[scenario.id]?.[profile.dependency] ?? scenario.boardBrief.firstImpact
+  const sectorContext = SECTOR_CONTEXT[profile.sector]
+  const ninetyDayAction = sectorContext
+    ? `${scenario.boardBrief.ninetyDayAction} ${sectorContext}`
+    : scenario.boardBrief.ninetyDayAction
+  return {
+    ...scenario.boardBrief,
+    firstImpact,
+    ninetyDayAction,
+  }
 }
 
 export function getAdjustedImpacts(

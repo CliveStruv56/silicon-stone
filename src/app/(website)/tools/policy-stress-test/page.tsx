@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Header, Footer } from '@/components/layout'
 import { EmailGateOverlay } from '@/components/tools/EmailGateOverlay'
+import { CopyMarkdownButton } from '@/components/tools/CopyMarkdownButton'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -19,6 +20,7 @@ import {
   PRIORITY_COLORS,
   JURISDICTION_COLORS,
 } from '@/lib/policy-data'
+import { policyStressTestMarkdown } from '@/lib/tools-markdown'
 import type { Policy, Jurisdiction, IndustryImpact } from '@/types/policy'
 import {
   Scale,
@@ -29,7 +31,106 @@ import {
   Building2,
   Globe,
   Gavel,
+  ShieldCheck,
+  ClipboardList,
+  ExternalLink,
+  Mail,
 } from 'lucide-react'
+
+const SIZE_CONTEXT = {
+  startup: {
+    label: 'Startup',
+    modifier: 0.4,
+    resourceNote: 'Keep the first pass narrow: one owner, one system inventory, counsel only for high-risk findings.',
+  },
+  sme: {
+    label: 'SME',
+    modifier: 0.2,
+    resourceNote: 'Assign a named policy owner and one operational owner so the response does not sit only with legal.',
+  },
+  enterprise: {
+    label: 'Enterprise',
+    modifier: 0.7,
+    resourceNote: 'Expect cross-functional governance: legal, product, security, procurement, and regional business owners.',
+  },
+} as const
+
+function clampScore(score: number) {
+  return Math.min(10, Math.max(0, Math.round(score * 10) / 10))
+}
+
+function getFrictionBand(score: number) {
+  if (score >= 7.5) return { label: 'High friction', tone: 'text-alert-red', summary: 'Requires executive visibility and a dated remediation plan.' }
+  if (score >= 4.5) return { label: 'Material friction', tone: 'text-silicon-amber', summary: 'Needs a coordinated policy, product, and operations workstream.' }
+  if (score > 0) return { label: 'Manageable friction', tone: 'text-stone-teal', summary: 'Useful for early triage, vendor review, and monitoring.' }
+  return { label: 'No mapped exposure', tone: 'text-text-muted', summary: 'No industry-specific mapping is available for this policy pair.' }
+}
+
+// Named pressure-point for each EU x US policy pair. The point of the tool is
+// that the user gets a sentence they can take into an internal meeting; if we
+// fall back to generic text the whole feature undersells. Pairs are keyed by
+// `${euId}:${usId}`.
+const PRESSURE_POINTS: Record<string, { title: string; text: string }> = {
+  'eu-ai-act:us-export-controls': {
+    title: 'AI rollout meets compute controls',
+    text: 'EU obligations push toward inventory, risk classification, documentation, and human oversight while US controls can constrain advanced-chip access, China-facing deployments, support activity, and customer screening.',
+  },
+  'eu-ai-act:us-chips-act': {
+    title: 'Regulated AI on subsidised hardware',
+    text: 'AI Act risk classification and post-market obligations must coexist with CHIPS Act funding terms, China guardrails, and reporting duties on any fab, packaging, or compute partner that touches the regulated AI system.',
+  },
+  'gdpr:us-export-controls': {
+    title: 'Data governance meets national-security controls',
+    text: 'The operating risk is not one rule contradicting the other; it is fragmented evidence. Data lineage, user access, model training, customer screening, and restricted-country exposure need to be visible in one control file.',
+  },
+  'gdpr:us-chips-act': {
+    title: 'Personal-data architecture meets industrial-policy reporting',
+    text: 'GDPR demands lawful basis, transfer mechanisms, and clear data flows; CHIPS Act funding adds workforce, supply chain, and project reporting that can pull HR, supplier, and R&D data into US-government touchpoints.',
+  },
+  'eu-chips-act:us-export-controls': {
+    title: 'European fab access versus US controls reach',
+    text: 'EU Chips Act incentives target capacity expansion inside Europe, but US export controls and Foreign Direct Product rules can reach tooling, IP, and customer relationships inside that capacity. Treat US compliance as a precondition, not a separate workstream.',
+  },
+  'eu-chips-act:us-chips-act': {
+    title: 'Subsidy upside with guardrail risk',
+    text: 'Both regimes can support investment, but the practical question is whether incentives, reporting, and foreign-country guardrails fit the same fab, packaging, R&D, and customer strategy.',
+  },
+  'dma:us-export-controls': {
+    title: 'Gatekeeper obligations under national-security overlays',
+    text: 'DMA interoperability, self-preferencing, and data-portability duties intersect with US controls on which counterparties, models, and infrastructure can be supplied. Compliance design must satisfy openness obligations without breaching control regimes.',
+  },
+  'dma:us-chips-act': {
+    title: 'Open-by-default platform meets industrial-policy partner',
+    text: 'DMA pushes gatekeepers toward openness, interoperability, and fairness for business users; CHIPS Act-funded partners and projects can carry security, reporting, and audit obligations that constrain which integrations and infrastructure choices are realistic.',
+  },
+  'eu-data-act:us-export-controls': {
+    title: 'Data access obligation meets export-control gatekeeping',
+    text: 'EU Data Act forces connected-product manufacturers to make user-generated data accessible to users, third parties, and aftermarket actors. US controls can restrict which of those recipients you can serve. Map third-party access requests against restricted-party screening before changing contracts.',
+  },
+  'eu-data-act:us-chips-act': {
+    title: 'Industrial data sharing meets funded-project boundaries',
+    text: 'EU Data Act pushes industrial and connected-product data outward to users and ecosystem partners; CHIPS Act-funded operations can have security, IP, and disclosure constraints. The architectural question is which datasets sit on which side of that line.',
+  },
+}
+
+function getPressurePoint(euPolicy?: Policy, usPolicy?: Policy) {
+  const pair = `${euPolicy?.id || ''}:${usPolicy?.id || ''}`
+  return PRESSURE_POINTS[pair] ?? {
+    title: 'Parallel compliance workstreams',
+    text: 'The main value is sequencing: identify what evidence can satisfy both regimes, what requires jurisdiction-specific treatment, and which actions should be handled before product, customer, or supplier commitments harden.',
+  }
+}
+
+function getEvidenceChecklist(euImpact?: IndustryImpact, usImpact?: IndustryImpact) {
+  const requirements = [...(euImpact?.requirements || []), ...(usImpact?.requirements || [])]
+  const defaults = [
+    'Product and service inventory by market',
+    'Customer, supplier, and restricted-country exposure',
+    'Named owner for each high-friction requirement',
+  ]
+
+  return [...requirements.slice(0, 4), ...defaults].slice(0, 6)
+}
 
 // Friction gauge component
 function FrictionGauge({ score, label }: { score: number; label: string }) {
@@ -157,10 +258,21 @@ function PolicyCard({
         )}
 
         <div className="pt-3 border-t border-border-subtle">
-          <div className="flex items-center gap-2 text-xs text-text-muted">
+          <div className="flex items-center gap-2 text-xs text-text-muted mb-2">
             <Gavel className="w-3 h-3" />
             <span>Penalty: {policy.penaltyRange}</span>
           </div>
+          {policy.sourceUrl && (
+            <a
+              href={policy.sourceUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 text-xs text-stone-teal hover:text-stone-teal/80"
+            >
+              {policy.sourceLabel || 'Official source'}
+              <ExternalLink className="w-3 h-3" />
+            </a>
+          )}
         </div>
       </CardContent>
     </Card>
@@ -197,6 +309,15 @@ export default function PolicyStressTestPage() {
     [selectedEuPolicy, selectedUsPolicy, selectedIndustry]
   )
 
+  const adjustedFriction = useMemo(
+    () => clampScore(combinedFriction + SIZE_CONTEXT[selectedSize as keyof typeof SIZE_CONTEXT].modifier),
+    [combinedFriction, selectedSize]
+  )
+
+  const frictionBand = useMemo(() => getFrictionBand(adjustedFriction), [adjustedFriction])
+  const pressurePoint = useMemo(() => getPressurePoint(euPolicy, usPolicy), [euPolicy, usPolicy])
+  const evidenceChecklist = useMemo(() => getEvidenceChecklist(euImpact, usImpact), [euImpact, usImpact])
+
   // Combine and prioritize actions
   const allActions = useMemo(() => {
     const actions = [
@@ -211,18 +332,24 @@ export default function PolicyStressTestPage() {
 
   const handleAnalyze = () => {
     if (selectedIndustry) {
-      if (isUnlocked) {
-        setShowResults(true)
-      } else {
-        setShowGate(true)
-      }
+      // Result is free to view. The gate now only protects the printable
+      // brief / email export — see handleRequestEmailBrief.
+      setShowResults(true)
+    }
+  }
+
+  const handleRequestEmailBrief = () => {
+    if (isUnlocked) {
+      window.print()
+    } else {
+      setShowGate(true)
     }
   }
 
   const handleGateUnlock = () => {
     setIsUnlocked(true)
     setShowGate(false)
-    setShowResults(true)
+    setTimeout(() => window.print(), 200)
   }
 
   return (
@@ -254,8 +381,8 @@ export default function PolicyStressTestPage() {
                 <Building2 className="w-5 h-5 text-stone-teal" />
                 Configure Your Context
               </CardTitle>
-              <CardDescription>
-                Select your industry and the policies to analyse
+            <CardDescription>
+                Select your industry and the policies to analyse. Results are a triage brief, not legal advice.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -362,16 +489,30 @@ export default function PolicyStressTestPage() {
               </div>
 
               {/* Analyze Button */}
-              <Button
-                onClick={handleAnalyze}
-                disabled={!selectedIndustry}
-                className="w-full bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90 disabled:opacity-50"
-              >
+                <Button
+                  onClick={handleAnalyze}
+                  disabled={!selectedIndustry}
+                  className="w-full bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90 disabled:opacity-50"
+                >
                 <Scale className="w-4 h-4 mr-2" />
                 Analyze Compliance Friction
               </Button>
             </CardContent>
           </Card>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            {[
+              { icon: ShieldCheck, title: 'What it tests', copy: 'Whether policy exposure is low-level monitoring, a real compliance workstream, or a board-level operational constraint.' },
+              { icon: ClipboardList, title: 'What you get', copy: 'A friction score, source-backed policy context, evidence checklist, and time-boxed action plan.' },
+              { icon: Scale, title: 'Why it adds value', copy: 'It turns regulatory drift into decisions about owners, documents, product scope, vendors, and regional exposure.' },
+            ].map(item => (
+              <div key={item.title} className="bg-stone-charcoal border border-border-subtle rounded-lg p-4">
+                <item.icon className="w-5 h-5 text-stone-teal mb-3" />
+                <h3 className="text-sm font-semibold text-text-primary mb-1">{item.title}</h3>
+                <p className="text-sm text-text-muted">{item.copy}</p>
+              </div>
+            ))}
+          </div>
 
           {/* Results */}
           <AnimatePresence>
@@ -385,25 +526,75 @@ export default function PolicyStressTestPage() {
                 {/* Friction Summary */}
                 <Card className="bg-stone-charcoal border-border-subtle">
                   <CardHeader>
-                    <CardTitle className="text-lg text-text-primary flex items-center gap-2">
-                      <AlertTriangle className="w-5 h-5 text-silicon-amber" />
-                      Friction Analysis: {selectedIndustry}
-                    </CardTitle>
+                    <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                      <div>
+                        <CardTitle className="text-lg text-text-primary flex items-center gap-2">
+                          <AlertTriangle className="w-5 h-5 text-silicon-amber" />
+                          Decision Brief: {selectedIndustry}
+                        </CardTitle>
+                        <CardDescription className="mt-2">
+                          {SIZE_CONTEXT[selectedSize as keyof typeof SIZE_CONTEXT].label} operating profile. Sources reviewed {euPolicy?.lastReviewed || 'recently'}.
+                        </CardDescription>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <CopyMarkdownButton
+                          toolName="Policy Stress-Test"
+                          filename={`policy-stress-test-${new Date().toISOString().slice(0, 10)}.md`}
+                          getMarkdown={() => policyStressTestMarkdown({
+                            industry: selectedIndustry,
+                            size: SIZE_CONTEXT[selectedSize as keyof typeof SIZE_CONTEXT].label,
+                            euPolicy,
+                            usPolicy,
+                            euImpact,
+                            usImpact,
+                            adjustedFriction,
+                            frictionBand,
+                            pressurePoint,
+                            sizeNote: SIZE_CONTEXT[selectedSize as keyof typeof SIZE_CONTEXT].resourceNote,
+                            actions: allActions,
+                            evidenceChecklist,
+                          })}
+                        />
+                        <Button
+                          variant="outline"
+                          onClick={handleRequestEmailBrief}
+                          className="border-silicon-amber text-silicon-amber hover:bg-silicon-amber/10"
+                        >
+                          <Mail className="w-4 h-4 mr-2" />
+                          Email me the brief
+                        </Button>
+                      </div>
+                    </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center mb-8">
                       <FrictionGauge
                         score={euImpact?.frictionScore || 0}
                         label="EU Friction"
                       />
                       <FrictionGauge
-                        score={combinedFriction}
-                        label="Combined Friction"
+                        score={adjustedFriction}
+                        label="Execution-Adjusted Friction"
                       />
                       <FrictionGauge
                         score={usImpact?.frictionScore || 0}
                         label="US Friction"
                       />
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                      <div className="bg-surface-elevated border border-border-subtle rounded-lg p-4">
+                        <div className={`text-sm font-semibold mb-1 ${frictionBand.tone}`}>{frictionBand.label}</div>
+                        <p className="text-sm text-text-muted">{frictionBand.summary}</p>
+                      </div>
+                      <div className="bg-surface-elevated border border-border-subtle rounded-lg p-4">
+                        <div className="text-sm font-semibold text-text-primary mb-1">{pressurePoint.title}</div>
+                        <p className="text-sm text-text-muted">{pressurePoint.text}</p>
+                      </div>
+                      <div className="bg-surface-elevated border border-border-subtle rounded-lg p-4">
+                        <div className="text-sm font-semibold text-text-primary mb-1">Size adjustment</div>
+                        <p className="text-sm text-text-muted">{SIZE_CONTEXT[selectedSize as keyof typeof SIZE_CONTEXT].resourceNote}</p>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -478,6 +669,30 @@ export default function PolicyStressTestPage() {
                   </Card>
                 )}
 
+                <Card className="bg-stone-charcoal border-border-subtle">
+                  <CardHeader>
+                    <CardTitle className="text-lg text-text-primary flex items-center gap-2">
+                      <ClipboardList className="w-5 h-5 text-stone-teal" />
+                      Evidence to Gather Before Spending Money
+                    </CardTitle>
+                    <CardDescription>
+                      Use this as the first internal checklist before commissioning external legal or technical work.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {evidenceChecklist.map((item, idx) => (
+                        <div key={`${item}-${idx}`} className="flex items-start gap-3 rounded-lg border border-border-subtle bg-surface-elevated p-3">
+                          <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-stone-teal/15 text-xs font-semibold text-stone-teal">
+                            {idx + 1}
+                          </span>
+                          <span className="text-sm text-text-primary">{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
                 {/* CTA */}
                 <div className="flex justify-center pt-6">
                   <Link href="/services#contact">
@@ -499,7 +714,7 @@ export default function PolicyStressTestPage() {
         onUnlock={handleGateUnlock}
         onDismiss={() => setShowGate(false)}
         toolName="Policy Stress-Test"
-        resultLabel="your friction analysis"
+        resultLabel="the printable brief"
       />
     </div>
   )
