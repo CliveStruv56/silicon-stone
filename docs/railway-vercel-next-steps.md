@@ -151,6 +151,7 @@ Add or update this environment variable:
 
 ```text
 NEXT_PUBLIC_API_URL=https://YOUR-RAILWAY-BACKEND-DOMAIN
+BACKEND_API_URL=https://YOUR-RAILWAY-BACKEND-DOMAIN
 ```
 
 Use the public Railway URL from step 5.

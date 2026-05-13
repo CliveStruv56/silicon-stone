@@ -35,7 +35,39 @@ interface Article {
   [key: string]: unknown
 }
 
+function getBackendApiUrl() {
+  const value = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_API_URL || ''
+  return value.replace(/\/$/, '')
+}
+
+async function fetchRailwayBriefings() {
+  const backendApiUrl = getBackendApiUrl()
+  if (!backendApiUrl) return null
+
+  try {
+    const response = await fetch(`${backendApiUrl}/v1/briefings`, {
+      headers: { Accept: 'application/json' },
+      cache: 'no-store',
+    })
+
+    if (!response.ok) {
+      console.error('Railway briefings proxy error:', response.status, await response.text())
+      return null
+    }
+
+    return response.json()
+  } catch (error) {
+    console.error('Railway briefings proxy failed:', error)
+    return null
+  }
+}
+
 export async function GET() {
+  const railwayData = await fetchRailwayBriefings()
+  if (railwayData) {
+    return NextResponse.json(railwayData)
+  }
+
   try {
     const articles: Article[] = await client.fetch(BRIEFINGS_QUERY)
 
