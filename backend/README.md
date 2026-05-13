@@ -27,6 +27,12 @@ Migrated category route:
 curl http://localhost:8000/v1/categories
 ```
 
+Migrated briefings route:
+
+```bash
+curl http://localhost:8000/v1/briefings
+```
+
 ## Railway Settings
 
 - Root Directory: `/backend`
@@ -41,7 +47,7 @@ example:
 ALLOWED_ORIGINS=https://siliconandstone.com,https://silicon-and-stone.vercel.app
 ```
 
-The `/v1/categories` route also needs the Sanity public project variables:
+The `/v1/categories` and `/v1/briefings` routes also need the Sanity public project variables:
 
 ```text
 NEXT_PUBLIC_SANITY_PROJECT_ID=your_sanity_project_id

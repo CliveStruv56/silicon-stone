@@ -240,8 +240,10 @@ export default function BriefingsPage() {
 
     async function fetchArticles() {
       try {
-        // Fetch from internal API route (avoids exposing Sanity credentials)
-        const response = await fetch('/api/briefings', {
+        const briefingsUrl = process.env.NEXT_PUBLIC_API_URL
+          ? `${process.env.NEXT_PUBLIC_API_URL}/v1/briefings`
+          : '/api/briefings'
+        const response = await fetch(briefingsUrl, {
           signal: controller.signal,
         })
         const data = await response.json()

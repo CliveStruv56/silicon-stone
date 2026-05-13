@@ -14,6 +14,26 @@ SANITY_CATEGORIES_QUERY = """*[_type == "category"] | order(title asc) {
   "slug": slug.current
 }"""
 
+SANITY_BRIEFINGS_QUERY = """*[_type == "article" && defined(slug.current)]
+| order(coalesce(impactScore, 5) desc, publishedAt desc) [0...20] {
+  _id,
+  title,
+  "slug": slug.current,
+  excerpt,
+  stoneTruth,
+  impactScore,
+  intelligenceTier,
+  publishedAt,
+  personas,
+  methodologyPillars,
+  mainImage,
+  categories[]->{
+    _id,
+    title,
+    "slug": slug.current
+  }
+}"""
+
 
 class ServiceRoute(BaseModel):
     app: str
@@ -43,6 +63,46 @@ def _sanity_env() -> tuple[str, str, str, str | None]:
         raise HTTPException(status_code=503, detail="Sanity project is not configured")
 
     return project_id, dataset, api_version, token
+
+
+def _sanity_query(query: str) -> Any:
+    project_id, dataset, api_version, token = _sanity_env()
+    headers = {"Authorization": f"Bearer {token}"} if token else {}
+    url = f"https://{project_id}.api.sanity.io/v{api_version}/data/query/{dataset}"
+
+    try:
+        response = httpx.get(
+            url,
+            params={"query": query},
+            headers=headers,
+            timeout=10,
+        )
+        response.raise_for_status()
+    except httpx.HTTPStatusError as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Sanity returned {exc.response.status_code}",
+        ) from exc
+    except httpx.HTTPError as exc:
+        raise HTTPException(status_code=502, detail="Sanity request failed") from exc
+
+    return response.json().get("result", [])
+
+
+def _sanity_image_url(image: dict[str, Any] | None, width: int = 800, height: int = 450) -> str | None:
+    project_id, dataset, _, _ = _sanity_env()
+    asset_ref = image.get("asset", {}).get("_ref") if image else None
+    if not isinstance(asset_ref, str) or not asset_ref.startswith("image-"):
+        return None
+
+    parts = asset_ref.split("-")
+    if len(parts) < 4:
+        return None
+
+    asset_id = parts[1]
+    dimensions = parts[2]
+    extension = parts[3]
+    return f"https://cdn.sanity.io/images/{project_id}/{dataset}/{asset_id}-{dimensions}.{extension}?w={width}&h={height}"
 
 
 service_routes = [
@@ -116,32 +176,26 @@ def topology() -> list[ServiceRoute]:
 
 @app.get("/v1/categories", response_model=list[Category])
 def categories() -> list[Category]:
-    project_id, dataset, api_version, token = _sanity_env()
-    headers = {"Authorization": f"Bearer {token}"} if token else {}
-    url = f"https://{project_id}.api.sanity.io/v{api_version}/data/query/{dataset}"
-
-    try:
-        response = httpx.get(
-            url,
-            params={"query": SANITY_CATEGORIES_QUERY},
-            headers=headers,
-            timeout=10,
-        )
-        response.raise_for_status()
-    except httpx.HTTPStatusError as exc:
-        raise HTTPException(
-            status_code=502,
-            detail=f"Sanity returned {exc.response.status_code}",
-        ) from exc
-    except httpx.HTTPError as exc:
-        raise HTTPException(status_code=502, detail="Sanity request failed") from exc
-
-    result = response.json().get("result", [])
+    result = _sanity_query(SANITY_CATEGORIES_QUERY)
     return [
         Category(id=item.get("_id", ""), title=item.get("title", ""), slug=item.get("slug", ""))
         for item in result
         if item.get("_id") and item.get("title") and item.get("slug")
     ]
+
+
+@app.get("/v1/briefings")
+def briefings() -> dict[str, list[dict[str, Any]]]:
+    articles = _sanity_query(SANITY_BRIEFINGS_QUERY)
+    articles_with_images = [
+        {
+            **article,
+            "mainImageUrl": _sanity_image_url(article.get("mainImage")),
+        }
+        for article in articles
+        if isinstance(article, dict)
+    ]
+    return {"result": articles_with_images}
 
 
 @app.post("/v1/hermes/events")
