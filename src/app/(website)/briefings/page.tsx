@@ -35,6 +35,18 @@ interface Article {
   }>
 }
 
+type BriefingsResponse = Article[] | {
+  result?: Article[]
+}
+
+async function fetchBriefings(url: string, signal: AbortSignal): Promise<BriefingsResponse> {
+  const response = await fetch(url, { signal })
+  if (!response.ok) {
+    throw new Error(`Briefings request failed with ${response.status}`)
+  }
+  return response.json()
+}
+
 function formatDate(dateString: string) {
   return new Date(dateString).toLocaleDateString('en-US', {
     month: 'short',
@@ -243,11 +255,21 @@ export default function BriefingsPage() {
         const briefingsUrl = process.env.NEXT_PUBLIC_API_URL
           ? `${process.env.NEXT_PUBLIC_API_URL}/v1/briefings`
           : '/api/briefings'
-        const response = await fetch(briefingsUrl, {
-          signal: controller.signal,
-        })
-        const data = await response.json()
-        setArticles(data.result || [])
+        const data = await fetchBriefings(briefingsUrl, controller.signal)
+        const nextArticles = Array.isArray(data) ? data : data.result
+
+        if (nextArticles?.length) {
+          setArticles(nextArticles)
+          return
+        }
+
+        if (briefingsUrl !== '/api/briefings') {
+          const fallbackData = await fetchBriefings('/api/briefings', controller.signal)
+          setArticles(Array.isArray(fallbackData) ? fallbackData : fallbackData.result || [])
+          return
+        }
+
+        setArticles([])
       } catch (error) {
         if (error instanceof Error && error.name !== 'AbortError') {
           console.error('Failed to fetch articles:', error)

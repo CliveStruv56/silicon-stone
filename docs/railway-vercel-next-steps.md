@@ -68,7 +68,7 @@ The committed `backend/railway.json` already contains that command, so Railway s
 In the Railway backend service variables, add:
 
 ```text
-ALLOWED_ORIGINS=https://siliconandstone.com,https://YOUR-VERCEL-PREVIEW-OR-PRODUCTION-DOMAIN
+ALLOWED_ORIGINS=https://siliconandstone.com,https://www.siliconandstone.com,https://YOUR-VERCEL-PREVIEW-OR-PRODUCTION-DOMAIN
 ENABLE_API_DOCS=false
 NEXT_PUBLIC_SANITY_PROJECT_ID=your_sanity_project_id
 NEXT_PUBLIC_SANITY_DATASET=production
@@ -78,7 +78,7 @@ NEXT_PUBLIC_SANITY_API_VERSION=2026-01-13
 For the first test, you can temporarily include localhost:
 
 ```text
-ALLOWED_ORIGINS=http://localhost:3000,https://siliconandstone.com,https://YOUR-VERCEL-DOMAIN
+ALLOWED_ORIGINS=http://localhost:3000,https://siliconandstone.com,https://www.siliconandstone.com,https://YOUR-VERCEL-DOMAIN
 ```
 
 Later, remove origins you do not need.
