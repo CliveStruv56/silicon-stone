@@ -15,7 +15,7 @@ Last updated: 2026-05-13
 ## What Is Done Locally
 
 - Added `backend/` as an isolated Railway service.
-- Added `backend/railway.json` with Nixpacks, IPv6-compatible binding via `--host ::`, and `/health` checks.
+- Added `backend/railway.json` with Nixpacks, IPv4-compatible binding via `--host 0.0.0.0`, and `/health` checks.
 - Added FastAPI endpoints:
   - `GET /health`
   - `GET /v1/topology`
