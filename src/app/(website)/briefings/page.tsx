@@ -39,6 +39,10 @@ type BriefingsResponse = Article[] | {
   result?: Article[]
 }
 
+function getBriefingArticles(data: BriefingsResponse): Article[] {
+  return Array.isArray(data) ? data : data.result || []
+}
+
 async function fetchBriefings(url: string, signal: AbortSignal): Promise<BriefingsResponse> {
   const response = await fetch(url, { signal })
   if (!response.ok) {
@@ -251,21 +255,23 @@ export default function BriefingsPage() {
     const controller = new AbortController()
 
     async function fetchArticles() {
+      const fallbackUrl = '/api/briefings'
+      const briefingsUrl = process.env.NEXT_PUBLIC_API_URL
+        ? `${process.env.NEXT_PUBLIC_API_URL}/v1/briefings`
+        : fallbackUrl
+
       try {
-        const briefingsUrl = process.env.NEXT_PUBLIC_API_URL
-          ? `${process.env.NEXT_PUBLIC_API_URL}/v1/briefings`
-          : '/api/briefings'
         const data = await fetchBriefings(briefingsUrl, controller.signal)
-        const nextArticles = Array.isArray(data) ? data : data.result
+        const nextArticles = getBriefingArticles(data)
 
         if (nextArticles?.length) {
           setArticles(nextArticles)
           return
         }
 
-        if (briefingsUrl !== '/api/briefings') {
-          const fallbackData = await fetchBriefings('/api/briefings', controller.signal)
-          setArticles(Array.isArray(fallbackData) ? fallbackData : fallbackData.result || [])
+        if (briefingsUrl !== fallbackUrl) {
+          const fallbackData = await fetchBriefings(fallbackUrl, controller.signal)
+          setArticles(getBriefingArticles(fallbackData))
           return
         }
 
@@ -273,6 +279,18 @@ export default function BriefingsPage() {
       } catch (error) {
         if (error instanceof Error && error.name !== 'AbortError') {
           console.error('Failed to fetch articles:', error)
+
+          if (briefingsUrl !== fallbackUrl) {
+            try {
+              const fallbackData = await fetchBriefings(fallbackUrl, controller.signal)
+              setArticles(getBriefingArticles(fallbackData))
+            } catch (fallbackError) {
+              if (fallbackError instanceof Error && fallbackError.name !== 'AbortError') {
+                console.error('Failed to fetch fallback articles:', fallbackError)
+              }
+              setArticles([])
+            }
+          }
         }
       } finally {
         setLoading(false)
