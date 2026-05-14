@@ -41,6 +41,14 @@ curl -X POST http://localhost:8000/v1/subscribe \
   -d '{"email":"test@example.com","tag":"Tool_Lead"}'
 ```
 
+Migrated contact route:
+
+```bash
+curl -X POST http://localhost:8000/v1/contact \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Test User","email":"test@example.com","company":"Example Ltd","interest":"AI governance","message":"Please contact me."}'
+```
+
 ## Railway Settings
 
 - Root Directory: `/backend`
@@ -73,3 +81,5 @@ CONVERTKIT_FORM_ID=your_kit_form_id
 CONVERTKIT_TOOL_LEAD_TAG_ID=your_tool_lead_tag_id
 CONVERTKIT_WAYMARKPATH_TAG_ID=your_waymarkpath_tag_id
 ```
+
+The `/v1/contact` route also uses `CONVERTKIT_CONTACT_TAG_ID` when configured.

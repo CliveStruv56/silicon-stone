@@ -93,6 +93,7 @@ CONVERTKIT_API_KEY=your_kit_api_key
 CONVERTKIT_FORM_ID=your_kit_form_id
 CONVERTKIT_TOOL_LEAD_TAG_ID=your_tool_lead_tag_id
 CONVERTKIT_WAYMARKPATH_TAG_ID=your_waymarkpath_tag_id
+CONVERTKIT_CONTACT_TAG_ID=your_contact_tag_id
 ```
 
 ## 5. Generate A Public Railway Domain

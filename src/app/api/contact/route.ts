@@ -17,6 +17,46 @@ function normalizeField(value: unknown, maxLength: number): string {
   return value.trim().slice(0, maxLength);
 }
 
+function getBackendApiUrl() {
+  const value = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_API_URL || "";
+  return value.replace(/\/$/, "");
+}
+
+async function proxyContact(body: {
+  name: string;
+  email: string;
+  company: string;
+  interest: string;
+  message: string;
+}) {
+  const backendApiUrl = getBackendApiUrl();
+  if (!backendApiUrl) return null;
+
+  try {
+    const response = await fetch(`${backendApiUrl}/v1/contact`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(body),
+      cache: "no-store",
+    });
+
+    const responseBody = await response.json().catch(() => ({}));
+
+    if (response.status < 500) {
+      return NextResponse.json(responseBody, { status: response.status });
+    }
+
+    console.error("Railway contact proxy error:", response.status, responseBody);
+    return null;
+  } catch (error) {
+    console.error("Railway contact proxy failed:", error);
+    return null;
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const ip = getClientIp(request);
@@ -70,6 +110,11 @@ export async function POST(request: NextRequest) {
         { error: "Invalid email format" },
         { status: 400 }
       );
+    }
+
+    const railwayResponse = await proxyContact({ name, email, company, interest, message });
+    if (railwayResponse) {
+      return railwayResponse;
     }
 
     if (!KIT_API_KEY || !KIT_FORM_ID) {

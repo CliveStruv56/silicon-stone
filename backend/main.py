@@ -59,9 +59,24 @@ class SubscribeRequest(BaseModel):
     tag: str | None = None
 
 
+class ContactRequest(BaseModel):
+    name: str
+    email: str
+    company: str | None = None
+    interest: str | None = None
+    message: str | None = None
+
+
 RATE_LIMITS: dict[str, list[float]] = {}
 ALLOWED_SUBSCRIBE_TAGS = {"Tool_Lead", "WaymarkPath_Early_Access"}
 EMAIL_RE = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
+CONTACT_FIELD_LENGTHS = {
+    "name": 120,
+    "email": 254,
+    "company": 160,
+    "interest": 160,
+    "message": 2_000,
+}
 
 
 def _split_csv(value: str) -> list[str]:
@@ -91,6 +106,12 @@ def _kit_env() -> tuple[str, str]:
         raise HTTPException(status_code=503, detail="Newsletter service not configured")
 
     return api_key, form_id
+
+
+def _normalize_field(value: str | None, max_length: int) -> str:
+    if not isinstance(value, str):
+        return ""
+    return value.strip()[:max_length]
 
 
 def _sanity_env() -> tuple[str, str, str, str | None]:
@@ -304,6 +325,95 @@ def subscribe(payload: SubscribeRequest) -> dict[str, bool]:
             # The subscription succeeded; don't fail the user-visible request for tag issues.
             logger.exception("Kit tag assignment failed")
             pass
+
+    return {"success": True}
+
+
+@app.post("/v1/contact")
+def contact(payload: ContactRequest) -> dict[str, bool]:
+    name = _normalize_field(payload.name, CONTACT_FIELD_LENGTHS["name"])
+    email = _normalize_field(payload.email, CONTACT_FIELD_LENGTHS["email"]).lower()
+    company = _normalize_field(payload.company, CONTACT_FIELD_LENGTHS["company"])
+    interest = _normalize_field(payload.interest, CONTACT_FIELD_LENGTHS["interest"])
+    message = _normalize_field(payload.message, CONTACT_FIELD_LENGTHS["message"])
+
+    retry_after = _check_rate_limit(f"contact:{email}", limit=5, window_seconds=15 * 60)
+    if retry_after is not None:
+        raise HTTPException(
+            status_code=429,
+            detail="Too many requests",
+            headers={"Retry-After": str(retry_after)},
+        )
+
+    if not email:
+        raise HTTPException(status_code=400, detail="Email is required")
+
+    if not name:
+        raise HTTPException(status_code=400, detail="Name is required")
+
+    if not EMAIL_RE.match(email):
+        raise HTTPException(status_code=400, detail="Invalid email format")
+
+    api_key, form_id = _kit_env()
+    headers = {
+        "Content-Type": "application/json",
+        "X-Kit-Api-Key": api_key,
+    }
+
+    try:
+        create_response = httpx.post(
+            "https://api.kit.com/v4/subscribers",
+            headers=headers,
+            json={
+                "first_name": name,
+                "email_address": email,
+                "fields": {
+                    "company": company,
+                    "interest": interest,
+                    "message": message,
+                    "source": "services-contact-form",
+                },
+            },
+            timeout=10,
+        )
+        create_response.raise_for_status()
+    except httpx.HTTPStatusError as exc:
+        logger.error(
+            "Kit contact create failed: status=%s body=%s",
+            exc.response.status_code,
+            exc.response.text[:500],
+        )
+        raise HTTPException(
+            status_code=502,
+            detail=f"Kit returned {exc.response.status_code}",
+        ) from exc
+    except httpx.HTTPError as exc:
+        logger.error("Kit contact create request failed: %s", exc)
+        raise HTTPException(status_code=502, detail="Kit request failed") from exc
+
+    subscriber_id = create_response.json().get("subscriber", {}).get("id")
+    if subscriber_id:
+        try:
+            httpx.post(
+                f"https://api.kit.com/v4/forms/{form_id}/subscribers/{subscriber_id}",
+                headers=headers,
+                json={},
+                timeout=10,
+            ).raise_for_status()
+        except httpx.HTTPError:
+            logger.exception("Kit contact form assignment failed")
+
+        tag_id = os.getenv("CONVERTKIT_CONTACT_TAG_ID")
+        if tag_id:
+            try:
+                httpx.post(
+                    f"https://api.kit.com/v4/tags/{tag_id}/subscribers/{subscriber_id}",
+                    headers=headers,
+                    json={},
+                    timeout=10,
+                ).raise_for_status()
+            except httpx.HTTPError:
+                logger.exception("Kit contact tag assignment failed")
 
     return {"success": True}
 
