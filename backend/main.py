@@ -7,6 +7,7 @@ from typing import Any
 import httpx
 from fastapi import FastAPI
 from fastapi import HTTPException
+from fastapi import Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -106,6 +107,16 @@ def _kit_env() -> tuple[str, str]:
         raise HTTPException(status_code=503, detail="Newsletter service not configured")
 
     return api_key, form_id
+
+
+def _require_backend_api_key(request: Request) -> None:
+    expected_key = os.getenv("BACKEND_API_KEY", "")
+    if not expected_key:
+        return
+
+    provided_key = request.headers.get("x-backend-api-key", "")
+    if provided_key != expected_key:
+        raise HTTPException(status_code=401, detail="Unauthorized")
 
 
 def _normalize_field(value: str | None, max_length: int) -> str:
@@ -260,7 +271,9 @@ def briefings() -> dict[str, list[dict[str, Any]]]:
 
 
 @app.post("/v1/subscribe")
-def subscribe(payload: SubscribeRequest) -> dict[str, bool]:
+def subscribe(payload: SubscribeRequest, request: Request) -> dict[str, bool]:
+    _require_backend_api_key(request)
+
     email = payload.email.strip()[:254].lower() if isinstance(payload.email, str) else ""
     tag = payload.tag if payload.tag in ALLOWED_SUBSCRIBE_TAGS else None
 
@@ -330,7 +343,9 @@ def subscribe(payload: SubscribeRequest) -> dict[str, bool]:
 
 
 @app.post("/v1/contact")
-def contact(payload: ContactRequest) -> dict[str, bool]:
+def contact(payload: ContactRequest, request: Request) -> dict[str, bool]:
+    _require_backend_api_key(request)
+
     name = _normalize_field(payload.name, CONTACT_FIELD_LENGTHS["name"])
     email = _normalize_field(payload.email, CONTACT_FIELD_LENGTHS["email"]).lower()
     company = _normalize_field(payload.company, CONTACT_FIELD_LENGTHS["company"])

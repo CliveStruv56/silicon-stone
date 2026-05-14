@@ -162,9 +162,13 @@ Add or update this environment variable:
 ```text
 NEXT_PUBLIC_API_URL=https://YOUR-RAILWAY-BACKEND-DOMAIN
 BACKEND_API_URL=https://YOUR-RAILWAY-BACKEND-DOMAIN
+BACKEND_API_KEY=long_random_shared_secret
 ```
 
 Use the public Railway URL from step 5.
+Set the same `BACKEND_API_KEY` value in Railway and Vercel. It protects write
+routes while leaving public read routes such as `/v1/categories` and
+`/v1/briefings` open.
 
 Then redeploy the Vercel project.
 

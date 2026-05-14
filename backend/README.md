@@ -56,6 +56,9 @@ curl -X POST http://localhost:8000/v1/contact \
 - Public health check: `/health`
 - Start command: handled by `backend/railway.json`
 
+Set `BACKEND_API_KEY` in Railway and Vercel to the same long random value to
+protect write endpoints such as `/v1/subscribe` and `/v1/contact`.
+
 Set `ALLOWED_ORIGINS` to a comma-separated list of Vercel frontend origins, for
 example:
 

@@ -11,6 +11,19 @@ function getBackendApiUrl() {
   return value.replace(/\/$/, "");
 }
 
+function getBackendHeaders() {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  };
+
+  if (process.env.BACKEND_API_KEY) {
+    headers["X-Backend-Api-Key"] = process.env.BACKEND_API_KEY;
+  }
+
+  return headers;
+}
+
 async function proxySubscribe(body: { email: string; tag?: string }) {
   const backendApiUrl = getBackendApiUrl();
   if (!backendApiUrl) return null;
@@ -18,10 +31,7 @@ async function proxySubscribe(body: { email: string; tag?: string }) {
   try {
     const response = await fetch(`${backendApiUrl}/v1/subscribe`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
+      headers: getBackendHeaders(),
       body: JSON.stringify(body),
       cache: "no-store",
     });
