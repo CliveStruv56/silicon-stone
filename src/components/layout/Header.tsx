@@ -14,7 +14,6 @@ type Category = {
 type NavItem = {
   name: string
   href: string
-  primary?: boolean
   children?: { name: string; href: string }[]
 }
 
@@ -22,7 +21,6 @@ const staticNavigation = [
   {
     name: 'Briefings',
     href: '/briefings',
-    primary: true,
     children: [
       { name: 'All Intelligence', href: '/briefings' },
       { name: 'For Compliance', href: '/briefings?persona=clara' },
@@ -168,11 +166,7 @@ export function Header() {
                 href={item.href}
                 aria-current={isActive(item) ? 'page' : undefined}
                 className={`font-ui-mono transition-colors hover:text-text-primary ${
-                  isActive(item)
-                    ? 'text-silicon-cyan'
-                    : item.primary
-                      ? 'text-text-primary'
-                      : 'text-text-muted'
+                  isActive(item) ? 'text-silicon-cyan' : 'text-text-muted'
                 }`}
               >
                 {item.name}
@@ -227,11 +221,7 @@ export function Header() {
                   href={item.href}
                   aria-current={isActive(item) ? 'page' : undefined}
                   className={`block py-2 text-base font-medium hover:text-text-primary ${
-                    isActive(item)
-                      ? 'text-silicon-cyan'
-                      : item.primary
-                        ? 'text-text-primary'
-                        : 'text-text-muted'
+                    isActive(item) ? 'text-silicon-cyan' : 'text-text-muted'
                   }`}
                   onClick={() => setMobileMenuOpen(false)}
                 >
