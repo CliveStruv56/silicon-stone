@@ -1,6 +1,7 @@
 import os
 import re
 import time
+import logging
 from typing import Any
 
 import httpx
@@ -9,6 +10,8 @@ from fastapi import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
+
+logger = logging.getLogger("silicon_stone_api")
 
 SANITY_CATEGORIES_QUERY = """*[_type == "category"] | order(title asc) {
   _id,
@@ -269,11 +272,17 @@ def subscribe(payload: SubscribeRequest) -> dict[str, bool]:
         )
         response.raise_for_status()
     except httpx.HTTPStatusError as exc:
+        logger.error(
+            "Kit subscribe failed: status=%s body=%s",
+            exc.response.status_code,
+            exc.response.text[:500],
+        )
         raise HTTPException(
             status_code=502,
             detail=f"Kit returned {exc.response.status_code}",
         ) from exc
     except httpx.HTTPError as exc:
+        logger.error("Kit subscribe request failed: %s", exc)
         raise HTTPException(status_code=502, detail="Kit request failed") from exc
 
     tag_id_map = {
@@ -293,6 +302,7 @@ def subscribe(payload: SubscribeRequest) -> dict[str, bool]:
             ).raise_for_status()
         except httpx.HTTPError:
             # The subscription succeeded; don't fail the user-visible request for tag issues.
+            logger.exception("Kit tag assignment failed")
             pass
 
     return {"success": True}
