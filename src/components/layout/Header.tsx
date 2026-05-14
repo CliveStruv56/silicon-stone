@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 
@@ -13,7 +14,7 @@ type Category = {
 type NavItem = {
   name: string
   href: string
-  highlight?: boolean
+  primary?: boolean
   children?: { name: string; href: string }[]
 }
 
@@ -21,7 +22,7 @@ const staticNavigation = [
   {
     name: 'Briefings',
     href: '/briefings',
-    highlight: true,  // Mark as primary
+    primary: true,
     children: [
       { name: 'All Intelligence', href: '/briefings' },
       { name: 'For Compliance', href: '/briefings?persona=clara' },
@@ -66,6 +67,18 @@ const staticNavigation = [
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [categories, setCategories] = useState<Category[]>([])
+  const pathname = usePathname()
+
+  const matchesHref = (href: string) => {
+    const path = href.split('?')[0]
+    if (path === '/') return pathname === '/'
+    return pathname === path || pathname.startsWith(`${path}/`)
+  }
+
+  const isActive = (item: NavItem) => {
+    if (matchesHref(item.href)) return true
+    return item.children?.some((child) => matchesHref(child.href)) ?? false
+  }
 
   // Fetch categories on mount
   useEffect(() => {
@@ -153,10 +166,13 @@ export function Header() {
             <div key={item.name} className="relative group">
               <Link
                 href={item.href}
+                aria-current={isActive(item) ? 'page' : undefined}
                 className={`font-ui-mono transition-colors hover:text-text-primary ${
-                  item.highlight
+                  isActive(item)
                     ? 'text-silicon-cyan'
-                    : 'text-text-muted'
+                    : item.primary
+                      ? 'text-text-primary'
+                      : 'text-text-muted'
                 }`}
               >
                 {item.name}
@@ -205,11 +221,18 @@ export function Header() {
       {mobileMenuOpen && (
         <div className="lg:hidden">
           <div className="space-y-1 px-6 pb-4 pt-2">
-            {navigation.map((item) => (
+            {navigation.map((item: NavItem) => (
               <div key={item.name}>
                 <Link
                   href={item.href}
-                  className="block py-2 text-base font-medium text-text-muted hover:text-text-primary"
+                  aria-current={isActive(item) ? 'page' : undefined}
+                  className={`block py-2 text-base font-medium hover:text-text-primary ${
+                    isActive(item)
+                      ? 'text-silicon-cyan'
+                      : item.primary
+                        ? 'text-text-primary'
+                        : 'text-text-muted'
+                  }`}
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {item.name}
