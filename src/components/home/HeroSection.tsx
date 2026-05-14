@@ -38,7 +38,7 @@ const HERO_OVERLAY_BACKGROUND = `
     linear-gradient(to right,
         rgba(11,17,23,0.50) 0%,
         rgba(11,17,23,0.18) 32%,
-        rgba(11,17,23,0.62) 60%,
+        rgba(11,17,23,0.70) 60%,
         rgba(11,17,23,0.95) 100%
     ),
     linear-gradient(to top,
@@ -113,9 +113,9 @@ export function HeroSection({ settings }: HeroSectionProps) {
                         <motion.div variants={itemVariants}>
                             <Badge
                                 variant="outline"
-                                className="mb-8 border-silicon-amber/60 text-silicon-amber font-mono text-[11px] tracking-[0.10em] uppercase bg-silicon-amber/5"
+                                className="mb-8 rounded-md border-silicon-amber bg-silicon-amber/14 px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.10em] text-silicon-amber shadow-[0_0_0_1px_rgba(246,173,85,0.35),0_0_28px_rgba(246,173,85,0.20),0_12px_40px_rgba(0,0,0,0.35)] backdrop-blur-sm"
                             >
-                                Forensic Technopolitics · an Outer Orkney isle
+                                Forensic Technopolitics · the view from the edge
                             </Badge>
                         </motion.div>
 
@@ -145,7 +145,10 @@ export function HeroSection({ settings }: HeroSectionProps) {
 
                         <motion.p
                             variants={itemVariants}
-                            className="text-base text-text-muted leading-relaxed max-w-xl"
+                            className="max-w-xl text-base font-medium leading-relaxed text-text-primary/90"
+                            style={{
+                                textShadow: '0 2px 18px rgba(0, 0, 0, 0.65)',
+                            }}
                         >
                             {settings?.heroDescription ||
                                 'Calibrated, decision-grade analysis from someone who spent thirty years inside the industry. Published twice a week from an Outer Orkney isle — sixty miles north of mainland Scotland — because the view from the edge is structurally clearer than the view from any centre.'}
