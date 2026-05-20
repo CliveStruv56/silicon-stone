@@ -105,16 +105,18 @@ export const youtubeScript = defineType({
     defineField({
       name: 'methodologyChecklist',
       title: 'Methodology Checklist (15–30s)',
-      description: 'Which Forensic Technopolitics pillars are applied',
+      description: 'Which cells of the Forensic Technopolitics 3 × 2 matrix are applied (3 forensic domains × 2 analytical methods). Match the article-level methodologyPillars vocabulary.',
       type: 'array',
       group: 'structure',
       of: [defineArrayMember({ type: 'string' })],
       options: {
         list: [
-          { title: 'Supply Chain Forensics', value: 'supply-chain-forensics' },
-          { title: 'Policy Stress-Testing', value: 'policy-stress-testing' },
-          { title: 'Scenario Modelling', value: 'scenario-modeling' },
-          { title: 'Signal Filtering', value: 'signal-filtering' },
+          { title: 'Supply Chain × Scenario Modelling', value: 'supply-chain-scenario-modelling' },
+          { title: 'Supply Chain × Long-Memory Filter', value: 'supply-chain-long-memory-filter' },
+          { title: 'Policy × Scenario Modelling',       value: 'policy-scenario-modelling'       },
+          { title: 'Policy × Long-Memory Filter',       value: 'policy-long-memory-filter'       },
+          { title: 'Talent × Scenario Modelling',       value: 'talent-scenario-modelling'       },
+          { title: 'Talent × Long-Memory Filter',       value: 'talent-long-memory-filter'       },
         ],
       },
     }),

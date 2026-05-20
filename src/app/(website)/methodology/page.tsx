@@ -9,21 +9,20 @@ import { Separator } from '@/components/ui/separator'
 
 export const metadata: Metadata = {
   title: 'Methodology | Silicon and Stone',
-  description: 'Forensic Technopolitics: Our analytical framework combining supply chain forensics, policy stress-testing, scenario modelling, and experience-led signal filtering.',
+  description: 'Forensic Technopolitics: a 3 × 2 matrix of three forensic domains (Supply Chain, Policy, Talent) stress-tested by two analytical methods (Scenario Modelling, Long-Memory Filter).',
 }
 
-const methodologies = [
+const domains = [
   {
     id: 'supply-chain-forensics',
     title: 'Supply Chain Forensics',
-    tagline: 'Following the silicon from sand to server',
-    description: 'Tracing the physical reality of technology production through every step of the value chain.',
+    tagline: 'The physical layer — silicon from sand to server',
+    description: 'Tracing the physical reality of technology production through every step of the value chain. Where the chokepoints are, who controls them, what substitution actually costs.',
     details: [
       'Mapping the 300+ steps from raw materials to finished semiconductors',
       'Identifying single points of failure and geographic concentration risks',
       'Tracking capacity investments, yields, and timeline slippages',
-      'Understanding the human capital bottlenecks often overlooked in analysis',
-      'Tracing how semiconductor supply chain disruptions propagate downstream into dependent industries',
+      'Tracing how disruptions propagate downstream into dependent industries',
     ],
     questions: [
       'Where does the neon for chip lithography actually come from?',
@@ -39,9 +38,9 @@ const methodologies = [
   },
   {
     id: 'policy-stress-testing',
-    title: 'Comparative Policy Stress-Testing',
-    tagline: 'What breaks when regulations collide',
-    description: 'Analysing how regulatory frameworks interact, conflict, and create unintended consequences for organisations operating across jurisdictions.',
+    title: 'Policy Stress-Testing',
+    tagline: 'The regulatory layer — what breaks when rules collide',
+    description: 'Running a single technological advancement through two operating systems — the US Innovation-First model and the EU Rights-Driven model — to find where compliance with one becomes non-compliance with the other.',
     details: [
       'Side-by-side comparison of US and EU regulatory approaches',
       'Identifying compliance conflicts and impossible positions',
@@ -50,7 +49,7 @@ const methodologies = [
     ],
     questions: [
       'Can you comply with both the AI Act and US export controls?',
-      'What does "adequate" data protection mean after Schrems II — the 2020 EU-US data-transfer ruling?',
+      'What does "adequate" data protection mean after Schrems II?',
       'How do CHIPS Act and EU Chips Act subsidies interact?',
     ],
     link: '/analysis/category/ai-act',
@@ -61,14 +60,40 @@ const methodologies = [
     ),
   },
   {
+    id: 'talent-capability-flow',
+    title: 'Talent & Capability Flow',
+    tagline: 'The human layer — where the people actually move',
+    description: 'Tracking the flow of senior engineers, fab technicians, AI researchers, and regulatory experts — and the second-order effects of where they land versus where they leave. The most underserved domain in existing technology-policy commentary.',
+    details: [
+      'Mapping skill density by region, not by national headline',
+      'Tracking senior-engineer flow between fabs, hyperscalers, and policy units',
+      'Identifying capability accumulation in unexpected geographies',
+      'Connecting macro industrial policy to individual professional reality',
+    ],
+    questions: [
+      'Where are TSMC\'s senior process engineers being recruited for the German fab?',
+      'Which European universities produce AI safety researchers, and where do they go?',
+      'What is the half-life of the regulatory expertise concentrated in Brussels?',
+    ],
+    link: '/analysis/category/edge-economy',
+    icon: (
+      <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+      </svg>
+    ),
+  },
+]
+
+const methods = [
+  {
     // Slug intentionally American spelling for URL stability — display text uses British (Modelling)
     id: 'scenario-modeling',
-    title: 'Scenario-Based Drift Modelling',
+    title: 'Scenario-Based Modelling',
     tagline: 'Futures that compound, not extrapolate',
-    description: 'Moving beyond linear forecasting to model how today\'s tensions could evolve into fundamentally different operating environments.',
+    description: 'Three scenarios per event — Low / Medium / High friction — using Value at Stake methodology. The output is not a prediction; it is a stress test, designed to give the reader a structured menu of preparation moves rather than a guess.',
     details: [
-      'Three core scenarios: Managed Friction, Bifurcation, and Escalation',
-      'Modelling cascade effects across supply chains and regulations',
+      'Three scenarios per event: Low, Medium, High friction',
+      'Value at Stake quantification per scenario',
       'Identifying trigger events and decision points',
       'Stress-testing strategies against multiple futures',
     ],
@@ -85,20 +110,20 @@ const methodologies = [
     ),
   },
   {
-    id: 'signal-filtering',
-    title: 'Experience-Led Signal Filtering',
-    tagline: 'Thirty years of pattern recognition',
-    description: 'Applying three decades of technology industry experience to separate genuine signals from noise, hype, and motivated reasoning.',
+    id: 'long-memory-filter',
+    title: 'Long-Memory Filter',
+    tagline: 'The 30-year cycle benchmark',
+    description: 'Pattern-matching the current event against the last thirty years of industrial cycles. The 1986 US-Japan Semiconductor Agreement, the 1990s offshoring wave, the 2000s globalisation consensus. The lens that separates Silicon Hype from Stone Truth.',
     details: [
-      'Recognising patterns from previous technology transitions',
+      'Pattern-matching against the last thirty years of industrial cycles',
       'Identifying overconfident projections and hidden dependencies',
-      'Understanding organisational and political dynamics behind announcements',
+      'Separating temporary noise from structural change',
       'Calibrating urgency: what matters now vs. what can wait',
     ],
     questions: [
       'Is this genuinely new, or a cycle repeating?',
       'Who benefits from this narrative?',
-      'What are they not telling us, and why?',
+      'What does the 1986 Semiconductor Agreement tell us about Pax Silica?',
     ],
     link: '/analysis/category/atlantic-drift',
     icon: (
@@ -109,6 +134,91 @@ const methodologies = [
     ),
   },
 ]
+
+const matrixCells = [
+  { domain: 'Supply Chain', method: 'Scenario Modelling', slug: 'supply-chain-scenario-modelling', description: 'Three-tier futures for the physical chokepoints' },
+  { domain: 'Supply Chain', method: 'Long-Memory Filter', slug: 'supply-chain-long-memory-filter', description: '30-year cycle pattern-match on the physical layer' },
+  { domain: 'Policy', method: 'Scenario Modelling', slug: 'policy-scenario-modelling', description: 'Low / Medium / High friction across regulatory regimes' },
+  { domain: 'Policy', method: 'Long-Memory Filter', slug: 'policy-long-memory-filter', description: '30-year regulatory precedent and enforcement drift' },
+  { domain: 'Talent', method: 'Scenario Modelling', slug: 'talent-scenario-modelling', description: 'Capability-flow scenarios across the human layer' },
+  { domain: 'Talent', method: 'Long-Memory Filter', slug: 'talent-long-memory-filter', description: '30-year skill-density and migration cycles' },
+]
+
+function MethodologyCard({
+  entry,
+  index,
+  prefix,
+}: {
+  entry: (typeof domains)[number]
+  index: number
+  prefix: string
+}) {
+  return (
+    <div id={entry.id}>
+      <Card className="bg-stone-charcoal border-border-subtle overflow-hidden">
+        <CardHeader className="pb-4">
+          <div className="flex items-start gap-4">
+            <div className="p-3 rounded-lg bg-surface-elevated text-stone-teal">
+              {entry.icon}
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-sm font-mono text-silicon-amber">
+                  {prefix}
+                  {index + 1}
+                </span>
+              </div>
+              <CardTitle className="text-xl font-semibold text-text-primary">
+                {entry.title}
+              </CardTitle>
+              <p className="text-stone-teal font-medium mt-1">{entry.tagline}</p>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <p className="text-text-muted leading-relaxed">{entry.description}</p>
+
+          <div>
+            <h4 className="text-sm font-semibold text-text-primary uppercase tracking-wide mb-3">
+              What This Means in Practice
+            </h4>
+            <ul className="space-y-2">
+              {entry.details.map((detail, i) => (
+                <li key={i} className="flex items-start gap-3 text-text-muted">
+                  <span className="text-stone-teal mt-1.5">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </span>
+                  {detail}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="bg-surface-elevated rounded-lg p-4 mb-4">
+            <h4 className="text-sm font-semibold text-text-primary uppercase tracking-wide mb-3">
+              Questions We Ask
+            </h4>
+            <ul className="space-y-2">
+              {entry.questions.map((question, i) => (
+                <li key={i} className="text-text-muted italic font-serif">
+                  &ldquo;{question}&rdquo;
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <Link href={entry.link}>
+            <div className="text-sm font-medium text-stone-teal hover:text-silicon-amber transition-colors flex items-center gap-1">
+              See Analysis &rarr;
+            </div>
+          </Link>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
 
 export default function MethodologyPage() {
   return (
@@ -137,8 +247,10 @@ export default function MethodologyPage() {
                 Forensic Technopolitics
               </h1>
               <p className="text-xl text-text-muted leading-relaxed">
-                Analysis that starts with physical reality, stress-tests against policy friction,
-                models how today&apos;s tensions compound into different futures, and filters through three decades of technology industry experience.
+                Three forensic domains stress-tested by two analytical methods. A
+                3&nbsp;×&nbsp;2 matrix, applied to every published piece, with a
+                visible audit so the reader can see which moves we ran and which we
+                didn&apos;t.
               </p>
             </div>
           </div>
@@ -172,84 +284,107 @@ export default function MethodologyPage() {
 
         <Separator className="mx-auto max-w-7xl bg-border-subtle" />
 
-        {/* Methodology Cards */}
+        {/* Three Forensic Domains */}
         <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
-          <h2 className="text-2xl font-semibold text-text-primary mb-8">
-            Four Analytical Lenses
-          </h2>
+          <div className="max-w-3xl mb-8">
+            <h2 className="text-2xl font-semibold text-text-primary mb-3">
+              Three Forensic Domains
+            </h2>
+            <p className="text-text-muted leading-relaxed">
+              The three layers of technology power that get analysed: the physical
+              supply chain, the regulatory environment, and the flow of people and
+              capability between them.
+            </p>
+          </div>
           <div className="space-y-12">
-            {methodologies.map((method, index) => (
-              <div key={method.id} id={method.id}>
-                <Card className="bg-stone-charcoal border-border-subtle overflow-hidden">
-                  <CardHeader className="pb-4">
-                    <div className="flex items-start gap-4">
-                      <div className="p-3 rounded-lg bg-surface-elevated text-stone-teal">
-                        {method.icon}
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-sm font-mono text-silicon-amber">
-                            0{index + 1}
-                          </span>
-                        </div>
-                        <CardTitle className="text-xl font-semibold text-text-primary">
-                          {method.title}
-                        </CardTitle>
-                        <p className="text-stone-teal font-medium mt-1">
-                          {method.tagline}
-                        </p>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <p className="text-text-muted leading-relaxed">
-                      {method.description}
-                    </p>
-
-                    <div>
-                      <h4 className="text-sm font-semibold text-text-primary uppercase tracking-wide mb-3">
-                        What This Means in Practice
-                      </h4>
-                      <ul className="space-y-2">
-                        {method.details.map((detail, i) => (
-                          <li key={i} className="flex items-start gap-3 text-text-muted">
-                            <span className="text-stone-teal mt-1.5">
-                              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                              </svg>
-                            </span>
-                            {detail}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    <div className="bg-surface-elevated rounded-lg p-4 mb-4">
-                      <h4 className="text-sm font-semibold text-text-primary uppercase tracking-wide mb-3">
-                        Questions We Ask
-                      </h4>
-                      <ul className="space-y-2">
-                        {method.questions.map((question, i) => (
-                          <li key={i} className="text-text-muted italic font-serif">
-                            &ldquo;{question}&rdquo;
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    <Link href={method.link}>
-                      <div className="text-sm font-medium text-stone-teal hover:text-silicon-amber transition-colors flex items-center gap-1">
-                        See Analysis &rarr;
-                      </div>
-                    </Link>
-                  </CardContent>
-                </Card>
-              </div>
+            {domains.map((entry, index) => (
+              <MethodologyCard
+                key={entry.id}
+                entry={entry}
+                index={index}
+                prefix="0"
+              />
             ))}
           </div>
         </section>
 
-        {/* Stone Truth — verdict closing the four lenses, before action */}
+        <Separator className="mx-auto max-w-7xl bg-border-subtle" />
+
+        {/* Two Analytical Methods */}
+        <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+          <div className="max-w-3xl mb-8">
+            <h2 className="text-2xl font-semibold text-text-primary mb-3">
+              Two Analytical Methods
+            </h2>
+            <p className="text-text-muted leading-relaxed">
+              Both methods get applied across all three domains. Scenario modelling
+              gives the reader a structured menu of futures. The Long-Memory Filter
+              compares the present to the last thirty years of industrial cycles so
+              that hype and structural change can be told apart.
+            </p>
+          </div>
+          <div className="space-y-12">
+            {methods.map((entry, index) => (
+              <MethodologyCard
+                key={entry.id}
+                entry={entry}
+                index={index}
+                prefix="M"
+              />
+            ))}
+          </div>
+        </section>
+
+        <Separator className="mx-auto max-w-7xl bg-border-subtle" />
+
+        {/* The Matrix */}
+        <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+          <div className="max-w-3xl mb-8">
+            <h2 className="text-2xl font-semibold text-text-primary mb-3">
+              The 3 × 2 Matrix
+            </h2>
+            <p className="text-text-muted leading-relaxed mb-3">
+              Three domains × two methods = six analytical moves. Every Stone Briefing
+              applies between two and four cells. Every Deep Dive applies all six. The
+              Methodology Audit at the top of every piece tells the reader which were
+              applied and which were not.
+            </p>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full max-w-4xl border-collapse">
+              <thead>
+                <tr>
+                  <th className="text-left p-3 border-b border-border-subtle text-sm font-semibold text-text-primary uppercase tracking-wide w-1/3"></th>
+                  <th className="text-left p-3 border-b border-border-subtle text-sm font-semibold text-text-primary uppercase tracking-wide">
+                    Scenario Modelling
+                  </th>
+                  <th className="text-left p-3 border-b border-border-subtle text-sm font-semibold text-text-primary uppercase tracking-wide">
+                    Long-Memory Filter
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {['Supply Chain', 'Policy', 'Talent'].map((domain) => (
+                  <tr key={domain} className="border-b border-border-subtle">
+                    <td className="p-3 text-text-primary font-medium">{domain}</td>
+                    {['Scenario Modelling', 'Long-Memory Filter'].map((method) => {
+                      const cell = matrixCells.find(
+                        (c) => c.domain === domain && c.method === method,
+                      )
+                      return (
+                        <td key={method} className="p-3 text-text-muted text-sm leading-snug align-top">
+                          {cell?.description}
+                        </td>
+                      )
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Stone Truth — verdict closing the matrix, before action */}
         <section className="mx-auto max-w-7xl px-6 lg:px-8 mt-12 mb-12">
           <div
             className="max-w-[880px] rounded-xl px-9 py-8 border border-border-subtle border-l-[3px] border-l-silicon-amber"
@@ -278,8 +413,9 @@ export default function MethodologyPage() {
                 See the Methodology in Action
               </h2>
               <p className="text-text-muted mb-8">
-                Our analysis applies these four lenses to the most pressing questions in
-                AI regulation, semiconductor supply chains, and digital sovereignty.
+                Our analysis applies the 3&nbsp;×&nbsp;2 matrix to the most pressing
+                questions in AI regulation, semiconductor supply chains, and digital
+                sovereignty.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/analysis">
