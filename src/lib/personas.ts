@@ -11,6 +11,8 @@ export interface Persona {
   role: string
   icon: string
   color: string
+  /** Path to the persona avatar image in /public */
+  avatar: string
   ctaCopy: string
   description: string
   contentNeeds: string[]
@@ -23,6 +25,7 @@ export const PERSONAS: Record<PersonaSlug, Persona> = {
     role: 'Legal/Compliance Officer',
     icon: 'shield-check',
     color: 'silicon-amber',
+    avatar: '/personas/clara.jpg',
     ctaCopy: 'Stay ahead of compliance deadlines',
     description: 'Navigating regulatory obligations with tight deadlines',
     contentNeeds: [
@@ -38,6 +41,7 @@ export const PERSONAS: Record<PersonaSlug, Persona> = {
     role: 'Operations/Supply Chain Manager',
     icon: 'truck',
     color: 'stone-teal',
+    avatar: '/personas/ian.jpg',
     ctaCopy: 'Get supply chain alerts before they hit',
     description: 'Managing operational risk in complex supply chains',
     contentNeeds: [
@@ -53,6 +57,7 @@ export const PERSONAS: Record<PersonaSlug, Persona> = {
     role: 'Policy/Strategy Analyst',
     icon: 'globe',
     color: 'tier-pulse',
+    avatar: '/personas/sofia.jpg',
     ctaCopy: 'Quantify the Atlantic Drift',
     description: 'Tracking regulatory divergence and digital sovereignty trends',
     contentNeeds: [
@@ -68,6 +73,7 @@ export const PERSONAS: Record<PersonaSlug, Persona> = {
     role: 'Regional Development Director',
     icon: 'map-pin',
     color: 'alert-red',
+    avatar: '/personas/robert.jpg',
     ctaCopy: 'Where regional implications get read first',
     description: 'Building regional technology capacity and resilience',
     contentNeeds: [
@@ -83,6 +89,7 @@ export const PERSONAS: Record<PersonaSlug, Persona> = {
     role: 'Informed Observer',
     icon: 'user',
     color: 'text-muted',
+    avatar: '/personas/citizen.jpg',
     ctaCopy: 'The weekly read for those tracking the bigger picture',
     description: 'Seeking accessible understanding of complex tech-policy issues',
     contentNeeds: [

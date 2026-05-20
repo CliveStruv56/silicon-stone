@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { Header, Footer } from '@/components/layout'
 import { Badge } from '@/components/ui/badge'
 import { PersonaFilter } from '@/components/briefings/PersonaFilter'
+import { PersonaIntro } from '@/components/briefings/PersonaIntro'
 import { DynamicCTA } from '@/components/article'
 import { cn } from '@/lib/utils'
 import { getPersonaLabel, PERSONAS, type PersonaSlug } from '@/lib/personas'
@@ -362,9 +363,15 @@ export default function BriefingsPage() {
           </div>
         </section>
 
+        {/* Persona Introduction */}
+        <PersonaIntro />
+
         {/* Persona Filter */}
         <section className="border-b border-border-subtle bg-stone-charcoal/30">
           <div className="mx-auto max-w-7xl px-6 py-4 lg:px-8">
+            <div className="font-ui-mono text-xs uppercase tracking-wider text-text-muted mb-3">
+              Filter by perspective
+            </div>
             <PersonaFilter
               selectedPersona={selectedPersona}
               onPersonaChange={setSelectedPersona}
