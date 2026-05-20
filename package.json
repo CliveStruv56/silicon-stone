@@ -12,7 +12,8 @@
     "test:security": "tsx scripts/security-checks.ts",
     "sync-content": "tsx scripts/sync-content.ts",
     "sync-content:dry": "tsx scripts/sync-content.ts --dry-run",
-    "sync-content:force": "tsx scripts/sync-content.ts --force"
+    "sync-content:force": "tsx scripts/sync-content.ts --force",
+    "render-briefing": "tsx scripts/render-briefing-pdf.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
@@ -46,12 +47,16 @@
     "@sanity/client": "^7.14.0",
     "@tailwindcss/postcss": "^4",
     "@types/d3-scale": "^4.0.9",
+    "@types/marked": "^5.0.2",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "dotenv": "^17.2.3",
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
+    "gray-matter": "^4.0.3",
+    "marked": "^18.0.3",
+    "puppeteer": "^24.43.1",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "tw-animate-css": "^1.4.0",
