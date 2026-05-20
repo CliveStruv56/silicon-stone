@@ -1,10 +1,10 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-05-14
+> Last Updated: 2026-05-20
 > Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing, 3 moderate transitive npm vulns (postcss inside next + brace-expansion via @sanity/import)**
 
-**Current State**: Full-featured intelligence portal live at siliconandstone.com. Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools (email-gated for lead capture, AI Act triage engine recently overhauled), product/commerce pages with Lemon Squeezy checkout links, Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Signal, Deep Dive, Research, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Awaiting Lemon Squeezy store setup, Plausible account, content publishing for 4 queued drafts, and full Sanity schema deploy (persona / siteSettings / youtubeScript types are local-only).
+**Current State**: Full-featured intelligence portal live at siliconandstone.com. Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools (email-gated for lead capture, AI Act triage engine recently overhauled), product/commerce pages with Lemon Squeezy checkout links, Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Signal, Deep Dive, Research, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Awaiting Lemon Squeezy store setup, Plausible account, content publishing for 2 queued drafts, and full Sanity schema deploy (persona / siteSettings / youtubeScript types are local-only).
 
 ---
 
@@ -135,11 +135,11 @@ All formats use Claude at temperature 0.4. Drafts are created directly in Sanity
 | Route | Status | Description |
 |-------|--------|-------------|
 | `/` | ✅ | Landing page with hero, Intelligence Stream, tools grid, deadline countdown, subscribe CTA |
-| `/briefings` | ✅ | Intelligence portal with persona filtering, tiered display, impact scores |
+| `/briefings` | ✅ | Intelligence portal: "Find Your Perspective" persona explainer (avatars), persona filter tabs, tiered display, impact scores |
 | `/analysis` | ✅ | Article listing with category sidebar |
 | `/analysis/[slug]` | ✅ | Individual article pages |
 | `/analysis/category/[slug]` | ✅ | Category-filtered articles |
-| `/methodology` | ✅ | Four Analytical Lenses with practice details and questions |
+| `/methodology` | ✅ | Forensic Technopolitics 3×2 matrix — 3 domains × 2 methods, practice details, questions |
 | `/services` | ✅ | Advisory services, assessment offerings, contact form (ConvertKit) |
 | `/about` | ✅ | Credentials, principles, focus areas, products CTA |
 | `/search` | ✅ | Full-text article search |
@@ -309,6 +309,8 @@ ADMIN_PASSWORD=studio123
 | Sanity schemas | `src/sanity/schemaTypes/` |
 | Sanity queries | `src/sanity/lib/queries.ts` |
 | Content sync | `scripts/sync-content.ts` |
+| Briefing PDF renderer | `scripts/render-briefing-pdf.ts` |
+| Persona definitions + avatars | `src/lib/personas.ts`, `public/personas/` |
 | Middleware (auth) | `src/middleware.ts` |
 | Context profiles | `context/core/` |
 | Business overview | `business-overview.json` |
@@ -319,6 +321,17 @@ ADMIN_PASSWORD=studio123
 ---
 
 ## 9. Recent Changes
+
+### May 20, 2026 — Briefings persona explainer + 3×2 matrix shipped
+
+| Commit | Description |
+|--------|-------------|
+| `de822c6` | Persona explainer ("Find Your Perspective") on the Briefings page — `PERSONA ROUTING` badge, heading, and 5 cards with generated persona avatars (`public/personas/*.jpg`). New `src/components/briefings/PersonaIntro.tsx`; `avatar` field added to `src/lib/personas.ts`. |
+| `9e51215` | Methodology 3×2 forensic matrix landed: `/methodology` page rewrite, `MethodologyChecklist` component (6-cell matrix + legacy-slug normalisation), `youtubeScript` schema enum, `business-overview.json` text, `docs/forensic-technopolitics-methodology.md`. |
+| `21eb123` | Markdown-to-PDF briefing pipeline — `scripts/render-briefing-pdf.ts`, `npm run render-briefing`, `docs/markdown-to-pdf-pipeline.md`. |
+| `570ab13` | Guard the PDF renderer against overwriting its input file. |
+| `b946ff1` | Reference docs: briefing outline, persona profiles, Welcome Pack v3. |
+| `bb81639` | Housekeeping: ignore `.claude/`, refresh Sanity Create artifacts, project-summary update (npm audit baseline corrected to 3 moderate). |
 
 ### May 13–14, 2026 — Railway backend migration + Welcome Pack v3
 
@@ -402,12 +415,12 @@ ADMIN_PASSWORD=studio123
 | Inoreader redirect URI | Still points to localhost — user needs to update in Inoreader dev portal to `https://siliconandstone.com/api/auth/callback/inoreader` | Medium |
 | Lemon Squeezy not configured | Checkout links wired but env vars not yet set (no store created) | Medium |
 | Plausible not configured | Script deployed but env var not set (no account created) | Medium |
-| Draft articles unpublished | Four generated drafts in Sanity need cover images and publishing (Helium, Korean Memory Fab, Greenland Critical Minerals, EU AI Act Compliance Chasm). | Medium |
+| Draft articles unpublished | Verified via GROQ 2026-05-20: 10 articles published, 2 still in draft — *Iran Conflict Reshapes European Semiconductor Supply Chains* (`drafts.1344add1-…`) and *Gulf Tensions and Your Phone Bill* (`drafts.b7326125-…`). Both need cover images before publishing in Studio. | Medium |
 | Atlantic Drift Briefing PDF unwritten | Lead magnet referenced in the Welcome Pack and required before YouTube launch. Outline now drafted at `docs/atlantic-drift-briefing-outline.md`; full PDF still to write. | Medium |
 | Sanity persona docs hold short version | Persona documents in Sanity carry shorter pain-points / content-needs than `docs/persona-profiles.md`. MCP backfill blocked by the schema-deploy gap above; can be done manually in Studio or after schema deploy. | Low |
-| Legacy methodologyPillars on published articles | 3 of 4 published articles with pillars (Atlantic Fault Lines, Helium Scarcity, Iran Conflict) still hold the old 4-lens slugs (`supply-chain-forensics`, `policy-stress-testing`) instead of the new 3 × 2 matrix cells. The `MethodologyChecklist` component normalises them at render via a legacy map so the UI is not blank, but the underlying data should be backfilled in Studio (each old slug expands to a single best-fit new cell). The Korean Memory Fab article is already on the new vocabulary. | Medium |
+| Legacy methodologyPillars on 2 articles | Verified via GROQ 2026-05-20: only 2 documents still hold legacy 4-lens slugs — the published *Atlantic Fault Lines Deepen* (`2oGVswEwQBfyYUvi889ioS`, `policy-stress-testing`) and the draft *Iran Conflict Reshapes…* (`drafts.1344add1-…`, `supply-chain-forensics`). All other articles with pillars are on the new 6-cell vocabulary. `MethodologyChecklist` normalises legacy slugs at render via a legacy map so the UI is never blank; backfill these 2 in Studio to retire the map. | Medium |
 | Transitive npm CVEs (postcss + brace-expansion) | `npm audit` shows 3 moderate severity vulns: the `postcss <8.5.10` advisory (GHSA-qx2v-qp2m-jg93, XSS via unescaped `</style>` in CSS stringify) reached via `next > postcss` (counted twice — `postcss` and `next`), plus `brace-expansion` 5.0.2–5.0.5 (GHSA-jxxr-4gwj-5jf2, DoS) reached via `@sanity/import`. The brace-expansion vuln clears with a plain `npm audit fix` (non-breaking). For postcss — **Remediation:** add an npm `overrides` block to `package.json` pinning `postcss@^8.5.10` — forces the patched version across the transitive tree. postcss 8.x has a stable API so the override is low-risk; verify with `npm run build` + `npm run check` after applying. **Do not** run `npm audit fix --force` — npm has no semver-compatible patch path and the `--force` flag would downgrade `next` to 9.3.3 (which is itself ancient and vulnerable). The XSS vector requires user-controlled CSS strings, which we don't process at runtime, so practical risk is low even before remediation. Surfaced 2026-05-14 alongside the puppeteer install; the new pipeline packages are clean. | Low |
-| Markdown-to-PDF pipeline newly added | `scripts/render-briefing-pdf.ts` + `npm run render-briefing` ship the lead-magnet / Intelligence Series PDF renderer. Adds `puppeteer` (~200MB Chromium download on first run), `marked`, `gray-matter`. Smoke-tested 2026-05-14. Full docs at `docs/markdown-to-pdf-pipeline.md`. No regression risk — pipeline is dev-only, never invoked by Vercel/Railway. | Info |
+| Markdown-to-PDF pipeline | `scripts/render-briefing-pdf.ts` + `npm run render-briefing` render lead-magnet / Intelligence Series PDFs. Committed 2026-05-20 (`21eb123`; overwrite-guard `570ab13`). `puppeteer` / `marked` / `gray-matter` are devDependencies — `puppeteer` pulls ~170MB Chromium on install. Dev-only, never invoked by Vercel/Railway. Docs: `docs/markdown-to-pdf-pipeline.md`. | Info |
 | Studio reference-array UX trap | Clicking "Add item" in a Sanity reference array and saving without picking a doc leaves an orphan row (`_type`/`_key` but no `_ref`). One of these was found and cleaned up on the Helium article draft on 2026-04-14. | Low |
 | No automated tests | Test suite not yet implemented | Low |
 | Limited CI gates | GitHub Actions `check` workflow runs lint + typecheck (added `16e9d2c`); no test step yet. | Low |
