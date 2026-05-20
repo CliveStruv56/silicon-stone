@@ -393,6 +393,18 @@ async function main(): Promise<void> {
   const inputPath = path.resolve(inputArg)
   const outputPath = path.resolve(outputArg ?? inputPath.replace(/\.md$/i, '.pdf'))
 
+  // Guard against clobbering the source. The default output path is derived
+  // by swapping a `.md` suffix for `.pdf`; if the input has no `.md` suffix
+  // (or an explicit output path matches the input) that derivation is a
+  // no-op and we would otherwise write the binary PDF over the markdown.
+  if (outputPath === inputPath) {
+    console.error(
+      `Refusing to run: the output path would overwrite the input file (${path.relative(process.cwd(), inputPath)}).\n` +
+        'Pass an explicit, different output path: npm run render-briefing -- <input.md> <output.pdf>',
+    )
+    process.exit(1)
+  }
+
   const raw = await fs.readFile(inputPath, 'utf8')
   const parsed = matter(raw)
   const fm = parsed.data as Frontmatter
