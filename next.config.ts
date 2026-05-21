@@ -24,7 +24,13 @@ const contentSecurityPolicy = [
 ].join("; ");
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ['@pinecone-database/pinecone'],
+  serverExternalPackages: ['@pinecone-database/pinecone', 'mammoth'],
+  experimental: {
+    // Allow .docx / .md uploads through the /import server action.
+    serverActions: {
+      bodySizeLimit: '8mb',
+    },
+  },
   images: {
     remotePatterns: [
       {

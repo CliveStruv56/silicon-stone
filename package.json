@@ -30,6 +30,7 @@
     "exa-js": "^2.2.0",
     "framer-motion": "^12.27.2",
     "lucide-react": "^0.562.0",
+    "mammoth": "^1.12.0",
     "maplibre-gl": "^5.17.0",
     "next": "^15.5.12",
     "next-sanity": "^11.6.12",

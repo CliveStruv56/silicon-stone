@@ -1,4 +1,5 @@
 import type { StructureResolver } from 'sanity/structure'
+import { ImagesIcon } from '@sanity/icons'
 
 // https://www.sanity.io/docs/structure-builder-cheat-sheet
 export const structure: StructureResolver = (S) =>
@@ -14,8 +15,45 @@ export const structure: StructureResolver = (S) =>
             .documentId('siteSettings')
         ),
       S.divider(),
-      // The rest of the documents, filtering out the singleton type
+      // Image Library — browse by collection (folders) or see every image
+      S.listItem()
+        .title('Image Library')
+        .icon(ImagesIcon)
+        .child(
+          S.list()
+            .title('Image Library')
+            .items([
+              S.listItem()
+                .title('Browse by Collection')
+                .child(
+                  S.documentTypeList('assetCollection')
+                    .title('Collections')
+                    .child((collectionId) =>
+                      S.documentList()
+                        .title('Images')
+                        .schemaType('libraryImage')
+                        .filter(
+                          '_type == "libraryImage" && collection._ref == $collectionId'
+                        )
+                        .params({ collectionId })
+                    )
+                ),
+              S.listItem()
+                .title('All Images')
+                .child(S.documentTypeList('libraryImage').title('All Images')),
+              S.listItem()
+                .title('Manage Collections')
+                .child(
+                  S.documentTypeList('assetCollection').title('Collections')
+                ),
+            ])
+        ),
+      S.divider(),
+      // The rest of the documents, filtering out the singleton + library types
       ...S.documentTypeListItems().filter(
-        (item) => item.getId() !== 'siteSettings'
+        (item) =>
+          !['siteSettings', 'assetCollection', 'libraryImage'].includes(
+            item.getId() ?? ''
+          )
       ),
     ])

@@ -32,6 +32,8 @@ export interface ArticleData {
     categorySlugs?: string[];
     intelligenceTier?: 'pulse' | 'briefing' | 'audit';
     methodologyPillars?: string[];   // matrix-cell slugs
+    source?: 'generated' | 'imported' | 'manual';
+    sourceMaterial?: string;         // original text for imported articles
 }
 
 export interface CategoryOption {
@@ -125,6 +127,8 @@ export async function createArticleInSanity(data: ArticleData) {
     if (data.methodologyPillars && data.methodologyPillars.length > 0) {
         doc.methodologyPillars = data.methodologyPillars;
     }
+    if (data.source) doc.source = data.source;
+    if (data.sourceMaterial) doc.sourceMaterial = data.sourceMaterial;
 
     return await writeClient.createOrReplace(doc);
 }
