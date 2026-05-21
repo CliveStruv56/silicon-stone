@@ -80,11 +80,11 @@ const frameworks = [
 const assessments = [
   {
     title: 'AI Act Readiness Assessment',
-    description: 'Comprehensive evaluation of your AI systems against EU AI Act requirements with prioritized compliance roadmap.',
+    description: 'Comprehensive evaluation of your AI systems against EU AI Act requirements with prioritised compliance roadmap.',
     deliverables: [
       'AI system inventory and risk classification',
       'Gap analysis against Article requirements',
-      'Prioritized action plan to August 2026 deadline',
+      'Prioritised action plan to August 2026 deadline',
       'Documentation requirements checklist',
     ],
     icon: Cpu,
@@ -561,11 +561,10 @@ export default function ServicesPage() {
                           key={option}
                           type="button"
                           onClick={() => setFormData({ ...formData, interest: option })}
-                          className={`px-3 py-2 text-sm rounded-md border transition-colors ${
-                            formData.interest === option
-                              ? 'border-stone-teal bg-stone-teal/10 text-stone-teal'
-                              : 'border-border-subtle bg-stone-charcoal text-text-muted hover:border-stone-teal/50'
-                          }`}
+                          className={`px-3 py-2 text-sm rounded-md border transition-colors ${formData.interest === option
+                            ? 'border-stone-teal bg-stone-teal/10 text-stone-teal'
+                            : 'border-border-subtle bg-stone-charcoal text-text-muted hover:border-stone-teal/50'
+                            }`}
                         >
                           {option}
                         </button>

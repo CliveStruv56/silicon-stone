@@ -34,7 +34,7 @@ export default function PrivacyPage() {
               <p className="text-text-muted leading-relaxed">
                 Silicon and Stone is an independent analysis and advisory service focused on
                 technology policy, AI regulation, semiconductor supply chains, and digital
-                sovereignty. We are based in Scotland, United Kingdom.
+                sovereignty. We are based in OrkneyScotland, United Kingdom.
               </p>
             </div>
 

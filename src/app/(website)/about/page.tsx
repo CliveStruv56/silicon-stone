@@ -77,7 +77,7 @@ export default function AboutPage() {
                 </p>
                 <p className="text-text-muted leading-relaxed">
                   Silicon and Stone combines deep technology industry experience with the clarity
-                  that comes from distance—geographic, temporal, and intellectual.
+                  that comes from distance: geographic, temporal, and intellectual.
                 </p>
               </div>
               <div className="relative">
