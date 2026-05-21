@@ -1,7 +1,7 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-05-20
+> Last Updated: 2026-05-21
 > Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing, 3 moderate transitive npm vulns (postcss inside next + brace-expansion via @sanity/import)**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com. Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools (email-gated for lead capture, AI Act triage engine recently overhauled), product/commerce pages with Lemon Squeezy checkout links, Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Signal, Deep Dive, Research, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Awaiting Lemon Squeezy store setup, Plausible account, content publishing for 2 queued drafts, and full Sanity schema deploy (persona / siteSettings / youtubeScript types are local-only).
@@ -322,6 +322,12 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### May 21, 2026 — Studio nav tab fix
+
+| Commit | Description |
+|--------|-------------|
+| `23b72c2` | Fix the admin "Studio" nav tab landing on the Sanity login screen instead of the CMS. It used a Next.js `<Link>` (soft client-side transition), which mounts the embedded Sanity Studio SPA inside the admin app where it mis-initialises and falls back to its own login. The nav item in `src/app/(admin)/layout.tsx` now carries a `hardNav` flag and renders as a plain `<a>` (full page load), matching the working generate-flow "Open in Sanity Studio" link. CORS for `siliconandstone.com` confirmed already registered on Sanity project `3q59mpd7`. |
 
 ### May 20, 2026 — Briefings persona explainer + 3×2 matrix shipped
 
