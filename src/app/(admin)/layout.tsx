@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Terminal, Zap, Search, Users, Database, Home, BrainCircuit, LogOut } from 'lucide-react';
+import { Terminal, Zap, Search, Users, Database, Home, BrainCircuit, LogOut, FileInput } from 'lucide-react';
 import { logout } from '@/app/(auth)/login/actions';
 
 export const metadata = {
@@ -20,6 +20,7 @@ type NavItem = {
 const NAV_ITEMS: NavItem[] = [
     { href: '/admin', label: 'Dashboard', icon: Home },
     { href: '/generate', label: 'Generate', icon: Zap },
+    { href: '/import', label: 'Import', icon: FileInput },
     { href: '/research', label: 'Research', icon: Search },
     { href: '/context', label: 'Context', icon: Users },
     { href: '/knowledge', label: 'Knowledge', icon: BrainCircuit },

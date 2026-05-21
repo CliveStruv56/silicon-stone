@@ -6,7 +6,7 @@ const anthropic = new Anthropic({
     apiKey: API_KEY,
 });
 
-export async function callClaude(system: string, user: string, temperature: number = 0.4) {
+export async function callClaude(system: string, user: string, temperature: number = 0.4, maxTokens: number = 4096) {
     if (!API_KEY) {
         if (process.env.NODE_ENV === 'production') {
             throw new Error("ANTHROPIC_API_KEY is not configured.");
@@ -36,7 +36,7 @@ export async function callClaude(system: string, user: string, temperature: numb
     try {
         const msg = await anthropic.messages.create({
             model: "claude-sonnet-4-6",
-            max_tokens: 4096,
+            max_tokens: maxTokens,
             temperature,
             system: system,
             messages: [

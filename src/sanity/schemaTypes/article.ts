@@ -230,6 +230,27 @@ export const article = defineType({
         }),
       ],
     }),
+    defineField({
+      name: 'source',
+      title: 'Source',
+      description: 'How this article entered the system.',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'AI-Generated', value: 'generated' },
+          { title: 'Imported & Reworked', value: 'imported' },
+          { title: 'Manual', value: 'manual' },
+        ],
+      },
+    }),
+    defineField({
+      name: 'sourceMaterial',
+      title: 'Original Source Material',
+      description:
+        'Original text an imported article was reworked from. Reference only — never published.',
+      type: 'text',
+      rows: 12,
+    }),
   ],
   preview: {
     select: {

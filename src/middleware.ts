@@ -7,6 +7,7 @@ export async function middleware(request: NextRequest) {
     const protectedPaths = [
         '/admin',
         '/generate',
+        '/import',
         '/research',
         '/context',
         '/content',
@@ -40,6 +41,7 @@ export const config = {
     matcher: [
         '/admin/:path*',
         '/generate/:path*',
+        '/import/:path*',
         '/research/:path*',
         '/context/:path*',
         '/content/:path*',
