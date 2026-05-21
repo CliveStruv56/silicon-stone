@@ -77,6 +77,8 @@ async function main() {
   const contactRouteSource = fs.readFileSync('src/app/api/contact/route.ts', 'utf-8')
   assert.match(subscribeRouteSource, /BACKEND_API_URL is configured but BACKEND_API_KEY is missing/)
   assert.match(contactRouteSource, /BACKEND_API_URL is configured but BACKEND_API_KEY is missing/)
+  assert.match(subscribeRouteSource, /Backend subscribe proxy failed/)
+  assert.match(contactRouteSource, /Backend contact proxy failed/)
 
   console.log('Security checks passed')
 }

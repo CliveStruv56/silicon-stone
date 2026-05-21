@@ -51,10 +51,16 @@ async function proxySubscribe(body: { email: string; tag?: string }) {
     }
 
     console.error("Railway subscribe proxy error:", response.status, responseBody);
-    return null;
+    return NextResponse.json(
+      { error: "Backend subscribe proxy error", status: response.status },
+      { status: 502 }
+    );
   } catch (error) {
     console.error("Railway subscribe proxy failed:", error);
-    return null;
+    return NextResponse.json(
+      { error: "Backend subscribe proxy failed" },
+      { status: 502 }
+    );
   }
 }
 

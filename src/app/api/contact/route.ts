@@ -68,10 +68,16 @@ async function proxyContact(body: {
     }
 
     console.error("Railway contact proxy error:", response.status, responseBody);
-    return null;
+    return NextResponse.json(
+      { error: "Backend contact proxy error", status: response.status },
+      { status: 502 }
+    );
   } catch (error) {
     console.error("Railway contact proxy failed:", error);
-    return null;
+    return NextResponse.json(
+      { error: "Backend contact proxy failed" },
+      { status: 502 }
+    );
   }
 }
 
