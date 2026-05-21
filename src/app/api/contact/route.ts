@@ -45,6 +45,14 @@ async function proxyContact(body: {
   const backendApiUrl = getBackendApiUrl();
   if (!backendApiUrl) return null;
 
+  if (!process.env.BACKEND_API_KEY) {
+    console.error("BACKEND_API_URL is configured but BACKEND_API_KEY is missing");
+    return NextResponse.json(
+      { error: "Backend shared key is not configured" },
+      { status: 503 }
+    );
+  }
+
   try {
     const response = await fetch(`${backendApiUrl}/v1/contact`, {
       method: "POST",
@@ -55,7 +63,7 @@ async function proxyContact(body: {
 
     const responseBody = await response.json().catch(() => ({}));
 
-    if (response.status < 500) {
+    if (response.status < 500 || response.status === 503) {
       return NextResponse.json(responseBody, { status: response.status });
     }
 

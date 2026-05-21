@@ -5,9 +5,12 @@ const ALG = 'HS256'
 const encoder = new TextEncoder()
 
 function getSecret(): string {
-    const secret = process.env.SESSION_SECRET || process.env.ADMIN_PASSWORD
+    const secret = process.env.SESSION_SECRET
     if (!secret) {
-        throw new Error('SESSION_SECRET (or ADMIN_PASSWORD) must be set')
+        throw new Error('SESSION_SECRET must be set')
+    }
+    if (secret.length < 32) {
+        throw new Error('SESSION_SECRET must be at least 32 characters')
     }
     return secret
 }

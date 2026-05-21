@@ -8,7 +8,7 @@ This guide outlines the workflows for researching topics, generating drafts, and
 
 1.  **Access the Pipeline:**
     *   Navigate to `/create` (e.g., `https://siliconandstone.com/create`).
-    *   Enter the **Admin Password** if prompted (`studio123`).
+    *   Enter the deployment **Admin Password** if prompted.
 
 2.  **Enter a Research Query:**
     *   Type a natural language query in the search bar.

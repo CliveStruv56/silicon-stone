@@ -16,7 +16,7 @@ This is the **Silicon & Stone intelligence portal** — a Next.js 15 + Sanity CM
 - Build passes cleanly (`npm run build` — 41 routes, 0 errors)
 - 3 moderate `npm audit` vulnerabilities — (1) the transitive `postcss <8.5.10` advisory (GHSA-qx2v-qp2m-jg93), counted twice (`postcss` itself and `next` depending on it), reached via `next > postcss`; and (2) `brace-expansion` 5.0.2–5.0.5 (GHSA-jxxr-4gwj-5jf2, DoS), reached via `@sanity/import`. The brace-expansion one clears with a plain `npm audit fix` (non-breaking). For postcss, the remediation is an npm `overrides` block in `package.json` pinning `postcss@^8.5.10` across the dep tree (postcss 8.x API is stable; low risk); alternative is to wait for `next` to bump its bundled postcss. **Not** `npm audit fix --force` — that would downgrade next to a much older vulnerable version. The postcss advisory surfaced 2026-05-14 when puppeteer / marked / gray-matter were added for the PDF pipeline; the new packages themselves are clean.
 - All API integrations verified working: Anthropic, Exa.ai, Inoreader, Sanity, ConvertKit
-- Admin login: `studio123`
+- Admin login: configured via `ADMIN_PASSWORD` in the deployment environment. Do not store the live password in project docs.
 - Inoreader connected as user `clive4`
 - Git repo: `github.com/CliveStruv56/silicon-stone`
 - **Live at siliconandstone.com** — deployed on Vercel, auto-deploys from main branch
@@ -157,7 +157,7 @@ All formats use Claude at temperature 0.4. Drafts are created directly in Sanity
 
 **Navigation**: Analysis, Briefings (cyan highlight), Tools, Products (dropdown), Methodology, Services, About, Search icon, Subscribe button (→ `/#subscribe`)
 
-### Admin Routes (`(admin)` group) — Password: `studio123`
+### Admin Routes (`(admin)` group) — protected by `ADMIN_PASSWORD` + signed `SESSION_SECRET` cookie
 
 | Route | Status | Description |
 |-------|--------|-------------|
@@ -249,7 +249,8 @@ NEXT_PUBLIC_LEMONSQUEEZY_CHECKLIST_URL=<url>              # Checklist Pack £24
 NEXT_PUBLIC_PLAUSIBLE_DOMAIN=siliconandstone.com          # Enables Plausible tracking
 
 # Admin Auth
-ADMIN_PASSWORD=studio123
+ADMIN_PASSWORD=<strong unique password>
+SESSION_SECRET=<long random secret, 32+ characters>
 ```
 
 ---
@@ -496,7 +497,7 @@ When starting a new Claude Code session:
 2. **The app builds cleanly** — `npm run build` should produce 41 routes, 0 errors
 3. **3 moderate npm vulnerabilities** — the transitive `postcss <8.5.10` advisory via `next > postcss` (counted twice) plus `brace-expansion` 5.0.2–5.0.5 via `@sanity/import`. postcss remediation is an npm `overrides` block (not `npm audit fix --force`, which would downgrade next); brace-expansion clears with a plain `npm audit fix`. Anything new on top of those three is real.
 4. **All APIs are working** — Anthropic, Exa, Inoreader, Sanity, ConvertKit
-5. **Admin password** is `studio123`
+5. **Admin password** is deployment-specific and must not be committed or recorded in docs. `SESSION_SECRET` is required for signed admin sessions and must be 32+ characters.
 6. **Inoreader** is connected as `clive4` (tokens in cookies, may need re-auth)
 7. **Do NOT upgrade Sanity to v5** until Next.js 16 is stable
 8. **Live at siliconandstone.com** — Vercel auto-deploys from main branch

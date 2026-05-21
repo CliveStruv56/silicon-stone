@@ -112,7 +112,8 @@ def _kit_env() -> tuple[str, str]:
 def _require_backend_api_key(request: Request) -> None:
     expected_key = os.getenv("BACKEND_API_KEY", "")
     if not expected_key:
-        return
+        logger.error("BACKEND_API_KEY is not configured; rejecting protected write request")
+        raise HTTPException(status_code=503, detail="Backend shared key is not configured")
 
     provided_key = request.headers.get("x-backend-api-key", "")
     if provided_key != expected_key:

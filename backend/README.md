@@ -58,6 +58,8 @@ curl -X POST http://localhost:8000/v1/contact \
 
 Set `BACKEND_API_KEY` in Railway and Vercel to the same long random value to
 protect write endpoints such as `/v1/subscribe` and `/v1/contact`.
+The backend fails closed for these write endpoints when `BACKEND_API_KEY` is not
+configured.
 
 Set `ALLOWED_ORIGINS` to a comma-separated list of Vercel frontend origins, for
 example:
