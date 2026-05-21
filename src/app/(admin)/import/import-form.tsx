@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useState } from 'react';
 import { importArticle } from './actions';
 import { IMPORT_INITIAL_STATE } from './types';
 import {
@@ -9,6 +9,7 @@ import {
     Loader2,
     CheckCircle,
     AlertCircle,
+    Upload,
 } from 'lucide-react';
 
 interface Persona {
@@ -41,6 +42,7 @@ export function ImportForm({ personas }: { personas: Persona[] }) {
         importArticle,
         IMPORT_INITIAL_STATE,
     );
+    const [fileName, setFileName] = useState('');
 
     return (
         <form action={formAction} className="space-y-8">
@@ -93,8 +95,8 @@ export function ImportForm({ personas }: { personas: Persona[] }) {
                 </div>
             </fieldset>
 
-            {/* STEP 3 — SOURCE TEXT */}
-            <fieldset className="space-y-3">
+            {/* STEP 3 — SOURCE */}
+            <fieldset className="space-y-4">
                 <legend className="text-sm font-semibold mb-2">3. The article</legend>
                 <div className="space-y-2">
                     <label
@@ -111,16 +113,41 @@ export function ImportForm({ personas }: { personas: Persona[] }) {
                         className="w-full px-4 py-2.5 bg-card border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                     />
                 </div>
+
                 <div className="space-y-2">
-                    <label htmlFor="text" className="text-sm text-muted-foreground">
-                        Paste the full article (plain text or markdown)
+                    <span className="text-sm text-muted-foreground">
+                        Upload a file{' '}
+                        <span className="opacity-60">(.docx, .md, .markdown, .txt)</span>
+                    </span>
+                    <label
+                        htmlFor="file"
+                        className="flex items-center gap-3 px-4 py-3 bg-card border border-dashed border-border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
+                    >
+                        <Upload className="w-4 h-4 text-muted-foreground shrink-0" />
+                        <span className="text-sm">{fileName || 'Choose a file…'}</span>
                     </label>
+                    <input
+                        id="file"
+                        name="file"
+                        type="file"
+                        accept=".docx,.md,.markdown,.txt"
+                        onChange={(e) => setFileName(e.target.files?.[0]?.name ?? '')}
+                        className="sr-only"
+                    />
+                </div>
+
+                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                    <span className="h-px flex-1 bg-border" />
+                    or paste the text
+                    <span className="h-px flex-1 bg-border" />
+                </div>
+
+                <div className="space-y-2">
                     <textarea
                         id="text"
                         name="text"
-                        required
-                        rows={16}
-                        placeholder="Paste the externally-written article here…"
+                        rows={14}
+                        placeholder="Paste the externally-written article here… (an uploaded file takes precedence)"
                         className="w-full px-4 py-3 bg-card border border-border rounded-lg text-sm font-mono leading-relaxed resize-y focus:outline-none focus:ring-2 focus:ring-primary"
                     />
                 </div>

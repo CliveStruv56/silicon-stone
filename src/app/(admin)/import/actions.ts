@@ -1,5 +1,6 @@
 "use server";
 
+import { extractRawText } from "mammoth";
 import { callClaude } from "@/lib/anthropic";
 import { buildPrompt, extractArticleMetadata } from "@/lib/prompts";
 import { createArticleInSanity, listSanityCategories } from "@/lib/sanity";
@@ -20,10 +21,37 @@ export async function importArticle(
     try {
         await requireAdmin();
 
-        const text = ((formData.get("text") as string) || "").trim();
         const format = (formData.get("format") as string) || "";
         const personaSlug = (formData.get("persona") as string) || "";
         const originalTitle = ((formData.get("originalTitle") as string) || "").trim();
+
+        // Source text comes from an uploaded file (.docx / .md / .markdown / .txt)
+        // if one was provided, otherwise from the pasted textarea.
+        let text = ((formData.get("text") as string) || "").trim();
+        const fileEntry = formData.get("file");
+        const file =
+            fileEntry instanceof File && fileEntry.size > 0 ? fileEntry : null;
+        if (file) {
+            const name = (file.name || "").toLowerCase();
+            if (name.endsWith(".docx")) {
+                const buffer = Buffer.from(await file.arrayBuffer());
+                const { value } = await extractRawText({ buffer });
+                text = (value || "").trim();
+            } else if (
+                name.endsWith(".md") ||
+                name.endsWith(".markdown") ||
+                name.endsWith(".txt")
+            ) {
+                text = (await file.text()).trim();
+            } else {
+                return {
+                    success: false,
+                    message:
+                        "Unsupported file type. Upload a .docx, .md, .markdown, or .txt file.",
+                    articleId: "",
+                };
+            }
+        }
 
         if (!personaSlug) {
             return { success: false, message: "Select a target persona.", articleId: "" };
@@ -34,7 +62,8 @@ export async function importArticle(
         if (text.length < 200) {
             return {
                 success: false,
-                message: "Paste the full article text (at least a couple of paragraphs).",
+                message:
+                    "Provide the article — upload a file or paste at least a couple of paragraphs.",
                 articleId: "",
             };
         }
