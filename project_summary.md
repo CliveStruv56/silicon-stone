@@ -164,6 +164,7 @@ All formats use Claude at temperature 0.4. Drafts are created directly in Sanity
 | `/admin` | ✅ | Dashboard with mission status, voice DNA, personas |
 | `/create` | ✅ | Unified content creation pipeline (Signal/Deep Dive/Research/YouTube) |
 | `/generate` | ✅ | AI content generation with Claude |
+| `/import` | ✅ | Import an externally-written article — reworked into S&S voice, saved as draft |
 | `/research` | ✅ | Research pipeline (Inoreader + Exa + Claude) |
 | `/context` | ✅ | View context profiles |
 | `/context/edit` | ✅ | Edit voice DNA, ICP, business profile |
@@ -323,6 +324,12 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### May 21, 2026 — Image library + external article importer
+
+| Commit | Description |
+|--------|-------------|
+| `b9d0b6c` | Two Sanity features on branch `feature/image-library-article-importer` (PR #2). **Image library:** new `assetCollection` (folder) + `libraryImage` document types with a folder-style "Image Library" section in the Studio desk; uploaded images become normal dataset assets, reusable in any article image picker. **Article importer:** new `/import` admin tool — paste an externally-written article, pick persona + format, and it is reworked into the S&S voice via the existing two-pass pipeline and saved as a draft; the verbatim original is kept in the new `article.sourceMaterial` field, with `article.source` marking it `imported`. Supporting: `callClaude` optional `maxTokens` arg; `/import` added to auth middleware + admin nav. Schema deployed to the hosted manifest 2026-05-21. |
+
 ### May 21, 2026 — Studio nav tab fix
 
 | Commit | Description |
@@ -418,7 +425,7 @@ SESSION_SECRET=<long random secret, 32+ characters>
 | Issue | Notes | Priority |
 |-------|-------|----------|
 | Legacy articles have no categories | Anything generated before commit `d8c4875` has empty `categories[]` and won't appear on `/analysis/category/*` pages. Backfill manually in Studio or via a one-off script. | Medium |
-| Sanity schema not fully deployed to manifest | Local schema declares `article`, `author`, `category`, `persona`, `siteSettings`, `youtubeScript`. Sanity Manifest only has the first three. Studio (which loads schema from local code) shows all six; MCP writes against `persona`/`siteSettings`/`youtubeScript` are blocked with `Unknown document type`. Resolve by running `npx sanity schema deploy` from the repo. | Medium |
+| ~~Sanity schema not fully deployed to manifest~~ **RESOLVED** | Resolved 2026-05-21: `npx sanity schema deploy` ran during the image-library work — the hosted manifest now carries all 8 types (`article`, `author`, `category`, `persona`, `siteSettings`, `youtubeScript`, `assetCollection`, `libraryImage`). MCP writes against all types now work. | — |
 | Inoreader redirect URI | Still points to localhost — user needs to update in Inoreader dev portal to `https://siliconandstone.com/api/auth/callback/inoreader` | Medium |
 | Lemon Squeezy not configured | Checkout links wired but env vars not yet set (no store created) | Medium |
 | Plausible not configured | Script deployed but env var not set (no account created) | Medium |
