@@ -20,7 +20,7 @@ SANITY_CATEGORIES_QUERY = """*[_type == "category"] | order(title asc) {
   "slug": slug.current
 }"""
 
-SANITY_BRIEFINGS_QUERY = """*[_type == "article" && defined(slug.current)]
+SANITY_BRIEFINGS_QUERY = """*[_type == "article" && !(_id in path("drafts.**")) && defined(intelligenceTier) && defined(slug.current)]
 | order(coalesce(impactScore, 5) desc, publishedAt desc) [0...20] {
   _id,
   title,

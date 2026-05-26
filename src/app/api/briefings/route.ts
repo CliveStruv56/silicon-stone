@@ -3,7 +3,7 @@ import { client } from '@/sanity/lib/client'
 import { urlFor } from '@/sanity/lib/image'
 
 const BRIEFINGS_QUERY = `
-  *[_type == "article" && defined(slug.current)]
+  *[_type == "article" && !(_id in path("drafts.**")) && defined(intelligenceTier) && defined(slug.current)]
   | order(coalesce(impactScore, 5) desc, publishedAt desc) [0...20] {
     _id,
     title,

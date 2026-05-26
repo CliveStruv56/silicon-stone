@@ -199,7 +199,7 @@ export const SEARCH_ARTICLES_QUERY = defineQuery(`
 
 // Intelligence Portal - Tiered Content
 export const ARTICLES_BY_TIER_QUERY = defineQuery(`
-  *[_type == "article" && intelligenceTier == $tier && defined(slug.current)]
+  *[_type == "article" && !(_id in path("drafts.**")) && intelligenceTier == $tier && defined(slug.current)]
   | order(coalesce(impactScore, 5) desc, publishedAt desc) [0...$limit] {
     _id,
     title,
@@ -221,7 +221,7 @@ export const ARTICLES_BY_TIER_QUERY = defineQuery(`
 
 // Briefings - All tiered content for the intelligence portal
 export const BRIEFINGS_QUERY = defineQuery(`
-  *[_type == "article" && defined(intelligenceTier) && defined(slug.current)]
+  *[_type == "article" && !(_id in path("drafts.**")) && defined(intelligenceTier) && defined(slug.current)]
   | order(coalesce(impactScore, 5) desc, publishedAt desc) {
     _id,
     title,

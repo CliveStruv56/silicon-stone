@@ -21,6 +21,12 @@ interface Persona {
 
 const FORMATS = [
     {
+        id: 'pulse',
+        name: 'Pulse',
+        desc: '30-second intelligence scan (100-140 words)',
+        icon: Sparkles,
+    },
+    {
         id: 'signal',
         name: 'Signal',
         desc: 'Rapid-response analysis (~800 words)',

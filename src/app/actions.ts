@@ -5,7 +5,7 @@ import { callClaude } from "@/lib/anthropic";
 import { createArticleInSanity, listSanityCategories } from "@/lib/sanity";
 import { requireAdmin } from "@/lib/auth";
 
-type ContentType = 'signal' | 'deepdive' | 'guide';
+type ContentType = 'pulse' | 'signal' | 'deepdive' | 'guide';
 
 interface ActionState {
     success: boolean;
@@ -26,7 +26,8 @@ export async function generateContent(_prevState: ActionState, formData: FormDat
     try {
         await requireAdmin();
         // 1. Build Prompts
-        const { systemPrompt, userPrompt } = await buildPrompt(topic, personaKey, contentType as ContentType);
+        const requestedType = contentType as ContentType;
+        const { systemPrompt, userPrompt } = await buildPrompt(topic, personaKey, requestedType);
 
         // 2. Call AI
         const content = await callClaude(systemPrompt, userPrompt);
@@ -69,6 +70,7 @@ export async function generateContent(_prevState: ActionState, formData: FormDat
             content,
             personaKey,
             categoryOptions.map(c => ({ slug: c.slug, title: c.title, description: c.description })),
+            requestedType === 'pulse' ? 'pulse' : undefined,
         );
 
         // Prefer the metadata call's meta description as the excerpt — it's tuned for <=160 chars.
@@ -80,14 +82,14 @@ export async function generateContent(_prevState: ActionState, formData: FormDat
             slug,
             excerpt: finalExcerpt,
             body: content, // The adapter converts this to blocks
-            contentType: contentType as ContentType,
+            contentType: requestedType === 'pulse' ? 'signal' : requestedType,
             persona: personaKey,
             seoTitle: metadata?.seoTitle,
             metaDescription: metadata?.metaDescription,
             stoneTruth: metadata?.stoneTruth,
             actionableInsights: metadata?.actionableInsights,
             categorySlugs: metadata?.categorySlugs,
-            intelligenceTier: metadata?.intelligenceTier,
+            intelligenceTier: requestedType === 'pulse' ? 'pulse' : metadata?.intelligenceTier,
             methodologyPillars: metadata?.methodologyPillars,
         });
 

@@ -26,6 +26,7 @@ function getPersonaColor(index: number) {
 }
 
 const TYPES = [
+    { id: 'pulse', name: 'Pulse', desc: '30-second intelligence scan', icon: Sparkles },
     { id: 'signal', name: 'Signal', desc: 'Rapid response (800 words)', icon: Sparkles },
     { id: 'deepdive', name: 'Deep Dive', desc: 'Forensic report (3000w)', icon: FileText },
     { id: 'guide', name: 'LinkedIn Post', desc: 'Executive summary', icon: Users },

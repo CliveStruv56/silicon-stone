@@ -4,7 +4,7 @@ import { callClaude } from "./anthropic";
 import { logErrorToFile } from "./debug";
 import type { VoiceDNA } from "@/types/context";
 
-type ContentType = 'signal' | 'deepdive' | 'guide';
+type ContentType = 'pulse' | 'signal' | 'deepdive' | 'guide';
 
 export async function buildPrompt(topic: string, personaKey: string, contentType: ContentType) {
     const [persona, voice, profile, contentFocus] = await Promise.all([
@@ -50,6 +50,29 @@ STRICT FORMATTING RULES:
 5. Hashtags: 3-5 relevant tags including #ForensicTechnopolitics.
 
 Structure it for maximum engagement/comments.
+`;
+    } else if (contentType === 'pulse') {
+        userPrompt = `Write a "Pulse" intelligence scan (100-140 words) about: "${topic}".
+
+Format: Markdown.
+Goal: Give ${persona.role} the signal, consequence, and immediate watchpoint in a genuine 30-second read.
+
+Structure:
+# [Headline: Specific and factual]
+
+**Stone Truth:** [One sentence stating the structural implication.]
+
+## What Shifted
+[Two short sentences stating the verified development.]
+
+## Why It Matters
+[Two short sentences directed to ${persona.role}s.]
+
+## Watch Next
+[One precise indicator or deadline to monitor.]
+
+Keep the full piece between 100 and 140 words. Do not expand it into a standard briefing.
+Tone: Clinical, concise, actionable.
 `;
     } else if (contentType === 'signal') {
         userPrompt = `Write a "Signal" analysis piece (800-1200 words) about: "${topic}".
@@ -136,6 +159,7 @@ export async function buildMetadataPrompt(
     personaKey: string,
     categories: CategoryChoice[],
     voice?: VoiceDNA,
+    requiredTier?: ArticleMetadata['intelligenceTier'],
 ) {
     const [persona, voiceDNA] = await Promise.all([
         getSanityPersona(personaKey),
@@ -184,6 +208,7 @@ Hard constraints:
   - "audit"    = forensic long-form deep analysis, 2000+ words.
   Choose based on the actual depth and rigour of the body, not on the
   contentType requested by the writer.
+${requiredTier ? `- This draft was deliberately commissioned as a "${requiredTier}" item. intelligenceTier MUST be "${requiredTier}".` : ''}
 - methodologyPillars MUST contain values drawn ONLY from this exact list
   of slugs (no other strings allowed):
     supply-chain-scenario-modelling
@@ -263,10 +288,11 @@ export async function extractArticleMetadata(
     body: string,
     personaKey: string,
     categories: CategoryChoice[],
+    requiredTier?: ArticleMetadata['intelligenceTier'],
 ): Promise<ArticleMetadata | null> {
     let raw = "";
     try {
-        const { systemPrompt, userPrompt } = await buildMetadataPrompt(title, body, personaKey, categories);
+        const { systemPrompt, userPrompt } = await buildMetadataPrompt(title, body, personaKey, categories, undefined, requiredTier);
         raw = await callClaude(systemPrompt, userPrompt);
 
         const firstOpen = raw.indexOf('{');
@@ -328,7 +354,7 @@ export async function extractArticleMetadata(
             stoneTruth: clamp(parsed.stoneTruth, 160),
             actionableInsights: insights.length >= 3 ? insights : undefined,
             categorySlugs: rawSlugs.length > 0 ? rawSlugs : undefined,
-            intelligenceTier,
+            intelligenceTier: requiredTier ?? intelligenceTier,
             methodologyPillars,
         };
     } catch (err) {

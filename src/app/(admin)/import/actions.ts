@@ -56,7 +56,7 @@ export async function importArticle(
         if (!personaSlug) {
             return { success: false, message: "Select a target persona.", articleId: "" };
         }
-        if (format !== "signal" && format !== "deep_dive") {
+        if (format !== "pulse" && format !== "signal" && format !== "deep_dive") {
             return { success: false, message: "Select a format.", articleId: "" };
         }
         if (text.length < 200) {
@@ -76,7 +76,7 @@ export async function importArticle(
         const { systemPrompt, userPrompt } = await buildPrompt(
             originalTitle || "Imported article",
             personaSlug,
-            contentType,
+            format === "pulse" ? "pulse" : contentType,
         );
 
         const reworkMessage = `${userPrompt}
@@ -129,6 +129,7 @@ Output ONLY a JSON object with this exact shape (no markdown fences, no commenta
                 parsed.content,
                 personaSlug,
                 categoryOptions,
+                format === "pulse" ? "pulse" : undefined,
             );
         } catch (err) {
             console.error("[/import] Metadata extraction failed:", err);
@@ -151,7 +152,7 @@ Output ONLY a JSON object with this exact shape (no markdown fences, no commenta
             stoneTruth: metadata?.stoneTruth,
             actionableInsights: metadata?.actionableInsights,
             categorySlugs: metadata?.categorySlugs,
-            intelligenceTier: metadata?.intelligenceTier,
+            intelligenceTier: format === "pulse" ? "pulse" : metadata?.intelligenceTier,
             methodologyPillars: metadata?.methodologyPillars,
             source: "imported",
             sourceMaterial: text,

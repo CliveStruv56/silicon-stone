@@ -36,6 +36,22 @@ interface Article {
   }>
 }
 
+type IntelligenceTier = 'pulse' | 'briefing' | 'audit'
+
+const INTELLIGENCE_TIERS: Array<{ value: IntelligenceTier; label: string }> = [
+  { value: 'pulse', label: 'Pulse (30s)' },
+  { value: 'briefing', label: 'Briefing (5min)' },
+  { value: 'audit', label: 'Audit (Deep)' },
+]
+
+function getPersonaParam(value: string | null): string | null {
+  return value && value in PERSONAS ? value : null
+}
+
+function getTierParam(value: string | null): IntelligenceTier | null {
+  return value === 'pulse' || value === 'briefing' || value === 'audit' ? value : null
+}
+
 type BriefingsResponse = Article[] | {
   result?: Article[]
 }
@@ -251,6 +267,19 @@ export default function BriefingsPage() {
   const [articles, setArticles] = useState<Article[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedPersona, setSelectedPersona] = useState<string | null>(null)
+  const [selectedTier, setSelectedTier] = useState<IntelligenceTier | null>(null)
+
+  useEffect(() => {
+    function syncFiltersFromUrl() {
+      const params = new URLSearchParams(window.location.search)
+      setSelectedPersona(getPersonaParam(params.get('persona')))
+      setSelectedTier(getTierParam(params.get('tier')))
+    }
+
+    syncFiltersFromUrl()
+    window.addEventListener('popstate', syncFiltersFromUrl)
+    return () => window.removeEventListener('popstate', syncFiltersFromUrl)
+  }, [])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -304,10 +333,27 @@ export default function BriefingsPage() {
     return () => controller.abort()
   }, [])
 
-  // Filter articles by persona
-  const filteredArticles = selectedPersona
-    ? articles.filter((a) => a.personas?.includes(selectedPersona))
+  function updateFilters(persona: string | null, tier: IntelligenceTier | null) {
+    setSelectedPersona(persona)
+    setSelectedTier(tier)
+
+    const params = new URLSearchParams(window.location.search)
+    if (persona) params.set('persona', persona)
+    else params.delete('persona')
+    if (tier) params.set('tier', tier)
+    else params.delete('tier')
+
+    const query = params.toString()
+    window.history.pushState(null, '', `${window.location.pathname}${query ? `?${query}` : ''}`)
+  }
+
+  const articlesForTier = selectedTier
+    ? articles.filter((article) => article.intelligenceTier === selectedTier)
     : articles
+
+  const filteredArticles = selectedPersona
+    ? articlesForTier.filter((article) => article.personas?.includes(selectedPersona))
+    : articlesForTier
 
   // Get featured article (highest impact or most recent)
   const featuredArticle = filteredArticles[0]
@@ -315,12 +361,21 @@ export default function BriefingsPage() {
 
   // Calculate persona counts
   const personaCounts: Record<string, number> = {
-    all: articles.length,
+    all: articlesForTier.length,
   }
-  articles.forEach((article) => {
+  articlesForTier.forEach((article) => {
     article.personas?.forEach((persona) => {
       personaCounts[persona] = (personaCounts[persona] || 0) + 1
     })
+  })
+
+  const tierCounts: Record<string, number> = {
+    all: articles.length,
+  }
+  articles.forEach((article) => {
+    if (article.intelligenceTier) {
+      tierCounts[article.intelligenceTier] = (tierCounts[article.intelligenceTier] || 0) + 1
+    }
   })
 
   return (
@@ -366,17 +421,59 @@ export default function BriefingsPage() {
         {/* Persona Introduction */}
         <PersonaIntro />
 
-        {/* Persona Filter */}
+        {/* Feed Filters */}
         <section className="border-b border-border-subtle bg-stone-charcoal/30">
-          <div className="mx-auto max-w-7xl px-6 py-4 lg:px-8">
-            <div className="font-ui-mono text-xs uppercase tracking-wider text-text-muted mb-3">
-              Filter by perspective
+          <div className="mx-auto max-w-7xl px-6 py-4 lg:px-8 space-y-5">
+            <div>
+              <div className="font-ui-mono text-xs uppercase tracking-wider text-text-muted mb-3">
+                Filter by tier
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => updateFilters(selectedPersona, null)}
+                  className={cn(
+                    'flex items-center gap-2 px-3 py-2 rounded-lg border transition-all text-sm font-medium',
+                    !selectedTier
+                      ? 'bg-silicon-cyan/20 border-silicon-cyan text-silicon-cyan'
+                      : 'bg-stone-charcoal/50 border-border-subtle text-text-muted hover:border-stone-teal hover:text-text-primary'
+                  )}
+                >
+                  <span>All Tiers</span>
+                  <Badge variant="secondary" className="text-xs px-1.5 py-0">{tierCounts.all}</Badge>
+                </button>
+                {INTELLIGENCE_TIERS.map((tier) => (
+                  <button
+                    key={tier.value}
+                    type="button"
+                    onClick={() => updateFilters(selectedPersona, selectedTier === tier.value ? null : tier.value)}
+                    className={cn(
+                      'flex items-center gap-2 px-3 py-2 rounded-lg border transition-all text-sm',
+                      selectedTier === tier.value
+                        ? 'bg-silicon-amber/20 border-silicon-amber text-silicon-amber'
+                        : 'bg-stone-charcoal/50 border-border-subtle text-text-muted hover:border-stone-teal hover:text-text-primary'
+                    )}
+                  >
+                    <span>{tier.label}</span>
+                    {(tierCounts[tier.value] || 0) > 0 && (
+                      <Badge variant="secondary" className="text-xs px-1.5 py-0">
+                        {tierCounts[tier.value]}
+                      </Badge>
+                    )}
+                  </button>
+                ))}
+              </div>
             </div>
-            <PersonaFilter
-              selectedPersona={selectedPersona}
-              onPersonaChange={setSelectedPersona}
-              personaCounts={personaCounts}
-            />
+            <div>
+              <div className="font-ui-mono text-xs uppercase tracking-wider text-text-muted mb-3">
+                Filter by perspective
+              </div>
+              <PersonaFilter
+                selectedPersona={selectedPersona}
+                onPersonaChange={(persona) => updateFilters(persona, selectedTier)}
+                personaCounts={personaCounts}
+              />
+            </div>
           </div>
         </section>
 
@@ -389,7 +486,7 @@ export default function BriefingsPage() {
               </div>
             ) : filteredArticles.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-text-muted">No briefings found for this persona.</p>
+                <p className="text-text-muted">No published intelligence matches these filters.</p>
               </div>
             ) : (
               <div className="space-y-12">
@@ -424,7 +521,10 @@ export default function BriefingsPage() {
         {/* CTA */}
         <section className="py-12 border-t border-border-subtle">
           <div className="mx-auto max-w-2xl px-6 lg:px-8">
-            <DynamicCTA primaryPersona={selectedPersona || undefined} />
+            <DynamicCTA
+              primaryPersona={selectedPersona || undefined}
+              intelligenceTier={selectedTier || undefined}
+            />
           </div>
         </section>
       </main>

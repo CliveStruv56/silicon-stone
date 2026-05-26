@@ -123,7 +123,12 @@ export function PulseHeader({
           </span>
         )}
 
-        {readingTime && readingTime > 0 && (
+        {intelligenceTier === 'pulse' ? (
+          <>
+            <span className="text-text-muted/50">&middot;</span>
+            <span className="text-xs text-text-muted">30 sec scan</span>
+          </>
+        ) : readingTime && readingTime > 0 && (
           <>
             <span className="text-text-muted/50">&middot;</span>
             <span className="text-xs text-text-muted">{readingTime} min read</span>

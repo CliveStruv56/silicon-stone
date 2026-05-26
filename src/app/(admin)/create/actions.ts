@@ -21,13 +21,16 @@ export async function performResearch(topic: string) {
     }
 }
 
-function getArticleSystemPrompt(format: "signal" | "deep_dive", personaSlug: string): string {
+function getArticleSystemPrompt(format: "pulse" | "signal" | "deep_dive", personaSlug: string): string {
     const isDeepDive = format === "deep_dive";
-    const wordCount = isDeepDive ? "3000+" : "800";
+    const wordCount = isDeepDive ? "3000+" : format === "pulse" ? "100-140" : "800";
+    const pulseConstraint = format === "pulse"
+        ? "\nThis is a Pulse: the complete article must be a genuine 30-second scan of 100-140 words. State what shifted, why it matters, and one watchpoint only."
+        : "";
 
     return `You are writing a ${format.replace('_', ' ')} (approx ${wordCount} words) for the brand "Silicon & Stone".
 The target persona slug is: ${personaSlug}
-Your task is to write the full article draft using the provided forensic research.
+Your task is to write the full article draft using the provided forensic research.${pulseConstraint}
 
 Please output ONLY a JSON object with the following structure:
 {
@@ -96,7 +99,7 @@ Please output ONLY a JSON object with the following structure:
 
 export async function createDraftFromResearch(
     researchResult: ResearchResult,
-    format: "signal" | "deep_dive" | "youtube",
+    format: "pulse" | "signal" | "deep_dive" | "youtube",
     personaSlug: string,
     topic: string = ""
 ) {
@@ -162,6 +165,7 @@ ${priorCoverageBlock}`;
                 parsedData.content,
                 personaSlug,
                 categoryOptions,
+                format === "pulse" ? "pulse" : undefined,
             );
         } catch (err) {
             console.error('[/create] Metadata extraction failed:', err);
@@ -179,7 +183,7 @@ ${priorCoverageBlock}`;
             stoneTruth: metadata?.stoneTruth,
             actionableInsights: metadata?.actionableInsights,
             categorySlugs: metadata?.categorySlugs,
-            intelligenceTier: metadata?.intelligenceTier,
+            intelligenceTier: format === "pulse" ? "pulse" : metadata?.intelligenceTier,
             methodologyPillars: metadata?.methodologyPillars,
         };
 

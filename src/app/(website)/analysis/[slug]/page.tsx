@@ -212,8 +212,8 @@ export default async function ArticlePage({ params }: Props) {
             />
           )}
 
-          {/* Actionable Insights - for Briefing tier */}
-          {article.actionableInsights && article.actionableInsights.length > 0 && (
+          {/* Actionable Insights - longer tiers only; keep a Pulse within its scan-time promise */}
+          {article.intelligenceTier !== 'pulse' && article.actionableInsights && article.actionableInsights.length > 0 && (
             <div className="glass-plate tech-corners rounded-lg p-6 mb-8 border border-tier-briefing/30">
               <h2 className="font-ui-mono text-tier-briefing text-sm mb-4">Actionable Insights</h2>
               <ul className="space-y-3">
