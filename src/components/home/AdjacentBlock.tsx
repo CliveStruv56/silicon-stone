@@ -27,7 +27,7 @@ export function AdjacentBlock() {
                 <div className="flex-1 min-w-0">
                     <p className="text-sm md:text-base text-text-primary leading-relaxed">
                         <span className="font-semibold text-sister-indigo">WaymarkPath</span>
-                        {' — the AI-powered career transition platform for senior leaders navigating the same shifts these briefings analyse.'}
+                        {' — the AI-powered career transition platform for senior professionals turning that shift to their advantage, and building the AI fluency that’s fast becoming the baseline rather than the edge.'}
                     </p>
                     <p className="mt-2 text-xs md:text-sm italic text-text-muted leading-relaxed">
                         A separate platform, in its own register. Free to start. No newsletter — that&apos;s what Silicon &amp; Stone is for.

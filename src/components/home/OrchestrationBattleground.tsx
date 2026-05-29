@@ -125,7 +125,11 @@ const fallbackStoneTruthBody: ReactNode = (
         Read which side of the orchestration divide your industry sits on.{' '}
         <em className="text-silicon-amber not-italic font-medium">
             The 2030 league table is being set there — not at the model layer where everyone else is looking.
-        </em>
+        </em>{' '}
+        <strong className="text-text-primary font-semibold">
+            The same divide runs through individual careers.
+        </strong>{' '}
+        AI fluency is sliding from differentiator to baseline — written into the job spec, not the bonus column. The way spreadsheets quietly became, a generation ago.
     </>
 )
 

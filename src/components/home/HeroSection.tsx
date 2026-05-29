@@ -154,6 +154,18 @@ export function HeroSection({ settings }: HeroSectionProps) {
                                 'Calibrated, decision-grade analysis from someone who spent thirty years inside the industry. Published twice a week from an Outer Orkney isle — sixty miles north of mainland Scotland — because the view from the edge is structurally clearer than the view from any centre.'}
                         </motion.p>
 
+                        <motion.p
+                            variants={itemVariants}
+                            className="mt-6 max-w-xl text-sm font-medium leading-relaxed text-text-primary/80"
+                            style={{
+                                textShadow: '0 2px 18px rgba(0, 0, 0, 0.65)',
+                            }}
+                        >
+                            AI fluency is fast becoming{' '}
+                            <span className="text-silicon-amber">the baseline, not the edge</span>
+                            {' '}— for industries and the careers inside them.
+                        </motion.p>
+
                         <motion.div
                             variants={itemVariants}
                             className="mt-10 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6"

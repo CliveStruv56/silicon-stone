@@ -1,7 +1,7 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-05-21
+> Last Updated: 2026-05-29
 > Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing, 3 moderate transitive npm vulns (postcss inside next + brace-expansion via @sanity/import)**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com. Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools (email-gated for lead capture, AI Act triage engine recently overhauled), product/commerce pages with Lemon Squeezy checkout links, Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Signal, Deep Dive, Research, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Awaiting Lemon Squeezy store setup, Plausible account, content publishing for 2 queued drafts, and full Sanity schema deploy (persona / siteSettings / youtubeScript types are local-only).
@@ -323,6 +323,12 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### May 29, 2026 — Home page: "AI fluency is the baseline" thread
+
+| Commit | Description |
+|--------|-------------|
+| `101f4e4` | Wove a subtle, escalating thread into the home page that AI fluency is shifting from *nice-to-have* to *baseline employer expectation*, giving the existing WaymarkPath cross-link its missing setup. Three touches, calibrated to the brand voice (no fear-mongering): (1) `HeroSection.tsx` — a new quiet secondary line under the hero description ("AI fluency is fast becoming **the baseline, not the edge** — for industries and the careers inside them"); headline/subheadline untouched. (2) `OrchestrationBattleground.tsx` — the "Stone Truth" fallback now extends to "…the same divide runs through individual careers. AI fluency is sliding from differentiator to baseline — written into the job spec, not the bonus column. The way spreadsheets quietly became, a generation ago." (3) `AdjacentBlock.tsx` — WaymarkPath lead reframed to "…senior professionals turning that shift to their advantage, and building the AI fluency that's fast becoming the baseline rather than the edge." All three are hardcoded/code-fallback copy (verified `orchestrationBattleground` not set in Sanity), so they render live without a CMS change. |
 
 ### May 21, 2026 — Image library + external article importer
 
