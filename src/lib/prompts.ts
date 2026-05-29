@@ -243,7 +243,7 @@ ${requiredTier ? `- This draft was deliberately commissioned as a "${requiredTie
   mandates — the per-cell test above is the actual selector):
     - pulse:    exactly 1 cell.
     - briefing: 2–4 cells.
-    - audit:    4–6 cells. Audits are wider in scope so naturally
+    - audit:    eligible for all 6 cells. Audits are wider in scope so may
                 touch more lenses, but never auto-select all 6 —
                 drop any lens the body does not actually use.
 

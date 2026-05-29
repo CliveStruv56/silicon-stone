@@ -117,7 +117,8 @@ export const article = defineType({
       title: 'Methodology Audit (3×2 matrix cells)',
       description:
         'Cells of the 3×2 Forensic Technopolitics matrix that this piece ' +
-        'applies. Pulses use 1 cell; Briefings 2–4 cells; Audits all 6.',
+        'visibly applies. Pulses usually use 1 cell; Briefings 2–4 cells; ' +
+        'Audits are eligible for all 6 but should only claim cells the body actually uses.',
       type: 'array',
       of: [defineArrayMember({ type: 'string' })],
       options: {

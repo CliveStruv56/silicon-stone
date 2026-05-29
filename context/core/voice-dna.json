@@ -24,7 +24,25 @@
   },
   "voice_boundaries": {
     "never_sounds_like": ["Clickbait", "Sensationalist", "Partisan"],
-    "never_uses_phrases": ["Game-changer", "Disruption"],
+    "never_uses_phrases": [
+      "game-changer",
+      "disruption",
+      "game-changing",
+      "revolutionary",
+      "transformative",
+      "cutting-edge",
+      "next-generation",
+      "best-in-class",
+      "future-proof",
+      "synergy",
+      "actionable insights",
+      "easy",
+      "simple",
+      "one-click",
+      "cut through the noise",
+      "AI is revolutionising X",
+      "literally"
+    ],
     "avoids_topics": ["Partisan politics", "Speculation without evidence"]
   },
   "emotional_range": {

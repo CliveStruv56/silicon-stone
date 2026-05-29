@@ -4,7 +4,11 @@ description: Voice rules for any text rendered on Silicon and Stone surfaces —
 
 # Silicon and Stone — Brand Voice
 
-> **Pair with `context/core/voice-dna.json`** — the existing structured voice file in this repo. That JSON is the canonical machine-readable spec; this skill is the prose extension that explains the register, gives examples, and provides drift-detection filters. Both apply.
+> **Pair with `context/core/voice-dna.json` and `.agent/rules/style/`** — the
+> structured voice file is the machine-readable spec, and the synced style rules
+> from the Ideaverse vault are the editorial source of truth for article
+> variants. This skill is the prose extension that explains the register, gives
+> examples, and provides drift-detection filters. All apply.
 >
 > **When to use**: Any time you generate or edit user-facing text on a Silicon and Stone surface. If a piece of text doesn't pass these rules, rewrite it.
 

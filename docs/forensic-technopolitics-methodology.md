@@ -52,7 +52,7 @@ Forensic Technopolitics rejects both. It calls this posture **Digital Realism** 
 
 ## 03 · The framework
 
-Three forensic domains × two analytical methods = a 3 × 2 matrix of six analytical moves. Every Silicon and Stone briefing applies between two and four of them. Every Deep Dive applies all six.
+Three forensic domains × two analytical methods = a 3 × 2 matrix of six analytical moves. Every Silicon and Stone briefing applies between two and four of them. Every Deep Dive is eligible to apply all six, but the audit only claims the cells the body visibly uses.
 
 ### The three domains
 
@@ -129,7 +129,7 @@ The Audit is the framework's commitment to intellectual honesty. It tells the re
 
 A reader who knows the framework can spot when a piece is over-claiming (an Audit that lists more than the body actually delivers) or under-claiming (an Audit that omits a move the body clearly used).
 
-A piece that lists only one cell isn't a failure. It's a Pulse signal. A piece that lists all six is a Deep Dive Audit-tier briefing — the foundational format. Most Tuesday Stone Briefings sit between two and four cells. The cadence is deliberate.
+A piece that lists only one cell isn't a failure. It's a Pulse signal. A piece that lists all six is a Deep Dive Audit-tier briefing only if the body visibly applies all six analytical moves. Most Tuesday Stone Briefings sit between two and four cells. The cadence is deliberate.
 
 ---
 
@@ -200,7 +200,7 @@ Not every piece applies the full matrix. The framework recognises three tiers, a
 
 - **Pulse** — 30-second scan. Usually one or two cells. For breaking signals where speed matters and the analytical depth is constrained by what is actually known yet.
 - **Briefing** — 5-minute read. Two to four cells. The default Stone Briefing tier. The Tuesday Stone Briefing on the YouTube channel maps to this.
-- **Audit** — Deep dive, 20+ minute read. All six cells. Foundational pieces. The format reserved for the questions that will compound — Pax Silica, the AI Act enforcement cliff, the German automotive supply-chain exposure.
+- **Audit** — Deep dive, 20+ minute read. Eligible for all six cells, but evidence-led in what it claims. Foundational pieces. The format reserved for the questions that will compound — Pax Silica, the AI Act enforcement cliff, the German automotive supply-chain exposure.
 
 The tier is set in Sanity Studio on every article. The Methodology Audit on the published piece reflects what was actually applied — which should match the tier, but doesn't always, and the Audit is always the source of truth.
 

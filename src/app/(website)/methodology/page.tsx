@@ -345,9 +345,9 @@ export default function MethodologyPage() {
             </h2>
             <p className="text-text-muted leading-relaxed mb-3">
               Three domains × two methods = six analytical moves. Every Stone Briefing
-              applies between two and four cells. Every Deep Dive applies all six. The
-              Methodology Audit at the top of every piece tells the reader which were
-              applied and which were not.
+              applies between two and four cells. Every Deep Dive is eligible for all
+              six, but the Methodology Audit only claims the cells the body visibly
+              applies.
             </p>
           </div>
           <div className="overflow-x-auto">

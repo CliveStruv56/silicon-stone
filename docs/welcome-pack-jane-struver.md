@@ -126,7 +126,7 @@ Applied to all three domains:
 
 ##### The matrix
 
-Three domains × two methods = a 3×2 matrix of analytical moves. Every published Stone Briefing applies two to four of them. Every Deep Dive applies all six. The Methodology Audit at the top of each piece tells the reader which were applied and which were not. That transparency is the framework's commitment to intellectual honesty.
+Three domains × two methods = a 3×2 matrix of analytical moves. Every published Stone Briefing applies two to four of them. Every Deep Dive is eligible to apply all six, but the Methodology Audit only claims cells the body visibly uses. That transparency is the framework's commitment to intellectual honesty.
 
 In Sanity Studio you'll see these as the six values in the **Methodology Audit (3×2 matrix cells)** field on every article:
 
