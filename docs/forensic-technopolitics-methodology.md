@@ -229,7 +229,7 @@ The framework is not abstract. It is built into the CMS:
 - Every article carries the **Stone Truth** field — the one-line verdict.
 - Every article carries the **Intelligence Tier** (Pulse / Briefing / Audit).
 - Every article carries one or more **Personas** — the decision-makers the piece is for.
-- Every article is **indexed in Pinecone** on publish, so future pieces can retrieve and cite the back-catalogue automatically.
+- Every published article is **indexed in Pinecone** on publish, so future pieces can retrieve and cite the back-catalogue automatically. Drafts are deliberately excluded from the vector index.
 - The four interactive **tools** on the website (Compliance Checker, Supply Chain Mapper, Scenario Modeler, Policy Stress-Test) are operational expressions of the framework — they let readers run a single question through one of the analytical methods themselves.
 
 The framework, in other words, is not just the editorial discipline. It is the schema. Every drop of content the platform produces is structurally legible against it.

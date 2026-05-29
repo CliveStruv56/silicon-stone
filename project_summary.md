@@ -2,9 +2,9 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-05-29
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing, 3 moderate transitive npm vulns (postcss inside next + brace-expansion via @sanity/import)**
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing, 13 moderate transitive npm audit findings (uuid through Sanity packages)**
 
-**Current State**: Full-featured intelligence portal live at siliconandstone.com. Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools (email-gated for lead capture, AI Act triage engine recently overhauled), product/commerce pages with Lemon Squeezy checkout links, Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Signal, Deep Dive, Research, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Awaiting Lemon Squeezy store setup, Plausible account, content publishing for 2 queued drafts, and full Sanity schema deploy (persona / siteSettings / youtubeScript types are local-only).
+**Current State**: Full-featured intelligence portal live at siliconandstone.com. Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools (email-gated for lead capture, AI Act triage engine recently overhauled), product/commerce pages with Lemon Squeezy checkout links, Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Awaiting Lemon Squeezy store setup, Plausible account, and content publishing for queued drafts.
 
 ---
 
@@ -13,8 +13,8 @@
 This is the **Silicon & Stone intelligence portal** — a Next.js 15 + Sanity CMS platform for "Forensic Technopolitics" analysis. It combines a public website, admin research/authoring tools, digital product sales pages, and an embedded CMS Studio.
 
 **Key facts:**
-- Build passes cleanly (`npm run build` — 41 routes, 0 errors)
-- 3 moderate `npm audit` vulnerabilities — (1) the transitive `postcss <8.5.10` advisory (GHSA-qx2v-qp2m-jg93), counted twice (`postcss` itself and `next` depending on it), reached via `next > postcss`; and (2) `brace-expansion` 5.0.2–5.0.5 (GHSA-jxxr-4gwj-5jf2, DoS), reached via `@sanity/import`. The brace-expansion one clears with a plain `npm audit fix` (non-breaking). For postcss, the remediation is an npm `overrides` block in `package.json` pinning `postcss@^8.5.10` across the dep tree (postcss 8.x API is stable; low risk); alternative is to wait for `next` to bump its bundled postcss. **Not** `npm audit fix --force` — that would downgrade next to a much older vulnerable version. The postcss advisory surfaced 2026-05-14 when puppeteer / marked / gray-matter were added for the PDF pipeline; the new packages themselves are clean.
+- Build passes cleanly (`npm run build` — 50 generated app routes, 0 errors)
+- `npm audit --audit-level=moderate` baseline: 13 moderate transitive findings. `brace-expansion` was remediated with a normal `npm audit fix` on 2026-05-29, and a narrow `postcss` override now resolves the previous Next/PostCSS finding. Remaining advisory is `uuid <11.1.1` through Sanity packages. **Do not run `npm audit fix --force`** — npm currently proposes unsafe Sanity/Vision downgrade paths. The practical runtime risk is low because the app does not pass attacker-controlled buffers to uuid helpers.
 - All API integrations verified working: Anthropic, Exa.ai, Inoreader, Sanity, ConvertKit
 - Admin login: configured via `ADMIN_PASSWORD` in the deployment environment. Do not store the live password in project docs.
 - Inoreader connected as user `clive4`
@@ -64,10 +64,10 @@ This is the **Silicon & Stone intelligence portal** — a Next.js 15 + Sanity CM
 
 | Layer | Technology | Version |
 |-------|------------|---------|
-| Framework | Next.js (App Router) | 15.5.12 |
+| Framework | Next.js (App Router) | 15.5.18 |
 | UI | React + Tailwind CSS + Shadcn/Radix | React 19.2.3, Tailwind 4 |
 | CMS | Sanity (Headless) | 4.22.0 |
-| Frontend Client | next-sanity | 11.6.12 |
+| Frontend Client | next-sanity | 11.6.13 |
 | AI | Anthropic Claude SDK | 0.71.2 |
 | Web Search | Exa.js | 2.2.0 |
 | Feed Aggregation | Inoreader API (OAuth2) | - |
@@ -109,12 +109,13 @@ Unified admin page for generating content from research results:
 
 | Format | Description |
 |--------|-------------|
+| **Pulse** | 100-140 word, 30-second intelligence scan |
 | **Signal** | 800-1,500 word breaking analysis |
 | **Deep Dive** | 3,000-6,000 word forensic report |
 | **Research Only** | Summary without full article |
 | **YouTube Script** | Tiered Intelligence structure (Pulse/Briefing/Audit CTA) |
 
-All formats use Claude at temperature 0.4. Drafts are created directly in Sanity CMS.
+All draft-generating formats use Claude at temperature 0.4. Drafts are created directly in Sanity CMS. Pulse drafts are saved as `contentType: signal` with `intelligenceTier: pulse`; the fields intentionally separate editorial format from reading-speed tier.
 
 **Inoreader OAuth**: App ID `1000008617`, redirect URI `http://localhost:3000/api/auth/callback/inoreader`. Connected as `clive4`. Tokens stored in httpOnly cookies.
 
@@ -162,8 +163,8 @@ All formats use Claude at temperature 0.4. Drafts are created directly in Sanity
 | Route | Status | Description |
 |-------|--------|-------------|
 | `/admin` | ✅ | Dashboard with mission status, voice DNA, personas |
-| `/create` | ✅ | Unified content creation pipeline (Signal/Deep Dive/Research/YouTube) |
-| `/generate` | ✅ | AI content generation with Claude |
+| `/create` | ✅ | Unified research-to-Sanity creation pipeline (Pulse/Signal/Deep Dive/Research/YouTube) |
+| `/generate` | ✅ | Legacy quick prompt-to-draft generator with Claude |
 | `/import` | ✅ | Import an externally-written article — reworked into S&S voice, saved as draft |
 | `/research` | ✅ | Research pipeline (Inoreader + Exa + Claude) |
 | `/context` | ✅ | View context profiles |
@@ -271,6 +272,7 @@ SESSION_SECRET=<long random secret, 32+ characters>
 |------|--------|---------|
 | **Signal** | 800-1,500 words | Breaking analysis, 24-72h turnaround |
 | **Deep Dive** | 3,000-6,000 words | Comprehensive forensic report |
+| **Pulse** | 100-140 words | One verified shift, one consequence, one watchpoint |
 | **YouTube Script** | Variable | Tiered Intelligence (Pulse/Briefing/Audit CTA) |
 | **Tool Guide** | 500-2,000 words | Instructions for interactive tools |
 
@@ -311,6 +313,7 @@ SESSION_SECRET=<long random secret, 32+ characters>
 | Sanity schemas | `src/sanity/schemaTypes/` |
 | Sanity queries | `src/sanity/lib/queries.ts` |
 | Content sync | `scripts/sync-content.ts` |
+| Pinecone backfill sync | `src/scripts/sync-pinecone.ts` |
 | Briefing PDF renderer | `scripts/render-briefing-pdf.ts` |
 | Persona definitions + avatars | `src/lib/personas.ts`, `public/personas/` |
 | Middleware (auth) | `src/middleware.ts` |
@@ -323,6 +326,13 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### May 29, 2026 — Pulse generation flow + vector index hygiene
+
+| Commit | Description |
+|--------|-------------|
+| `53f7f64` | Clarified Pulse generation end-to-end: admin navigation now points at `/create`, `/content` and dashboard New Article links use `/create`, generated drafts are marked `source: generated`, malformed Claude draft payloads fail with clearer validation, and `docs/authoring-guide.md` documents Pulse as a first-class workflow. |
+| `5153ffd` | Pinecone/vectorization now skips draft articles. The webhook ignores `drafts.*`, fetches only published articles, and the backfill sync queries only published Sanity documents. |
 
 ### May 29, 2026 — Home page: "AI fluency is the baseline" thread
 
@@ -439,7 +449,7 @@ SESSION_SECRET=<long random secret, 32+ characters>
 | Atlantic Drift Briefing PDF unwritten | Lead magnet referenced in the Welcome Pack and required before YouTube launch. Outline now drafted at `docs/atlantic-drift-briefing-outline.md`; full PDF still to write. | Medium |
 | Sanity persona docs hold short version | Persona documents in Sanity carry shorter pain-points / content-needs than `docs/persona-profiles.md`. MCP backfill blocked by the schema-deploy gap above; can be done manually in Studio or after schema deploy. | Low |
 | Legacy methodologyPillars on 2 articles | Verified via GROQ 2026-05-20: only 2 documents still hold legacy 4-lens slugs — the published *Atlantic Fault Lines Deepen* (`2oGVswEwQBfyYUvi889ioS`, `policy-stress-testing`) and the draft *Iran Conflict Reshapes…* (`drafts.1344add1-…`, `supply-chain-forensics`). All other articles with pillars are on the new 6-cell vocabulary. `MethodologyChecklist` normalises legacy slugs at render via a legacy map so the UI is never blank; backfill these 2 in Studio to retire the map. | Medium |
-| Transitive npm CVEs (postcss + brace-expansion) | `npm audit` shows 3 moderate severity vulns: the `postcss <8.5.10` advisory (GHSA-qx2v-qp2m-jg93, XSS via unescaped `</style>` in CSS stringify) reached via `next > postcss` (counted twice — `postcss` and `next`), plus `brace-expansion` 5.0.2–5.0.5 (GHSA-jxxr-4gwj-5jf2, DoS) reached via `@sanity/import`. The brace-expansion vuln clears with a plain `npm audit fix` (non-breaking). For postcss — **Remediation:** add an npm `overrides` block to `package.json` pinning `postcss@^8.5.10` — forces the patched version across the transitive tree. postcss 8.x has a stable API so the override is low-risk; verify with `npm run build` + `npm run check` after applying. **Do not** run `npm audit fix --force` — npm has no semver-compatible patch path and the `--force` flag would downgrade `next` to 9.3.3 (which is itself ancient and vulnerable). The XSS vector requires user-controlled CSS strings, which we don't process at runtime, so practical risk is low even before remediation. Surfaced 2026-05-14 alongside the puppeteer install; the new pipeline packages are clean. | Low |
+| Transitive npm audit findings (uuid via Sanity) | `npm audit --audit-level=moderate` shows 13 moderate findings after a normal `npm audit fix` cleared `brace-expansion` and a narrow `postcss` override cleared the previous Next/PostCSS finding on 2026-05-29. Remaining advisory: `uuid <11.1.1` via Sanity packages. **Do not run `npm audit fix --force`** — npm currently proposes unsafe Sanity/Vision downgrade paths. Practical runtime risk is low: the app does not pass attacker-controlled buffers into uuid helpers. Revisit when Sanity publishes a patched compatible dependency tree. | Low |
 | Markdown-to-PDF pipeline | `scripts/render-briefing-pdf.ts` + `npm run render-briefing` render lead-magnet / Intelligence Series PDFs. Committed 2026-05-20 (`21eb123`; overwrite-guard `570ab13`). `puppeteer` / `marked` / `gray-matter` are devDependencies — `puppeteer` pulls ~170MB Chromium on install. Dev-only, never invoked by Vercel/Railway. Docs: `docs/markdown-to-pdf-pipeline.md`. | Info |
 | Studio reference-array UX trap | Clicking "Add item" in a Sanity reference array and saving without picking a doc leaves an orphan row (`_type`/`_key` but no `_ref`). One of these was found and cleaned up on the Helium article draft on 2026-04-14. | Low |
 | No automated tests | Test suite not yet implemented | Low |
@@ -492,7 +502,7 @@ SESSION_SECRET=<long random secret, 32+ characters>
 npm run dev              # Start dev server on localhost:3000
 
 # Production
-npm run build            # Build for production (verify: 41 routes, 0 errors)
+npm run build            # Build for production (verify: 50 generated app routes, 0 errors)
 npm start                # Start production server
 
 # Content Sync
@@ -500,7 +510,7 @@ npm run sync-content     # Sync markdown to Sanity
 npm run sync-content:dry # Preview sync changes
 
 # Audit
-npm audit                # Expect 3 moderate (postcss in next + brace-expansion via @sanity/import)
+npm audit                # Expect 13 moderate (uuid via Sanity packages)
 
 # Linting
 npm run lint             # Run ESLint
@@ -513,8 +523,8 @@ npm run lint             # Run ESLint
 When starting a new Claude Code session:
 
 1. **Read this document first** for full context
-2. **The app builds cleanly** — `npm run build` should produce 41 routes, 0 errors
-3. **3 moderate npm vulnerabilities** — the transitive `postcss <8.5.10` advisory via `next > postcss` (counted twice) plus `brace-expansion` 5.0.2–5.0.5 via `@sanity/import`. postcss remediation is an npm `overrides` block (not `npm audit fix --force`, which would downgrade next); brace-expansion clears with a plain `npm audit fix`. Anything new on top of those three is real.
+2. **The app builds cleanly** — `npm run build` should produce 50 generated app routes, 0 errors
+3. **13 moderate npm audit findings** — remaining baseline is transitive `uuid <11.1.1` via Sanity packages. Do not run `npm audit fix --force`; npm proposes unsafe Sanity/Vision downgrade paths. Anything new on top of this baseline is real.
 4. **All APIs are working** — Anthropic, Exa, Inoreader, Sanity, ConvertKit
 5. **Admin password** is deployment-specific and must not be committed or recorded in docs. `SESSION_SECRET` is required for signed admin sessions and must be 32+ characters.
 6. **Inoreader** is connected as `clive4` (tokens in cookies, may need re-auth)
@@ -526,8 +536,8 @@ When starting a new Claude Code session:
 ### Quick Verification
 
 ```bash
-npm run build            # Should pass with 41 routes
-npm audit                # Expect 3 moderate (postcss in next + brace-expansion via @sanity/import)
+npm run build            # Should pass with 50 generated app routes
+npm audit                # Expect 13 moderate (uuid via Sanity packages)
 npm run dev              # Start dev server, visit localhost:3000
 ```
 

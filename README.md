@@ -5,6 +5,15 @@ embedded Sanity Studio. The repository also includes a new isolated Railway
 backend package in `backend/` for the planned Vercel frontend + Railway logic
 deployment model.
 
+## What This Repo Contains
+
+- Public intelligence portal at `src/app/(website)`.
+- Protected Writer Studio routes at `src/app/(admin)`.
+- Embedded Sanity Studio at `src/app/studio`.
+- Next.js API routes for Sanity, search, newsletter/contact proxying, and vectorization.
+- Railway FastAPI backend scaffold in `backend/`.
+- Operational docs in `docs/` and the session handoff in `project_summary.md`.
+
 ## Getting Started
 
 First, run the development server:
@@ -20,6 +29,23 @@ bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser.
+
+## Writer Studio
+
+The main end-to-end content workflow is `/create`:
+
+1. Select a format, including Pulse, Signal, Deep Dive, Research Only, or YouTube Script.
+2. Launch the research agent.
+3. Review sources and forensic summary.
+4. Generate a Sanity draft.
+5. Review and publish in `/studio`.
+
+`/generate` remains available as a legacy quick prompt-to-draft tool. Use `/create`
+when source-gathering and the full research-to-Sanity process matter.
+
+Generated Pulse articles are stored as `contentType: signal` with
+`intelligenceTier: pulse`; Sanity treats editorial format and reading-speed tier as
+separate fields.
 
 ## Railway Logic API
 
@@ -38,12 +64,15 @@ See `docs/struver-stack-deployment.md` for the Vercel/Railway deployment runbook
 ```bash
 npm run check
 npm run test:security
+npm run build
 ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+`npm audit` currently has a known moderate baseline from transitive Next/Sanity
+packages. Do not run `npm audit fix --force`; npm currently proposes unsafe
+downgrades for the remaining advisories.
 
 ## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The frontend deploys on Vercel from `main`. Railway hosts the separate logic API
+where configured. See `docs/struver-stack-deployment.md` and
+`docs/railway-vercel-next-steps.md` for deployment details.
