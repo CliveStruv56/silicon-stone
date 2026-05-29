@@ -31,6 +31,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Missing _id' }, { status: 400 })
   }
 
+  if (_id.startsWith('drafts.')) {
+    return NextResponse.json({ skipped: true, reason: 'draft' })
+  }
+
   // Only handle articles
   if (_type && _type !== 'article') {
     return NextResponse.json({ skipped: true })
@@ -46,7 +50,7 @@ export async function POST(req: NextRequest) {
 
   // Fetch full article by _id
   const fullArticle = await sanity.fetch(
-    `*[_type == "article" && _id == $id][0] {
+    `*[_type == "article" && !(_id in path("drafts.**")) && _id == $id][0] {
       _id, title, "slug": slug.current, excerpt, stoneTruth,
       body, actionableInsights, methodologyPillars,
       contentType, intelligenceTier, impactScore, publishedAt, personas

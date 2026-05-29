@@ -41,7 +41,7 @@ async function main() {
   const index = pinecone.index(indexName)
 
   const articles = await sanity.fetch(`
-    *[_type == "article" && defined(slug.current)] {
+    *[_type == "article" && !(_id in path("drafts.**")) && defined(slug.current)] {
       _id, title, "slug": slug.current, excerpt, stoneTruth,
       body, actionableInsights, methodologyPillars,
       contentType, intelligenceTier, impactScore, publishedAt, personas
