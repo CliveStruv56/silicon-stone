@@ -19,7 +19,7 @@ type NavItem = {
 
 const NAV_ITEMS: NavItem[] = [
     { href: '/admin', label: 'Dashboard', icon: Home },
-    { href: '/generate', label: 'Generate', icon: Zap },
+    { href: '/create', label: 'Create', icon: Zap },
     { href: '/import', label: 'Import', icon: FileInput },
     { href: '/research', label: 'Research', icon: Search },
     { href: '/context', label: 'Context', icon: Users },

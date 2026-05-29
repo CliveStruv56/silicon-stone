@@ -91,6 +91,7 @@ export async function generateContent(_prevState: ActionState, formData: FormDat
             categorySlugs: metadata?.categorySlugs,
             intelligenceTier: requestedType === 'pulse' ? 'pulse' : metadata?.intelligenceTier,
             methodologyPillars: metadata?.methodologyPillars,
+            source: 'generated',
         });
 
         return {

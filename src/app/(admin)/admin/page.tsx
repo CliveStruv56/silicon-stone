@@ -40,7 +40,7 @@ export default async function Home() {
       {/* Quick Actions Grid */}
       <section className="grid md:grid-cols-3 gap-6">
         <Link
-          href="/generate"
+          href="/create"
           className="p-6 rounded-xl border border-border bg-card hover:bg-muted/50 transition-colors cursor-pointer group block"
         >
           <div className="h-12 w-12 rounded-lg bg-blue-500/10 flex items-center justify-center mb-4 group-hover:bg-blue-500/20">
@@ -51,7 +51,7 @@ export default async function Home() {
         </Link>
 
         <Link
-          href="/generate"
+          href="/create"
           className="p-6 rounded-xl border border-border bg-card hover:bg-muted/50 transition-colors cursor-pointer group block"
         >
           <div className="h-12 w-12 rounded-lg bg-emerald-500/10 flex items-center justify-center mb-4 group-hover:bg-emerald-500/20">

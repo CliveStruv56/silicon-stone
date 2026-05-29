@@ -23,6 +23,7 @@ This guide outlines the workflows for researching topics, generating drafts, and
 4.  **Choose Output Format:**
     | Format | Description |
     |--------|-------------|
+    | **Pulse** | 100-140 word, 30-second intelligence scan |
     | **Signal** | 800-1,500 word breaking analysis (default) |
     | **Deep Dive** | 3,000-6,000 word forensic report |
     | **Research Only** | Summary without full article generation |
@@ -30,8 +31,29 @@ This guide outlines the workflows for researching topics, generating drafts, and
 
 5.  **Generate Draft:**
     *   Select format and click generate.
+    *   For a **Pulse**, choose `Pulse`, launch research, then click **Generate Pulse**. The draft is saved as `contentType: signal` with `intelligenceTier: pulse` because Sanity separates editorial format from reading-speed tier.
     *   Claude produces the draft at temperature 0.4 (controlled, on-brand output).
     *   A new **unpublished article** is created in Sanity CMS.
+    *   The app redirects to Sanity Studio so you can review, add a cover image, and publish.
+
+### Pulse end-to-end flow
+
+1.  Go to `/create`.
+2.  Select **Pulse** and a target persona.
+3.  Enter the topic and click **Launch Agent**.
+4.  Review the forensic summary and source list.
+5.  Click **Generate Pulse**.
+6.  Review the draft in Sanity Studio. Confirm:
+    *   **Content Type:** `Signal`
+    *   **Intelligence Tier:** `Pulse`
+    *   **Body:** 100-140 words
+    *   **Stone Truth:** one short bottom-line sentence
+    *   **Methodology Audit:** one matrix cell
+7.  Add a cover image if needed, then publish.
+
+### Legacy quick generator (`/generate`)
+
+`/generate` still exists for quick prompt-to-draft generation, including Pulse, Signal, Deep Dive, and LinkedIn-style guide drafts. It does **not** run the research/source-gathering step first. Use `/create` for the full research-to-Sanity article pipeline.
 
 ## 2. Research Portal (`/research`)
 **Best for:** Exploring topics without immediately generating a full draft.
@@ -74,6 +96,13 @@ npm run sync-content:force # Overwrite ALL articles (use with caution)
 ## 4. Final Polish & Publishing (Sanity Studio)
 **Best for:** Final editing, image selection, and publishing.
 
+### Sanity URLs
+
+| Purpose | URL |
+|---------|-----|
+| Embedded Studio | `https://siliconandstone.com/studio` |
+| Sanity Manage / project settings | `https://www.sanity.io/manage/project/3q59mpd7` |
+
 1.  **Go to Studio:**
     *   Navigate to `/studio` (e.g., `https://siliconandstone.com/studio`).
 
@@ -97,6 +126,7 @@ npm run sync-content:force # Overwrite ALL articles (use with caution)
 
 | Type | Slug | Length | Turnaround | Use When |
 |------|------|--------|------------|----------|
+| **Pulse** | `pulse` intelligence tier | 100-140 words | Same day | One verified shift, one consequence, one watchpoint |
 | **Signal** | `signal` | 800-1,500 words | 24-72 hours | Breaking regulatory news, quick analysis |
 | **Deep Dive** | `deepdive` | 3,000-6,000 words | 1-2 weeks | Comprehensive forensic report on a topic |
 | **Guide** | `guide` | 500-2,000 words | As needed | How to use interactive tools or products |

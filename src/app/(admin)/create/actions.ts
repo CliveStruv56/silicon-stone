@@ -97,6 +97,25 @@ Please output ONLY a JSON object with the following structure:
 }`;
 }
 
+function assertGeneratedDraftShape(value: unknown): asserts value is {
+    title: string;
+    excerpt: string;
+    content: string;
+    keywords?: string[];
+} {
+    if (!value || typeof value !== "object") {
+        throw new Error("Claude returned an invalid draft payload.");
+    }
+
+    const draft = value as Record<string, unknown>;
+    const requiredFields = ["title", "excerpt", "content"];
+    const missing = requiredFields.filter((field) => typeof draft[field] !== "string" || !draft[field]?.toString().trim());
+
+    if (missing.length > 0) {
+        throw new Error(`Claude draft payload is missing: ${missing.join(", ")}.`);
+    }
+}
+
 export async function createDraftFromResearch(
     researchResult: ResearchResult,
     format: "pulse" | "signal" | "deep_dive" | "youtube",
@@ -151,6 +170,7 @@ ${priorCoverageBlock}`;
         }
 
         const parsedData = JSON.parse(jsonText);
+        assertGeneratedDraftShape(parsedData);
 
         const contentType = isYouTube ? "youtube" : (format === "deep_dive" ? "deepdive" : "signal");
 
@@ -185,6 +205,7 @@ ${priorCoverageBlock}`;
             categorySlugs: metadata?.categorySlugs,
             intelligenceTier: format === "pulse" ? "pulse" : metadata?.intelligenceTier,
             methodologyPillars: metadata?.methodologyPillars,
+            source: "generated" as const,
         };
 
         await createArticleInSanity(sanityArticle);

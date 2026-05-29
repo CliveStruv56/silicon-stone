@@ -27,7 +27,7 @@ export default async function ContentPage() {
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Link href="/generate" className="bg-primary text-primary-foreground px-4 py-2 rounded-lg font-medium flex items-center gap-2 hover:bg-blue-600 transition-colors">
+                    <Link href="/create" className="bg-primary text-primary-foreground px-4 py-2 rounded-lg font-medium flex items-center gap-2 hover:bg-blue-600 transition-colors">
                         <PlusCircle className="w-4 h-4" /> New Article
                     </Link>
                 </div>
@@ -43,7 +43,7 @@ export default async function ContentPage() {
                     {sanityArticles.length === 0 ? (
                         <div className="text-center py-20 bg-muted/20 border border-border rounded-xl border-dashed">
                             <p className="text-muted-foreground mb-4">No articles yet. Start creating!</p>
-                            <Link href="/generate" className="text-primary hover:underline font-medium">Generate your first article →</Link>
+                            <Link href="/create" className="text-primary hover:underline font-medium">Generate your first article →</Link>
                         </div>
                     ) : (
                         sanityArticles.map(article => (
