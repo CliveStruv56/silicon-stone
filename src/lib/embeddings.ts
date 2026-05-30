@@ -9,11 +9,13 @@ function getClient(): OpenAI {
   return openaiClient
 }
 
+// Changing either value requires rebuilding every Pinecone index.
+export const EMBEDDING_MODEL = 'text-embedding-3-small'
 export const EMBEDDING_DIMENSIONS = 1024
 
 export async function generateEmbedding(text: string): Promise<number[]> {
   const response = await getClient().embeddings.create({
-    model: 'text-embedding-3-small',
+    model: EMBEDDING_MODEL,
     input: text,
     dimensions: EMBEDDING_DIMENSIONS,
   })

@@ -15,6 +15,9 @@ export async function middleware(request: NextRequest) {
         '/create',
         '/knowledge',
         '/api/draft-mode/enable',
+        '/api/knowledge/sources',
+        '/api/knowledge/evidence',
+        '/api/knowledge/candidates',
         '/api/search/semantic',
     ]
 
@@ -49,6 +52,9 @@ export const config = {
         '/create/:path*',
         '/knowledge/:path*',
         '/api/draft-mode/enable',
+        '/api/knowledge/sources/:path*',
+        '/api/knowledge/evidence/:path*',
+        '/api/knowledge/candidates/:path*',
         '/api/search/semantic',
     ],
 }

@@ -13,6 +13,11 @@
     "sync-content": "tsx scripts/sync-content.ts",
     "sync-content:dry": "tsx scripts/sync-content.ts --dry-run",
     "sync-content:force": "tsx scripts/sync-content.ts --force",
+    "knowledge:pull": "tsx scripts/pull-knowledge-source.ts",
+    "test:knowledge-inbox": "tsx scripts/knowledge-inbox-checks.ts",
+    "evidence:rebuild": "tsx scripts/rebuild-evidence-index.ts",
+    "evidence:rebuild:dry": "tsx scripts/rebuild-evidence-index.ts --dry-run",
+    "test:evidence-index": "tsx scripts/evidence-index-checks.ts",
     "render-briefing": "tsx scripts/render-briefing-pdf.ts"
   },
   "dependencies": {

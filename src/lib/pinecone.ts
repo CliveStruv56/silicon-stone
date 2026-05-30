@@ -17,6 +17,12 @@ export function getPineconeIndex() {
   return getClient().index(indexName)
 }
 
+export function getEvidencePineconeIndex() {
+  const indexName = process.env.PINECONE_EVIDENCE_INDEX_NAME
+  if (!indexName) throw new Error('PINECONE_EVIDENCE_INDEX_NAME is not set')
+  return getClient().index(indexName)
+}
+
 export type PineconeArticleMetadata = {
   title: string
   slug: string

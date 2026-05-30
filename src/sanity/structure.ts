@@ -1,5 +1,5 @@
 import type { StructureResolver } from 'sanity/structure'
-import { ImagesIcon } from '@sanity/icons'
+import { DocumentTextIcon, ImagesIcon } from '@sanity/icons'
 
 // https://www.sanity.io/docs/structure-builder-cheat-sheet
 export const structure: StructureResolver = (S) =>
@@ -49,10 +49,48 @@ export const structure: StructureResolver = (S) =>
             ])
         ),
       S.divider(),
+      S.listItem()
+        .title('Knowledge Inbox')
+        .icon(DocumentTextIcon)
+        .child(
+          S.list()
+            .title('Knowledge Inbox')
+            .items([
+              S.listItem()
+                .title('Pending Sources')
+                .child(
+                  S.documentList()
+                    .title('Pending Sources')
+                    .schemaType('knowledgeSource')
+                    .filter('_type == "knowledgeSource" && status == "pending"')
+                ),
+              S.listItem()
+                .title('All Sources')
+                .child(S.documentTypeList('knowledgeSource').title('All Sources')),
+              S.listItem()
+                .title('Candidates Awaiting Filing')
+                .child(
+                  S.documentList()
+                    .title('Candidates Awaiting Filing')
+                    .schemaType('knowledgeCandidate')
+                    .filter('_type == "knowledgeCandidate" && status == "pending"')
+                ),
+              S.listItem()
+                .title('All Candidates')
+                .child(S.documentTypeList('knowledgeCandidate').title('All Candidates')),
+            ])
+        ),
+      S.divider(),
       // The rest of the documents, filtering out the singleton + library types
       ...S.documentTypeListItems().filter(
         (item) =>
-          !['siteSettings', 'assetCollection', 'libraryImage'].includes(
+          ![
+            'siteSettings',
+            'assetCollection',
+            'libraryImage',
+            'knowledgeSource',
+            'knowledgeCandidate',
+          ].includes(
             item.getId() ?? ''
           )
       ),
