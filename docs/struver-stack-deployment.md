@@ -1,6 +1,6 @@
 # Struver Stack Deployment Runbook
 
-Last updated: 2026-05-13
+Last updated: 2026-06-02
 
 ## Target Topology
 
@@ -100,6 +100,8 @@ to `/frontend` at the same time as the filesystem move.
 - Generate the Railway public domain.
 - Add `NEXT_PUBLIC_API_URL` in Vercel.
 - Configure production secrets in Vercel and Railway.
+- Add `EXA_API_KEY` to the Railway backend service (the `/create` deep-research job calls Exa directly; the key previously lived only in Vercel).
+- Add the Railway Redis plugin so `REDIS_URL` is injected (durable deep-research job state; falls back to in-memory if absent). See `railway-vercel-next-steps.md` section 14.
 - Decide service names because Railway private DNS depends on them.
 
 ## Still To Build

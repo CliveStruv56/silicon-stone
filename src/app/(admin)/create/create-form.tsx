@@ -8,7 +8,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, Zap, FileText, Search, BrainCircuit, ExternalLink, Activity, Video } from "lucide-react";
-import { performResearch, createDraftFromResearch } from "./actions";
+import { startResearch, pollResearchJob, createDraftFromResearch } from "./actions";
 import { PersonaData } from "@/lib/sanity";
 
 import { ResearchResult, ResearchSource } from "@/types/research";
@@ -29,14 +29,34 @@ export function CreateForm({ initialPersonas }: CreateFormProps) {
 
     const [isGenerating, setIsGenerating] = useState(false);
 
+    async function pollDeepJob(jobId: string): Promise<ResearchResult> {
+        // Deep research runs as a Railway background job. Poll from the browser
+        // via a short server action so no single request hits a serverless timeout.
+        const startedAt = Date.now();
+        const TIMEOUT_MS = 12 * 60 * 1000;
+        const INTERVAL_MS = 4000;
+        while (Date.now() - startedAt < TIMEOUT_MS) {
+            await new Promise((r) => setTimeout(r, INTERVAL_MS));
+            const res = await pollResearchJob(jobId, topic);
+            if (res.status === "completed" && res.result) return res.result;
+            if (res.status === "failed") throw new Error(res.error || "Deep research failed");
+        }
+        throw new Error("Deep research timed out");
+    }
+
     async function handleLaunchResearch() {
         if (!topic.trim() || !personaSlug) return;
 
         setIsResearching(true);
         setResearchResult(null);
         try {
-            // Pass the persona focus keyword to research if possible, or just the topic
-            const result = await performResearch(topic);
+            // Deep Dive uses Exa's agentic Research API (slower, multi-step) and runs
+            // as a Railway background job when configured; every other format uses the
+            // fast recency-biased web search and returns inline.
+            const started = await startResearch(topic, format === "deep_dive");
+            const result = started.mode === "job"
+                ? await pollDeepJob(started.jobId)
+                : started.result;
             setResearchResult(result);
         } catch (error) {
             console.error("Research failed:", error);
@@ -186,7 +206,7 @@ export function CreateForm({ initialPersonas }: CreateFormProps) {
                                 {isResearching ? (
                                     <>
                                         <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                        Gathering Intel...
+                                        {format === "deep_dive" ? "Researching (a few min)..." : "Gathering Intel..."}
                                     </>
                                 ) : (
                                     <>
@@ -196,6 +216,11 @@ export function CreateForm({ initialPersonas }: CreateFormProps) {
                                 )}
                             </Button>
                         </div>
+                        {format === "deep_dive" && (
+                            <p className="text-xs text-muted-foreground">
+                                Deep Dive runs an agentic, multi-step research pass (Exa Research Pro). Expect a few minutes and a higher per-run cost than other formats.
+                            </p>
+                        )}
                     </div>
                 </CardContent>
             </Card>

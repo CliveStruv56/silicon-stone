@@ -1,10 +1,18 @@
 import os
 import re
 import time
+import uuid
+import asyncio
 import logging
 from typing import Any
 
 import httpx
+
+try:
+    # redis-py ships an asyncio client at redis.asyncio (>= 4.2).
+    from redis import asyncio as aioredis
+except ImportError:  # pragma: no cover — redis is optional; falls back to memory
+    aioredis = None
 from fastapi import FastAPI
 from fastapi import HTTPException
 from fastapi import Request
@@ -66,6 +74,14 @@ class ContactRequest(BaseModel):
     company: str | None = None
     interest: str | None = None
     message: str | None = None
+
+
+class DeepResearchRequest(BaseModel):
+    # `instructions` carries the full forensic prompt built on the Next.js side,
+    # so all brand/prompt logic stays in one place. `topic` is for logging only.
+    topic: str
+    instructions: str
+    model: str | None = None
 
 
 RATE_LIMITS: dict[str, list[float]] = {}
@@ -176,6 +192,151 @@ def _sanity_image_url(image: dict[str, Any] | None, width: int = 800, height: in
     dimensions = parts[2]
     extension = parts[3]
     return f"https://cdn.sanity.io/images/{project_id}/{dataset}/{asset_id}-{dimensions}.{extension}?w={width}&h={height}"
+
+
+# --- Deep research (Exa Research API) -----------------------------------------
+# Long-running agentic research for Deep Dives. Runs here, on Railway, rather than
+# in a Vercel serverless function which would time out after a few minutes.
+#
+# Job state lives in Redis when REDIS_URL is set (durable across redeploys and
+# shared across replicas), and falls back to an in-process dict for local dev or
+# before Redis is provisioned. Records are transient (status + report) with a
+# short TTL, which is why Redis — not Postgres — is the right home for them; keep
+# Postgres for durable records you intend to keep and query.
+#
+# NOTE: the async worker still runs in the process that accepted the POST. Redis
+# makes job *state* durable and replica-shared; full crash-resumption of an
+# in-flight run would need a real queue/worker and is out of scope here.
+EXA_RESEARCH_URL = "https://api.exa.ai/research/v1"
+RESEARCH_JOB_TTL_SECONDS = 60 * 60
+REDIS_URL = os.getenv("REDIS_URL", "")
+
+# In-memory fallback store (used only when Redis is not configured).
+RESEARCH_JOBS: dict[str, dict[str, Any]] = {}
+
+_redis_client = None
+
+
+def _get_redis():
+    """Lazily build a shared async Redis client, or None to use the memory store."""
+    global _redis_client
+    if not REDIS_URL or aioredis is None:
+        return None
+    if _redis_client is None:
+        _redis_client = aioredis.from_url(REDIS_URL, decode_responses=True)
+    return _redis_client
+
+
+def _exa_api_key() -> str:
+    key = os.getenv("EXA_API_KEY", "")
+    if not key:
+        raise HTTPException(status_code=503, detail="Exa API key is not configured")
+    return key
+
+
+def _job_key(job_id: str) -> str:
+    return f"research:job:{job_id}"
+
+
+async def _job_create(job_id: str, topic: str) -> None:
+    redis = _get_redis()
+    if redis is not None:
+        key = _job_key(job_id)
+        await redis.hset(key, mapping={"status": "pending", "created_at": str(time.time()), "topic": topic})
+        await redis.expire(key, RESEARCH_JOB_TTL_SECONDS)
+        return
+    _prune_research_jobs()
+    RESEARCH_JOBS[job_id] = {"status": "pending", "created_at": time.time(), "topic": topic}
+
+
+async def _job_update(job_id: str, **changes: Any) -> None:
+    redis = _get_redis()
+    if redis is not None:
+        # Hash fields are strings; None becomes "" so the GET endpoint can treat it as absent.
+        mapping = {k: ("" if v is None else str(v)) for k, v in changes.items()}
+        await redis.hset(_job_key(job_id), mapping=mapping)
+        return
+    if job_id in RESEARCH_JOBS:
+        RESEARCH_JOBS[job_id].update(changes)
+
+
+async def _job_get(job_id: str) -> dict[str, Any] | None:
+    redis = _get_redis()
+    if redis is not None:
+        data = await redis.hgetall(_job_key(job_id))
+        return data or None
+    return RESEARCH_JOBS.get(job_id)
+
+
+def _prune_research_jobs() -> None:
+    cutoff = time.time() - RESEARCH_JOB_TTL_SECONDS
+    stale = [jid for jid, job in RESEARCH_JOBS.items() if job.get("created_at", 0) < cutoff]
+    for jid in stale:
+        RESEARCH_JOBS.pop(jid, None)
+
+
+async def _run_deep_research(job_id: str, instructions: str, model: str) -> None:
+    api_key = os.getenv("EXA_API_KEY", "")
+    if not api_key:
+        await _job_update(job_id, status="failed", error="Exa API key is not configured")
+        return
+
+    headers = {"x-api-key": api_key, "Content-Type": "application/json"}
+    try:
+        async with httpx.AsyncClient(timeout=httpx.Timeout(30.0)) as client:
+            created = await client.post(
+                EXA_RESEARCH_URL,
+                headers=headers,
+                json={"instructions": instructions, "model": model},
+            )
+            created.raise_for_status()
+            research_id = created.json().get("researchId")
+            if not research_id:
+                await _job_update(job_id, status="failed", error="Exa did not return a researchId")
+                return
+
+            await _job_update(job_id, status="running", research_id=research_id)
+
+            deadline = time.time() + 10 * 60  # 10 minutes
+            while time.time() < deadline:
+                await asyncio.sleep(3)
+                poll = await client.get(
+                    f"{EXA_RESEARCH_URL}/{research_id}",
+                    headers=headers,
+                    params={"stream": "false"},
+                )
+                poll.raise_for_status()
+                data = poll.json()
+                status = data.get("status")
+
+                if status == "completed":
+                    output = data.get("output") or {}
+                    cost = (data.get("costDollars") or {}).get("total")
+                    await _job_update(
+                        job_id,
+                        status="completed",
+                        report=output.get("content", ""),
+                        cost_dollars=cost,
+                    )
+                    return
+                if status in ("failed", "canceled"):
+                    await _job_update(
+                        job_id,
+                        status="failed",
+                        error=data.get("error", f"research {status}"),
+                    )
+                    return
+
+            await _job_update(job_id, status="failed", error="Deep research timed out")
+    except httpx.HTTPStatusError as exc:
+        logger.error("Exa research failed: status=%s body=%s", exc.response.status_code, exc.response.text[:500])
+        await _job_update(job_id, status="failed", error=f"Exa returned {exc.response.status_code}")
+    except httpx.HTTPError as exc:
+        logger.error("Exa research request failed: %s", exc)
+        await _job_update(job_id, status="failed", error="Exa request failed")
+    except Exception as exc:  # noqa: BLE001 — never let a worker crash silently
+        logger.exception("Deep research job crashed")
+        await _job_update(job_id, status="failed", error=str(exc))
 
 
 service_routes = [
@@ -440,4 +601,39 @@ def hermes_events(payload: dict[str, Any]) -> dict[str, Any]:
         "accepted": True,
         "event_type": payload.get("type", "unknown"),
         "routing_note": "Wire this endpoint to the Hermes service when the central agent is deployed.",
+    }
+
+
+@app.post("/v1/research/deep")
+async def start_deep_research(payload: DeepResearchRequest, request: Request) -> dict[str, str]:
+    _require_backend_api_key(request)
+    _exa_api_key()  # fail fast if the key is missing
+
+    instructions = payload.instructions.strip()
+    if not instructions:
+        raise HTTPException(status_code=400, detail="instructions are required")
+
+    model = payload.model or "exa-research-pro"
+    job_id = uuid.uuid4().hex
+    await _job_create(job_id, payload.topic.strip()[:300])
+    # Fire-and-forget: returns immediately so the caller never blocks on the
+    # minutes-long research run; the client polls the GET endpoint below.
+    asyncio.create_task(_run_deep_research(job_id, instructions, model))
+    return {"jobId": job_id, "status": "pending"}
+
+
+@app.get("/v1/research/deep/{job_id}")
+async def get_deep_research(job_id: str, request: Request) -> dict[str, Any]:
+    _require_backend_api_key(request)
+    job = await _job_get(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Unknown research job")
+
+    cost = job.get("cost_dollars")
+    return {
+        "jobId": job_id,
+        "status": job.get("status", "unknown"),
+        "report": job.get("report") or None,
+        "error": job.get("error") or None,
+        "costDollars": float(cost) if cost not in (None, "") else None,
     }
