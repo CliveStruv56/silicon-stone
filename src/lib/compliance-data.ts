@@ -454,9 +454,9 @@ export const RISK_DETAILS: Record<RiskLevel, RiskDetail> = {
   },
 }
 
-// Key Deadline for hero display
+// Key implementation milestone for any legacy consumers.
 export const KEY_DEADLINE = {
   date: 'August 2, 2026',
-  label: 'High-Risk AI Compliance Deadline',
-  description: 'All high-risk AI systems must comply with full AI Act requirements',
+  label: 'AI Act Transparency Milestone',
+  description: 'Transparency obligations remain relevant while certain high-risk transition dates are subject to formal adoption of the 7 May 2026 political agreement',
 }

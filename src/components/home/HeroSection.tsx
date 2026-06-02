@@ -140,7 +140,7 @@ export function HeroSection({ settings }: HeroSectionProps) {
                                 lineHeight: 1.38,
                             }}
                         >
-                            Decision-grade intelligence on the technology power shift — for the senior leaders who&apos;ll be defining it, not defined by it.
+                            Independent, decision-grade intelligence for UK and European leaders managing AI governance, technology dependency, and operational resilience.
                         </motion.p>
 
                         <motion.p

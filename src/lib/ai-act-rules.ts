@@ -78,8 +78,8 @@ export interface RuleEvaluation {
   reportSections: string[]
 }
 
-const RULE_VERSION = '2026-05-11'
-const LAST_REVIEWED = '2026-05-11'
+const RULE_VERSION = '2026-06-02'
+const LAST_REVIEWED = '2026-06-02'
 
 const sources = {
   overview: {

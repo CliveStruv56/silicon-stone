@@ -24,12 +24,20 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Silicon and Stone | Forensic Technopolitics",
   description:
-    "Deep analysis at the intersection of technology policy, supply chains, and geopolitics. Cutting through complexity with 30 years of experience from the edge.",
+    "Independent, decision-grade intelligence for UK and European leaders managing AI governance, technology dependency, and operational resilience.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://siliconandstone.com"),
   openGraph: {
     title: "Silicon and Stone | Forensic Technopolitics",
     description:
       "AI regulation, semiconductor supply chains, and digital sovereignty. Analysis for European decision-makers from 30 years at the edge.",
+    images: [
+      {
+        url: "/homepage-redesign-2026/the-watcher.png",
+        width: 1200,
+        height: 675,
+        alt: "Silicon and Stone: the view from the Atlantic edge",
+      },
+    ],
     siteName: "Silicon and Stone",
     locale: "en_GB",
     type: "website",
@@ -39,6 +47,7 @@ export const metadata: Metadata = {
     title: "Silicon and Stone | Forensic Technopolitics",
     description:
       "AI regulation, semiconductor supply chains, and digital sovereignty. Analysis for European decision-makers.",
+    images: ["/homepage-redesign-2026/the-watcher.png"],
   },
   robots: {
     index: true,

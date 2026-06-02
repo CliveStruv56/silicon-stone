@@ -306,7 +306,7 @@ export const SCENARIOS: Scenario[] = [
     name: 'AI Act Enforcement & Digital Simplification',
     shortName: 'AI Act',
     frictionLevel: 'medium',
-    triggerEvent: '2 August 2026 AI Act obligations begin applying while Digital Omnibus simplification debates alter timing, guidance, and enforcement expectations',
+    triggerEvent: '2 August 2026 transparency obligations remain relevant while the 7 May 2026 political agreement changes the expected timetable for certain high-risk rules, subject to formal adoption',
     timeframe: '2026-2027',
     probability: '80-90%',
     confidence: 'High',
@@ -362,7 +362,7 @@ export const SCENARIOS: Scenario[] = [
     },
     keyIndicators: [
       'AI Office and national authority guidance on GPAI, high-risk systems, and transparency duties',
-      'Digital Omnibus changes linking some high-risk timelines to standards and support-tool availability',
+      'Formal adoption and publication of the 7 May 2026 political agreement affecting certain high-risk timelines',
       'CEN/CENELEC harmonised standards, common specifications, and notified-body capacity',
       'First national enforcement actions, procurement exclusions, or customer audit clauses',
     ],
@@ -374,12 +374,12 @@ export const SCENARIOS: Scenario[] = [
     ],
     evidenceNotes: [
       {
-        fact: 'The AI Act applies progressively: prohibitions and AI literacy from 2 February 2025, GPAI/governance from 2 August 2025, most rules from 2 August 2026, and some embedded high-risk product rules from 2 August 2027.',
+        fact: 'The AI Act applies progressively: prohibitions and AI literacy from 2 February 2025, governance rules and GPAI obligations from 2 August 2025, and transparency rules from 2 August 2026.',
         implication: 'The tool should show staged operational exposure rather than implying one universal enforcement date.',
       },
       {
-        fact: 'The Commission has proposed simplification measures that may link some high-risk obligations to support tools and harmonised standards.',
-        implication: 'The scenario is a compliance-readiness risk, not simply a penalty-countdown risk.',
+        fact: 'A 7 May 2026 political agreement would move rules for certain high-risk areas to 2 December 2027 and product-integrated systems to 2 August 2028. Formal adoption and Official Journal publication remain relevant before the amendments enter force.',
+        implication: 'The scenario is an evidence-readiness risk, not a penalty-countdown story.',
       },
     ],
     boardBrief: {

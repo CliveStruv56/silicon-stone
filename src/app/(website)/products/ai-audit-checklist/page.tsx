@@ -49,7 +49,13 @@ const contents = [
 
 const checkoutUrl = process.env.NEXT_PUBLIC_LEMONSQUEEZY_CHECKLIST_URL
 
+function isConfiguredCheckout(url?: string) {
+  return Boolean(url && !url.includes('example.com'))
+}
+
 export default function AIAuditChecklistPage() {
+  const checkoutReady = isConfiguredCheckout(checkoutUrl)
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -73,17 +79,20 @@ export default function AIAuditChecklistPage() {
                 <div className="flex items-center gap-4 mb-8">
                   <div className="text-3xl font-mono font-bold text-stone-teal">£24</div>
                   <div className="text-sm text-text-muted">
-                    2 spreadsheets + 2 PDFs<br />
-                    Instant digital delivery
+                  2 spreadsheets + 2 PDFs<br />
+                    {checkoutReady ? 'Digital delivery' : 'Early access'}
                   </div>
                 </div>
                 <Button size="lg" className="bg-stone-teal text-slate-deep hover:bg-stone-teal/90 font-semibold" asChild>
-                  <a href={checkoutUrl || '#'} target="_blank" rel="noopener noreferrer" className="plausible-event-name=Buy+Checklist+Pack">
-                    Buy Checklist Pack — £24
+                  <a href={checkoutReady ? checkoutUrl : '/services#contact'} target={checkoutReady ? '_blank' : undefined} rel={checkoutReady ? 'noopener noreferrer' : undefined} className="plausible-event-name=Buy+Checklist+Pack">
+                    {checkoutReady ? 'Buy Checklist Pack — £24' : 'Request Early Access'}
                   </a>
                 </Button>
                 <p className="text-xs text-text-muted mt-3">
                   Includes a £20 discount code for the full AI Act Compliance Toolkit.
+                </p>
+                <p className="mt-5 font-mono text-xs uppercase tracking-wider text-text-muted">
+                  Regulatory copy last reviewed: 2 June 2026
                 </p>
               </div>
 
@@ -163,9 +172,9 @@ export default function AIAuditChecklistPage() {
             </h2>
             <div className="space-y-4 text-text-muted">
               <p>
-                Most organisations don&apos;t know how many AI systems they use. The average
-                mid-sized business has 12-20 AI tools in active use across departments —
-                from ChatGPT subscriptions to AI-powered CRM features to automated invoice processing.
+                Most organisations do not have a complete record of the AI systems they use.
+                The inventory often extends beyond approved standalone tools to AI-powered
+                CRM features, automated processing, and vendor-managed capabilities.
               </p>
               <p>
                 You cannot build a compliance plan for systems you haven&apos;t catalogued. This pack
@@ -189,15 +198,15 @@ export default function AIAuditChecklistPage() {
               </h2>
               <p className="text-text-muted mb-8">
                 At £24, this is less than the cost of a business book — and it gives you
-                an actionable picture of your AI exposure in a single afternoon.
+                a structured picture of your AI exposure in a single afternoon.
               </p>
               <Button size="lg" className="bg-stone-teal text-slate-deep hover:bg-stone-teal/90 font-semibold" asChild>
-                <a href={checkoutUrl || '#'} target="_blank" rel="noopener noreferrer">
-                  Buy Checklist Pack — £24
+                <a href={checkoutReady ? checkoutUrl : '/services#contact'} target={checkoutReady ? '_blank' : undefined} rel={checkoutReady ? 'noopener noreferrer' : undefined}>
+                  {checkoutReady ? 'Buy Checklist Pack — £24' : 'Request Early Access'}
                 </a>
               </Button>
               <div className="flex items-center justify-center gap-6 mt-6 text-xs text-text-muted">
-                <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> Instant delivery</span>
+                <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> {checkoutReady ? 'Digital delivery' : 'Early access enquiries open'}</span>
                 <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> £20 Toolkit discount included</span>
                 <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> EU VAT handled</span>
               </div>

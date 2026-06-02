@@ -20,7 +20,6 @@ import {
   Building2,
   User,
   MessageSquare,
-  Cpu,
   Globe,
   FileText,
   Shield,
@@ -79,26 +78,13 @@ const frameworks = [
 
 const assessments = [
   {
-    title: 'AI Act Readiness Assessment',
-    description: 'Comprehensive evaluation of your AI systems against EU AI Act requirements with prioritised compliance roadmap.',
+    title: 'Manufacturing Exposure Module',
+    description: 'Add a focused view of semiconductor, cloud, supplier, and operational dependencies where they matter to your organisation.',
     deliverables: [
-      'AI system inventory and risk classification',
-      'Gap analysis against Article requirements',
-      'Prioritised action plan to August 2026 deadline',
-      'Documentation requirements checklist',
-    ],
-    icon: Cpu,
-    fromTool: 'Compliance Checker',
-    color: 'silicon-amber',
-  },
-  {
-    title: 'Supply Chain Exposure Report',
-    description: 'Deep analysis of your semiconductor and technology supply chain vulnerabilities with diversification recommendations.',
-    deliverables: [
-      'Chokepoint identification for your components',
-      'Supplier risk scoring (geopolitical, concentration)',
-      'Alternative sourcing analysis',
-      'Resilience recommendations',
+      'Technology and supplier dependency map',
+      'Chokepoint identification for critical components',
+      'Procurement questions for exposed suppliers',
+      'Prioritised resilience actions',
     ],
     icon: Globe,
     fromTool: 'Supply Chain Mapper',
@@ -147,17 +133,17 @@ const tiers = [
     highlighted: false,
   },
   {
-    name: 'Focused Assessment',
+    name: 'Focused Diagnostic',
     price: 'Custom scope',
-    description: 'Deep-dive analysis using one of our four frameworks, delivered as a written report.',
+    description: 'A focused review of your AI governance, evidence gaps, and technology dependencies.',
     features: [
-      'Single-framework analysis',
+      'AI system and vendor-evidence review',
       'Written report (15-25 pages)',
       'Executive summary',
-      'Recommendations with priorities',
+      'Prioritised actions',
       '30-day follow-up call',
     ],
-    cta: 'Request Assessment',
+    cta: 'Request Diagnostic',
     highlighted: true,
   },
   {
@@ -230,13 +216,45 @@ export default function ServicesPage() {
                 Strategic Advisory for the Technopolitical Age
               </h1>
               <p className="text-xl text-text-muted leading-relaxed mb-6">
-                From AI Act compliance to supply chain resilience, we help organisations
-                navigate the intersection of technology, regulation, and geopolitics.
+                AI adoption creates a governance problem and a dependency problem at the
+                same time. We help organisations map both.
               </p>
               <p className="text-text-muted leading-relaxed">
-                Our interactive tools provide immediate insight. Our advisory services
-                provide the depth and customization your strategic decisions require.
+                Start with the systems in use, the evidence missing from vendors, and the
+                technology exposures that could become operating constraints.
               </p>
+              <p className="mt-5 font-mono text-xs uppercase tracking-wider text-text-muted">
+                Regulatory copy last reviewed: 2 June 2026
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Primary diagnostic */}
+        <section className="border-b border-border-subtle bg-silicon-amber/5">
+          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-[2fr_1fr] lg:items-center">
+              <div>
+                <Badge variant="outline" className="mb-4 border-silicon-amber text-silicon-amber">
+                  Recommended Starting Point
+                </Badge>
+                <h2 className="mb-4 text-2xl font-semibold text-text-primary">
+                  AI Governance and Technology Dependency Diagnostic
+                </h2>
+                <p className="max-w-3xl leading-relaxed text-text-muted">
+                  A focused assessment for organisations adopting third-party AI tools or
+                  AI-enabled products. Identify the systems in use, likely AI Act roles,
+                  missing vendor evidence, oversight gaps, and technology dependencies.
+                  Add a manufacturing exposure module where semiconductor, cloud, or supplier
+                  concentration matters.
+                </p>
+              </div>
+              <a href="#contact" className="lg:text-right">
+                <Button size="lg" className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90">
+                  Request a Focused Diagnostic
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </a>
             </div>
           </div>
         </section>
@@ -245,11 +263,12 @@ export default function ServicesPage() {
         <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
           <div className="mb-12">
             <h2 className="text-2xl font-semibold text-text-primary mb-4">
-              Four Analytical Frameworks
+              The 3 x 2 Method. Applied to Your Decision.
             </h2>
             <p className="text-text-muted max-w-3xl">
-              Every engagement draws on our Forensic Technopolitics methodology—four
-              distinct frameworks that combine industrial experience with rigorous analysis.
+              Every engagement draws on the Forensic Technopolitics methodology: three
+              forensic domains and two analytical methods. These applied views turn that
+              method into practical work.
             </p>
           </div>
 
@@ -302,11 +321,11 @@ export default function ServicesPage() {
         <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
           <div className="mb-12">
             <h2 className="text-2xl font-semibold text-text-primary mb-4">
-              Assessment Offerings
+              Follow-on Modules
             </h2>
             <p className="text-text-muted max-w-3xl">
               Each assessment builds on the insights from our interactive tools,
-              providing the depth and customization that self-service cannot deliver.
+              providing depth and customisation where self-service cannot.
             </p>
           </div>
 
@@ -417,41 +436,6 @@ export default function ServicesPage() {
           </div>
         </section>
 
-        {/* WaymarkPath CTA */}
-        <section className="bg-stone-charcoal/50 border-y border-border-subtle">
-          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
-            <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8 items-center">
-              <div>
-                <Badge className="mb-3 bg-silicon-amber/20 text-silicon-amber border-silicon-amber/30">
-                  Coming Soon
-                </Badge>
-                <h2 className="text-2xl font-bold text-text-primary mb-3">
-                  WaymarkPath: AI-Powered Career Transition
-                </h2>
-                <p className="text-text-muted mb-4">
-                  For mid-career professionals navigating significant career changes. Personalised AI coaching,
-                  skills gap analysis, structured roadmaps, and daily accountability check-ins&mdash;transforming
-                  an overwhelming career pivot into a clear, achievable path.
-                </p>
-                <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-text-muted">
-                  <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> Skills gap analysis</span>
-                  <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> AI coaching</span>
-                  <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> CV optimisation</span>
-                  <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> Daily check-ins</span>
-                </div>
-              </div>
-              <div className="text-center lg:text-right">
-                <Link href="/waymarkpath">
-                  <Button size="lg" className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90 font-semibold">
-                    Get Early Access
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* Contact Form */}
         <section id="contact" className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -469,7 +453,7 @@ export default function ServicesPage() {
                   <Shield className="w-5 h-5 text-stone-teal flex-shrink-0 mt-0.5" />
                   <div>
                     <div className="text-text-primary font-medium">Confidentiality First</div>
-                    <p className="text-text-muted">All inquiries are treated with strict confidentiality.</p>
+                    <p className="text-text-muted">All enquiries are treated with strict confidentiality.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -556,7 +540,7 @@ export default function ServicesPage() {
                       Area of Interest
                     </label>
                     <div className="grid grid-cols-2 gap-2">
-                      {['AI Act Compliance', 'Supply Chain Risk', 'Scenario Planning', 'Policy Analysis', 'Career Transition'].map((option) => (
+                      {['AI Governance', 'Vendor Dependency', 'Manufacturing Exposure', 'Scenario Planning', 'Policy Analysis'].map((option) => (
                         <button
                           key={option}
                           type="button"

@@ -58,7 +58,7 @@ const sections = [
     icon: CalendarClock,
     title: 'Timeline and Action Plan',
     pages: '4-5 pages',
-    description: 'Visual timeline from now to full enforcement with specific milestones. Includes a suggested 90-day action plan for organisations starting from scratch today.',
+    description: 'Visual timeline of phased implementation milestones, with the legal status of each date made explicit. Includes a suggested 90-day action plan for organisations starting from scratch today.',
   },
 ]
 
@@ -67,7 +67,14 @@ const checkoutUrls = {
   professional: process.env.NEXT_PUBLIC_LEMONSQUEEZY_TOOLKIT_PROFESSIONAL_URL,
 }
 
+function isConfiguredCheckout(url?: string) {
+  return Boolean(url && !url.includes('example.com'))
+}
+
 export default function AIActToolkitPage() {
+  const standardCheckoutReady = isConfiguredCheckout(checkoutUrls.standard)
+  const professionalCheckoutReady = isConfiguredCheckout(checkoutUrls.professional)
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -86,7 +93,8 @@ export default function AIActToolkitPage() {
                 </h1>
                 <p className="text-xl text-text-muted leading-relaxed mb-6">
                   Everything a European business needs to understand and act on AI Act
-                  obligations. Practical, affordable, and immediately actionable.
+                  obligations. Catalogue systems, classify risk, collect vendor evidence,
+                  and set review triggers.
                 </p>
                 <div className="flex items-center gap-4 mb-8">
                   <div className="text-3xl font-mono font-bold text-silicon-amber">£79</div>
@@ -97,18 +105,22 @@ export default function AIActToolkitPage() {
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3">
                   <Button size="lg" className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90 font-semibold" asChild>
-                    <a href={checkoutUrls.standard || '#'} target="_blank" rel="noopener noreferrer" className="plausible-event-name=Buy+Toolkit+Standard">
-                      Buy Standard — £79
+                    <a href={standardCheckoutReady ? checkoutUrls.standard : '/services#contact'} target={standardCheckoutReady ? '_blank' : undefined} rel={standardCheckoutReady ? 'noopener noreferrer' : undefined} className="plausible-event-name=Buy+Toolkit+Standard">
+                      {standardCheckoutReady ? 'Buy Standard — £79' : 'Request Early Access'}
                     </a>
                   </Button>
                   <Button size="lg" variant="outline" className="border-stone-teal text-stone-teal hover:bg-stone-teal/10" asChild>
-                    <a href={checkoutUrls.professional || '#'} target="_blank" rel="noopener noreferrer" className="plausible-event-name=Buy+Toolkit+Professional">
-                      Buy Professional — £149
+                    <a href={professionalCheckoutReady ? checkoutUrls.professional : '/services#contact'} target={professionalCheckoutReady ? '_blank' : undefined} rel={professionalCheckoutReady ? 'noopener noreferrer' : undefined} className="plausible-event-name=Buy+Toolkit+Professional">
+                      {professionalCheckoutReady ? 'Buy Professional — £149' : 'Ask About Professional'}
                     </a>
                   </Button>
                 </div>
                 <p className="text-xs text-text-muted mt-3">
-                  Professional includes 30-minute video walkthrough. Instant digital delivery.
+                  Professional includes a 30-minute video walkthrough.
+                  {!standardCheckoutReady && ' Early access is open while fulfilment is finalised.'}
+                </p>
+                <p className="mt-5 font-mono text-xs uppercase tracking-wider text-text-muted">
+                  Regulatory copy last reviewed: 2 June 2026
                 </p>
               </div>
 
@@ -154,8 +166,8 @@ export default function AIActToolkitPage() {
             <div className="flex items-center gap-3">
               <Shield className="w-5 h-5 text-silicon-amber flex-shrink-0" />
               <p className="text-sm text-text-primary">
-                <span className="font-semibold text-silicon-amber">August 2026 deadline approaching.</span>
-                {' '}Most European businesses using AI have not started compliance work. This toolkit gets you from zero to structured in days, not months.
+                <span className="font-semibold text-silicon-amber">AI Act implementation is phased.</span>
+                {' '}Transparency obligations remain relevant from 2 August 2026. A 7 May 2026 political agreement would move certain high-risk timelines, subject to formal adoption. The evidence work continues.
               </p>
             </div>
           </div>
@@ -230,21 +242,21 @@ export default function AIActToolkitPage() {
           <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
             <div className="text-center max-w-2xl mx-auto">
               <h2 className="text-2xl font-bold text-text-primary mb-4">
-                Start Your Compliance Journey
+                Build Your Evidence Trail
               </h2>
               <p className="text-text-muted mb-8">
-                At £79, this toolkit costs less than a single hour of formal counsel —
-                and it gives your team a structured path forward they can act on immediately.
+                Start with a structured record of systems, roles, vendors, evidence gaps,
+                owners, and review triggers. Use formal counsel where your findings require it.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
                 <Button size="lg" className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90 font-semibold" asChild>
-                  <a href={checkoutUrls.standard || '#'} target="_blank" rel="noopener noreferrer">
-                    Buy Standard — £79
+                  <a href={standardCheckoutReady ? checkoutUrls.standard : '/services#contact'} target={standardCheckoutReady ? '_blank' : undefined} rel={standardCheckoutReady ? 'noopener noreferrer' : undefined}>
+                    {standardCheckoutReady ? 'Buy Standard — £79' : 'Request Early Access'}
                   </a>
                 </Button>
                 <Button size="lg" variant="outline" className="border-stone-teal text-stone-teal hover:bg-stone-teal/10" asChild>
-                  <a href={checkoutUrls.professional || '#'} target="_blank" rel="noopener noreferrer">
-                    Buy Professional — £149
+                  <a href={professionalCheckoutReady ? checkoutUrls.professional : '/services#contact'} target={professionalCheckoutReady ? '_blank' : undefined} rel={professionalCheckoutReady ? 'noopener noreferrer' : undefined}>
+                    {professionalCheckoutReady ? 'Buy Professional — £149' : 'Ask About Professional'}
                   </a>
                 </Button>
               </div>
@@ -256,7 +268,7 @@ export default function AIActToolkitPage() {
                 {' '}and get a £20 discount on this toolkit.
               </p>
               <div className="flex items-center justify-center gap-6 mt-8 text-xs text-text-muted">
-                <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> Instant delivery</span>
+                <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> {standardCheckoutReady ? 'Digital delivery' : 'Early access enquiries open'}</span>
                 <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> Quarterly updates</span>
                 <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> EU VAT handled</span>
               </div>

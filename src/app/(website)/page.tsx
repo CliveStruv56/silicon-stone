@@ -18,7 +18,7 @@ import { SITE_SETTINGS_QUERY, ARTICLES_BY_TIER_QUERY } from '@/sanity/lib/querie
 export const metadata: Metadata = {
   title: 'Silicon and Stone | Forensic Technopolitics for the Senior Leaders Defining the AI Power Shift',
   description:
-    "Decision-grade intelligence on the technology power shift, for the senior leaders who'll be defining it, not defined by it. Twice a week from the edge of Europe.",
+    'Independent, decision-grade intelligence for UK and European leaders managing AI governance, technology dependency, and operational resilience.',
 }
 
 export default async function Home() {
@@ -42,7 +42,7 @@ export default async function Home() {
         name: 'Silicon and Stone',
         url: 'https://siliconandstone.com',
         description:
-          'Forensic Technopolitics for the senior leaders defining the AI power shift. Decision-grade intelligence on AI policy, semiconductor supply chains, and digital sovereignty, twice a week from the edge of Europe.',
+          'Independent, decision-grade intelligence for UK and European leaders managing AI governance, technology dependency, and operational resilience.',
       },
       {
         '@type': 'Organization',
@@ -65,7 +65,7 @@ export default async function Home() {
         '@type': 'WebPage',
         name: 'Forensic Technopolitics for the AI Power Shift',
         description:
-          "Decision-grade intelligence on the technology power shift, for the senior leaders who'll be defining it, not defined by it. Twice a week from the edge of Europe.",
+          'Independent, decision-grade intelligence for UK and European leaders managing AI governance, technology dependency, and operational resilience.',
         url: 'https://siliconandstone.com',
         about: {
           '@type': 'Thing',
@@ -90,7 +90,7 @@ export default async function Home() {
         {/* 1. Hero — The Vantage Point */}
         <HeroSection settings={siteSettings} />
 
-        {/* 2. Deadline Countdown */}
+        {/* 2. AI Act readiness */}
         <div className="bg-slate-deep border-y border-border-subtle">
           <div className="mx-auto max-w-7xl px-6 py-3 lg:px-8">
             <DeadlineCountdown />
@@ -110,14 +110,14 @@ export default async function Home() {
           auditArticle={auditArticle}
         />
 
-        {/* 5b. Adjacent Block — sister-product cross-link to WaymarkPath */}
-        <AdjacentBlock />
-
         {/* 6. Tool Gallery — Real-World Utility */}
         <ToolsGallery />
 
         {/* 7. Persona Navigator — Find Your Perspective */}
         <PersonaNavigator />
+
+        {/* 7b. Adjacent Block — sister-product cross-link to WaymarkPath */}
+        <AdjacentBlock />
 
         {/* 8. Subscribe CTA */}
         <div className="bg-stone-charcoal/30 border-t border-border-subtle">

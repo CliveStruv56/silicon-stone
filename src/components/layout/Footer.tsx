@@ -44,7 +44,7 @@ export function Footer() {
               </span>
             </Link>
             <p className="text-sm text-text-muted max-w-xs">
-              Forensic Technopolitics from the edge. Cutting through complexity with 30 years of experience.
+              Forensic Technopolitics from the edge. Tracing the constraints that shape technology decisions.
             </p>
             <p className="text-xs text-text-muted">
               Analysis for decision-makers navigating the AI Act, semiconductor supply chains, and digital sovereignty.

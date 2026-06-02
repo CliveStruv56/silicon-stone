@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 const tools = [
   {
     name: 'Compliance Checker',
-    description: 'Determine if your AI system qualifies as High-Risk under the EU AI Act',
+    description: 'Create a first-pass AI system record, identify likely obligations, and capture missing vendor evidence',
     href: '/tools/compliance-checker',
     icon: (
       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -15,7 +15,7 @@ const tools = [
   },
   {
     name: 'Supply Chain Mapper',
-    description: 'Visualize semiconductor supply chain vulnerabilities and chokepoints',
+    description: 'Visualise semiconductor supply-chain vulnerabilities and chokepoints',
     href: '/tools/supply-chain-mapper',
     icon: (
       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

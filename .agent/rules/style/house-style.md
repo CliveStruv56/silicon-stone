@@ -2,7 +2,7 @@
 type: style
 scope: global
 canonical: true
-updated: 2026-05-29
+updated: 2026-06-02
 ---
 
 # House Style (canonical)
@@ -36,9 +36,37 @@ updated: 2026-05-29
 
 - Hype, breathless framing, unearned superlatives (e.g. no exclamation marks, clickbait, or sensationalist framing).
 - **Banned Words & Phrases**: "game-changer", "disruption", "game-changing", "revolutionary", "transformative", "cutting-edge", "next-generation", "best-in-class", "future-proof", "synergy", "leverage" (as verb), "actionable insights", "easy", "simple", "one-click", "cut through the noise", "AI is revolutionising X", "literally".
+- **Artificial urgency and vague value claims**: Avoid "the clock is ticking", "act now before it is too late", "cut through complexity", "unlock", "empower", "seamless", and "full enforcement" unless the legal meaning is precise and sourced.
 - **US Spellings**: Avoid US spellings (e.g., use *organisation*, *programme*, *optimise*).
 - **Em-dashes**: Space-padded em-dash habits (` — `) for pauses, up to three per paragraph.
 - **Smart Quotes**: Always use smart quotes (`"`, `'`) for editorial polish.
+
+## Operational language
+
+Silicon & Stone is measured, forensic, and practical. Prefer verbs that describe
+real analytical work:
+
+`catalogue`, `classify`, `trace`, `map`, `evidence`, `monitor`, `compare`,
+`stress-test`, `prepare`, `reassess`, `verify`, `identify`.
+
+Use these verbs particularly in product pages, service descriptions, tool calls
+to action, executive summaries, and Practical Move sections. The aim is not to
+make the voice mechanical. It is to show what the reader can actually do next.
+
+## Regulatory writing
+
+- Separate fact, inference, and scenario. Label the status of a regulatory
+  change explicitly: current law, political agreement, proposal, guidance, or
+  inference.
+- Use exact dates where dates materially affect a decision. Add a
+  `Last reviewed` date to regulatory tools, product pages, and service pages.
+- Link to primary sources where possible. Do not use a countdown as a
+  substitute for analysis.
+- Prefer calibrated formulations such as: "The timetable is moving. The
+  evidence gap remains."
+- Do not dilute the sober register, short declarative paragraphs, Stone Truth
+  convention, Digital Realism, 3 x 2 methodology, or the "view from the edge"
+  identity.
 
 ## Variant-specific rules
 

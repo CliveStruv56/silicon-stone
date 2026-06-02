@@ -9,7 +9,6 @@ import {
   Shield,
   ClipboardCheck,
   FileText,
-  RefreshCw,
   ArrowRight,
   CheckCircle,
 } from 'lucide-react'
@@ -20,26 +19,6 @@ export const metadata: Metadata = {
 }
 
 const products = [
-  {
-    title: 'AI Act Compliance Toolkit',
-    slug: 'ai-act-toolkit',
-    description: 'Everything a European business needs to understand and act on AI Act obligations before the August 2026 deadline.',
-    price: 'From £79',
-    badge: 'Flagship',
-    badgeColor: 'bg-silicon-amber text-slate-deep',
-    icon: Shield,
-    iconColor: 'text-silicon-amber',
-    iconBg: 'bg-silicon-amber/10',
-    highlights: [
-      'Risk classification decision tree',
-      'Compliance checklist by risk category',
-      'Template documents and policies',
-      'AI Systems Register spreadsheet',
-      'Compliance Tracker spreadsheet',
-      'Timeline and action plan to August 2026',
-    ],
-    cta: 'View Toolkit',
-  },
   {
     title: 'AI Audit Checklist Pack',
     slug: 'ai-audit-checklist',
@@ -60,23 +39,24 @@ const products = [
     cta: 'View Checklist Pack',
   },
   {
-    title: 'WaymarkPath',
-    slug: 'waymarkpath',
-    description: 'AI-powered career transition companion for mid-career professionals. Personalised coaching, skills gap analysis, and daily accountability.',
-    price: 'Free Early Access',
-    badge: 'Coming Soon',
-    badgeColor: 'bg-silicon-amber/20 text-silicon-amber',
-    icon: RefreshCw,
+    title: 'AI Act Compliance Toolkit',
+    slug: 'ai-act-toolkit',
+    description: 'A structured governance toolkit for cataloguing systems, classifying risk, collecting vendor evidence, and planning against phased AI Act implementation.',
+    price: 'From £79',
+    badge: 'Flagship',
+    badgeColor: 'bg-silicon-amber text-slate-deep',
+    icon: Shield,
     iconColor: 'text-silicon-amber',
     iconBg: 'bg-silicon-amber/10',
     highlights: [
-      'Skills inventory with proficiency mapping',
-      'AI-powered gap analysis ranked by priority',
-      'Personalised learning path and roadmap',
-      'ATS-optimised CV generation',
-      'Daily AI coaching check-ins with streaks',
+      'Risk classification decision tree',
+      'Compliance checklist by risk category',
+      'Template documents and policies',
+      'AI Systems Register spreadsheet',
+      'Compliance Tracker spreadsheet',
+      'Phased implementation action plan',
     ],
-    cta: 'Get Early Access',
+    cta: 'View Toolkit',
   },
   {
     title: 'Sector Intelligence Briefings',
@@ -116,8 +96,12 @@ export default function ProductsPage() {
                 Practical Tools for Compliance and Strategy
               </h1>
               <p className="text-xl text-text-muted leading-relaxed">
-                Actionable frameworks, checklists, and templates built from forensic analysis.
-                Stop reading about compliance — start doing it.
+                The practical first step is not a countdown. It is an evidence trail:
+                know which systems you use, what role you play, what your vendors can
+                prove, and what should trigger reassessment.
+              </p>
+              <p className="mt-5 font-mono text-xs uppercase tracking-wider text-text-muted">
+                Regulatory copy last reviewed: 2 June 2026
               </p>
             </div>
           </div>
@@ -129,8 +113,8 @@ export default function ProductsPage() {
             <div className="flex items-center gap-3">
               <Shield className="w-5 h-5 text-silicon-amber flex-shrink-0" />
               <p className="text-sm text-text-primary">
-                <span className="font-semibold text-silicon-amber">EU AI Act enforcement begins August 2026.</span>
-                {' '}Most European businesses haven&apos;t started compliance work. These tools help you begin today.
+                <span className="font-semibold text-silicon-amber">The AI Act is already applying in phases.</span>
+                {' '}Transparency obligations remain relevant from 2 August 2026. The timetable is moving. The evidence gap remains.
               </p>
             </div>
           </div>
@@ -171,7 +155,7 @@ export default function ProductsPage() {
                         </li>
                       ))}
                     </ul>
-                    <Link href={product.slug === 'waymarkpath' ? '/waymarkpath' : `/products/${product.slug}`} className="mt-6">
+                    <Link href={`/products/${product.slug}`} className="mt-6">
                       <Button className="w-full bg-surface-elevated text-text-primary hover:bg-surface-elevated/80">
                         {product.cta}
                         <ArrowRight className="w-4 h-4 ml-2" />
@@ -181,6 +165,20 @@ export default function ProductsPage() {
                 </Card>
               )
             })}
+          </div>
+        </section>
+
+        {/* Sister product */}
+        <section className="border-y border-border-subtle bg-stone-charcoal/30">
+          <div className="mx-auto flex max-w-7xl flex-col gap-3 px-6 py-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+            <p className="text-sm text-text-muted">
+              <span className="font-semibold text-sister-indigo">WaymarkPath</span>
+              {' '}is the separate career-transition companion for professionals navigating the same shifts.
+            </p>
+            <Link href="/waymarkpath" className="inline-flex items-center gap-1.5 text-sm text-sister-indigo hover:underline">
+              See WaymarkPath
+              <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
         </section>
 
