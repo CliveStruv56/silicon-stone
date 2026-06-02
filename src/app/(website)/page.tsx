@@ -49,7 +49,7 @@ export default async function Home() {
         name: 'Silicon and Stone',
         url: 'https://siliconandstone.com',
         description:
-          'Forensic Technopolitics intelligence service for senior decision-makers in European industry. Calibrated, practitioner-grade analysis from thirty years inside the technology industry. Published from the edge of Europe.',
+          'Forensic Technopolitics intelligence service for senior decision-makers in European industry. Calibrated, decision-grade analysis from thirty years inside the technology industry. Published from the edge of Europe.',
         foundingDate: '2024',
         areaServed: 'Europe',
         knowsAbout: [

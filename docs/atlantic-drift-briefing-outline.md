@@ -50,7 +50,7 @@ The PDF should work for an Ian first. The other personas pick up adjacent value.
 
 ### Executive summary (1 page)
 
-- One paragraph on the macro situation (Atlantic Drift, Pax Silica, AI Act enforcement converging in 2026)
+- One paragraph on the macro situation (Atlantic Drift, Pax Silica, and phased AI Act implementation converging in 2026)
 - The five chokepoints listed in priority order with a one-line Stone Truth each
 - Methodology Audit grid (which cells were applied across the briefing as a whole)
 - "Read the chokepoint that matters most to your sector first" — table mapping each chokepoint to the sectors it most exposes
@@ -61,7 +61,7 @@ Sets the macro frame so the five chokepoints aren't read in isolation.
 
 - The Donroe Doctrine and the US pivot to Western-Hemisphere-First
 - The Pax Silica framework and Europe's exclusion
-- The EU AI Act August 2026 enforcement cliff
+- The EU AI Act evidence gap: phased obligations, moving high-risk timelines, and the work organisations still need to complete
 - Why these three are not separate stories — they are one system reorganising
 
 Closes with a Stone Truth on the macro frame:

@@ -200,7 +200,7 @@ Not every piece applies the full matrix. The framework recognises three tiers, a
 
 - **Pulse** — 30-second scan. Usually one or two cells. For breaking signals where speed matters and the analytical depth is constrained by what is actually known yet.
 - **Briefing** — 5-minute read. Two to four cells. The default Stone Briefing tier. The Tuesday Stone Briefing on the YouTube channel maps to this.
-- **Audit** — Deep dive, 20+ minute read. Eligible for all six cells, but evidence-led in what it claims. Foundational pieces. The format reserved for the questions that will compound — Pax Silica, the AI Act enforcement cliff, the German automotive supply-chain exposure.
+- **Audit** — Deep dive, 20+ minute read. Eligible for all six cells, but evidence-led in what it claims. Foundational pieces. The format reserved for the questions that will compound — Pax Silica, phased AI Act implementation, the German automotive supply-chain exposure.
 
 The tier is set in Sanity Studio on every article. The Methodology Audit on the published piece reflects what was actually applied — which should match the tier, but doesn't always, and the Audit is always the source of truth.
 

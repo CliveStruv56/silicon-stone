@@ -2,6 +2,14 @@
 
 > Track every change shipped as part of the 2026 homepage redesign here. Append-only.
 
+## 2026-06-02 — Homepage handoff reconciliation
+- Reconciled `COPY.md`, `SPEC.md`, `DESIGN-TOKENS.md`, and the redesign implementation skill with the shipped homepage.
+- §8 is now documented as a static phased-readiness strip rather than a preserved deadline countdown.
+- Public-facing copy references the edge or an Outer Orkney isle where appropriate; the image brief retains Sanday because it records the actual shoot location.
+- Newsletter handoff copy now matches the live `Get the Atlantic Drift Briefing` section and uses `decision-grade`.
+- Reconciled the View from the Edge handoff copy and JSON-LD organisation description from `practitioner-grade` to `decision-grade`.
+- Adjacent WaymarkPath placement is documented below persona routing.
+
 ## §C fix-up — CredibilityBlock distance remnants
 - §C's "fifty miles" → "sixty miles" sweep missed two more references in `CredibilityBlock.tsx`: the mono-caps subhead under H2 (`Thirty years inside. Fifty miles north.` → `Thirty years inside. Sixty miles north.`) and the stat card 2 value (`50 mi N` → `60 mi N`). Both were rendering on the live homepage as a factual contradiction with the §C prose paragraph that already said sixty.
 - Source-of-truth in `COPY.md` updated to match: §View from the Edge subhead row (line 51) and Stat cards table card 2 value (line 69).

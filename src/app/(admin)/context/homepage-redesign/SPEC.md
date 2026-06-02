@@ -15,7 +15,7 @@
 **Replace with**: `Silicon and Stone | Forensic Technopolitics for the Senior Leaders Defining the AI Power Shift`
 
 ### Page meta-description
-**Replace with**: `Decision-grade intelligence on the technology power shift, for the senior leaders who'll be defining it, not defined by it. Twice a week from Sanday, Orkney.`
+**Replace with**: `Independent, decision-grade intelligence for UK and European leaders managing AI governance, technology dependency, and operational resilience.`
 
 ### Where to edit
 Likely `src/app/(website)/layout.tsx` or `src/app/(website)/page.tsx` — Next.js metadata exports. Verify by searching for the current title string.
@@ -96,7 +96,7 @@ Section already renders. Three copy edits + one stat-tag replacement. The compon
 
 **Body paragraph 3** — full replacement:
 - WAS: `In an era of synthetic expertise, Silicon and Stone provides something AI cannot replicate: the **human-in-the-loop perspective** built on real-world experience, not training data.`
-- NOW: `Practitioner-grade analysis from thirty years inside the industry. *Calibrated where the evidence supports it, hedged where it doesn't.* Never glib, never breathless.`
+- NOW: `Decision-grade analysis from thirty years inside the industry. *Calibrated where the evidence supports it, hedged where it doesn't.* Never glib, never breathless.`
 
 ### Stat cards (the data column on the right)
 
@@ -104,7 +104,7 @@ Card 3 changes:
 
 | | WAS | NOW |
 |---|---|---|
-| Value | `Human-in-the-Loop` | `PRACTITIONER‑GRADE` (use non-breaking hyphen U+2011) |
+| Value | `Human-in-the-Loop` | `DECISION‑GRADE` (use non-breaking hyphen U+2011) |
 | Label | `Not AI-Generated` | `Calibrated by Default` |
 | Description | (none) | `Hedged on purpose. Not pundit takes, not consensus reading.` |
 
@@ -198,7 +198,7 @@ Drop the **Transition** tier (the WaymarkPath one). The section becomes a clean 
 #### Tier 2 — Stone Briefing (visually highlighted — the active tier)
 - Timer: `5 min · The Stone Briefing`
 - Title: `Operational intelligence for managers and directors`
-- Description: `Tuesday Stone Briefing on what just shifted. Friday Practical Move on what to do about it. Calibrated, practitioner-grade — never glib, never breathless.`
+- Description: `Tuesday Stone Briefing on what just shifted. Friday Practical Move on what to do about it. Calibrated, decision-grade — never glib, never breathless.`
 - Latest: live from Sanity (e.g. `Atlantic Fault Lines Deepen: US Tech Policies Threaten EU Digital Autonomy · 24 Jan 2026 · 5 min read`)
 - Highlight: `silicon-amber-bg` gradient + amber-tinted border
 
@@ -316,14 +316,14 @@ The Global Citizen change drops "Cut through the noise," which appeared twice on
 
 ---
 
-## §7 — Get the Signal (`SubscribeCTA.tsx`)
+## §7 — Get the Atlantic Drift Briefing (`SubscribeCTA.tsx`)
 
 Three things to fix.
 
 ### 1. Cadence reconciliation
 Currently says `Weekly`. Real cadence is twice a week.
 - WAS: `Weekly analysis on AI regulation, semiconductor supply chains, and digital sovereignty. Cut through the noise with insights from 30 years at the edge.`
-- NOW: `**Twice a week from Sanday** — Tuesday Stone Briefing on what just shifted in AI policy, semiconductors, supply chains, and digital sovereignty. Friday Practical Move on what to do about it. **Practitioner-grade analysis from thirty years inside the industry.**`
+- NOW: `**Twice a week from the edge of Europe** — Tuesday Stone Briefing on what just shifted in AI policy, semiconductors, supply chains, and digital sovereignty. Friday Practical Move on what to do about it. **Decision-grade analysis from thirty years inside the industry.** A welcome Atlantic Drift Briefing arrives on signup.`
 
 ### 2. CTA alignment with hero
 The hero CTA is `Get the Atlantic Drift Briefing`. The newsletter form should make clear it delivers the same lead magnet:
@@ -334,13 +334,16 @@ The hero CTA is `Get the Atlantic Drift Briefing`. The newsletter form should ma
 - WAS: `No spam. Unsubscribe anytime.`
 - NOW: `Free. Unsubscribe anytime.`
 
-### Full copy in COPY.md §Get the Signal.
+### Full copy in COPY.md §Get the Atlantic Drift Briefing.
 
 ---
 
-## §8 — AI Act Deadline (`DeadlineCountdown.tsx`)
+## §8 — AI Act readiness (`DeadlineCountdown.tsx`)
 
-**No copy changes.** Already on register. Confirmed strong by the audit. Leave the component untouched.
+Replace the single countdown with a static phased-readiness strip. A universal countdown
+creates false precision because AI Act implementation is staged and the 7 May 2026
+political agreement changes the expected timetable for certain high-risk rules subject to
+formal adoption. Use the copy in `COPY.md`.
 
 ---
 

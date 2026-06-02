@@ -13,7 +13,7 @@
 | Field | Value |
 |---|---|
 | `title` | `Silicon and Stone \| Forensic Technopolitics for the Senior Leaders Defining the AI Power Shift` |
-| `description` | `Decision-grade intelligence on the technology power shift, for the senior leaders who'll be defining it, not defined by it. Twice a week from Sanday, Orkney.` |
+| `description` | `Independent, decision-grade intelligence for UK and European leaders managing AI governance, technology dependency, and operational resilience.` |
 | `og:title` | (same as title, but consider shorter version: `Silicon and Stone — Forensic Technopolitics`) |
 | `og:description` | (same as description) |
 
@@ -23,22 +23,28 @@
 
 | Field | Value |
 |---|---|
-| `eyebrow` (badge) | `Forensic Technopolitics · Sanday, Orkney` |
+| `eyebrow` (badge) | `Forensic Technopolitics · the view from the edge` |
 | `headline` | `AI. Policy. Power. Leadership.` |
-| `subhead` | `Decision-grade intelligence on the technology power shift — for the senior leaders who'll be defining it, not defined by it.` |
-| `lede` | `Calibrated, practitioner-grade analysis from someone who spent thirty years inside the industry. Published twice a week from Sanday — sixty miles north of mainland Scotland — because the view from the edge is structurally clearer than the view from any centre.` |
+| `subhead` | `Independent, decision-grade intelligence for UK and European leaders managing AI governance, technology dependency, and operational resilience.` |
+| `lede` | `Calibrated, decision-grade analysis from someone who spent thirty years inside the industry. Published twice a week from an Outer Orkney isle — sixty miles north of mainland Scotland — because the view from the edge is structurally clearer than the view from any centre.` |
 | `primaryCtaLabel` | `Get the Atlantic Drift Briefing` |
 | `primaryCtaHref` | `/#subscribe` *(or wherever the lead-magnet capture lives)* |
 | `secondaryCtaLabel` | `Read the methodology` |
 | `secondaryCtaHref` | `/methodology` |
 | `strapLine` | `Two briefings a week · Tuesday Stone Briefing · Friday Practical Move` |
-| `imageAlt` | `A figure on a Sanday clifftop, looking out across the North Atlantic — the view from the edge` |
+| `imageAlt` | `A figure on a clifftop on an Outer Orkney isle, looking out across the North Atlantic — the view from the edge` |
 
 ---
 
-## §AI Act Deadline strip
+## §AI Act readiness strip
 
-No copy changes. (`AI Act Deadline · 91D 05H 12M 58S · Implementation Phase` — driven by countdown logic.)
+| Field | Value |
+|---|---|
+| `eyebrow` | `AI Act implementation` |
+| `headline` | `The timetable is phased. The evidence work is not.` |
+| `body` | `Catalogue your systems. Clarify your role. Capture vendor evidence. Set review triggers. Transparency obligations remain relevant from 2 August 2026.` |
+| `ctaLabel` | `Assess readiness` |
+| `ctaHref` | `/tools/compliance-checker` |
 
 ---
 
@@ -59,7 +65,7 @@ No copy changes. (`AI Act Deadline · 91D 05H 12M 58S · Implementation Phase` �
 > While the mainland reacts to the noise, we identify **the Drift** — the structural shifts in policy, capital, and supply chains that will define European industry's next decade.
 
 **Paragraph 3** (note `*italic*` on the calibrated line):
-> Practitioner-grade analysis from thirty years inside the industry. *Calibrated where the evidence supports it, hedged where it doesn't.* Never glib, never breathless.
+> Decision-grade analysis from thirty years inside the industry. *Calibrated where the evidence supports it, hedged where it doesn't.* Never glib, never breathless.
 
 ### Stat cards
 
@@ -67,7 +73,7 @@ No copy changes. (`AI Act Deadline · 91D 05H 12M 58S · Implementation Phase` �
 |---|---|---|---|
 | 1 | `30` | `Years in Tech` | `From inside the industry, not observing it from outside.` |
 | 2 | `60 mi N` | `Beyond the Mainland` | `The view from the edge is structurally clearer than the view from any centre.` |
-| 3 | `PRACTITIONER‑GRADE` *(non-breaking hyphen, U+2011)* | `Calibrated by Default` | `Hedged on purpose. Not pundit takes, not consensus reading.` |
+| 3 | `DECISION‑GRADE` *(non-breaking hyphen, U+2011)* | `Calibrated by Default` | `Hedged on purpose. Not pundit takes, not consensus reading.` |
 
 ---
 
@@ -150,7 +156,7 @@ No copy changes. (`AI Act Deadline · 91D 05H 12M 58S · Implementation Phase` �
 |---|---|
 | `timer` | `5 min · The Stone Briefing` |
 | `title` | `Operational intelligence for managers and directors` |
-| `description` | `Tuesday Stone Briefing on what just shifted. Friday Practical Move on what to do about it. Calibrated, practitioner-grade — never glib, never breathless.` |
+| `description` | `Tuesday Stone Briefing on what just shifted. Friday Practical Move on what to do about it. Calibrated, decision-grade — never glib, never breathless.` |
 | `latestLabel` | `Latest Briefing` |
 | `latestItem` | (live from Sanity — example: `Atlantic Fault Lines Deepen: US Tech Policies Threaten EU Digital Autonomy`) |
 | `latestDate` | (live from Sanity — example: `24 Jan 2026 · 5 min read`) |
@@ -171,7 +177,7 @@ No copy changes. (`AI Act Deadline · 91D 05H 12M 58S · Implementation Phase` �
 
 ## §Adjacent Block (NEW — sister product cross-link)
 
-This block sits immediately below the tier grid. WaymarkPath gets one row of visibility on the S&S homepage; deeper detail lives on its own page.
+This block sits below the persona navigator. WaymarkPath gets one row of visibility on the S&S homepage; deeper detail lives on its own page.
 
 | Field | Value |
 |---|---|
@@ -191,6 +197,8 @@ This block sits immediately below the tier grid. WaymarkPath gets one row of vis
 | `eyebrow` | `Decision Tools` |
 | `h2` | `From Analysis to Action` *(or keep current `Execution Engines` — see SPEC.md §5 on rename)* |
 | `subhead` | `Four tools that solve high-stakes problems in the first session — calibrated against the same intelligence the briefings draw from.` |
+| `primaryPathway` | `Assess AI governance exposure` → `/tools/compliance-checker` |
+| `secondaryPathway` | `Map technology dependency` → `/tools/supply-chain-mapper` |
 
 ### Tool cards (4)
 
@@ -225,13 +233,13 @@ This block sits immediately below the tier grid. WaymarkPath gets one row of vis
 
 ---
 
-## §Get the Signal (Newsletter)
+## §Get the Atlantic Drift Briefing (Newsletter)
 
 | Field | Value |
 |---|---|
 | `eyebrow` | `Newsletter` |
-| `h2` | `Get the Signal` |
-| `lede` | `**Twice a week from Sanday** — Tuesday Stone Briefing on what just shifted in AI policy, semiconductors, supply chains, and digital sovereignty. Friday Practical Move on what to do about it. **Practitioner-grade analysis from thirty years inside the industry.**` |
+| `h2` | `Get the Atlantic Drift Briefing` |
+| `lede` | `**Twice a week from the edge of Europe** — Tuesday Stone Briefing on what just shifted in AI policy, semiconductors, supply chains, and digital sovereignty. Friday Practical Move on what to do about it. **Decision-grade analysis from thirty years inside the industry.** A welcome Atlantic Drift Briefing arrives on signup.` |
 | `formLabel` | `Get the Atlantic Drift Briefing` |
 | `inputPlaceholder` | `your.email@company.com` |
 | `submitLabel` | `Subscribe` |
@@ -243,7 +251,7 @@ This block sits immediately below the tier grid. WaymarkPath gets one row of vis
 
 | Field | Value |
 |---|---|
-| `brandLine` | `**Silicon & Stone** · Forensic Technopolitics from Sanday, Orkney · 2026` |
+| `brandLine` | `**Silicon & Stone** · Forensic Technopolitics from the edge · 2026` |
 | `links` | `Methodology` · `About` · `Privacy` · `RSS` |
 | `sisterLink` | `WaymarkPath →` (links to `https://waymarkpath.vercel.app`, indigo styling) |
 
@@ -254,10 +262,10 @@ This block sits immediately below the tier grid. WaymarkPath gets one row of vis
 - All **bold** in copy maps to `**bold**` in Markdown / `<strong>` in HTML — semantic emphasis, not styling.
 - All **italic** maps to `*italic*` / `<em>`.
 - Em-dashes use the actual character `—` (U+2014). Don't substitute hyphens.
-- Non-breaking hyphen (U+2011) used in `PRACTITIONER‑GRADE` to keep it on one line.
+- Non-breaking hyphen (U+2011) used in `DECISION‑GRADE` to keep it on one line.
 - Smart quotes (`"` `"` `'` `'`) in voice quotes and titles where shown.
 - Where descriptions reference dates (e.g. *Latest Briefing*), wire to live Sanity content rather than hardcoding.
 
 ---
 
-**Last updated**: 2026-05. Approved for production once Clive signs off voice and Jane verifies it matches Sanity.
+**Last updated**: 2026-06-02. The readiness strip, operational pathways, and sister-product placement reflect the live implementation.

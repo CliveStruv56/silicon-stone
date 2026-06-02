@@ -2,7 +2,7 @@
 
 > **Version:** 1.0  
 > **Last Updated:** January 2026  
-> **Platform Mission:** Forensic Technopolitics — Cutting through complexity in AI regulation, semiconductor supply chains, and digital sovereignty.
+> **Platform Mission:** Forensic Technopolitics — tracing the operating constraints created by AI regulation, semiconductor supply chains, and digital sovereignty.
 
 ---
 
@@ -90,7 +90,7 @@ All content should be tagged for relevance to one or more of these decision-make
 > - Documentation and transparency requirements
 > - Cross-border regulatory complexity  
 > 
-> **Content Needs:** Clear compliance checklists, deadline trackers, legal interpretation guidance
+> **Content Needs:** Clear compliance checklists, phased implementation trackers, vendor-evidence prompts, legal interpretation guidance
 
 ### Industrial Ian
 > **Role:** Operations/Supply Chain Manager  
@@ -166,7 +166,7 @@ Each tool requires a supporting content ecosystem:
 ## Editorial Priorities (Current Phase)
 
 ### High Priority ⬆️
-1. **AI Act Implementation** — Immediate relevance as deadlines approach
+1. **AI Act Implementation** — Immediate relevance as organisations catalogue systems, collect vendor evidence, and prepare for phased obligations
 2. **Atlantic Drift** — Flagship differentiator, underexplored niche
 3. **Semiconductor Supply Chains** — High ongoing interest, tool integration
 

@@ -58,7 +58,7 @@ The platform is **live in production at siliconandstone.com** and has been since
 - A separate logic backend runs on Railway, handling subscribe, contact, briefings, and categories endpoints. (You don't have to think about this — it's invisible from the editor's seat.)
 - **Nine articles are published**, mostly the January 2026 launch set; another four generated drafts are queued in Sanity awaiting cover images and review.
 - **Four interactive tools** are live and email-gated for lead capture: Compliance Checker, Supply Chain Mapper, Scenario Modeler, Policy Stress-Test.
-- Three product sales pages are wired with Lemon Squeezy checkout links (Toolkit £79/£149, AI Audit Checklist £24, Sector Briefings coming soon), pending store creation.
+- Three product sales pages are live (Toolkit £79/£149, AI Audit Checklist £24, Sector Briefings coming soon). Paid-product buttons use an early-access enquiry fallback until the Lemon Squeezy store and checkout URLs are configured.
 - Newsletter and contact forms run through **Kit** (the platform formerly known as ConvertKit), with a **Substack** running in parallel for distribution.
 - Plausible analytics is deployed in code, pending account setup.
 - The Sanity → Pinecone vector pipeline runs automatically: every published article is indexed for semantic search and used as RAG context for future drafts.
@@ -175,7 +175,7 @@ The YouTube channel runs two long-form pieces per week. The pillars are delibera
 
 #### The bridge
 
-Tuesday's analysis creates Friday's context. If Tuesday is on the Pax Silica chip alliance, Friday is on what supply-chain literacy now means for an operations director's CV. If Tuesday is on the EU AI Act enforcement deadline, Friday is on AI fluency for the over-50 leader.
+Tuesday's analysis creates Friday's context. If Tuesday is on the Pax Silica chip alliance, Friday is on what supply-chain literacy now means for an operations director's CV. If Tuesday is on the phased EU AI Act timetable, Friday is on the governance evidence an operations leader needs to request from vendors.
 
 This bridge is the moat. Pure geopolitics commentators don't connect to career impact. Pure career creators don't have the analytical depth. Silicon and Stone does both. That's why it is one channel, not two.
 
@@ -187,7 +187,7 @@ Built to compound, not to sequence. Each layer activates as the audience justifi
 |---|---|---|
 | 1 | Free PDF lead magnets (email capture via Kit) | Lead capture **live** via tool email gates and homepage; Atlantic Drift PDF outline drafted, full PDF pending. |
 | 1 | Affiliate links in YouTube descriptions | Pending channel launch. |
-| 2 | Paid Intelligence Series PDFs (£12–19) | Sales infrastructure live (Lemon Squeezy); store creation + product files pending. |
+| 2 | Paid Intelligence Series PDFs (£12–19) | Sales pages live with early-access enquiry fallback; Lemon Squeezy store creation + product files pending. |
 | 2 | YouTube ad revenue (AdSense) | Pending channel launch + thresholds (1,000 subs + 4,000 watch hours). |
 | 3 | Sponsorships (B2B integrations) | Month 12+, when audience-quality data justifies. |
 | 3 | Premium subscription (£7–12/mo) | Month 12+, when newsletter shows engagement. |
@@ -269,7 +269,7 @@ The point of the table is not lock-step compliance. It's that both of you know w
 | **Railway backend** | A separate logic API. Currently handles subscribe/contact/briefings/categories. Invisible from the editor's seat — only matters when something breaks. | Clive |
 | **Kit (newsletter + contact)** | Primary newsletter platform (formerly ConvertKit). Subscribe, contact, and tool-lead tagging all run through it. | Jane |
 | **Substack** | Running in parallel for distribution and discovery. Same content, different audience surface. | Jane |
-| **Lemon Squeezy** | Checkout for paid PDFs and digital products. Sales pages live; store creation pending. | Joint |
+| **Lemon Squeezy** | Intended checkout for paid PDFs and digital products. Sales pages are live with an early-access enquiry fallback; store creation and checkout URLs are pending. | Joint |
 | **Plausible** | Privacy-first analytics. Six custom event goals defined; account/env var pending. | Jane (once live) |
 | **YouTube Studio** | Channel management — uploads, thumbnails, descriptions, analytics. *Channel not yet launched.* | Jane uploads; both view analytics |
 | **LinkedIn** | Primary social channel for the senior-professional audience. Three posts/week minimum. | Jane |

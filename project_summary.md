@@ -1,10 +1,10 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-05-29
+> Last Updated: 2026-06-02
 > Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing, 13 moderate transitive npm audit findings (uuid through Sanity packages)**
 
-**Current State**: Full-featured intelligence portal live at siliconandstone.com. Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools (email-gated for lead capture, AI Act triage engine recently overhauled), product/commerce pages with Lemon Squeezy checkout links, Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Awaiting Lemon Squeezy store setup, Plausible account, and content publishing for queued drafts.
+**Current State**: Full-featured intelligence portal live at siliconandstone.com. Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools (email-gated for lead capture, AI Act triage engine recently overhauled), product/commerce pages with an early-access enquiry fallback until Lemon Squeezy checkout URLs are configured, Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Awaiting Lemon Squeezy store setup, Plausible account, and content publishing for queued drafts.
 
 ---
 
@@ -90,7 +90,7 @@ Sanity v5, next-sanity v12, and @sanity/vision v5 are available but **cannot be 
 ### Research Pipeline
 
 ```
-User Query (e.g. "EU AI Act enforcement August 2026")
+User Query (e.g. "EU AI Act phased implementation and vendor evidence gaps")
        │
        ├─ Step 1: Inoreader search (if connected)
        │   └─ Searches user's reading list, returns up to 20 items
@@ -135,13 +135,13 @@ All draft-generating formats use Claude at temperature 0.4. Drafts are created d
 
 | Route | Status | Description |
 |-------|--------|-------------|
-| `/` | ✅ | Landing page with hero, Intelligence Stream, tools grid, deadline countdown, subscribe CTA |
+| `/` | ✅ | Landing page with hero, phased AI Act readiness strip, Intelligence Stream, operational pathways, tools grid, persona routing, WaymarkPath sister-product link, subscribe CTA |
 | `/briefings` | ✅ | Intelligence portal: "Find Your Perspective" persona explainer (avatars), persona filter tabs, tiered display, impact scores |
 | `/analysis` | ✅ | Article listing with category sidebar |
 | `/analysis/[slug]` | ✅ | Individual article pages |
 | `/analysis/category/[slug]` | ✅ | Category-filtered articles |
 | `/methodology` | ✅ | Forensic Technopolitics 3×2 matrix — 3 domains × 2 methods, practice details, questions |
-| `/services` | ✅ | Advisory services, assessment offerings, contact form (ConvertKit) |
+| `/services` | ✅ | AI Governance and Technology Dependency Diagnostic, follow-on modules, advisory tiers, contact form (ConvertKit) |
 | `/about` | ✅ | Credentials, principles, focus areas, products CTA |
 | `/search` | ✅ | Full-text article search |
 | `/tools` | ✅ | Interactive tools hub |
@@ -149,7 +149,7 @@ All draft-generating formats use Claude at temperature 0.4. Drafts are created d
 | `/tools/supply-chain-mapper` | ✅ | Semiconductor supply chain visualization (email-gated) |
 | `/tools/scenario-modeler` | ✅ | Geopolitical scenario comparison (email-gated) |
 | `/tools/policy-stress-test` | ✅ | US vs EU regulatory friction scoring (email-gated) |
-| `/products` | ✅ | Products hub with 3 product cards |
+| `/products` | ✅ | Products hub: Checklist Pack first, Toolkit follow-on, Sector Briefings, separate WaymarkPath sister-product strip |
 | `/products/ai-act-toolkit` | ✅ | Sales page: £79/£149 pricing tiers |
 | `/products/ai-audit-checklist` | ✅ | Sales page: £24 gateway product |
 | `/products/briefings` | ✅ | Coming Soon with email capture |
@@ -209,11 +209,12 @@ All 4 tools require email submission before revealing results:
 
 | Product | Price | Status |
 |---------|-------|--------|
-| EU AI Act Compliance Toolkit | £79 (Standard) / £149 (Professional) | Sales page live, no payment integration |
-| AI Audit Checklist | £24 | Sales page live, £20 toolkit discount upsell |
+| EU AI Act Compliance Toolkit | £79 (Standard) / £149 (Professional) | Sales page live; early-access enquiry fallback until Lemon Squeezy URL is configured |
+| AI Audit Checklist | £24 | First paid step; sales page live; early-access enquiry fallback until Lemon Squeezy URL is configured |
 | Sector Briefings (4 planned) | TBD | Coming Soon page with email capture |
 
-**Note**: No payment processing integrated yet. Sales pages exist but need Stripe/Gumroad/Lemon Squeezy connection.
+**Note**: Lemon Squeezy is the intended checkout. Until its URLs are configured, product
+buttons route to `/services#contact` as honest early-access enquiries rather than dead links.
 
 ---
 
@@ -443,7 +444,7 @@ SESSION_SECRET=<long random secret, 32+ characters>
 | Legacy articles have no categories | Anything generated before commit `d8c4875` has empty `categories[]` and won't appear on `/analysis/category/*` pages. Backfill manually in Studio or via a one-off script. | Medium |
 | ~~Sanity schema not fully deployed to manifest~~ **RESOLVED** | Resolved 2026-05-21: `npx sanity schema deploy` ran during the image-library work — the hosted manifest now carries all 8 types (`article`, `author`, `category`, `persona`, `siteSettings`, `youtubeScript`, `assetCollection`, `libraryImage`). MCP writes against all types now work. | — |
 | Inoreader redirect URI | Still points to localhost — user needs to update in Inoreader dev portal to `https://siliconandstone.com/api/auth/callback/inoreader` | Medium |
-| Lemon Squeezy not configured | Checkout links wired but env vars not yet set (no store created) | Medium |
+| Lemon Squeezy not configured | Checkout env vars not yet set (no store created); paid-product buttons route to the early-access enquiry fallback | Medium |
 | Plausible not configured | Script deployed but env var not set (no account created) | Medium |
 | Draft articles unpublished | Verified via GROQ 2026-05-20: 10 articles published, 2 still in draft — *Iran Conflict Reshapes European Semiconductor Supply Chains* (`drafts.1344add1-…`) and *Gulf Tensions and Your Phone Bill* (`drafts.b7326125-…`). Both need cover images before publishing in Studio. | Medium |
 | Atlantic Drift Briefing PDF unwritten | Lead magnet referenced in the Welcome Pack and required before YouTube launch. Outline now drafted at `docs/atlantic-drift-briefing-outline.md`; full PDF still to write. | Medium |
@@ -530,7 +531,7 @@ When starting a new Claude Code session:
 6. **Inoreader** is connected as `clive4` (tokens in cookies, may need re-auth)
 7. **Do NOT upgrade Sanity to v5** until Next.js 16 is stable
 8. **Live at siliconandstone.com** — Vercel auto-deploys from main branch
-9. **Lemon Squeezy** — checkout links wired but may not yet have URLs configured
+9. **Lemon Squeezy** — early-access enquiry fallback remains active until checkout URLs are configured
 10. **Plausible** — script deployed but may not yet have account/env var configured
 
 ### Quick Verification

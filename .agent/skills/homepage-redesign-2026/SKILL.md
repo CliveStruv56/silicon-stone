@@ -30,8 +30,8 @@ The homepage's current copy drifts toward career-readiness register (e.g. *"AI L
 | 4b | Adjacent block (NEW) | `AdjacentBlock.tsx` | **Create** — new component for sister-product cross-link |
 | 5 | Execution Engines / Decision Tools | `ToolsGallery.tsx`, `ToolsGrid.tsx` | **Edit** — drop "Not theory — execution" tagline, optional rename |
 | 6 | Find Your Perspective | `PersonaNavigator.tsx` | **Edit** — two persona descriptions |
-| 7 | Get the Signal | `SubscribeCTA.tsx` | **Edit** — cadence reconciliation, CTA alignment |
-| 8 | AI Act Deadline | `DeadlineCountdown.tsx` | **Keep** — already on register |
+| 7 | Get the Atlantic Drift Briefing | `SubscribeCTA.tsx` | **Edit** — cadence reconciliation, CTA alignment |
+| 8 | AI Act readiness | `DeadlineCountdown.tsx` | **Edit** — replace the countdown with the static phased-readiness strip |
 | 9 | Page meta-title | `src/app/(website)/layout.tsx` or `page.tsx` | **Edit** — see SPEC.md Global section |
 
 If the homepage `page.tsx` imports these components from `'@/components/home'` (the index re-export), edits flow through automatically. If `OrchestrationFramework` is renamed to `OrchestrationBattleground`, update `src/components/home/index.ts` accordingly.
@@ -45,12 +45,13 @@ Implement section-by-section. After each, commit and verify visually before movi
 1. **Hero** (`HeroSection.tsx`) — biggest visual change, sets page tone
 2. **Orchestration Battleground** (`OrchestrationFramework.tsx` → rewrite) — net-new analytical content
 3. **Intelligence Tiers** (`IntelligenceTiers.tsx`) — drop fourth tier, simpler structure
-4. **Adjacent block** (`AdjacentBlock.tsx`) — net-new, render below the tier grid
+4. **Adjacent block** (`AdjacentBlock.tsx`) — net-new, render below persona routing so it remains visibly separate from the S&S product path
 5. **View from the Edge** (`CredibilityBlock.tsx`) — copy-only edits
-6. **Get the Signal** (`SubscribeCTA.tsx`) — cadence + CTA reconciliation
+6. **Get the Atlantic Drift Briefing** (`SubscribeCTA.tsx`) — cadence + CTA reconciliation
 7. **Tools** (`ToolsGallery.tsx` / `ToolsGrid.tsx`) — minor copy
 8. **Personas** (`PersonaNavigator.tsx`) — minor copy
 9. **Page meta-title** — single change in `(website)` route group
+10. **AI Act readiness** (`DeadlineCountdown.tsx`) — replace the single deadline countdown with the phased-readiness strip in `COPY.md`
 
 ---
 
@@ -153,7 +154,7 @@ Open side-by-side with localhost.
 - [ ] All eight sections reflect new copy from `COPY.md`
 - [ ] Hero image renders at full opacity, no filters
 - [ ] `IntelligenceTiers.tsx` reduced to three tiers
-- [ ] `AdjacentBlock.tsx` created and rendered below the tier grid
+- [ ] `AdjacentBlock.tsx` created and rendered below persona routing
 - [ ] `OrchestrationFramework.tsx` renamed/rewritten as `OrchestrationBattleground` with new structure
 - [ ] Page meta-title reads `Silicon and Stone | Forensic Technopolitics for the Senior Leaders Defining the AI Power Shift`
 - [ ] Footer has indigo `WaymarkPath →` cross-link

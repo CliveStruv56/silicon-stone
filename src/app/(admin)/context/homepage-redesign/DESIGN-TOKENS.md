@@ -331,7 +331,7 @@ src/components/home/
 ├── ToolsGrid.tsx                   # EDIT — subhead + CTA copy (verify which renders)
 ├── PersonaNavigator.tsx            # EDIT — two persona descriptions
 ├── SubscribeCTA.tsx                # EDIT — cadence reconciliation
-├── DeadlineCountdown.tsx           # KEEP — no changes
+├── DeadlineCountdown.tsx           # EDIT — static phased-readiness strip
 └── index.ts                        # UPDATE — add AdjacentBlock; rename OrchestrationFramework → OrchestrationBattleground
 
 src/components/ui/
