@@ -325,8 +325,8 @@ async def _run_deep_research(job_id: str, instructions: str, model: str) -> None
                         cost_dollars=cost,
                     )
                     logger.info(
-                        "deep research %s completed via Exa (store=%s, cost=%s)",
-                        research_id, _store_mode(), cost,
+                        "deep research job %s completed via Exa (research_id=%s, store=%s, cost=%s)",
+                        job_id, research_id, _store_mode(), cost,
                     )
                     return
                 if status in ("failed", "canceled"):
