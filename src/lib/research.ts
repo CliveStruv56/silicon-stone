@@ -2,7 +2,7 @@ import { callClaude } from "./anthropic";
 import { ResearchResult } from "@/types/research";
 import { searchItems } from "./inoreader";
 import { logErrorToFile } from "@/lib/debug";
-import { searchExa } from "@/lib/exa";
+import { searchExa, deepResearchExa } from "@/lib/exa";
 
 // Mock search function if no API key or Exa fails
 async function searchWeb(query: string): Promise<string> {
@@ -44,8 +44,30 @@ function formatExaResults(results: ExaResult[]): string {
     `).join('\n');
 }
 
-export async function performResearch(topic: string, inoreaderToken?: string): Promise<ResearchResult> {
+/**
+ * Forensic research instructions for the Exa Research API. Shared by the
+ * in-process deep path (below) and the Railway background job, so the prompt
+ * lives in exactly one place.
+ */
+export function buildDeepInstructions(topic: string): string {
+    return `You are a forensic technopolitics analyst for "Silicon & Stone". Produce a thorough, board-grade research brief on: "${topic}".
+
+Cover, where the evidence supports it:
+- The physical / supply-chain layer (chokepoints, capacity, critical materials, who controls what).
+- The regulatory layer (specific rules, dates, enforcement actions, US-EU divergence).
+- The talent / capability layer (where skilled people are moving, skill density by region).
+- Low / medium / high friction scenarios, with rough Value-at-Stake figures where quantifiable.
+
+Ground every claim in sources. Include specific figures, dates, named entities, and inline source URLs. Where the evidence is thin, say so explicitly rather than guessing.`;
+}
+
+export async function performResearch(
+    topic: string,
+    inoreaderToken?: string,
+    opts: { deep?: boolean } = {}
+): Promise<ResearchResult> {
     let searchContext = "";
+    let deepReport: string | undefined;
 
     // 1. Inoreader Search (Priority)
     if (inoreaderToken) {
@@ -71,32 +93,80 @@ export async function performResearch(topic: string, inoreaderToken?: string): P
         }
     }
 
-    // 2. Web Search (Real via Exa)
-    console.log(`Searching Exa for: ${topic}`);
-    // Check if Exa key present (simple check, the lib handles details)
-    try {
-        const exaResults = await searchExa(topic);
-        if (exaResults && exaResults.length > 0) {
-            searchContext += `\n--- WEB RESULTS (EXA.AI) ---\n${formatExaResults(exaResults)}`;
-        } else {
-            if (process.env.NODE_ENV === 'production') {
-                throw new Error("Exa returned no results or is not configured.");
+    // 2. Web research.
+    //    Deep Dives use Exa's agentic Research API (multi-step, minutes-long).
+    //    Everything else uses the fast, recency-biased single search.
+    //
+    //    INFRA CAVEAT: deep research can run for minutes. If /create is served by a
+    //    short-timeout serverless function (e.g. Vercel), route the deep path through
+    //    the Railway backend or a background job rather than blocking the request.
+    if (opts.deep) {
+        console.log(`Deep research (Exa Research Pro) for: ${topic}`);
+        const instructions = buildDeepInstructions(topic);
+        try {
+            const deep = await deepResearchExa(instructions);
+            if (deep?.content) {
+                deepReport = deep.content;
+                searchContext += `\n--- DEEP RESEARCH (EXA RESEARCH PRO) ---\n${deep.content}\n`;
+            } else if (process.env.NODE_ENV === 'production') {
+                throw new Error("Exa deep research returned no content.");
             }
-            console.log("Exa returned no results or failed, falling back to mock.");
+        } catch (e) {
+            console.error("Exa deep research error", e);
+            if (process.env.NODE_ENV === 'production') {
+                throw new Error("Deep research failed.");
+            }
+        }
+        // Dev fallback (or empty deep result outside production): standard search.
+        if (!deepReport) {
+            const exaResults = await searchExa(topic, { recencyDays: 90, numResults: 8 });
+            searchContext += exaResults && exaResults.length > 0
+                ? `\n--- WEB RESULTS (EXA.AI) ---\n${formatExaResults(exaResults)}`
+                : `\n--- WEB RESULTS (MOCK FALLBACK) ---\n${await searchWeb(topic)}`;
+        }
+    } else {
+        // Standard: recency-first, news-biased; broaden to evergreen if too thin.
+        console.log(`Searching Exa for: ${topic}`);
+        try {
+            let exaResults = await searchExa(topic, { recencyDays: 90, numResults: 8, category: "news" });
+            if (!exaResults || exaResults.length < 3) {
+                const broad = await searchExa(topic, { recencyDays: null, numResults: 8 });
+                const seen = new Set((exaResults ?? []).map(r => r.url));
+                exaResults = [...(exaResults ?? []), ...((broad ?? []).filter(r => !seen.has(r.url)))];
+            }
+            if (exaResults && exaResults.length > 0) {
+                searchContext += `\n--- WEB RESULTS (EXA.AI) ---\n${formatExaResults(exaResults)}`;
+            } else if (process.env.NODE_ENV === 'production') {
+                throw new Error("Exa returned no results or is not configured.");
+            } else {
+                console.log("Exa returned no results or failed, falling back to mock.");
+                searchContext += `\n--- WEB RESULTS (MOCK FALLBACK) ---\n${await searchWeb(topic)}`;
+            }
+        } catch (e) {
+            console.error("Exa search error in main flow", e);
+            if (process.env.NODE_ENV === 'production') {
+                throw new Error("Live web search failed.");
+            }
             searchContext += `\n--- WEB RESULTS (MOCK FALLBACK) ---\n${await searchWeb(topic)}`;
         }
-    } catch (e) {
-        console.error("Exa search error in main flow", e);
-        if (process.env.NODE_ENV === 'production') {
-            throw new Error("Live web search failed.");
-        }
-        searchContext += `\n--- WEB RESULTS (MOCK FALLBACK) ---\n${await searchWeb(topic)}`;
     }
 
-    // 3. Synthesize with Claude
-    const systemPrompt = `You are a Forensic Technopolitical Analyst. 
+    // 3. Synthesize gathered context into the ResearchResult shape.
+    return synthesizeContext(topic, searchContext, deepReport);
+}
+
+/**
+ * Synthesises gathered context (web / Inoreader / deep report) into the
+ * ResearchResult shape via Claude. Shared by the standard and deep paths.
+ */
+async function synthesizeContext(
+    topic: string,
+    searchContext: string,
+    deepReport?: string
+): Promise<ResearchResult> {
+    const systemPrompt = `You are a Forensic Technopolitical Analyst.
     Your job is to synthesize raw search results into actionable intelligence.
-    
+
     Output JSON ONLY with this structure:
     {
        "summary": "A 2-3 sentence forensic summary of the situation.",
@@ -108,10 +178,10 @@ export async function performResearch(topic: string, inoreaderToken?: string): P
     }`;
 
     const userPrompt = `Analyze these search results for the topic: "${topic}".
-    
+
     Search Results:
     ${searchContext}
-    
+
     Extract the key signal from the noise. Identify any new keywords or pain points that should be added to our knowledge base.`;
 
     let rawJson = "";
@@ -128,18 +198,32 @@ export async function performResearch(topic: string, inoreaderToken?: string): P
         }
 
         const cleaned = rawJson.substring(firstOpen, lastClose + 1);
-        return JSON.parse(cleaned);
+        const parsed = JSON.parse(cleaned) as ResearchResult;
+        return { ...parsed, deepReport };
     } catch (e) {
         console.error("Failed to parse research JSON", e);
 
         const logs = `ERROR: ${e instanceof Error ? e.message : 'Unknown error'}\n\nRAW OUTPUT:\n${rawJson}`;
         logErrorToFile(logs);
 
-        // Fallback
+        // Fallback. If a deep report exists, still hand it to the writer.
         return {
-            summary: "Analysis failed to parse. I have logged the raw output to debug_error.log.",
+            summary: deepReport
+                ? "Synthesis parse failed, but the full forensic research report is available to the writer."
+                : "Analysis failed to parse. I have logged the raw output to debug_error.log.",
             sources: [],
-            suggestedContext: { keywords: [], pain_points: [] }
+            suggestedContext: { keywords: [], pain_points: [] },
+            deepReport,
         };
     }
+}
+
+/**
+ * Synthesises a completed Exa Research report (delivered by the Railway
+ * background job) into the ResearchResult shape, preserving the full report
+ * so the Deep Dive writer builds on it verbatim.
+ */
+export async function synthesizeDeepReport(topic: string, report: string): Promise<ResearchResult> {
+    const searchContext = `\n--- DEEP RESEARCH (EXA RESEARCH PRO) ---\n${report}\n`;
+    return synthesizeContext(topic, searchContext, report);
 }

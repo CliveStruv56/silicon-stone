@@ -1,7 +1,8 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { performResearch as researchPipeline } from "@/lib/research";
+import { performResearch as researchPipeline, synthesizeDeepReport, buildDeepInstructions } from "@/lib/research";
+import { isBackendConfigured, startDeepResearchJob, getDeepResearchJob, type DeepJobStatus } from "@/lib/research-backend";
 import { callClaude } from "@/lib/anthropic";
 import { createArticleInSanity, listSanityCategories } from "@/lib/sanity";
 import { extractArticleMetadata } from "@/lib/prompts";
@@ -10,14 +11,61 @@ import { ResearchResult } from "@/types/research";
 import { generateEmbedding } from "@/lib/embeddings";
 import { searchSimilar } from "@/lib/pinecone";
 
-export async function performResearch(topic: string) {
+export async function performResearch(topic: string, opts?: { deep?: boolean }) {
     try {
         await requireAdmin();
-        const result = await researchPipeline(topic);
+        const result = await researchPipeline(topic, undefined, opts);
         return result;
     } catch (error) {
         console.error("Error performing research:", error);
         throw new Error("Failed to gather intelligence.");
+    }
+}
+
+export type StartResearchResponse =
+    | { mode: "result"; result: ResearchResult }
+    | { mode: "job"; jobId: string };
+
+/**
+ * Entry point for the /create form. Deep Dives run on the Railway backend as a
+ * background job (returns a jobId to poll) when the backend is configured;
+ * everything else — and the local/dev fallback — runs in-process and returns a
+ * result immediately.
+ */
+export async function startResearch(topic: string, deep: boolean): Promise<StartResearchResponse> {
+    await requireAdmin();
+    try {
+        if (deep && isBackendConfigured()) {
+            const jobId = await startDeepResearchJob(topic, buildDeepInstructions(topic));
+            return { mode: "job", jobId };
+        }
+        const result = await researchPipeline(topic, undefined, { deep });
+        return { mode: "result", result };
+    } catch (error) {
+        console.error("Error starting research:", error);
+        throw new Error("Failed to gather intelligence.");
+    }
+}
+
+/** Poll a background deep-research job; synthesises the report when complete. */
+export async function pollResearchJob(
+    jobId: string,
+    topic: string,
+): Promise<{ status: DeepJobStatus["status"]; result?: ResearchResult; error?: string }> {
+    await requireAdmin();
+    try {
+        const job = await getDeepResearchJob(jobId);
+        if (job.status === "completed" && job.report) {
+            const result = await synthesizeDeepReport(topic, job.report);
+            return { status: "completed", result };
+        }
+        if (job.status === "failed") {
+            return { status: "failed", error: job.error ?? "Deep research failed" };
+        }
+        return { status: job.status };
+    } catch (error) {
+        console.error("Error polling research job:", error);
+        return { status: "failed", error: "Failed to poll research job." };
     }
 }
 
@@ -144,6 +192,12 @@ export async function createDraftFromResearch(
             // Pinecone not configured — skip silently
         }
 
+        // Deep Dives carry the full agentic research report; hand it to the writer
+        // verbatim as primary material so its specifics, figures and sources survive.
+        const deepReportBlock = (format === "deep_dive" && researchResult.deepReport)
+            ? `\n=== FULL FORENSIC RESEARCH REPORT (primary material — build the Deep Dive on this; preserve its figures, dates and sources) ===\n${researchResult.deepReport}\n`
+            : '';
+
         const userMessage = `
 === TOPIC ===
 ${topic}
@@ -156,7 +210,7 @@ ${researchResult.sources.map(s => `- ${s.title}: ${s.snippet} (${s.url})`).join(
 
 === PAIN POINTS & KEYWORDS ===
 ${[...researchResult.suggestedContext.pain_points, ...researchResult.suggestedContext.keywords].join(', ')}
-${priorCoverageBlock}`;
+${deepReportBlock}${priorCoverageBlock}`;
 
         // Temperature 0.4 for controlled, on-brand output
         const responseText = await callClaude(systemPrompt, userMessage, 0.4);

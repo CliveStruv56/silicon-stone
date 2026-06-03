@@ -1,6 +1,6 @@
 # Railway and Vercel Next Steps
 
-Last updated: 2026-05-13
+Last updated: 2026-06-03
 
 This document starts from the current state of this repository:
 
@@ -138,6 +138,8 @@ In the same Railway project, add:
 2. Redis
 
 For now, these can sit unused. They are there so future services can share the same project canvas.
+
+> Redis now has a first concrete use: deep-research job state for the Silicon & Stone `/create` Deep Dive flow (see section 14). PostgreSQL remains unused until a schema is defined.
 
 Recommended intended use:
 
@@ -309,3 +311,72 @@ This phase is complete when:
 - No current production functionality has regressed.
 
 After that, the project is ready for the first route-by-route backend migration.
+
+## 14. Deep Research Background Job (Exa Research)
+
+The Silicon & Stone `/create` **Deep Dive** format runs an agentic, multi-step Exa
+Research pass that can take several minutes — too long for a Vercel serverless
+function. It runs on this Railway backend as a background job; the browser polls
+until it finishes. Short-form formats (Pulse / Signal / YouTube) are unaffected and
+still run in-process on Vercel.
+
+### Endpoints (`backend/main.py`)
+
+| Method | Path | Auth | Purpose |
+|---|---|---|---|
+| `POST` | `/v1/research/deep` | `x-backend-api-key` | Body `{ topic, instructions, model? }`. Starts a job, returns `{ jobId, status }` immediately. |
+| `GET` | `/v1/research/deep/{jobId}` | `x-backend-api-key` | Returns `{ status, report, error, costDollars }`. |
+
+The backend calls Exa's REST Research API directly (`POST https://api.exa.ai/research/v1`,
+then polls `GET …/{id}?stream=false`, header `x-api-key`). The forensic instructions are
+built on the Next.js side and passed in, so brand/prompt logic stays in one place.
+
+### Required environment variables
+
+**Railway backend service** — add:
+
+```text
+EXA_API_KEY=your_exa_key          # NEW — backend calls Exa directly; previously only in Vercel
+REDIS_URL=${{ Redis.REDIS_PRIVATE_URL }}   # set on the backend yourself, referencing the Redis service — not auto-injected, never on Vercel (recommended; see durability)
+```
+
+`BACKEND_API_KEY` is already required by the existing write routes (sections 4 and 7).
+
+**Vercel (web)** — already added in section 7:
+
+```text
+BACKEND_API_URL=https://YOUR-RAILWAY-BACKEND-DOMAIN
+BACKEND_API_KEY=long_random_shared_secret   # must match Railway
+```
+
+When **both** `BACKEND_API_URL` and `BACKEND_API_KEY` are set, `/create` routes Deep
+Dives to the backend automatically. If they are unset, it falls back to running deep
+research in-process — fine locally, but it will time out on Vercel in production.
+
+### Job-state durability (Redis)
+
+- Job records (status + the finished report) are stored in **Redis when `REDIS_URL`
+  is set**: durable across redeploys, shared across replicas, with a 1-hour TTL.
+- If `REDIS_URL` is **not** set, the backend falls back to an in-process dict — fine
+  for local dev or before Redis is provisioned, but jobs are lost on restart and not
+  shared across replicas.
+- `REDIS_URL` lives only on the **Railway backend** service — Vercel never connects to
+  Redis. Adding the Redis database does not auto-inject it; set it on the backend,
+  referencing the Redis service (`${{ Redis.REDIS_PRIVATE_URL }}`), then redeploy.
+- Redis — not Postgres — is the right home because these records are transient. Keep
+  Postgres for durable records you intend to keep and query.
+- Caveat: the async worker runs in the process that accepted the `POST`. Redis makes
+  job *state* durable and replica-shared; resuming an *in-flight* run after a process
+  crash would need a real queue/worker and is out of scope.
+
+### Dependency
+
+`backend/requirements.txt` adds `redis==5.0.1` (used via `redis.asyncio`). No other new
+dependencies — `httpx` is already present.
+
+### End-to-end flow
+
+1. `/create` (Deep Dive) → `startResearch` → `POST /v1/research/deep` → `{ jobId }`.
+2. Browser polls `pollResearchJob` every 4s → `GET /v1/research/deep/{jobId}`.
+3. On `completed`, the report is synthesised into the research result, and the Deep
+   Dive draft is generated as usual — the writer receives the full report verbatim.
