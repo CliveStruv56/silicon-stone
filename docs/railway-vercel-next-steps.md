@@ -376,6 +376,19 @@ research in-process — fine locally, but it will time out on Vercel in producti
 `backend/requirements.txt` adds `redis==5.0.1` (used via `redis.asyncio`). No other new
 dependencies — `httpx` is already present.
 
+### Working from the Railway CLI
+
+The `railway` CLI on the dev machine defaults to the **Hermes** project, not Struver
+Stack. Before running CLI commands against the Silicon & Stone backend (setting
+`REDIS_URL`, viewing `railway logs`, deleting a service, etc.), relink first:
+
+```text
+railway link -p "Struver Stack" -e production -s silicon-stone
+```
+
+Switch back with `railway link -p Hermes` when done. The link is **local only** — it does
+not affect deployments, env vars, or article / Deep Dive generation.
+
 ### End-to-end flow
 
 1. `/create` (Deep Dive) → `startResearch` → `POST /v1/research/deep` → `{ jobId }`.
