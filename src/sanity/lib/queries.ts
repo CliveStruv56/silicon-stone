@@ -197,6 +197,47 @@ export const SEARCH_ARTICLES_QUERY = defineQuery(`
   }
 `)
 
+// Analytics dashboard — content library counts.
+// Breakdowns count published (non-draft) articles to avoid double-counting the
+// draft shadow of an edited-published doc. `articlesDrafts` is reported
+// separately as a rough "unpublished / pending edits" indicator.
+export const CONTENT_STATS_QUERY = defineQuery(`{
+  "articlesPublished": count(*[_type == "article" && !(_id in path("drafts.**"))]),
+  "articlesDrafts": count(*[_type == "article" && _id in path("drafts.**")]),
+  "byContentType": {
+    "signal": count(*[_type == "article" && !(_id in path("drafts.**")) && contentType == "signal"]),
+    "deepdive": count(*[_type == "article" && !(_id in path("drafts.**")) && contentType == "deepdive"]),
+    "guide": count(*[_type == "article" && !(_id in path("drafts.**")) && contentType == "guide"]),
+    "youtube": count(*[_type == "article" && !(_id in path("drafts.**")) && contentType == "youtube"])
+  },
+  "byTier": {
+    "pulse": count(*[_type == "article" && !(_id in path("drafts.**")) && intelligenceTier == "pulse"]),
+    "briefing": count(*[_type == "article" && !(_id in path("drafts.**")) && intelligenceTier == "briefing"]),
+    "audit": count(*[_type == "article" && !(_id in path("drafts.**")) && intelligenceTier == "audit"]),
+    "untiered": count(*[_type == "article" && !(_id in path("drafts.**")) && !defined(intelligenceTier)])
+  },
+  "byPersona": {
+    "clara": count(*[_type == "article" && !(_id in path("drafts.**")) && "clara" in personas]),
+    "ian": count(*[_type == "article" && !(_id in path("drafts.**")) && "ian" in personas]),
+    "sofia": count(*[_type == "article" && !(_id in path("drafts.**")) && "sofia" in personas]),
+    "robert": count(*[_type == "article" && !(_id in path("drafts.**")) && "robert" in personas]),
+    "citizen": count(*[_type == "article" && !(_id in path("drafts.**")) && "citizen" in personas])
+  },
+  "youtubeScriptsTotal": count(*[_type == "youtubeScript" && !(_id in path("drafts.**"))]),
+  "youtubeByPillar": {
+    "stone-briefing": count(*[_type == "youtubeScript" && !(_id in path("drafts.**")) && pillar == "stone-briefing"]),
+    "silicon-move": count(*[_type == "youtubeScript" && !(_id in path("drafts.**")) && pillar == "silicon-move"]),
+    "shorts": count(*[_type == "youtubeScript" && !(_id in path("drafts.**")) && pillar == "shorts"])
+  },
+  "youtubeByStatus": {
+    "idea": count(*[_type == "youtubeScript" && !(_id in path("drafts.**")) && productionStatus == "idea"]),
+    "scripted": count(*[_type == "youtubeScript" && !(_id in path("drafts.**")) && productionStatus == "scripted"]),
+    "filmed": count(*[_type == "youtubeScript" && !(_id in path("drafts.**")) && productionStatus == "filmed"]),
+    "edited": count(*[_type == "youtubeScript" && !(_id in path("drafts.**")) && productionStatus == "edited"]),
+    "published": count(*[_type == "youtubeScript" && !(_id in path("drafts.**")) && productionStatus == "published"])
+  }
+}`)
+
 // Intelligence Portal - Tiered Content
 export const ARTICLES_BY_TIER_QUERY = defineQuery(`
   *[_type == "article" && !(_id in path("drafts.**")) && intelligenceTier == $tier && defined(slug.current)]

@@ -1,4 +1,5 @@
 import OpenAI from 'openai'
+import { recordUsage } from './usage'
 
 let openaiClient: OpenAI | null = null
 
@@ -19,6 +20,16 @@ export async function generateEmbedding(text: string): Promise<number[]> {
     input: text,
     dimensions: EMBEDDING_DIMENSIONS,
   })
+
+  // Record token usage / cost for the analytics dashboard (non-fatal).
+  // Embeddings bill on input tokens only (prompt_tokens === total_tokens).
+  await recordUsage({
+    service: "openai",
+    model: EMBEDDING_MODEL,
+    operation: "embedding",
+    inputTokens: response.usage?.prompt_tokens,
+  })
+
   return response.data[0].embedding
 }
 

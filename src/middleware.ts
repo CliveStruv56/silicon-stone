@@ -6,6 +6,7 @@ export async function middleware(request: NextRequest) {
     // Protect all admin routes (excluding /studio which uses Sanity's own auth)
     const protectedPaths = [
         '/admin',
+        '/analytics',
         '/generate',
         '/import',
         '/research',
@@ -43,6 +44,7 @@ export async function middleware(request: NextRequest) {
 export const config = {
     matcher: [
         '/admin/:path*',
+        '/analytics/:path*',
         '/generate/:path*',
         '/import/:path*',
         '/research/:path*',

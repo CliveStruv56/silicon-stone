@@ -1,9 +1,11 @@
 import os
 import re
+import json
 import time
 import uuid
 import asyncio
 import logging
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 import httpx
@@ -83,6 +85,21 @@ class DeepResearchRequest(BaseModel):
     topic: str
     instructions: str
     model: str | None = None
+
+
+class UsageEvent(BaseModel):
+    # One metered external-API call. Posted by the Next.js call sites (and by
+    # the deep-research worker below). Cost is computed caller-side from a price
+    # table; we just store and aggregate. Field names are camelCase to match the
+    # frontend payload verbatim.
+    service: str
+    model: str
+    operation: str
+    inputTokens: int | None = None
+    outputTokens: int | None = None
+    costDollars: float = 0.0
+    jobId: str | None = None
+    ts: str | None = None
 
 
 RATE_LIMITS: dict[str, list[float]] = {}
@@ -328,6 +345,9 @@ async def _run_deep_research(job_id: str, instructions: str, model: str) -> None
                         "deep research job %s completed via Exa (research_id=%s, store=%s, cost=%s)",
                         job_id, research_id, _store_mode(), cost,
                     )
+                    # Record spend in the usage ledger. The frontend only polls
+                    # when the backend runs the job, so it can't log this itself.
+                    await _record_exa_usage("deep-research", model, cost, job_id)
                     return
                 if status in ("failed", "canceled"):
                     await _job_update(
@@ -347,6 +367,100 @@ async def _run_deep_research(job_id: str, instructions: str, model: str) -> None
     except Exception as exc:  # noqa: BLE001 — never let a worker crash silently
         logger.exception("Deep research job crashed")
         await _job_update(job_id, status="failed", error=str(exc))
+
+
+# --- API usage ledger ---------------------------------------------------------
+# Records one event per metered external call (Claude / OpenAI / Exa) so the
+# admin analytics dashboard can show spend and token totals. Same storage shape
+# as the research job store: Redis when REDIS_URL is set (durable, replica-
+# shared), in-process dict otherwise. Events are bucketed by UTC day for cheap
+# range aggregation; a `usage:days` set indexes which day buckets exist so the
+# "all" period can be reconstructed without scanning the keyspace.
+USAGE_EVENT_TTL_SECONDS = 60 * 60 * 24 * 400  # ~13 months of history
+USAGE_DAYS_KEY = "usage:days"
+
+# In-memory fallback store (used only when Redis is not configured): day -> events.
+USAGE_EVENTS: dict[str, list[dict[str, Any]]] = {}
+
+
+def _usage_day_key(day: str) -> str:
+    return f"usage:events:{day}"
+
+
+def _event_day(event: dict[str, Any]) -> str:
+    """UTC day (YYYY-MM-DD) for an event, from its `ts` or now."""
+    ts = event.get("ts")
+    if isinstance(ts, str) and len(ts) >= 10:
+        return ts[:10]
+    return datetime.now(timezone.utc).date().isoformat()
+
+
+async def _usage_store(event: dict[str, Any]) -> None:
+    day = _event_day(event)
+    redis = _get_redis()
+    if redis is not None:
+        key = _usage_day_key(day)
+        await redis.rpush(key, json.dumps(event))
+        await redis.expire(key, USAGE_EVENT_TTL_SECONDS)
+        await redis.sadd(USAGE_DAYS_KEY, day)
+        return
+    USAGE_EVENTS.setdefault(day, []).append(event)
+
+
+async def _usage_events_for_day(day: str) -> list[dict[str, Any]]:
+    redis = _get_redis()
+    if redis is not None:
+        raw = await redis.lrange(_usage_day_key(day), 0, -1)
+        out: list[dict[str, Any]] = []
+        for item in raw:
+            try:
+                out.append(json.loads(item))
+            except (ValueError, TypeError):
+                continue
+        return out
+    return USAGE_EVENTS.get(day, [])
+
+
+async def _usage_all_days() -> list[str]:
+    redis = _get_redis()
+    if redis is not None:
+        return sorted(await redis.smembers(USAGE_DAYS_KEY))
+    return sorted(USAGE_EVENTS.keys())
+
+
+async def _usage_days_for_period(period: str) -> list[str]:
+    """Ordered day buckets to aggregate. Fixed windows include zero-cost days so
+    the trend chart shows gaps; 'all' returns only days that have data."""
+    today = datetime.now(timezone.utc).date()
+    if period == "all":
+        return await _usage_all_days()
+
+    if period == "7d":
+        start = today - timedelta(days=6)
+    elif period == "30d":
+        start = today - timedelta(days=29)
+    else:  # "mtd" (default)
+        start = today.replace(day=1)
+
+    span = (today - start).days
+    return [(start + timedelta(days=i)).isoformat() for i in range(span + 1)]
+
+
+async def _record_exa_usage(operation: str, model: str, cost: Any, job_id: str | None = None) -> None:
+    """Best-effort usage write for backend-run Exa work; never raises."""
+    try:
+        await _usage_store(
+            {
+                "service": "exa",
+                "model": model,
+                "operation": operation,
+                "costDollars": float(cost) if cost not in (None, "") else 0.0,
+                "jobId": job_id,
+                "ts": datetime.now(timezone.utc).isoformat(),
+            }
+        )
+    except Exception:  # noqa: BLE001 — usage logging must never break the worker
+        logger.exception("usage record failed for %s", operation)
 
 
 service_routes = [
@@ -649,4 +763,58 @@ async def get_deep_research(job_id: str, request: Request) -> dict[str, Any]:
         "report": job.get("report") or None,
         "error": job.get("error") or None,
         "costDollars": float(cost) if cost not in (None, "") else None,
+    }
+
+
+@app.post("/v1/usage")
+async def record_usage(payload: UsageEvent, request: Request) -> dict[str, bool]:
+    _require_backend_api_key(request)
+    event = payload.model_dump()
+    if not event.get("ts"):
+        event["ts"] = datetime.now(timezone.utc).isoformat()
+    await _usage_store(event)
+    return {"ok": True}
+
+
+@app.get("/v1/usage/summary")
+async def usage_summary(request: Request, period: str = "mtd") -> dict[str, Any]:
+    _require_backend_api_key(request)
+
+    if period not in ("7d", "30d", "mtd", "all"):
+        period = "mtd"
+
+    days = await _usage_days_for_period(period)
+
+    by_service: dict[str, dict[str, Any]] = {}
+    daily: list[dict[str, Any]] = []
+    total_cost = 0.0
+    total_calls = 0
+
+    for day in days:
+        day_cost = 0.0
+        for event in await _usage_events_for_day(day):
+            service = event.get("service") or "unknown"
+            cost = float(event.get("costDollars") or 0)
+            agg = by_service.setdefault(
+                service,
+                {"service": service, "calls": 0, "inputTokens": 0, "outputTokens": 0, "costDollars": 0.0},
+            )
+            agg["calls"] += 1
+            agg["inputTokens"] += int(event.get("inputTokens") or 0)
+            agg["outputTokens"] += int(event.get("outputTokens") or 0)
+            agg["costDollars"] += cost
+            day_cost += cost
+            total_cost += cost
+            total_calls += 1
+        daily.append({"date": day, "costDollars": round(day_cost, 6)})
+
+    for agg in by_service.values():
+        agg["costDollars"] = round(agg["costDollars"], 6)
+
+    return {
+        "period": period,
+        "totalCostDollars": round(total_cost, 6),
+        "totalCalls": total_calls,
+        "byService": sorted(by_service.values(), key=lambda s: s["costDollars"], reverse=True),
+        "daily": daily,
     }

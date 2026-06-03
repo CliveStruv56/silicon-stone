@@ -1,4 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { recordUsage } from './usage';
+
+const CLAUDE_MODEL = "claude-sonnet-4-6";
 
 const API_KEY = process.env.ANTHROPIC_API_KEY ? process.env.ANTHROPIC_API_KEY.trim() : "";
 
@@ -35,13 +38,22 @@ export async function callClaude(system: string, user: string, temperature: numb
 
     try {
         const msg = await anthropic.messages.create({
-            model: "claude-sonnet-4-6",
+            model: CLAUDE_MODEL,
             max_tokens: maxTokens,
             temperature,
             system: system,
             messages: [
                 { role: "user", content: user }
             ],
+        });
+
+        // Record token usage / cost for the analytics dashboard (non-fatal).
+        await recordUsage({
+            service: "anthropic",
+            model: CLAUDE_MODEL,
+            operation: "messages",
+            inputTokens: msg.usage?.input_tokens,
+            outputTokens: msg.usage?.output_tokens,
         });
 
         // The SDK returns ContentBlock[], likely of type { type: 'text', text: '...' }

@@ -49,6 +49,25 @@ curl -X POST http://localhost:8000/v1/contact \
   -d '{"name":"Test User","email":"test@example.com","company":"Example Ltd","interest":"AI governance","message":"Please contact me."}'
 ```
 
+API usage ledger (records spend/tokens per metered external call; powers the
+admin analytics dashboard). Both routes require `x-backend-api-key`:
+
+```bash
+# Record an event
+curl -X POST http://localhost:8000/v1/usage \
+  -H "Content-Type: application/json" \
+  -H "x-backend-api-key: $BACKEND_API_KEY" \
+  -d '{"service":"anthropic","model":"claude-sonnet-4-6","operation":"messages","inputTokens":1000,"outputTokens":500,"costDollars":0.0105}'
+
+# Read an aggregate summary (period = 7d | 30d | mtd | all)
+curl "http://localhost:8000/v1/usage/summary?period=mtd" \
+  -H "x-backend-api-key: $BACKEND_API_KEY"
+```
+
+Events are bucketed by UTC day. Storage reuses the deep-research job store:
+Redis when `REDIS_URL` is set (durable, ~13-month TTL), in-process dict
+otherwise. Deep-research jobs also self-record their Exa cost on completion.
+
 ## Railway Settings
 
 - Root Directory: `/backend`

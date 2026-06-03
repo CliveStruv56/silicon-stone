@@ -1,7 +1,7 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-06-02
+> Last Updated: 2026-06-03
 > Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing, 13 moderate transitive npm audit findings (uuid through Sanity packages)**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com. Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools (email-gated for lead capture, AI Act triage engine recently overhauled), product/commerce pages with an early-access enquiry fallback until Lemon Squeezy checkout URLs are configured, Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Awaiting Lemon Squeezy store setup, Plausible account, and content publishing for queued drafts.
@@ -323,10 +323,24 @@ SESSION_SECRET=<long random secret, 32+ characters>
 | Strategy docs | `docs/` |
 | Plausible types | `src/types/plausible.d.ts` |
 | Favicon | `src/app/icon.svg` |
+| Codebase knowledge graph | `.understand-anything/knowledge-graph.json` |
+| Graph dashboard launcher | `scripts/view-graph.sh` (`npm run graph`) |
 
 ---
 
 ## 9. Recent Changes
+
+### June 3, 2026 — Analytics dashboard (Phase 1: API usage/cost + content + Kit)
+
+| Commit | Description |
+|--------|-------------|
+| _(pending)_ | New protected admin dashboard at `/analytics` (nav item added; `/analytics` added to middleware allowlist + matcher). **API usage ledger:** `src/lib/usage.ts` (`recordUsage`/`getUsageSummary`) + `src/lib/pricing.ts` (per-model $/Mtok rate table, cost computed at record time). Instrumented call sites: `src/lib/anthropic.ts` (Claude tokens), `src/lib/embeddings.ts` (OpenAI embedding tokens), `src/lib/exa.ts` (search + deep-research `costDollars`). Ledger is fire-and-forget, swallows errors, no-ops when backend unconfigured. **Content counts:** `CONTENT_STATS_QUERY` in `queries.ts` + `src/lib/metrics/content.ts` (published/drafts; by contentType, intelligenceTier, persona; youtubeScript by pillar/status) via token-bearing `writeClient`. **Audience:** `src/lib/metrics/kit.ts` reads Kit v4 `account/growth-stats` (subscriber total + net-new), degrades gracefully. UI helpers in `src/components/admin/metric-bits.tsx` (pure-SVG spend trend, no chart dep). **Backend usage store (`backend/main.py`):** added `POST /v1/usage` + `GET /v1/usage/summary?period=7d\|30d\|mtd\|all` (key-auth'd), events bucketed by UTC day in Redis (with `usage:days` index, ~13-month TTL) or the in-process fallback, mirroring the deep-research job store; the deep-research worker self-records its Exa cost on completion. Verified end-to-end with FastAPI TestClient (auth guard, aggregation, period windows). **Deploy step:** redeploy the Railway backend so `/v1/usage*` exists, then the dashboard Usage section populates automatically. Phase 2 deferred: YouTube/LinkedIn/Substack metrics, Kit broadcast stats, provider-billing-API reconciliation. |
+
+### June 1, 2026 — Codebase knowledge graph + dashboard viewer
+
+| Commit | Description |
+|--------|-------------|
+| _(pending)_ | Generated an Understand-Anything knowledge graph of the whole app (446 nodes / 828 edges across 230 files: Next.js portal, FastAPI backend, docs, config) into `.understand-anything/` (committed with the repo). Added `scripts/view-graph.sh` + `npm run graph` to launch the read-only dashboard viewer over the saved graph (does not re-analyse; bound to `127.0.0.1` only). The viewer's access token is generated once and cached in the **gitignored** `.understand-anything/.dashboard-token` — never committed, never passed on the command line (Vite auto-opens the tokenised URL via the `UNDERSTAND_ACCESS_TOKEN` env var the script exports). Regenerate the graph after code changes with the `/understand` Claude Code command (incremental after the first build). README has a new "Codebase Map" section. |
 
 ### May 29, 2026 — Pulse generation flow + vector index hygiene
 
