@@ -337,7 +337,7 @@ built on the Next.js side and passed in, so brand/prompt logic stays in one plac
 
 ```text
 EXA_API_KEY=your_exa_key          # NEW — backend calls Exa directly; previously only in Vercel
-REDIS_URL=${{ Redis.REDIS_PRIVATE_URL }}   # set on the backend yourself, referencing the Redis service — not auto-injected, never on Vercel (recommended; see durability)
+REDIS_URL=${{ Redis.REDIS_URL }}   # set on the backend yourself, referencing the Redis service — not auto-injected, never on Vercel (recommended; see durability)
 ```
 
 `BACKEND_API_KEY` is already required by the existing write routes (sections 4 and 7).
@@ -362,7 +362,9 @@ research in-process — fine locally, but it will time out on Vercel in producti
   shared across replicas.
 - `REDIS_URL` lives only on the **Railway backend** service — Vercel never connects to
   Redis. Adding the Redis database does not auto-inject it; set it on the backend,
-  referencing the Redis service (`${{ Redis.REDIS_PRIVATE_URL }}`), then redeploy.
+  referencing the Redis service (`${{ Redis.REDIS_URL }}`), then redeploy. (Railway's
+  Redis `REDIS_URL` is already the private `redis.railway.internal` address — there is
+  no separate `REDIS_PRIVATE_URL`.)
 - Redis — not Postgres — is the right home because these records are transient. Keep
   Postgres for durable records you intend to keep and query.
 - Caveat: the async worker runs in the process that accepted the `POST`. Redis makes
