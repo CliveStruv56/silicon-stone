@@ -20,6 +20,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("silicon_stone_api")
 
 SANITY_CATEGORIES_QUERY = """*[_type == "category"] | order(title asc) {
@@ -227,6 +228,11 @@ def _get_redis():
     return _redis_client
 
 
+def _store_mode() -> str:
+    """Which job store is active: 'redis' when REDIS_URL is set, else 'memory'."""
+    return "redis" if (REDIS_URL and aioredis is not None) else "memory"
+
+
 def _exa_api_key() -> str:
     key = os.getenv("EXA_API_KEY", "")
     if not key:
@@ -318,6 +324,10 @@ async def _run_deep_research(job_id: str, instructions: str, model: str) -> None
                         report=output.get("content", ""),
                         cost_dollars=cost,
                     )
+                    logger.info(
+                        "deep research %s completed via Exa (store=%s, cost=%s)",
+                        research_id, _store_mode(), cost,
+                    )
                     return
                 if status in ("failed", "canceled"):
                     await _job_update(
@@ -392,6 +402,8 @@ app.add_middleware(
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
+
+logger.info("research job store: %s", _store_mode())
 
 
 @app.get("/health")
@@ -616,6 +628,7 @@ async def start_deep_research(payload: DeepResearchRequest, request: Request) ->
     model = payload.model or "exa-research-pro"
     job_id = uuid.uuid4().hex
     await _job_create(job_id, payload.topic.strip()[:300])
+    logger.info("deep research job %s started (store=%s)", job_id, _store_mode())
     # Fire-and-forget: returns immediately so the caller never blocks on the
     # minutes-long research run; the client polls the GET endpoint below.
     asyncio.create_task(_run_deep_research(job_id, instructions, model))
