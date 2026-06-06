@@ -13,21 +13,25 @@ This guide outlines the workflows for researching topics, generating drafts, and
 2.  **Enter a Research Query:**
     *   Type a natural language query in the search bar.
     *   *Example:* "European battery passport implementation timeline and blockers"
-    *   The system searches Inoreader feeds (if connected) and Exa.ai web results, then Claude synthesises a **Forensic Summary**.
+    *   The system runs a live **Exa.ai** web search (Deep Dive uses the agentic Exa Research Pro pass), then Claude synthesises a **Forensic Summary**. It also surfaces semantically similar **prior articles** from the Pinecone index so the draft extends rather than repeats past coverage.
+    *   *(Note: `/create` does **not** read your Inoreader subscriptions — that is the `/research` route. In practice you browse Inoreader yourself, pick a story, and type its topic here. See `Project/ops/inoreader-intelligence-engine-v2.md`.)*
 
 3.  **Review Intelligence:**
     *   **Summary:** High-level overview of the topic.
     *   **Sources:** Cited articles and reports.
     *   **Context:** Suggested keywords and persona pain points.
 
-4.  **Choose Output Format:**
+4.  **Choose Output Format** — the five canonical brand formats, plus Research-Only:
     | Format | Description |
     |--------|-------------|
     | **Pulse** | 100-140 word, 30-second intelligence scan |
     | **Signal** | 800-1,500 word breaking analysis (default) |
-    | **Deep Dive** | 3,000-6,000 word forensic report |
-    | **Research Only** | Summary without full article generation |
+    | **Deep Dive** | 3,000-6,000 word forensic report (agentic Exa Research Pro) |
+    | **Guide** | 500-2,000 word how-to for a tool or technique |
     | **YouTube Script** | Tiered Intelligence structure (Pulse/Briefing/Audit CTA) |
+    | **Research Only** | Gather intelligence without generating a draft |
+
+    Every draft format is **research-backed**: `/create` always runs the research pass first, then drafts on that evidence. All formats share one data-driven prompt builder (`buildDraftPrompt` in `src/lib/prompts.ts`) that carries the brand voice DNA, business profile, and the full persona record.
 
 5.  **Generate Draft:**
     *   Select format and click generate.
@@ -51,9 +55,9 @@ This guide outlines the workflows for researching topics, generating drafts, and
     *   **Methodology Audit:** one matrix cell
 7.  Add a cover image if needed, then publish.
 
-### Legacy quick generator (`/generate`)
+### `/generate` has been removed
 
-`/generate` still exists for quick prompt-to-draft generation, including Pulse, Signal, Deep Dive, and LinkedIn-style guide drafts. It does **not** run the research/source-gathering step first. Use `/create` for the full research-to-Sanity article pipeline.
+The old no-research quick generator has been **merged into `/create` and deleted** (route and middleware entries removed; it was never in the admin menu). Everything `/generate` did well — its data-driven, brand-voice prompt builder — is now the prompt engine for *every* `/create` format, and every draft is research-backed. There is no longer a prompt-only path: if you want intel without a draft, use **Research Only**.
 
 ## 2. Research Portal (`/research`)
 **Best for:** Exploring topics without immediately generating a full draft.
