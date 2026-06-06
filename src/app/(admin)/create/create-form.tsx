@@ -7,13 +7,13 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Zap, FileText, Search, BrainCircuit, ExternalLink, Activity, Video } from "lucide-react";
+import { Loader2, Zap, FileText, Search, BrainCircuit, ExternalLink, Activity, Video, BookOpen } from "lucide-react";
 import { startResearch, pollResearchJob, createDraftFromResearch } from "./actions";
 import { PersonaData } from "@/lib/sanity";
 
 import { ResearchResult, ResearchSource } from "@/types/research";
 
-export type FormatType = "pulse" | "signal" | "deep_dive" | "youtube" | "research";
+export type FormatType = "pulse" | "signal" | "deep_dive" | "guide" | "youtube" | "research";
 
 interface CreateFormProps {
     initialPersonas: PersonaData[];
@@ -71,7 +71,7 @@ export function CreateForm({ initialPersonas }: CreateFormProps) {
 
         setIsGenerating(true);
         try {
-            await createDraftFromResearch(researchResult, format as "pulse" | "signal" | "deep_dive" | "youtube", personaSlug, topic);
+            await createDraftFromResearch(researchResult, format as "pulse" | "signal" | "deep_dive" | "guide" | "youtube", personaSlug, topic);
         } catch (error) {
             console.error("Generation failed:", error);
             alert("Failed to generate draft. Please try again.");
@@ -98,7 +98,7 @@ export function CreateForm({ initialPersonas }: CreateFormProps) {
                             <span className="flex items-center justify-center w-5 h-5 rounded-full bg-primary/10 text-primary text-xs">1</span>
                             Format
                         </Label>
-                        <RadioGroup defaultValue={format} onValueChange={(v: string) => setFormat(v as FormatType)} className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                        <RadioGroup defaultValue={format} onValueChange={(v: string) => setFormat(v as FormatType)} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                             <div>
                                 <RadioGroupItem value="pulse" id="format-pulse" className="peer sr-only" />
                                 <Label
@@ -130,6 +130,17 @@ export function CreateForm({ initialPersonas }: CreateFormProps) {
                                     <FileText className="mb-3 h-6 w-6 text-emerald-500" />
                                     <div className="font-semibold mb-1">Deep Dive</div>
                                     <div className="text-xs text-muted-foreground text-center">3000+ word forensic report</div>
+                                </Label>
+                            </div>
+                            <div>
+                                <RadioGroupItem value="guide" id="format-guide" className="peer sr-only" />
+                                <Label
+                                    htmlFor="format-guide"
+                                    className="flex flex-col items-center justify-between rounded-xl border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-amber-500 [&:has([data-state=checked])]:border-amber-500 cursor-pointer"
+                                >
+                                    <BookOpen className="mb-3 h-6 w-6 text-amber-500" />
+                                    <div className="font-semibold mb-1">Guide</div>
+                                    <div className="text-xs text-muted-foreground text-center">How-to for a tool or technique</div>
                                 </Label>
                             </div>
                             <div>
@@ -257,7 +268,7 @@ export function CreateForm({ initialPersonas }: CreateFormProps) {
                                         {isGenerating ? (
                                             <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Writing Draft...</>
                                         ) : (
-                                            <>{format === 'youtube' ? <Video className="mr-2 h-4 w-4" /> : <FileText className="mr-2 h-4 w-4" />} Generate {format === 'pulse' ? 'Pulse' : format === 'signal' ? 'Signal' : format === 'youtube' ? 'YouTube Script' : 'Deep Dive'}</>
+                                            <>{format === 'youtube' ? <Video className="mr-2 h-4 w-4" /> : format === 'guide' ? <BookOpen className="mr-2 h-4 w-4" /> : <FileText className="mr-2 h-4 w-4" />} Generate {format === 'pulse' ? 'Pulse' : format === 'signal' ? 'Signal' : format === 'youtube' ? 'YouTube Script' : format === 'guide' ? 'Guide' : 'Deep Dive'}</>
                                         )}
                                     </Button>
                                 )}

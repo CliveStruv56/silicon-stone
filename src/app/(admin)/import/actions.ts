@@ -2,7 +2,7 @@
 
 import { extractRawText } from "mammoth";
 import { callClaude } from "@/lib/anthropic";
-import { buildPrompt, extractArticleMetadata } from "@/lib/prompts";
+import { buildDraftPrompt, extractArticleMetadata } from "@/lib/prompts";
 import { createArticleInSanity, listSanityCategories } from "@/lib/sanity";
 import { requireAdmin } from "@/lib/auth";
 import type { ImportState } from "./types";
@@ -70,37 +70,20 @@ export async function importArticle(
 
         const contentType = format === "deep_dive" ? "deepdive" : "signal";
 
-        // Pass 1 — rework the supplied article into the S&S voice + structure.
-        // buildPrompt() carries the full brand voice DNA + persona context and the
-        // format scaffold; we swap in a rework instruction and the source text.
-        const { systemPrompt, userPrompt } = await buildPrompt(
-            originalTitle || "Imported article",
-            personaSlug,
-            format === "pulse" ? "pulse" : contentType,
-        );
-
-        const reworkMessage = `${userPrompt}
-
-=== SOURCE ARTICLE TO REWORK ===
-The article below was written outside the system. Rework it COMPLETELY into the
-Silicon & Stone voice and the structure described above. Preserve every fact, figure,
-and the analytical substance, but rewrite the prose entirely — do not keep the original
-author's phrasing. Do not invent claims the source does not support.
-
-${text}
-=== END SOURCE ARTICLE ===
-
-Output ONLY a JSON object with this exact shape (no markdown fences, no commentary):
-{
-  "title": "A compelling, forensic title",
-  "excerpt": "A punchy 2-sentence summary",
-  "content": "The full reworked article in markdown",
-  "keywords": ["keyword1", "keyword2"]
-}`;
+        // Pass 1 — rework the supplied article into the S&S voice + structure via
+        // the same unified prompt builder /create uses. Passing `sourceMaterial`
+        // switches it into rework mode (preserve facts, rewrite prose) and carries
+        // the brand voice DNA + persona context + format scaffold automatically.
+        const { systemPrompt, userPrompt } = await buildDraftPrompt({
+            topic: originalTitle || "Imported article",
+            personaKey: personaSlug,
+            format,
+            sourceMaterial: text,
+        });
 
         // Deep dives can exceed the 4096-token default — give them headroom.
         const maxTokens = format === "deep_dive" ? 8192 : 4096;
-        const responseText = await callClaude(systemPrompt, reworkMessage, 0.4, maxTokens);
+        const responseText = await callClaude(systemPrompt, userPrompt, 0.4, maxTokens);
 
         // Extract the JSON object (tolerate stray prose / code fences).
         let jsonText = responseText;

@@ -4,14 +4,55 @@ import { callClaude } from "./anthropic";
 import { logErrorToFile } from "./debug";
 import type { VoiceDNA } from "@/types/context";
 
-type ContentType = 'pulse' | 'signal' | 'deepdive' | 'guide';
+/**
+ * The five canonical Silicon & Stone draft formats. `research` is a separate
+ * mode in the UI (gather intel without drafting) so it never reaches here.
+ */
+export type DraftFormat = 'pulse' | 'signal' | 'deep_dive' | 'guide' | 'youtube';
 
-export async function buildPrompt(topic: string, personaKey: string, contentType: ContentType) {
+export interface DraftResearch {
+    summary: string;
+    sources: { title: string; url: string; snippet: string }[];
+    painPoints: string[];
+    keywords: string[];
+}
+
+export interface DraftPromptInput {
+    topic: string;
+    personaKey: string;
+    format: DraftFormat;
+    /** Forensic research synthesised upstream (Exa / Inoreader via /research). */
+    research?: DraftResearch;
+    /** Pre-formatted "prior coverage" lines from the Pinecone article index. */
+    priorCoverage?: string;
+    /** Full Exa Research Pro report, for Deep Dives — handed to the writer verbatim. */
+    deepReport?: string;
+    /**
+     * Externally-written article to rework into the S&S voice + format (the
+     * `/import` flow). When set, the prompt switches from "draft on research"
+     * to "rework this source" — preserve its facts, rewrite the prose.
+     */
+    sourceMaterial?: string;
+}
+
+/**
+ * Unified draft prompt builder for every authoring route. Produces the
+ * data-driven brand/voice/persona system prompt (shared by all formats) plus a
+ * format-specific user prompt that carries whatever inputs the route provides:
+ * forensic research, prior coverage and the full forensic report (/create), or
+ * a source article to rework (/import). Replaces the old direct-prompt
+ * `buildPrompt()` and the inline prompts that used to live in /create.
+ */
+export async function buildDraftPrompt(
+    input: DraftPromptInput,
+): Promise<{ systemPrompt: string; userPrompt: string }> {
+    const { topic, personaKey, format, research, priorCoverage, deepReport, sourceMaterial } = input;
+
     const [persona, voice, profile, contentFocus] = await Promise.all([
         getSanityPersona(personaKey),
         getVoiceDNA(),
         getBusinessProfile(),
-        getContentFocus()
+        getContentFocus(),
     ]);
 
     if (!persona) throw new Error(`Persona ${personaKey} not found in Sanity`);
@@ -34,30 +75,70 @@ Current Content Focus Areas:
 ${contentFocus}
 
 IMPORTANT: The current year is ${currentYear}. Always use ${currentYear} for any date references or copyright notices.
-`;
 
-    let userPrompt = "";
+${sourceMaterial
+    ? `You will be given a source article written outside the system. Rework it COMPLETELY into the Silicon & Stone voice and the structure below: preserve every fact, figure, date and the analytical substance, but rewrite the prose entirely — do not keep the original author's phrasing. Do not invent claims the source does not support.`
+    : `You will be given forensic research (and possibly prior coverage from your own knowledge base). Build the piece on that research: preserve its specific figures, dates, named entities and source URLs. Do not invent facts beyond what the research supports; where it is thin, say so rather than guessing.`}
 
-    if (contentType === 'guide') {
-        userPrompt = `Write a LinkedIn post about: "${topic}".
+Output ONLY a single valid JSON object and NOTHING ELSE — no markdown fences, no preamble:
+{
+  "title": "A compelling, forensic title",
+  "excerpt": "A short, punchy 2-sentence summary",
+  "content": "The full piece in markdown, following the structure in the task",
+  "keywords": ["keyword1", "keyword2"]
+}`;
 
-STRICT FORMATTING RULES:
-1. Hook (First 2 lines): Must stop the scroll. Under 140 chars. No questions. Start with a fact or bold claim.
-   Example openers: ${voice.signature_phrases.opener_phrases.join(" | ")}
-2. Body: Short, punchy lines. One idea per line. Use bullets for lists.
-3. Tone: ${voice.tone.primary_tone}.
-4. Ending: Clear CTA or thought-provoking question.
-5. Hashtags: 3-5 relevant tags including #ForensicTechnopolitics.
+    const researchBlock = research
+        ? `
+=== RESEARCH SUMMARY ===
+${research.summary}
 
-Structure it for maximum engagement/comments.
-`;
-    } else if (contentType === 'pulse') {
-        userPrompt = `Write a "Pulse" intelligence scan (100-140 words) about: "${topic}".
+=== SOURCES ===
+${research.sources.map((s) => `- ${s.title}: ${s.snippet} (${s.url})`).join('\n')}
 
-Format: Markdown.
-Goal: Give ${persona.role} the signal, consequence, and immediate watchpoint in a genuine 30-second read.
+=== PAIN POINTS & KEYWORDS ===
+${[...research.painPoints, ...research.keywords].join(', ')}
+`
+        : '';
 
-Structure:
+    const deepReportBlock = (format === 'deep_dive' && deepReport)
+        ? `
+=== FULL FORENSIC RESEARCH REPORT (primary material — build the Deep Dive on this; preserve its figures, dates and sources) ===
+${deepReport}
+`
+        : '';
+
+    const priorCoverageBlock = priorCoverage ? `\n${priorCoverage}\n` : '';
+
+    const sourceBlock = sourceMaterial
+        ? `
+=== SOURCE ARTICLE TO REWORK ===
+${sourceMaterial}
+=== END SOURCE ARTICLE ===
+`
+        : '';
+
+    const task = getFormatTask(format, persona, voice);
+
+    const userPrompt = `=== TOPIC ===
+${topic}
+${researchBlock}${deepReportBlock}${priorCoverageBlock}${sourceBlock}
+=== YOUR TASK ===
+${task}`;
+
+    return { systemPrompt, userPrompt };
+}
+
+type SanityPersona = NonNullable<Awaited<ReturnType<typeof getSanityPersona>>>;
+
+/** Format-specific structure templates for the "content" field of the draft. */
+function getFormatTask(format: DraftFormat, persona: SanityPersona, voice: VoiceDNA): string {
+    switch (format) {
+        case 'pulse':
+            return `Write a "Pulse" intelligence scan (100–140 words) for ${persona.role}.
+The "content" must be a genuine 30-second scan — state what shifted, why it matters, and one watchpoint only. Do not expand it into a briefing.
+
+Markdown structure for "content":
 # [Headline: Specific and factual]
 
 **Stone Truth:** [One sentence stating the structural implication.]
@@ -71,16 +152,13 @@ Structure:
 ## Watch Next
 [One precise indicator or deadline to monitor.]
 
-Keep the full piece between 100 and 140 words. Do not expand it into a standard briefing.
-Tone: Clinical, concise, actionable.
-`;
-    } else if (contentType === 'signal') {
-        userPrompt = `Write a "Signal" analysis piece (800-1200 words) about: "${topic}".
+Tone: Clinical, concise, actionable.`;
 
-Format: Markdown.
-Goal: "What just happened and what does it actually mean?" for ${persona.role}.
+        case 'signal':
+            return `Write a "Signal" analysis piece (800–1,200 words) for ${persona.role}.
+Goal: "What just happened and what does it actually mean?"
 
-Structure:
+Markdown structure for "content":
 # [Headline: Specific & Urgent]
 
 **Executive Summary**: 3 bullet points on why this matters to ${persona.role}s.
@@ -97,7 +175,7 @@ Apply the "Silicon vs Stone" lens.
 - Stone aspect: (Regulation/Geography/Sovereignty friction)
 
 ## Strategic Implication
-Three specific impacts on ${persona.organizationTypes?.[0] || 'your industry'}:
+Three specific impacts on ${persona.organizationTypes?.[0] || 'their industry'}:
 1. [Impact 1]
 2. [Impact 2]
 3. [Impact 3]
@@ -105,16 +183,13 @@ Three specific impacts on ${persona.organizationTypes?.[0] || 'your industry'}:
 ## The Long View
 Conclusion. Use a closer like: ${voice.signature_phrases.closer_phrases.join(" | ")}.
 
-Tone: Clinical, urgent, actionable.
-`;
-    } else {
-        // Deep Dive
-        userPrompt = `Write a "Deep Dive" forensic report (2500+ words) about: "${topic}".
+Tone: Clinical, urgent, actionable.`;
 
-Format: Markdown.
-Goal: The definitive reference on this topic for ${persona.role}.
+        case 'deep_dive':
+            return `Write a "Deep Dive" forensic report (3,000+ words) — the definitive reference on this topic for ${persona.role}.
+When a full forensic research report is provided above, build on it verbatim: preserve its figures, dates and sources.
 
-Structure:
+Markdown structure for "content":
 # [Headline: Comprehensive & Authoritative]
 
 > **Forensic Summary**: A 150-word abstract of the analysis.
@@ -138,13 +213,59 @@ Run 3 scenarios for the next 24 months:
 Specific, operational steps they should take now.
 
 ## References
-Cite key regulations (e.g. AI Act Articles) or specific technologies.
+Cite key regulations (e.g. AI Act Articles), the sources above, or specific technologies.
 
-Tone: Academic but accessible. "The Adult in the Room".
-`;
+Tone: Academic but accessible. "The Adult in the Room".`;
+
+        case 'guide':
+            return `Write a "Guide" (500–2,000 words) that teaches ${persona.role} how to apply a specific tool or technique relevant to this topic. Practical and operational, not theoretical.
+
+Markdown structure for "content":
+# [Headline: A clear, outcome-oriented "how to" title]
+
+> **What you'll get:** One sentence on the concrete outcome of following this guide.
+
+## Why This Matters
+Two or three sentences connecting the technique to ${persona.role}'s pain point.
+
+## Before You Start
+Prerequisites, data, or access needed.
+
+## Step-by-Step
+Numbered, concrete steps. Each step states the action and the expected result.
+
+## Common Pitfalls
+2–4 mistakes to avoid, drawn from the research.
+
+## Next Steps
+Where to go deeper, or how this links to a Silicon & Stone interactive tool.
+
+Tone: Clinical, practical, no hype.`;
+
+        case 'youtube':
+            return `Write a YouTube Script Outline for a 12–18 minute video, synthesising the research into the "Tiered Intelligence" format. The presenter is "Clive". Treat the viewer as an intelligent adult who lacks time, not intelligence.
+Use a YouTube title (under 70 characters) as "title" and a 2-sentence video description as "excerpt".
+
+Markdown structure for "content":
+
+## 1. The Pulse (0:00 - 1:00)
+**Standard Hook:** A variation of: "I'm Clive. After 30 years in the engine room of the technology industry, I now track the shifting fault lines of AI and semiconductor politics from the edge of Europe. Welcome to Silicon and Stone, where we cut through the tech noise to give decision-makers the actionable intelligence they need." — vary the wording slightly per episode.
+**Persona Tag:** State explicitly who this briefing is for (tie it to ${persona.role}).
+**Impact Score:** Assign a Systemic Friction or Risk score out of 10.
+**The Stone Truth:** A 3-sentence, sober bottom-line summary.
+
+## 2. The Briefing (1:00 - 12:00)
+Divide the research into 3–4 distinct "Takeaways". For each:
+**Visual Hook:** what to show on screen.
+**Talking Points:** 4–5 detailed bullets incorporating specific data, geography and regulatory deadlines from the research.
+**Methodology Application:** tie the analysis to one Silicon & Stone pillar (Supply Chain Forensics, Policy Stress-Testing, Scenario Modeling, or Signal Filtering).
+
+## 3. The Audit CTA (12:00 - End)
+**The Transition:** a smooth move from the final takeaway into the call to action.
+**The Pitch:** a low-pressure pitch to siliconandstone.com — direct ${persona.role} to a free interactive tool (Compliance Checker, Supply Chain Mapper), and mention the £24 AI Audit Checklist Pack or the £79 AI Act Compliance Toolkit.
+
+Tone: Sober, authoritative, clinical. Zero hype.`;
     }
-
-    return { systemPrompt, userPrompt };
 }
 
 export interface CategoryChoice {
