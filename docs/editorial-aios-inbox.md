@@ -3,6 +3,8 @@
 The AIOS inbox is additive. It does not change the existing `article` schema,
 draft-generation path, publishing workflow, or article-level Pinecone index.
 
+For the full user-facing walkthrough, see [Editorial AIOS User Manual](./editorial-aios-manual.md).
+
 ## Sanity Documents
 
 - `knowledgeSource`: captured originals and extracted text awaiting reviewed
