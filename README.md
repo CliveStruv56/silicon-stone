@@ -75,6 +75,27 @@ npm run build
 packages. Do not run `npm audit fix --force`; npm currently proposes unsafe
 downgrades for the remaining advisories.
 
+## Codebase Map (Knowledge Graph)
+
+An interactive knowledge graph of the codebase (files, functions, imports,
+architectural layers, and a guided tour) lives in `.understand-anything/` and is
+committed with the repo. To explore it locally:
+
+```bash
+npm run graph
+```
+
+This launches the read-only dashboard viewer and auto-opens it at a localhost
+URL. It only *views* the saved graph — it does not re-analyse code. Notes:
+
+- The viewer binds to `127.0.0.1` only and gates its data endpoints with an
+  access token. The token is generated once and cached in the gitignored
+  `.understand-anything/.dashboard-token` (never committed, never passed on the
+  command line). The same token persists across launches, so the URL is stable.
+- To **regenerate** the graph after code changes, run the `/understand` command
+  in Claude Code (incremental after the first build). The dashboard re-reads the
+  graph on refresh.
+
 ## Deploy on Vercel
 
 The frontend deploys on Vercel from `main`. Railway hosts the separate logic API

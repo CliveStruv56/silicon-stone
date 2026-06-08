@@ -21,7 +21,8 @@
     "evidence:rebuild": "tsx scripts/rebuild-evidence-index.ts",
     "evidence:rebuild:dry": "tsx scripts/rebuild-evidence-index.ts --dry-run",
     "test:evidence-index": "tsx scripts/evidence-index-checks.ts",
-    "render-briefing": "tsx scripts/render-briefing-pdf.ts"
+    "render-briefing": "tsx scripts/render-briefing-pdf.ts",
+    "graph": "bash scripts/view-graph.sh"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
