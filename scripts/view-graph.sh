@@ -14,23 +14,29 @@ set -euo pipefail
 # Repo root = parent of this script's directory.
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-# Stable, bookmarkable URL without committing a secret: the access token is
-# generated once and cached in a GITIGNORED local file (per machine), not baked
-# into this script. Localhost-only binding is the real guard; the token just
-# blocks other local processes from reading the graph/source endpoints.
-TOKEN_FILE="$REPO_ROOT/.understand-anything/.dashboard-token"
-if [ ! -s "$TOKEN_FILE" ]; then
-  node -e "console.log(require('crypto').randomBytes(12).toString('hex'))" > "$TOKEN_FILE"
-  chmod 600 "$TOKEN_FILE"
-fi
-export UNDERSTAND_ACCESS_TOKEN="$(tr -d '[:space:]' < "$TOKEN_FILE")"
-
+# Check the graph exists BEFORE anything else. On a fresh clone
+# .understand-anything/ may not exist at all, so doing this first means we print
+# a clean "run /understand" message instead of failing on the token write below
+# (writing into a missing directory aborts the script under `set -e`).
 GRAPH_FILE="$REPO_ROOT/.understand-anything/knowledge-graph.json"
 if [ ! -f "$GRAPH_FILE" ]; then
   echo "No knowledge graph found at $GRAPH_FILE"
   echo "Run the /understand command in Claude Code first to generate it."
   exit 1
 fi
+
+# Stable, bookmarkable URL without committing a secret: the access token is
+# generated once and cached in a GITIGNORED local file (per machine), not baked
+# into this script. Localhost-only binding is the real guard; the token just
+# blocks other local processes from reading the graph/source endpoints.
+# (The .understand-anything/ directory is guaranteed to exist here, since the
+# graph file above does.)
+TOKEN_FILE="$REPO_ROOT/.understand-anything/.dashboard-token"
+if [ ! -s "$TOKEN_FILE" ]; then
+  node -e "console.log(require('crypto').randomBytes(12).toString('hex'))" > "$TOKEN_FILE"
+  chmod 600 "$TOKEN_FILE"
+fi
+export UNDERSTAND_ACCESS_TOKEN="$(tr -d '[:space:]' < "$TOKEN_FILE")"
 
 # Resolve the newest installed plugin version's dashboard package.
 PLUGIN_CACHE="$HOME/.claude/plugins/cache/understand-anything/understand-anything"
