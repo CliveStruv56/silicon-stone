@@ -2,7 +2,7 @@
 
 import { extractRawText } from "mammoth";
 import { callClaude } from "@/lib/anthropic";
-import { buildDraftPrompt, extractArticleMetadata } from "@/lib/prompts";
+import { buildDraftPrompt, extractArticleMetadata, runVoiceEditPass, type DraftFormat } from "@/lib/prompts";
 import { createArticleInSanity, listSanityCategories } from "@/lib/sanity";
 import { requireAdmin } from "@/lib/auth";
 import type { ImportState } from "./types";
@@ -102,6 +102,20 @@ export async function importArticle(
             };
         }
 
+        // Pass 3 — voice edit (humanising final pass). Best-effort, same as
+        // /create: Deep Dives audit-only, others rewritten. Runs before Pass 2 so
+        // the metadata reflects the edited body.
+        let voiceEditNotes: string | undefined;
+        try {
+            const edit = await runVoiceEditPass(parsed.title, parsed.content, format as DraftFormat);
+            if (edit) {
+                parsed.content = edit.content;
+                voiceEditNotes = edit.editSummary;
+            }
+        } catch (err) {
+            console.error("[/import] Voice edit pass failed:", err);
+        }
+
         // Pass 2 — SEO / taxonomy / tier metadata. Best-effort: if it fails the
         // draft still saves, just without the extra fields (same as /create).
         let metadata: Awaited<ReturnType<typeof extractArticleMetadata>> | undefined;
@@ -137,6 +151,7 @@ export async function importArticle(
             categorySlugs: metadata?.categorySlugs,
             intelligenceTier: format === "pulse" ? "pulse" : metadata?.intelligenceTier,
             methodologyPillars: metadata?.methodologyPillars,
+            voiceEditNotes,
             source: "imported",
             sourceMaterial: text,
         });

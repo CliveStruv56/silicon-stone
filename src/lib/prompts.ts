@@ -1,4 +1,4 @@
-import { getVoiceDNA, getBusinessProfile, getContentFocus } from "./api";
+import { getVoiceDNA, getBusinessProfile, getContentFocus, getStyleGuardrail, getHouseStyleRules, getAITells } from "./api";
 import { getSanityPersona } from "./sanity";
 import { callClaude } from "./anthropic";
 import { logErrorToFile } from "./debug";
@@ -66,6 +66,8 @@ Keywords: ${voice.vocabulary.keywords_2026.join(", ")}.
 
 NEVER use hype words: ${voice.voice_boundaries.never_uses_phrases.join(", ")}.
 ALWAYS be: ${voice.emotional_range.primary_emotions.join(", ")}.
+
+${getStyleGuardrail()}
 
 You are writing for: ${persona.role} (${persona.name}).
 Their pain point: ${persona.painPoints}.
@@ -265,6 +267,147 @@ Divide the research into 3–4 distinct "Takeaways". For each:
 **The Pitch:** a low-pressure pitch to siliconandstone.com — direct ${persona.role} to a free interactive tool (Compliance Checker, Supply Chain Mapper), and mention the £24 AI Audit Checklist Pack or the £79 AI Act Compliance Toolkit.
 
 Tone: Sober, authoritative, clinical. Zero hype.`;
+    }
+}
+
+/**
+ * Pass-3 "voice edit" — the humanising final pass. `rewrite` returns a fully
+ * edited body; `audit` only reports what needs fixing and leaves the body as-is
+ * (used for long-form Deep Dives where a full 3,000-word rewrite is not worth
+ * the cost/latency — the author rewrites from the notes instead).
+ */
+export type VoiceEditMode = 'rewrite' | 'audit';
+
+export interface VoiceEditResult {
+    /** The edited body (rewrite) or the unchanged draft body (audit). */
+    content: string;
+    /** Markdown hand-back: tells removed, house-style fixes, and the [AUTHOR: …] list. */
+    editSummary: string;
+}
+
+/** Deep Dives audit-only (too long to rewrite economically); every other format gets a full rewrite. */
+const VOICE_EDIT_MODE_BY_FORMAT: Record<DraftFormat, VoiceEditMode> = {
+    pulse: 'rewrite',
+    signal: 'rewrite',
+    guide: 'rewrite',
+    youtube: 'rewrite',
+    deep_dive: 'audit',
+};
+
+export function voiceEditModeForFormat(format: DraftFormat): VoiceEditMode {
+    return VOICE_EDIT_MODE_BY_FORMAT[format];
+}
+
+/** The edit-summary structure the voice-edit pass must return (mirrors the skill's EDIT-SUMMARY.md). */
+const EDIT_SUMMARY_SPEC = `## Voice Edit Summary
+
+**Edited against:** Silicon & Stone house style · UK English
+
+### AI tells removed
+- Banned/house vocabulary: [N] ([examples with counts])
+- Hedges cut: [N] · Empty connectives removed: [N]
+- Structural tics fixed: [list — rule-of-three, summarising kickers, false balance, etc.]
+
+### House-style corrections
+- UK English: [N] · Smart quotes: [Y/N] · Em-dashes within 3-per-para cap: [Y/N]
+- Headlines/subheads: [exclamation marks removed? rhetorical questions rewritten?]
+- Structural furniture + Stone Truth callout preserved: [Y/N]
+- Regulatory labelling (if applicable): [fact/inference/scenario labelled? Last reviewed date?]
+
+### ⚠ Author specifics needed
+List every [AUTHOR: …] placeholder left in the body — location and what is needed. Do not publish until each is resolved.
+
+### Verdict
+[One or two sentences: ready once placeholders are filled, or needs a structural rethink.]`;
+
+export async function buildVoiceEditPrompt(
+    title: string,
+    body: string,
+    mode: VoiceEditMode,
+): Promise<{ systemPrompt: string; userPrompt: string }> {
+    const houseStyle = getHouseStyleRules();
+    const aiTells = getAITells();
+
+    const outputContract = mode === 'rewrite'
+        ? `Output ONLY a single valid JSON object and NOTHING ELSE — no markdown fences, no preamble:
+{
+  "content": "The full edited article in markdown. Preserve the author's heading structure, front-matter and the Stone Truth callout exactly. Insert [AUTHOR: …] placeholders where only the author can supply a specific — never invent facts.",
+  "editSummary": "The edit summary in the exact structure given below."
+}`
+        : `This is an AUDIT pass. Do NOT rewrite the article — leave the prose to the author. Identify every AI tell, house-style breach, and place where a concrete specific is missing.
+Output ONLY a single valid JSON object and NOTHING ELSE — no markdown fences, no preamble:
+{
+  "editSummary": "The edit summary in the exact structure given below, listing concrete locations (quote the offending phrase) so the author can act without re-reading the whole draft."
+}`;
+
+    const systemPrompt = `You are a ruthless, experienced editor performing the FINAL voice pass on an AI-assisted draft for "Silicon & Stone". Your job is to make it read as if a sharp, opinionated human with real expertise wrote it. You cut, sharpen, and demand specifics. You never soften AI prose with more AI prose, and you never pretend a draft is fine when it reads like a machine wrote it.
+
+Your goal is good writing, not detector evasion. Genuinely specific, opinionated, well-structured prose is the target.
+
+Procedure: (1) strip the AI tells, (2) demand the specifics — flag every place that stays general when it should name an example, number, date or source, (3) enforce the house-style mechanics, (4) enforce the brand voice with a real point of view and varied rhythm. Never fabricate facts, statistics, names or quotes — use [AUTHOR: …] placeholders instead.
+
+=== HOUSE STYLE (authority — overrides the generic list on any overlap) ===
+${houseStyle}
+
+=== AI TELLS (detection & removal reference) ===
+${aiTells}
+
+=== EDIT SUMMARY FORMAT (return verbatim structure, filled in) ===
+${EDIT_SUMMARY_SPEC}
+
+${outputContract}`;
+
+    const userPrompt = `Voice-edit this draft.
+
+TITLE:
+${title}
+
+DRAFT BODY:
+${body}
+
+Return the JSON object now.`;
+
+    return { systemPrompt, userPrompt };
+}
+
+/**
+ * Run the Pass-3 voice edit. Best-effort: returns null on any failure (parse
+ * error, missing API key / dev mock, etc.) so the upstream pipeline still saves
+ * the Pass-1 draft. In `audit` mode the returned `content` is the original body
+ * unchanged and only `editSummary` is populated.
+ */
+export async function runVoiceEditPass(
+    title: string,
+    body: string,
+    format: DraftFormat,
+): Promise<VoiceEditResult | null> {
+    const mode = voiceEditModeForFormat(format);
+    let raw = "";
+    try {
+        const { systemPrompt, userPrompt } = await buildVoiceEditPrompt(title, body, mode);
+        // Editing is conservative (0.3); generous token budget so a full rewrite is not truncated.
+        raw = await callClaude(systemPrompt, userPrompt, 0.3, mode === 'rewrite' ? 8192 : 2048);
+
+        const firstOpen = raw.indexOf('{');
+        const lastClose = raw.lastIndexOf('}');
+        if (firstOpen === -1 || lastClose === -1) throw new Error("No JSON object in voice-edit response");
+
+        const parsed = JSON.parse(raw.substring(firstOpen, lastClose + 1));
+
+        const editSummary = typeof parsed.editSummary === 'string' ? parsed.editSummary.trim() : '';
+        if (!editSummary) throw new Error("voice-edit response missing editSummary");
+
+        if (mode === 'audit') {
+            return { content: body, editSummary };
+        }
+
+        const edited = typeof parsed.content === 'string' ? parsed.content.trim() : '';
+        // If the rewrite came back empty, keep the original body rather than blanking the draft.
+        return { content: edited || body, editSummary };
+    } catch (err) {
+        const message = err instanceof Error ? err.message : 'Unknown error';
+        logErrorToFile(`VOICE EDIT PASS FAILED (${format}): ${message}\n\nRAW:\n${raw}`);
+        return null;
     }
 }
 

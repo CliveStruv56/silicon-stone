@@ -11,6 +11,13 @@ description: Voice rules for any text rendered on Silicon and Stone surfaces —
 > examples, and provides drift-detection filters. All apply.
 >
 > **When to use**: Any time you generate or edit user-facing text on a Silicon and Stone surface. If a piece of text doesn't pass these rules, rewrite it.
+>
+> **Article generation already applies these rules automatically.** `/create` and
+> `/import` inject a condensed house-style guardrail into the draft prompt (Pass 1)
+> and run a `voice-edit` pass afterwards (Pass 3) against the full
+> `.agent/rules/style/house-style.md` + `ai-tells.md`. This skill is for everything
+> *outside* that pipeline (homepage, tools, microcopy) and for manual passes via the
+> `/voice-edit` skill. See `docs/authoring-guide.md` §7.
 
 ---
 

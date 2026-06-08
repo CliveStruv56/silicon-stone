@@ -34,6 +34,7 @@ export interface ArticleData {
     methodologyPillars?: string[];   // matrix-cell slugs
     source?: 'generated' | 'imported' | 'manual';
     sourceMaterial?: string;         // original text for imported articles
+    voiceEditNotes?: string;         // Pass-3 voice-edit summary + [AUTHOR: …] list
 }
 
 export interface CategoryOption {
@@ -129,6 +130,7 @@ export async function createArticleInSanity(data: ArticleData) {
     }
     if (data.source) doc.source = data.source;
     if (data.sourceMaterial) doc.sourceMaterial = data.sourceMaterial;
+    if (data.voiceEditNotes) doc.voiceEditNotes = data.voiceEditNotes;
 
     return await writeClient.createOrReplace(doc);
 }

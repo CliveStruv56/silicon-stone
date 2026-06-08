@@ -37,11 +37,15 @@ The main end-to-end content workflow is `/create`:
 1. Select a format, including Pulse, Signal, Deep Dive, Research Only, or YouTube Script.
 2. Launch the research agent.
 3. Review sources and forensic summary.
-4. Generate a Sanity draft.
-5. Review and publish in `/studio`.
+4. Generate a Sanity draft. House style is enforced automatically: a guardrail in the
+   draft prompt (Pass 1) plus a voice-edit pass (Pass 3) that strips AI tells, enforces
+   the style guide, and flags `[AUTHOR: …]` specifics in a **Voice Edit Notes** field.
+   Deep Dives get an audit-only pass (notes, no full rewrite).
+5. Review and publish in `/studio` — resolve every `[AUTHOR: …]` placeholder first.
 
-`/generate` remains available as a legacy quick prompt-to-draft tool. Use `/create`
-when source-gathering and the full research-to-Sanity process matter.
+`/generate` has been **removed** and merged into `/create`; every draft is now
+research-backed. For intel without a draft, use **Research Only**. The house-style
+rules are synced from the Ideaverse vault — see `docs/authoring-guide.md` §7.
 
 Generated Pulse articles are stored as `contentType: signal` with
 `intelligenceTier: pulse`; Sanity treats editorial format and reading-speed tier as

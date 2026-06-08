@@ -59,6 +59,19 @@ This guide outlines the workflows for researching topics, generating drafts, and
 
 The old no-research quick generator has been **merged into `/create` and deleted** (route and middleware entries removed; it was never in the admin menu). Everything `/generate` did well — its data-driven, brand-voice prompt builder — is now the prompt engine for *every* `/create` format, and every draft is research-backed. There is no longer a prompt-only path: if you want intel without a draft, use **Research Only**.
 
+### Voice & house style (applied automatically to every draft)
+
+Tone is enforced by the pipeline itself — you no longer rely on the draft "happening" to sound on-brand. Two things run on every `/create` and `/import` draft:
+
+- **Pass 1 — house-style guardrail (in the draft prompt).** Before drafting, the prompt now carries a condensed house-style guardrail: UK English, smart quotes, the em-dash cap, no hype/banned words, take a position rather than hedge, and demand concrete specifics. Built by `getStyleGuardrail()` and injected by `buildDraftPrompt` (`src/lib/prompts.ts`).
+- **Pass 3 — voice edit (the humanising final pass).** After drafting, `runVoiceEditPass` runs the full voice-edit procedure against the complete house-style and AI-tells references: it strips AI tells, enforces the mechanics, and demands the specifics only a human can supply.
+  - **Pulse / Signal / Guide / YouTube** are **rewritten** in place.
+  - **Deep Dives** get an **audit-only** pass — too long to rewrite economically, so it reports what to fix rather than rewriting the 3,000+ words. You rewrite from the notes.
+  - Where only you can supply a fact, figure, name, or anecdote, it inserts an inline **`[AUTHOR: …]`** placeholder rather than inventing one, and writes a summary (tells removed, house-style fixes, and the full `[AUTHOR: …]` list) to the article's **Voice Edit Notes** field in Studio.
+  - The pass is best-effort: if it fails, the Pass-1 draft still saves.
+
+**Where the rules come from.** The canonical rules live in the Ideaverse vault (`Style/house-style.md` + `Style/ai-tells.md`). `sync-style.sh` syncs them into `.agent/rules/style/`, then `npm run gen:style` codegens the bundled module the app imports (`src/lib/style-rules.generated.ts`) so the rules always reach the production prompt. See *House style & the vault* below. The same references back the terminal **`/voice-edit`** skill for manual passes on any draft.
+
 ## 2. Research Portal (`/research`)
 **Best for:** Exploring topics without immediately generating a full draft.
 
@@ -122,7 +135,12 @@ npm run sync-content:force # Overwrite ALL articles (use with caution)
     *   **Impact Score:** Set 1-10 for the briefings page impact bar.
     *   **Stone Truth:** Add a one-line forensic insight (displayed in italics on briefings cards).
 
-4.  **Publish:**
+4.  **Resolve the Voice Edit Notes (before publishing):**
+    *   Open the read-only **Voice Edit Notes** field. It lists the AI tells removed, the house-style corrections, and — most importantly — every **`[AUTHOR: …]`** placeholder the voice edit left in the body.
+    *   Search the body for `[AUTHOR:` and replace each placeholder with the real specific (a figure, a name, a date, a first-hand take). **Do not publish with any `[AUTHOR: …]` placeholder still in place.**
+    *   For a **Deep Dive** (audit-only), the notes describe what to fix; apply the rewrite yourself. You can also run the terminal **`/voice-edit`** skill on the draft for a full hands-on pass.
+
+5.  **Publish:**
     *   Click the green **Publish** button to make the article live on the site.
     *   The site uses ISR — published changes appear after revalidation.
 
@@ -145,3 +163,32 @@ npm run sync-content:force # Overwrite ALL articles (use with caution)
 | Sovereign Sofia | `sofia` | Policy analysts at think tanks and government |
 | Remote Robert | `robert` | Regional development strategists |
 | Global Citizen | `citizen` | Informed general public, journalists, educators |
+
+## 7. House Style & the Vault (source of truth)
+
+The **Ideaverse 2 Silicon and Stone** Obsidian vault is the single source of truth for house style and variant rules. **Yes — we still sync from it.** The website repo *consumes* these rules and never edits them.
+
+```
+Vault  Style/house-style.md, Style/ai-tells.md, pulse/briefing/deep-dive/variant-map.md   ← edit here
+  │   (run sync-style.sh in the vault after editing)
+  ├─ rsync → .agent/rules/style/*.md            (editorial reference for agents/humans)
+  ├─ codegen → src/lib/style-rules.generated.ts (npm run gen:style — bundled, what the web app imports)
+  └─ copy  → .agent/skills/voice-edit/references/  and  .claude/skills/voice-edit/references/
+```
+
+`sync-style.sh` lives in the vault root. After editing any `Style/*.md` file, run it: it rsyncs the Markdown into the repo, regenerates the bundled rules module, and refreshes both copies of the `voice-edit` skill's references. Then commit the repo changes. (`gen:style` also runs automatically on `prebuild`, so a deploy can never ship stale rules.)
+
+**Why a bundled module and not a runtime file read?** Reading repo `.md` at runtime is unreliable on Vercel (the file may not be traced into the serverless bundle). Importing a generated module is reliable — the same mechanism that makes `context/core/voice-dna.json` dependable.
+
+### The voice/style files
+
+| File | Role |
+|------|------|
+| `context/core/voice-dna.json` | Structured voice spec (traits, banned phrases) — also injected into the draft prompt |
+| `.agent/rules/style/house-style.md` | Canonical house style (UK English, banned words, punctuation, regulatory discipline) — synced from the vault |
+| `.agent/rules/style/ai-tells.md` | AI-register tells to strip (hedging, rule-of-three, false balance, the absence test) — synced from the vault |
+| `src/lib/style-guardrail.ts` | Hand-curated condensed guardrail for Pass 1 (keep in step with the canonical rules) |
+| `src/lib/style-rules.generated.ts` | Auto-generated full rules the web app imports — do not edit by hand |
+| `.agent/skills/voice-edit/` | Committed, versioned `/voice-edit` editorial skill (manual passes) |
+| `.claude/skills/voice-edit/` | Local, Claude-Code-discoverable mirror of the same skill (`.claude/` is gitignored) |
+| `.agent/skills/silicon-stone-brand-voice/` | Prose voice skill — register, vocabulary, drift filters |

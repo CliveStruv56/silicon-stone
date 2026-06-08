@@ -4,6 +4,8 @@ import { ICP, VoiceDNA, BusinessProfile } from '@/types/context';
 import icpJson from '../../context/core/icp.json';
 import voiceDnaJson from '../../context/core/voice-dna.json';
 import businessProfileJson from '../../context/core/business-profile.json';
+import { HOUSE_STYLE_RULES, AI_TELLS_RULES } from './style-rules.generated';
+import { STYLE_GUARDRAIL } from './style-guardrail';
 
 const ROOT = process.env.AI_WRITER_ROOT || process.cwd();
 
@@ -82,6 +84,24 @@ export async function getVoiceDNA(): Promise<VoiceDNA> {
 
 export async function getBusinessProfile(): Promise<BusinessProfile> {
     return businessProfileJson as BusinessProfile;
+}
+
+/**
+ * Condensed house-style guardrail for the Pass-1 draft prompt. Bundled (not read
+ * from disk) so it always reaches the production prompt. See style-guardrail.ts.
+ */
+export function getStyleGuardrail(): string {
+    return STYLE_GUARDRAIL;
+}
+
+/** Full canonical house-style rules (Pass-3 voice edit). Generated from the vault SSOT. */
+export function getHouseStyleRules(): string {
+    return HOUSE_STYLE_RULES;
+}
+
+/** Full AI-tells detection/removal reference (Pass-3 voice edit). Generated from the vault SSOT. */
+export function getAITells(): string {
+    return AI_TELLS_RULES;
 }
 
 export async function getContentFocus(): Promise<string> {

@@ -1,7 +1,7 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-06-03
+> Last Updated: 2026-06-08
 > Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing, 13 moderate transitive npm audit findings (uuid through Sanity packages)**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com. Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools (email-gated for lead capture, AI Act triage engine recently overhauled), product/commerce pages with an early-access enquiry fallback until Lemon Squeezy checkout URLs are configured, Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Awaiting Lemon Squeezy store setup, Plausible account, and content publishing for queued drafts.
@@ -310,7 +310,13 @@ SESSION_SECRET=<long random secret, 32+ characters>
 | Content creation | `src/app/(admin)/create/` |
 | Inoreader client | `src/lib/inoreader.ts` |
 | Research pipeline | `src/lib/research.ts` |
-| AI prompts | `src/lib/prompts.ts` |
+| AI prompts (Pass 1 draft + Pass 3 voice edit) | `src/lib/prompts.ts` |
+| Pass-1 house-style guardrail (hand-curated) | `src/lib/style-guardrail.ts` |
+| Full house-style + AI-tells rules (bundled, generated) | `src/lib/style-rules.generated.ts` |
+| Style codegen (.md → bundled module) | `scripts/gen-style-rules.mjs` (`npm run gen:style`) |
+| Canonical style rules (synced from vault) | `.agent/rules/style/house-style.md`, `ai-tells.md` |
+| `voice-edit` skill (committed canonical / local mirror) | `.agent/skills/voice-edit/`, `.claude/skills/voice-edit/` |
+| Vault → repo style sync (SSOT) | `sync-style.sh` in the Ideaverse 2 Silicon and Stone vault |
 | Sanity schemas | `src/sanity/schemaTypes/` |
 | Sanity queries | `src/sanity/lib/queries.ts` |
 | Content sync | `scripts/sync-content.ts` |
@@ -329,6 +335,12 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### June 8, 2026 — Voice-edit: house style + AI-tells now drive every generation
+
+| Commit | Description |
+|--------|-------------|
+| _(pending)_ | Wired the new `voice-edit` editorial guidance into the article pipeline so tone is enforced on **every** generation (previously only the thin `context/core/voice-dna.json` reached the prompt; the rich `.agent/rules/style/` rules were never read by code). **SSOT:** promoted the rules into the Ideaverse vault `Style/` (new `ai-tells.md`; `house-style.md` gains the `[AUTHOR: …]` placeholder convention + ai-tells cross-ref). `sync-style.sh` (in the vault) now rsyncs `ai-tells.md`, regenerates the bundled module, and refreshes both voice-edit skill homes. **Reliable loading:** runtime `fs.readFile` of repo `.md` is unreliable on Vercel (see the empty `getContentFocus`), so `scripts/gen-style-rules.mjs` codegens `src/lib/style-rules.generated.ts` (imported = always bundled); run via `npm run gen:style` / `prebuild`. New `api.ts` loaders `getStyleGuardrail` / `getHouseStyleRules` / `getAITells`; hand-curated condensed guardrail in `src/lib/style-guardrail.ts`. **Pass 1:** `buildDraftPrompt` now injects the guardrail (covers `/create` + `/import`). **Pass 3 (new):** `runVoiceEditPass` in `prompts.ts` — a humanising final pass using the FULL references; rewrites pulse/signal/guide/youtube, **audit-only for deep_dive** (notes, no 3k-word rewrite); inserts inline `[AUTHOR: …]` placeholders and writes a summary to the new read-only `voiceEditNotes` field on the article schema (carried through `sanity.ts`). Best-effort, so a failed pass never blocks the draft. **Skill:** installed at `.claude/skills/voice-edit/` (discoverable as `/voice-edit`, but `.claude` is gitignored) **and** committed at `.agent/skills/voice-edit/` (versioned, alongside `silicon-stone-brand-voice`). **Verification:** `npm run test:style-rules` (guards the silent-`""` regression), typecheck, lint, and `next build` all pass. NOT yet run: a live `/create` generation (needs `ANTHROPIC_API_KEY` + Sanity write token + real API spend). |
 
 ### June 3, 2026 — Analytics dashboard (Phase 1: API usage/cost + content + Kit)
 
@@ -523,6 +535,11 @@ npm start                # Start production server
 # Content Sync
 npm run sync-content     # Sync markdown to Sanity
 npm run sync-content:dry # Preview sync changes
+
+# House style / voice rules
+npm run gen:style        # Regenerate bundled style rules from .agent/rules/style/*.md (also runs on prebuild)
+npm run test:style-rules # Assert the guardrail + full rules reach the bundle (guards silent-"" regression)
+# To change the rules: edit Style/*.md in the Ideaverse vault, then run its sync-style.sh
 
 # Audit
 npm audit                # Expect 13 moderate (uuid via Sanity packages)

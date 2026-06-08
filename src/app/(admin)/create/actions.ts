@@ -5,7 +5,7 @@ import { performResearch as researchPipeline, synthesizeDeepReport, buildDeepIns
 import { isBackendConfigured, startDeepResearchJob, getDeepResearchJob, type DeepJobStatus } from "@/lib/research-backend";
 import { callClaude } from "@/lib/anthropic";
 import { createArticleInSanity, listSanityCategories } from "@/lib/sanity";
-import { extractArticleMetadata, buildDraftPrompt, type DraftFormat } from "@/lib/prompts";
+import { extractArticleMetadata, buildDraftPrompt, runVoiceEditPass, type DraftFormat } from "@/lib/prompts";
 import { requireAdmin } from "@/lib/auth";
 import { ResearchResult } from "@/types/research";
 import { generateEmbedding } from "@/lib/embeddings";
@@ -144,6 +144,21 @@ export async function createDraftFromResearch(
         const parsedData = JSON.parse(jsonText);
         assertGeneratedDraftShape(parsedData);
 
+        // Pass-3: voice edit (the humanising final pass). Best-effort — strips AI
+        // tells, enforces house style and flags [AUTHOR: …] specifics. Deep Dives
+        // run audit-only (notes, no rewrite); every other format is rewritten.
+        // Runs before Pass-2 so the metadata reflects the edited body.
+        let voiceEditNotes: string | undefined;
+        try {
+            const edit = await runVoiceEditPass(parsedData.title, parsedData.content, format);
+            if (edit) {
+                parsedData.content = edit.content;
+                voiceEditNotes = edit.editSummary;
+            }
+        } catch (err) {
+            console.error('[/create] Voice edit pass failed:', err);
+        }
+
         const contentType = format === "youtube" ? "youtube"
             : format === "deep_dive" ? "deepdive"
             : format === "guide" ? "guide"
@@ -180,6 +195,7 @@ export async function createDraftFromResearch(
             categorySlugs: metadata?.categorySlugs,
             intelligenceTier: format === "pulse" ? "pulse" : metadata?.intelligenceTier,
             methodologyPillars: metadata?.methodologyPillars,
+            voiceEditNotes,
             source: "generated" as const,
         };
 
