@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { parseBody } from 'next-sanity/webhook'
 
 export async function POST(req: NextRequest) {
@@ -16,8 +17,16 @@ export async function POST(req: NextRequest) {
             return new Response('Bad Request', { status: 400 })
         }
 
-        // Revalidate the main list and specific paths
-        // revalidateTag('sanity')
+        // Invalidate cached content surfaces. revalidateTag covers any
+        // sanityFetch results tagged 'sanity'; revalidatePath covers the
+        // statically-cached list/detail routes regardless of tagging.
+        revalidateTag('sanity')
+        revalidatePath('/')
+        revalidatePath('/analysis')
+        revalidatePath('/briefings')
+        if (body.slug?.current) {
+            revalidatePath(`/analysis/${body.slug.current}`)
+        }
 
         return NextResponse.json({
             status: 200,

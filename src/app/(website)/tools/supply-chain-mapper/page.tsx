@@ -10,6 +10,7 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import { Tooltip } from 'react-tooltip'
 import { Header, Footer } from '@/components/layout'
 import { EmailGateOverlay } from '@/components/tools/EmailGateOverlay'
+import { usePrintGate } from '@/components/tools/usePrintGate'
 import { CopyMarkdownButton } from '@/components/tools/CopyMarkdownButton'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -86,8 +87,7 @@ export default function SupplyChainMapperPage() {
   const [selectedNode, setSelectedNode] = useState<SupplyChainNode | null>(null)
   // Email gate is now triggered only by the "Email me the brief" export action.
   // The interactive map and node detail are free to use.
-  const [isUnlocked, setIsUnlocked] = useState(false)
-  const [showGate, setShowGate] = useState(false)
+  const { showGate, requestBrief, unlock, dismiss } = usePrintGate()
   const [selectedScenarioId, setSelectedScenarioId] = useState<ScenarioId>('baseline')
   const [exposureProfile, setExposureProfile] = useState<ExposureProfile>({
     industry: 'industrial-manufacturing',
@@ -99,21 +99,6 @@ export default function SupplyChainMapperPage() {
   const handleSelectNode = useCallback((node: SupplyChainNode) => {
     setSelectedNode(node)
   }, [])
-
-  const handleRequestEmailBrief = () => {
-    if (isUnlocked) {
-      window.print()
-    } else {
-      setShowGate(true)
-    }
-  }
-
-  const handleGateUnlock = () => {
-    setIsUnlocked(true)
-    setShowGate(false)
-    // After unlocking, kick off the print/save flow they came here for.
-    setTimeout(() => window.print(), 200)
-  }
 
   const [activeNodeTypes, setActiveNodeTypes] = useState<NodeType[]>(
     NODE_TYPE_OPTIONS.map(opt => opt.value)
@@ -825,7 +810,7 @@ export default function SupplyChainMapperPage() {
                   />
                   <Button
                     variant="outline"
-                    onClick={handleRequestEmailBrief}
+                    onClick={requestBrief}
                     className="border-silicon-amber text-silicon-amber hover:bg-silicon-amber/10"
                   >
                     <Mail className="w-4 h-4" />
@@ -891,8 +876,8 @@ export default function SupplyChainMapperPage() {
       <Footer />
       <EmailGateOverlay
         isOpen={showGate}
-        onUnlock={handleGateUnlock}
-        onDismiss={() => setShowGate(false)}
+        onUnlock={unlock}
+        onDismiss={dismiss}
         toolName="Supply Chain Mapper"
         resultLabel="the printable brief"
       />

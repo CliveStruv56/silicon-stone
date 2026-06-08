@@ -4,23 +4,12 @@ import { redirect } from "next/navigation";
 import { performResearch as researchPipeline, synthesizeDeepReport, buildDeepInstructions } from "@/lib/research";
 import { isBackendConfigured, startDeepResearchJob, getDeepResearchJob, type DeepJobStatus } from "@/lib/research-backend";
 import { callClaude } from "@/lib/anthropic";
-import { createArticleInSanity, listSanityCategories } from "@/lib/sanity";
-import { extractArticleMetadata, buildDraftPrompt, runVoiceEditPass, type DraftFormat } from "@/lib/prompts";
+import { buildDraftPrompt, type DraftFormat } from "@/lib/prompts";
+import { parseDraftPayload, finalizeDraft } from "@/lib/draft-pipeline";
 import { requireAdmin } from "@/lib/auth";
 import { ResearchResult } from "@/types/research";
 import { generateEmbedding } from "@/lib/embeddings";
 import { searchSimilar } from "@/lib/pinecone";
-
-export async function performResearch(topic: string, opts?: { deep?: boolean }) {
-    try {
-        await requireAdmin();
-        const result = await researchPipeline(topic, undefined, opts);
-        return result;
-    } catch (error) {
-        console.error("Error performing research:", error);
-        throw new Error("Failed to gather intelligence.");
-    }
-}
 
 export type StartResearchResponse =
     | { mode: "result"; result: ResearchResult }
@@ -69,25 +58,6 @@ export async function pollResearchJob(
     }
 }
 
-function assertGeneratedDraftShape(value: unknown): asserts value is {
-    title: string;
-    excerpt: string;
-    content: string;
-    keywords?: string[];
-} {
-    if (!value || typeof value !== "object") {
-        throw new Error("Claude returned an invalid draft payload.");
-    }
-
-    const draft = value as Record<string, unknown>;
-    const requiredFields = ["title", "excerpt", "content"];
-    const missing = requiredFields.filter((field) => typeof draft[field] !== "string" || !draft[field]?.toString().trim());
-
-    if (missing.length > 0) {
-        throw new Error(`Claude draft payload is missing: ${missing.join(", ")}.`);
-    }
-}
-
 export async function createDraftFromResearch(
     researchResult: ResearchResult,
     format: DraftFormat,
@@ -130,76 +100,21 @@ export async function createDraftFromResearch(
             deepReport: researchResult.deepReport,
         });
 
-        // Temperature 0.4 for controlled, on-brand output
-        const responseText = await callClaude(systemPrompt, userPrompt, 0.4);
+        // Deep Dives can exceed the 4096-token default — give them headroom
+        // (matches /import; previously /create truncated long deep dives at 4096).
+        const maxTokens = format === "deep_dive" ? 8192 : 4096;
+        const responseText = await callClaude(systemPrompt, userPrompt, 0.4, maxTokens);
 
-        // Extract JSON from response (handle markdown code blocks)
-        let jsonText = responseText;
-        const firstOpen = jsonText.indexOf('{');
-        const lastClose = jsonText.lastIndexOf('}');
-        if (firstOpen !== -1 && lastClose !== -1) {
-            jsonText = jsonText.substring(firstOpen, lastClose + 1);
-        }
+        const draft = parseDraftPayload(responseText);
 
-        const parsedData = JSON.parse(jsonText);
-        assertGeneratedDraftShape(parsedData);
-
-        // Pass-3: voice edit (the humanising final pass). Best-effort — strips AI
-        // tells, enforces house style and flags [AUTHOR: …] specifics. Deep Dives
-        // run audit-only (notes, no rewrite); every other format is rewritten.
-        // Runs before Pass-2 so the metadata reflects the edited body.
-        let voiceEditNotes: string | undefined;
-        try {
-            const edit = await runVoiceEditPass(parsedData.title, parsedData.content, format);
-            if (edit) {
-                parsedData.content = edit.content;
-                voiceEditNotes = edit.editSummary;
-            }
-        } catch (err) {
-            console.error('[/create] Voice edit pass failed:', err);
-        }
-
-        const contentType = format === "youtube" ? "youtube"
-            : format === "deep_dive" ? "deepdive"
-            : format === "guide" ? "guide"
-            : "signal";
-
-        // Pass-2: SEO/insights/taxonomy/tier/matrix-cells extraction.
-        // Best-effort — if it fails the draft still saves, just without
-        // the metadata fields (same pattern as /import).
-        let metadata: Awaited<ReturnType<typeof extractArticleMetadata>> | undefined;
-        try {
-            const categoryOptions = await listSanityCategories();
-            metadata = await extractArticleMetadata(
-                parsedData.title,
-                parsedData.content,
-                personaSlug,
-                categoryOptions,
-                format === "pulse" ? "pulse" : undefined,
-            );
-        } catch (err) {
-            console.error('[/create] Metadata extraction failed:', err);
-        }
-
-        const sanityArticle = {
-            title: parsedData.title,
-            slug: parsedData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''),
-            excerpt: metadata?.metaDescription ?? parsedData.excerpt,
-            body: parsedData.content,
-            contentType: contentType as "signal" | "deepdive" | "guide" | "youtube",
-            persona: personaSlug,
-            seoTitle: metadata?.seoTitle,
-            metaDescription: metadata?.metaDescription,
-            stoneTruth: metadata?.stoneTruth,
-            actionableInsights: metadata?.actionableInsights,
-            categorySlugs: metadata?.categorySlugs,
-            intelligenceTier: format === "pulse" ? "pulse" : metadata?.intelligenceTier,
-            methodologyPillars: metadata?.methodologyPillars,
-            voiceEditNotes,
-            source: "generated" as const,
-        };
-
-        await createArticleInSanity(sanityArticle);
+        // Pass-3 (voice edit) → Pass-2 (metadata) → Sanity write — shared with /import.
+        await finalizeDraft({
+            draft,
+            format,
+            personaSlug,
+            source: "generated",
+            logPrefix: "/create",
+        });
 
     } catch (error) {
         console.error("Error creating draft:", error);

@@ -1,5 +1,5 @@
 import "server-only";
-import { computeTokenCost } from "./pricing";
+import { computeTokenCost, hasRate } from "./pricing";
 
 /**
  * API usage ledger client.
@@ -62,6 +62,16 @@ export interface UsageEvent extends RecordUsageInput {
  */
 export async function recordUsage(input: RecordUsageInput): Promise<void> {
     if (!isConfigured()) return;
+
+    // Warn when a token-metered call has no rate row — its cost silently logs as
+    // $0, so the dashboard under-reports spend. Add the model to pricing.ts.
+    if (
+        input.costDollars === undefined &&
+        (input.inputTokens || input.outputTokens) &&
+        !hasRate(input.model)
+    ) {
+        console.warn(`recordUsage: no price row for model "${input.model}" — cost recorded as $0.`);
+    }
 
     const costDollars =
         input.costDollars ??

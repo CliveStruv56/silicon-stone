@@ -18,6 +18,7 @@ export function DynamicCTA({
 }: DynamicCTAProps) {
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [errorMsg, setErrorMsg] = useState('')
 
   const { headline, subheadline } = getDynamicCTA(primaryPersona)
 
@@ -26,12 +27,27 @@ export function DynamicCTA({
     if (!email) return
 
     setStatus('loading')
+    setErrorMsg('')
 
-    // Simulate API call - replace with actual newsletter signup
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    try {
+      const res = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
 
-    setStatus('success')
-    setEmail('')
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || 'Failed to subscribe')
+      }
+
+      setStatus('success')
+      setEmail('')
+      window.plausible?.('Newsletter+Subscribe')
+    } catch (err) {
+      setStatus('error')
+      setErrorMsg(err instanceof Error ? err.message : 'Something went wrong')
+    }
   }
 
   const getTierAccent = () => {
@@ -89,6 +105,12 @@ export function DynamicCTA({
             {status === 'loading' ? 'Subscribing...' : 'Subscribe'}
           </Button>
         </form>
+      )}
+
+      {status === 'error' && (
+        <p className="text-sm text-alert-red mt-2">
+          {errorMsg || 'Something went wrong. Please try again.'}
+        </p>
       )}
 
       <p className="text-xs text-text-muted/60 mt-3">

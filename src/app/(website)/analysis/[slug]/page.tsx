@@ -18,6 +18,7 @@ import { sanityFetch } from '@/sanity/lib/live'
 import { ARTICLE_QUERY, ARTICLE_SLUGS_QUERY } from '@/sanity/lib/queries'
 import { urlFor } from '@/sanity/lib/image'
 import { getPersonaLabel } from '@/lib/personas'
+import { formatDate } from '@/lib/format'
 
 type Props = {
   params: Promise<{ slug: string }>
@@ -59,14 +60,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: article.seo?.metaTitle || `${article.title} | Silicon and Stone`,
     description: article.seo?.metaDescription || article.stoneTruth || article.excerpt,
   }
-}
-
-function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  })
 }
 
 type PortableTextBlock = {
@@ -170,7 +163,7 @@ export default async function ArticlePage({ params }: Props) {
                 <>
                   <span className="text-border-subtle">|</span>
                   <time dateTime={article.publishedAt}>
-                    {formatDate(article.publishedAt)}
+                    {formatDate(article.publishedAt, 'long')}
                   </time>
                 </>
               )}

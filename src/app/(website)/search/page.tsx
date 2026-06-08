@@ -6,19 +6,11 @@ import { Badge } from '@/components/ui/badge'
 import { sanityFetch } from '@/sanity/lib/live'
 import { SEARCH_ARTICLES_QUERY } from '@/sanity/lib/queries'
 import SearchForm from './SearchForm'
+import { formatDate } from '@/lib/format'
 
 export const metadata: Metadata = {
   title: 'Search | Silicon and Stone',
   description: 'Search our archive of forensic technopolitics analysis.',
-}
-
-// Helper to format date
-function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  })
 }
 
 // Sanity Types (Simplified)

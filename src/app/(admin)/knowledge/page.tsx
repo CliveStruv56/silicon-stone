@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Search, ExternalLink, FileText, Video, BookOpen, Zap, Plus, RefreshCw } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
+import { formatDate } from '@/lib/format'
 
 type SemanticResult = {
   id: string
@@ -69,15 +70,6 @@ const CONTENT_TYPE_ICONS: Record<string, React.ElementType> = {
   deepdive: BookOpen,
   guide: FileText,
   youtube: Video,
-}
-
-function formatDate(dateString: string) {
-  if (!dateString) return ''
-  return new Date(dateString).toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  })
 }
 
 export default function KnowledgePage() {
@@ -288,7 +280,7 @@ export default function KnowledgePage() {
                 <div className="flex gap-2 items-center flex-wrap">
                   <Badge variant={source.status === 'processed' ? 'secondary' : 'outline'}>{source.status}</Badge>
                   <span className="text-xs text-muted-foreground">{source.sourceType}</span>
-                  <span className="text-xs text-muted-foreground">{formatDate(source.capturedAt)}</span>
+                  <span className="text-xs text-muted-foreground">{formatDate(source.capturedAt, 'gb')}</span>
                 </div>
                 <p className="font-medium text-sm mt-2">{source.title}</p>
                 <p className="text-xs text-muted-foreground mt-1">{source.sourceId}</p>
@@ -375,7 +367,7 @@ export default function KnowledgePage() {
               <div key={candidate._id} className="border border-border rounded-md p-3">
                 <div className="flex gap-2 items-center flex-wrap">
                   <Badge variant={candidate.status === 'filed' ? 'secondary' : 'outline'}>{candidate.status}</Badge>
-                  <span className="text-xs text-muted-foreground">{formatDate(candidate.createdAt)}</span>
+                  <span className="text-xs text-muted-foreground">{formatDate(candidate.createdAt, 'gb')}</span>
                 </div>
                 <p className="font-medium text-sm mt-2">{candidate.title}</p>
                 <p className="text-xs text-muted-foreground mt-1">{candidate.candidateId}</p>
@@ -448,7 +440,7 @@ export default function KnowledgePage() {
                           {result.personas.map((persona) => <span key={persona} className="text-xs px-1.5 py-0.5 bg-muted rounded text-muted-foreground">{persona}</span>)}
                         </div>
                       )}
-                      {result.publishedAt && <p className="text-xs text-muted-foreground mt-2">{formatDate(result.publishedAt)}</p>}
+                      {result.publishedAt && <p className="text-xs text-muted-foreground mt-2">{formatDate(result.publishedAt, 'gb')}</p>}
                     </div>
                     <div className="flex flex-col gap-2 flex-shrink-0">
                       <Link href={`/analysis/${result.slug}`} target="_blank" className="flex items-center gap-1 text-xs text-primary hover:underline">

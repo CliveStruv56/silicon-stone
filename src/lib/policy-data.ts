@@ -635,11 +635,12 @@ export const INDUSTRIES = [
   'Advertising',
 ]
 
-// Company size options
+// Company size options. (The friction adjustment lives in the page's
+// SIZE_CONTEXT.modifier; the previous `multiplier` here was never read.)
 export const COMPANY_SIZES = [
-  { value: 'startup', label: 'Startup (<50 employees)', multiplier: 0.5 },
-  { value: 'sme', label: 'SME (50-250 employees)', multiplier: 0.8 },
-  { value: 'enterprise', label: 'Enterprise (250+ employees)', multiplier: 1.0 },
+  { value: 'startup', label: 'Startup (<50 employees)' },
+  { value: 'sme', label: 'SME (50-250 employees)' },
+  { value: 'enterprise', label: 'Enterprise (250+ employees)' },
 ]
 
 // Utility functions

@@ -1,3 +1,4 @@
+import 'server-only'
 import OpenAI from 'openai'
 import { recordUsage } from './usage'
 
@@ -14,23 +15,35 @@ function getClient(): OpenAI {
 export const EMBEDDING_MODEL = 'text-embedding-3-small'
 export const EMBEDDING_DIMENSIONS = 1024
 
+// text-embedding-3-* accept ~8191 tokens. Cap input well under that (~6k tokens)
+// so a long article can't hard-fail the embed call (and silently leave the
+// article unindexed via the vectorize webhook).
+const MAX_EMBEDDING_CHARS = 24_000
+
 export async function generateEmbedding(text: string): Promise<number[]> {
+  const input = text.length > MAX_EMBEDDING_CHARS ? text.slice(0, MAX_EMBEDDING_CHARS) : text
+
   const response = await getClient().embeddings.create({
     model: EMBEDDING_MODEL,
-    input: text,
+    input,
     dimensions: EMBEDDING_DIMENSIONS,
   })
 
-  // Record token usage / cost for the analytics dashboard (non-fatal).
+  // Record token usage / cost for the analytics dashboard. Fire-and-forget so
+  // the ledger round-trip never adds latency to the caller.
   // Embeddings bill on input tokens only (prompt_tokens === total_tokens).
-  await recordUsage({
+  void recordUsage({
     service: "openai",
     model: EMBEDDING_MODEL,
     operation: "embedding",
     inputTokens: response.usage?.prompt_tokens,
-  })
+  }).catch(() => {})
 
-  return response.data[0].embedding
+  const embedding = response.data?.[0]?.embedding
+  if (!embedding) {
+    throw new Error('Embedding API returned no data')
+  }
+  return embedding
 }
 
 type PortableTextBlock = {

@@ -12,90 +12,77 @@ export function markdownToPortableText(markdown: string): unknown[] {
   const blocks: unknown[] = []
   const lines = markdown.split('\n')
   let currentParagraph: string[] = []
+  let currentQuote: string[] = []
 
   const flushParagraph = () => {
     if (currentParagraph.length === 0) return
-
     const text = currentParagraph.join(' ').trim()
     if (text) {
-      blocks.push({
-        _type: 'block',
-        _key: key(),
-        style: 'normal',
-        markDefs: [],
-        children: parseInlineMarkdown(text),
-      })
+      const { children, markDefs } = parseInlineMarkdown(text)
+      blocks.push({ _type: 'block', _key: key(), style: 'normal', markDefs, children })
     }
     currentParagraph = []
   }
 
+  const flushQuote = () => {
+    if (currentQuote.length === 0) return
+    const text = currentQuote.join(' ').trim()
+    if (text) {
+      const { children, markDefs } = parseInlineMarkdown(text)
+      blocks.push({ _type: 'block', _key: key(), style: 'blockquote', markDefs, children })
+    }
+    currentQuote = []
+  }
+
+  const flushAll = () => {
+    flushParagraph()
+    flushQuote()
+  }
+
+  const pushBlock = (style: string, text: string, extra: Record<string, unknown> = {}) => {
+    flushAll()
+    const { children, markDefs } = parseInlineMarkdown(text)
+    blocks.push({ _type: 'block', _key: key(), style, markDefs, children, ...extra })
+  }
+
   for (const line of lines) {
+    // Accumulate consecutive blockquote lines into a single blockquote block so
+    // multi-line quotes aren't folded into the following paragraph.
+    if (line.startsWith('> ') || line.trimEnd() === '>') {
+      flushParagraph()
+      currentQuote.push(line.replace(/^>\s?/, ''))
+      continue
+    }
+    // A non-quote line ends any open quote.
+    flushQuote()
+
     if (line.trim() === '---') {
       flushParagraph()
       continue
     }
 
     if (line.startsWith('### ')) {
-      flushParagraph()
-      blocks.push({
-        _type: 'block',
-        _key: key(),
-        style: 'h3',
-        markDefs: [],
-        children: [span(line.replace(/^###\s*/, ''))],
-      })
+      pushBlock('h3', line.replace(/^###\s*/, ''))
       continue
     }
 
     if (line.startsWith('## ')) {
-      flushParagraph()
-      blocks.push({
-        _type: 'block',
-        _key: key(),
-        style: 'h2',
-        markDefs: [],
-        children: [span(line.replace(/^##\s*/, ''))],
-      })
+      pushBlock('h2', line.replace(/^##\s*/, ''))
       continue
     }
 
     if (line.startsWith('# ')) {
-      flushParagraph()
-      blocks.push({
-        _type: 'block',
-        _key: key(),
-        style: 'h1',
-        markDefs: [],
-        children: [span(line.replace(/^#\s*/, ''))],
-      })
+      pushBlock('h1', line.replace(/^#\s*/, ''))
       continue
     }
 
     if (line.startsWith('- ') || line.startsWith('* ')) {
-      flushParagraph()
-      blocks.push({
-        _type: 'block',
-        _key: key(),
-        style: 'normal',
-        listItem: 'bullet',
-        level: 1,
-        markDefs: [],
-        children: parseInlineMarkdown(line.replace(/^[-*]\s*/, '')),
-      })
+      pushBlock('normal', line.replace(/^[-*]\s*/, ''), { listItem: 'bullet', level: 1 })
       continue
     }
 
     if (/^\d+\.\s/.test(line)) {
-      flushParagraph()
-      blocks.push({
-        _type: 'block',
-        _key: key(),
-        style: 'normal',
-        listItem: 'number',
-        level: 1,
-        markDefs: [],
-        children: parseInlineMarkdown(line.replace(/^\d+\.\s*/, '')),
-      })
+      pushBlock('normal', line.replace(/^\d+\.\s*/, ''), { listItem: 'number', level: 1 })
       continue
     }
 
@@ -104,47 +91,64 @@ export function markdownToPortableText(markdown: string): unknown[] {
       continue
     }
 
-    if (line.startsWith('> ')) {
-      flushParagraph()
-      blocks.push({
-        _type: 'block',
-        _key: key(),
-        style: 'blockquote',
-        markDefs: [],
-        children: parseInlineMarkdown(line.replace(/^>\s*/, '')),
-      })
-      continue
-    }
-
     currentParagraph.push(line)
   }
 
-  flushParagraph()
+  flushAll()
   return blocks
 }
 
-function parseInlineMarkdown(text: string): unknown[] {
-  const parts: { text: string; bold: boolean }[] = []
-  const boldRegex = /\*\*(.+?)\*\*/g
-  let match
-  let currentIndex = 0
+const SAFE_LINK = /^(https?:\/\/|mailto:)/i
 
-  while ((match = boldRegex.exec(text)) !== null) {
-    if (match.index > currentIndex) {
-      parts.push({ text: text.slice(currentIndex, match.index), bold: false })
+/**
+ * Parse inline markdown into Portable Text spans + the markDefs they reference.
+ * Supports links ([text](url)), bold (**), inline code (`code`) and italics (*).
+ * Links with unsafe/relative hrefs are rendered as plain text (the schema only
+ * permits http/https/mailto).
+ */
+function parseInlineMarkdown(text: string): { children: unknown[]; markDefs: unknown[] } {
+  const children: unknown[] = []
+  const markDefs: unknown[] = []
+
+  // Order matters: links first, then bold before single-star italic.
+  const pattern = /\[([^\]]+)\]\(([^)\s]+)\)|\*\*(.+?)\*\*|`([^`]+)`|\*(?!\*)([^*]+?)\*(?!\*)/g
+
+  let last = 0
+  let match: RegExpExecArray | null
+  while ((match = pattern.exec(text)) !== null) {
+    if (match.index > last) {
+      children.push(span(text.slice(last, match.index)))
     }
-    parts.push({ text: match[1], bold: true })
-    currentIndex = match.index + match[0].length
+
+    if (match[1] !== undefined) {
+      // Link: [label](href)
+      const label = match[1]
+      const href = match[2]
+      if (SAFE_LINK.test(href)) {
+        const linkKey = key()
+        markDefs.push({ _type: 'link', _key: linkKey, href })
+        children.push(span(label, [linkKey]))
+      } else {
+        children.push(span(label))
+      }
+    } else if (match[3] !== undefined) {
+      children.push(span(match[3], ['strong']))
+    } else if (match[4] !== undefined) {
+      children.push(span(match[4], ['code']))
+    } else if (match[5] !== undefined) {
+      children.push(span(match[5], ['em']))
+    }
+
+    last = match.index + match[0].length
   }
 
-  if (currentIndex < text.length) {
-    parts.push({ text: text.slice(currentIndex), bold: false })
+  if (last < text.length) {
+    children.push(span(text.slice(last)))
   }
 
-  if (parts.length === 0) {
-    return [span(text)]
+  if (children.length === 0) {
+    children.push(span(text))
   }
 
-  return parts.map(part => span(part.text, part.bold ? ['strong'] : []))
+  return { children, markDefs }
 }
-

@@ -34,6 +34,7 @@ const frameworks = [
     color: 'text-stone-teal',
     bgColor: 'bg-stone-teal/10',
     borderColor: 'border-stone-teal/30',
+    hoverBorderColor: 'hover:border-stone-teal/30',
     process: 'Map supplier networks, identify chokepoints, assess geographic concentration risk',
     tool: 'Supply Chain Mapper',
     toolHref: '/tools/supply-chain-mapper',
@@ -46,6 +47,7 @@ const frameworks = [
     color: 'text-silicon-amber',
     bgColor: 'bg-silicon-amber/10',
     borderColor: 'border-silicon-amber/30',
+    hoverBorderColor: 'hover:border-silicon-amber/30',
     process: 'Compare jurisdictions, identify gaps, build transatlantic compliance roadmaps',
     tool: 'Policy Stress-Test',
     toolHref: '/tools/policy-stress-test',
@@ -58,6 +60,7 @@ const frameworks = [
     color: 'text-alert-red',
     bgColor: 'bg-alert-red/10',
     borderColor: 'border-alert-red/30',
+    hoverBorderColor: 'hover:border-alert-red/30',
     process: 'Build scenarios, model impacts by sector, quantify exposure in euros',
     tool: 'Scenario Modeler',
     toolHref: '/tools/scenario-modeler',
@@ -70,6 +73,7 @@ const frameworks = [
     color: 'text-text-muted',
     bgColor: 'bg-surface-elevated',
     borderColor: 'border-border-subtle',
+    hoverBorderColor: 'hover:border-border-subtle',
     process: 'Compare to past cycles, identify structural vs. temporary changes',
     tool: 'Compliance Checker',
     toolHref: '/tools/compliance-checker',
@@ -283,7 +287,7 @@ export default function ServicesPage() {
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.1 }}
                 >
-                  <Card className={`h-full bg-stone-charcoal border-border-subtle hover:${framework.borderColor} transition-colors`}>
+                  <Card className={`h-full bg-stone-charcoal border-border-subtle ${framework.hoverBorderColor} transition-colors`}>
                     <CardHeader>
                       <div className={`w-10 h-10 rounded-lg ${framework.bgColor} ${framework.borderColor} border flex items-center justify-center mb-3`}>
                         <Icon className={`w-5 h-5 ${framework.color}`} />

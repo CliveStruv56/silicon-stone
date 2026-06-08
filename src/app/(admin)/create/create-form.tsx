@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, Zap, FileText, Search, BrainCircuit, ExternalLink, Activity, Video, BookOpen } from "lucide-react";
 import { startResearch, pollResearchJob, createDraftFromResearch } from "./actions";
-import { PersonaData } from "@/lib/sanity";
+import type { PersonaData } from "@/lib/sanity";
 
 import { ResearchResult, ResearchSource } from "@/types/research";
 

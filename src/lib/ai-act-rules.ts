@@ -628,6 +628,20 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     build: () => transparencyFinding('emotion recognition or biometric categorisation'),
   }),
   rule({
+    id: 'article-50-customer-service',
+    title: 'Customer-facing chatbot transparency trigger',
+    category: 'transparency',
+    legalStatus: 'current-law',
+    source: sources.article50,
+    priority: 304,
+    // A customer-service / user-facing assistant is the canonical Article 50 case.
+    // Fire even if the explicit chatbot transparency box was not ticked, but skip
+    // when it was, to avoid emitting a duplicate transparency finding.
+    when: (answers) =>
+      has(answers, 'primary_use', 'customer-service') && !has(answers, 'transparency', 'chatbot'),
+    build: () => transparencyFinding('a customer-facing or user-facing AI assistant'),
+  }),
+  rule({
     id: 'gpai-product-route',
     title: 'GPAI or AI product route',
     category: 'gpai',

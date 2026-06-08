@@ -1,7 +1,10 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { recordUsage } from './usage';
 
-const CLAUDE_MODEL = "claude-sonnet-4-6";
+// Default model is env-overridable so individual passes (e.g. the voice-edit
+// pass) can be routed to a stronger model without editing code. Keep the pricing
+// table in pricing.ts in lockstep with whatever model id is actually used.
+const DEFAULT_CLAUDE_MODEL = process.env.ANTHROPIC_MODEL?.trim() || "claude-sonnet-4-6";
 
 const API_KEY = process.env.ANTHROPIC_API_KEY ? process.env.ANTHROPIC_API_KEY.trim() : "";
 
@@ -9,7 +12,13 @@ const anthropic = new Anthropic({
     apiKey: API_KEY,
 });
 
-export async function callClaude(system: string, user: string, temperature: number = 0.4, maxTokens: number = 4096) {
+export async function callClaude(
+    system: string,
+    user: string,
+    temperature: number = 0.4,
+    maxTokens: number = 4096,
+    model: string = DEFAULT_CLAUDE_MODEL,
+) {
     if (!API_KEY) {
         if (process.env.NODE_ENV === 'production') {
             throw new Error("ANTHROPIC_API_KEY is not configured.");
@@ -38,7 +47,7 @@ export async function callClaude(system: string, user: string, temperature: numb
 
     try {
         const msg = await anthropic.messages.create({
-            model: CLAUDE_MODEL,
+            model,
             max_tokens: maxTokens,
             temperature,
             system: system,
@@ -47,21 +56,25 @@ export async function callClaude(system: string, user: string, temperature: numb
             ],
         });
 
-        // Record token usage / cost for the analytics dashboard (non-fatal).
-        await recordUsage({
+        // Record token usage / cost for the analytics dashboard. Fire-and-forget
+        // so the ledger round-trip never adds latency to (or breaks) the caller.
+        void recordUsage({
             service: "anthropic",
-            model: CLAUDE_MODEL,
+            model,
             operation: "messages",
             inputTokens: msg.usage?.input_tokens,
             outputTokens: msg.usage?.output_tokens,
-        });
+        }).catch(() => {});
 
-        // The SDK returns ContentBlock[], likely of type { type: 'text', text: '...' }
-        // We extract the first text block.
-        const textBlock = msg.content[0];
-        if (textBlock.type === 'text') {
-            return textBlock.text;
-        }
+        // Concatenate every text block. Indexing content[0] breaks when a
+        // non-text block (e.g. a thinking block) leads the response.
+        const text = msg.content
+            .filter((block): block is Anthropic.TextBlock => block.type === 'text')
+            .map((block) => block.text)
+            .join('\n')
+            .trim();
+
+        if (text) return text;
 
         return "Error: No text content returned from Claude.";
 

@@ -2,7 +2,8 @@
 
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-import { getPersonaLabel, getPersonaColor } from '@/lib/personas'
+import { getPersonaLabel, getPersonaBadgeClasses } from '@/lib/personas'
+import { formatDate } from '@/lib/format'
 
 interface PulseHeaderProps {
   impactScore?: number
@@ -12,14 +13,6 @@ interface PulseHeaderProps {
   publishedAt?: string
   readingTime?: number
   className?: string
-}
-
-function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  })
 }
 
 function getTierConfig(tier?: string) {
@@ -108,10 +101,7 @@ export function PulseHeader({
         {primaryPersona && (
           <Badge
             variant="outline"
-            className={cn(
-              'text-xs',
-              `border-${getPersonaColor(primaryPersona)}/50 text-${getPersonaColor(primaryPersona)}`
-            )}
+            className={cn('text-xs', getPersonaBadgeClasses(primaryPersona))}
           >
             {getPersonaLabel(primaryPersona)}
           </Badge>

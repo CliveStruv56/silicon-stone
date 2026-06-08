@@ -1,14 +1,11 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import Image from 'next/image'
 import type { Metadata } from 'next'
 
 import { Header, Footer } from '@/components/layout'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { sanityFetch } from '@/sanity/lib/live'
 import { CATEGORY_QUERY, ARTICLES_BY_CATEGORY_QUERY, CATEGORIES_QUERY } from '@/sanity/lib/queries'
-import { urlFor } from '@/sanity/lib/image'
+import { ArticleGridCard } from '@/components/article/ArticleGridCard'
 
 type Props = {
   params: Promise<{ slug: string }>
@@ -53,14 +50,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: `${category.title} | Analysis | Silicon and Stone`,
     description: category.description || `Articles about ${category.title}`,
   }
-}
-
-function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  })
 }
 
 export default async function CategoryPage({ params }: Props) {
@@ -185,68 +174,7 @@ export default async function CategoryPage({ params }: Props) {
               {articles && articles.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {articles.map((article: Article) => (
-                    <Card
-                      key={article._id}
-                      className="bg-stone-charcoal border-border-subtle overflow-hidden hover:border-stone-teal/50 transition-colors"
-                    >
-                      {article.mainImage?.asset ? (
-                        <div className="relative aspect-[16/9]">
-                          <Image
-                            src={urlFor(article.mainImage).width(600).height(338).url()}
-                            alt={article.mainImage.alt || article.title}
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                      ) : (
-                        <div className="relative aspect-[16/9] bg-gradient-to-br from-stone-charcoal to-slate-deep flex items-center justify-center border-b border-border-subtle">
-                          <div className="text-center">
-                            <div className="text-2xl font-mono font-bold text-silicon-amber/20">S&amp;S</div>
-                            <div className="text-[10px] font-mono uppercase tracking-widest text-text-muted/30 mt-1">Forensic Technopolitics</div>
-                          </div>
-                        </div>
-                      )}
-                      <CardHeader className="pb-2">
-                        <div className="flex flex-wrap items-center gap-2 mb-2">
-                          {article.categories?.slice(0, 2).map((cat: Category) => (
-                            <Badge
-                              key={cat._id}
-                              variant="secondary"
-                              className="bg-stone-teal/20 text-stone-teal text-xs"
-                            >
-                              {cat.title}
-                            </Badge>
-                          ))}
-                          {article.contentType && (
-                            <Badge
-                              variant="outline"
-                              className="text-text-muted border-text-muted/30 text-xs"
-                            >
-                              {article.contentType === 'deepdive' ? 'Deep Dive' :
-                                article.contentType === 'signal' ? 'Signal' : 'Guide'}
-                            </Badge>
-                          )}
-                        </div>
-                        <CardTitle className="text-lg font-semibold text-text-primary hover:text-silicon-amber transition-colors">
-                          <Link href={`/analysis/${article.slug}`}>{article.title}</Link>
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        {article.excerpt && (
-                          <p className="text-sm text-text-muted line-clamp-2 mb-3">
-                            {article.excerpt}
-                          </p>
-                        )}
-                        {article.publishedAt && (
-                          <time
-                            dateTime={article.publishedAt}
-                            className="text-xs text-text-muted"
-                          >
-                            {formatDate(article.publishedAt)}
-                          </time>
-                        )}
-                      </CardContent>
-                    </Card>
+                    <ArticleGridCard key={article._id} article={article} />
                   ))}
                 </div>
               ) : (

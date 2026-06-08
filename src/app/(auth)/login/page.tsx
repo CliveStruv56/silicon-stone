@@ -16,6 +16,7 @@ export default function LoginPage() {
                         type="password"
                         name="password"
                         placeholder="Enter access code"
+                        aria-label="Access code"
                         className="w-full p-3 bg-black border border-stone-700 rounded text-stone-300 focus:border-blue-500 outline-none"
                     />
                     <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">

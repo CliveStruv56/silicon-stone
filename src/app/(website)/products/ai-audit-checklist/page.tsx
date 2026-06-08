@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
+import { isConfiguredCheckout } from '@/lib/checkout'
 import {
   CheckCircle,
   FileSpreadsheet,
@@ -48,10 +49,6 @@ const contents = [
 ]
 
 const checkoutUrl = process.env.NEXT_PUBLIC_LEMONSQUEEZY_CHECKLIST_URL
-
-function isConfiguredCheckout(url?: string) {
-  return Boolean(url && !url.includes('example.com'))
-}
 
 export default function AIAuditChecklistPage() {
   const checkoutReady = isConfiguredCheckout(checkoutUrl)

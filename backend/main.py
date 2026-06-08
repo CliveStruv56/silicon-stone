@@ -118,7 +118,21 @@ def _split_csv(value: str) -> list[str]:
     return [item.strip() for item in value.split(",") if item.strip()]
 
 
+def _client_ip(request: Request) -> str:
+    # Behind the Railway proxy, x-forwarded-for's first entry is the client IP.
+    # Keyed instead of the user-supplied email so an attacker can't rotate the
+    # email per request to mint a fresh bucket each time.
+    forwarded = request.headers.get("x-forwarded-for", "")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    if request.client:
+        return request.client.host
+    return "unknown"
+
+
 def _check_rate_limit(key: str, limit: int, window_seconds: int) -> int | None:
+    # NOTE: in-memory and per-process. With >1 replica the effective limit is
+    # limit * replicas; move to the shared Redis store for strict limiting.
     now = time.time()
     window_start = now - window_seconds
     requests = [timestamp for timestamp in RATE_LIMITS.get(key, []) if timestamp > window_start]
@@ -508,7 +522,23 @@ app = FastAPI(
     redoc_url=None,
 )
 
-allowed_origins = _split_csv(os.getenv("ALLOWED_ORIGINS", "http://localhost:3000"))
+def _validate_origins(origins: list[str]) -> list[str]:
+    # With allow_credentials=True a wildcard "*" is invalid and unsafe, and the
+    # browser requires exact, well-formed origins. Drop anything else.
+    valid = [o for o in origins if o.startswith(("http://", "https://")) and o != "*"]
+    dropped = [o for o in origins if o not in valid]
+    if dropped:
+        logger.warning("Ignoring invalid/unsafe CORS origins: %s", dropped)
+    return valid
+
+
+_raw_origins = os.getenv("ALLOWED_ORIGINS")
+allowed_origins = _validate_origins(_split_csv(_raw_origins or "http://localhost:3000"))
+if not _raw_origins:
+    logger.warning("ALLOWED_ORIGINS not set; defaulting to http://localhost:3000 — set it explicitly in production.")
+if not allowed_origins:
+    logger.error("No valid ALLOWED_ORIGINS configured; browser requests will be blocked by CORS.")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
@@ -565,19 +595,20 @@ def subscribe(payload: SubscribeRequest, request: Request) -> dict[str, bool]:
     email = payload.email.strip()[:254].lower() if isinstance(payload.email, str) else ""
     tag = payload.tag if payload.tag in ALLOWED_SUBSCRIBE_TAGS else None
 
-    retry_after = _check_rate_limit(f"subscribe:{email}", limit=10, window_seconds=15 * 60)
+    # Validate before consuming a rate-limit slot so malformed input can't burn quota.
+    if not email:
+        raise HTTPException(status_code=400, detail="Email is required")
+
+    if not EMAIL_RE.match(email):
+        raise HTTPException(status_code=400, detail="Invalid email format")
+
+    retry_after = _check_rate_limit(f"subscribe:{_client_ip(request)}", limit=10, window_seconds=15 * 60)
     if retry_after is not None:
         raise HTTPException(
             status_code=429,
             detail="Too many requests",
             headers={"Retry-After": str(retry_after)},
         )
-
-    if not email:
-        raise HTTPException(status_code=400, detail="Email is required")
-
-    if not EMAIL_RE.match(email):
-        raise HTTPException(status_code=400, detail="Invalid email format")
 
     api_key, form_id = _kit_env()
     headers = {
@@ -640,14 +671,7 @@ def contact(payload: ContactRequest, request: Request) -> dict[str, bool]:
     interest = _normalize_field(payload.interest, CONTACT_FIELD_LENGTHS["interest"])
     message = _normalize_field(payload.message, CONTACT_FIELD_LENGTHS["message"])
 
-    retry_after = _check_rate_limit(f"contact:{email}", limit=5, window_seconds=15 * 60)
-    if retry_after is not None:
-        raise HTTPException(
-            status_code=429,
-            detail="Too many requests",
-            headers={"Retry-After": str(retry_after)},
-        )
-
+    # Validate before consuming a rate-limit slot so malformed input can't burn quota.
     if not email:
         raise HTTPException(status_code=400, detail="Email is required")
 
@@ -656,6 +680,14 @@ def contact(payload: ContactRequest, request: Request) -> dict[str, bool]:
 
     if not EMAIL_RE.match(email):
         raise HTTPException(status_code=400, detail="Invalid email format")
+
+    retry_after = _check_rate_limit(f"contact:{_client_ip(request)}", limit=5, window_seconds=15 * 60)
+    if retry_after is not None:
+        raise HTTPException(
+            status_code=429,
+            detail="Too many requests",
+            headers={"Retry-After": str(retry_after)},
+        )
 
     api_key, form_id = _kit_env()
     headers = {

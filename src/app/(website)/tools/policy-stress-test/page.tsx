@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Header, Footer } from '@/components/layout'
 import { EmailGateOverlay } from '@/components/tools/EmailGateOverlay'
+import { usePrintGate } from '@/components/tools/usePrintGate'
 import { CopyMarkdownButton } from '@/components/tools/CopyMarkdownButton'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -37,15 +38,18 @@ import {
   Mail,
 } from 'lucide-react'
 
+// Friction modifier rises with organisational governance overhead
+// (startup < SME < enterprise). Previously SME (0.2) sat below startup (0.4),
+// which was non-monotonic; values reordered to match the resourceNotes.
 const SIZE_CONTEXT = {
   startup: {
     label: 'Startup',
-    modifier: 0.4,
+    modifier: 0.2,
     resourceNote: 'Keep the first pass narrow: one owner, one system inventory, counsel only for high-risk findings.',
   },
   sme: {
     label: 'SME',
-    modifier: 0.2,
+    modifier: 0.4,
     resourceNote: 'Assign a named policy owner and one operational owner so the response does not sit only with legal.',
   },
   enterprise: {
@@ -285,8 +289,7 @@ export default function PolicyStressTestPage() {
   const [selectedEuPolicy, setSelectedEuPolicy] = useState<string>('eu-ai-act')
   const [selectedUsPolicy, setSelectedUsPolicy] = useState<string>('us-export-controls')
   const [showResults, setShowResults] = useState(false)
-  const [isUnlocked, setIsUnlocked] = useState(false)
-  const [showGate, setShowGate] = useState(false)
+  const { showGate, requestBrief, unlock, dismiss } = usePrintGate()
 
   const euPolicies = POLICIES.filter(p => p.jurisdiction === 'EU')
   const usPolicies = POLICIES.filter(p => p.jurisdiction === 'US')
@@ -336,20 +339,6 @@ export default function PolicyStressTestPage() {
       // brief / email export — see handleRequestEmailBrief.
       setShowResults(true)
     }
-  }
-
-  const handleRequestEmailBrief = () => {
-    if (isUnlocked) {
-      window.print()
-    } else {
-      setShowGate(true)
-    }
-  }
-
-  const handleGateUnlock = () => {
-    setIsUnlocked(true)
-    setShowGate(false)
-    setTimeout(() => window.print(), 200)
   }
 
   return (
@@ -557,7 +546,7 @@ export default function PolicyStressTestPage() {
                         />
                         <Button
                           variant="outline"
-                          onClick={handleRequestEmailBrief}
+                          onClick={requestBrief}
                           className="border-silicon-amber text-silicon-amber hover:bg-silicon-amber/10"
                         >
                           <Mail className="w-4 h-4 mr-2" />
@@ -711,8 +700,8 @@ export default function PolicyStressTestPage() {
       <Footer />
       <EmailGateOverlay
         isOpen={showGate}
-        onUnlock={handleGateUnlock}
-        onDismiss={() => setShowGate(false)}
+        onUnlock={unlock}
+        onDismiss={dismiss}
         toolName="Policy Stress-Test"
         resultLabel="the printable brief"
       />

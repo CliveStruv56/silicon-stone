@@ -1,20 +1,43 @@
+import crypto from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@sanity/client'
+import { apiVersion, dataset, projectId } from '@/sanity/env'
 import { getPineconeIndex } from '@/lib/pinecone'
 import { generateEmbedding, extractArticleText, buildArticleMetadata } from '@/lib/embeddings'
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
 
 const sanity = createClient({
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET ?? 'production',
-  apiVersion: '2024-01-01',
+  projectId,
+  dataset,
+  apiVersion,
   token: process.env.SANITY_API_READ_TOKEN,
   useCdn: false,
 })
 
+/** Constant-time secret comparison to avoid leaking the secret via timing. */
+function secretMatches(provided: string | null, expected: string | undefined): boolean {
+  if (!provided || !expected) return false
+  const a = Buffer.from(provided)
+  const b = Buffer.from(expected)
+  if (a.length !== b.length) return false
+  return crypto.timingSafeEqual(a, b)
+}
+
 export async function POST(req: NextRequest) {
-  // Verify webhook secret
+  // Rate-limit before auth so a leaked/guessed secret can't drive unbounded
+  // paid embedding + index writes.
+  const ip = getClientIp(req)
+  const rl = checkRateLimit(`vectorize:${ip}`, { limit: 120, windowMs: 60_000 })
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: 'Rate limited' },
+      { status: 429, headers: { 'Retry-After': String(rl.retryAfter) } },
+    )
+  }
+
+  // Verify webhook secret (constant-time)
   const secret = req.headers.get('x-sanity-webhook-secret')
-  if (secret !== process.env.SANITY_WEBHOOK_SECRET) {
+  if (!secretMatches(secret, process.env.SANITY_WEBHOOK_SECRET)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

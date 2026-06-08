@@ -2,15 +2,19 @@
  * Seed Categories Script
  * Creates initial content categories in Sanity
  * 
- * Run with: npx tsx scripts/seed-categories.ts
+ * Run with: tsx scripts/seed-categories.ts
  */
 
+import dotenv from 'dotenv'
 import { createClient } from '@sanity/client'
+
+// Match the other scripts: load local env so the Sanity client is configured.
+dotenv.config({ path: '.env.local' })
 
 const client = createClient({
     projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
     dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
-    apiVersion: '2024-01-01',
+    apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2026-01-13',
     token: process.env.SANITY_API_WRITE_TOKEN,
     useCdn: false,
 })
@@ -94,4 +98,7 @@ async function seedCategories() {
     console.log('\n🎉 Done!')
 }
 
-seedCategories()
+seedCategories().catch((err) => {
+    console.error(err)
+    process.exit(1)
+})

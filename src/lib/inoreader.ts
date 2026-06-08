@@ -1,3 +1,5 @@
+import 'server-only';
+
 const API_BASE = 'https://www.inoreader.com/reader/api/0';
 const OAUTH_BASE = 'https://www.inoreader.com/oauth2';
 

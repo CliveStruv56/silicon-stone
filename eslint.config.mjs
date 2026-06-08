@@ -11,11 +11,15 @@ const eslintConfig = defineConfig([
     ".next/**",
     "out/**",
     "build/**",
+    "dist/**",
     "next-env.d.ts",
-    // Local tooling — not part of the project source:
+    // Local tooling / generated outputs — not part of the project source:
     ".agent/**",
+    ".agents/**",
     ".claude/**",
-    "studio-silicon-and-stone/**",
+    ".understand-anything/**",
+    "generated-docs/**",
+    "outputs/**",
   ]),
 ]);
 

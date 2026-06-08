@@ -1,3 +1,4 @@
+import 'server-only';
 import Exa from 'exa-js';
 import { recordUsage } from './usage';
 
@@ -51,12 +52,12 @@ export async function searchExa(query: string, options: ExaSearchOptions = {}) {
         // Record cost for the analytics dashboard (non-fatal). Exa reports the
         // per-request cost on the search response when available.
         const searchCost = (result as { costDollars?: { total?: number } }).costDollars?.total;
-        await recordUsage({
+        void recordUsage({
             service: "exa",
             model: "exa-search",
             operation: "search",
             costDollars: searchCost ?? 0,
-        });
+        }).catch(() => {});
 
         return result.results;
     } catch (e) {
@@ -106,12 +107,12 @@ export async function deepResearchExa(instructions: string): Promise<DeepResearc
         // in-process fallback path; when the Railway backend runs the job it
         // records the event itself at completion, so the two never both fire
         // for one job (research.ts picks one path or the other).
-        await recordUsage({
+        void recordUsage({
             service: "exa",
             model: "exa-research-pro",
             operation: "deep-research",
             costDollars: finished.costDollars?.total ?? 0,
-        });
+        }).catch(() => {});
 
         return {
             content: finished.output.content,

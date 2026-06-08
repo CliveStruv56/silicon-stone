@@ -10,6 +10,7 @@ import { PersonaIntro } from '@/components/briefings/PersonaIntro'
 import { DynamicCTA } from '@/components/article'
 import { cn } from '@/lib/utils'
 import { getPersonaLabel, PERSONAS, type PersonaSlug } from '@/lib/personas'
+import { formatDate } from '@/lib/format'
 
 // Types for Sanity data
 interface Article {
@@ -66,13 +67,6 @@ async function fetchBriefings(url: string, signal: AbortSignal): Promise<Briefin
     throw new Error(`Briefings request failed with ${response.status}`)
   }
   return response.json()
-}
-
-function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-  })
 }
 
 function getTierStyles(tier?: string) {
@@ -143,7 +137,7 @@ function ArticleCard({ article }: { article: Article }) {
           )}
           {article.publishedAt && (
             <span className="text-xs text-text-muted">
-              {formatDate(article.publishedAt)}
+              {formatDate(article.publishedAt, 'short')}
             </span>
           )}
         </div>
@@ -241,7 +235,7 @@ function FeaturedArticle({ article }: { article: Article }) {
           {/* Meta */}
           <div className="flex items-center gap-4 text-sm text-text-muted">
             {article.publishedAt && (
-              <span>{formatDate(article.publishedAt)}</span>
+              <span>{formatDate(article.publishedAt, 'short')}</span>
             )}
             {article.personas && article.personas.length > 0 && (
               <div className="flex gap-1">

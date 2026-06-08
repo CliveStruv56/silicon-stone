@@ -5,6 +5,7 @@ import { ArrowRight } from 'lucide-react'
 import { StaggerContainer, StaggerItem } from '@/components/ui/StaggerContainer'
 import { ForensicCard } from '@/components/ui/ForensicCard'
 import { Badge } from '@/components/ui/badge'
+import { formatDate } from '@/lib/format'
 
 interface Article {
   _id: string
@@ -65,14 +66,6 @@ const tiers: Tier[] = [
     fallbackLatestStatus: 'Q1 2026 Audit in production',
   },
 ]
-
-function formatDate(dateString: string): string {
-  return new Date(dateString).toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  })
-}
 
 function calculateReadTime(tier: TierKey, excerpt?: string): string | null {
   if (tier === 'pulse') return '30 sec scan'
@@ -176,7 +169,7 @@ export function IntelligenceTiers({
                           </h4>
                           <div className="flex items-center gap-2 text-xs font-mono text-text-muted">
                             {article.publishedAt && (
-                              <span>{formatDate(article.publishedAt)}</span>
+                              <span>{formatDate(article.publishedAt, 'gb')}</span>
                             )}
                             {calculateReadTime(tier.key, article.excerpt) && (
                               <>

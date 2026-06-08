@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
+import { isConfiguredCheckout } from '@/lib/checkout'
 import {
   Shield,
   CheckCircle,
@@ -65,10 +66,6 @@ const sections = [
 const checkoutUrls = {
   standard: process.env.NEXT_PUBLIC_LEMONSQUEEZY_TOOLKIT_STANDARD_URL,
   professional: process.env.NEXT_PUBLIC_LEMONSQUEEZY_TOOLKIT_PROFESSIONAL_URL,
-}
-
-function isConfiguredCheckout(url?: string) {
-  return Boolean(url && !url.includes('example.com'))
 }
 
 export default function AIActToolkitPage() {

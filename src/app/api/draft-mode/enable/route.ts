@@ -9,7 +9,9 @@ export async function GET(req: NextRequest) {
 
   const { searchParams } = new URL(req.url)
   const slug = searchParams.get('slug')
-  const target = slug ? `/analysis/${slug}` : '/'
+  // Only accept well-formed slugs so the constructed path can't traverse out of /analysis/.
+  const isValidSlug = slug ? /^[a-z0-9-]+$/.test(slug) : false
+  const target = isValidSlug ? `/analysis/${slug}` : '/'
 
   const dm = await draftMode()
   dm.enable()

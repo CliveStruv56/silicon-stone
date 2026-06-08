@@ -1,6 +1,8 @@
+import 'server-only';
 import { createClient } from '@sanity/client';
 import crypto from 'crypto';
 import { apiVersion, dataset, projectId } from '../sanity/env';
+import { CATEGORIES_QUERY } from '../sanity/lib/queries';
 import { markdownToPortableText } from './markdown-to-portable-text';
 
 const token = process.env.SANITY_API_WRITE_TOKEN;
@@ -46,13 +48,9 @@ export interface CategoryOption {
 
 export async function listSanityCategories(): Promise<CategoryOption[]> {
     if (!token) return [];
-    const query = `*[_type == "category"] | order(title asc) {
-        _id,
-        title,
-        "slug": slug.current,
-        description
-    }`;
-    return await writeClient.fetch(query);
+    // Single source of truth for the category projection (shared with the public
+    // read paths). Same projection {_id, title, slug, description}.
+    return await writeClient.fetch(CATEGORIES_QUERY);
 }
 
 async function resolveCategoryRefs(slugs: string[]): Promise<{ _type: 'reference'; _ref: string; _key: string }[]> {
@@ -137,10 +135,30 @@ export async function createArticleInSanity(data: ArticleData) {
 
 export async function deleteArticleInSanity(slug: string) {
     if (!token) return; // Skip if no token
-    // We used a deterministic ID: draft.slug
-    const id = `draft.${slug}`;
     try {
-        await writeClient.delete(id);
+        // Resolve real document ids by slug rather than reconstructing an ID, so
+        // this works regardless of the id scheme used at creation time:
+        //   - legacy sync flow:  draft.${fileSlug}      (a published doc)
+        //   - AI-draft flow:     drafts.${uuid}         (a true Sanity draft)
+        //   - any published twin
+        const ids: string[] = await writeClient.fetch(
+            `*[_type == "article" && slug.current == $slug]._id`,
+            { slug }
+        );
+        const targets = new Set<string>(ids);
+        // Always include the legacy deterministic id as a belt-and-braces fallback.
+        targets.add(`draft.${slug}`);
+        // Remove the drafts.* twin for any published id we found.
+        for (const id of [...targets]) {
+            if (!id.startsWith('drafts.')) targets.add(`drafts.${id}`);
+        }
+        await Promise.all(
+            [...targets].map((id) =>
+                writeClient.delete(id).catch(() => {
+                    /* missing id is fine — nothing to delete */
+                })
+            )
+        );
     } catch (e) {
         console.error("Failed to delete from Sanity:", e);
     }

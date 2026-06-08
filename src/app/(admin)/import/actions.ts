@@ -2,8 +2,8 @@
 
 import { extractRawText } from "mammoth";
 import { callClaude } from "@/lib/anthropic";
-import { buildDraftPrompt, extractArticleMetadata, runVoiceEditPass, type DraftFormat } from "@/lib/prompts";
-import { createArticleInSanity, listSanityCategories } from "@/lib/sanity";
+import { buildDraftPrompt, type DraftFormat } from "@/lib/prompts";
+import { parseDraftPayload, finalizeDraft } from "@/lib/draft-pipeline";
 import { requireAdmin } from "@/lib/auth";
 import type { ImportState } from "./types";
 
@@ -68,8 +68,6 @@ export async function importArticle(
             };
         }
 
-        const contentType = format === "deep_dive" ? "deepdive" : "signal";
-
         // Pass 1 — rework the supplied article into the S&S voice + structure via
         // the same unified prompt builder /create uses. Passing `sourceMaterial`
         // switches it into rework mode (preserve facts, rewrite prose) and carries
@@ -85,82 +83,23 @@ export async function importArticle(
         const maxTokens = format === "deep_dive" ? 8192 : 4096;
         const responseText = await callClaude(systemPrompt, userPrompt, 0.4, maxTokens);
 
-        // Extract the JSON object (tolerate stray prose / code fences).
-        let jsonText = responseText;
-        const firstOpen = jsonText.indexOf("{");
-        const lastClose = jsonText.lastIndexOf("}");
-        if (firstOpen !== -1 && lastClose !== -1) {
-            jsonText = jsonText.substring(firstOpen, lastClose + 1);
-        }
+        const draft = parseDraftPayload(responseText);
 
-        const parsed = JSON.parse(jsonText);
-        if (!parsed?.title || !parsed?.content) {
-            return {
-                success: false,
-                message: "The rework step returned an unexpected response. Try again.",
-                articleId: "",
-            };
-        }
-
-        // Pass 3 — voice edit (humanising final pass). Best-effort, same as
-        // /create: Deep Dives audit-only, others rewritten. Runs before Pass 2 so
-        // the metadata reflects the edited body.
-        let voiceEditNotes: string | undefined;
-        try {
-            const edit = await runVoiceEditPass(parsed.title, parsed.content, format as DraftFormat);
-            if (edit) {
-                parsed.content = edit.content;
-                voiceEditNotes = edit.editSummary;
-            }
-        } catch (err) {
-            console.error("[/import] Voice edit pass failed:", err);
-        }
-
-        // Pass 2 — SEO / taxonomy / tier metadata. Best-effort: if it fails the
-        // draft still saves, just without the extra fields (same as /create).
-        let metadata: Awaited<ReturnType<typeof extractArticleMetadata>> | undefined;
-        try {
-            const categoryOptions = await listSanityCategories();
-            metadata = await extractArticleMetadata(
-                parsed.title,
-                parsed.content,
-                personaSlug,
-                categoryOptions,
-                format === "pulse" ? "pulse" : undefined,
-            );
-        } catch (err) {
-            console.error("[/import] Metadata extraction failed:", err);
-        }
-
-        const slug = parsed.title
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/(^-|-$)+/g, "");
-
-        const created = await createArticleInSanity({
-            title: parsed.title,
-            slug,
-            excerpt: metadata?.metaDescription ?? parsed.excerpt ?? "",
-            body: parsed.content,
-            contentType,
-            persona: personaSlug,
-            seoTitle: metadata?.seoTitle,
-            metaDescription: metadata?.metaDescription,
-            stoneTruth: metadata?.stoneTruth,
-            actionableInsights: metadata?.actionableInsights,
-            categorySlugs: metadata?.categorySlugs,
-            intelligenceTier: format === "pulse" ? "pulse" : metadata?.intelligenceTier,
-            methodologyPillars: metadata?.methodologyPillars,
-            voiceEditNotes,
+        // Pass-3 (voice edit) → Pass-2 (metadata) → Sanity write — shared with /create.
+        const created = await finalizeDraft({
+            draft,
+            format: format as DraftFormat,
+            personaSlug,
             source: "imported",
             sourceMaterial: text,
+            logPrefix: "/import",
         });
 
         const articleId = String(created?._id ?? "").replace(/^drafts\./, "");
 
         return {
             success: true,
-            message: `"${parsed.title}" was reworked and saved as a draft.`,
+            message: `"${draft.title}" was reworked and saved as a draft.`,
             articleId,
         };
     } catch (error) {

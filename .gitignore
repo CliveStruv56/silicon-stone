@@ -52,3 +52,10 @@ next-env.d.ts
 
 # Debug logs
 debug_error.log
+
+# Local tooling outputs — not part of the project source (avoid accidental
+# `git add .` committing generated graphs/exports that may embed private content)
+/generated-docs/
+/outputs/
+/.agents/
+.understand-anything/

@@ -128,6 +128,24 @@ export function getPersonaColor(slug: string): string {
 }
 
 /**
+ * Complete, static Tailwind classes for a persona badge (border + text).
+ * These are written as full literals so Tailwind's compiler can see and emit
+ * them. NEVER build these by interpolating a token into `border-${x}` — Tailwind
+ * v4 only generates classes it sees as complete strings.
+ */
+const PERSONA_BADGE_CLASSES: Record<PersonaSlug, string> = {
+  clara: 'border-silicon-amber/50 text-silicon-amber',
+  ian: 'border-stone-teal/50 text-stone-teal',
+  sofia: 'border-tier-pulse/50 text-tier-pulse',
+  robert: 'border-alert-red/50 text-alert-red',
+  citizen: 'border-border-subtle text-text-muted',
+}
+
+export function getPersonaBadgeClasses(slug: string): string {
+  return PERSONA_BADGE_CLASSES[slug as PersonaSlug] || 'border-border-subtle text-text-muted'
+}
+
+/**
  * Get persona by slug
  */
 export function getPersona(slug: string): Persona | undefined {

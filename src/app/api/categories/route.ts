@@ -1,11 +1,6 @@
 import { NextResponse } from 'next/server'
 import { client } from '@/sanity/lib/client'
-
-const CATEGORIES_QUERY = `*[_type == "category"] | order(title asc) {
-  _id,
-  title,
-  "slug": slug.current
-}`
+import { CATEGORIES_QUERY } from '@/sanity/lib/queries'
 
 export async function GET() {
     try {

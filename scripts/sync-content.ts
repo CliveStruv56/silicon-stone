@@ -35,7 +35,7 @@ const forceUpdate = args.includes('--force')
 const client = createClient({
   projectId: SANITY_PROJECT_ID,
   dataset: SANITY_DATASET,
-  apiVersion: '2024-01-01',
+  apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2026-01-13',
   token: SANITY_WRITE_TOKEN,
   useCdn: false,
 })
