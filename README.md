@@ -77,22 +77,27 @@ downgrades for the remaining advisories.
 
 ## Codebase Map (Knowledge Graph)
 
-An interactive knowledge graph of the codebase (files, functions, imports,
-architectural layers, and a guided tour) lives in `.understand-anything/` and is
-committed with the repo. To explore it locally:
+You can explore an interactive knowledge graph of the codebase (files, functions,
+imports, architectural layers, and a guided tour) locally:
 
 ```bash
 npm run graph
 ```
 
-This launches the read-only dashboard viewer and auto-opens it at a localhost
-URL. It only *views* the saved graph — it does not re-analyse code. Notes:
+The graph itself is **generated locally, not committed** — `.understand-anything/`
+is gitignored (it is regenerable and can embed source snippets). On a fresh clone
+you must generate it first by running the `/understand` command in Claude Code
+(which needs the understand-anything plugin). Once
+`.understand-anything/knowledge-graph.json` exists, `npm run graph` launches the
+read-only dashboard viewer and auto-opens it at a localhost URL — it only *views*
+the saved graph, it does not re-analyse code. (If the graph is missing, the script
+just tells you to run `/understand` first.) Notes:
 
 - The viewer binds to `127.0.0.1` only and gates its data endpoints with an
   access token. The token is generated once and cached in the gitignored
   `.understand-anything/.dashboard-token` (never committed, never passed on the
   command line). The same token persists across launches, so the URL is stable.
-- To **regenerate** the graph after code changes, run the `/understand` command
+- To **refresh** the graph after code changes, re-run the `/understand` command
   in Claude Code (incremental after the first build). The dashboard re-reads the
   graph on refresh.
 
