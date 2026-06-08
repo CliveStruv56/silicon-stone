@@ -1,6 +1,6 @@
 # Model Routing Guide
 
-**Last updated:** 2026-05-10. Recommendations age fast — re-check when a major model ships.
+**Last updated:** 2026-06-01 (Claude Code CLI flagship refreshed to Opus 4.8). Recommendations age fast — re-check when a major model ships.
 
 ## ROUTING DIRECTIVE — read this before answering any task
 
@@ -70,7 +70,7 @@ Open-weight model hosted via Vertex. **Not** GPT-5 or Codex. Useful when you spe
 ## When to leave Antigravity for a CLI
 
 ### Claude Code CLI
-- **Anthropic's Opus 4.7** (released April 2026) is one minor version ahead of Antigravity's Opus 4.6: SWE-bench Verified 87.6% vs 80.8% (+6.8pp), self-verification loops, 3.3× higher vision resolution, xhigh effort level, stricter literal instruction-following.
+- **Anthropic's Opus 4.8** is the current Claude flagship and the newest Opus *selectable* in Claude Code — you choose the model, so Claude Code can also run 4.7/4.6 or the Sonnet/Haiku tiers; it isn't pinned to 4.8. It's a newer *version* than Antigravity's Opus 4.6. Its performance is **not** benchmarked in this guide; 4.8 post-dates these figures, so do not assume specific gains without current numbers. For historical reference only, the earlier **Opus 4.7** led Antigravity's 4.6 on SWE-bench Verified 87.6% vs 80.8%, with self-verification loops, 3.3× higher vision resolution, xhigh effort level, and stricter literal instruction-following; 4.8 is the successor to that line.
 - Reach for Claude Code when: you need a very long autonomous coding session (>1 hour, >100K tokens of work), the task benefits from self-verification (security-sensitive code, code generation that must compile first try), or you specifically want strict literal instruction-following.
 
 ### OpenAI Codex CLI
@@ -126,4 +126,4 @@ Open-weight model hosted via Vertex. **Not** GPT-5 or Codex. Useful when you spe
 2. **Recommendations age fast.** A new flagship can flip the matrix overnight. Re-evaluate when any of the three providers ships a major version.
 3. **Cost and rate limits are out of scope** beyond the rough $/M figures. Check your billing tier before assuming Opus 4.6 is affordable for your workload.
 4. **Benchmarks disagree.** Terminal-Bench numbers in particular vary by scaffold and run. Treat differences under ~3 points as noise.
-5. **Antigravity is one minor version behind on Claude.** It ships Opus/Sonnet 4.6, not 4.7. If a task is at the edge of Claude's published 4.7 capabilities, use Claude Code CLI directly.
+5. **Antigravity offers an older Opus version than Claude Code.** Antigravity ships Opus/Sonnet 4.6; Claude Code lets you *select* the newer Opus 4.8 (Sonnet 4.6 is still current, so only Antigravity's Opus is behind *by version*). To use Claude's latest Opus release, pick it in Claude Code directly — its relative performance is not benchmarked here.
