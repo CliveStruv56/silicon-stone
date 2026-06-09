@@ -2,6 +2,7 @@ import 'server-only'
 
 import { Ratelimit } from '@upstash/ratelimit'
 import { Redis } from '@upstash/redis'
+import { checkRateLimit } from './rate-limit'
 
 export type DurableRateLimitResult = {
   allowed: boolean
@@ -47,21 +48,51 @@ function getLimiter(key: DurableRateLimitKey) {
   return limiter
 }
 
+/** Convert a sliding-window string (e.g. '15 m') to milliseconds. */
+function windowToMs(window: RateLimitConfig['window']): number {
+  const [value, unit] = window.split(' ') as [string, 's' | 'm' | 'h' | 'd']
+  const mult = unit === 's' ? 1_000 : unit === 'm' ? 60_000 : unit === 'h' ? 3_600_000 : 86_400_000
+  return Number(value) * mult
+}
+
+/**
+ * Per-instance, in-memory fallback used when Upstash is not configured or is
+ * unreachable. It is weaker than the shared store (limits are per-lambda and
+ * reset on cold start), but it keeps brute-force protection in place WITHOUT
+ * locking users out of login/forms when Redis is unavailable.
+ */
+function inMemoryFallback(key: DurableRateLimitKey, identifier: string): DurableRateLimitResult {
+  const config = configs[key]
+  return checkRateLimit(`${config.prefix}:${identifier || 'unknown'}`, {
+    limit: config.limit,
+    windowMs: windowToMs(config.window),
+  })
+}
+
 export async function checkDurableRateLimit(
   key: DurableRateLimitKey,
   identifier: string,
 ): Promise<DurableRateLimitResult> {
   const limiter = getLimiter(key)
   if (!limiter) {
-    throw new Error('Durable rate limiting is not configured.')
+    // Upstash not configured — degrade gracefully rather than failing closed
+    // (which would brick login and the public forms).
+    return inMemoryFallback(key, identifier)
   }
 
-  const result = await limiter.limit(identifier || 'unknown')
-  const retryAfter = result.success
-    ? 0
-    : Math.max(1, Math.ceil((result.reset - Date.now()) / 1000))
+  try {
+    const result = await limiter.limit(identifier || 'unknown')
+    const retryAfter = result.success
+      ? 0
+      : Math.max(1, Math.ceil((result.reset - Date.now()) / 1000))
 
-  return { allowed: result.success, retryAfter }
+    return { allowed: result.success, retryAfter }
+  } catch (error) {
+    // Upstash unreachable at request time (network/credentials) — degrade to the
+    // in-memory limiter instead of locking everyone out.
+    console.error('Durable rate limit unavailable; falling back to in-memory:', error)
+    return inMemoryFallback(key, identifier)
+  }
 }
 
 export function durableRateLimitConfigured() {
