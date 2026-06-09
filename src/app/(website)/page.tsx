@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 
 import { Header, Footer } from '@/components/layout'
+import { JsonLd } from '@/components/seo/JsonLd'
 import {
   HeroSection,
   DeadlineCountdown,
@@ -90,10 +91,7 @@ export default async function Home() {
     <div className="min-h-screen flex flex-col">
       <Header />
 
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
 
       <main className="flex-1">
         {/* 1. Hero — The Vantage Point */}

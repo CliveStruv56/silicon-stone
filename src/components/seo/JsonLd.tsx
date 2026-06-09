@@ -9,7 +9,11 @@ export function JsonLd({ data }: { data: JsonLdData | JsonLdData[] }) {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+      // Escape `<` so CMS-sourced strings can never contain a literal
+      // `</script>` that breaks out of the tag.
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(data).replace(/</g, '\\u003c'),
+      }}
     />
   )
 }
