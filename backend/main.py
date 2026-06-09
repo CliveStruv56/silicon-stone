@@ -3,6 +3,7 @@ import re
 import json
 import time
 import uuid
+import hmac
 import hashlib
 import asyncio
 import logging
@@ -165,7 +166,7 @@ def _require_backend_api_key(request: Request) -> None:
         raise HTTPException(status_code=503, detail="Backend shared key is not configured")
 
     provided_key = request.headers.get("x-backend-api-key", "")
-    if provided_key != expected_key:
+    if not hmac.compare_digest(provided_key, expected_key):
         raise HTTPException(status_code=401, detail="Unauthorized")
 
 
