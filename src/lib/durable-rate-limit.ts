@@ -27,8 +27,31 @@ export type DurableRateLimitKey = keyof typeof configs
 
 const limiters = new Map<DurableRateLimitKey, Ratelimit>()
 
+/**
+ * Resolve the Upstash REST credentials from either the standard Upstash env
+ * names or the KV_* names that Vercel's Upstash/KV integration injects (both
+ * point at the same Upstash instance).
+ */
+function redisCreds(): { url?: string; token?: string } {
+  return {
+    url: process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL,
+    token: process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN,
+  }
+}
+
 function isConfigured() {
-  return Boolean(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN)
+  const { url, token } = redisCreds()
+  return Boolean(url && token)
+}
+
+function makeRedis(): Redis {
+  // Redis.fromEnv() reads the standard UPSTASH_REDIS_REST_URL / _TOKEN names;
+  // otherwise build the client from Vercel's KV_* integration variables.
+  if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+    return Redis.fromEnv()
+  }
+  const { url, token } = redisCreds()
+  return new Redis({ url: url as string, token: token as string })
 }
 
 function getLimiter(key: DurableRateLimitKey) {
@@ -39,7 +62,7 @@ function getLimiter(key: DurableRateLimitKey) {
 
   const config = configs[key]
   const limiter = new Ratelimit({
-    redis: Redis.fromEnv(),
+    redis: makeRedis(),
     limiter: Ratelimit.slidingWindow(config.limit, config.window),
     analytics: true,
     prefix: config.prefix,
