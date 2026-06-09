@@ -225,7 +225,7 @@ const tools = [
     href: '/tools/supply-chain-mapper',
     accent: 'teal' as const,
     Preview: SupplyChainPreview,
-    takeFurther: { label: 'Manufacturing Exposure Module', href: '/services' },
+    takeFurther: { label: 'Manufacturing Exposure Module', href: '/advisory' },
   },
   {
     name: 'Scenario Modeler',
@@ -234,7 +234,7 @@ const tools = [
     href: '/tools/scenario-modeler',
     accent: 'amber' as const,
     Preview: ScenarioPreview,
-    takeFurther: { label: 'Scenario Impact Analysis', href: '/services' },
+    takeFurther: { label: 'Scenario Impact Analysis', href: '/advisory' },
   },
   {
     name: 'Policy Stress-Test',
@@ -243,7 +243,7 @@ const tools = [
     href: '/tools/policy-stress-test',
     accent: 'teal' as const,
     Preview: StressTestPreview,
-    takeFurther: { label: 'Regulatory Friction Assessment', href: '/services' },
+    takeFurther: { label: 'Regulatory Friction Assessment', href: '/advisory' },
   },
 ]
 

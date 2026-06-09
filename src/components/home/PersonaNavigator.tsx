@@ -69,7 +69,7 @@ export function PersonaNavigator() {
             const Icon = iconMap[persona.icon] || User
             const colorClass = colorMap[persona.color] || 'text-text-muted'
             const hoverBorder = hoverBorderMap[persona.color] || 'hover:border-text-muted/60'
-            const href = persona.href ?? `/briefings?persona=${slug}`
+            const href = persona.href ?? `/intelligence?persona=${slug}`
             const isHighlighted = Boolean(persona.href)
 
             return (

@@ -21,15 +21,14 @@ const STATIC_ROUTES: Array<{
   priority: number
 }> = [
   { path: '/', changeFrequency: 'daily', priority: 1 },
-  { path: '/analysis', changeFrequency: 'daily', priority: 0.9 },
-  { path: '/briefings', changeFrequency: 'daily', priority: 0.9 },
+  { path: '/intelligence', changeFrequency: 'daily', priority: 0.9 },
   { path: '/about', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/methodology', changeFrequency: 'monthly', priority: 0.7 },
-  { path: '/services', changeFrequency: 'monthly', priority: 0.6 },
+  { path: '/advisory', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/products', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/products/ai-act-toolkit', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/products/ai-audit-checklist', changeFrequency: 'monthly', priority: 0.6 },
-  { path: '/products/briefings', changeFrequency: 'monthly', priority: 0.6 },
+  { path: '/products/sector-reports', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/tools', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/tools/compliance-checker', changeFrequency: 'monthly', priority: 0.5 },
   { path: '/tools/policy-stress-test', changeFrequency: 'monthly', priority: 0.5 },

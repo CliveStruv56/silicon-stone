@@ -78,8 +78,8 @@ export default async function CategoryPage({ params }: Props) {
         <section className="bg-slate-deep border-b border-border-subtle">
           <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
             <div className="flex items-center gap-2 text-sm text-text-muted mb-4">
-              <Link href="/analysis" className="hover:text-stone-teal">
-                Analysis
+              <Link href="/intelligence" className="hover:text-stone-teal">
+                Intelligence
               </Link>
               <span>/</span>
               <span className="text-text-primary">{category.title}</span>
@@ -148,7 +148,7 @@ export default async function CategoryPage({ params }: Props) {
                 </h2>
                 <nav className="space-y-2">
                   <Link
-                    href="/analysis"
+                    href="/intelligence"
                     className="block py-2 px-3 rounded-md text-text-muted hover:text-text-primary hover:bg-stone-charcoal/50 transition-colors"
                   >
                     All Articles
@@ -180,7 +180,7 @@ export default async function CategoryPage({ params }: Props) {
               ) : (
                 <div className="text-center py-12">
                   <p className="text-text-muted mb-4">No articles in this category yet.</p>
-                  <Link href="/analysis" className="text-stone-teal hover:text-silicon-amber">
+                  <Link href="/intelligence" className="text-stone-teal hover:text-silicon-amber">
                     &larr; View all articles
                   </Link>
                 </div>

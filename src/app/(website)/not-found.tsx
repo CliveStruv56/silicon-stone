@@ -24,10 +24,10 @@ export default function NotFound() {
                 Go home
               </Button>
             </Link>
-            <Link href="/analysis">
+            <Link href="/intelligence">
               <Button variant="outline" className="border-border-subtle w-full">
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Browse Analysis
+                Browse Intelligence
               </Button>
             </Link>
           </div>

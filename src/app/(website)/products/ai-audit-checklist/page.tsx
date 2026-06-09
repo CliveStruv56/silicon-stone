@@ -81,7 +81,7 @@ export default function AIAuditChecklistPage() {
                   </div>
                 </div>
                 <Button size="lg" className="bg-stone-teal text-slate-deep hover:bg-stone-teal/90 font-semibold" asChild>
-                  <a href={checkoutReady ? checkoutUrl : '/services#contact'} target={checkoutReady ? '_blank' : undefined} rel={checkoutReady ? 'noopener noreferrer' : undefined} className="plausible-event-name=Buy+Checklist+Pack">
+                  <a href={checkoutReady ? checkoutUrl : '/advisory#contact'} target={checkoutReady ? '_blank' : undefined} rel={checkoutReady ? 'noopener noreferrer' : undefined} className="plausible-event-name=Buy+Checklist+Pack">
                     {checkoutReady ? 'Buy Checklist Pack — £24' : 'Request Early Access'}
                   </a>
                 </Button>
@@ -198,7 +198,7 @@ export default function AIAuditChecklistPage() {
                 a structured picture of your AI exposure in a single afternoon.
               </p>
               <Button size="lg" className="bg-stone-teal text-slate-deep hover:bg-stone-teal/90 font-semibold" asChild>
-                <a href={checkoutReady ? checkoutUrl : '/services#contact'} target={checkoutReady ? '_blank' : undefined} rel={checkoutReady ? 'noopener noreferrer' : undefined}>
+                <a href={checkoutReady ? checkoutUrl : '/advisory#contact'} target={checkoutReady ? '_blank' : undefined} rel={checkoutReady ? 'noopener noreferrer' : undefined}>
                   {checkoutReady ? 'Buy Checklist Pack — £24' : 'Request Early Access'}
                 </a>
               </Button>

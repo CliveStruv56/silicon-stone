@@ -18,11 +18,7 @@ type NavItem = {
 const primaryNavigation: NavItem[] = [
   {
     name: 'Intelligence',
-    href: '/briefings',
-    children: [
-      { name: 'By topic', href: '/analysis' },
-      { name: 'By role & depth', href: '/briefings' },
-    ],
+    href: '/intelligence',
   },
   {
     name: 'Tools',
@@ -40,12 +36,12 @@ const primaryNavigation: NavItem[] = [
     children: [
       { name: 'AI Audit Checklist Pack', href: '/products/ai-audit-checklist' },
       { name: 'AI Act Compliance Toolkit', href: '/products/ai-act-toolkit' },
-      { name: 'Sector Reports', href: '/products/briefings', note: 'Coming soon' },
+      { name: 'Sector Reports', href: '/products/sector-reports', note: 'Coming soon' },
     ],
   },
   {
     name: 'Advisory',
-    href: '/services',
+    href: '/advisory',
   },
 ]
 

@@ -60,7 +60,7 @@ const products = [
   },
   {
     title: 'Sector Reports',
-    slug: 'briefings',
+    slug: 'sector-reports',
     description: 'Focused 15-20 page briefings on AI impact, regulatory exposure, and geopolitical risk for specific industries.',
     price: 'From £39',
     badge: 'Coming Soon',
@@ -194,7 +194,7 @@ export default function ProductsPage() {
                 From AI readiness assessments to strategic briefings for your leadership team.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/services#contact">
+                <Link href="/advisory#contact">
                   <Button className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90">
                     Discuss Advisory Services
                   </Button>

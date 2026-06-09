@@ -16,7 +16,7 @@ export interface Persona {
   ctaCopy: string
   description: string
   contentNeeds: string[]
-  /** Optional routing override. Defaults to /briefings?persona=<slug>. */
+  /** Optional routing override. Defaults to /intelligence?persona=<slug>. */
   href?: string
 }
 

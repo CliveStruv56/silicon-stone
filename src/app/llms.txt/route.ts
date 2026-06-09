@@ -17,10 +17,9 @@ type LlmsArticle = { title: string; slug: string; excerpt?: string | null }
 const CORE_PAGES: Array<{ title: string; path: string; note: string }> = [
   { title: 'About', path: '/about', note: 'Mission, ownership and the Forensic Technopolitics method.' },
   { title: 'Methodology', path: '/methodology', note: 'How Silicon & Stone produces calibrated, decision-grade analysis.' },
-  { title: 'Analysis', path: '/analysis', note: 'The full archive of published intelligence.' },
-  { title: 'Briefings', path: '/briefings', note: 'Tiered intelligence portal — Pulse, Briefing and Audit.' },
+  { title: 'Intelligence', path: '/intelligence', note: 'The full archive of published intelligence — filter by topic, tier (Pulse, Briefing, Audit) and role.' },
   { title: 'Interactive tools', path: '/tools', note: 'AI Act compliance checker, supply-chain mapper, policy stress-test, scenario modeler.' },
-  { title: 'Services', path: '/services', note: 'Strategic advisory for AI governance and technology dependency.' },
+  { title: 'Advisory', path: '/advisory', note: 'Strategic advisory for AI governance and technology dependency.' },
 ]
 
 export async function GET() {

@@ -64,7 +64,7 @@ export function AdvisoryBand() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {tiers.map((tier) => (
               <StaggerItem key={tier.title}>
-                <Link href="/services" className="block h-full">
+                <Link href="/advisory" className="block h-full">
                   <ForensicCard
                     accent={tier.popular ? 'amber' : 'subtle'}
                     showMarkers={false}

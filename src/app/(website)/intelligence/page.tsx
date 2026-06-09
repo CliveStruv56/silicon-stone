@@ -54,6 +54,10 @@ function getTierParam(value: string | null): IntelligenceTier | null {
   return value === 'pulse' || value === 'briefing' || value === 'audit' ? value : null
 }
 
+function getTopicParam(value: string | null): string | null {
+  return value && /^[a-z0-9-]+$/i.test(value) ? value : null
+}
+
 type BriefingsResponse = Article[] | {
   result?: Article[]
 }
@@ -258,17 +262,19 @@ function FeaturedArticle({ article }: { article: Article }) {
   )
 }
 
-export default function BriefingsPage() {
+export default function IntelligencePage() {
   const [articles, setArticles] = useState<Article[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedPersona, setSelectedPersona] = useState<string | null>(null)
   const [selectedTier, setSelectedTier] = useState<IntelligenceTier | null>(null)
+  const [selectedTopic, setSelectedTopic] = useState<string | null>(null)
 
   useEffect(() => {
     function syncFiltersFromUrl() {
       const params = new URLSearchParams(window.location.search)
       setSelectedPersona(getPersonaParam(params.get('persona')))
       setSelectedTier(getTierParam(params.get('tier')))
+      setSelectedTopic(getTopicParam(params.get('topic')))
     }
 
     syncFiltersFromUrl()
@@ -328,23 +334,43 @@ export default function BriefingsPage() {
     return () => controller.abort()
   }, [])
 
-  function updateFilters(persona: string | null, tier: IntelligenceTier | null) {
+  function updateFilters(
+    persona: string | null,
+    tier: IntelligenceTier | null,
+    topic: string | null = selectedTopic,
+  ) {
     setSelectedPersona(persona)
     setSelectedTier(tier)
+    setSelectedTopic(topic)
 
     const params = new URLSearchParams(window.location.search)
     if (persona) params.set('persona', persona)
     else params.delete('persona')
     if (tier) params.set('tier', tier)
     else params.delete('tier')
+    if (topic) params.set('topic', topic)
+    else params.delete('topic')
 
     const query = params.toString()
     window.history.pushState(null, '', `${window.location.pathname}${query ? `?${query}` : ''}`)
   }
 
-  const articlesForTier = selectedTier
-    ? articles.filter((article) => article.intelligenceTier === selectedTier)
+  // Topic options derived from the categories present on the fetched articles.
+  const topicOptions = Array.from(
+    new Map(
+      articles
+        .flatMap((article) => article.categories ?? [])
+        .map((category) => [category.slug, category]),
+    ).values(),
+  ).sort((a, b) => a.title.localeCompare(b.title))
+
+  const articlesForTopic = selectedTopic
+    ? articles.filter((article) => article.categories?.some((category) => category.slug === selectedTopic))
     : articles
+
+  const articlesForTier = selectedTier
+    ? articlesForTopic.filter((article) => article.intelligenceTier === selectedTier)
+    : articlesForTopic
 
   const filteredArticles = selectedPersona
     ? articlesForTier.filter((article) => article.personas?.includes(selectedPersona))
@@ -365,12 +391,19 @@ export default function BriefingsPage() {
   })
 
   const tierCounts: Record<string, number> = {
-    all: articles.length,
+    all: articlesForTopic.length,
   }
-  articles.forEach((article) => {
+  articlesForTopic.forEach((article) => {
     if (article.intelligenceTier) {
       tierCounts[article.intelligenceTier] = (tierCounts[article.intelligenceTier] || 0) + 1
     }
+  })
+
+  const topicCounts: Record<string, number> = { all: articles.length }
+  articles.forEach((article) => {
+    article.categories?.forEach((category) => {
+      topicCounts[category.slug] = (topicCounts[category.slug] || 0) + 1
+    })
   })
 
   return (
@@ -384,13 +417,13 @@ export default function BriefingsPage() {
             <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
               <div>
                 <Badge className="bg-silicon-cyan/20 text-silicon-cyan border border-silicon-cyan/30 mb-4">
-                  Intelligence Portal
+                  Intelligence Hub
                 </Badge>
                 <h1 className="text-4xl lg:text-5xl font-bold text-text-primary mb-4">
-                  Briefings
+                  Intelligence
                 </h1>
                 <p className="text-lg text-text-muted max-w-2xl">
-                  Tiered intelligence for decision-makers. Scan the Pulse, digest the Briefing, or audit the deep analysis.
+                  One library, filtered your way — by topic, by tier (scan the Pulse, digest the Briefing, or audit the deep analysis), or by the role it serves.
                 </p>
               </div>
 
@@ -422,6 +455,48 @@ export default function BriefingsPage() {
         {/* Feed Filters */}
         <section className="border-b border-border-subtle bg-stone-charcoal/30">
           <div className="mx-auto max-w-7xl px-6 py-4 lg:px-8 space-y-5">
+            {topicOptions.length > 0 && (
+              <div>
+                <div className="font-ui-mono text-xs uppercase tracking-wider text-text-muted mb-3">
+                  Filter by topic
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => updateFilters(selectedPersona, selectedTier, null)}
+                    className={cn(
+                      'flex items-center gap-2 px-3 py-2 rounded-lg border transition-all text-sm font-medium',
+                      !selectedTopic
+                        ? 'bg-silicon-cyan/20 border-silicon-cyan text-silicon-cyan'
+                        : 'bg-stone-charcoal/50 border-border-subtle text-text-muted hover:border-stone-teal hover:text-text-primary'
+                    )}
+                  >
+                    <span>All Topics</span>
+                    <Badge variant="secondary" className="text-xs px-1.5 py-0">{topicCounts.all}</Badge>
+                  </button>
+                  {topicOptions.map((topic) => (
+                    <button
+                      key={topic.slug}
+                      type="button"
+                      onClick={() => updateFilters(selectedPersona, selectedTier, selectedTopic === topic.slug ? null : topic.slug)}
+                      className={cn(
+                        'flex items-center gap-2 px-3 py-2 rounded-lg border transition-all text-sm',
+                        selectedTopic === topic.slug
+                          ? 'bg-silicon-amber/20 border-silicon-amber text-silicon-amber'
+                          : 'bg-stone-charcoal/50 border-border-subtle text-text-muted hover:border-stone-teal hover:text-text-primary'
+                      )}
+                    >
+                      <span>{topic.title}</span>
+                      {(topicCounts[topic.slug] || 0) > 0 && (
+                        <Badge variant="secondary" className="text-xs px-1.5 py-0">
+                          {topicCounts[topic.slug]}
+                        </Badge>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
             <div>
               <div className="font-ui-mono text-xs uppercase tracking-wider text-text-muted mb-3">
                 Filter by tier
@@ -502,7 +577,7 @@ export default function BriefingsPage() {
                 {remainingArticles.length > 0 && (
                   <div>
                     <h2 className="font-ui-mono text-stone-teal text-sm mb-4">
-                      All Briefings
+                      All Intelligence
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {remainingArticles.map((article) => (

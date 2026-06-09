@@ -332,9 +332,9 @@ export default function AboutPage() {
                   </Button>
                 </a>
               )}
-              <Link href="/analysis">
+              <Link href="/intelligence">
                 <Button variant="outline" className="border-text-muted text-text-muted hover:bg-surface-elevated">
-                  Read Analysis
+                  Browse Intelligence
                 </Button>
               </Link>
             </div>

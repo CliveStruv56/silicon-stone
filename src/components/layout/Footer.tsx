@@ -5,8 +5,7 @@ const WAYMARKPATH_URL =
 
 const footerNavigation = {
   intelligence: [
-    { name: 'By topic', href: '/analysis' },
-    { name: 'By role & depth', href: '/briefings' },
+    { name: 'All intelligence', href: '/intelligence' },
     { name: 'Atlantic Drift', href: '/analysis/category/atlantic-drift' },
     { name: 'AI Act & Compliance', href: '/analysis/category/ai-act' },
     { name: 'Semiconductors', href: '/analysis/category/semiconductors' },
@@ -14,12 +13,12 @@ const footerNavigation = {
   engage: [
     { name: 'Tools', href: '/tools' },
     { name: 'Products', href: '/products' },
-    { name: 'Advisory', href: '/services' },
+    { name: 'Advisory', href: '/advisory' },
     { name: 'Methodology', href: '/methodology' },
     { name: 'About', href: '/about' },
   ],
   company: [
-    { name: 'Contact', href: '/services#contact' },
+    { name: 'Contact', href: '/advisory#contact' },
     { name: 'Privacy', href: '/privacy' },
     { name: 'Terms', href: '/terms' },
   ],

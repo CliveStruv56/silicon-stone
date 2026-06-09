@@ -29,8 +29,7 @@ export async function POST(req: NextRequest) {
         // statically-cached list/detail routes regardless of tagging.
         revalidateTag('sanity')
         revalidatePath('/')
-        revalidatePath('/analysis')
-        revalidatePath('/briefings')
+        revalidatePath('/intelligence')
         if (body.slug?.current) {
             revalidatePath(`/analysis/${body.slug.current}`)
         }

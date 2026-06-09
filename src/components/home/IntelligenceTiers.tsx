@@ -41,7 +41,7 @@ const tiers: Tier[] = [
     title: 'The shortest read on what just shifted',
     description:
       'Essential signals on AI policy, semiconductors, supply chains, and sovereignty. Read in 30 seconds; act on it before the news cycle catches up.',
-    href: '/briefings?tier=pulse',
+    href: '/intelligence?tier=pulse',
     browseLabel: 'Browse Pulse',
     fallbackLatestStatus: 'Coming soon',
   },
@@ -51,7 +51,7 @@ const tiers: Tier[] = [
     title: 'Operational intelligence for managers and directors',
     description:
       'Tuesday Stone Briefing on what just shifted. Friday Practical Move on what to do about it. Calibrated, decision-grade — never glib, never breathless.',
-    href: '/briefings?tier=briefing',
+    href: '/intelligence?tier=briefing',
     browseLabel: 'Browse Briefings',
     featured: true,
   },
@@ -61,7 +61,7 @@ const tiers: Tier[] = [
     title: 'Forensic deep-dives into structural friction',
     description:
       'Quarterly long-form analyses applying the full 3×2 Forensic Technopolitics matrix to a single high-stakes question. For decision-makers who need the analysis their industry is missing.',
-    href: '/briefings?tier=audit',
+    href: '/intelligence?tier=audit',
     browseLabel: 'Browse Audits',
     fallbackLatestStatus: 'Q1 2026 Audit in production',
   },

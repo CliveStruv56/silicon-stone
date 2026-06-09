@@ -289,7 +289,7 @@ export default function WaymarkPathPage() {
 
               <p className="text-sm text-text-muted mt-8">
                 Already using Silicon and Stone?{' '}
-                <Link href="/briefings" className="text-stone-teal hover:underline">
+                <Link href="/intelligence" className="text-stone-teal hover:underline">
                   Explore the Intelligence Stream
                   <ArrowRight className="w-3 h-3 inline ml-1" />
                 </Link>

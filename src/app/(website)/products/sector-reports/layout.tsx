@@ -5,10 +5,10 @@ export const metadata: Metadata = {
   title: 'Sector Reports | Silicon and Stone',
   description:
     'Subscription sector intelligence: forensic analysis of AI regulation, semiconductors, and digital sovereignty for industry leaders.',
-  alternates: { canonical: '/products/briefings' },
+  alternates: { canonical: '/products/sector-reports' },
 }
 
-export default function ProductsBriefingsLayout({
+export default function ProductsSectorReportsLayout({
   children,
 }: {
   children: React.ReactNode

@@ -102,12 +102,12 @@ export default function AIActToolkitPage() {
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3">
                   <Button size="lg" className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90 font-semibold" asChild>
-                    <a href={standardCheckoutReady ? checkoutUrls.standard : '/services#contact'} target={standardCheckoutReady ? '_blank' : undefined} rel={standardCheckoutReady ? 'noopener noreferrer' : undefined} className="plausible-event-name=Buy+Toolkit+Standard">
+                    <a href={standardCheckoutReady ? checkoutUrls.standard : '/advisory#contact'} target={standardCheckoutReady ? '_blank' : undefined} rel={standardCheckoutReady ? 'noopener noreferrer' : undefined} className="plausible-event-name=Buy+Toolkit+Standard">
                       {standardCheckoutReady ? 'Buy Standard — £79' : 'Request Early Access'}
                     </a>
                   </Button>
                   <Button size="lg" variant="outline" className="border-stone-teal text-stone-teal hover:bg-stone-teal/10" asChild>
-                    <a href={professionalCheckoutReady ? checkoutUrls.professional : '/services#contact'} target={professionalCheckoutReady ? '_blank' : undefined} rel={professionalCheckoutReady ? 'noopener noreferrer' : undefined} className="plausible-event-name=Buy+Toolkit+Professional">
+                    <a href={professionalCheckoutReady ? checkoutUrls.professional : '/advisory#contact'} target={professionalCheckoutReady ? '_blank' : undefined} rel={professionalCheckoutReady ? 'noopener noreferrer' : undefined} className="plausible-event-name=Buy+Toolkit+Professional">
                       {professionalCheckoutReady ? 'Buy Professional — £149' : 'Ask About Professional'}
                     </a>
                   </Button>
@@ -247,12 +247,12 @@ export default function AIActToolkitPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
                 <Button size="lg" className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90 font-semibold" asChild>
-                  <a href={standardCheckoutReady ? checkoutUrls.standard : '/services#contact'} target={standardCheckoutReady ? '_blank' : undefined} rel={standardCheckoutReady ? 'noopener noreferrer' : undefined}>
+                  <a href={standardCheckoutReady ? checkoutUrls.standard : '/advisory#contact'} target={standardCheckoutReady ? '_blank' : undefined} rel={standardCheckoutReady ? 'noopener noreferrer' : undefined}>
                     {standardCheckoutReady ? 'Buy Standard — £79' : 'Request Early Access'}
                   </a>
                 </Button>
                 <Button size="lg" variant="outline" className="border-stone-teal text-stone-teal hover:bg-stone-teal/10" asChild>
-                  <a href={professionalCheckoutReady ? checkoutUrls.professional : '/services#contact'} target={professionalCheckoutReady ? '_blank' : undefined} rel={professionalCheckoutReady ? 'noopener noreferrer' : undefined}>
+                  <a href={professionalCheckoutReady ? checkoutUrls.professional : '/advisory#contact'} target={professionalCheckoutReady ? '_blank' : undefined} rel={professionalCheckoutReady ? 'noopener noreferrer' : undefined}>
                     {professionalCheckoutReady ? 'Buy Professional — £149' : 'Ask About Professional'}
                   </a>
                 </Button>

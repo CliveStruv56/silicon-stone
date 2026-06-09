@@ -41,8 +41,17 @@ const nextConfig: NextConfig = {
     ],
   },
   async redirects() {
+    // Phase B route consolidation — permanent 301s for moved routes. Article
+    // and category URLs (/analysis/[slug], /analysis/category/[slug]) are
+    // deliberately preserved; only the two index pages fold into /intelligence.
+    const routeRedirects = [
+      { source: '/analysis', destination: '/intelligence', statusCode: 301 },
+      { source: '/briefings', destination: '/intelligence', statusCode: 301 },
+      { source: '/services', destination: '/advisory', statusCode: 301 },
+      { source: '/products/briefings', destination: '/products/sector-reports', statusCode: 301 },
+    ]
     // 301s for renamed article slugs (see src/lib/slug-redirects.ts).
-    return articleRedirectRules()
+    return [...routeRedirects, ...articleRedirectRules()]
   },
   async headers() {
     return [

@@ -23,7 +23,7 @@ const rungs: Rung[] = [
     title: 'Read',
     body: 'Understand the shift. Twice-weekly intelligence and a deep archive — from a 30-second Pulse to a forensic Audit.',
     cta: 'Browse Intelligence',
-    href: '/briefings',
+    href: '/intelligence',
     tone: 'free',
   },
   {
@@ -47,7 +47,7 @@ const rungs: Rung[] = [
     title: 'Engage',
     body: 'Bring us in directly. Diagnostics and assessments scoped to your organisation.',
     cta: 'Explore Advisory',
-    href: '/services',
+    href: '/advisory',
     tone: 'paid',
   },
 ]

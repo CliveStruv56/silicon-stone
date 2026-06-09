@@ -79,7 +79,7 @@ export function buildArticleSchema(a: SchemaArticle) {
 
 export function buildBreadcrumbSchema(a: SchemaArticle) {
   const items: Array<{ name: string; url: string }> = [
-    { name: 'Analysis', url: absoluteUrl('/analysis') },
+    { name: 'Intelligence', url: absoluteUrl('/intelligence') },
   ]
   const category = a.categories?.[0]
   if (category) {
