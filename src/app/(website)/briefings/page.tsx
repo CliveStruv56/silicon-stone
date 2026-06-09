@@ -7,6 +7,7 @@ import { Header, Footer } from '@/components/layout'
 import { Badge } from '@/components/ui/badge'
 import { PersonaFilter } from '@/components/briefings/PersonaFilter'
 import { PersonaIntro } from '@/components/briefings/PersonaIntro'
+import { ThreeReadings } from '@/components/ThreeReadings'
 import { DynamicCTA } from '@/components/article'
 import { cn } from '@/lib/utils'
 import { getPersonaLabel, PERSONAS, type PersonaSlug } from '@/lib/personas'
@@ -411,6 +412,9 @@ export default function BriefingsPage() {
             </div>
           </div>
         </section>
+
+        {/* Three Readings of Every Briefing — relocated from the homepage */}
+        <ThreeReadings className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12 border-b border-border-subtle" />
 
         {/* Persona Introduction */}
         <PersonaIntro />

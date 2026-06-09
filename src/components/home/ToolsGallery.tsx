@@ -216,6 +216,7 @@ const tools = [
     href: '/tools/compliance-checker',
     accent: 'amber' as const,
     Preview: CompliancePreview,
+    takeFurther: { label: 'AI Act Compliance Toolkit (\u00a379)', href: '/products' },
   },
   {
     name: 'Supply Chain Mapper',
@@ -224,6 +225,7 @@ const tools = [
     href: '/tools/supply-chain-mapper',
     accent: 'teal' as const,
     Preview: SupplyChainPreview,
+    takeFurther: { label: 'Manufacturing Exposure Module', href: '/services' },
   },
   {
     name: 'Scenario Modeler',
@@ -232,6 +234,7 @@ const tools = [
     href: '/tools/scenario-modeler',
     accent: 'amber' as const,
     Preview: ScenarioPreview,
+    takeFurther: { label: 'Scenario Impact Analysis', href: '/services' },
   },
   {
     name: 'Policy Stress-Test',
@@ -240,6 +243,7 @@ const tools = [
     href: '/tools/policy-stress-test',
     accent: 'teal' as const,
     Preview: StressTestPreview,
+    takeFurther: { label: 'Regulatory Friction Assessment', href: '/services' },
   },
 ]
 
@@ -297,35 +301,44 @@ export function ToolsGallery() {
               const Preview = tool.Preview
               return (
                 <StaggerItem key={tool.name}>
-                  <Link href={tool.href} className="block h-full">
-                    <ForensicCard
-                      accent={tool.accent}
-                      showMarkers={true}
-                      gridHover={true}
-                      delay={0}
-                      className="h-full cursor-pointer"
+                  <ForensicCard
+                    accent={tool.accent}
+                    showMarkers={true}
+                    gridHover={true}
+                    delay={0}
+                    className="h-full"
+                  >
+                    {/* POV scenario line */}
+                    <p className="text-xs text-text-muted italic mb-3 font-mono leading-relaxed">
+                      &ldquo;{tool.scenario}&rdquo;
+                    </p>
+
+                    {/* Mini preview */}
+                    <div className="rounded-md bg-slate-deep/50 border border-border-subtle/50 mb-4 overflow-hidden">
+                      <Preview />
+                    </div>
+
+                    {/* Tool info */}
+                    <h3 className="text-lg font-semibold text-text-primary mb-1">{tool.name}</h3>
+                    <p className="text-sm text-text-muted mb-4">{tool.tagline}</p>
+
+                    {/* CTA — launch the free tool */}
+                    <Link
+                      href={tool.href}
+                      className={`inline-flex items-center gap-1.5 text-sm font-medium transition-colors ${tool.accent === 'amber' ? 'text-silicon-amber hover:text-silicon-amber/80' : 'text-stone-teal hover:text-stone-teal/80'}`}
                     >
-                      {/* POV scenario line */}
-                      <p className="text-xs text-text-muted italic mb-3 font-mono leading-relaxed">
-                        &ldquo;{tool.scenario}&rdquo;
-                      </p>
+                      <span>Launch tool</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
 
-                      {/* Mini preview */}
-                      <div className="rounded-md bg-slate-deep/50 border border-border-subtle/50 mb-4 overflow-hidden">
-                        <Preview />
-                      </div>
-
-                      {/* Tool info */}
-                      <h3 className="text-lg font-semibold text-text-primary mb-1">{tool.name}</h3>
-                      <p className="text-sm text-text-muted mb-4">{tool.tagline}</p>
-
-                      {/* CTA */}
-                      <div className={`flex items-center gap-1.5 text-sm font-medium ${tool.accent === 'amber' ? 'text-silicon-amber' : 'text-stone-teal'}`}>
-                        <span>Launch tool</span>
-                        <ArrowRight className="w-4 h-4" />
-                      </div>
-                    </ForensicCard>
-                  </Link>
+                    {/* Bridge — the paid next step */}
+                    <Link
+                      href={tool.takeFurther.href}
+                      className="mt-4 pt-3 border-t border-dashed border-border-subtle/70 flex items-center gap-1.5 font-mono text-[11px] font-semibold tracking-[0.03em] text-text-muted transition-colors hover:text-text-primary"
+                    >
+                      <span>Take it further → {tool.takeFurther.label}</span>
+                    </Link>
+                  </ForensicCard>
                 </StaggerItem>
               )
             })}

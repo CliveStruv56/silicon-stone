@@ -59,7 +59,7 @@ const products = [
     cta: 'View Toolkit',
   },
   {
-    title: 'Sector Intelligence Briefings',
+    title: 'Sector Reports',
     slug: 'briefings',
     description: 'Focused 15-20 page briefings on AI impact, regulatory exposure, and geopolitical risk for specific industries.',
     price: 'From £39',
@@ -75,7 +75,7 @@ const products = [
       'Three scenarios with action points',
       '90-day action checklist',
     ],
-    cta: 'View Briefings',
+    cta: 'View Sector Reports',
   },
 ]
 

@@ -1,9 +1,9 @@
 'use client'
 
-import { Shield, Truck, Globe, MapPin, User } from 'lucide-react'
+import { Shield, Truck, Globe, MapPin, User, Compass } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-import { PERSONAS, PERSONA_ORDER, type PersonaSlug } from '@/lib/personas'
+import { PERSONAS, BRIEFINGS_PERSONA_ORDER, type PersonaSlug } from '@/lib/personas'
 
 interface PersonaFilterProps {
   selectedPersona: string | null
@@ -17,6 +17,7 @@ const PERSONA_ICONS: Record<PersonaSlug, React.ReactNode> = {
   ian: <Truck className="h-4 w-4" />,
   sofia: <Globe className="h-4 w-4" />,
   robert: <MapPin className="h-4 w-4" />,
+  positional: <Compass className="h-4 w-4" />,
   citizen: <User className="h-4 w-4" />,
 }
 
@@ -48,7 +49,7 @@ export function PersonaFilter({
       </button>
 
       {/* Persona filters */}
-      {PERSONA_ORDER.map((slug) => {
+      {BRIEFINGS_PERSONA_ORDER.map((slug) => {
         const persona = PERSONAS[slug]
         const isSelected = selectedPersona === slug
         const count = personaCounts[slug]
@@ -104,7 +105,7 @@ export function PersonaFilterDropdown({
         )}
       >
         <option value="">All Personas</option>
-        {PERSONA_ORDER.map((slug) => (
+        {BRIEFINGS_PERSONA_ORDER.map((slug) => (
           <option key={slug} value={slug}>
             {PERSONAS[slug].name}
           </option>

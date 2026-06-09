@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { StaggerContainer, StaggerItem } from '@/components/ui/StaggerContainer'
 import { ForensicCard } from '@/components/ui/ForensicCard'
 import { Badge } from '@/components/ui/badge'
-import { PERSONAS, PERSONA_ORDER, type PersonaSlug } from '@/lib/personas'
+import { PERSONAS, BRIEFINGS_PERSONA_ORDER, type PersonaSlug } from '@/lib/personas'
 
 // Avatar ring colour per persona accent token. Literal strings so Tailwind
 // picks them up at build time.
@@ -57,7 +57,7 @@ export function PersonaIntro() {
           </StaggerItem>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            {PERSONA_ORDER.map((slug: PersonaSlug) => {
+            {BRIEFINGS_PERSONA_ORDER.map((slug: PersonaSlug) => {
               const persona = PERSONAS[slug]
               const ringClass = ringMap[persona.color] || 'border-border-subtle'
 

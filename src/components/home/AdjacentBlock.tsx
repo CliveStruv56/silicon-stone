@@ -4,33 +4,25 @@ import { ArrowRight } from 'lucide-react'
 const WAYMARKPATH_URL =
     process.env.NEXT_PUBLIC_WAYMARKPATH_URL ?? 'https://waymarkpath.vercel.app'
 
+// WaymarkPath is adjacent to the Read → Use → Buy → Engage ladder, not a rung on it.
+// This is a deliberately lighter "Related" card, not a peer offering section.
 export function AdjacentBlock() {
     return (
         <section
-            aria-label="Sister product cross-link"
-            className="mx-auto max-w-7xl px-6 pb-16 lg:px-8 lg:pb-24"
+            aria-label="Related companion"
+            className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16"
         >
-            <div
-                className="rounded-[10px] px-6 py-6 md:px-8 md:py-7 flex flex-col md:flex-row md:items-center gap-5 md:gap-8"
-                style={{
-                    border: '1px dashed rgba(99, 102, 241, 0.4)',
-                    background:
-                        'linear-gradient(to right, rgba(99, 102, 241, 0.06), rgba(232, 154, 60, 0.03))',
-                }}
-            >
-                <div className="flex-shrink-0">
-                    <span className="inline-block font-mono text-[11px] tracking-[0.10em] uppercase text-sister-indigo border border-sister-indigo/40 rounded px-2.5 py-1">
-                        Sister product
-                    </span>
-                </div>
-
+            <div className="rounded-[10px] border border-dashed border-sister-indigo/30 bg-stone-charcoal/20 px-6 py-5 md:px-8 md:py-6 flex flex-col md:flex-row md:items-center gap-4 md:gap-8">
                 <div className="flex-1 min-w-0">
-                    <p className="text-sm md:text-base text-text-primary leading-relaxed">
-                        <span className="font-semibold text-sister-indigo">WaymarkPath</span>
-                        {' — the AI-powered career transition platform for senior professionals turning that shift to their advantage, and building the AI fluency that’s fast becoming the baseline rather than the edge.'}
-                    </p>
-                    <p className="mt-2 text-xs md:text-sm italic text-text-muted leading-relaxed">
-                        A separate platform, in its own register. Free to start. No newsletter — that&apos;s what Silicon &amp; Stone is for.
+                    <span className="block font-mono text-[10px] tracking-[0.12em] uppercase text-sister-indigo mb-2">
+                        Related — a separate companion
+                    </span>
+                    <h3 className="text-base md:text-lg font-semibold text-text-primary">
+                        WaymarkPath
+                    </h3>
+                    <p className="mt-1 text-sm text-text-muted leading-relaxed max-w-2xl">
+                        The career-transition companion for the individual professional
+                        navigating the same shifts. Free to start.
                     </p>
                 </div>
 
@@ -39,7 +31,7 @@ export function AdjacentBlock() {
                         href={WAYMARKPATH_URL}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group inline-flex items-center gap-2 px-4 py-2 rounded-md border border-sister-indigo/50 text-sister-indigo hover:bg-sister-indigo/10 transition-colors text-sm font-medium"
+                        className="group inline-flex items-center gap-2 px-4 py-2 rounded-md border border-sister-indigo/40 text-sister-indigo hover:bg-sister-indigo/10 transition-colors text-sm font-medium"
                     >
                         See WaymarkPath
                         <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />

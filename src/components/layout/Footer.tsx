@@ -4,28 +4,24 @@ const WAYMARKPATH_URL =
   process.env.NEXT_PUBLIC_WAYMARKPATH_URL ?? 'https://waymarkpath.vercel.app'
 
 const footerNavigation = {
-  analysis: [
+  intelligence: [
+    { name: 'By topic', href: '/analysis' },
+    { name: 'By role & depth', href: '/briefings' },
     { name: 'Atlantic Drift', href: '/analysis/category/atlantic-drift' },
     { name: 'AI Act & Compliance', href: '/analysis/category/ai-act' },
     { name: 'Semiconductors', href: '/analysis/category/semiconductors' },
-    { name: 'Digital Sovereignty', href: '/analysis/category/digital-sovereignty' },
   ],
-  methodology: [
-    { name: 'Supply Chain Forensics', href: '/methodology#supply-chain' },
-    { name: 'Policy Stress-Testing', href: '/methodology#stress-testing' },
-    { name: 'Scenario Modeling', href: '/methodology#scenarios' },
-    { name: 'Signal Filtering', href: '/methodology#signals' },
+  engage: [
+    { name: 'Tools', href: '/tools' },
+    { name: 'Products', href: '/products' },
+    { name: 'Advisory', href: '/services' },
+    { name: 'Methodology', href: '/methodology' },
+    { name: 'About', href: '/about' },
   ],
   company: [
-    { name: 'About', href: '/about' },
-    { name: 'Why the Edge', href: '/about#edge' },
-    { name: 'The Long View', href: '/about#long-view' },
-    { name: 'Services', href: '/services' },
     { name: 'Contact', href: '/services#contact' },
-  ],
-  terms: [
-    { name: 'Privacy Policy', href: '/privacy' },
-    { name: 'Terms of Service', href: '/terms' },
+    { name: 'Privacy', href: '/privacy' },
+    { name: 'Terms', href: '/terms' },
   ],
 }
 
@@ -33,9 +29,9 @@ export function Footer() {
   return (
     <footer className="border-t border-border-subtle bg-slate-deep">
       <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
-        <div className="xl:grid xl:grid-cols-3 xl:gap-8">
+        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
           {/* Brand */}
-          <div className="space-y-4">
+          <div className="col-span-2 md:col-span-1 space-y-4">
             <Link href="/" className="inline-block">
               <span className="text-xl font-bold tracking-tight">
                 <span className="text-silicon-amber">Silicon</span>
@@ -44,79 +40,76 @@ export function Footer() {
               </span>
             </Link>
             <p className="text-sm text-text-muted max-w-xs">
-              Forensic Technopolitics from the edge. Tracing the constraints that shape technology decisions.
-            </p>
-            <p className="text-xs text-text-muted">
-              Analysis for decision-makers navigating the AI Act, semiconductor supply chains, and digital sovereignty.
+              Forensic Technopolitics for the senior leaders defining the AI power shift.
+              Published from Sanday, Orkney.
             </p>
           </div>
 
-          {/* Navigation */}
-          <div className="mt-12 grid grid-cols-2 gap-8 xl:col-span-2 xl:mt-0">
-            <div className="md:grid md:grid-cols-2 md:gap-8">
-              <div>
-                <h3 className="text-sm font-semibold text-text-primary">Analysis</h3>
-                <ul className="mt-4 space-y-3">
-                  {footerNavigation.analysis.map((item) => (
-                    <li key={item.name}>
-                      <Link
-                        href={item.href}
-                        className="text-sm text-text-muted hover:text-stone-teal transition-colors"
-                      >
-                        {item.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="mt-10 md:mt-0">
-                <h3 className="text-sm font-semibold text-text-primary">Methodology</h3>
-                <ul className="mt-4 space-y-3">
-                  {footerNavigation.methodology.map((item) => (
-                    <li key={item.name}>
-                      <Link
-                        href={item.href}
-                        className="text-sm text-text-muted hover:text-stone-teal transition-colors"
-                      >
-                        {item.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-            <div className="md:grid md:grid-cols-2 md:gap-8">
-              <div>
-                <h3 className="text-sm font-semibold text-text-primary">Company</h3>
-                <ul className="mt-4 space-y-3">
-                  {footerNavigation.company.map((item) => (
-                    <li key={item.name}>
-                      <Link
-                        href={item.href}
-                        className="text-sm text-text-muted hover:text-stone-teal transition-colors"
-                      >
-                        {item.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="mt-10 md:mt-0">
-                <h3 className="text-sm font-semibold text-text-primary">Terms</h3>
-                <ul className="mt-4 space-y-3">
-                  {footerNavigation.terms.map((item) => (
-                    <li key={item.name}>
-                      <Link
-                        href={item.href}
-                        className="text-sm text-text-muted hover:text-stone-teal transition-colors"
-                      >
-                        {item.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
+          {/* Intelligence */}
+          <div>
+            <h3 className="text-sm font-semibold text-text-primary">Intelligence</h3>
+            <ul className="mt-4 space-y-3">
+              {footerNavigation.intelligence.map((item) => (
+                <li key={item.name}>
+                  <Link
+                    href={item.href}
+                    className="text-sm text-text-muted hover:text-stone-teal transition-colors"
+                  >
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Engage */}
+          <div>
+            <h3 className="text-sm font-semibold text-text-primary">Engage</h3>
+            <ul className="mt-4 space-y-3">
+              {footerNavigation.engage.map((item) => (
+                <li key={item.name}>
+                  <Link
+                    href={item.href}
+                    className="text-sm text-text-muted hover:text-stone-teal transition-colors"
+                  >
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Related + Company */}
+          <div>
+            <h3 className="font-mono text-[11px] uppercase tracking-[0.12em] text-sister-indigo">
+              Related
+            </h3>
+            <ul className="mt-4 space-y-3">
+              <li>
+                <Link
+                  href={WAYMARKPATH_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-sister-indigo hover:text-sister-indigo/80 transition-colors"
+                >
+                  WaymarkPath
+                </Link>
+              </li>
+            </ul>
+
+            <h3 className="mt-8 text-sm font-semibold text-text-primary">Company</h3>
+            <ul className="mt-4 space-y-3">
+              {footerNavigation.company.map((item) => (
+                <li key={item.name}>
+                  <Link
+                    href={item.href}
+                    className="text-sm text-text-muted hover:text-stone-teal transition-colors"
+                  >
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
 
@@ -125,20 +118,9 @@ export function Footer() {
           <p className="text-xs text-text-muted leading-relaxed max-w-3xl mb-6">
             What we publish is analysis, not instruction. We aim to inform; the decisions are yours. The publication is not responsible for outcomes.
           </p>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <p className="text-xs text-text-muted">
-              &copy; {new Date().getFullYear()} Silicon and Stone. All rights reserved.
-            </p>
-            <Link
-              href={WAYMARKPATH_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-[0.10em] text-sister-indigo border border-sister-indigo/40 hover:bg-sister-indigo/10 transition-colors px-3 py-1.5 rounded"
-            >
-              WaymarkPath
-              <span aria-hidden="true">→</span>
-            </Link>
-          </div>
+          <p className="text-xs text-text-muted">
+            &copy; {new Date().getFullYear()} Silicon and Stone. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>

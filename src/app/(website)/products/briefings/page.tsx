@@ -80,7 +80,7 @@ export default function BriefingsProductPage() {
                 Coming Soon
               </Badge>
               <h1 className="text-4xl font-bold text-text-primary sm:text-5xl mb-6">
-                Sector Intelligence Briefings
+                Sector Reports
               </h1>
               <p className="text-xl text-text-muted leading-relaxed mb-6">
                 Focused 15-20 page briefings combining AI landscape analysis, regulatory

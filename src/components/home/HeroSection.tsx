@@ -145,6 +145,16 @@ export function HeroSection({ settings }: HeroSectionProps) {
 
                         <motion.p
                             variants={itemVariants}
+                            className="mb-8 max-w-xl border-l-2 border-silicon-amber/50 pl-4 text-base italic leading-relaxed text-silicon-amber"
+                            style={{
+                                textShadow: '0 2px 18px rgba(0, 0, 0, 0.65)',
+                            }}
+                        >
+                            Read every briefing three ways — for your institution, for the balance of power, and for your own position.
+                        </motion.p>
+
+                        <motion.p
+                            variants={itemVariants}
                             className="max-w-xl text-base font-medium leading-relaxed text-text-primary/90"
                             style={{
                                 textShadow: '0 2px 18px rgba(0, 0, 0, 0.65)',

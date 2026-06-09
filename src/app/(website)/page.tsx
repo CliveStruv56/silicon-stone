@@ -11,6 +11,9 @@ import {
   ToolsGallery,
   PersonaNavigator,
   SubscribeCTA,
+  StartHereSpine,
+  ProductsBand,
+  AdvisoryBand,
 } from '@/components/home'
 import { sanityFetch } from '@/sanity/lib/live'
 import { SITE_SETTINGS_QUERY, ARTICLES_BY_TIER_QUERY } from '@/sanity/lib/queries'
@@ -96,12 +99,8 @@ export default async function Home() {
         {/* 1. Hero — The Vantage Point */}
         <HeroSection settings={siteSettings} />
 
-        {/* 2. AI Act readiness */}
-        <div className="bg-slate-deep border-y border-border-subtle">
-          <div className="mx-auto max-w-7xl px-6 py-3 lg:px-8">
-            <DeadlineCountdown />
-          </div>
-        </div>
+        {/* 2. Start here — the Read → Use → Buy → Engage spine */}
+        <StartHereSpine />
 
         {/* 3. Credibility — The View from the Edge */}
         <CredibilityBlock />
@@ -109,20 +108,33 @@ export default async function Home() {
         {/* 4. Orchestration Battleground — Model-Dependent vs Orchestration-Side */}
         <OrchestrationBattleground settings={siteSettings?.orchestrationBattleground} />
 
-        {/* 5. Intelligence Tiers — three-tier ladder */}
+        {/* 5. AI Act readiness — featured compliance on-ramp */}
+        <div className="bg-slate-deep border-y border-border-subtle">
+          <div className="mx-auto max-w-7xl px-6 py-3 lg:px-8">
+            <DeadlineCountdown />
+          </div>
+        </div>
+
+        {/* 6. Intelligence Tiers — Read, three-tier ladder */}
         <IntelligenceTiers
           pulseArticle={pulseArticle}
           briefingArticle={briefingArticle}
           auditArticle={auditArticle}
         />
 
-        {/* 6. Tool Gallery — Real-World Utility */}
+        {/* 7. Tool Gallery — Use, with take-it-further bridges */}
         <ToolsGallery />
 
-        {/* 7. Persona Navigator — Find Your Perspective */}
+        {/* 8. Products band — Buy */}
+        <ProductsBand />
+
+        {/* 9. Advisory band — Engage */}
+        <AdvisoryBand />
+
+        {/* 10. Persona Navigator — Find Your Perspective (+ Positional tile) */}
         <PersonaNavigator />
 
-        {/* 7b. Adjacent Block — sister-product cross-link to WaymarkPath */}
+        {/* 11. Adjacent Block — WaymarkPath as a "Related" companion */}
         <AdjacentBlock />
 
         {/* 8. Subscribe CTA */}

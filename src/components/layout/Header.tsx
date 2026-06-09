@@ -2,30 +2,26 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 
-type Category = {
-  _id: string
-  title: string
-  slug: string
-}
+type NavChild = { name: string; href: string; note?: string }
 
 type NavItem = {
   name: string
   href: string
-  children?: { name: string; href: string }[]
+  children?: NavChild[]
 }
 
-const staticNavigation = [
+// Primary navigation reads the commitment ladder left → right: free → paid.
+// Read (Intelligence) → Use (Tools) → Buy (Products) → Engage (Advisory).
+const primaryNavigation: NavItem[] = [
   {
-    name: 'Briefings',
+    name: 'Intelligence',
     href: '/briefings',
     children: [
-      { name: 'All Intelligence', href: '/briefings' },
-      { name: 'For Compliance', href: '/briefings?persona=clara' },
-      { name: 'For Operations', href: '/briefings?persona=ian' },
-      { name: 'For Policy', href: '/briefings?persona=sofia' },
+      { name: 'By topic', href: '/analysis' },
+      { name: 'By role & depth', href: '/briefings' },
     ],
   },
   {
@@ -42,29 +38,27 @@ const staticNavigation = [
     name: 'Products',
     href: '/products',
     children: [
-      { name: 'AI Act Compliance Toolkit', href: '/products/ai-act-toolkit' },
       { name: 'AI Audit Checklist Pack', href: '/products/ai-audit-checklist' },
-      { name: 'Sector Briefings', href: '/products/briefings' },
-      { name: 'WaymarkPath', href: '/waymarkpath' },
+      { name: 'AI Act Compliance Toolkit', href: '/products/ai-act-toolkit' },
+      { name: 'Sector Reports', href: '/products/briefings', note: 'Coming soon' },
     ],
   },
   {
-    name: 'Methodology',
-    href: '/methodology',
-  },
-  {
-    name: 'Services',
+    name: 'Advisory',
     href: '/services',
-  },
-  {
-    name: 'About',
-    href: '/about',
   },
 ]
 
+// Credibility pages — kept, but visually secondary (a lighter right-hand pair).
+const secondaryNavigation: NavItem[] = [
+  { name: 'Methodology', href: '/methodology' },
+  { name: 'About', href: '/about' },
+]
+
+const mobileNavigation: NavItem[] = [...primaryNavigation, ...secondaryNavigation]
+
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [categories, setCategories] = useState<Category[]>([])
   const pathname = usePathname()
 
   const matchesHref = (href: string) => {
@@ -78,47 +72,45 @@ export function Header() {
     return item.children?.some((child) => matchesHref(child.href)) ?? false
   }
 
-  // Fetch categories on mount
-  useEffect(() => {
-    async function fetchCategories() {
-      try {
-        const categoriesUrl = process.env.NEXT_PUBLIC_API_URL
-          ? `${process.env.NEXT_PUBLIC_API_URL}/v1/categories`
-          : '/api/categories'
-        const res = await fetch(categoriesUrl)
-        if (res.ok) {
-          const data = await res.json()
-          setCategories(data.map((category: Category & { id?: string }) => ({
-            _id: category._id ?? category.id ?? category.slug,
-            title: category.title,
-            slug: category.slug,
-          })))
-        }
-      } catch (e) {
-        console.error('Failed to fetch categories', e)
-      }
-    }
-    fetchCategories()
-  }, [])
-
-  // Fallback categories when Sanity has none
-  const fallbackCategories = [
-    { name: 'All Analysis', href: '/analysis' },
-  ]
-
-  // Build navigation with dynamic Analysis dropdown
-  const analysisNav = {
-    name: 'Analysis',
-    href: '/analysis',
-    children: categories.length > 0
-      ? categories.map(cat => ({
-        name: cat.title,
-        href: `/analysis/category/${cat.slug}`
-      }))
-      : fallbackCategories
-  }
-
-  const navigation = [analysisNav, ...staticNavigation]
+  const renderDesktopItem = (item: NavItem, secondary = false) => (
+    <div key={item.name} className="relative group">
+      <Link
+        href={item.href}
+        aria-current={isActive(item) ? 'page' : undefined}
+        className={`font-ui-mono transition-colors hover:text-text-primary ${
+          isActive(item)
+            ? 'text-silicon-cyan'
+            : secondary
+              ? 'text-text-muted/70'
+              : 'text-text-muted'
+        }`}
+      >
+        {item.name}
+      </Link>
+      {item.children && item.children.length > 0 && (
+        <div className="absolute left-0 top-full pt-0 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-150">
+          <div className="pt-2">
+            <div className="rounded-lg bg-stone-charcoal p-2 shadow-xl ring-1 ring-border-subtle">
+              {item.children.map((child) => (
+                <Link
+                  key={child.name}
+                  href={child.href}
+                  className="block rounded-md px-3 py-2 text-sm text-text-muted transition-colors hover:bg-surface-elevated hover:text-text-primary whitespace-nowrap"
+                >
+                  {child.name}
+                  {child.note && (
+                    <span className="ml-2 font-mono text-[10px] uppercase tracking-[0.08em] text-text-muted/60">
+                      {child.note}
+                    </span>
+                  )}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border-subtle glass-plate noise-overlay">
@@ -159,37 +151,10 @@ export function Header() {
         </div>
 
         {/* Desktop navigation */}
-        <div className="hidden lg:flex lg:gap-x-8">
-          {navigation.map((item: NavItem) => (
-            <div key={item.name} className="relative group">
-              <Link
-                href={item.href}
-                aria-current={isActive(item) ? 'page' : undefined}
-                className={`font-ui-mono transition-colors hover:text-text-primary ${
-                  isActive(item) ? 'text-silicon-cyan' : 'text-text-muted'
-                }`}
-              >
-                {item.name}
-              </Link>
-              {item.children && item.children.length > 0 && (
-                <div className="absolute left-0 top-full pt-0 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-150">
-                  <div className="pt-2">
-                    <div className="rounded-lg bg-stone-charcoal p-2 shadow-xl ring-1 ring-border-subtle">
-                      {item.children.map((child) => (
-                        <Link
-                          key={child.name}
-                          href={child.href}
-                          className="block rounded-md px-3 py-2 text-sm text-text-muted transition-colors hover:bg-surface-elevated hover:text-text-primary whitespace-nowrap"
-                        >
-                          {child.name}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
+        <div className="hidden lg:flex lg:items-center lg:gap-x-6">
+          {primaryNavigation.map((item) => renderDesktopItem(item))}
+          <span aria-hidden="true" className="h-4 w-px bg-border-subtle" />
+          {secondaryNavigation.map((item) => renderDesktopItem(item, true))}
         </div>
 
         {/* Search & CTA */}
@@ -215,7 +180,7 @@ export function Header() {
       {mobileMenuOpen && (
         <div className="lg:hidden">
           <div className="space-y-1 px-6 pb-4 pt-2">
-            {navigation.map((item: NavItem) => (
+            {mobileNavigation.map((item: NavItem) => (
               <div key={item.name}>
                 <Link
                   href={item.href}
@@ -237,6 +202,11 @@ export function Header() {
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         {child.name}
+                        {child.note && (
+                          <span className="ml-2 font-mono text-[10px] uppercase tracking-[0.08em] text-text-muted/60">
+                            {child.note}
+                          </span>
+                        )}
                       </Link>
                     ))}
                   </div>

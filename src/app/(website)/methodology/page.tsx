@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
+import { ThreeReadings } from '@/components/ThreeReadings'
 
 export const metadata: Metadata = {
   title: 'Methodology | Silicon and Stone',
@@ -281,6 +282,11 @@ export default function MethodologyPage() {
             </div>
           </div>
         </section>
+
+        <Separator className="mx-auto max-w-7xl bg-border-subtle" />
+
+        {/* Three Readings of Every Briefing — relocated from the homepage */}
+        <ThreeReadings className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16" />
 
         <Separator className="mx-auto max-w-7xl bg-border-subtle" />
 

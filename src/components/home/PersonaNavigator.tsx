@@ -5,7 +5,7 @@ import { StaggerContainer, StaggerItem } from '@/components/ui/StaggerContainer'
 import { ForensicCard } from '@/components/ui/ForensicCard'
 import { Badge } from '@/components/ui/badge'
 import { PERSONAS, PERSONA_ORDER, type PersonaSlug } from '@/lib/personas'
-import { ShieldCheck, Truck, Globe, MapPin, User, ArrowRight } from 'lucide-react'
+import { ShieldCheck, Truck, Globe, MapPin, User, Compass, ArrowRight } from 'lucide-react'
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   'shield-check': ShieldCheck,
@@ -13,6 +13,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   'globe': Globe,
   'map-pin': MapPin,
   'user': User,
+  'compass': Compass,
 }
 
 const colorMap: Record<string, string> = {
@@ -20,6 +21,7 @@ const colorMap: Record<string, string> = {
   'stone-teal': 'text-stone-teal',
   'tier-pulse': 'text-silicon-cyan',
   'alert-red': 'text-alert-red',
+  'sister-indigo': 'text-sister-indigo',
   'text-muted': 'text-text-muted',
 }
 
@@ -28,6 +30,7 @@ const hoverBorderMap: Record<string, string> = {
   'stone-teal': 'hover:border-stone-teal/60',
   'tier-pulse': 'hover:border-silicon-cyan/60',
   'alert-red': 'hover:border-alert-red/60',
+  'sister-indigo': 'hover:border-sister-indigo/60',
   'text-muted': 'hover:border-text-muted/60',
 }
 
@@ -60,22 +63,26 @@ export function PersonaNavigator() {
           </div>
         </StaggerItem>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {PERSONA_ORDER.map((slug: PersonaSlug) => {
             const persona = PERSONAS[slug]
             const Icon = iconMap[persona.icon] || User
             const colorClass = colorMap[persona.color] || 'text-text-muted'
             const hoverBorder = hoverBorderMap[persona.color] || 'hover:border-text-muted/60'
+            const href = persona.href ?? `/briefings?persona=${slug}`
+            const isHighlighted = Boolean(persona.href)
 
             return (
               <StaggerItem key={slug}>
-                <Link href={`/briefings?persona=${slug}`} className="block h-full">
+                <Link href={href} className="block h-full">
                   <ForensicCard
                     accent="subtle"
                     showMarkers={false}
                     gridHover={true}
                     delay={0}
-                    className={`h-full cursor-pointer transition-all ${hoverBorder}`}
+                    className={`h-full cursor-pointer transition-all ${hoverBorder} ${
+                      isHighlighted ? 'border-sister-indigo/50 ring-1 ring-sister-indigo/20' : ''
+                    }`}
                   >
                     <div className="text-center space-y-3">
                       <div className={`mx-auto w-10 h-10 rounded-full bg-stone-charcoal border border-border-subtle flex items-center justify-center ${colorClass}`}>

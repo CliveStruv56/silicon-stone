@@ -1,7 +1,7 @@
 import "server-only";
 import { writeClient } from "@/lib/sanity";
 import { CONTENT_STATS_QUERY } from "@/sanity/lib/queries";
-import { PERSONA_ORDER, getPersonaLabel, type PersonaSlug } from "@/lib/personas";
+import { BRIEFINGS_PERSONA_ORDER, getPersonaLabel, type PersonaSlug } from "@/lib/personas";
 
 /**
  * Content-library counts for the analytics dashboard.
@@ -79,7 +79,7 @@ export async function getContentStats(): Promise<ContentStats> {
 
 /** Persona counts in canonical order with display names. */
 export function personaBreakdown(stats: ContentStats): Array<{ slug: PersonaSlug; label: string; count: number }> {
-    return PERSONA_ORDER.map((slug) => ({
+    return BRIEFINGS_PERSONA_ORDER.map((slug) => ({
         slug,
         label: getPersonaLabel(slug),
         count: stats.byPersona[slug] ?? 0,

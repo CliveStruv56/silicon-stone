@@ -3,7 +3,7 @@
  * Based on content-focus-areas.md persona specifications
  */
 
-export type PersonaSlug = 'clara' | 'ian' | 'sofia' | 'robert' | 'citizen'
+export type PersonaSlug = 'clara' | 'ian' | 'sofia' | 'robert' | 'positional' | 'citizen'
 
 export interface Persona {
   slug: PersonaSlug
@@ -16,6 +16,8 @@ export interface Persona {
   ctaCopy: string
   description: string
   contentNeeds: string[]
+  /** Optional routing override. Defaults to /briefings?persona=<slug>. */
+  href?: string
 }
 
 export const PERSONAS: Record<PersonaSlug, Persona> = {
@@ -83,6 +85,23 @@ export const PERSONAS: Record<PersonaSlug, Persona> = {
       'Local implementation guides',
     ],
   },
+  positional: {
+    slug: 'positional',
+    name: 'Positional',
+    role: 'Senior Practitioner',
+    icon: 'compass',
+    color: 'sister-indigo',
+    avatar: '/personas/citizen.jpg',
+    href: '/waymarkpath',
+    ctaCopy: 'Where the durable bets are in a redrawn labour market.',
+    description: 'Reading every shift for its impact on your own position and career',
+    contentNeeds: [
+      'Skill-demand signals',
+      'Role-resilience analysis',
+      'Capability transition paths',
+      'Labour-market scenarios',
+    ],
+  },
   citizen: {
     slug: 'citizen',
     name: 'Global Citizen',
@@ -101,7 +120,16 @@ export const PERSONAS: Record<PersonaSlug, Persona> = {
   },
 }
 
-export const PERSONA_ORDER: PersonaSlug[] = ['clara', 'ian', 'sofia', 'robert', 'citizen']
+export const PERSONA_ORDER: PersonaSlug[] = ['clara', 'ian', 'sofia', 'robert', 'positional', 'citizen']
+
+/**
+ * Personas that filter the briefings content feed. Excludes any persona with an
+ * `href` override (e.g. Positional, which routes to WaymarkPath rather than a
+ * briefings filter and has no content of its own).
+ */
+export const BRIEFINGS_PERSONA_ORDER: PersonaSlug[] = PERSONA_ORDER.filter(
+  (slug) => !PERSONAS[slug].href,
+)
 
 /**
  * Get persona label for display
@@ -138,6 +166,7 @@ const PERSONA_BADGE_CLASSES: Record<PersonaSlug, string> = {
   ian: 'border-stone-teal/50 text-stone-teal',
   sofia: 'border-tier-pulse/50 text-tier-pulse',
   robert: 'border-alert-red/50 text-alert-red',
+  positional: 'border-sister-indigo/50 text-sister-indigo',
   citizen: 'border-border-subtle text-text-muted',
 }
 
@@ -182,6 +211,10 @@ export function getDynamicCTA(activePersona?: string | null): {
     robert: {
       headline: 'Regional Impact Analysis',
       subheadline: 'Local implementation insights. Economic impact data you won\'t find elsewhere.',
+    },
+    positional: {
+      headline: 'Positional Intelligence',
+      subheadline: 'Read every shift for your own position. Where the durable bets are in a redrawn labour market.',
     },
     citizen: {
       headline: 'Weekly Explainer',
