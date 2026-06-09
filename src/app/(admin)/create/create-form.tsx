@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -20,6 +21,7 @@ interface CreateFormProps {
 }
 
 export function CreateForm({ initialPersonas }: CreateFormProps) {
+    const router = useRouter();
     const [format, setFormat] = useState<FormatType>("signal");
     const [personaSlug, setPersonaSlug] = useState<string>(initialPersonas[0]?.slug.current || "");
     const [topic, setTopic] = useState("");
@@ -71,10 +73,20 @@ export function CreateForm({ initialPersonas }: CreateFormProps) {
 
         setIsGenerating(true);
         try {
-            await createDraftFromResearch(researchResult, format as "pulse" | "signal" | "deep_dive" | "guide" | "youtube", personaSlug, topic);
+            // On success the action returns { ok: true } and we navigate to Studio.
+            // On failure it returns { error } — a specific message naming the
+            // API/credential at fault. (The action intentionally does not
+            // redirect() itself; that threw a spurious error on the client.)
+            const result = await createDraftFromResearch(researchResult, format as "pulse" | "signal" | "deep_dive" | "guide" | "youtube", personaSlug, topic);
+            if ("error" in result) {
+                alert(result.error);
+                setIsGenerating(false);
+                return;
+            }
+            router.push("/studio/structure/article");
         } catch (error) {
             console.error("Generation failed:", error);
-            alert("Failed to generate draft. Please try again.");
+            alert("Failed to generate draft — the request didn't reach the server (network or session issue). Please try again.");
             setIsGenerating(false);
         }
     }
