@@ -9,6 +9,10 @@ import { requireAdmin } from "@/lib/auth";
 import { ResearchResult } from "@/types/research";
 import { generateEmbedding } from "@/lib/embeddings";
 import { searchSimilar } from "@/lib/pinecone";
+import { checkDurableRateLimit } from "@/lib/durable-rate-limit";
+import { getServerActionClientIp } from "@/lib/rate-limit";
+
+const MAX_TOPIC_LENGTH = 300
 
 export type StartResearchResponse =
     | { mode: "result"; result: ResearchResult }
@@ -22,12 +26,23 @@ export type StartResearchResponse =
  */
 export async function startResearch(topic: string, deep: boolean): Promise<StartResearchResponse> {
     await requireAdmin();
+    const normalizedTopic = topic.trim().slice(0, MAX_TOPIC_LENGTH)
+    if (!normalizedTopic) {
+        throw new Error("Topic is required.")
+    }
     try {
+        if (deep) {
+            const ip = await getServerActionClientIp()
+            const rateLimit = await checkDurableRateLimit("deepResearch", ip)
+            if (!rateLimit.allowed) {
+                throw new Error(`Too many deep research starts. Try again in ${rateLimit.retryAfter} seconds.`)
+            }
+        }
         if (deep && isBackendConfigured()) {
-            const jobId = await startDeepResearchJob(topic, buildDeepInstructions(topic));
+            const jobId = await startDeepResearchJob(normalizedTopic, buildDeepInstructions(normalizedTopic));
             return { mode: "job", jobId };
         }
-        const result = await researchPipeline(topic, undefined, { deep });
+        const result = await researchPipeline(normalizedTopic, undefined, { deep });
         return { mode: "result", result };
     } catch (error) {
         console.error("Error starting research:", error);

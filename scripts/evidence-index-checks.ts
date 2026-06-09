@@ -62,6 +62,14 @@ assert.ok(
   evidenceIndex.indexOf('deleteMany') < evidenceIndex.indexOf('index.upsert'),
   'evidence deletion must occur before evidence upsert',
 )
+assert.match(evidenceIndex, /EVIDENCE_EMBEDDING_BATCH_SIZE/)
+assert.match(evidenceIndex, /EVIDENCE_SOURCE_MAX_CHUNKS/)
+assert.match(evidenceIndex, /embedInBatches/)
+assert.equal(
+  /Promise\.all\(\s*records\.map/.test(evidenceIndex),
+  false,
+  'evidence replacement must not fan out every embedding call at once',
+)
 
 const pineconeSource = fs.readFileSync('src/lib/pinecone.ts', 'utf8')
 assert.match(pineconeSource, /PINECONE_EVIDENCE_INDEX_NAME/)
@@ -69,10 +77,15 @@ assert.match(pineconeSource, /PINECONE_EVIDENCE_INDEX_NAME/)
 const vectorizeRoute = fs.readFileSync('src/app/api/vectorize/route.ts', 'utf8')
 assert.equal(vectorizeRoute.includes('getEvidencePineconeIndex'), false)
 assert.equal(vectorizeRoute.includes('replaceEvidenceSource'), false)
+assert.match(vectorizeRoute, /relatedArticles/)
 
 const semanticSearchRoute = fs.readFileSync('src/app/api/search/semantic/route.ts', 'utf8')
 assert.equal(semanticSearchRoute.includes('searchEvidence'), false)
 assert.match(semanticSearchRoute, /searchSimilar/)
+
+const relatedArticlesComponent = fs.readFileSync('src/components/article/RelatedArticles.tsx', 'utf8')
+assert.equal(relatedArticlesComponent.includes('generateEmbedding'), false)
+assert.equal(relatedArticlesComponent.includes('searchSimilar'), false)
 
 const evidenceSearchRoute = fs.readFileSync('src/app/api/knowledge/evidence/route.ts', 'utf8')
 assert.match(evidenceSearchRoute, /await requireAdmin\(\)/)

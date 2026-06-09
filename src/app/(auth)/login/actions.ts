@@ -4,6 +4,8 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import crypto from 'crypto'
 import { SESSION_COOKIE_NAME, SESSION_MAX_AGE_SECONDS, issueSession } from '@/lib/session'
+import { checkDurableRateLimit } from '@/lib/durable-rate-limit'
+import { getServerActionClientIp } from '@/lib/rate-limit'
 
 interface LoginState {
     message: string;
@@ -24,6 +26,17 @@ function timingSafeEqual(a: string, b: string): boolean {
 export async function verifyPassword(_prevState: LoginState, formData: FormData): Promise<LoginState> {
     const password = formData.get('password') as string
     const correctPassword = process.env.ADMIN_PASSWORD
+    const ip = await getServerActionClientIp()
+
+    try {
+        const rateLimit = await checkDurableRateLimit('login', ip)
+        if (!rateLimit.allowed) {
+            return { message: `Too many attempts. Try again in ${rateLimit.retryAfter} seconds.` }
+        }
+    } catch (error) {
+        console.error("Login rate limit unavailable:", error)
+        return { message: 'Login temporarily unavailable: Contact Administrator' }
+    }
 
     if (!correctPassword) {
         console.error("ADMIN_PASSWORD environment variable is not set.")

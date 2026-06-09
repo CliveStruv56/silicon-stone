@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { getClientIp } from "@/lib/rate-limit";
+import { checkDurableRateLimit } from "@/lib/durable-rate-limit";
 
 const KIT_API_KEY = process.env.CONVERTKIT_API_KEY || "";
 const KIT_FORM_ID = process.env.CONVERTKIT_FORM_ID || "";
@@ -67,10 +68,16 @@ async function proxySubscribe(body: { email: string; tag?: string }) {
 export async function POST(request: NextRequest) {
   try {
     const ip = getClientIp(request);
-    const rateLimit = checkRateLimit(`subscribe:${ip}`, {
-      limit: 10,
-      windowMs: 15 * 60 * 1000,
-    });
+    let rateLimit;
+    try {
+      rateLimit = await checkDurableRateLimit("subscribe", ip);
+    } catch (error) {
+      console.error("Subscribe rate limit unavailable:", error);
+      return NextResponse.json(
+        { error: "Subscription service temporarily unavailable" },
+        { status: 503 }
+      );
+    }
 
     if (!rateLimit.allowed) {
       return NextResponse.json(
@@ -90,7 +97,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json();
+    let body: Record<string, unknown>;
+    try {
+      const raw = await request.text();
+      if (raw.length > MAX_BODY_BYTES) {
+        return NextResponse.json(
+          { error: "Request too large" },
+          { status: 413 }
+        );
+      }
+      body = JSON.parse(raw) as Record<string, unknown>;
+    } catch {
+      return NextResponse.json(
+        { error: "Invalid JSON" },
+        { status: 400 }
+      );
+    }
     const email = typeof body.email === "string" ? body.email.trim().slice(0, 254).toLowerCase() : "";
     const tag = typeof body.tag === "string" && ALLOWED_TAGS.has(body.tag) ? body.tag : undefined;
 

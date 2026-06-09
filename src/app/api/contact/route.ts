@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { getClientIp } from "@/lib/rate-limit";
+import { checkDurableRateLimit } from "@/lib/durable-rate-limit";
 
 const KIT_API_KEY = process.env.CONVERTKIT_API_KEY || "";
 const KIT_FORM_ID = process.env.CONVERTKIT_FORM_ID || "";
@@ -84,10 +85,16 @@ async function proxyContact(body: {
 export async function POST(request: NextRequest) {
   try {
     const ip = getClientIp(request);
-    const rateLimit = checkRateLimit(`contact:${ip}`, {
-      limit: 5,
-      windowMs: 15 * 60 * 1000,
-    });
+    let rateLimit;
+    try {
+      rateLimit = await checkDurableRateLimit("contact", ip);
+    } catch (error) {
+      console.error("Contact rate limit unavailable:", error);
+      return NextResponse.json(
+        { error: "Contact service temporarily unavailable" },
+        { status: 503 }
+      );
+    }
 
     if (!rateLimit.allowed) {
       return NextResponse.json(
@@ -107,7 +114,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json();
+    let body: Record<string, unknown>;
+    try {
+      const raw = await request.text();
+      if (raw.length > MAX_BODY_BYTES) {
+        return NextResponse.json(
+          { error: "Request too large" },
+          { status: 413 }
+        );
+      }
+      body = JSON.parse(raw) as Record<string, unknown>;
+    } catch {
+      return NextResponse.json(
+        { error: "Invalid JSON" },
+        { status: 400 }
+      );
+    }
     const name = normalizeField(body.name, MAX_FIELD_LENGTHS.name);
     const email = normalizeField(body.email, MAX_FIELD_LENGTHS.email).toLowerCase();
     const company = normalizeField(body.company, MAX_FIELD_LENGTHS.company);

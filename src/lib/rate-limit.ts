@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server'
+import { headers } from 'next/headers'
 
 type Bucket = {
   count: number
@@ -25,6 +26,17 @@ export function getClientIp(request: NextRequest): string {
   if (forwardedFor) {
     return forwardedFor.split(',')[0].trim()
   }
+
+  return 'unknown'
+}
+
+export async function getServerActionClientIp(): Promise<string> {
+  const headerStore = await headers()
+  const realIp = headerStore.get('x-real-ip')
+  if (realIp) return realIp.trim()
+
+  const forwardedFor = headerStore.get('x-forwarded-for')
+  if (forwardedFor) return forwardedFor.split(',')[0].trim()
 
   return 'unknown'
 }
@@ -60,4 +72,3 @@ export function checkRateLimit(
   current.count += 1
   return { allowed: true, retryAfter: 0 }
 }
-

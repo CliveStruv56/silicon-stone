@@ -2,8 +2,15 @@ import { type NextRequest, NextResponse } from 'next/server'
 import { revalidatePath, revalidateTag } from 'next/cache'
 import { parseBody } from 'next-sanity/webhook'
 
+const MAX_REVALIDATE_BODY_BYTES = 50_000
+
 export async function POST(req: NextRequest) {
     try {
+        const contentLength = Number(req.headers.get('content-length') || 0)
+        if (!contentLength || contentLength > MAX_REVALIDATE_BODY_BYTES) {
+            return new Response('Request too large', { status: 413 })
+        }
+
         const { isValidSignature, body } = await parseBody<{ _type: string; slug?: { current: string } }>(
             req,
             process.env.SANITY_REVALIDATE_SECRET,
@@ -32,7 +39,6 @@ export async function POST(req: NextRequest) {
             status: 200,
             revalidated: true,
             now: Date.now(),
-            body,
         })
     } catch (err) {
         console.error(err)

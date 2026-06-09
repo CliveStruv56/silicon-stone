@@ -4,13 +4,22 @@ import { createClient } from '@sanity/client'
 import { apiVersion, dataset, projectId } from '@/sanity/env'
 import { getPineconeIndex } from '@/lib/pinecone'
 import { generateEmbedding, extractArticleText, buildArticleMetadata } from '@/lib/embeddings'
-import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
+import { getClientIp } from '@/lib/rate-limit'
+import { checkDurableRateLimit } from '@/lib/durable-rate-limit'
 
 const sanity = createClient({
   projectId,
   dataset,
   apiVersion,
   token: process.env.SANITY_API_READ_TOKEN,
+  useCdn: false,
+})
+
+const writeSanity = createClient({
+  projectId,
+  dataset,
+  apiVersion,
+  token: process.env.SANITY_API_WRITE_TOKEN,
   useCdn: false,
 })
 
@@ -27,7 +36,13 @@ export async function POST(req: NextRequest) {
   // Rate-limit before auth so a leaked/guessed secret can't drive unbounded
   // paid embedding + index writes.
   const ip = getClientIp(req)
-  const rl = checkRateLimit(`vectorize:${ip}`, { limit: 120, windowMs: 60_000 })
+  let rl
+  try {
+    rl = await checkDurableRateLimit('vectorize', ip)
+  } catch (error) {
+    console.error('Vectorize rate limit unavailable:', error)
+    return NextResponse.json({ error: 'Rate limiter unavailable' }, { status: 503 })
+  }
   if (!rl.allowed) {
     return NextResponse.json(
       { error: 'Rate limited' },
@@ -90,6 +105,25 @@ export async function POST(req: NextRequest) {
   const metadata = buildArticleMetadata(fullArticle)
 
   await index.upsert({ records: [{ id: _id, values: vector, metadata }] })
+
+  if (process.env.SANITY_API_WRITE_TOKEN) {
+    const related = await index.query({
+      vector,
+      topK: 4,
+      includeMetadata: false,
+      includeValues: false,
+    })
+    const refs = (related.matches ?? [])
+      .filter((match) => match.id !== _id)
+      .slice(0, 3)
+      .map((match) => ({
+        _type: 'reference',
+        _ref: match.id,
+        _key: crypto.randomUUID().slice(0, 8),
+      }))
+
+    await writeSanity.patch(_id).set({ relatedArticles: refs }).commit()
+  }
 
   return NextResponse.json({ success: true, id: _id, title: fullArticle.title })
 }

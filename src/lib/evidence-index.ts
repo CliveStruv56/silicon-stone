@@ -6,9 +6,38 @@ import {
 } from './evidence'
 import { generateEmbedding } from './embeddings'
 
+export const EVIDENCE_EMBEDDING_BATCH_SIZE = 8
+export const EVIDENCE_SOURCE_MAX_CHUNKS = 500
+
+async function embedInBatches(records: ReturnType<typeof buildEvidenceChunkRecords>) {
+  const embeddedRecords: Array<{
+    id: string
+    values: number[]
+    metadata: EvidenceChunkMetadata
+  }> = []
+
+  for (let i = 0; i < records.length; i += EVIDENCE_EMBEDDING_BATCH_SIZE) {
+    const batch = records.slice(i, i + EVIDENCE_EMBEDDING_BATCH_SIZE)
+    const embeddedBatch = await Promise.all(
+      batch.map(async ({ id, metadata }) => ({
+        id,
+        values: await generateEmbedding(metadata.text),
+        metadata,
+      })),
+    )
+    embeddedRecords.push(...embeddedBatch)
+  }
+
+  return embeddedRecords
+}
+
 export async function replaceEvidenceSource(source: EvidenceSource) {
   const index = getEvidencePineconeIndex()
   const records = buildEvidenceChunkRecords(source)
+
+  if (records.length > EVIDENCE_SOURCE_MAX_CHUNKS) {
+    throw new Error(`Evidence source ${source.sourceId} has ${records.length} chunks; maximum is ${EVIDENCE_SOURCE_MAX_CHUNKS}.`)
+  }
 
   try {
     await index.deleteMany({
@@ -24,13 +53,7 @@ export async function replaceEvidenceSource(source: EvidenceSource) {
 
   if (records.length === 0) return { deleted: true, upserted: 0 }
 
-  const embeddedRecords = await Promise.all(
-    records.map(async ({ id, metadata }) => ({
-      id,
-      values: await generateEmbedding(metadata.text),
-      metadata,
-    })),
-  )
+  const embeddedRecords = await embedInBatches(records)
 
   await index.upsert({ records: embeddedRecords })
   return { deleted: true, upserted: embeddedRecords.length }

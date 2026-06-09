@@ -3,6 +3,7 @@ import re
 import json
 import time
 import uuid
+import hashlib
 import asyncio
 import logging
 from datetime import datetime, timedelta, timezone
@@ -242,6 +243,11 @@ def _sanity_image_url(image: dict[str, Any] | None, width: int = 800, height: in
 EXA_RESEARCH_URL = "https://api.exa.ai/research/v1"
 RESEARCH_JOB_TTL_SECONDS = 60 * 60
 REDIS_URL = os.getenv("REDIS_URL", "")
+DEEP_RESEARCH_MAX_TOPIC_CHARS = 300
+DEEP_RESEARCH_MAX_INSTRUCTION_CHARS = 20_000
+DEEP_RESEARCH_START_LIMIT = 3
+DEEP_RESEARCH_START_WINDOW_SECONDS = 60 * 60
+DEEP_RESEARCH_MAX_ACTIVE_JOBS = 2
 
 # In-memory fallback store (used only when Redis is not configured).
 RESEARCH_JOBS: dict[str, dict[str, Any]] = {}
@@ -273,6 +279,64 @@ def _exa_api_key() -> str:
 
 def _job_key(job_id: str) -> str:
     return f"research:job:{job_id}"
+
+
+def _deep_research_hash(topic: str, instructions: str) -> str:
+    digest = hashlib.sha256(f"{topic}\n\n{instructions}".encode("utf-8")).hexdigest()
+    return digest[:32]
+
+
+def _deep_research_idempotency_key(digest: str) -> str:
+    return f"research:active-hash:{digest}"
+
+
+async def _require_deep_research_budget(request: Request, digest: str) -> str | None:
+    redis = _get_redis()
+    if redis is None:
+        raise HTTPException(status_code=503, detail="Deep research budget store is not configured")
+
+    existing_job_id = await redis.get(_deep_research_idempotency_key(digest))
+    if existing_job_id:
+        return str(existing_job_id)
+
+    active_count = await redis.scard("research:active-jobs")
+    if active_count >= DEEP_RESEARCH_MAX_ACTIVE_JOBS:
+        raise HTTPException(status_code=429, detail="Too many active deep research jobs")
+
+    key = f"research:starts:{_client_ip(request)}"
+    count = await redis.incr(key)
+    if count == 1:
+        await redis.expire(key, DEEP_RESEARCH_START_WINDOW_SECONDS)
+    if count > DEEP_RESEARCH_START_LIMIT:
+        ttl = await redis.ttl(key)
+        raise HTTPException(
+            status_code=429,
+            detail="Too many deep research starts",
+            headers={"Retry-After": str(max(1, ttl))},
+        )
+
+    return None
+
+
+async def _deep_research_mark_active(job_id: str, digest: str) -> None:
+    redis = _get_redis()
+    if redis is None:
+        return
+    await redis.sadd("research:active-jobs", job_id)
+    await redis.expire("research:active-jobs", RESEARCH_JOB_TTL_SECONDS)
+    await redis.set(_deep_research_idempotency_key(digest), job_id, ex=RESEARCH_JOB_TTL_SECONDS)
+    await _job_update(job_id, digest=digest)
+
+
+async def _deep_research_mark_finished(job_id: str) -> None:
+    redis = _get_redis()
+    if redis is None:
+        return
+    job = await _job_get(job_id)
+    digest = job.get("digest") if job else None
+    await redis.srem("research:active-jobs", job_id)
+    if digest:
+        await redis.delete(_deep_research_idempotency_key(str(digest)))
 
 
 async def _job_create(job_id: str, topic: str) -> None:
@@ -316,6 +380,7 @@ async def _run_deep_research(job_id: str, instructions: str, model: str) -> None
     api_key = os.getenv("EXA_API_KEY", "")
     if not api_key:
         await _job_update(job_id, status="failed", error="Exa API key is not configured")
+        await _deep_research_mark_finished(job_id)
         return
 
     headers = {"x-api-key": api_key, "Content-Type": "application/json"}
@@ -362,6 +427,7 @@ async def _run_deep_research(job_id: str, instructions: str, model: str) -> None
                     # Record spend in the usage ledger. The frontend only polls
                     # when the backend runs the job, so it can't log this itself.
                     await _record_exa_usage("deep-research", model, cost, job_id)
+                    await _deep_research_mark_finished(job_id)
                     return
                 if status in ("failed", "canceled"):
                     await _job_update(
@@ -369,18 +435,23 @@ async def _run_deep_research(job_id: str, instructions: str, model: str) -> None
                         status="failed",
                         error=data.get("error", f"research {status}"),
                     )
+                    await _deep_research_mark_finished(job_id)
                     return
 
             await _job_update(job_id, status="failed", error="Deep research timed out")
+            await _deep_research_mark_finished(job_id)
     except httpx.HTTPStatusError as exc:
         logger.error("Exa research failed: status=%s body=%s", exc.response.status_code, exc.response.text[:500])
         await _job_update(job_id, status="failed", error=f"Exa returned {exc.response.status_code}")
+        await _deep_research_mark_finished(job_id)
     except httpx.HTTPError as exc:
         logger.error("Exa research request failed: %s", exc)
         await _job_update(job_id, status="failed", error="Exa request failed")
+        await _deep_research_mark_finished(job_id)
     except Exception as exc:  # noqa: BLE001 — never let a worker crash silently
         logger.exception("Deep research job crashed")
         await _job_update(job_id, status="failed", error=str(exc))
+        await _deep_research_mark_finished(job_id)
 
 
 # --- API usage ledger ---------------------------------------------------------
@@ -767,13 +838,22 @@ async def start_deep_research(payload: DeepResearchRequest, request: Request) ->
     _require_backend_api_key(request)
     _exa_api_key()  # fail fast if the key is missing
 
+    topic = payload.topic.strip()[:DEEP_RESEARCH_MAX_TOPIC_CHARS]
     instructions = payload.instructions.strip()
     if not instructions:
         raise HTTPException(status_code=400, detail="instructions are required")
+    if len(instructions) > DEEP_RESEARCH_MAX_INSTRUCTION_CHARS:
+        raise HTTPException(status_code=413, detail="instructions are too large")
 
     model = payload.model or "exa-research-pro"
+    digest = _deep_research_hash(topic, instructions)
+    existing_job_id = await _require_deep_research_budget(request, digest)
+    if existing_job_id:
+        return {"jobId": existing_job_id, "status": "pending"}
+
     job_id = uuid.uuid4().hex
-    await _job_create(job_id, payload.topic.strip()[:300])
+    await _job_create(job_id, topic)
+    await _deep_research_mark_active(job_id, digest)
     logger.info("deep research job %s started (store=%s)", job_id, _store_mode())
     # Fire-and-forget: returns immediately so the caller never blocks on the
     # minutes-long research run; the client polls the GET endpoint below.

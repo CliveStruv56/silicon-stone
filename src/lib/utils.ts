@@ -19,8 +19,14 @@ export function safeInternalPath(target: string | null | undefined, fallback = '
   return target
 }
 
-export function slugify(text: string): string {
-  const slug = text
+/**
+ * Build a clean URL slug from a title. Truncates to `maxLength` on a *word
+ * boundary* (never mid-word) so long titles don't yield slugs like
+ * `…-include-the-fda` cut at 96 chars. Default cap is 60 — short enough for
+ * tidy, shareable URLs, long enough to stay descriptive.
+ */
+export function slugify(text: string, maxLength = 60): string {
+  const base = text
     .toString()
     .toLowerCase()
     .trim()
@@ -29,7 +35,15 @@ export function slugify(text: string): string {
     .replace(/\-\-+/g, '-')   // Replace multiple - with single -
     .replace(/^-+/, '')       // Trim - from start of text
     .replace(/-+$/, '');      // Trim - from end of text
+
   // Never return an empty slug (e.g. for all-non-ASCII titles) — callers should
   // add a unique suffix, but this guarantees a routable, non-empty floor.
-  return slug || 'untitled';
+  if (!base) return 'untitled'
+  if (base.length <= maxLength) return base
+
+  // Cut at the last hyphen within the limit so we never split a word.
+  const cut = base.slice(0, maxLength)
+  const lastDash = cut.lastIndexOf('-')
+  const trimmed = (lastDash > 0 ? cut.slice(0, lastDash) : cut).replace(/-+$/, '')
+  return trimmed || cut.replace(/-+$/, '') || 'untitled'
 }

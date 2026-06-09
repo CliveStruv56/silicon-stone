@@ -16,3 +16,7 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npm run check
+      - run: npm run test:security
+      - run: npm run test:style-rules
+      - run: npm run test:knowledge-inbox
+      - run: npm run test:evidence-index
