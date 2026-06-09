@@ -2,10 +2,6 @@
 // (the Read → Use → Buy → Engage spine does the primary explaining there).
 // This panel explains how to read a single briefing; it lives in the
 // Intelligence area and on the Methodology page.
-//
-// NOTE: provisional copy derived from the hero three-readings line
-// ("for your institution, for the balance of power, and for your own position").
-// Swap for the exact §R panel wording when supplied.
 
 type Reading = {
   name: string
