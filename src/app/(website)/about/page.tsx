@@ -54,6 +54,21 @@ const principles = [
   },
 ]
 
+const editorialStandards = [
+  {
+    title: 'Independence & Ownership',
+    body: 'Silicon and Stone is independently owned and operated. It takes no funding from, and holds no affiliation with, the vendors, governments, or platforms whose activities it analyses. There is no sponsored content; commercial products — tools, briefings, advisory — are clearly labelled and never shape the analysis.',
+  },
+  {
+    title: 'Sourcing & Method',
+    body: 'Every piece works from primary sources — regulatory texts, official filings, company disclosures, and named reporting — read in full rather than second-hand. The reasoning follows the Forensic Technopolitics method, and sources are cited inline and listed under each article.',
+  },
+  {
+    title: 'Accuracy & Corrections',
+    body: 'Analysis is calibrated: what is knowable is stated plainly, and uncertainty is admitted rather than hidden. When we get something wrong, we correct it openly and note material changes. Spot an error? Tell us — corrections are welcomed, not buried.',
+  },
+]
+
 const linkedinUrl = process.env.NEXT_PUBLIC_LINKEDIN_URL
 
 export default function AboutPage() {
@@ -255,6 +270,37 @@ export default function AboutPage() {
                 View Products &rarr;
               </Link>
             </div>
+          </div>
+        </section>
+
+        <Separator className="mx-auto max-w-7xl bg-border-subtle" />
+
+        {/* Editorial Standards */}
+        <section id="editorial-standards" className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+          <h2 className="text-2xl font-semibold text-text-primary mb-4">
+            Editorial Standards
+          </h2>
+          <p className="text-text-muted mb-8 max-w-3xl">
+            How Silicon and Stone is funded, how it sources its analysis, and how
+            it handles mistakes. For the analytical method itself, see the{' '}
+            <Link href="/methodology" className="text-stone-teal hover:underline">
+              methodology
+            </Link>
+            .
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {editorialStandards.map((item) => (
+              <Card key={item.title} className="bg-stone-charcoal border-border-subtle">
+                <CardContent className="p-6">
+                  <h3 className="text-text-primary font-semibold mb-2">
+                    {item.title}
+                  </h3>
+                  <p className="text-text-muted text-sm leading-relaxed">
+                    {item.body}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </section>
 

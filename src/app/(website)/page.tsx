@@ -14,6 +14,7 @@ import {
 } from '@/components/home'
 import { sanityFetch } from '@/sanity/lib/live'
 import { SITE_SETTINGS_QUERY, ARTICLES_BY_TIER_QUERY } from '@/sanity/lib/queries'
+import { SITE_URL } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'Silicon and Stone | Forensic Technopolitics for the Senior Leaders Defining the AI Power Shift',
@@ -39,15 +40,18 @@ export default async function Home() {
     '@graph': [
       {
         '@type': 'WebSite',
+        '@id': `${SITE_URL}/#website`,
         name: 'Silicon and Stone',
-        url: 'https://siliconandstone.com',
+        url: SITE_URL,
         description:
           'Independent, decision-grade intelligence for UK and European leaders managing AI governance, technology dependency, and operational resilience.',
+        publisher: { '@id': `${SITE_URL}/#organization` },
       },
       {
         '@type': 'Organization',
+        '@id': `${SITE_URL}/#organization`,
         name: 'Silicon and Stone',
-        url: 'https://siliconandstone.com',
+        url: SITE_URL,
         description:
           'Forensic Technopolitics intelligence service for senior decision-makers in European industry. Calibrated, decision-grade analysis from thirty years inside the technology industry. Published from the edge of Europe.',
         foundingDate: '2024',
@@ -63,10 +67,12 @@ export default async function Home() {
       },
       {
         '@type': 'WebPage',
+        '@id': `${SITE_URL}/#webpage`,
         name: 'Forensic Technopolitics for the AI Power Shift',
         description:
           'Independent, decision-grade intelligence for UK and European leaders managing AI governance, technology dependency, and operational resilience.',
-        url: 'https://siliconandstone.com',
+        url: SITE_URL,
+        isPartOf: { '@id': `${SITE_URL}/#website` },
         about: {
           '@type': 'Thing',
           name: 'The Orchestration Battleground',

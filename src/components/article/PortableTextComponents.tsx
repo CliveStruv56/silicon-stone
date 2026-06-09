@@ -5,8 +5,11 @@ import { urlFor } from '@/sanity/lib/image'
 
 export const portableTextComponents: PortableTextComponents = {
   block: {
+    // Body markdown that starts with `# Heading` would otherwise emit a second
+    // <h1>, duplicating the page title. Render it as an <h2> (keeping the larger
+    // visual weight) so each article has exactly one <h1>.
     h1: ({ children }) => (
-      <h1 className="text-3xl font-bold text-text-primary mt-10 mb-4">{children}</h1>
+      <h2 className="text-3xl font-bold text-text-primary mt-10 mb-4">{children}</h2>
     ),
     h2: ({ children }) => (
       <h2 className="text-2xl font-bold text-text-primary mt-8 mb-4">{children}</h2>

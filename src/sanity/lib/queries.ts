@@ -52,6 +52,7 @@ export const FEATURED_ARTICLES_QUERY = defineQuery(`
 export const ARTICLE_QUERY = defineQuery(`
   *[_type == "article" && slug.current == $slug][0] {
     _id,
+    _updatedAt,
     title,
     "slug": slug.current,
     excerpt,
@@ -78,6 +79,18 @@ export const ARTICLE_QUERY = defineQuery(`
       bio,
       role
     },
+    relatedArticles[]->{
+      _id,
+      title,
+      "slug": slug.current,
+      excerpt,
+      contentType
+    },
+    citations[]{
+      title,
+      url,
+      publisher
+    },
     seo {
       metaTitle,
       metaDescription
@@ -88,6 +101,49 @@ export const ARTICLE_QUERY = defineQuery(`
 export const ARTICLE_SLUGS_QUERY = defineQuery(`
   *[_type == "article" && defined(slug.current)]{
     "slug": slug.current
+  }
+`)
+
+// Sitemap — published articles with last-modified for <lastmod>
+export const SITEMAP_ARTICLES_QUERY = defineQuery(`
+  *[_type == "article" && defined(slug.current) && !(_id in path("drafts.**"))]
+  | order(coalesce(publishedAt, _updatedAt) desc) {
+    "slug": slug.current,
+    publishedAt,
+    _updatedAt
+  }
+`)
+
+// RSS / llms.txt — latest published articles for syndication and AI curation
+export const RSS_ARTICLES_QUERY = defineQuery(`
+  *[_type == "article" && defined(slug.current) && !(_id in path("drafts.**"))]
+  | order(coalesce(publishedAt, _updatedAt) desc) [0...30] {
+    title,
+    "slug": slug.current,
+    excerpt,
+    stoneTruth,
+    publishedAt,
+    _updatedAt,
+    "author": author->name,
+    "categories": categories[]->title
+  }
+`)
+
+// Open Graph card — minimal fields for the generated social image
+export const OG_ARTICLE_QUERY = defineQuery(`
+  *[_type == "article" && slug.current == $slug][0] {
+    title,
+    stoneTruth,
+    excerpt,
+    "category": categories[0]->title
+  }
+`)
+
+// Sitemap — categories with last-modified
+export const SITEMAP_CATEGORIES_QUERY = defineQuery(`
+  *[_type == "category" && defined(slug.current)] {
+    "slug": slug.current,
+    _updatedAt
   }
 `)
 

@@ -1,13 +1,14 @@
 import Link from 'next/link'
-import { generateEmbedding, extractArticleText } from '@/lib/embeddings'
-import { searchSimilar } from '@/lib/pinecone'
 import { Badge } from '@/components/ui/badge'
 
 type Props = {
-  currentId: string
-  title: string
-  excerpt?: string
-  stoneTruth?: string
+  articles?: Array<{
+    _id: string
+    title?: string
+    slug?: string
+    excerpt?: string
+    contentType?: string
+  }> | null
 }
 
 const CONTENT_TYPE_LABELS: Record<string, string> = {
@@ -17,27 +18,10 @@ const CONTENT_TYPE_LABELS: Record<string, string> = {
   youtube: 'YouTube Script',
 }
 
-async function fetchRelated(
-  currentId: string,
-  title: string,
-  excerpt?: string,
-  stoneTruth?: string
-) {
-  try {
-    const text = extractArticleText({ title, excerpt, stoneTruth })
-    const vector = await generateEmbedding(text)
-    return await searchSimilar(vector, 4, currentId)
-  } catch {
-    // Pinecone not configured or unavailable — fail silently on public pages
-    return []
-  }
-}
+export function RelatedArticles({ articles }: Props) {
+  const topThree = (articles ?? []).filter((article) => article.slug && article.title).slice(0, 3)
+  if (topThree.length === 0) return null
 
-export async function RelatedArticles({ currentId, title, excerpt, stoneTruth }: Props) {
-  const results = await fetchRelated(currentId, title, excerpt, stoneTruth)
-  if (results.length === 0) return null
-
-  const topThree = results.slice(0, 3)
 
   return (
     <div className="mt-10 pt-8 border-t border-border-subtle">
@@ -45,27 +29,27 @@ export async function RelatedArticles({ currentId, title, excerpt, stoneTruth }:
         Related Intelligence
       </h2>
       <div className="grid gap-4 sm:grid-cols-3">
-        {topThree.map((result) => (
+        {topThree.map((article) => (
           <Link
-            key={result.id}
-            href={`/analysis/${result.metadata.slug}`}
+            key={article._id}
+            href={`/analysis/${article.slug}`}
             className="group block bg-stone-charcoal/50 rounded-lg p-4 hover:bg-stone-charcoal transition-colors border border-border-subtle hover:border-stone-teal/30"
           >
             <div className="flex items-center gap-2 mb-2">
-              {result.metadata.contentType && (
+              {article.contentType && (
                 <Badge
                   variant="outline"
                   className="text-xs text-text-muted border-text-muted/30"
                 >
-                  {CONTENT_TYPE_LABELS[result.metadata.contentType] ?? result.metadata.contentType}
+                  {CONTENT_TYPE_LABELS[article.contentType] ?? article.contentType}
                 </Badge>
               )}
             </div>
             <h3 className="text-sm font-semibold text-text-primary group-hover:text-stone-teal transition-colors line-clamp-2 mb-1">
-              {result.metadata.title}
+              {article.title}
             </h3>
-            {result.metadata.excerpt && (
-              <p className="text-xs text-text-muted line-clamp-2">{result.metadata.excerpt}</p>
+            {article.excerpt && (
+              <p className="text-xs text-text-muted line-clamp-2">{article.excerpt}</p>
             )}
           </Link>
         ))}

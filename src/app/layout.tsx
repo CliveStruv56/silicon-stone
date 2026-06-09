@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import { Unbounded, Outfit, JetBrains_Mono } from "next/font/google";
+import { SITE_URL } from "@/lib/site";
 import "./(website)/globals.css";
 
 const unbounded = Unbounded({
@@ -25,7 +26,10 @@ export const metadata: Metadata = {
   title: "Silicon and Stone | Forensic Technopolitics",
   description:
     "Independent, decision-grade intelligence for UK and European leaders managing AI governance, technology dependency, and operational resilience.",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://siliconandstone.com"),
+  metadataBase: new URL(SITE_URL),
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     title: "Silicon and Stone | Forensic Technopolitics",
     description:

@@ -14,11 +14,18 @@ import {
   DynamicCTA,
 } from '@/components/article'
 import { RelatedArticles } from '@/components/article/RelatedArticles'
+import { JsonLd } from '@/components/seo/JsonLd'
 import { sanityFetch } from '@/sanity/lib/live'
 import { ARTICLE_QUERY, ARTICLE_SLUGS_QUERY } from '@/sanity/lib/queries'
 import { urlFor } from '@/sanity/lib/image'
 import { getPersonaLabel } from '@/lib/personas'
 import { formatDate } from '@/lib/format'
+import { absoluteUrl } from '@/lib/site'
+import {
+  buildArticleSchema,
+  buildBreadcrumbSchema,
+  cleanDescription,
+} from '@/lib/seo'
 
 type Props = {
   params: Promise<{ slug: string }>
@@ -56,9 +63,32 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
   }
 
+  const title = article.seo?.metaTitle || `${article.title} | Silicon and Stone`
+  const description = cleanDescription(
+    article.seo?.metaDescription || article.stoneTruth || article.excerpt
+  )
+  const canonicalPath = `/analysis/${slug}`
+  const tags = article.categories?.map((category: Category) => category.title)
+
+  // og:image / twitter:image are auto-injected from opengraph-image.tsx.
   return {
-    title: article.seo?.metaTitle || `${article.title} | Silicon and Stone`,
-    description: article.seo?.metaDescription || article.stoneTruth || article.excerpt,
+    title,
+    description,
+    alternates: { canonical: canonicalPath },
+    openGraph: {
+      title,
+      description,
+      type: 'article',
+      url: canonicalPath,
+      publishedTime: article.publishedAt || undefined,
+      modifiedTime: article._updatedAt || article.publishedAt || undefined,
+      ...(tags && tags.length ? { tags } : {}),
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
   }
 }
 
@@ -97,9 +127,32 @@ export default async function ArticlePage({ params }: Props) {
   const primaryPersona = article.personas?.[0]
   const hasIntelligenceFields = article.intelligenceTier || article.impactScore || article.stoneTruth
 
+  const schemaInput = {
+    title: article.title,
+    slug: article.slug,
+    description: cleanDescription(
+      article.seo?.metaDescription || article.stoneTruth || article.excerpt
+    ),
+    publishedAt: article.publishedAt,
+    _updatedAt: article._updatedAt,
+    contentType: article.contentType,
+    imageUrl: article.mainImage?.asset
+      ? urlFor(article.mainImage).width(1200).height(630).url()
+      : absoluteUrl('/homepage-redesign-2026/the-watcher.png'),
+    author: article.author
+      ? { name: article.author.name, slug: article.author.slug }
+      : null,
+    categories: article.categories,
+    citations: article.citations,
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+
+      <JsonLd
+        data={[buildArticleSchema(schemaInput), buildBreadcrumbSchema(schemaInput)]}
+      />
 
       <main className="flex-1">
         {/* Article Header */}
@@ -233,6 +286,33 @@ export default async function ArticlePage({ params }: Props) {
 
           <Separator className="mt-10 mb-8 bg-border-subtle" />
 
+          {/* Sources / Citations */}
+          {article.citations && article.citations.length > 0 && (
+            <div className="mb-8">
+              <h2 className="font-ui-mono text-stone-teal text-sm mb-4">Sources</h2>
+              <ol className="space-y-2 list-decimal list-outside ml-5">
+                {article.citations.map(
+                  (
+                    citation: { title: string; url: string; publisher?: string },
+                    index: number
+                  ) => (
+                    <li key={index} className="text-sm text-text-muted">
+                      <a
+                        href={citation.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-stone-teal hover:text-silicon-amber underline underline-offset-2 transition-colors"
+                      >
+                        {citation.title}
+                      </a>
+                      {citation.publisher && <span> — {citation.publisher}</span>}
+                    </li>
+                  )
+                )}
+              </ol>
+            </div>
+          )}
+
           {/* Author Bio */}
           {article.author && (
             <div className="bg-stone-charcoal rounded-lg p-6 mb-8">
@@ -285,12 +365,7 @@ export default async function ArticlePage({ params }: Props) {
           />
 
           {/* Related Articles - semantic similarity via Pinecone */}
-          <RelatedArticles
-            currentId={article._id}
-            title={article.title}
-            excerpt={article.excerpt}
-            stoneTruth={article.stoneTruth}
-          />
+          <RelatedArticles articles={article.relatedArticles} />
         </article>
       </main>
 

@@ -1,5 +1,6 @@
 import { defineType, defineField, defineArrayMember } from 'sanity'
 import { DocumentTextIcon } from '@sanity/icons'
+import { slugify } from '@/lib/utils'
 
 export const article = defineType({
   name: 'article',
@@ -19,7 +20,9 @@ export const article = defineType({
       type: 'slug',
       options: {
         source: 'title',
-        maxLength: 96,
+        maxLength: 64,
+        // Word-boundary truncation so manual Studio slugs match the pipeline's.
+        slugify: (input) => slugify(input, 64),
       },
       validation: (rule) => rule.required(),
     }),
@@ -141,6 +144,15 @@ export const article = defineType({
       of: [defineArrayMember({ type: 'text' })],
     }),
     defineField({
+      name: 'relatedArticles',
+      title: 'Related Articles',
+      description:
+        'Precomputed semantic neighbours. Updated by the vectorize webhook so public article renders do not call embedding/search providers.',
+      type: 'array',
+      of: [defineArrayMember({ type: 'reference', to: [{ type: 'article' }] })],
+      validation: (rule) => rule.max(3),
+    }),
+    defineField({
       name: 'publishedAt',
       title: 'Published At',
       type: 'datetime',
@@ -208,6 +220,43 @@ export const article = defineType({
               title: 'Caption',
             }),
           ],
+        }),
+      ],
+    }),
+    defineField({
+      name: 'citations',
+      title: 'Sources / Citations',
+      description:
+        'Primary sources cited in this piece. Renders as the "Sources" list and ' +
+        'feeds Article structured data (schema.org citation). Prefer primary ' +
+        'sources — official filings, regulators, named reporting.',
+      type: 'array',
+      of: [
+        defineArrayMember({
+          type: 'object',
+          name: 'citation',
+          fields: [
+            defineField({
+              name: 'title',
+              title: 'Title',
+              type: 'string',
+              validation: (rule) => rule.required(),
+            }),
+            defineField({
+              name: 'url',
+              title: 'URL',
+              type: 'url',
+              validation: (rule) =>
+                rule.required().uri({ scheme: ['http', 'https'] }),
+            }),
+            defineField({
+              name: 'publisher',
+              title: 'Publisher',
+              description: 'e.g. European Commission, Reuters, FT',
+              type: 'string',
+            }),
+          ],
+          preview: { select: { title: 'title', subtitle: 'url' } },
         }),
       ],
     }),

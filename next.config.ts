@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { articleRedirectRules } from "./src/lib/slug-redirects";
 
 const isDevelopment = process.env.NODE_ENV === 'development'
 const scriptSrc = [
@@ -38,6 +39,10 @@ const nextConfig: NextConfig = {
         hostname: 'cdn.sanity.io',
       },
     ],
+  },
+  async redirects() {
+    // 301s for renamed article slugs (see src/lib/slug-redirects.ts).
+    return articleRedirectRules()
   },
   async headers() {
     return [
