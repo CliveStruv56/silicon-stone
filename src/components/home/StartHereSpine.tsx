@@ -37,7 +37,7 @@ const rungs: Rung[] = [
   {
     marker: 'From £24',
     title: 'Buy',
-    body: 'Operationalise it yourself. Practical toolkits and reports you download and run.',
+    body: 'Practical Tools for Compliance and Strategy',
     cta: 'See Products',
     href: '/products',
     tone: 'paid',
