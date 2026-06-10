@@ -16,7 +16,14 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npm run check
+      - run: npm test
       - run: npm run test:security
       - run: npm run test:style-rules
       - run: npm run test:knowledge-inbox
       - run: npm run test:evidence-index
+      # Catch server/client-boundary breakage that lint+typecheck miss —
+      # otherwise it surfaces only as a failed Vercel deploy.
+      - run: npm run build
+        env:
+          NEXT_PUBLIC_SANITY_PROJECT_ID: 3q59mpd7
+          NEXT_PUBLIC_SANITY_DATASET: production
