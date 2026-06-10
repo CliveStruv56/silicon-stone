@@ -10,11 +10,17 @@
  *   1. Rename `slug.current` on the article in Sanity to the clean slug.
  *   2. Add `{ from: '<old>', to: '<new>' }` below (slugs only, no `/analysis/`).
  *
- * Kept intentionally empty until the renames are approved — adding a redirect
- * for a slug that is still live would send a working URL to a 404.
+ * Approved by Clive 2026-06-10 (docs/slug-renames-proposal.md) and renamed in
+ * Sanity the same day — keep the pairs below in lockstep with `slug.current`.
  */
 export const ARTICLE_SLUG_REDIRECTS: Array<{ from: string; to: string }> = [
-  // { from: 'recent-ai-developments-in-the-usa-include-the-fda--1761', to: 'us-ai-policy-fda-shift' },
+  { from: 'eu-ai-act-enforcement-august-2026-compliance-readi-6378', to: 'eu-ai-act-compliance-chasm-august-2026' },
+  { from: 'impact-of-helium-shortages-on-semiconductor-amarke-2035', to: 'helium-scarcity-semiconductor-production' },
+  { from: 'impacts-of-the-war-in-iran-on-global-technology-su-0690', to: 'iran-conflict-european-technology-supply-crisis' },
+  { from: 'korean-memory-fab-capacity-squeeze-2027-3756', to: 'korean-memory-fab-capacity-squeeze-2027' },
+  { from: 'recent-ai-developments-in-the-usa-include-the-fda--1761', to: 'us-national-ai-policy-acceleration' },
+  { from: 'semiconductor-testing-is-emerging-as-a-critical-bo-5189', to: 'semiconductor-testing-bottleneck-ai-accelerators' },
+  { from: 'us-foreign-policy-changes-on-european-tech-industr-3833', to: 'atlantic-fault-lines-us-tech-policy-eu-autonomy' },
 ]
 
 /** Expand into Next.js redirect rules under the /analysis/ path. */
