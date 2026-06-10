@@ -14,8 +14,10 @@ import httpx
 
 try:
     # redis-py ships an asyncio client at redis.asyncio (>= 4.2).
+    import redis as redis_sync
     from redis import asyncio as aioredis
 except ImportError:  # pragma: no cover — redis is optional; falls back to memory
+    redis_sync = None
     aioredis = None
 from fastapi import FastAPI
 from fastapi import HTTPException
@@ -107,6 +109,13 @@ class UsageEvent(BaseModel):
 RATE_LIMITS: dict[str, list[float]] = {}
 ALLOWED_SUBSCRIBE_TAGS = {"Tool_Lead", "WaymarkPath_Early_Access"}
 EMAIL_RE = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
+EMAIL_IN_TEXT_RE = re.compile(r"[^\s@\"']+@[^\s@\"']+")
+
+
+def _redact_log_snippet(text: str | None, max_length: int = 200) -> str:
+    """Kit error bodies echo the submitted email — mask anything email-shaped
+    and clamp the length before it reaches the log stream."""
+    return EMAIL_IN_TEXT_RE.sub("***@redacted", text or "")[:max_length]
 CONTACT_FIELD_LENGTHS = {
     "name": 120,
     "email": 254,
@@ -132,9 +141,46 @@ def _client_ip(request: Request) -> str:
     return "unknown"
 
 
+_sync_redis_client = None
+
+
+def _get_sync_redis():
+    """Sync Redis client for rate limiting inside sync endpoints (which FastAPI
+    runs in a threadpool, so a short blocking call is fine). Shares REDIS_URL
+    with the async job/usage store."""
+    global _sync_redis_client
+    if not REDIS_URL or redis_sync is None:
+        return None
+    if _sync_redis_client is None:
+        _sync_redis_client = redis_sync.from_url(
+            REDIS_URL,
+            decode_responses=True,
+            socket_timeout=2,
+            socket_connect_timeout=2,
+        )
+    return _sync_redis_client
+
+
 def _check_rate_limit(key: str, limit: int, window_seconds: int) -> int | None:
-    # NOTE: in-memory and per-process. With >1 replica the effective limit is
-    # limit * replicas; move to the shared Redis store for strict limiting.
+    # Durable fixed-window limit in Redis when available — survives redeploys
+    # and is shared across replicas.
+    redis_client = _get_sync_redis()
+    if redis_client is not None:
+        try:
+            window = int(time.time() // window_seconds)
+            redis_key = f"ratelimit:{key}:{window}"
+            count = redis_client.incr(redis_key)
+            if count == 1:
+                redis_client.expire(redis_key, window_seconds + 5)
+            if count > limit:
+                ttl = redis_client.ttl(redis_key)
+                return max(1, ttl if isinstance(ttl, int) and ttl > 0 else window_seconds)
+            return None
+        except Exception:
+            logger.exception("Redis rate-limit check failed; falling back to in-memory")
+
+    # In-memory fallback: per-process, so with >1 replica the effective limit
+    # is limit * replicas, and it resets on redeploy.
     now = time.time()
     window_start = now - window_seconds
     requests = [timestamp for timestamp in RATE_LIMITS.get(key, []) if timestamp > window_start]
@@ -700,7 +746,7 @@ def subscribe(payload: SubscribeRequest, request: Request) -> dict[str, bool]:
         logger.error(
             "Kit subscribe failed: status=%s body=%s",
             exc.response.status_code,
-            exc.response.text[:500],
+            _redact_log_snippet(exc.response.text),
         )
         raise HTTPException(
             status_code=502,
@@ -788,7 +834,7 @@ def contact(payload: ContactRequest, request: Request) -> dict[str, bool]:
         logger.error(
             "Kit contact create failed: status=%s body=%s",
             exc.response.status_code,
-            exc.response.text[:500],
+            _redact_log_snippet(exc.response.text),
         )
         raise HTTPException(
             status_code=502,
@@ -826,7 +872,10 @@ def contact(payload: ContactRequest, request: Request) -> dict[str, bool]:
 
 
 @app.post("/v1/hermes/events")
-def hermes_events(payload: dict[str, Any]) -> dict[str, Any]:
+def hermes_events(payload: dict[str, Any], request: Request) -> dict[str, Any]:
+    # Key-gated even though it's currently a no-op echo, so it can never be
+    # wired to a real consumer while still publicly writable.
+    _require_backend_api_key(request)
     return {
         "accepted": True,
         "event_type": payload.get("type", "unknown"),
