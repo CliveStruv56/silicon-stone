@@ -1,7 +1,7 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-06-09
+> Last Updated: 2026-06-10
 > Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing, 13 moderate transitive npm audit findings (uuid through Sanity packages)**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com. Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools (email-gated for lead capture, AI Act triage engine recently overhauled), product/commerce pages with an early-access enquiry fallback until Lemon Squeezy checkout URLs are configured, Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Awaiting Lemon Squeezy store setup, Plausible account, and content publishing for queued drafts.
@@ -353,6 +353,12 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### June 10, 2026 — Studio media library (sanity-plugin-media)
+
+| Commit | Description |
+|--------|-------------|
+| (this commit) | Clive reported the Studio "image library" was empty despite articles having images. Diagnosis: the dataset's asset store was fine (11 `sanity.imageAsset` docs, all article `mainImage`s referencing uploaded assets) — the empty view was Sanity's separate org-level **Media Library** product, which does not sync with dataset assets, and the embedded studio had no asset-browser tool at all. Fix: installed `sanity-plugin-media@4.3.1` (peer-compatible with Sanity v4 / React 19 — within the CLAUDE.md upgrade ceilings) and registered `media()` in `sanity.config.ts` plugins. This adds a **Media** tab in `/studio` listing all dataset assets (search/tags) and registers itself as an asset source on image fields. `next build` passes. Side note: a stray `studio-silicon-and-stone/` dir containing only a `package-lock.json` reappeared locally (IDE artifact; the scaffold itself was deleted June 8) — left untracked. |
 
 ### June 9–10, 2026 — Project review + hardening phase (review brief executed)
 
