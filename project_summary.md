@@ -354,6 +354,12 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### June 9–10, 2026 — Project review + hardening phase (review brief executed)
+
+| Commit | Description |
+|--------|-------------|
+| `470a946`…`857b171` (12 commits) | Full project review (`docs/review-report.md`, verdict **Healthy**) and execution of its next-phase brief (`docs/next-phase-brief.md`). **Security:** JSON-LD `<` escaping via the shared `JsonLd` component (homepage now uses it too); backend shared-key compare moved to `hmac.compare_digest`; `/v1/hermes/events` key-gated; subscriber emails masked in upstream-error logs on both sides (`redactForLog` / `_redact_log_snippet`). **Backend:** subscribe/contact rate limits now Redis-backed (fixed-window, shared `REDIS_URL`, in-memory fallback) — **Railway redeploy needed to pick up**. **Tests:** vitest scaffold — 54 specs locking the AI Act engine (scope short-circuit, all Article 5 flags, Annex III defaults, Article 50 dedup, GPAI routing, score thresholds — mutation-verified), `slugify`/`safeInternalPath`/`redactForLog`, markdown→Portable Text; `npm test` in CI plus a `next build` step (verified to pass with only the public Sanity vars). **A11y:** EmailGateOverlay is a real dialog (role/aria-modal, focus trap + restore, Escape, labelled input, `role=alert` errors); Header dropdowns open on focus-within; hamburger has `aria-expanded`. **UX/perf:** `(website)/loading.tsx` skeleton + root `global-error.tsx`; maplibre map extracted to `SupplyChainMap.tsx` behind `next/dynamic` (ssr:false). **Docs:** this summary brought to post-Phase-B reality; review report + brief + SEO report committed; `docs/slug-renames-proposal.md` drafted (7 slugs, awaiting sign-off); stray `explorer-size.css` moved to the Obsidian vault. **Review false-alarm corrected:** `/api/revalidate` exists at `src/app/(website)/api/revalidate/route.ts` and is properly signature-verified. **Outstanding founder actions:** rotate/confirm `ADMIN_PASSWORD` in Vercel (review finding H1), redeploy Railway, slug sign-off, Lemon Squeezy / Plausible / Inoreader config. |
+
 ### June 9, 2026 — Offering Architecture Phase B (route consolidation + 301s)
 
 | Commit | Description |
@@ -521,7 +527,8 @@ SESSION_SECRET=<long random secret, 32+ characters>
 | Transitive npm audit findings (uuid via Sanity) | `npm audit --audit-level=moderate` shows 13 moderate findings after a normal `npm audit fix` cleared `brace-expansion` and a narrow `postcss` override cleared the previous Next/PostCSS finding on 2026-05-29. Remaining advisory: `uuid <11.1.1` via Sanity packages. **Do not run `npm audit fix --force`** — npm currently proposes unsafe Sanity/Vision downgrade paths. Practical runtime risk is low: the app does not pass attacker-controlled buffers into uuid helpers. Revisit when Sanity publishes a patched compatible dependency tree. | Low |
 | Markdown-to-PDF pipeline | `scripts/render-briefing-pdf.ts` + `npm run render-briefing` render lead-magnet / Intelligence Series PDFs. Committed 2026-05-20 (`21eb123`; overwrite-guard `570ab13`). `puppeteer` / `marked` / `gray-matter` are devDependencies — `puppeteer` pulls ~170MB Chromium on install. Dev-only, never invoked by Vercel/Railway. Docs: `docs/markdown-to-pdf-pipeline.md`. | Info |
 | Studio reference-array UX trap | Clicking "Add item" in a Sanity reference array and saving without picking a doc leaves an orphan row (`_type`/`_key` but no `_ref`). One of these was found and cleaned up on the Helium article draft on 2026-04-14. | Low |
-| No unit tests for app logic | CI runs four invariant suites (`test:security`, `test:style-rules`, `test:knowledge-inbox`, `test:evidence-index`) but there is no unit-test framework over app logic (AI Act engine, slug/markdown utils) — being addressed in the 2026-06 review phase (vitest). | Low |
+| ~~No unit tests for app logic~~ **RESOLVED** | Resolved 2026-06-10: vitest suite (54 specs, `npm test`) covers the AI Act engine, slug/redirect utils, log redaction, and the markdown→Portable Text converter; runs in CI alongside the four invariant suites, and CI now also runs `next build`. | — |
+| Legacy slug renames awaiting sign-off | `docs/slug-renames-proposal.md` (2026-06-10) proposes new slugs for the 7 truncated/suffixed published articles. After Clive signs off: rename in Sanity + populate `ARTICLE_SLUG_REDIRECTS` in the same deploy window. | Medium |
 
 ---
 
