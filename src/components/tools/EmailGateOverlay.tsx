@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -18,6 +18,44 @@ export function EmailGateOverlay({ isOpen, onUnlock, onDismiss, toolName, result
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
+  const dialogRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  // Move focus into the dialog on open and restore it on close.
+  useEffect(() => {
+    if (!isOpen) return
+    const previouslyFocused = document.activeElement as HTMLElement | null
+    // Delay past the mount animation so focus isn't lost.
+    const timer = setTimeout(() => inputRef.current?.focus(), 50)
+    return () => {
+      clearTimeout(timer)
+      previouslyFocused?.focus?.()
+    }
+  }, [isOpen])
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape' && status !== 'loading') {
+      e.stopPropagation()
+      onDismiss()
+      return
+    }
+    // Keep Tab cycling inside the dialog.
+    if (e.key === 'Tab' && dialogRef.current) {
+      const focusables = dialogRef.current.querySelectorAll<HTMLElement>(
+        'input, button, [href], [tabindex]:not([tabindex="-1"])'
+      )
+      if (focusables.length === 0) return
+      const first = focusables[0]
+      const last = focusables[focusables.length - 1]
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault()
+        first.focus()
+      }
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -59,6 +97,11 @@ export function EmailGateOverlay({ isOpen, onUnlock, onDismiss, toolName, result
           className="fixed inset-0 z-50 flex items-center justify-center bg-slate-deep/80 backdrop-blur-sm p-4"
         >
           <motion.div
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Unlock ${resultLabel} from the ${toolName}`}
+            onKeyDown={handleKeyDown}
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -94,16 +137,18 @@ export function EmailGateOverlay({ isOpen, onUnlock, onDismiss, toolName, result
                 {status !== 'success' && (
                   <form onSubmit={handleSubmit} className="space-y-3">
                     <input
+                      ref={inputRef}
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="your@email.com"
+                      aria-label="Email address"
                       required
                       className="w-full rounded-md border border-border-subtle bg-slate-deep px-3 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-silicon-amber"
                     />
 
                     {status === 'error' && (
-                      <p className="text-sm text-alert-red">{errorMsg || 'Something went wrong. Please try again.'}</p>
+                      <p role="alert" className="text-sm text-alert-red">{errorMsg || 'Something went wrong. Please try again.'}</p>
                     )}
 
                     <Button

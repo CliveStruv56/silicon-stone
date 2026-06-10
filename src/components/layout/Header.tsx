@@ -84,7 +84,7 @@ export function Header() {
         {item.name}
       </Link>
       {item.children && item.children.length > 0 && (
-        <div className="absolute left-0 top-full pt-0 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-150">
+        <div className="absolute left-0 top-full pt-0 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto group-focus-within:opacity-100 group-focus-within:pointer-events-auto transition-opacity duration-150">
           <div className="pt-2">
             <div className="rounded-lg bg-stone-charcoal p-2 shadow-xl ring-1 ring-border-subtle">
               {item.children.map((child) => (
@@ -127,9 +127,11 @@ export function Header() {
           <button
             type="button"
             className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-text-muted"
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-menu"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
-            <span className="sr-only">Open main menu</span>
+            <span className="sr-only">{mobileMenuOpen ? 'Close main menu' : 'Open main menu'}</span>
             <svg
               className="h-6 w-6"
               fill="none"
@@ -174,7 +176,7 @@ export function Header() {
 
       {/* Mobile menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden">
+        <div id="mobile-menu" className="lg:hidden">
           <div className="space-y-1 px-6 pb-4 pt-2">
             {mobileNavigation.map((item: NavItem) => (
               <div key={item.name}>
