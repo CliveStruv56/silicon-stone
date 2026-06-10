@@ -18,7 +18,7 @@ import {
 } from '@/components/home'
 import { sanityFetch } from '@/sanity/lib/live'
 import { SITE_SETTINGS_QUERY, ARTICLES_BY_TIER_QUERY } from '@/sanity/lib/queries'
-import { SITE_URL } from '@/lib/site'
+import { SITE_URL, absoluteUrl } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'Silicon and Stone | Forensic Technopolitics for the Senior Leaders Defining the AI Power Shift',
@@ -56,6 +56,17 @@ export default async function Home() {
         '@id': `${SITE_URL}/#organization`,
         name: 'Silicon and Stone',
         url: SITE_URL,
+        logo: {
+          '@type': 'ImageObject',
+          url: absoluteUrl('/brand/silicon-and-stone-logo.png'),
+          width: 1104,
+          height: 960,
+        },
+        founder: {
+          '@type': 'Person',
+          name: 'Clive Struver',
+          url: absoluteUrl('/authors/clive-struver'),
+        },
         description:
           'Forensic Technopolitics intelligence service for senior decision-makers in European industry. Calibrated, decision-grade analysis from thirty years inside the technology industry. Published from the edge of Europe.',
         foundingDate: '2024',

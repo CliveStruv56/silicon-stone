@@ -1,5 +1,6 @@
-import { defineType, defineField } from 'sanity'
+import { defineType, defineField, defineArrayMember } from 'sanity'
 import { UserIcon } from '@sanity/icons'
+import { slugify } from '@/lib/utils'
 
 export const author = defineType({
   name: 'author',
@@ -19,7 +20,8 @@ export const author = defineType({
       type: 'slug',
       options: {
         source: 'name',
-        maxLength: 96,
+        maxLength: 64,
+        slugify: (input) => slugify(input, 64),
       },
       validation: (rule) => rule.required(),
     }),
@@ -32,15 +34,31 @@ export const author = defineType({
       },
     }),
     defineField({
+      name: 'role',
+      title: 'Role',
+      description: 'e.g. "Founder & Editor" — shown in the byline and as jobTitle in Person schema.',
+      type: 'string',
+    }),
+    defineField({
       name: 'bio',
       title: 'Bio',
+      description: 'Short biography for the author page and Person structured data (E-E-A-T).',
       type: 'text',
       rows: 4,
     }),
     defineField({
-      name: 'role',
-      title: 'Role',
-      type: 'string',
+      name: 'sameAs',
+      title: 'Profile links (sameAs)',
+      description:
+        'Public profile URLs that identify this author — LinkedIn, X/Twitter, Substack, personal site, ORCID. Feeds the Person schema "sameAs" for entity disambiguation.',
+      type: 'array',
+      of: [
+        defineArrayMember({
+          type: 'url',
+          validation: (rule) => rule.uri({ scheme: ['http', 'https'] }),
+        }),
+      ],
+      validation: (rule) => rule.unique(),
     }),
   ],
   preview: {

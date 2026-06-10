@@ -158,6 +158,13 @@ export const article = defineType({
       type: 'datetime',
     }),
     defineField({
+      name: 'updatedAt',
+      title: 'Updated At',
+      description:
+        'Set this only when you materially revise a piece after publishing. Shows a visible "Updated" date and feeds dateModified in structured data. Leave blank for the original publication and for minor/SEO-only tweaks.',
+      type: 'datetime',
+    }),
+    defineField({
       name: 'excerpt',
       title: 'Excerpt',
       description: 'Short summary for cards and SEO (max 200 characters)',

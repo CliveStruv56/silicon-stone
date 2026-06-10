@@ -3,6 +3,7 @@ import { sanityFetch } from '@/sanity/lib/live'
 import {
   SITEMAP_ARTICLES_QUERY,
   SITEMAP_CATEGORIES_QUERY,
+  AUTHOR_SLUGS_QUERY,
 } from '@/sanity/lib/queries'
 import { absoluteUrl } from '@/lib/site'
 
@@ -40,18 +41,24 @@ const STATIC_ROUTES: Array<{
 ]
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [{ data: articles }, { data: categories }] = await Promise.all([
-    sanityFetch({
-      query: SITEMAP_ARTICLES_QUERY,
-      perspective: 'published',
-      stega: false,
-    }),
-    sanityFetch({
-      query: SITEMAP_CATEGORIES_QUERY,
-      perspective: 'published',
-      stega: false,
-    }),
-  ])
+  const [{ data: articles }, { data: categories }, { data: authors }] =
+    await Promise.all([
+      sanityFetch({
+        query: SITEMAP_ARTICLES_QUERY,
+        perspective: 'published',
+        stega: false,
+      }),
+      sanityFetch({
+        query: SITEMAP_CATEGORIES_QUERY,
+        perspective: 'published',
+        stega: false,
+      }),
+      sanityFetch({
+        query: AUTHOR_SLUGS_QUERY,
+        perspective: 'published',
+        stega: false,
+      }),
+    ])
 
   const staticEntries: MetadataRoute.Sitemap = STATIC_ROUTES.map((route) => ({
     url: absoluteUrl(route.path),
@@ -81,5 +88,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }))
 
-  return [...staticEntries, ...articleEntries, ...categoryEntries]
+  const authorEntries: MetadataRoute.Sitemap = (
+    (authors ?? []) as Array<{ slug: string }>
+  ).map((author) => ({
+    url: absoluteUrl(`/authors/${author.slug}`),
+    changeFrequency: 'weekly',
+    priority: 0.5,
+  }))
+
+  return [
+    ...staticEntries,
+    ...articleEntries,
+    ...categoryEntries,
+    ...authorEntries,
+  ]
 }

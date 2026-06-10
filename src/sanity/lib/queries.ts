@@ -57,6 +57,7 @@ export const ARTICLE_QUERY = defineQuery(`
     "slug": slug.current,
     excerpt,
     publishedAt,
+    updatedAt,
     contentType,
     intelligenceTier,
     impactScore,
@@ -77,7 +78,8 @@ export const ARTICLE_QUERY = defineQuery(`
       "slug": slug.current,
       image,
       bio,
-      role
+      role,
+      sameAs
     },
     relatedArticles[]->{
       _id,
@@ -191,7 +193,45 @@ export const AUTHOR_QUERY = defineQuery(`
     "slug": slug.current,
     image,
     bio,
-    role
+    role,
+    sameAs
+  }
+`)
+
+// Author bio page — author plus their published articles
+export const AUTHOR_PAGE_QUERY = defineQuery(`
+  *[_type == "author" && slug.current == $slug][0] {
+    _id,
+    name,
+    "slug": slug.current,
+    image,
+    bio,
+    role,
+    sameAs,
+    "articles": *[_type == "article" && author._ref == ^._id && defined(slug.current) && !(_id in path("drafts.**"))]
+      | order(coalesce(publishedAt, _updatedAt) desc) {
+        _id,
+        title,
+        "slug": slug.current,
+        excerpt,
+        publishedAt,
+        contentType,
+        intelligenceTier,
+        impactScore,
+        stoneTruth,
+        categories[]->{
+          _id,
+          title,
+          "slug": slug.current
+        }
+      }
+  }
+`)
+
+// Author slugs — for generateStaticParams on /authors/[slug]
+export const AUTHOR_SLUGS_QUERY = defineQuery(`
+  *[_type == "author" && defined(slug.current)]{
+    "slug": slug.current
   }
 `)
 

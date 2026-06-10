@@ -13,7 +13,11 @@ export type SchemaArticle = {
   _updatedAt?: string | null
   contentType?: string | null
   imageUrl?: string | null
-  author?: { name?: string | null; slug?: string | null } | null
+  author?: {
+    name?: string | null
+    slug?: string | null
+    sameAs?: string[] | null
+  } | null
   categories?: Array<{ title: string; slug: string }> | null
   citations?: Array<{
     title: string
@@ -56,6 +60,10 @@ export function buildArticleSchema(a: SchemaArticle) {
             ...(a.author.slug
               ? { url: absoluteUrl(`/authors/${a.author.slug}`) }
               : {}),
+            ...(a.author.sameAs && a.author.sameAs.length
+              ? { sameAs: a.author.sameAs }
+              : {}),
+            worksFor: { '@id': `${SITE_URL}/#organization` },
           },
         }
       : {}),
@@ -99,5 +107,40 @@ export function buildBreadcrumbSchema(a: SchemaArticle) {
       name: item.name,
       item: item.url,
     })),
+  }
+}
+
+export type SchemaAuthor = {
+  name: string
+  slug: string
+  role?: string | null
+  bio?: string | null
+  imageUrl?: string | null
+  sameAs?: string[] | null
+}
+
+/**
+ * ProfilePage wrapping a Person for an author bio page — the single fastest
+ * E-E-A-T lever. `sameAs` disambiguates the author entity across the web.
+ */
+export function buildPersonProfileSchema(author: SchemaAuthor) {
+  const url = absoluteUrl(`/authors/${author.slug}`)
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ProfilePage',
+    '@id': url,
+    mainEntity: {
+      '@type': 'Person',
+      '@id': `${url}#person`,
+      name: author.name,
+      url,
+      ...(author.role ? { jobTitle: author.role } : {}),
+      ...(author.bio ? { description: author.bio } : {}),
+      ...(author.imageUrl ? { image: author.imageUrl } : {}),
+      ...(author.sameAs && author.sameAs.length
+        ? { sameAs: author.sameAs }
+        : {}),
+      worksFor: { '@id': `${SITE_URL}/#organization` },
+    },
   }
 }

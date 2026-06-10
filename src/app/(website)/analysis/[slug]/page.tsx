@@ -127,6 +127,14 @@ export default async function ArticlePage({ params }: Props) {
   const primaryPersona = article.personas?.[0]
   const hasIntelligenceFields = article.intelligenceTier || article.impactScore || article.stoneTruth
 
+  // Show a visible "Updated" date only when an editor set updatedAt after publish.
+  const updatedDate =
+    article.updatedAt &&
+    article.publishedAt &&
+    new Date(article.updatedAt).getTime() > new Date(article.publishedAt).getTime()
+      ? article.updatedAt
+      : null
+
   const schemaInput = {
     title: article.title,
     slug: article.slug,
@@ -134,13 +142,18 @@ export default async function ArticlePage({ params }: Props) {
       article.seo?.metaDescription || article.stoneTruth || article.excerpt
     ),
     publishedAt: article.publishedAt,
-    _updatedAt: article._updatedAt,
+    // Prefer the editorial updatedAt; fall back to the system timestamp.
+    _updatedAt: article.updatedAt || article._updatedAt,
     contentType: article.contentType,
     imageUrl: article.mainImage?.asset
       ? urlFor(article.mainImage).width(1200).height(630).url()
       : absoluteUrl('/homepage-redesign-2026/the-watcher.png'),
     author: article.author
-      ? { name: article.author.name, slug: article.author.slug }
+      ? {
+          name: article.author.name,
+          slug: article.author.slug,
+          sameAs: article.author.sameAs,
+        }
       : null,
     categories: article.categories,
     citations: article.citations,
@@ -194,40 +207,64 @@ export default async function ArticlePage({ params }: Props) {
             {article.title}
           </h1>
 
-          {/* Meta - only show if no PulseHeader */}
-          {!hasIntelligenceFields && (
-            <div className="flex flex-wrap items-center gap-4 text-sm text-text-muted mb-8">
-              {article.author && (
-                <div className="flex items-center gap-2">
-                  {article.author.image && (
-                    <div className="relative w-8 h-8 rounded-full overflow-hidden">
-                      <Image
-                        src={urlFor(article.author.image).width(64).height(64).url()}
-                        alt={article.author.name}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
+          {/* Byline — author + dates on every article (E-E-A-T). The PulseHeader
+              already shows the published date + reading time for intelligence
+              pieces, so those are only repeated here for non-intelligence ones. */}
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-text-muted mb-8">
+            {article.author && (
+              <div className="flex items-center gap-2">
+                {article.author.image ? (
+                  <div className="relative w-8 h-8 rounded-full overflow-hidden">
+                    <Image
+                      src={urlFor(article.author.image).width(64).height(64).url()}
+                      alt={article.author.name}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-stone-charcoal flex items-center justify-center text-xs font-semibold text-text-muted">
+                    {article.author.name?.charAt(0)}
+                  </div>
+                )}
+                <span className="text-text-primary">
+                  By{' '}
+                  {article.author.slug ? (
+                    <Link
+                      href={`/authors/${article.author.slug}`}
+                      className="text-text-primary hover:text-stone-teal underline-offset-2 hover:underline"
+                    >
+                      {article.author.name}
+                    </Link>
+                  ) : (
+                    article.author.name
                   )}
-                  <span className="text-text-primary">{article.author.name}</span>
-                </div>
-              )}
-              {article.publishedAt && (
-                <>
-                  <span className="text-border-subtle">|</span>
-                  <time dateTime={article.publishedAt}>
-                    {formatDate(article.publishedAt, 'long')}
-                  </time>
-                </>
-              )}
-              {readingTime > 0 && (
-                <>
-                  <span className="text-border-subtle">|</span>
-                  <span>{readingTime} min read</span>
-                </>
-              )}
-            </div>
-          )}
+                </span>
+              </div>
+            )}
+            {!hasIntelligenceFields && article.publishedAt && (
+              <>
+                <span className="text-border-subtle">|</span>
+                <time dateTime={article.publishedAt}>
+                  {formatDate(article.publishedAt, 'long')}
+                </time>
+              </>
+            )}
+            {updatedDate && (
+              <>
+                <span className="text-border-subtle">|</span>
+                <time dateTime={updatedDate}>
+                  Updated {formatDate(updatedDate, 'long')}
+                </time>
+              </>
+            )}
+            {!hasIntelligenceFields && readingTime > 0 && (
+              <>
+                <span className="text-border-subtle">|</span>
+                <span>{readingTime} min read</span>
+              </>
+            )}
+          </div>
 
           {/* Main Image */}
           {article.mainImage?.asset && (
@@ -328,12 +365,31 @@ export default async function ArticlePage({ params }: Props) {
                   </div>
                 )}
                 <div>
-                  <h3 className="font-semibold text-text-primary">{article.author.name}</h3>
+                  <h3 className="font-semibold text-text-primary">
+                    {article.author.slug ? (
+                      <Link
+                        href={`/authors/${article.author.slug}`}
+                        className="hover:text-stone-teal underline-offset-2 hover:underline"
+                      >
+                        {article.author.name}
+                      </Link>
+                    ) : (
+                      article.author.name
+                    )}
+                  </h3>
                   {article.author.role && (
                     <p className="text-sm text-stone-teal mb-2">{article.author.role}</p>
                   )}
                   {article.author.bio && (
                     <p className="text-sm text-text-muted">{article.author.bio}</p>
+                  )}
+                  {article.author.slug && (
+                    <Link
+                      href={`/authors/${article.author.slug}`}
+                      className="mt-2 inline-block text-sm text-stone-teal hover:underline"
+                    >
+                      More from {article.author.name} &rarr;
+                    </Link>
                   )}
                 </div>
               </div>
