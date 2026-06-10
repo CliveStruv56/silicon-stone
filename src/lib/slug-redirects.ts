@@ -28,6 +28,8 @@ export function articleRedirectRules() {
   return ARTICLE_SLUG_REDIRECTS.map(({ from, to }) => ({
     source: `/analysis/${from}`,
     destination: `/analysis/${to}`,
-    permanent: true,
+    // Explicit 301 (not permanent:true → Next's 308) to match the site's
+    // route-consolidation redirects.
+    statusCode: 301,
   }))
 }
