@@ -1,7 +1,7 @@
 # Legacy Slug Renames — Proposal for Sign-off
 
 **Generated:** 2026-06-10 (from live Sanity production data, 11 published articles)
-**Status:** AWAITING CLIVE'S SIGN-OFF — no renames executed, redirect map still empty by design.
+**Status:** ✅ **EXECUTED 2026-06-10** — Clive approved the Recommended column; all 7 renamed in Sanity (transaction `6NJ7ZhgUZlEpRSet3iu2B0`), `ARTICLE_SLUG_REDIRECTS` populated, and verified on production: every old URL 301s to its new URL, all new URLs 200, sitemap and canonicals carry the new slugs. Optional follow-up: request reindexing of the 7 new URLs in Google Search Console.
 
 7 published articles carry legacy slugs that truncate mid-word and/or end in a
 4-digit suffix. The redirect mechanism (`src/lib/slug-redirects.ts` →

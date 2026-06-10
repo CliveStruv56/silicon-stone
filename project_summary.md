@@ -528,7 +528,7 @@ SESSION_SECRET=<long random secret, 32+ characters>
 | Markdown-to-PDF pipeline | `scripts/render-briefing-pdf.ts` + `npm run render-briefing` render lead-magnet / Intelligence Series PDFs. Committed 2026-05-20 (`21eb123`; overwrite-guard `570ab13`). `puppeteer` / `marked` / `gray-matter` are devDependencies — `puppeteer` pulls ~170MB Chromium on install. Dev-only, never invoked by Vercel/Railway. Docs: `docs/markdown-to-pdf-pipeline.md`. | Info |
 | Studio reference-array UX trap | Clicking "Add item" in a Sanity reference array and saving without picking a doc leaves an orphan row (`_type`/`_key` but no `_ref`). One of these was found and cleaned up on the Helium article draft on 2026-04-14. | Low |
 | ~~No unit tests for app logic~~ **RESOLVED** | Resolved 2026-06-10: vitest suite (54 specs, `npm test`) covers the AI Act engine, slug/redirect utils, log redaction, and the markdown→Portable Text converter; runs in CI alongside the four invariant suites, and CI now also runs `next build`. | — |
-| Legacy slug renames awaiting sign-off | `docs/slug-renames-proposal.md` (2026-06-10) proposes new slugs for the 7 truncated/suffixed published articles. After Clive signs off: rename in Sanity + populate `ARTICLE_SLUG_REDIRECTS` in the same deploy window. | Medium |
+| ~~Legacy slug renames awaiting sign-off~~ **RESOLVED** | Resolved 2026-06-10: Clive approved the recommended slugs; all 7 renamed in Sanity + 301s live in `ARTICLE_SLUG_REDIRECTS` (explicit 301, matching the Phase B convention). Verified on production: old→new 301s, new URLs 200, sitemap + canonicals updated. Optional: GSC reindex request for the 7 new URLs. | — |
 
 ---
 
