@@ -219,6 +219,7 @@ export const AUTHOR_PAGE_QUERY = defineQuery(`
         intelligenceTier,
         impactScore,
         stoneTruth,
+        mainImage,
         categories[]->{
           _id,
           title,
