@@ -56,14 +56,6 @@ SANITY_BRIEFINGS_QUERY = """*[_type == "article" && !(_id in path("drafts.**")) 
 }"""
 
 
-class ServiceRoute(BaseModel):
-    app: str
-    frontend_host: str | None
-    logic_host: str
-    role: str
-    status: str
-
-
 class Category(BaseModel):
     id: str
     title: str
@@ -595,44 +587,6 @@ async def _record_exa_usage(operation: str, model: str, cost: Any, job_id: str |
         logger.exception("usage record failed for %s", operation)
 
 
-service_routes = [
-    ServiceRoute(
-        app="Silicon and Stone",
-        frontend_host="Vercel",
-        logic_host="Railway",
-        role="Content portal and geopolitical analysis",
-        status="frontend-currently-in-this-repo",
-    ),
-    ServiceRoute(
-        app="Family Hub",
-        frontend_host="Vercel",
-        logic_host="Railway",
-        role='Messaging and "Emergency Tap" system',
-        status="planned",
-    ),
-    ServiceRoute(
-        app="VB Partners",
-        frontend_host=None,
-        logic_host="Railway",
-        role="SaaS for small businesses",
-        status="planned",
-    ),
-    ServiceRoute(
-        app="WaymarkPath",
-        frontend_host="Vercel",
-        logic_host="Railway",
-        role="Career and skills gap analysis engine",
-        status="planned",
-    ),
-    ServiceRoute(
-        app="The Brain",
-        frontend_host=None,
-        logic_host="Railway",
-        role="Central AI agent serving the project portfolio",
-        status="planned",
-    ),
-]
-
 app = FastAPI(
     title="Silicon and Stone Logic API",
     version="0.1.0",
@@ -675,11 +629,6 @@ def health() -> dict[str, str]:
         "service": os.getenv("RAILWAY_SERVICE_NAME", "silicon-and-stone-logic"),
         "environment": os.getenv("RAILWAY_ENVIRONMENT_NAME", "local"),
     }
-
-
-@app.get("/v1/topology", response_model=list[ServiceRoute])
-def topology() -> list[ServiceRoute]:
-    return service_routes
 
 
 @app.get("/v1/categories", response_model=list[Category])
@@ -869,18 +818,6 @@ def contact(payload: ContactRequest, request: Request) -> dict[str, bool]:
                 logger.exception("Kit contact tag assignment failed")
 
     return {"success": True}
-
-
-@app.post("/v1/hermes/events")
-def hermes_events(payload: dict[str, Any], request: Request) -> dict[str, Any]:
-    # Key-gated even though it's currently a no-op echo, so it can never be
-    # wired to a real consumer while still publicly writable.
-    _require_backend_api_key(request)
-    return {
-        "accepted": True,
-        "event_type": payload.get("type", "unknown"),
-        "routing_note": "Wire this endpoint to the Hermes service when the central agent is deployed.",
-    }
 
 
 @app.post("/v1/research/deep")

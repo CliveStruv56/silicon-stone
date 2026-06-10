@@ -18,12 +18,17 @@ Last updated: 2026-06-03
 - Added `backend/railway.json` with Nixpacks, IPv4-compatible binding via `--host 0.0.0.0`, and `/health` checks.
 - Added FastAPI endpoints:
   - `GET /health`
-  - `GET /v1/topology`
   - `GET /v1/categories`
   - `GET /v1/briefings`
   - `POST /v1/subscribe`
   - `POST /v1/contact`
-  - `POST /v1/hermes/events`
+  - (Later additions: `POST /v1/research/deep`, `GET /v1/research/deep/{job_id}`,
+    `POST /v1/usage`, `GET /v1/usage/summary`.)
+  - **Removed 2026-06-10:** the `GET /v1/topology` and `POST /v1/hermes/events`
+    placeholders. Hermes ("The Brain") was never built; the stubs served no S&S
+    function and `/v1/topology` publicly disclosed the multi-app roadmap.
+    Re-add an events endpoint only when Hermes exists with a concrete,
+    authenticated interface.
 - Added `NEXT_PUBLIC_API_URL` and Railway backend variables to `.env.example`.
 
 ## Current Repository Shape
