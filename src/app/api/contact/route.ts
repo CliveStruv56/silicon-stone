@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getClientIp } from "@/lib/rate-limit";
 import { checkDurableRateLimit } from "@/lib/durable-rate-limit";
+import { redactForLog } from "@/lib/utils";
 
 const KIT_API_KEY = process.env.CONVERTKIT_API_KEY || "";
 const KIT_FORM_ID = process.env.CONVERTKIT_FORM_ID || "";
@@ -68,7 +69,7 @@ async function proxyContact(body: {
       return NextResponse.json(responseBody, { status: response.status });
     }
 
-    console.error("Railway contact proxy error:", response.status, responseBody);
+    console.error("Railway contact proxy error:", response.status, redactForLog(responseBody));
     return NextResponse.json(
       { error: "Backend contact proxy error", status: response.status },
       { status: 502 }
@@ -195,7 +196,7 @@ export async function POST(request: NextRequest) {
 
     if (!createResponse.ok) {
       const errorText = await createResponse.text();
-      console.error("ConvertKit create subscriber error:", createResponse.status, errorText);
+      console.error("ConvertKit create subscriber error:", createResponse.status, redactForLog(errorText));
       return NextResponse.json(
         { error: "Failed to send inquiry. Please try again." },
         { status: 502 }

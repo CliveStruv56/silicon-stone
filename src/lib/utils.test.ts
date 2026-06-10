@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { safeInternalPath, slugify } from './utils'
+import { redactForLog, safeInternalPath, slugify } from './utils'
 
 describe('safeInternalPath', () => {
   it('accepts a normal rooted path', () => {
@@ -20,6 +20,23 @@ describe('safeInternalPath', () => {
   it('returns the supplied fallback for null/undefined', () => {
     expect(safeInternalPath(null, '/intelligence')).toBe('/intelligence')
     expect(safeInternalPath(undefined, '/intelligence')).toBe('/intelligence')
+  })
+})
+
+describe('redactForLog', () => {
+  it('masks email addresses in strings', () => {
+    const result = redactForLog('email_address user@example.com already exists')
+    expect(result).not.toContain('user@example.com')
+    expect(result).toContain('***@redacted')
+  })
+
+  it('serialises and masks objects', () => {
+    const result = redactForLog({ error: 'duplicate', email: 'a@b.co' })
+    expect(result).not.toContain('a@b.co')
+  })
+
+  it('clamps output length', () => {
+    expect(redactForLog('x'.repeat(1000)).length).toBeLessThanOrEqual(200)
   })
 })
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getClientIp } from "@/lib/rate-limit";
 import { checkDurableRateLimit } from "@/lib/durable-rate-limit";
+import { redactForLog } from "@/lib/utils";
 
 const KIT_API_KEY = process.env.CONVERTKIT_API_KEY || "";
 const KIT_FORM_ID = process.env.CONVERTKIT_FORM_ID || "";
@@ -51,7 +52,7 @@ async function proxySubscribe(body: { email: string; tag?: string }) {
       return NextResponse.json(responseBody, { status: response.status });
     }
 
-    console.error("Railway subscribe proxy error:", response.status, responseBody);
+    console.error("Railway subscribe proxy error:", response.status, redactForLog(responseBody));
     return NextResponse.json(
       { error: "Backend subscribe proxy error", status: response.status },
       { status: 502 }
@@ -160,7 +161,7 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("ConvertKit API error:", response.status, errorText);
+      console.error("ConvertKit API error:", response.status, redactForLog(errorText));
       return NextResponse.json(
         { error: "Failed to subscribe. Please try again." },
         { status: 502 }

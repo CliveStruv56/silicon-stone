@@ -20,6 +20,17 @@ export function safeInternalPath(target: string | null | undefined, fallback = '
 }
 
 /**
+ * Make upstream error payloads safe to log: mask anything email-shaped and
+ * clamp the length. Kit/ConvertKit error bodies echo the submitted address,
+ * so logging them verbatim writes subscriber PII into the log stream.
+ */
+export function redactForLog(value: unknown, maxLength = 200): string {
+  const text =
+    typeof value === 'string' ? value : (JSON.stringify(value) ?? String(value))
+  return text.replace(/[^\s@"']+@[^\s@"']+/g, '***@redacted').slice(0, maxLength)
+}
+
+/**
  * Build a clean URL slug from a title. Truncates to `maxLength` on a *word
  * boundary* (never mid-word) so long titles don't yield slugs like
  * `…-include-the-fda` cut at 96 chars. Default cap is 60 — short enough for
