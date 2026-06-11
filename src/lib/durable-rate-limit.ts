@@ -21,6 +21,7 @@ const configs = {
   contact: { limit: 5, window: '15 m', prefix: 'sas:contact' },
   vectorize: { limit: 120, window: '1 m', prefix: 'sas:vectorize' },
   deepResearch: { limit: 3, window: '1 h', prefix: 'sas:deep-research' },
+  factCheck: { limit: 10, window: '1 h', prefix: 'sas:fact-check' },
 } satisfies Record<string, RateLimitConfig>
 
 export type DurableRateLimitKey = keyof typeof configs

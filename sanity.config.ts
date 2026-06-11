@@ -13,6 +13,8 @@ import {media} from 'sanity-plugin-media'
 import {apiVersion, dataset, projectId} from './src/sanity/env'
 import {schema} from './src/sanity/schemaTypes'
 import {structure} from './src/sanity/structure'
+import {FactCheckAction} from './src/sanity/actions/factCheckAction'
+import {factCheckBadge} from './src/sanity/badges/factCheckBadge'
 
 export default defineConfig({
   basePath: '/studio',
@@ -20,6 +22,11 @@ export default defineConfig({
   dataset,
   // Add and edit the content schema in the './sanity/schemaTypes' folder
   schema,
+  document: {
+    // "Run fact-check" action + verdict badge on articles only
+    actions: (prev, ctx) => (ctx.schemaType === 'article' ? [...prev, FactCheckAction] : prev),
+    badges: (prev, ctx) => (ctx.schemaType === 'article' ? [...prev, factCheckBadge] : prev),
+  },
   plugins: [
     structureTool({structure}),
     // Vision is for querying with GROQ from inside the Studio

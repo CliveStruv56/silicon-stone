@@ -6,6 +6,9 @@ import { recordUsage } from './usage';
 // table in pricing.ts in lockstep with whatever model id is actually used.
 const DEFAULT_CLAUDE_MODEL = process.env.ANTHROPIC_MODEL?.trim() || "claude-sonnet-4-6";
 
+/** The model id callClaude uses when no override is passed (for report metadata). */
+export const CLAUDE_MODEL = DEFAULT_CLAUDE_MODEL;
+
 const API_KEY = process.env.ANTHROPIC_API_KEY ? process.env.ANTHROPIC_API_KEY.trim() : "";
 
 const anthropic = new Anthropic({

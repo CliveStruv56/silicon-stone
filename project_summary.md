@@ -1,7 +1,7 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-06-10
+> Last Updated: 2026-06-11
 > Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing, 13 moderate transitive npm audit findings (uuid through Sanity packages)**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com. Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools (email-gated for lead capture, AI Act triage engine recently overhauled), product/commerce pages with an early-access enquiry fallback until Lemon Squeezy checkout URLs are configured, Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Awaiting Lemon Squeezy store setup, Plausible account, and content publishing for queued drafts.
@@ -353,6 +353,12 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### June 11, 2026 — On-demand article fact-check (Studio-triggered, web-verified)
+
+| Commit | Description |
+|--------|-------------|
+| (this commit) | Optional fact-check for ALL articles (generated, imported, manual; draft or published), triggered from a new **"Run fact-check"** document action in `/studio` — advisory only, never blocks publishing, never edits the body. **Pipeline** (`src/lib/fact-check.ts`): Claude extracts discrete checkable claims (capped by tier: pulse 8 / briefing 12 / audit & deepdive 18), each claim is independently verified against fresh Exa web searches (`recencyDays: null` so primary sources aren't recency-filtered, concurrency 4), then batched Claude verification calls (5 claims/call, 2 in flight) produce per-claim verdicts (accurate / inaccurate / outdated / needs-context / unverifiable) with confidence, evidence, source URLs, and a **suggested revision** for anything not accurate. Verified primary sources are **appended to `citations[]`** (URL-normalised dedupe vs existing). **Schema:** new read-only collapsible `factCheck` object on `article` (status/timestamps/model/overallVerdict/summary/counts/claims[] with scannable ✓✗⏱◐? previews) — `sanity schema deploy` run. **Route** (`src/app/api/fact-check/route.ts`, `maxDuration 300`): rate-limited (`factCheck` 10/h durable bucket), authenticated via the admin session cookie (same-origin Studio fetch; editor must also be logged in at `/login` — a secret in the Studio bundle would be public), patches `status:'running'` then finishes via Next 15 `after()`; failures always patch `status:'failed'` (never stuck running); 409 re-entrancy guard (10-min stale window). **Studio:** `FactCheckAction` + `factCheckBadge` registered for `article` only in `sanity.config.ts`; badge shows running/clean/minor/major/failed. Gotcha found in testing: on apiVersion 2026-01-13 the client defaults to the `published` perspective, hiding drafts — all pipeline fetches pass `{perspective:'raw'}`. Verified end-to-end locally: 401 unauthenticated, 202 start, 409 while running, completed report + verdicts patched onto a real pulse draft. `npm run check` + 54 tests pass. |
 
 ### June 10, 2026 — Author entity / E-E-A-T (SEO build brief, item 4)
 

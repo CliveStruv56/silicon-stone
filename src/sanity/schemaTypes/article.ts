@@ -317,6 +317,136 @@ export const article = defineType({
       rows: 12,
       readOnly: true,
     }),
+    defineField({
+      name: 'factCheck',
+      title: 'Fact Check',
+      description:
+        'Machine-generated verification report from the "Run fact-check" document action. ' +
+        'Each claim is checked against fresh web searches of primary sources. Advisory only — ' +
+        'never blocks publishing, never edits the body. Apply suggested revisions manually.',
+      type: 'object',
+      readOnly: true,
+      options: { collapsible: true, collapsed: true },
+      fields: [
+        defineField({
+          name: 'status',
+          title: 'Status',
+          type: 'string',
+          options: {
+            list: [
+              { title: 'Running', value: 'running' },
+              { title: 'Completed', value: 'completed' },
+              { title: 'Failed', value: 'failed' },
+            ],
+          },
+        }),
+        defineField({ name: 'requestedAt', title: 'Requested At', type: 'datetime' }),
+        defineField({ name: 'completedAt', title: 'Completed At', type: 'datetime' }),
+        defineField({
+          name: 'model',
+          title: 'Model',
+          description: 'Claude model that produced this report.',
+          type: 'string',
+        }),
+        defineField({ name: 'error', title: 'Error', type: 'text', rows: 2 }),
+        defineField({
+          name: 'overallVerdict',
+          title: 'Overall Verdict',
+          type: 'string',
+          options: {
+            list: [
+              { title: 'Clean', value: 'clean' },
+              { title: 'Minor issues', value: 'minor-issues' },
+              { title: 'Major issues', value: 'major-issues' },
+              { title: 'Mostly unverifiable', value: 'unverifiable' },
+            ],
+          },
+        }),
+        defineField({ name: 'summary', title: 'Summary', type: 'text', rows: 4 }),
+        defineField({
+          name: 'counts',
+          title: 'Verdict Counts',
+          type: 'object',
+          fields: [
+            defineField({ name: 'total', title: 'Total', type: 'number' }),
+            defineField({ name: 'accurate', title: 'Accurate', type: 'number' }),
+            defineField({ name: 'inaccurate', title: 'Inaccurate', type: 'number' }),
+            defineField({ name: 'outdated', title: 'Outdated', type: 'number' }),
+            defineField({ name: 'needsContext', title: 'Needs Context', type: 'number' }),
+            defineField({ name: 'unverifiable', title: 'Unverifiable', type: 'number' }),
+          ],
+        }),
+        defineField({
+          name: 'claims',
+          title: 'Claims',
+          type: 'array',
+          of: [
+            defineArrayMember({
+              type: 'object',
+              name: 'claimCheck',
+              fields: [
+                defineField({ name: 'claim', title: 'Claim', type: 'text', rows: 2 }),
+                defineField({
+                  name: 'locationHint',
+                  title: 'Location Hint',
+                  description: 'Verbatim fragment from the body — search for it to find the claim.',
+                  type: 'string',
+                }),
+                defineField({
+                  name: 'verdict',
+                  title: 'Verdict',
+                  type: 'string',
+                  options: {
+                    list: [
+                      { title: 'Accurate', value: 'accurate' },
+                      { title: 'Inaccurate', value: 'inaccurate' },
+                      { title: 'Outdated', value: 'outdated' },
+                      { title: 'Needs context', value: 'needs-context' },
+                      { title: 'Unverifiable', value: 'unverifiable' },
+                    ],
+                  },
+                }),
+                defineField({
+                  name: 'confidence',
+                  title: 'Confidence',
+                  type: 'string',
+                  options: { list: ['high', 'medium', 'low'] },
+                }),
+                defineField({ name: 'evidence', title: 'Evidence', type: 'text', rows: 3 }),
+                defineField({
+                  name: 'sourceUrls',
+                  title: 'Source URLs',
+                  type: 'array',
+                  of: [defineArrayMember({ type: 'url' })],
+                }),
+                defineField({
+                  name: 'suggestedRevision',
+                  title: 'Suggested Revision',
+                  description: 'Proposed corrected wording — apply manually, never auto-applied.',
+                  type: 'text',
+                  rows: 3,
+                }),
+              ],
+              preview: {
+                select: { title: 'claim', verdict: 'verdict', confidence: 'confidence' },
+                prepare({ title, verdict, confidence }) {
+                  const mark =
+                    verdict === 'accurate' ? '✓'
+                    : verdict === 'inaccurate' ? '✗'
+                    : verdict === 'outdated' ? '⏱'
+                    : verdict === 'needs-context' ? '◐'
+                    : '?'
+                  return {
+                    title: `${mark} ${title ?? ''}`,
+                    subtitle: `${verdict ?? '—'}${confidence ? ` · ${confidence} confidence` : ''}`,
+                  }
+                },
+              },
+            }),
+          ],
+        }),
+      ],
+    }),
   ],
   preview: {
     select: {
