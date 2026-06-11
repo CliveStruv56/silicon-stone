@@ -237,7 +237,7 @@ Verdicts: "accurate" (evidence confirms it), "inaccurate" (evidence contradicts 
 Respond with a single JSON object only — no prose, no code fences:
 {"results": [{"claim_index": <number>, "verdict": "<verdict>", "confidence": "high"|"medium"|"low", "evidence": "<1-3 sentence justification citing the specific evidence>", "sourceUrls": ["<urls of the evidence items you relied on>"], "suggestedRevision": "<corrected or better-explained wording — ONLY when verdict is not accurate, otherwise omit>", "suggestedCitations": [{"title": "<source title>", "url": "<url>", "publisher": "<organisation>"}]}]}
 
-suggestedCitations: include only PRIMARY sources (official filings, regulators, original reporting) that genuinely support the claim — usually 0 or 1 per claim. Return one result per claim, in order.`;
+suggestedCitations: ONLY when the verdict is "accurate", and only PRIMARY sources (official filings, regulators, institutional publications, original named reporting — never blogs, vendor content, or aggregators) that genuinely support the claim — usually 0 or 1 per claim. Claims that are not accurate must have an empty suggestedCitations array. Return one result per claim, in order.`;
 
   const user = batch
     .map(({ claim, evidence }, i) => {
@@ -320,7 +320,11 @@ function buildSummary(results: ClaimResult[], verdict: string): string {
 /**
  * Collect citation suggestions across claims, dedupe by normalized URL —
  * internally and against the document's current citations — and shape them
- * as `citation` array members ready to append.
+ * as `citation` array members ready to append. Only claims that verified
+ * ACCURATE contribute: appending sources that refuted a claim would put the
+ * refuting evidence on the live Sources list while the wrong claim still
+ * stands in the body. Editors can pull URLs for flagged claims from each
+ * claim's sourceUrls when applying the suggested revision.
  */
 function buildNewCitations(
   results: ClaimResult[],
@@ -330,7 +334,7 @@ function buildNewCitations(
     existing.map((c) => (c.url ? normalizeUrl(c.url) : null)).filter((u): u is string => !!u),
   );
   const out: { _type: 'citation'; _key: string; title: string; url: string; publisher?: string }[] = [];
-  for (const result of results) {
+  for (const result of results.filter((r) => r.verdict === 'accurate')) {
     for (const citation of result.suggestedCitations) {
       const normalized = normalizeUrl(citation.url);
       if (!normalized || seen.has(normalized)) continue;

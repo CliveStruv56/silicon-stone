@@ -7,14 +7,20 @@ export const article = defineType({
   title: 'Article',
   type: 'document',
   icon: DocumentTextIcon,
+  groups: [
+    { name: 'content', title: 'Content', default: true },
+    { name: 'factCheck', title: 'Fact Check' },
+  ],
   fields: [
     defineField({
+      group: 'content',
       name: 'title',
       title: 'Title',
       type: 'string',
       validation: (rule) => rule.required(),
     }),
     defineField({
+      group: 'content',
       name: 'slug',
       title: 'Slug',
       type: 'slug',
@@ -27,12 +33,14 @@ export const article = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      group: 'content',
       name: 'author',
       title: 'Author',
       type: 'reference',
       to: [{ type: 'author' }],
     }),
     defineField({
+      group: 'content',
       name: 'mainImage',
       title: 'Main Image',
       type: 'image',
@@ -49,12 +57,14 @@ export const article = defineType({
       ],
     }),
     defineField({
+      group: 'content',
       name: 'categories',
       title: 'Categories',
       type: 'array',
       of: [defineArrayMember({ type: 'reference', to: [{ type: 'category' }] })],
     }),
     defineField({
+      group: 'content',
       name: 'personas',
       title: 'Target Personas',
       description: 'Which decision-makers is this most relevant for?',
@@ -71,6 +81,7 @@ export const article = defineType({
       },
     }),
     defineField({
+      group: 'content',
       name: 'contentType',
       title: 'Content Type',
       type: 'string',
@@ -87,6 +98,7 @@ export const article = defineType({
     }),
     // === INTELLIGENCE PORTAL FIELDS ===
     defineField({
+      group: 'content',
       name: 'intelligenceTier',
       title: 'Intelligence Tier',
       description: 'Reading speed tier for tiered content experience',
@@ -101,6 +113,7 @@ export const article = defineType({
       },
     }),
     defineField({
+      group: 'content',
       name: 'impactScore',
       title: 'Impact Score',
       description: 'Significance rating 1-10 for urgency display',
@@ -108,6 +121,7 @@ export const article = defineType({
       validation: (rule) => rule.min(1).max(10),
     }),
     defineField({
+      group: 'content',
       name: 'stoneTruth',
       title: 'Stone Truth',
       description: 'One-sentence "bottom line" summary (max 160 chars)',
@@ -116,6 +130,7 @@ export const article = defineType({
       validation: (rule) => rule.max(160).warning('Keep Stone Truth under 160 characters'),
     }),
     defineField({
+      group: 'content',
       name: 'methodologyPillars',
       title: 'Methodology Audit (3×2 matrix cells)',
       description:
@@ -137,6 +152,7 @@ export const article = defineType({
       validation: (rule) => rule.max(6),
     }),
     defineField({
+      group: 'content',
       name: 'actionableInsights',
       title: 'Actionable Insights',
       description: 'Key takeaways for decision-makers (3-5 bullets)',
@@ -144,6 +160,7 @@ export const article = defineType({
       of: [defineArrayMember({ type: 'text' })],
     }),
     defineField({
+      group: 'content',
       name: 'relatedArticles',
       title: 'Related Articles',
       description:
@@ -153,11 +170,13 @@ export const article = defineType({
       validation: (rule) => rule.max(3),
     }),
     defineField({
+      group: 'content',
       name: 'publishedAt',
       title: 'Published At',
       type: 'datetime',
     }),
     defineField({
+      group: 'content',
       name: 'updatedAt',
       title: 'Updated At',
       description:
@@ -165,6 +184,7 @@ export const article = defineType({
       type: 'datetime',
     }),
     defineField({
+      group: 'content',
       name: 'excerpt',
       title: 'Excerpt',
       description: 'Short summary for cards and SEO (max 200 characters)',
@@ -173,6 +193,7 @@ export const article = defineType({
       validation: (rule) => rule.max(200).warning('Keep excerpts under 200 characters'),
     }),
     defineField({
+      group: 'content',
       name: 'body',
       title: 'Body',
       type: 'array',
@@ -231,6 +252,7 @@ export const article = defineType({
       ],
     }),
     defineField({
+      group: 'content',
       name: 'citations',
       title: 'Sources / Citations',
       description:
@@ -268,6 +290,7 @@ export const article = defineType({
       ],
     }),
     defineField({
+      group: 'content',
       name: 'seo',
       title: 'SEO',
       type: 'object',
@@ -288,6 +311,7 @@ export const article = defineType({
       ],
     }),
     defineField({
+      group: 'content',
       name: 'source',
       title: 'Source',
       description: 'How this article entered the system.',
@@ -301,6 +325,7 @@ export const article = defineType({
       },
     }),
     defineField({
+      group: 'content',
       name: 'sourceMaterial',
       title: 'Original Source Material',
       description:
@@ -309,6 +334,7 @@ export const article = defineType({
       rows: 12,
     }),
     defineField({
+      group: 'content',
       name: 'voiceEditNotes',
       title: 'Voice Edit Notes',
       description:
@@ -318,6 +344,7 @@ export const article = defineType({
       readOnly: true,
     }),
     defineField({
+      group: 'factCheck',
       name: 'factCheck',
       title: 'Fact Check',
       description:
@@ -326,7 +353,7 @@ export const article = defineType({
         'never blocks publishing, never edits the body. Apply suggested revisions manually.',
       type: 'object',
       readOnly: true,
-      options: { collapsible: true, collapsed: true },
+      options: { collapsible: true, collapsed: false },
       fields: [
         defineField({
           name: 'status',
