@@ -42,6 +42,7 @@ const ARTICLE_TEXT_CHARS = 30_000;
 interface ExtractedClaim {
   claim: string;
   locationHint: string;
+  originalText: string;
   searchQuery: string;
 }
 
@@ -61,6 +62,7 @@ interface SuggestedCitation {
 interface ClaimResult {
   claim: string;
   locationHint: string;
+  originalText: string;
   verdict: Verdict;
   confidence: Confidence;
   evidence: string;
@@ -168,7 +170,7 @@ async function extractClaims(article: FactCheckArticle, today: string): Promise<
 Extract ONLY claims that are checkable against external sources: statistics and figures, dates and time scales, direct quotes, named events, regulatory or legal facts, and concrete attributions ("X said/announced/fined Y"). Skip opinion, analysis, predictions, and the publication's own framing.
 
 Respond with a single JSON object only — no prose, no code fences:
-{"claims": [{"claim": "<the factual claim, self-contained>", "locationHint": "<short verbatim fragment copied from the article text where the claim appears>", "searchQuery": "<the best web search query to find a PRIMARY source for this claim>"}]}
+{"claims": [{"claim": "<the factual claim, self-contained>", "locationHint": "<short verbatim fragment copied from the article text where the claim appears>", "originalText": "<the COMPLETE sentence(s) containing this claim, copied EXACTLY verbatim from the article text — this is used for find-and-replace, so it must match character-for-character>", "searchQuery": "<the best web search query to find a PRIMARY source for this claim>"}]}
 
 Order claims by how damaging they would be if wrong. Return at most ${cap} claims. If the article contains no checkable claims, return {"claims": []}.`;
 
@@ -184,6 +186,7 @@ Order claims by how damaging they would be if wrong. Return at most ${cap} claim
     .map((c) => ({
       claim: typeof c.claim === 'string' ? c.claim.trim() : '',
       locationHint: typeof c.locationHint === 'string' ? c.locationHint.trim() : '',
+      originalText: typeof c.originalText === 'string' ? c.originalText.trim() : '',
       searchQuery: typeof c.searchQuery === 'string' ? c.searchQuery.trim() : '',
     }))
     .filter((c) => c.claim && c.searchQuery)
@@ -218,6 +221,7 @@ function unverifiableResult(claim: ExtractedClaim, reason: string): ClaimResult 
   return {
     claim: claim.claim,
     locationHint: claim.locationHint,
+    originalText: claim.originalText,
     verdict: 'unverifiable',
     confidence: 'low',
     evidence: reason,
@@ -276,6 +280,7 @@ suggestedCitations: ONLY when the verdict is "accurate", and only PRIMARY source
     return {
       claim: claim.claim,
       locationHint: claim.locationHint,
+      originalText: claim.originalText,
       verdict: asVerdict(row.verdict),
       confidence: asConfidence(row.confidence),
       evidence: typeof row.evidence === 'string' ? row.evidence.trim() : '',
@@ -429,6 +434,7 @@ export async function runFactCheck(targetId: string, requestedAt: string): Promi
         _key: newKey(),
         claim: r.claim,
         locationHint: r.locationHint,
+        ...(r.originalText ? { originalText: r.originalText } : {}),
         verdict: r.verdict,
         confidence: r.confidence,
         evidence: r.evidence,

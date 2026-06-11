@@ -1,6 +1,7 @@
 import { defineType, defineField, defineArrayMember } from 'sanity'
 import { DocumentTextIcon } from '@sanity/icons'
 import { slugify } from '@/lib/utils'
+import { ClaimCheckInput } from '../components/ClaimCheckInput'
 
 export const article = defineType({
   name: 'article',
@@ -350,15 +351,16 @@ export const article = defineType({
       description:
         'Machine-generated verification report from the "Run fact-check" document action. ' +
         'Each claim is checked against fresh web searches of primary sources. Advisory only — ' +
-        'never blocks publishing, never edits the body. Apply suggested revisions manually.',
+        'never blocks publishing. Edit a Suggested Revision if needed, then use ' +
+        '"Insert into article" on the claim to apply it to the body.',
       type: 'object',
-      readOnly: true,
       options: { collapsible: true, collapsed: false },
       fields: [
         defineField({
           name: 'status',
           title: 'Status',
           type: 'string',
+          readOnly: true,
           options: {
             list: [
               { title: 'Running', value: 'running' },
@@ -367,19 +369,21 @@ export const article = defineType({
             ],
           },
         }),
-        defineField({ name: 'requestedAt', title: 'Requested At', type: 'datetime' }),
-        defineField({ name: 'completedAt', title: 'Completed At', type: 'datetime' }),
+        defineField({ name: 'requestedAt', title: 'Requested At', type: 'datetime', readOnly: true }),
+        defineField({ name: 'completedAt', title: 'Completed At', type: 'datetime', readOnly: true }),
         defineField({
           name: 'model',
           title: 'Model',
           description: 'Claude model that produced this report.',
           type: 'string',
+          readOnly: true,
         }),
-        defineField({ name: 'error', title: 'Error', type: 'text', rows: 2 }),
+        defineField({ name: 'error', title: 'Error', type: 'text', rows: 2, readOnly: true }),
         defineField({
           name: 'overallVerdict',
           title: 'Overall Verdict',
           type: 'string',
+          readOnly: true,
           options: {
             list: [
               { title: 'Clean', value: 'clean' },
@@ -389,11 +393,12 @@ export const article = defineType({
             ],
           },
         }),
-        defineField({ name: 'summary', title: 'Summary', type: 'text', rows: 4 }),
+        defineField({ name: 'summary', title: 'Summary', type: 'text', rows: 4, readOnly: true }),
         defineField({
           name: 'counts',
           title: 'Verdict Counts',
           type: 'object',
+          readOnly: true,
           fields: [
             defineField({ name: 'total', title: 'Total', type: 'number' }),
             defineField({ name: 'accurate', title: 'Accurate', type: 'number' }),
@@ -411,18 +416,30 @@ export const article = defineType({
             defineArrayMember({
               type: 'object',
               name: 'claimCheck',
+              components: { input: ClaimCheckInput },
               fields: [
-                defineField({ name: 'claim', title: 'Claim', type: 'text', rows: 2 }),
+                defineField({ name: 'claim', title: 'Claim', type: 'text', rows: 2, readOnly: true }),
                 defineField({
                   name: 'locationHint',
                   title: 'Location Hint',
                   description: 'Verbatim fragment from the body — search for it to find the claim.',
                   type: 'string',
+                  readOnly: true,
+                }),
+                defineField({
+                  name: 'originalText',
+                  title: 'Original Text',
+                  description:
+                    'The exact passage from the article this claim came from — used by "Insert into article" to find and replace it.',
+                  type: 'text',
+                  rows: 3,
+                  readOnly: true,
                 }),
                 defineField({
                   name: 'verdict',
                   title: 'Verdict',
                   type: 'string',
+                  readOnly: true,
                   options: {
                     list: [
                       { title: 'Accurate', value: 'accurate' },
@@ -437,35 +454,48 @@ export const article = defineType({
                   name: 'confidence',
                   title: 'Confidence',
                   type: 'string',
+                  readOnly: true,
                   options: { list: ['high', 'medium', 'low'] },
                 }),
-                defineField({ name: 'evidence', title: 'Evidence', type: 'text', rows: 3 }),
+                defineField({ name: 'evidence', title: 'Evidence', type: 'text', rows: 3, readOnly: true }),
                 defineField({
                   name: 'sourceUrls',
                   title: 'Source URLs',
                   type: 'array',
+                  readOnly: true,
                   of: [defineArrayMember({ type: 'url' })],
                 }),
                 defineField({
                   name: 'suggestedRevision',
                   title: 'Suggested Revision',
-                  description: 'Proposed corrected wording — apply manually, never auto-applied.',
+                  description:
+                    'Proposed corrected wording. Edit it here if needed, then click "Insert into article" below to replace the original passage in the body.',
                   type: 'text',
                   rows: 3,
                 }),
+                defineField({
+                  name: 'applied',
+                  title: 'Applied',
+                  description: 'Set automatically when the revision is inserted into the body.',
+                  type: 'boolean',
+                  readOnly: true,
+                }),
               ],
               preview: {
-                select: { title: 'claim', verdict: 'verdict', confidence: 'confidence' },
-                prepare({ title, verdict, confidence }) {
+                select: { title: 'claim', verdict: 'verdict', confidence: 'confidence', applied: 'applied' },
+                prepare({ title, verdict, confidence, applied }) {
                   const mark =
                     verdict === 'accurate' ? '✓'
                     : verdict === 'inaccurate' ? '✗'
                     : verdict === 'outdated' ? '⏱'
                     : verdict === 'needs-context' ? '◐'
                     : '?'
+                  const status = applied
+                    ? ' · revision applied'
+                    : confidence ? ` · ${confidence} confidence` : ''
                   return {
                     title: `${mark} ${title ?? ''}`,
-                    subtitle: `${verdict ?? '—'}${confidence ? ` · ${confidence} confidence` : ''}`,
+                    subtitle: `${verdict ?? '—'}${status}`,
                   }
                 },
               },
