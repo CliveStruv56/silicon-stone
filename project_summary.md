@@ -354,6 +354,12 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### June 13, 2026 — Main draft pass moved off JSON to delimiter output
+
+| Commit | Description |
+|--------|-------------|
+| _(this change)_ | **Article generation failed at the "parsing Claude's draft" stage.** The main draft pass (`buildDraftPrompt` → `parseDraftPayload`, shared by `/create`, `/import`, `/research`) asked Claude for a single JSON object whose `content` value was the full markdown article. Markdown bodies routinely contain literal newlines and unescaped quotes, which break `JSON.parse` — the same failure mode that had killed Pass-3 voice edit (`727af19`). Fix: switch the draft contract to the proven delimiter format (`===TITLE===` / `===EXCERPT===` / `===KEYWORDS===` / `===CONTENT===`), parsed by slicing on markers in new `parseDelimitedDraft`. `parseDraftPayload` prefers the delimiter path and **falls back to the legacy JSON shape** (`parseJsonDraft`) if the markers are absent; `extractJsonObject` stays exported for that fallback and for `fact-check.ts`. **VERIFIED (2026-06-13):** a live round-trip (`scripts/verify-draft-delimiter.mts`: real `buildDraftPrompt` → `callClaude` → `parseDraftPayload`, persona `compliance-clara`, Pulse) — Claude emitted the delimiter format and the parser returned a valid draft (title, 2-sentence excerpt, 8 keywords, 1,176-char markdown body). No Sanity write, so no test draft to clean up. |
+
 ### June 13, 2026 — Voice-edit always-empty + fact-check session robustness
 
 | Commit | Description |

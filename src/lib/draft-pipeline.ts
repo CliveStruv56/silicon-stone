@@ -26,23 +26,76 @@ export interface ParsedDraft {
     keywords?: string[];
 }
 
+const DRAFT_MARKERS = {
+    title: '===TITLE===',
+    excerpt: '===EXCERPT===',
+    keywords: '===KEYWORDS===',
+    content: '===CONTENT===',
+} as const;
+
+/** Text after `start`, up to the earliest of `nexts` that follows it (or end). */
+function sliceSection(raw: string, start: string, nexts: string[] = []): string {
+    const from = raw.indexOf(start);
+    if (from === -1) return '';
+    const begin = from + start.length;
+    let end = raw.length;
+    for (const marker of nexts) {
+        const at = raw.indexOf(marker, begin);
+        if (at !== -1 && at < end) end = at;
+    }
+    return raw.slice(begin, end).trim();
+}
+
+/**
+ * Parse the delimiter format (see buildDraftPrompt). Returns null if the
+ * required markers aren't present, so the caller can fall back to JSON.
+ * Robust to multi-line markdown — no escaping needed, unlike a JSON string value.
+ */
+function parseDelimitedDraft(raw: string): ParsedDraft | null {
+    if (!raw.includes(DRAFT_MARKERS.title) || !raw.includes(DRAFT_MARKERS.content)) return null;
+    const { title: T, excerpt: E, keywords: K, content: C } = DRAFT_MARKERS;
+    const keywordsRaw = sliceSection(raw, K, [C]);
+    const keywords = keywordsRaw
+        ? keywordsRaw.split(',').map((k) => k.trim()).filter(Boolean)
+        : undefined;
+    return {
+        title: sliceSection(raw, T, [E, K, C]),
+        excerpt: sliceSection(raw, E, [K, C]),
+        content: sliceSection(raw, C),
+        keywords: keywords?.length ? keywords : undefined,
+    };
+}
+
+/** Legacy JSON shape `{ title, excerpt, content, keywords }`. Throws on invalid JSON. */
+function parseJsonDraft(raw: string): ParsedDraft {
+    const parsed = JSON.parse(extractJsonObject(raw)) as Record<string, unknown>;
+    return {
+        title: typeof parsed.title === 'string' ? parsed.title : '',
+        excerpt: typeof parsed.excerpt === 'string' ? parsed.excerpt : '',
+        content: typeof parsed.content === 'string' ? parsed.content : '',
+        keywords: Array.isArray(parsed.keywords)
+            ? parsed.keywords.filter((k): k is string => typeof k === 'string')
+            : undefined,
+    };
+}
+
 /**
  * Parse + validate a model draft response. Requires `title` and `content`;
  * `excerpt` is optional (the metadata pass usually supplies a meta description).
- * Throws on malformed payloads so callers share one validation contract.
+ * Prefers the delimiter format (robust for multi-line markdown) and falls back
+ * to the legacy JSON shape — the latter regularly broke JSON.parse when the
+ * markdown body held literal newlines or unescaped quotes. Throws on malformed
+ * payloads so callers share one validation contract.
  */
 export function parseDraftPayload(raw: string): ParsedDraft {
-    const parsed = JSON.parse(extractJsonObject(raw)) as Record<string, unknown>;
-    const title = typeof parsed.title === 'string' ? parsed.title.trim() : '';
-    const content = typeof parsed.content === 'string' ? parsed.content.trim() : '';
+    const draft = parseDelimitedDraft(raw) ?? parseJsonDraft(raw);
+    const title = draft.title.trim();
+    const content = draft.content.trim();
     if (!title || !content) {
         throw new Error('The model returned an unexpected draft payload (missing title or content).');
     }
-    const excerpt = typeof parsed.excerpt === 'string' ? parsed.excerpt.trim() : '';
-    const keywords = Array.isArray(parsed.keywords)
-        ? parsed.keywords.filter((k): k is string => typeof k === 'string')
-        : undefined;
-    return { title, excerpt, content, keywords };
+    const keywords = draft.keywords?.filter((k) => k.trim().length > 0);
+    return { title, excerpt: draft.excerpt.trim(), content, keywords: keywords?.length ? keywords : undefined };
 }
 
 function contentTypeForFormat(format: DraftFormat): 'signal' | 'deepdive' | 'guide' | 'youtube' {
