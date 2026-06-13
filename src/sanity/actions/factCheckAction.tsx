@@ -31,10 +31,18 @@ export const FactCheckAction: DocumentActionComponent = (props) => {
           body: JSON.stringify({ documentId: props.id }),
         })
         if (res.status === 401) {
+          // The admin session (separate from the Sanity Studio login) is
+          // missing or expired. Open /login in a new tab so the editor can
+          // re-authenticate without losing their place in this document, then
+          // re-run the action. Best-effort: popup blockers may swallow open().
+          if (typeof window !== 'undefined') {
+            window.open('/login', '_blank', 'noopener')
+          }
           toast.push({
             status: 'error',
-            title: 'Not authorised',
-            description: 'Log in to the admin area at /login first, then retry.',
+            title: 'Admin session expired',
+            description:
+              'Opened the admin login in a new tab — sign in there, then run the fact-check again. (This is the /login access code, not your Sanity login.)',
           })
         } else if (res.status === 409) {
           toast.push({ status: 'warning', title: 'A fact-check is already running' })
