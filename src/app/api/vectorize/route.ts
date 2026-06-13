@@ -86,12 +86,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ deleted: _id })
   }
 
-  // Fetch full article by _id
+  // Fetch full article by _id — including the current relatedArticles ids so we
+  // can skip the write-back when nothing changed (see the loop note below).
   const fullArticle = await sanity.fetch(
     `*[_type == "article" && !(_id in path("drafts.**")) && _id == $id][0] {
       _id, title, "slug": slug.current, excerpt, stoneTruth,
       body, actionableInsights, methodologyPillars,
-      contentType, intelligenceTier, impactScore, publishedAt, personas
+      contentType, intelligenceTier, impactScore, publishedAt, personas,
+      "relatedArticleIds": relatedArticles[]._ref
     }`,
     { id: _id }
   )
@@ -113,16 +115,31 @@ export async function POST(req: NextRequest) {
       includeMetadata: false,
       includeValues: false,
     })
-    const refs = (related.matches ?? [])
+    const relatedIds = (related.matches ?? [])
       .filter((match) => match.id !== _id)
       .slice(0, 3)
-      .map((match) => ({
-        _type: 'reference',
-        _ref: match.id,
-        _key: crypto.randomUUID().slice(0, 8),
-      }))
+      .map((match) => match.id)
 
-    await writeSanity.patch(_id).set({ relatedArticles: refs }).commit()
+    // Only write back when the neighbour set actually changed. Patching
+    // relatedArticles mutates the article, which re-fires this same webhook —
+    // so a non-idempotent write-back loops forever (and burns embedding +
+    // index spend on every hop). Two guards: (1) deterministic _key derived
+    // from the ref id, so an identical neighbour set produces an identical
+    // array; (2) compare the ordered id set against the current one and skip
+    // the patch when unchanged, terminating the loop after at most one hop.
+    const currentIds: string[] = fullArticle.relatedArticleIds ?? []
+    const changed =
+      relatedIds.length !== currentIds.length ||
+      relatedIds.some((id, i) => id !== currentIds[i])
+
+    if (changed) {
+      const refs = relatedIds.map((id) => ({
+        _type: 'reference',
+        _ref: id,
+        _key: crypto.createHash('md5').update(id).digest('hex').slice(0, 8),
+      }))
+      await writeSanity.patch(_id).set({ relatedArticles: refs }).commit()
+    }
   }
 
   return NextResponse.json({ success: true, id: _id, title: fullArticle.title })
