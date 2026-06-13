@@ -1,7 +1,7 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-06-11
+> Last Updated: 2026-06-13
 > Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing, 13 moderate transitive npm audit findings (uuid through Sanity packages)**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com. Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools (email-gated for lead capture, AI Act triage engine recently overhauled), product/commerce pages with an early-access enquiry fallback until Lemon Squeezy checkout URLs are configured, Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Awaiting Lemon Squeezy store setup, Plausible account, and content publishing for queued drafts.
@@ -353,6 +353,14 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### June 13, 2026 — Design overhaul: light/dark theming + readability (whole site)
+
+| Commit | Description |
+|--------|-------------|
+| `6129f39` | **Font P0 fix + site-wide light/dark theming.** Headings/body were rendering in the OS system font in production: the `@theme inline` font tokens aren't emitted as `:root` vars, so `var(--font-sans/display)` in `@layer base` resolved to Tailwind's default stack. Fixed by referencing the next/font vars directly (`--font-unbounded` / `--font-outfit`). **Theming:** brand surface/text tokens (`slate-deep`, `stone-charcoal`, `text-primary/muted`, `border-subtle`, `silicon-amber`, `stone-teal`, …) now flip per theme — light = warm stone (`#efece4` bg, white cards, slate ink, deep-teal accent, amber demoted to ochre), dark = refined Atlantic slate — so the entire token-driven component tree themes at once. New fixed `--ink-on-accent` token; migrated 42 `text-slate-deep` (dark ink on accent chips) → `text-ink-on-accent` so they don't flip. `glass-plate` / `color-scheme` / selection made theme-aware. **Toggle:** Light / Dark / **System** control in the header (persisted, no-flash init script); first visit follows the OS, explicit choice overrides. **Hero** reworked to fixed-light text + readable amber highlight + teal CTA (sits on an always-dark photo, must not follow theme tokens). **Articles:** serif body, ~70ch measure, visible teal links, `dark:prose-invert` (was forcing light text on light across article/about/methodology/privacy/terms). **Readability:** raised the type scale (xs/sm/base/lg/xl) + bumped hardcoded micro-labels; reduced large section paddings + header margins site-wide. |
+| `cd7d331` | **Card polish.** Resting depth + subtle hover lift (`.card-interactive`) across all home grids via the shared `ForensicCard` (framer `whileHover`), plus `ToolsGrid`, `ArticleGridCard`, `ThreeReadings`. Accent-bar idea dropped (clashed with ForensicCard's `tech-corners` `::before`). |
+| `bdce50b` | **Secondary-route sweep.** Verified every secondary route in both themes (products, tools, advisory, waymarkpath, search, about, methodology + interactive detail pages) — no contrast issues, no hardcoded-light traps. Applied `.card-interactive` to the `/products` and `/advisory` page card grids for consistency with the home grids. `next build` clean. |
 
 ### June 11, 2026 — On-demand article fact-check (Studio-triggered, web-verified)
 
