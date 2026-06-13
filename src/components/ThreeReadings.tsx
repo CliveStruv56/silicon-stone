@@ -54,7 +54,7 @@ export function ThreeReadings({ className = '' }: { className?: string }) {
         {readings.map((reading) => (
           <div
             key={reading.name}
-            className="rounded-lg border border-border-subtle bg-stone-charcoal p-6"
+            className="card-interactive rounded-lg border border-border-subtle bg-stone-charcoal p-6"
           >
             <p className="font-mono text-[12px] uppercase tracking-[0.10em] text-text-muted mb-2">
               {reading.lens}

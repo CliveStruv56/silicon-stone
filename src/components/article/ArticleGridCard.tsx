@@ -36,7 +36,7 @@ export function ArticleGridCard({
   showAuthor?: boolean
 }) {
   return (
-    <Card className="bg-stone-charcoal border-border-subtle overflow-hidden hover:border-stone-teal/50 transition-colors">
+    <Card className="card-interactive h-full bg-stone-charcoal border-border-subtle overflow-hidden hover:border-stone-teal/50">
       {article.mainImage?.asset ? (
         <div className="relative aspect-[16/9]">
           <Image
