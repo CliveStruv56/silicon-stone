@@ -354,6 +354,13 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### June 13, 2026 — Generation timeout + vectorize webhook loop (two bug fixes)
+
+| Commit | Description |
+|--------|-------------|
+| `a379a15` | **Vectorize webhook no longer loops.** `/api/vectorize` patched each article's `relatedArticles` with a fresh random `_key` every run and never compared against the existing set, so every invocation genuinely mutated the document → re-fired the same webhook in an endless loop. Symptom: the Studio article list "kept jumping around / adding bits" (constant live re-sorts), plus wasted OpenAI embedding + Pinecone spend on every hop. Fix: idempotent write-back — `_key` derived from the ref id (stable), and the patch is skipped entirely when the ordered neighbour id set is unchanged (query now also projects `relatedArticleIds`), so the loop terminates after at most one hop. |
+| `(prev)` | **`/create` draft generation got a 300s ceiling.** The draft pipeline runs five sequential round-trips from one server action (OpenAI embedding → Pinecone query → Claude draft → Claude voice-edit → Claude metadata → Sanity write). With no `maxDuration` the page inherited Vercel's low default, so a cold first attempt 504'd ("the request didn't reach the server") and a warm retry worked. Added `export const maxDuration = 300` to `create/page.tsx` (server actions inherit the invoking page's ceiling), matching `/api/fact-check`. Note: a timed-out first attempt could still complete server-side, so the retry created a duplicate draft — worth a one-time Studio cleanup of duplicate drafts. |
+
 ### June 13, 2026 — Design overhaul: light/dark theming + readability (whole site)
 
 | Commit | Description |
