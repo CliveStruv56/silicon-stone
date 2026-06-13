@@ -36,7 +36,7 @@ export function ArticleGridCard({
   showAuthor?: boolean
 }) {
   return (
-    <Card className="bg-stone-charcoal border-border-subtle overflow-hidden hover:border-stone-teal/50 transition-colors">
+    <Card className="card-interactive h-full bg-stone-charcoal border-border-subtle overflow-hidden hover:border-stone-teal/50">
       {article.mainImage?.asset ? (
         <div className="relative aspect-[16/9]">
           <Image
@@ -50,7 +50,7 @@ export function ArticleGridCard({
         <div className="relative aspect-[16/9] bg-gradient-to-br from-stone-charcoal to-slate-deep flex items-center justify-center border-b border-border-subtle">
           <div className="text-center">
             <div className="text-2xl font-mono font-bold text-silicon-amber/20">S&amp;S</div>
-            <div className="text-[10px] font-mono uppercase tracking-widest text-text-muted/30 mt-1">Forensic Technopolitics</div>
+            <div className="text-[12px] font-mono uppercase tracking-widest text-text-muted/30 mt-1">Forensic Technopolitics</div>
           </div>
         </div>
       )}

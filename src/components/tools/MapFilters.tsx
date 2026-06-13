@@ -145,10 +145,10 @@ export function MapFilters({
 export function MapLegend() {
   return (
     <div className="bg-stone-charcoal/95 backdrop-blur-sm border border-border-subtle rounded-lg p-3 text-xs text-text-muted space-y-2">
-      <div className="font-mono text-stone-teal uppercase text-[10px] mb-1">Legend</div>
+      <div className="font-mono text-stone-teal uppercase text-[12px] mb-1">Legend</div>
 
       <div className="space-y-1">
-        <div className="text-[10px] text-text-muted mb-1">Node Types</div>
+        <div className="text-[12px] text-text-muted mb-1">Node Types</div>
         {NODE_TYPE_OPTIONS.map(({ label, color }) => (
           <div key={label} className="flex items-center gap-2">
             <div
@@ -161,7 +161,7 @@ export function MapLegend() {
       </div>
 
       <div className="pt-1 border-t border-border-subtle space-y-1">
-        <div className="text-[10px] text-text-muted mb-1">Risk Level (Ring)</div>
+        <div className="text-[12px] text-text-muted mb-1">Risk Level (Ring)</div>
         {RISK_LEVEL_OPTIONS.map(({ label, color }) => (
           <div key={label} className="flex items-center gap-2">
             <div

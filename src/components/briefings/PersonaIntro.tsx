@@ -27,13 +27,13 @@ export function PersonaIntro() {
       aria-labelledby="persona-intro-heading"
       className="border-b border-border-subtle"
     >
-      <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+      <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
         <StaggerContainer>
           <StaggerItem>
             <div className="text-center max-w-2xl mx-auto mb-10">
               <Badge
                 variant="outline"
-                className="mb-5 border-silicon-amber/60 text-silicon-amber font-mono text-[11px] tracking-[0.10em] uppercase bg-silicon-amber/5"
+                className="mb-5 border-silicon-amber/60 text-silicon-amber font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
               >
                 Persona Routing
               </Badge>
@@ -86,7 +86,7 @@ export function PersonaIntro() {
                         <h3 className="text-sm font-semibold text-text-primary">
                           {persona.name}
                         </h3>
-                        <div className="font-mono text-[11px] uppercase tracking-wider text-text-muted mt-1">
+                        <div className="font-mono text-[12.5px] uppercase tracking-wider text-text-muted mt-1">
                           {persona.role}
                         </div>
                       </div>

@@ -89,7 +89,7 @@ export default function WaymarkPathPage() {
       <main className="flex-1">
         {/* Hero */}
         <section className="bg-slate-deep border-b border-border-subtle">
-          <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-24">
+          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
             <div className="max-w-3xl">
               <Badge className="mb-4 bg-silicon-amber/20 text-silicon-amber border-silicon-amber/30">
                 Early Access — Coming Soon
@@ -129,7 +129,7 @@ export default function WaymarkPathPage() {
                     type="submit"
                     disabled={status === 'loading'}
                     size="lg"
-                    className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90 font-semibold whitespace-nowrap"
+                    className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90 font-semibold whitespace-nowrap"
                   >
                     {status === 'loading' ? (
                       <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Joining...</>
@@ -173,8 +173,8 @@ export default function WaymarkPathPage() {
         </section>
 
         {/* Features grid */}
-        <section className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-24">
-          <div className="text-center max-w-2xl mx-auto mb-12">
+        <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+          <div className="text-center max-w-2xl mx-auto mb-8">
             <h2 className="text-3xl font-bold text-text-primary mb-4">
               Six Steps to Your Next Chapter
             </h2>
@@ -207,7 +207,7 @@ export default function WaymarkPathPage() {
 
         {/* How it works */}
         <section className="bg-stone-charcoal">
-          <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-24">
+          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
             <div className="max-w-3xl mx-auto">
               <h2 className="text-2xl font-bold text-text-primary mb-8 text-center">
                 From Overwhelm to Orchestration
@@ -252,7 +252,7 @@ export default function WaymarkPathPage() {
 
         {/* Bottom CTA */}
         <section className="bg-slate-deep border-t border-border-subtle">
-          <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-20">
+          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-14">
             <div className="text-center max-w-2xl mx-auto">
               <h2 className="text-2xl font-bold text-text-primary mb-4">
                 Be First In
@@ -280,7 +280,7 @@ export default function WaymarkPathPage() {
                   <Button
                     type="submit"
                     disabled={status === 'loading'}
-                    className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90 font-semibold"
+                    className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90 font-semibold"
                   >
                     {status === 'loading' ? 'Joining...' : 'Get Early Access'}
                   </Button>

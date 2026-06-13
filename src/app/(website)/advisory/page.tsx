@@ -211,7 +211,7 @@ export default function ServicesPage() {
       <main className="flex-1">
         {/* Hero Section */}
         <section className="bg-slate-deep border-b border-border-subtle">
-          <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-24">
+          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
             <div className="max-w-3xl">
               <Badge variant="outline" className="mb-4 border-stone-teal text-stone-teal">
                 Services
@@ -236,7 +236,7 @@ export default function ServicesPage() {
 
         {/* Primary diagnostic */}
         <section className="border-b border-border-subtle bg-silicon-amber/5">
-          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+          <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-[2fr_1fr] lg:items-center">
               <div>
                 <Badge variant="outline" className="mb-4 border-silicon-amber text-silicon-amber">
@@ -254,7 +254,7 @@ export default function ServicesPage() {
                 </p>
               </div>
               <a href="#contact" className="lg:text-right">
-                <Button size="lg" className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90">
+                <Button size="lg" className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90">
                   Request a Focused Diagnostic
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
@@ -264,8 +264,8 @@ export default function ServicesPage() {
         </section>
 
         {/* Methodology Section */}
-        <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
-          <div className="mb-12">
+        <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
+          <div className="mb-8">
             <h2 className="text-2xl font-semibold text-text-primary mb-4">
               The 3 x 2 Method. Applied to Your Decision.
             </h2>
@@ -287,7 +287,7 @@ export default function ServicesPage() {
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.1 }}
                 >
-                  <Card className={`h-full bg-stone-charcoal border-border-subtle ${framework.hoverBorderColor} transition-colors`}>
+                  <Card className={`card-interactive h-full bg-stone-charcoal border-border-subtle ${framework.hoverBorderColor}`}>
                     <CardHeader>
                       <div className={`w-10 h-10 rounded-lg ${framework.bgColor} ${framework.borderColor} border flex items-center justify-center mb-3`}>
                         <Icon className={`w-5 h-5 ${framework.color}`} />
@@ -322,8 +322,8 @@ export default function ServicesPage() {
         <Separator className="mx-auto max-w-7xl bg-border-subtle" />
 
         {/* Assessment Offerings */}
-        <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
-          <div className="mb-12">
+        <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
+          <div className="mb-8">
             <h2 className="text-2xl font-semibold text-text-primary mb-4">
               Follow-on Modules
             </h2>
@@ -344,11 +344,11 @@ export default function ServicesPage() {
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.1 }}
                 >
-                  <Card className="h-full bg-stone-charcoal border-border-subtle">
+                  <Card className="card-interactive h-full bg-stone-charcoal border-border-subtle">
                     <CardHeader>
                       <div className="flex items-start justify-between">
                         <Icon className={`w-6 h-6 text-${assessment.color}`} />
-                        <Badge variant="outline" className="text-[10px] text-text-muted border-border-subtle">
+                        <Badge variant="outline" className="text-[12px] text-text-muted border-border-subtle">
                           From {assessment.fromTool}
                         </Badge>
                       </div>
@@ -379,8 +379,8 @@ export default function ServicesPage() {
 
         {/* Service Tiers */}
         <section className="bg-stone-charcoal/50">
-          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
-            <div className="mb-12 text-center">
+          <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
+            <div className="mb-8 text-center">
               <h2 className="text-2xl font-semibold text-text-primary mb-4">
                 Engagement Options
               </h2>
@@ -399,10 +399,10 @@ export default function ServicesPage() {
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.1 }}
                 >
-                  <Card className={`h-full ${tier.highlighted ? 'bg-slate-deep border-silicon-amber' : 'bg-stone-charcoal border-border-subtle'}`}>
+                  <Card className={`card-interactive h-full ${tier.highlighted ? 'bg-slate-deep border-silicon-amber' : 'bg-stone-charcoal border-border-subtle'}`}>
                     <CardHeader>
                       {tier.highlighted && (
-                        <Badge className="w-fit mb-2 bg-silicon-amber text-slate-deep">
+                        <Badge className="w-fit mb-2 bg-silicon-amber text-ink-on-accent">
                           Most Popular
                         </Badge>
                       )}
@@ -427,7 +427,7 @@ export default function ServicesPage() {
                       </ul>
                       <a href="#contact">
                         <Button
-                          className={`w-full mt-4 ${tier.highlighted ? 'bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90' : 'bg-surface-elevated text-text-primary hover:bg-surface-elevated/80'}`}
+                          className={`w-full mt-4 ${tier.highlighted ? 'bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90' : 'bg-surface-elevated text-text-primary hover:bg-surface-elevated/80'}`}
                         >
                           {tier.cta}
                         </Button>
@@ -441,7 +441,7 @@ export default function ServicesPage() {
         </section>
 
         {/* Contact Form */}
-        <section id="contact" className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+        <section id="contact" className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             <div>
               <h2 className="text-2xl font-semibold text-text-primary mb-4">
@@ -583,7 +583,7 @@ export default function ServicesPage() {
                   <Button
                     type="submit"
                     disabled={formLoading}
-                    className="w-full bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90"
+                    className="w-full bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90"
                   >
                     {formLoading ? 'Sending...' : 'Send Inquiry'}
                     {!formLoading && <ArrowRight className="w-4 h-4 ml-2" />}

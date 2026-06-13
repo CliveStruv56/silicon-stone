@@ -100,7 +100,7 @@ export function DynamicCTA({
           <Button
             type="submit"
             disabled={status === 'loading'}
-            className="bg-silicon-amber hover:bg-silicon-amber/90 text-slate-deep font-medium"
+            className="bg-silicon-amber hover:bg-silicon-amber/90 text-ink-on-accent font-medium"
           >
             {status === 'loading' ? 'Subscribing...' : 'Subscribe'}
           </Button>

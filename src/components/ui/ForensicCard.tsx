@@ -42,13 +42,14 @@ export function ForensicCard({
         <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
+            whileHover={{ y: -6, transition: { duration: 0.25, ease: 'easeOut' } }}
             transition={{
                 duration: 0.4,
                 delay,
                 ease: [0.25, 0.46, 0.45, 0.94] // Custom easing
             }}
             className={cn(
-                'relative rounded-lg p-6 transition-all duration-300',
+                'relative rounded-lg p-6 transition-all duration-300 card-interactive',
                 glass ? 'glass-plate' : 'bg-stone-charcoal',
                 accentColors[accent],
                 'border',

@@ -21,7 +21,7 @@ export const portableTextComponents: PortableTextComponents = {
       <h4 className="text-lg font-semibold text-text-primary mt-4 mb-2">{children}</h4>
     ),
     normal: ({ children }) => (
-      <p className="text-text-primary leading-relaxed mb-4">{children}</p>
+      <p className="font-serif text-[1.18rem] leading-[1.72] text-text-primary mb-5">{children}</p>
     ),
     blockquote: ({ children }) => (
       <blockquote className="border-l-4 border-silicon-amber pl-6 py-2 my-6 italic text-text-muted font-serif">

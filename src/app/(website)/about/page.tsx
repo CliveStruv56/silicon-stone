@@ -79,7 +79,7 @@ export default function AboutPage() {
       <main className="flex-1">
         {/* Hero Section */}
         <section className="bg-slate-deep border-b border-border-subtle">
-          <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-24">
+          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div>
                 <Badge variant="outline" className="mb-4 border-stone-teal text-stone-teal">
@@ -115,12 +115,12 @@ export default function AboutPage() {
         </section>
 
         {/* Why the Edge */}
-        <section id="edge" className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+        <section id="edge" className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
           <div className="max-w-3xl">
             <h2 className="text-2xl font-semibold text-text-primary mb-6">
               Why the Edge?
             </h2>
-            <div className="prose prose-lg prose-invert">
+            <div className="prose prose-lg dark:prose-invert">
               <p className="text-text-muted leading-relaxed mb-4">
                 There&apos;s a reason the most interesting analysis often comes from outside the major
                 technology centres. Silicon Valley, London, Beijing—these places generate enormous
@@ -145,7 +145,7 @@ export default function AboutPage() {
         <Separator className="mx-auto max-w-7xl bg-border-subtle" />
 
         {/* The Long View - Timeline */}
-        <section id="long-view" className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+        <section id="long-view" className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
           <h2 className="text-2xl font-semibold text-text-primary mb-8">
             The Long View: 30 Years of Perspective
           </h2>
@@ -175,7 +175,7 @@ export default function AboutPage() {
         <Separator className="mx-auto max-w-7xl bg-border-subtle" />
 
         {/* Principles */}
-        <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+        <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
           <h2 className="text-2xl font-semibold text-text-primary mb-8">
             Analytical Principles
           </h2>
@@ -200,11 +200,11 @@ export default function AboutPage() {
 
         {/* Focus Areas */}
         <section className="bg-stone-charcoal/50">
-          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+          <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
             <h2 className="text-2xl font-semibold text-text-primary mb-8">
               Current Focus Areas
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
               <Card className="bg-stone-charcoal border-border-subtle">
                 <CardContent className="p-6">
                   <div className="text-silicon-amber mb-4">
@@ -276,7 +276,7 @@ export default function AboutPage() {
         <Separator className="mx-auto max-w-7xl bg-border-subtle" />
 
         {/* Editorial Standards */}
-        <section id="editorial-standards" className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+        <section id="editorial-standards" className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
           <h2 className="text-2xl font-semibold text-text-primary mb-4">
             Editorial Standards
           </h2>
@@ -305,7 +305,7 @@ export default function AboutPage() {
         </section>
 
         {/* Contact Section */}
-        <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+        <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
           <div className="max-w-2xl mx-auto text-center">
             <h2 className="text-2xl font-semibold text-text-primary mb-4">
               Get in Touch
@@ -315,7 +315,7 @@ export default function AboutPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a href="mailto:hello@siliconandstone.com">
-                <Button className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90">
+                <Button className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90">
                   <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>

@@ -33,7 +33,7 @@ export default function SearchForm() {
   }, [debouncedTerm, router, searchParams])
 
   return (
-    <div className="relative max-w-lg w-full mx-auto mb-12">
+    <div className="relative max-w-lg w-full mx-auto mb-8">
       <div className="relative">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
           <svg className="h-5 w-5 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -78,19 +78,19 @@ function getTierStyles(tier?: string) {
   switch (tier) {
     case 'pulse':
       return {
-        badge: 'bg-tier-pulse text-slate-deep',
+        badge: 'bg-tier-pulse text-ink-on-accent',
         border: 'border-tier-pulse/30',
         accent: 'text-tier-pulse',
       }
     case 'briefing':
       return {
-        badge: 'bg-tier-briefing text-slate-deep',
+        badge: 'bg-tier-briefing text-ink-on-accent',
         border: 'border-tier-briefing/30',
         accent: 'text-tier-briefing',
       }
     case 'audit':
       return {
-        badge: 'bg-tier-audit text-slate-deep',
+        badge: 'bg-tier-audit text-ink-on-accent',
         border: 'border-tier-audit/30',
         accent: 'text-tier-audit',
       }
@@ -136,7 +136,7 @@ function ArticleCard({ article }: { article: Article }) {
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           {article.intelligenceTier && (
-            <Badge className={cn('font-ui-mono text-[10px]', tierStyles.badge)}>
+            <Badge className={cn('font-ui-mono text-[12px]', tierStyles.badge)}>
               {article.intelligenceTier.toUpperCase()}
             </Badge>
           )}
@@ -413,7 +413,7 @@ export default function IntelligencePage() {
       <main className="flex-1">
         {/* Hero */}
         <section className="border-b border-border-subtle">
-          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+          <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
             <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
               <div>
                 <Badge className="bg-silicon-cyan/20 text-silicon-cyan border border-silicon-cyan/30 mb-4">
@@ -447,7 +447,7 @@ export default function IntelligencePage() {
         </section>
 
         {/* Three Readings of Every Briefing — relocated from the homepage */}
-        <ThreeReadings className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12 border-b border-border-subtle" />
+        <ThreeReadings className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-10 border-b border-border-subtle" />
 
         {/* Persona Introduction */}
         <PersonaIntro />
@@ -551,14 +551,14 @@ export default function IntelligencePage() {
         </section>
 
         {/* Content */}
-        <section className="py-12">
+        <section className="py-10">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             {loading ? (
-              <div className="text-center py-12">
+              <div className="text-center py-10">
                 <div className="animate-pulse text-text-muted">Loading intelligence...</div>
               </div>
             ) : filteredArticles.length === 0 ? (
-              <div className="text-center py-12">
+              <div className="text-center py-10">
                 <p className="text-text-muted">No published intelligence matches these filters.</p>
               </div>
             ) : (
@@ -592,7 +592,7 @@ export default function IntelligencePage() {
         </section>
 
         {/* CTA */}
-        <section className="py-12 border-t border-border-subtle">
+        <section className="py-10 border-t border-border-subtle">
           <div className="mx-auto max-w-2xl px-6 lg:px-8">
             <DynamicCTA
               primaryPersona={selectedPersona || undefined}

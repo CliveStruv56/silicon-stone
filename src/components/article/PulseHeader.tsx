@@ -20,19 +20,19 @@ function getTierConfig(tier?: string) {
     case 'pulse':
       return {
         label: 'PULSE',
-        color: 'bg-tier-pulse text-slate-deep',
+        color: 'bg-tier-pulse text-ink-on-accent',
         borderColor: 'border-tier-pulse',
       }
     case 'briefing':
       return {
         label: 'BRIEFING',
-        color: 'bg-tier-briefing text-slate-deep',
+        color: 'bg-tier-briefing text-ink-on-accent',
         borderColor: 'border-tier-briefing',
       }
     case 'audit':
       return {
         label: 'AUDIT',
-        color: 'bg-tier-audit text-slate-deep',
+        color: 'bg-tier-audit text-ink-on-accent',
         borderColor: 'border-tier-audit',
       }
     default:
@@ -93,7 +93,7 @@ export function PulseHeader({
       {/* Meta Row: Tier, Persona, Date, Reading Time */}
       <div className="flex flex-wrap items-center gap-2">
         {tierConfig && (
-          <Badge className={cn('font-ui-mono text-[10px]', tierConfig.color)}>
+          <Badge className={cn('font-ui-mono text-[12px]', tierConfig.color)}>
             {tierConfig.label}
           </Badge>
         )}

@@ -154,7 +154,7 @@ export function EmailGateOverlay({ isOpen, onUnlock, onDismiss, toolName, result
                     <Button
                       type="submit"
                       disabled={status === 'loading'}
-                      className="w-full bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90 font-semibold"
+                      className="w-full bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90 font-semibold"
                     >
                       {status === 'loading' ? (
                         <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...</>

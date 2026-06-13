@@ -45,7 +45,7 @@ export function SubscribeCTA() {
       <CardHeader className="space-y-3">
         <Badge
           variant="outline"
-          className="self-start border-silicon-amber/60 text-silicon-amber font-mono text-[11px] tracking-[0.10em] uppercase bg-silicon-amber/5"
+          className="self-start border-silicon-amber/60 text-silicon-amber font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
         >
           Newsletter
         </Badge>
@@ -87,7 +87,7 @@ export function SubscribeCTA() {
           </div>
         ) : (
           <>
-            <div className="font-mono text-[11px] tracking-[0.10em] uppercase text-silicon-amber mb-2 flex items-center gap-1.5">
+            <div className="font-mono text-[12.5px] tracking-[0.10em] uppercase text-silicon-amber mb-2 flex items-center gap-1.5">
               <span aria-hidden="true">○</span>
               Get the Atlantic Drift Briefing
             </div>
@@ -103,7 +103,7 @@ export function SubscribeCTA() {
               <Button
                 type="submit"
                 disabled={status === 'loading'}
-                className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90"
+                className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90"
               >
                 {status === 'loading' ? 'Subscribing...' : 'Subscribe'}
               </Button>

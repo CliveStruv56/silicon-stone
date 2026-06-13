@@ -53,7 +53,7 @@ export function ToolsGrid() {
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {tools.map((tool) => (
         <Link key={tool.name} href={tool.href}>
-          <Card className="h-full bg-stone-charcoal border-border-subtle transition-colors hover:border-stone-teal/50 cursor-pointer">
+          <Card className="card-interactive h-full bg-stone-charcoal border-border-subtle hover:border-stone-teal/50 cursor-pointer">
             <CardHeader className="pb-2">
               <div className="flex justify-between items-start">
                 <CardTitle className="text-base font-medium text-text-primary flex items-center gap-3">

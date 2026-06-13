@@ -65,8 +65,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <head>
+        {/* No-flash theme init. Stored preference is 'light' | 'dark' | 'system'.
+            With nothing stored we follow the OS (first-time visitors with a dark OS
+            get dark); an explicit 'light'/'dark' choice overrides the system. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{var t=localStorage.getItem('theme');var sys=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;var dark=t==='dark'||((t==='system'||!t)&&sys);document.documentElement.classList.toggle('dark',dark);}catch(e){}})();",
+          }}
+        />
         {process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN && (
           <Script
             defer

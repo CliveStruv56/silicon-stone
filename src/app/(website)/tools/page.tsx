@@ -15,7 +15,7 @@ export default function ToolsPage() {
 
             <main className="flex-1">
                 <section className="bg-slate-deep border-b border-border-subtle">
-                    <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-24">
+                    <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
                         <div className="max-w-3xl">
                             <Badge variant="outline" className="mb-4 border-silicon-amber text-silicon-amber">
                                 Interactive Analysis
@@ -31,7 +31,7 @@ export default function ToolsPage() {
                     </div>
                 </section>
 
-                <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
+                <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8">
                     <ToolsGrid />
                 </section>
             </main>

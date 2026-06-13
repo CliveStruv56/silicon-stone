@@ -278,7 +278,7 @@ export default function ScenarioModelerPage() {
 
       <main className="flex-1 bg-background">
         {/* Hero Section */}
-        <section className="bg-slate-deep border-b border-border-subtle py-12 md:py-16">
+        <section className="bg-slate-deep border-b border-border-subtle py-10 md:py-12">
           <div className="mx-auto max-w-7xl px-6 lg:px-8 text-center">
             <Badge variant="outline" className="mb-4 border-stone-teal text-stone-teal">
               Interactive Tool
@@ -316,7 +316,7 @@ export default function ScenarioModelerPage() {
                 >
                   <Badge
                     variant="outline"
-                    className={`mb-2 text-[10px] ${colors.text} ${colors.border}`}
+                    className={`mb-2 text-[12px] ${colors.text} ${colors.border}`}
                   >
                     {scenario.frictionLevel.toUpperCase()} FRICTION
                   </Badge>
@@ -811,7 +811,7 @@ export default function ScenarioModelerPage() {
                   }}
                 />
                 <Link href="/advisory#contact">
-                  <Button className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90">
+                  <Button className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90">
                     Request Custom Scenario Analysis
                   </Button>
                 </Link>

@@ -74,7 +74,7 @@ export default function BriefingsProductPage() {
       <main className="flex-1">
         {/* Hero */}
         <section className="bg-slate-deep border-b border-border-subtle">
-          <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-24">
+          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
             <div className="max-w-3xl">
               <Badge variant="outline" className="mb-4 border-text-muted text-text-muted">
                 Coming Soon
@@ -95,7 +95,7 @@ export default function BriefingsProductPage() {
         </section>
 
         {/* What Each Briefing Contains */}
-        <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+        <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
           <h2 className="text-2xl font-semibold text-text-primary mb-4">
             Every Briefing Includes
           </h2>
@@ -121,7 +121,7 @@ export default function BriefingsProductPage() {
         </section>
 
         {/* Briefings Catalogue */}
-        <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+        <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
           <h2 className="text-2xl font-semibold text-text-primary mb-8">
             Planned Briefings
           </h2>
@@ -133,7 +133,7 @@ export default function BriefingsProductPage() {
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <Icon className="w-6 h-6 text-stone-teal" />
-                      <Badge variant="outline" className="text-[10px] text-text-muted border-border-subtle">
+                      <Badge variant="outline" className="text-[12px] text-text-muted border-border-subtle">
                         {briefing.status}
                       </Badge>
                     </div>
@@ -150,7 +150,7 @@ export default function BriefingsProductPage() {
 
         {/* Notify CTA */}
         <section className="bg-stone-charcoal/50">
-          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+          <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
             <div className="max-w-xl mx-auto text-center">
               <FileText className="w-10 h-10 text-stone-teal mx-auto mb-4" />
               <h2 className="text-2xl font-bold text-text-primary mb-4">
@@ -178,7 +178,7 @@ export default function BriefingsProductPage() {
                   <Button
                     type="submit"
                     disabled={status === 'loading'}
-                    className="bg-stone-teal text-slate-deep hover:bg-stone-teal/90"
+                    className="bg-stone-teal text-ink-on-accent hover:bg-stone-teal/90"
                   >
                     {status === 'loading' ? 'Joining...' : 'Notify Me'}
                   </Button>

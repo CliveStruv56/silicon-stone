@@ -36,13 +36,13 @@ const hoverBorderMap: Record<string, string> = {
 
 export function PersonaNavigator() {
   return (
-    <section aria-labelledby="persona-heading" className="mx-auto max-w-7xl px-6 py-20 lg:px-8 lg:py-28">
+    <section aria-labelledby="persona-heading" className="mx-auto max-w-7xl px-6 py-14 lg:px-8 lg:py-14">
       <StaggerContainer>
         <StaggerItem>
-          <div className="text-center max-w-2xl mx-auto mb-12">
+          <div className="text-center max-w-2xl mx-auto mb-8">
             <Badge
               variant="outline"
-              className="mb-5 border-silicon-amber/60 text-silicon-amber font-mono text-[11px] tracking-[0.10em] uppercase bg-silicon-amber/5"
+              className="mb-5 border-silicon-amber/60 text-silicon-amber font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
             >
               Persona Routing
             </Badge>

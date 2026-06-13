@@ -38,13 +38,13 @@ export function AdvisoryBand() {
       aria-labelledby="advisory-band-heading"
       className="border-b border-border-subtle"
     >
-      <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8 lg:py-24">
+      <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8 lg:py-16">
         <StaggerContainer>
           <StaggerItem>
-            <div className="max-w-2xl mb-12">
+            <div className="max-w-2xl mb-8">
               <Badge
                 variant="outline"
-                className="mb-4 border-silicon-amber/60 text-silicon-amber font-mono text-[11px] tracking-[0.10em] uppercase bg-silicon-amber/5"
+                className="mb-4 border-silicon-amber/60 text-silicon-amber font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
               >
                 Engage · advisory
               </Badge>
@@ -73,7 +73,7 @@ export function AdvisoryBand() {
                     className="h-full cursor-pointer"
                   >
                     <span
-                      className={`font-mono text-[10px] uppercase tracking-[0.10em] mb-2 block ${
+                      className={`font-mono text-[12px] uppercase tracking-[0.10em] mb-2 block ${
                         tier.popular ? 'text-silicon-amber' : 'text-text-muted'
                       }`}
                     >

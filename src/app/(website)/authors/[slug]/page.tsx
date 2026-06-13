@@ -106,7 +106,7 @@ export default async function AuthorPage({ params }: Props) {
       <main className="flex-1">
         {/* Profile header */}
         <section className="bg-slate-deep border-b border-border-subtle">
-          <div className="mx-auto max-w-4xl px-6 py-16 lg:px-8">
+          <div className="mx-auto max-w-4xl px-6 py-12 lg:px-8">
             <div className="flex flex-col sm:flex-row items-start gap-6">
               {avatarUrl ? (
                 <div className="relative w-28 h-28 rounded-full overflow-hidden flex-shrink-0 border border-border-subtle">
@@ -151,7 +151,7 @@ export default async function AuthorPage({ params }: Props) {
         </section>
 
         {/* Articles */}
-        <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+        <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
           <h2 className="text-2xl font-semibold text-text-primary mb-8">
             Analysis by {author.name}
           </h2>

@@ -143,7 +143,7 @@ export function MethodologyChecklist({
           <span className="font-ui-mono text-silicon-cyan text-xs">
             Methodology Audit
           </span>
-          <span className="font-ui-mono text-text-muted/60 text-[10px]">
+          <span className="font-ui-mono text-text-muted/60 text-[12px]">
             3 × 2 matrix
           </span>
         </div>
@@ -256,7 +256,7 @@ export function MethodologyChecklist({
                           </Link>
                           <p
                             className={cn(
-                              'text-[11px] mt-0.5 leading-snug',
+                              'text-[12.5px] mt-0.5 leading-snug',
                               isApplied
                                 ? 'text-text-muted'
                                 : 'text-text-muted/40'

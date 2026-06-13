@@ -103,17 +103,20 @@ export function HeroSection({ settings }: HeroSectionProps) {
             />
 
             <motion.div
-                className="relative z-10 mx-auto max-w-7xl px-6 py-24 lg:py-36"
+                className="relative z-10 mx-auto max-w-7xl px-6 py-16 lg:py-24"
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
             >
                 <div className="lg:grid lg:grid-cols-3 lg:gap-8">
                     <div className="lg:col-start-2 lg:col-span-2">
+                        {/* The hero always sits on the dark Atlantic photo, so all text here is
+                            FIXED light + a readable bright accent — it must NOT follow the theme
+                            tokens (which flip to dark ink in light mode). */}
                         <motion.div variants={itemVariants}>
                             <Badge
                                 variant="outline"
-                                className="mb-8 rounded-md border-silicon-amber bg-silicon-amber/14 px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.10em] text-silicon-amber shadow-[0_0_0_1px_rgba(246,173,85,0.35),0_0_28px_rgba(246,173,85,0.20),0_12px_40px_rgba(0,0,0,0.35)] backdrop-blur-sm"
+                                className="mb-8 rounded-md border-[#F6AD55]/70 bg-[#F6AD55]/12 px-3 py-1.5 font-mono text-[12.5px] uppercase tracking-[0.10em] text-[#F6AD55] shadow-[0_8px_30px_rgba(0,0,0,0.35)] backdrop-blur-sm"
                             >
                                 Forensic Technopolitics · the view from the edge
                             </Badge>
@@ -121,11 +124,12 @@ export function HeroSection({ settings }: HeroSectionProps) {
 
                         <motion.h1
                             variants={itemVariants}
-                            className="font-bold text-text-primary mb-6"
+                            className="font-bold text-white mb-6"
                             style={{
                                 fontSize: 'clamp(44px, 6vw, 80px)',
                                 letterSpacing: '-0.028em',
                                 lineHeight: 1.02,
+                                textShadow: '0 2px 30px rgba(0,0,0,0.45)',
                             }}
                         >
                             {settings?.heroTitle || 'AI. Policy. Power. Leadership.'}
@@ -133,11 +137,12 @@ export function HeroSection({ settings }: HeroSectionProps) {
 
                         <motion.p
                             variants={itemVariants}
-                            className="text-text-primary font-medium mb-8 max-w-2xl"
+                            className="font-medium mb-7 max-w-2xl text-white/92"
                             style={{
-                                fontSize: 'clamp(20px, 2vw, 26px)',
+                                fontSize: 'clamp(19px, 1.9vw, 24px)',
                                 letterSpacing: '-0.005em',
-                                lineHeight: 1.38,
+                                lineHeight: 1.42,
+                                textShadow: '0 2px 20px rgba(0,0,0,0.5)',
                             }}
                         >
                             Independent, decision-grade intelligence for UK and European leaders managing AI governance, technology dependency, and operational resilience.
@@ -145,45 +150,24 @@ export function HeroSection({ settings }: HeroSectionProps) {
 
                         <motion.p
                             variants={itemVariants}
-                            className="mb-8 max-w-xl text-base font-medium leading-relaxed text-text-primary/90"
+                            className="mb-9 max-w-xl text-base font-medium leading-relaxed text-white/80"
                             style={{
-                                textShadow: '0 2px 18px rgba(0, 0, 0, 0.65)',
+                                textShadow: '0 2px 18px rgba(0, 0, 0, 0.6)',
                             }}
                         >
                             AI fluency is fast becoming{' '}
-                            <span className="font-semibold text-silicon-amber">the baseline, not the edge</span>
+                            <span className="font-semibold text-[#F6AD55]">the baseline, not the edge</span>
                             {' '}— for industries and the careers inside them.
-                        </motion.p>
-
-                        <motion.p
-                            variants={itemVariants}
-                            className="mb-8 max-w-xl border-l-2 border-silicon-amber/50 pl-4 text-base italic leading-relaxed text-silicon-amber"
-                            style={{
-                                textShadow: '0 2px 18px rgba(0, 0, 0, 0.65)',
-                            }}
-                        >
-                            Read every briefing three ways — for your institution, for the balance of power, and for your own position.
-                        </motion.p>
-
-                        <motion.p
-                            variants={itemVariants}
-                            className="max-w-xl text-base font-medium leading-relaxed text-text-primary/90"
-                            style={{
-                                textShadow: '0 2px 18px rgba(0, 0, 0, 0.65)',
-                            }}
-                        >
-                            {settings?.heroDescription ||
-                                'Calibrated, decision-grade analysis from someone who spent thirty years inside the industry. Published twice a week from an Outer Orkney isle — sixty miles north of mainland Scotland — because the view from the edge is structurally clearer than the view from any centre.'}
                         </motion.p>
 
                         <motion.div
                             variants={itemVariants}
-                            className="mt-10 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6"
+                            className="mt-2 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6"
                         >
                             <Link href="/#subscribe">
                                 <Button
                                     size="lg"
-                                    className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90 transition-transform hover:scale-105 font-semibold text-base px-8"
+                                    className="bg-[#1f807c] text-white hover:bg-[#27938d] transition-transform hover:scale-105 font-semibold text-base px-8 shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
                                 >
                                     Get the Atlantic Drift Briefing
                                 </Button>
@@ -191,7 +175,7 @@ export function HeroSection({ settings }: HeroSectionProps) {
 
                             <Link
                                 href="/methodology"
-                                className="group inline-flex items-center gap-2 text-text-primary hover:text-silicon-amber transition-colors font-medium"
+                                className="group inline-flex items-center gap-2 text-white/90 hover:text-white transition-colors font-medium"
                             >
                                 Read the methodology
                                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -200,9 +184,9 @@ export function HeroSection({ settings }: HeroSectionProps) {
 
                         <motion.p
                             variants={itemVariants}
-                            className="mt-10 font-mono text-xs uppercase tracking-[0.10em] text-text-muted flex items-center gap-2"
+                            className="mt-10 font-mono text-xs uppercase tracking-[0.10em] text-white/65 flex items-center gap-2"
                         >
-                            <span className="text-stone-teal" aria-hidden="true">●</span>
+                            <span className="text-[#8fcbc4]" aria-hidden="true">●</span>
                             Two briefings a week · Tuesday Stone Briefing · Friday Practical Move
                         </motion.p>
                     </div>
