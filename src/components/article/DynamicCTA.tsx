@@ -83,7 +83,7 @@ export function DynamicCTA({
           <span className="font-medium">Confirmed.</span> You&apos;ll receive your first briefing shortly.
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="flex gap-2">
+        <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
           <input
             type="email"
             value={email}
@@ -91,7 +91,7 @@ export function DynamicCTA({
             placeholder="your@email.com"
             required
             className={cn(
-              'flex-1 px-3 py-2 bg-slate-deep border border-border-subtle rounded-md',
+              'flex-1 min-w-0 w-full px-3 py-2 bg-slate-deep border border-border-subtle rounded-md',
               'text-text-primary placeholder:text-text-muted/50',
               'focus:outline-none focus:ring-1 focus:ring-silicon-cyan focus:border-silicon-cyan',
               'transition-colors'
@@ -100,7 +100,7 @@ export function DynamicCTA({
           <Button
             type="submit"
             disabled={status === 'loading'}
-            className="bg-silicon-amber hover:bg-silicon-amber/90 text-ink-on-accent font-medium"
+            className="w-full sm:w-auto bg-silicon-amber hover:bg-silicon-amber/90 text-ink-on-accent font-medium"
           >
             {status === 'loading' ? 'Subscribing...' : 'Subscribe'}
           </Button>
