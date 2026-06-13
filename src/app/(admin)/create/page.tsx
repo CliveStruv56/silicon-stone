@@ -6,6 +6,15 @@ export const metadata = {
     description: "Unified research and generation pipeline.",
 };
 
+// Draft generation runs five sequential network round-trips from a single server
+// action (OpenAI embedding → Pinecone query → Claude draft → Claude voice-edit →
+// Claude metadata → Sanity write), which routinely exceeds Vercel's low default
+// timeout — especially on a cold start. Without this ceiling the first attempt
+// 504s and the client shows "the request didn't reach the server". Server
+// actions inherit the maxDuration of the page that invokes them. Matches the
+// 300s ceiling already used by /api/fact-check.
+export const maxDuration = 300;
+
 export default async function CreatePage() {
     const personas = await listSanityPersonas();
 
