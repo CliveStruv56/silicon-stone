@@ -169,7 +169,7 @@ export default async function ArticlePage({ params }: Props) {
 
       <main className="flex-1">
         {/* Article Header */}
-        <article className="mx-auto max-w-4xl px-6 py-12 lg:px-8 lg:py-16">
+        <article className="mx-auto max-w-4xl px-6 py-10 lg:px-8 lg:py-12">
           {/* Pulse Header - Intelligence Portal metadata */}
           {hasIntelligenceFields && (
             <PulseHeader
@@ -314,8 +314,8 @@ export default async function ArticlePage({ params }: Props) {
 
           <Separator className="mb-10 bg-border-subtle" />
 
-          {/* Article Body */}
-          <div className="prose prose-lg prose-invert max-w-none">
+          {/* Article Body — reading measure capped (~70ch) for comfortable long-form reading */}
+          <div className="prose prose-lg dark:prose-invert max-w-[70ch]">
             {article.body && (
               <PortableText value={article.body} components={portableTextComponents} />
             )}

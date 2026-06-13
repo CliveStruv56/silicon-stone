@@ -7,7 +7,7 @@ export default function NotFound() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-1 flex items-center justify-center px-6 py-16">
+      <main className="flex-1 flex items-center justify-center px-6 py-12">
         <div className="max-w-md w-full text-center">
           <div className="mb-6">
             <FileQuestion className="w-16 h-16 mx-auto text-text-muted" />
@@ -19,7 +19,7 @@ export default function NotFound() {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/">
-              <Button className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90 w-full">
+              <Button className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90 w-full">
                 <Home className="w-4 h-4 mr-2" />
                 Go home
               </Button>

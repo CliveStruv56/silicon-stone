@@ -35,7 +35,7 @@ export function ThreeReadings({ className = '' }: { className?: string }) {
   return (
     <section aria-labelledby="three-readings-heading" className={className}>
       <div className="max-w-3xl mb-8">
-        <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-text-muted mb-3">
+        <p className="font-mono text-[12.5px] uppercase tracking-[0.14em] text-text-muted mb-3">
           How to read our work
         </p>
         <h2
@@ -56,7 +56,7 @@ export function ThreeReadings({ className = '' }: { className?: string }) {
             key={reading.name}
             className="rounded-lg border border-border-subtle bg-stone-charcoal p-6"
           >
-            <p className="font-mono text-[10px] uppercase tracking-[0.10em] text-text-muted mb-2">
+            <p className="font-mono text-[12px] uppercase tracking-[0.10em] text-text-muted mb-2">
               {reading.lens}
             </p>
             <h3 className={`text-lg font-semibold mb-2 ${reading.accent}`}>

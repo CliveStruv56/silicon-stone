@@ -79,10 +79,10 @@ export default function AIActToolkitPage() {
       <main className="flex-1">
         {/* Hero */}
         <section className="bg-slate-deep border-b border-border-subtle">
-          <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-24">
+          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div>
-                <Badge className="mb-4 bg-silicon-amber text-slate-deep">
+                <Badge className="mb-4 bg-silicon-amber text-ink-on-accent">
                   Flagship Product
                 </Badge>
                 <h1 className="text-4xl font-bold text-text-primary sm:text-5xl mb-6">
@@ -101,7 +101,7 @@ export default function AIActToolkitPage() {
                   </div>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <Button size="lg" className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90 font-semibold" asChild>
+                  <Button size="lg" className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90 font-semibold" asChild>
                     <a href={standardCheckoutReady ? checkoutUrls.standard : '/advisory#contact'} target={standardCheckoutReady ? '_blank' : undefined} rel={standardCheckoutReady ? 'noopener noreferrer' : undefined} className="plausible-event-name=Buy+Toolkit+Standard">
                       {standardCheckoutReady ? 'Buy Standard — £79' : 'Request Early Access'}
                     </a>
@@ -171,7 +171,7 @@ export default function AIActToolkitPage() {
         </section>
 
         {/* What's Inside */}
-        <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+        <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
           <h2 className="text-2xl font-semibold text-text-primary mb-4">
             What&apos;s Inside
           </h2>
@@ -207,7 +207,7 @@ export default function AIActToolkitPage() {
         <Separator className="mx-auto max-w-7xl bg-border-subtle" />
 
         {/* Who It's For */}
-        <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+        <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
           <h2 className="text-2xl font-semibold text-text-primary mb-8">
             Who This Is For
           </h2>
@@ -236,7 +236,7 @@ export default function AIActToolkitPage() {
 
         {/* Pricing CTA */}
         <section className="bg-stone-charcoal/50">
-          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+          <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
             <div className="text-center max-w-2xl mx-auto">
               <h2 className="text-2xl font-bold text-text-primary mb-4">
                 Build Your Evidence Trail
@@ -246,7 +246,7 @@ export default function AIActToolkitPage() {
                 owners, and review triggers. Use formal counsel where your findings require it.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
-                <Button size="lg" className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90 font-semibold" asChild>
+                <Button size="lg" className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90 font-semibold" asChild>
                   <a href={standardCheckoutReady ? checkoutUrls.standard : '/advisory#contact'} target={standardCheckoutReady ? '_blank' : undefined} rel={standardCheckoutReady ? 'noopener noreferrer' : undefined}>
                     {standardCheckoutReady ? 'Buy Standard — £79' : 'Request Early Access'}
                   </a>

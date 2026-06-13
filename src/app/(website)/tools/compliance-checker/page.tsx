@@ -134,7 +134,7 @@ export default function ComplianceCheckerPage() {
       <Header />
 
       <main className="flex-1 bg-background">
-        <section className="bg-slate-deep border-b border-border-subtle py-10 md:py-14">
+        <section className="bg-slate-deep border-b border-border-subtle py-10 md:py-10">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="max-w-4xl">
               <Badge variant="outline" className="mb-4 border-stone-teal text-stone-teal">
@@ -285,7 +285,7 @@ export default function ComplianceCheckerPage() {
                                 <span className={`mt-1 h-4 w-4 rounded border flex items-center justify-center flex-shrink-0 ${
                                   selected ? 'border-stone-teal bg-stone-teal' : 'border-text-muted'
                                 }`}>
-                                  {selected && <CheckCircle2 className="w-3 h-3 text-slate-deep" />}
+                                  {selected && <CheckCircle2 className="w-3 h-3 text-ink-on-accent" />}
                                 </span>
                                 <span className="font-medium text-text-primary">{option.label}</span>
                               </span>
@@ -310,7 +310,7 @@ export default function ComplianceCheckerPage() {
                         type="button"
                         onClick={goNext}
                         disabled={!canContinue}
-                        className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90"
+                        className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90"
                       >
                         {currentIndex >= visibleQuestions.length - 1 ? 'Generate result' : 'Continue'}
                         <ArrowRight className="w-4 h-4" />
@@ -435,7 +435,7 @@ export default function ComplianceCheckerPage() {
                       ))}
                     </ul>
                     <Link href="/products/ai-act-toolkit">
-                      <Button className="w-full bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90">
+                      <Button className="w-full bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90">
                         View compliance toolkit
                       </Button>
                     </Link>

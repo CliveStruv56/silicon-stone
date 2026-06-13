@@ -76,7 +76,7 @@ export default async function CategoryPage({ params }: Props) {
       <main className="flex-1">
         {/* Page Header */}
         <section className="bg-slate-deep border-b border-border-subtle">
-          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+          <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
             <div className="flex items-center gap-2 text-sm text-text-muted mb-4">
               <Link href="/intelligence" className="hover:text-stone-teal">
                 Intelligence
@@ -138,7 +138,7 @@ export default async function CategoryPage({ params }: Props) {
         </section>
 
         {/* Content */}
-        <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
+        <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             {/* Sidebar - Categories */}
             <aside className="lg:col-span-1">
@@ -178,7 +178,7 @@ export default async function CategoryPage({ params }: Props) {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-12">
+                <div className="text-center py-10">
                   <p className="text-text-muted mb-4">No articles in this category yet.</p>
                   <Link href="/intelligence" className="text-stone-teal hover:text-silicon-amber">
                     &larr; View all articles

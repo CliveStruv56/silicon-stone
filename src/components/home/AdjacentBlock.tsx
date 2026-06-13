@@ -10,11 +10,11 @@ export function AdjacentBlock() {
     return (
         <section
             aria-label="Related companion"
-            className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16"
+            className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12"
         >
             <div className="rounded-[10px] border border-dashed border-sister-indigo/30 bg-stone-charcoal/20 px-6 py-5 md:px-8 md:py-6 flex flex-col md:flex-row md:items-center gap-4 md:gap-8">
                 <div className="flex-1 min-w-0">
-                    <span className="block font-mono text-[10px] tracking-[0.12em] uppercase text-sister-indigo mb-2">
+                    <span className="block font-mono text-[12px] tracking-[0.12em] uppercase text-sister-indigo mb-2">
                         Related — a separate companion
                     </span>
                     <h3 className="text-base md:text-lg font-semibold text-text-primary">

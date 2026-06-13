@@ -200,7 +200,7 @@ function StanceColumn({
         <ForensicCard accent={accent} showMarkers={true} gridHover={false} className="h-full">
             <div className="mb-5">
                 <div
-                    className={`font-mono text-[11px] tracking-[0.10em] uppercase mb-3 ${tagClassName}`}
+                    className={`font-mono text-[12.5px] tracking-[0.10em] uppercase mb-3 ${tagClassName}`}
                 >
                     {tag}
                 </div>
@@ -259,14 +259,14 @@ export function OrchestrationBattleground({ settings }: OrchestrationBattlegroun
     return (
         <section
             aria-labelledby="orchestration-battleground-heading"
-            className="mx-auto max-w-7xl px-6 py-20 lg:px-8 lg:py-28"
+            className="mx-auto max-w-7xl px-6 py-14 lg:px-8 lg:py-14"
         >
             <StaggerContainer>
                 <StaggerItem>
-                    <div className="max-w-3xl mb-12">
+                    <div className="max-w-3xl mb-8">
                         <Badge
                             variant="outline"
-                            className="mb-6 border-silicon-amber/60 text-silicon-amber font-mono text-[11px] tracking-[0.10em] uppercase bg-silicon-amber/5"
+                            className="mb-6 border-silicon-amber/60 text-silicon-amber font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
                         >
                             {eyebrow}
                         </Badge>
@@ -294,7 +294,7 @@ export function OrchestrationBattleground({ settings }: OrchestrationBattlegroun
                     </div>
                 </StaggerItem>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     <StaggerItem>
                         <StanceColumn
                             stance={settings?.stance01}
@@ -324,7 +324,7 @@ export function OrchestrationBattleground({ settings }: OrchestrationBattlegroun
                             'linear-gradient(to right, rgba(232,154,60,0.06), rgba(74,155,155,0.04))',
                     }}
                 >
-                    <div className="font-mono text-[11px] tracking-[0.10em] uppercase text-silicon-amber mb-3">
+                    <div className="font-mono text-[12.5px] tracking-[0.10em] uppercase text-silicon-amber mb-3">
                         {stoneTruthLabel}
                     </div>
                     {stoneTruthSanityBody && stoneTruthSanityBody.length > 0 ? (

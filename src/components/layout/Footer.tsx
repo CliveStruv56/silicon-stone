@@ -27,7 +27,7 @@ const footerNavigation = {
 export function Footer() {
   return (
     <footer className="border-t border-border-subtle bg-slate-deep">
-      <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+      <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1 space-y-4">
@@ -80,7 +80,7 @@ export function Footer() {
 
           {/* Related + Company */}
           <div>
-            <h3 className="font-mono text-[11px] uppercase tracking-[0.12em] text-sister-indigo">
+            <h3 className="font-mono text-[12.5px] uppercase tracking-[0.12em] text-sister-indigo">
               Related
             </h3>
             <ul className="mt-4 space-y-3">

@@ -9,13 +9,13 @@ export function CredibilityBlock() {
       aria-labelledby="credibility-heading"
       className="relative bg-stone-charcoal noise-overlay"
     >
-      <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8 lg:py-28">
+      <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8 lg:py-14">
         <StaggerContainer className="max-w-4xl mx-auto">
           <StaggerItem>
             <div className="text-center mb-10">
               <Badge
                 variant="outline"
-                className="mb-5 border-silicon-amber/60 text-silicon-amber font-mono text-[11px] tracking-[0.10em] uppercase bg-silicon-amber/5"
+                className="mb-5 border-silicon-amber/60 text-silicon-amber font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
               >
                 Brand Position
               </Badge>

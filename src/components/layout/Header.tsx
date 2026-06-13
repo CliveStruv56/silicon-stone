@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { ThemeToggle } from '@/components/layout/ThemeToggle'
 
 type NavChild = { name: string; href: string; note?: string }
 
@@ -95,7 +96,7 @@ export function Header() {
                 >
                   {child.name}
                   {child.note && (
-                    <span className="ml-2 font-mono text-[10px] uppercase tracking-[0.08em] text-text-muted/60">
+                    <span className="ml-2 font-mono text-[12px] uppercase tracking-[0.08em] text-text-muted/60">
                       {child.note}
                     </span>
                   )}
@@ -166,8 +167,9 @@ export function Header() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </Link>
+          <ThemeToggle />
           <Link href="/#subscribe">
-            <Button variant="default" className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90">
+            <Button variant="default" className="bg-primary text-primary-foreground hover:opacity-90">
               Subscribe
             </Button>
           </Link>
@@ -201,7 +203,7 @@ export function Header() {
                       >
                         {child.name}
                         {child.note && (
-                          <span className="ml-2 font-mono text-[10px] uppercase tracking-[0.08em] text-text-muted/60">
+                          <span className="ml-2 font-mono text-[12px] uppercase tracking-[0.08em] text-text-muted/60">
                             {child.note}
                           </span>
                         )}
@@ -218,12 +220,13 @@ export function Header() {
             >
               Search
             </Link>
-            <div className="pt-4">
-              <Link href="/#subscribe" onClick={() => setMobileMenuOpen(false)}>
-                <Button variant="default" className="w-full bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90">
+            <div className="flex items-center gap-3 pt-4">
+              <Link href="/#subscribe" onClick={() => setMobileMenuOpen(false)} className="flex-1">
+                <Button variant="default" className="w-full bg-primary text-primary-foreground hover:opacity-90">
                   Subscribe
                 </Button>
               </Link>
+              <ThemeToggle className="shrink-0" />
             </div>
           </div>
         </div>

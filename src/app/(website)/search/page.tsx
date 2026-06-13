@@ -44,7 +44,7 @@ export default async function SearchPage({ searchParams }: Props) {
 
       <main className="flex-1">
         <section className="bg-slate-deep border-b border-border-subtle">
-          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
+          <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8">
             <h1 className="text-3xl font-bold text-text-primary text-center mb-8">
               Search the Archive
             </h1>
@@ -52,7 +52,7 @@ export default async function SearchPage({ searchParams }: Props) {
           </div>
         </section>
 
-        <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
+        <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8">
           {query ? (
             <div className="space-y-6 max-w-4xl mx-auto">
               <div className="text-text-muted mb-4">
@@ -72,7 +72,7 @@ export default async function SearchPage({ searchParams }: Props) {
                               </Badge>
                             )}
                             {article.contentType && (
-                              <Badge variant="outline" className="text-[10px] text-text-muted border-text-muted/30">
+                              <Badge variant="outline" className="text-[12px] text-text-muted border-text-muted/30">
                                 {article.contentType}
                               </Badge>
                             )}
@@ -96,13 +96,13 @@ export default async function SearchPage({ searchParams }: Props) {
                   </Card>
                 ))
               ) : (
-                <div className="text-center py-12 bg-stone-charcoal/30 rounded-lg border border-border-subtle border-dashed">
+                <div className="text-center py-10 bg-stone-charcoal/30 rounded-lg border border-border-subtle border-dashed">
                   <p className="text-text-muted">No analysis found matching your criteria.</p>
                 </div>
               )}
             </div>
           ) : (
-            <div className="text-center py-20 text-text-muted">
+            <div className="text-center py-14 text-text-muted">
               Type above to begin searching...
             </div>
           )}

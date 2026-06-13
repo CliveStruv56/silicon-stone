@@ -60,10 +60,10 @@ export default function AIAuditChecklistPage() {
       <main className="flex-1">
         {/* Hero */}
         <section className="bg-slate-deep border-b border-border-subtle">
-          <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-24">
+          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div>
-                <Badge className="mb-4 bg-stone-teal text-slate-deep">
+                <Badge className="mb-4 bg-stone-teal text-ink-on-accent">
                   Quick Start
                 </Badge>
                 <h1 className="text-4xl font-bold text-text-primary sm:text-5xl mb-6">
@@ -80,7 +80,7 @@ export default function AIAuditChecklistPage() {
                     {checkoutReady ? 'Digital delivery' : 'Early access'}
                   </div>
                 </div>
-                <Button size="lg" className="bg-stone-teal text-slate-deep hover:bg-stone-teal/90 font-semibold" asChild>
+                <Button size="lg" className="bg-stone-teal text-ink-on-accent hover:bg-stone-teal/90 font-semibold" asChild>
                   <a href={checkoutReady ? checkoutUrl : '/advisory#contact'} target={checkoutReady ? '_blank' : undefined} rel={checkoutReady ? 'noopener noreferrer' : undefined} className="plausible-event-name=Buy+Checklist+Pack">
                     {checkoutReady ? 'Buy Checklist Pack — £24' : 'Request Early Access'}
                   </a>
@@ -129,7 +129,7 @@ export default function AIAuditChecklistPage() {
         </section>
 
         {/* What's Included */}
-        <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+        <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
           <h2 className="text-2xl font-semibold text-text-primary mb-8">
             What&apos;s Included
           </h2>
@@ -142,7 +142,7 @@ export default function AIAuditChecklistPage() {
                   <CardHeader className="pb-2">
                     <div className="flex items-center gap-3">
                       <Icon className="w-5 h-5 text-stone-teal" />
-                      <Badge variant="outline" className="text-[10px] text-text-muted border-border-subtle">
+                      <Badge variant="outline" className="text-[12px] text-text-muted border-border-subtle">
                         {item.format}
                       </Badge>
                     </div>
@@ -162,7 +162,7 @@ export default function AIAuditChecklistPage() {
         <Separator className="mx-auto max-w-7xl bg-border-subtle" />
 
         {/* Why Start Here */}
-        <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+        <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
           <div className="max-w-3xl">
             <h2 className="text-2xl font-semibold text-text-primary mb-6">
               Why Start With an Audit?
@@ -188,7 +188,7 @@ export default function AIAuditChecklistPage() {
 
         {/* CTA */}
         <section className="bg-stone-charcoal/50">
-          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+          <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
             <div className="text-center max-w-2xl mx-auto">
               <h2 className="text-2xl font-bold text-text-primary mb-4">
                 Know Where You Stand
@@ -197,7 +197,7 @@ export default function AIAuditChecklistPage() {
                 At £24, this is less than the cost of a business book — and it gives you
                 a structured picture of your AI exposure in a single afternoon.
               </p>
-              <Button size="lg" className="bg-stone-teal text-slate-deep hover:bg-stone-teal/90 font-semibold" asChild>
+              <Button size="lg" className="bg-stone-teal text-ink-on-accent hover:bg-stone-teal/90 font-semibold" asChild>
                 <a href={checkoutReady ? checkoutUrl : '/advisory#contact'} target={checkoutReady ? '_blank' : undefined} rel={checkoutReady ? 'noopener noreferrer' : undefined}>
                   {checkoutReady ? 'Buy Checklist Pack — £24' : 'Request Early Access'}
                 </a>

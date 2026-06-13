@@ -148,7 +148,7 @@ export default async function Home() {
 
         {/* 8. Subscribe CTA */}
         <div className="bg-stone-charcoal/30 border-t border-border-subtle">
-          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+          <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
             <div className="max-w-md mx-auto">
               <SubscribeCTA />
             </div>

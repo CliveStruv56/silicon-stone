@@ -347,7 +347,7 @@ export default function PolicyStressTestPage() {
 
       <main className="flex-1 bg-background">
         {/* Hero Section */}
-        <section className="bg-slate-deep border-b border-border-subtle py-12 md:py-16">
+        <section className="bg-slate-deep border-b border-border-subtle py-10 md:py-12">
           <div className="mx-auto max-w-7xl px-6 lg:px-8 text-center">
             <Badge variant="outline" className="mb-4 border-stone-teal text-stone-teal">
               Interactive Tool
@@ -481,7 +481,7 @@ export default function PolicyStressTestPage() {
                 <Button
                   onClick={handleAnalyze}
                   disabled={!selectedIndustry}
-                  className="w-full bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90 disabled:opacity-50"
+                  className="w-full bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90 disabled:opacity-50"
                 >
                 <Scale className="w-4 h-4 mr-2" />
                 Analyze Compliance Friction
@@ -685,7 +685,7 @@ export default function PolicyStressTestPage() {
                 {/* CTA */}
                 <div className="flex justify-center pt-6">
                   <Link href="/advisory#contact">
-                    <Button className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90">
+                    <Button className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90">
                       <FileText className="w-4 h-4 mr-2" />
                       Request Detailed Compliance Assessment
                     </Button>

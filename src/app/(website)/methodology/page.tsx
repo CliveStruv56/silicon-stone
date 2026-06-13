@@ -229,11 +229,11 @@ export default function MethodologyPage() {
       <main className="flex-1">
         {/* Hero Section */}
         <section className="bg-slate-deep border-b border-border-subtle">
-          <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-24">
+          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
             <div className="max-w-3xl">
               <Badge
                 variant="outline"
-                className="mb-5 border-silicon-amber/60 text-silicon-amber font-mono text-[11px] tracking-[0.10em] uppercase bg-silicon-amber/5"
+                className="mb-5 border-silicon-amber/60 text-silicon-amber font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
               >
                 Forensic Technopolitics
               </Badge>
@@ -258,12 +258,12 @@ export default function MethodologyPage() {
         </section>
 
         {/* Introduction */}
-        <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+        <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
           <div className="max-w-3xl">
             <h2 className="text-2xl font-semibold text-text-primary mb-6">
               Why &ldquo;Forensic&rdquo;?
             </h2>
-            <div className="prose prose-lg prose-invert">
+            <div className="prose prose-lg dark:prose-invert">
               <p className="text-text-muted leading-relaxed mb-4">
                 Most technology analysis works backwards from conclusions. Analysts start with a narrative—
                 &ldquo;AI will transform everything,&rdquo; &ldquo;Europe is falling behind,&rdquo; &ldquo;supply chains are resilient&rdquo;—
@@ -286,12 +286,12 @@ export default function MethodologyPage() {
         <Separator className="mx-auto max-w-7xl bg-border-subtle" />
 
         {/* Three Readings of Every Briefing — relocated from the homepage */}
-        <ThreeReadings className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16" />
+        <ThreeReadings className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12" />
 
         <Separator className="mx-auto max-w-7xl bg-border-subtle" />
 
         {/* Three Forensic Domains */}
-        <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+        <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
           <div className="max-w-3xl mb-8">
             <h2 className="text-2xl font-semibold text-text-primary mb-3">
               Three Forensic Domains
@@ -317,7 +317,7 @@ export default function MethodologyPage() {
         <Separator className="mx-auto max-w-7xl bg-border-subtle" />
 
         {/* Two Analytical Methods */}
-        <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+        <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
           <div className="max-w-3xl mb-8">
             <h2 className="text-2xl font-semibold text-text-primary mb-3">
               Two Analytical Methods
@@ -344,7 +344,7 @@ export default function MethodologyPage() {
         <Separator className="mx-auto max-w-7xl bg-border-subtle" />
 
         {/* The Matrix */}
-        <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+        <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
           <div className="max-w-3xl mb-8">
             <h2 className="text-2xl font-semibold text-text-primary mb-3">
               The 3 × 2 Matrix
@@ -391,7 +391,7 @@ export default function MethodologyPage() {
         </section>
 
         {/* Stone Truth — verdict closing the matrix, before action */}
-        <section className="mx-auto max-w-7xl px-6 lg:px-8 mt-12 mb-12">
+        <section className="mx-auto max-w-7xl px-6 lg:px-8 mt-12 mb-8">
           <div
             className="max-w-[880px] rounded-xl px-9 py-8 border border-border-subtle border-l-[3px] border-l-silicon-amber"
             style={{
@@ -399,7 +399,7 @@ export default function MethodologyPage() {
                 'linear-gradient(to right, rgba(232,154,60,0.06), rgba(74,155,155,0.04))',
             }}
           >
-            <div className="font-mono text-[11px] tracking-[0.10em] uppercase text-silicon-amber mb-3">
+            <div className="font-mono text-[12.5px] tracking-[0.10em] uppercase text-silicon-amber mb-3">
               Stone Truth
             </div>
             <p className="text-base leading-relaxed text-text-primary">
@@ -413,7 +413,7 @@ export default function MethodologyPage() {
 
         {/* CTA Section */}
         <section className="bg-stone-charcoal/50">
-          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+          <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
             <div className="text-center max-w-2xl mx-auto">
               <h2 className="text-2xl font-bold text-text-primary mb-4">
                 See the Methodology in Action
@@ -425,7 +425,7 @@ export default function MethodologyPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/intelligence">
-                  <Button className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90">
+                  <Button className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90">
                     Read Our Analysis
                   </Button>
                 </Link>

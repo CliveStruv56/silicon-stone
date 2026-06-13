@@ -58,13 +58,13 @@ export function StartHereSpine() {
       aria-labelledby="start-here-heading"
       className="border-b border-border-subtle bg-stone-charcoal/30"
     >
-      <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-20">
+      <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-14">
         <StaggerContainer>
           <StaggerItem>
             <div className="max-w-3xl mb-10">
               <Badge
                 variant="outline"
-                className="mb-4 border-stone-teal/60 text-stone-teal font-mono text-[11px] tracking-[0.10em] uppercase bg-stone-teal/5"
+                className="mb-4 border-stone-teal/60 text-stone-teal font-mono text-[12.5px] tracking-[0.10em] uppercase bg-stone-teal/5"
               >
                 Start here
               </Badge>
@@ -97,7 +97,7 @@ export function StartHereSpine() {
                       className="h-full cursor-pointer"
                     >
                       <span
-                        className={`inline-block rounded-full px-2.5 py-1 mb-3 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] ${markerClasses}`}
+                        className={`inline-block rounded-full px-2.5 py-1 mb-3 font-mono text-[12px] font-semibold uppercase tracking-[0.08em] ${markerClasses}`}
                       >
                         {rung.marker}
                       </span>
@@ -108,7 +108,7 @@ export function StartHereSpine() {
                         {rung.body}
                       </p>
                       <div
-                        className={`flex items-center gap-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.05em] ${accentText}`}
+                        className={`flex items-center gap-1.5 font-mono text-[12.5px] font-semibold uppercase tracking-[0.05em] ${accentText}`}
                       >
                         <span>{rung.cta}</span>
                         <ArrowRight className="w-3.5 h-3.5" />

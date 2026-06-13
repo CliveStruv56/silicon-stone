@@ -8,7 +8,7 @@ export default function Loading() {
     <div className="min-h-screen bg-slate-deep px-6 py-10">
       <div className="mx-auto max-w-7xl animate-pulse">
         {/* Header bar placeholder */}
-        <div className="mb-12 flex items-center justify-between">
+        <div className="mb-8 flex items-center justify-between">
           <div className="h-6 w-40 rounded bg-stone-charcoal" />
           <div className="hidden gap-4 lg:flex">
             <div className="h-4 w-24 rounded bg-stone-charcoal" />

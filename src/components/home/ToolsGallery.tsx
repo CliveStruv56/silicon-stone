@@ -158,7 +158,7 @@ function ScenarioPreview() {
             animate={inView ? { height: `${s.value}%` } : {}}
             transition={{ duration: 0.6, delay: 0.3 + i * 0.15, ease: 'easeOut' }}
           />
-          <span className="font-mono text-[9px] text-text-muted">{s.label}</span>
+          <span className="font-mono text-[12.5px] text-text-muted">{s.label}</span>
         </div>
       ))}
     </div>
@@ -199,7 +199,7 @@ function StressTestPreview() {
                 <span className="font-mono text-xs text-text-primary">{gauge.score}</span>
               </div>
             </div>
-            <span className="font-mono text-[10px] text-text-muted">{gauge.label}</span>
+            <span className="font-mono text-[12px] text-text-muted">{gauge.label}</span>
           </div>
         )
       })}
@@ -251,13 +251,13 @@ const tools = [
 export function ToolsGallery() {
   return (
     <section aria-labelledby="tools-heading" className="bg-stone-charcoal/50">
-      <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8 lg:py-28">
+      <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8 lg:py-14">
         <StaggerContainer>
           <StaggerItem>
-            <div className="text-center max-w-2xl mx-auto mb-12">
+            <div className="text-center max-w-2xl mx-auto mb-8">
               <Badge
                 variant="outline"
-                className="mb-5 border-silicon-amber/60 text-silicon-amber font-mono text-[11px] tracking-[0.10em] uppercase bg-silicon-amber/5"
+                className="mb-5 border-silicon-amber/60 text-silicon-amber font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
               >
                 Decision Tools
               </Badge>
@@ -334,7 +334,7 @@ export function ToolsGallery() {
                     {/* Bridge — the paid next step */}
                     <Link
                       href={tool.takeFurther.href}
-                      className="mt-4 pt-3 border-t border-dashed border-border-subtle/70 flex items-center gap-1.5 font-mono text-[11px] font-semibold tracking-[0.03em] text-text-muted transition-colors hover:text-text-primary"
+                      className="mt-4 pt-3 border-t border-dashed border-border-subtle/70 flex items-center gap-1.5 font-mono text-[12.5px] font-semibold tracking-[0.03em] text-text-muted transition-colors hover:text-text-primary"
                     >
                       <span>Take it further → {tool.takeFurther.label}</span>
                     </Link>

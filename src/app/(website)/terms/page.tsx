@@ -15,7 +15,7 @@ export default function TermsPage() {
 
       <main className="flex-1">
         <section className="bg-slate-deep border-b border-border-subtle">
-          <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-24">
+          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
             <Badge variant="outline" className="mb-4 border-text-muted text-text-muted">
               Legal
             </Badge>
@@ -26,8 +26,8 @@ export default function TermsPage() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-3xl px-6 py-12 lg:px-8 lg:py-16">
-          <div className="prose prose-invert prose-sm max-w-none space-y-8">
+        <section className="mx-auto max-w-3xl px-6 py-10 lg:px-8 lg:py-12">
+          <div className="prose dark:prose-invert prose-sm max-w-none space-y-8">
 
             <div>
               <h2 className="text-xl font-semibold text-text-primary mb-3">Overview</h2>

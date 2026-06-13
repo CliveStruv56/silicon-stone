@@ -50,7 +50,7 @@ export function ArticleGridCard({
         <div className="relative aspect-[16/9] bg-gradient-to-br from-stone-charcoal to-slate-deep flex items-center justify-center border-b border-border-subtle">
           <div className="text-center">
             <div className="text-2xl font-mono font-bold text-silicon-amber/20">S&amp;S</div>
-            <div className="text-[10px] font-mono uppercase tracking-widest text-text-muted/30 mt-1">Forensic Technopolitics</div>
+            <div className="text-[12px] font-mono uppercase tracking-widest text-text-muted/30 mt-1">Forensic Technopolitics</div>
           </div>
         </div>
       )}

@@ -41,13 +41,13 @@ export function ProductsBand() {
       aria-labelledby="products-band-heading"
       className="border-b border-border-subtle bg-stone-charcoal/50"
     >
-      <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8 lg:py-24">
+      <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8 lg:py-16">
         <StaggerContainer>
           <StaggerItem>
-            <div className="max-w-2xl mb-12">
+            <div className="max-w-2xl mb-8">
               <Badge
                 variant="outline"
-                className="mb-4 border-silicon-amber/60 text-silicon-amber font-mono text-[11px] tracking-[0.10em] uppercase bg-silicon-amber/5"
+                className="mb-4 border-silicon-amber/60 text-silicon-amber font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
               >
                 Buy · self-serve products
               </Badge>
@@ -80,7 +80,7 @@ export function ProductsBand() {
                         {product.price}
                       </span>
                       {product.label && (
-                        <span className="font-mono text-[10px] uppercase tracking-[0.08em] text-text-muted">
+                        <span className="font-mono text-[12px] uppercase tracking-[0.08em] text-text-muted">
                           · {product.label}
                         </span>
                       )}

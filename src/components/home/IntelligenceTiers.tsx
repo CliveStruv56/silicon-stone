@@ -89,14 +89,14 @@ export function IntelligenceTiers({
   return (
     <section
       aria-labelledby="tiers-heading"
-      className="mx-auto max-w-7xl px-6 py-20 lg:px-8 lg:py-28"
+      className="mx-auto max-w-7xl px-6 py-14 lg:px-8 lg:py-14"
     >
       <StaggerContainer>
         <StaggerItem>
-          <div className="max-w-3xl mb-12">
+          <div className="max-w-3xl mb-8">
             <Badge
               variant="outline"
-              className="mb-6 border-silicon-amber/60 text-silicon-amber font-mono text-[11px] tracking-[0.10em] uppercase bg-silicon-amber/5"
+              className="mb-6 border-silicon-amber/60 text-silicon-amber font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
             >
               Subscription Tiers
             </Badge>
@@ -143,7 +143,7 @@ export function IntelligenceTiers({
                     }`}
                   >
                     <div
-                      className={`font-mono text-[11px] tracking-[0.10em] uppercase mb-4 ${
+                      className={`font-mono text-[12.5px] tracking-[0.10em] uppercase mb-4 ${
                         featured ? 'text-silicon-amber' : 'text-text-muted'
                       }`}
                     >
@@ -161,7 +161,7 @@ export function IntelligenceTiers({
                     <div className="border-t border-border-subtle pt-4 mt-auto">
                       {article ? (
                         <Link href={`/analysis/${article.slug}`} className="block group">
-                          <div className="font-mono text-[10px] tracking-[0.10em] uppercase text-text-muted mb-2">
+                          <div className="font-mono text-[12px] tracking-[0.10em] uppercase text-text-muted mb-2">
                             Latest
                           </div>
                           <h4 className="text-sm font-medium text-text-primary group-hover:text-silicon-amber transition-colors line-clamp-2 mb-1.5">

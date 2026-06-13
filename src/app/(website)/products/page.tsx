@@ -25,7 +25,7 @@ const products = [
     description: 'A quick-start pack for auditing your AI exposure, vendor dependencies, and compliance gaps. The essential first step.',
     price: '£24',
     badge: 'Quick Start',
-    badgeColor: 'bg-stone-teal text-slate-deep',
+    badgeColor: 'bg-stone-teal text-ink-on-accent',
     icon: ClipboardCheck,
     iconColor: 'text-stone-teal',
     iconBg: 'bg-stone-teal/10',
@@ -44,7 +44,7 @@ const products = [
     description: 'A structured governance toolkit for cataloguing systems, classifying risk, collecting vendor evidence, and planning against phased AI Act implementation.',
     price: 'From £79',
     badge: 'Flagship',
-    badgeColor: 'bg-silicon-amber text-slate-deep',
+    badgeColor: 'bg-silicon-amber text-ink-on-accent',
     icon: Shield,
     iconColor: 'text-silicon-amber',
     iconBg: 'bg-silicon-amber/10',
@@ -87,7 +87,7 @@ export default function ProductsPage() {
       <main className="flex-1">
         {/* Hero */}
         <section className="bg-slate-deep border-b border-border-subtle">
-          <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-24">
+          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
             <div className="max-w-3xl">
               <Badge variant="outline" className="mb-4 border-silicon-amber text-silicon-amber">
                 Digital Products
@@ -121,7 +121,7 @@ export default function ProductsPage() {
         </section>
 
         {/* Products Grid */}
-        <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+        <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {products.map((product) => {
               const Icon = product.icon
@@ -184,7 +184,7 @@ export default function ProductsPage() {
 
         {/* Advisory CTA */}
         <section className="bg-stone-charcoal/50">
-          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+          <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
             <div className="text-center max-w-2xl mx-auto">
               <h2 className="text-2xl font-bold text-text-primary mb-4">
                 Need More Than a Toolkit?
@@ -195,7 +195,7 @@ export default function ProductsPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/advisory#contact">
-                  <Button className="bg-silicon-amber text-slate-deep hover:bg-silicon-amber/90">
+                  <Button className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90">
                     Discuss Advisory Services
                   </Button>
                 </Link>
