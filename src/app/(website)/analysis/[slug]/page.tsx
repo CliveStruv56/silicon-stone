@@ -94,6 +94,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 type PortableTextBlock = {
   _type?: string
+  style?: string
   children?: Array<{ text?: string }>
 }
 
@@ -110,6 +111,27 @@ function getReadingTime(body: PortableTextBlock[]): number {
 
   const words = text.split(/\s+/).length
   return Math.ceil(words / 200) // Average reading speed
+}
+
+// Many generated articles end the body with a "Sources" heading + list, which
+// duplicates the structured `citations[]` rendered separately below. When we have
+// citations to show, drop the trailing in-body Sources section (the heading and
+// everything after it) so the page shows a single, canonical Sources list.
+function stripTrailingSourcesSection(body: PortableTextBlock[]): PortableTextBlock[] {
+  if (!Array.isArray(body)) return body
+  let cut = -1
+  body.forEach((block, i) => {
+    if (block?._type === 'block' && /^h[1-4]$/.test(block.style || '')) {
+      const text = (block.children || [])
+        .map((c) => c.text || '')
+        .join('')
+        .trim()
+        .toLowerCase()
+        .replace(/[:\s]+$/, '')
+      if (text === 'sources' || text === 'references') cut = i
+    }
+  })
+  return cut >= 0 ? body.slice(0, cut) : body
 }
 
 export default async function ArticlePage({ params }: Props) {
@@ -314,10 +336,18 @@ export default async function ArticlePage({ params }: Props) {
 
           <Separator className="mb-10 bg-border-subtle" />
 
-          {/* Article Body — reading measure capped (~70ch) for comfortable long-form reading */}
+          {/* Article Body — reading measure capped (~70ch) for comfortable long-form reading.
+              Drop the in-body "Sources" section when we render structured citations below. */}
           <div className="prose prose-lg dark:prose-invert max-w-[70ch]">
             {article.body && (
-              <PortableText value={article.body} components={portableTextComponents} />
+              <PortableText
+                value={
+                  article.citations && article.citations.length > 0
+                    ? stripTrailingSourcesSection(article.body)
+                    : article.body
+                }
+                components={portableTextComponents}
+              />
             )}
           </div>
 
