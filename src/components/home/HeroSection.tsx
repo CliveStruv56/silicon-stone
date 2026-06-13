@@ -116,9 +116,10 @@ export function HeroSection({ settings }: HeroSectionProps) {
                         <motion.div variants={itemVariants}>
                             <Badge
                                 variant="outline"
-                                className="mb-8 rounded-md border-[#F6AD55]/70 bg-[#F6AD55]/12 px-3 py-1.5 font-mono text-[12.5px] uppercase tracking-[0.10em] text-[#F6AD55] shadow-[0_8px_30px_rgba(0,0,0,0.35)] backdrop-blur-sm"
+                                className="mb-8 max-w-full whitespace-normal rounded-md border-[#F6AD55]/70 bg-[#F6AD55]/12 px-3 py-1.5 font-mono text-[11px] sm:text-[12.5px] uppercase tracking-[0.06em] sm:tracking-[0.10em] text-[#F6AD55] shadow-[0_8px_30px_rgba(0,0,0,0.35)] backdrop-blur-sm"
                             >
-                                Forensic Technopolitics · the view from the edge
+                                Forensic Technopolitics
+                                <span className="hidden sm:inline"> · the view from the edge</span>
                             </Badge>
                         </motion.div>
 
