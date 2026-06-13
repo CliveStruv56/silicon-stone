@@ -341,17 +341,24 @@ export async function buildVoiceEditPrompt(
     const houseStyle = getHouseStyleRules();
     const aiTells = getAITells();
 
+    // Delimiter-based output (NOT JSON): the article body and the edit summary
+    // are multi-line markdown with quotes, em-dashes and newlines. Asking for a
+    // JSON object with those as string values makes the model emit invalid JSON
+    // (literal newlines / unescaped quotes), so JSON.parse failed on every run —
+    // silently discarding both the edit notes AND the humanising rewrite. Plain
+    // markers need no escaping and parse reliably.
     const outputContract = mode === 'rewrite'
-        ? `Output ONLY a single valid JSON object and NOTHING ELSE — no markdown fences, no preamble:
-{
-  "content": "The full edited article in markdown. Preserve the author's heading structure, front-matter and the Stone Truth callout exactly. Insert [AUTHOR: …] placeholders where only the author can supply a specific — never invent facts.",
-  "editSummary": "The edit summary in the exact structure given below."
-}`
+        ? `Return plain text in EXACTLY this layout — the two marker lines verbatim, nothing before the first marker and nothing after the summary, no JSON, no code fences:
+
+===EDITED ARTICLE===
+The full edited article in markdown. Preserve the author's heading structure, front-matter and the Stone Truth callout exactly. Insert [AUTHOR: …] placeholders where only the author can supply a specific — never invent facts.
+===EDIT SUMMARY===
+The edit summary in the exact structure given above.`
         : `This is an AUDIT pass. Do NOT rewrite the article — leave the prose to the author. Identify every AI tell, house-style breach, and place where a concrete specific is missing.
-Output ONLY a single valid JSON object and NOTHING ELSE — no markdown fences, no preamble:
-{
-  "editSummary": "The edit summary in the exact structure given below, listing concrete locations (quote the offending phrase) so the author can act without re-reading the whole draft."
-}`;
+Return plain text in EXACTLY this layout — the marker line verbatim, nothing before it, no JSON, no code fences:
+
+===EDIT SUMMARY===
+The edit summary in the exact structure given above, listing concrete locations (quote the offending phrase) so the author can act without re-reading the whole draft.`;
 
     const systemPrompt = `You are a ruthless, experienced editor performing the FINAL voice pass on an AI-assisted draft for "Silicon & Stone". Your job is to make it read as if a sharp, opinionated human with real expertise wrote it. You cut, sharpen, and demand specifics. You never soften AI prose with more AI prose, and you never pretend a draft is fine when it reads like a machine wrote it.
 
@@ -401,20 +408,25 @@ export async function runVoiceEditPass(
         // Editing is conservative (0.3); generous token budget so a full rewrite is not truncated.
         raw = await callClaude(systemPrompt, userPrompt, 0.3, mode === 'rewrite' ? 8192 : 2048);
 
-        const firstOpen = raw.indexOf('{');
-        const lastClose = raw.lastIndexOf('}');
-        if (firstOpen === -1 || lastClose === -1) throw new Error("No JSON object in voice-edit response");
+        // Parse the delimiter format (see buildVoiceEditPrompt). The summary
+        // always trails ===EDIT SUMMARY===; in rewrite mode the edited body sits
+        // between ===EDITED ARTICLE=== and that marker.
+        const SUMMARY_MARKER = '===EDIT SUMMARY===';
+        const ARTICLE_MARKER = '===EDITED ARTICLE===';
+        const summaryIdx = raw.indexOf(SUMMARY_MARKER);
+        if (summaryIdx === -1) throw new Error("voice-edit response missing the ===EDIT SUMMARY=== marker");
 
-        const parsed = JSON.parse(raw.substring(firstOpen, lastClose + 1));
-
-        const editSummary = typeof parsed.editSummary === 'string' ? parsed.editSummary.trim() : '';
-        if (!editSummary) throw new Error("voice-edit response missing editSummary");
+        const editSummary = raw.slice(summaryIdx + SUMMARY_MARKER.length).trim();
+        if (!editSummary) throw new Error("voice-edit response had an empty edit summary");
 
         if (mode === 'audit') {
             return { content: body, editSummary };
         }
 
-        const edited = typeof parsed.content === 'string' ? parsed.content.trim() : '';
+        const articleIdx = raw.indexOf(ARTICLE_MARKER);
+        const edited = articleIdx !== -1 && articleIdx < summaryIdx
+            ? raw.slice(articleIdx + ARTICLE_MARKER.length, summaryIdx).trim()
+            : '';
         // If the rewrite came back empty, keep the original body rather than blanking the draft.
         return { content: edited || body, editSummary };
     } catch (err) {
