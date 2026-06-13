@@ -287,7 +287,7 @@ export default function ServicesPage() {
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.1 }}
                 >
-                  <Card className={`h-full bg-stone-charcoal border-border-subtle ${framework.hoverBorderColor} transition-colors`}>
+                  <Card className={`card-interactive h-full bg-stone-charcoal border-border-subtle ${framework.hoverBorderColor}`}>
                     <CardHeader>
                       <div className={`w-10 h-10 rounded-lg ${framework.bgColor} ${framework.borderColor} border flex items-center justify-center mb-3`}>
                         <Icon className={`w-5 h-5 ${framework.color}`} />
@@ -344,7 +344,7 @@ export default function ServicesPage() {
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.1 }}
                 >
-                  <Card className="h-full bg-stone-charcoal border-border-subtle">
+                  <Card className="card-interactive h-full bg-stone-charcoal border-border-subtle">
                     <CardHeader>
                       <div className="flex items-start justify-between">
                         <Icon className={`w-6 h-6 text-${assessment.color}`} />
@@ -399,7 +399,7 @@ export default function ServicesPage() {
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.1 }}
                 >
-                  <Card className={`h-full ${tier.highlighted ? 'bg-slate-deep border-silicon-amber' : 'bg-stone-charcoal border-border-subtle'}`}>
+                  <Card className={`card-interactive h-full ${tier.highlighted ? 'bg-slate-deep border-silicon-amber' : 'bg-stone-charcoal border-border-subtle'}`}>
                     <CardHeader>
                       {tier.highlighted && (
                         <Badge className="w-fit mb-2 bg-silicon-amber text-ink-on-accent">

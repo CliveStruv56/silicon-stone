@@ -126,7 +126,7 @@ export default function ProductsPage() {
             {products.map((product) => {
               const Icon = product.icon
               return (
-                <Card key={product.slug} className="h-full bg-stone-charcoal border-border-subtle flex flex-col">
+                <Card key={product.slug} className="card-interactive h-full bg-stone-charcoal border-border-subtle flex flex-col">
                   <CardHeader>
                     <div className="flex items-start justify-between mb-3">
                       <div className={`p-3 rounded-lg ${product.iconBg}`}>
