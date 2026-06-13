@@ -354,6 +354,13 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### June 13, 2026 — Voice-edit always-empty + fact-check session robustness
+
+| Commit | Description |
+|--------|-------------|
+| `(voice-edit)` | **Pass-3 voice edit was failing on every generation.** It asked Claude for a JSON object whose values were the full edited article + a multi-section markdown edit summary; markdown-in-JSON-string reliably broke `JSON.parse`, so `runVoiceEditPass` returned null every time — leaving the read-only **Voice Edit Notes** field empty AND silently discarding the humanising rewrite (draft fell back to the un-edited Pass-1 body). Confirmed: 100% of generated articles in production have empty `voiceEditNotes`. Fix: delimiter output contract (`===EDITED ARTICLE===` / `===EDIT SUMMARY===`) parsed by slicing on markers — no escaping needed for multi-line markdown. |
+| `0c916cc` | **Fact-check "log into the admin area" 401.** The "Run fact-check" Studio action authenticates with the admin `/login` session cookie (`ai-writer-auth`), which is **separate from the Sanity Studio account login**. When that session was absent by the time the action ran, the editor hit a dead-end 401. The cookie proved robust to cross-site navigation and to entering Studio (verified live), so the exact deletion-during-Sanity-OAuth could not be reproduced and **no auth-model change was made**. Two safe robustness improvements instead: (1) middleware **sliding-refresh** of the admin session on every authenticated admin request (so `/create` at generation time re-issues a fresh 24h session right before the user is sent into Studio); (2) factCheckAction now opens `/login` in a new tab on 401 (preserving the open document) and clarifies it's the `/login` code, not the Sanity login. **Note:** the writer-gate password (`ADMIN_PASSWORD`) was changed from `studio123` to a new value — see auto-memory. |
+
 ### June 13, 2026 — Generation timeout + vectorize webhook loop (two bug fixes)
 
 | Commit | Description |
