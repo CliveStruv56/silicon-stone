@@ -17,6 +17,7 @@
   --text-muted: #586072;      /* muted text — meta, secondary */
   --alert-red: #c2410c;       /* deadlines / risk */
   --surface-elevated: #f5f3ed;/* lighter raised band */
+  --footer-bg: #e8e3d7;       /* deeper grounded stone — footer band */
   --border-subtle: #e2dccf;   /* warm hairline */
 
   --silicon-cyan: #0e7c8b;    /* deepened cyan for contrast on light */
@@ -80,6 +81,7 @@
   --text-muted: #8b93a0;
   --alert-red: #fc8181;
   --surface-elevated: #232c3b;
+  --footer-bg: #161d2b;        /* raised slate band — footer */
   --border-subtle: rgba(255, 255, 255, 0.10);
   --silicon-cyan: #4fd1e0;
   --sister-indigo: #818cf8;
@@ -132,6 +134,7 @@
   --color-text-muted: var(--text-muted);
   --color-alert-red: var(--alert-red);
   --color-surface-elevated: var(--surface-elevated);
+  --color-footer-bg: var(--footer-bg);
   --color-border-subtle: var(--border-subtle);
   --color-silicon-cyan: var(--silicon-cyan);
   --color-sister-indigo: var(--sister-indigo);

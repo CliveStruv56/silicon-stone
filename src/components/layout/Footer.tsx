@@ -26,7 +26,7 @@ const footerNavigation = {
 
 export function Footer() {
   return (
-    <footer className="border-t border-border-subtle bg-slate-deep">
+    <footer className="border-t border-border-subtle bg-footer-bg">
       <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
           {/* Brand */}
@@ -78,25 +78,9 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Related + Company */}
+          {/* Company */}
           <div>
-            <h3 className="font-mono text-[12.5px] uppercase tracking-[0.12em] text-sister-indigo">
-              Related
-            </h3>
-            <ul className="mt-4 space-y-3">
-              <li>
-                <Link
-                  href={WAYMARKPATH_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-sister-indigo hover:text-sister-indigo/80 transition-colors"
-                >
-                  WaymarkPath
-                </Link>
-              </li>
-            </ul>
-
-            <h3 className="mt-8 text-sm font-semibold text-text-primary">Company</h3>
+            <h3 className="text-sm font-semibold text-text-primary">Company</h3>
             <ul className="mt-4 space-y-3">
               {footerNavigation.company.map((item) => (
                 <li key={item.name}>
@@ -108,6 +92,16 @@ export function Footer() {
                   </Link>
                 </li>
               ))}
+              <li>
+                <Link
+                  href={WAYMARKPATH_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-sister-indigo hover:text-sister-indigo/80 transition-colors"
+                >
+                  WaymarkPath &nearr;
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
