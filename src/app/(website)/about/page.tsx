@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 
 import { Header, Footer } from '@/components/layout'
@@ -98,15 +99,20 @@ export default function AboutPage() {
                 </p>
               </div>
               <div className="relative">
-                {/* Placeholder for atmospheric image */}
-                <div className="aspect-[4/3] rounded-lg bg-gradient-to-br from-stone-charcoal to-slate-deep border border-border-subtle overflow-hidden">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center p-8">
-                      <div className="text-6xl mb-4 opacity-50">🏴󠁧󠁢󠁳󠁣󠁴󠁿</div>
-                      <p className="text-text-muted text-sm italic">
-                        &ldquo;The edge is where you see what the centre misses&rdquo;
-                      </p>
-                    </div>
+                <div className="aspect-[4/3] rounded-lg border border-border-subtle overflow-hidden">
+                  <Image
+                    src="/about-edge-island.png"
+                    alt="A small island off Scotland's Atlantic coast, ringed by the sea"
+                    fill
+                    sizes="(min-width: 1024px) 50vw, 100vw"
+                    className="object-cover"
+                    priority
+                  />
+                  {/* Gradient scrim for caption legibility */}
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-deep/90 to-transparent p-6 pt-16">
+                    <p className="text-text-primary text-sm italic">
+                      &ldquo;The edge is where you see what the centre misses&rdquo;
+                    </p>
                   </div>
                 </div>
               </div>
