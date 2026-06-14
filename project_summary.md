@@ -1,7 +1,7 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-06-13
+> Last Updated: 2026-06-14
 > Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing, 13 moderate transitive npm audit findings (uuid through Sanity packages)**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com. Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools (email-gated for lead capture, AI Act triage engine recently overhauled), product/commerce pages with an early-access enquiry fallback until Lemon Squeezy checkout URLs are configured, Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Awaiting Lemon Squeezy store setup, Plausible account, and content publishing for queued drafts.
@@ -353,6 +353,13 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### June 14, 2026 — About hero image + footer cleanup/differentiation
+
+| Commit | Description |
+|--------|-------------|
+| `0e622fb` | **Footer: consistent headings + differentiated band.** (1) The 4th footer column had two mismatched headings — a mono/uppercase/indigo **"Related"** sitting in the heading row above the WaymarkPath link, then a normal **"Company"** heading below. Collapsed to a single `Company` heading matching `Intelligence`/`Engage` (`text-sm font-semibold text-text-primary`); WaymarkPath moved down into the Company list as an external sister-product link (kept indigo + `↗`). (2) The footer used `bg-slate-deep`, identical to the page `--background` in both themes, so it blended into the page. Added a dedicated **`--footer-bg`** token (registered in `@theme inline` as `--color-footer-bg`): dark = raised slate `#161d2b` vs page `#0f141e`; light = deeper grounded stone `#e8e3d7` vs page `#efece4`. Footer now reads as its own band in both themes (top hairline border retained). **VERIFIED** in both themes via Playwright screenshots on `/about`. Files: `src/components/layout/Footer.tsx`, `src/app/(website)/globals.css`. |
+| `c1aa71d` | **About hero image placed.** Replaced the Scotland-flag-emoji placeholder in the `/about` hero's right-hand panel with an atmospheric island photo (`public/about-edge-island.png`, 598×400), rendered via `next/image` (`fill` + `object-cover`, `priority`) inside the existing rounded 4:3 frame. The "The edge is where you see what the centre misses" quote is retained, overlaid at the bottom on a gradient scrim for legibility. File: `src/app/(website)/about/page.tsx`. |
 
 ### June 13, 2026 — Main draft pass moved off JSON to delimiter output
 
