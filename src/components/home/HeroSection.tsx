@@ -146,7 +146,7 @@ export function HeroSection({ settings }: HeroSectionProps) {
                                 textShadow: '0 2px 20px rgba(0,0,0,0.5)',
                             }}
                         >
-                            Independent, decision-grade intelligence on technology dependency and the geopolitics of the technology supply chain — read from thirty years inside the industry. For UK and European leaders, with AI governance as one application, not the whole map.
+                            Independent, decision-grade intelligence on the technology supply chain and the geopolitics of dependency — read from thirty years inside the industry. For UK and European leaders, with AI governance as one application, not the whole map.
                         </motion.p>
 
                         <motion.p
