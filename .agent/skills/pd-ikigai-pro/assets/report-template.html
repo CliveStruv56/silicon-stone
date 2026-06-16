@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<!--
+  Ikigai Pro — dark-mode report template.
+  Fill the {{PLACEHOLDER}} tokens (or generate the sections inline following this
+  structure). Design rules per SKILL.md Stage 10B:
+    - Dark mode only, near-black background
+    - One serif display + one sans + one mono
+    - One primary accent, one secondary, one warning
+    - No emoji decoration; type does the heavy lifting
+    - Numerical data in mono; verbatim quotes in serif italic
+    - Single column under 880px
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ikigai Pro Report — {{NICHE_NAME}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #050507;
+    --surface:   #0c0c10;
+    --line:      rgba(255,255,255,0.07);
+    --text:      #ECECEE;
+    --muted:     #8A8A93;
+    --accent:    #C6F24E;   /* primary — lime */
+    --secondary: #6BD3FF;   /* secondary — cyan */
+    --warning:   #FF8B6B;   /* warning — amber/red */
+    --serif: "Instrument Serif", Georgia, serif;
+    --sans:  "Inter", system-ui, sans-serif;
+    --mono:  "JetBrains Mono", ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 28px; }
+  section { padding: 72px 0; border-bottom: 1px solid var(--line); }
+  h1, h2, h3 { font-family: var(--serif); font-weight: 400; letter-spacing: -0.01em; line-height: 1.1; }
+  h1 { font-size: clamp(40px, 6vw, 76px); margin: 0 0 18px; }
+  h2 { font-size: clamp(28px, 4vw, 44px); margin: 0 0 28px; }
+  h3 { font-size: 22px; margin: 0 0 12px; }
+  .eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin: 0 0 18px; }
+  .muted { color: var(--muted); }
+  .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  a { color: var(--secondary); }
+
+  /* Hero */
+  .hero { padding-top: 96px; }
+  .hero .niche { font-size: clamp(20px, 2.4vw, 26px); color: var(--muted); max-width: 760px; }
+  .statbar { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 44px; }
+  .stat { flex: 1 1 180px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 22px; }
+  .stat .k { font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+  .stat .v { font-family: var(--mono); font-size: 34px; font-weight: 700; margin-top: 8px; color: var(--accent); }
+
+  /* Generic cards */
+  .grid { display: grid; gap: 18px; }
+  .grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid-4 { grid-template-columns: repeat(4, 1fr); }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 24px; }
+  .card .label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--secondary); margin-bottom: 10px; }
+  .card.warn .label { color: var(--warning); }
+
+  /* Quote */
+  blockquote { margin: 0; font-family: var(--serif); font-style: italic; font-size: 22px; color: var(--text); border-left: 2px solid var(--accent); padding-left: 22px; }
+  .quote-grid blockquote { font-size: 17px; margin-bottom: 16px; }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 14px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  thead th { position: sticky; top: 0; background: var(--bg); font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+  td.num { color: var(--accent); }
+
+  /* Score bars */
+  .score-row { display: grid; grid-template-columns: 200px 1fr 48px; align-items: center; gap: 16px; margin-bottom: 14px; }
+  .score-row .name { font-size: 14px; }
+  .bar { height: 10px; background: rgba(255,255,255,0.06); border-radius: 6px; overflow: hidden; }
+  .bar > i { display: block; height: 100%; background: var(--accent); border-radius: 6px; }
+  .score-row .out { font-family: var(--mono); text-align: right; color: var(--accent); }
+  .composite { font-family: var(--mono); font-size: clamp(56px, 9vw, 104px); font-weight: 700; color: var(--accent); line-height: 1; }
+  .composite small { font-size: 28px; color: var(--muted); }
+
+  /* Offer tiers */
+  .tier { display: flex; flex-direction: column; }
+  .tier.featured { border-color: var(--accent); }
+  .tier .price { font-family: var(--mono); font-size: 30px; font-weight: 700; margin: 6px 0 14px; }
+  .tier ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; }
+  .tier .commit { margin-top: auto; padding-top: 16px; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+
+  /* Action plan */
+  .actions { list-style: none; padding: 0; margin: 0; }
+  .actions li { padding: 16px 0; border-bottom: 1px solid var(--line); display: flex; gap: 18px; }
+  .actions .day { font-family: var(--mono); font-size: 12px; color: var(--secondary); min-width: 92px; }
+
+  .closing { font-family: var(--serif); font-style: italic; font-size: clamp(22px, 3vw, 30px); color: var(--text); max-width: 760px; }
+
+  @media (max-width: 880px) {
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    .score-row { grid-template-columns: 120px 1fr 40px; }
+    section { padding: 56px 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 1 · HERO -->
+<section class="hero wrap">
+  <p class="eyebrow">Ikigai Pro · Validated Business Idea</p>
+  <h1>{{HEADLINE_FINDING}}</h1>
+  <p class="niche">{{NICHE_STATEMENT}}</p>
+  <div class="statbar">
+    <div class="stat"><div class="k">Validation score</div><div class="v">{{SCORE}}<span class="muted" style="font-size:18px">/100</span></div></div>
+    <div class="stat"><div class="k">Recommended price</div><div class="v">{{REC_PRICE}}</div></div>
+    <div class="stat"><div class="k">Clients to goal</div><div class="v">{{CLIENTS_TO_GOAL}}</div></div>
+  </div>
+</section>
+
+<!-- 2 · PERSONA / SITUATION -->
+<section class="wrap">
+  <p class="eyebrow">Situation</p>
+  <h2>Where you're starting from</h2>
+  <p class="muted">{{PERSONA_CONTEXT}}</p>
+</section>
+
+<!-- 3 · IKIGAI 4 LISTS -->
+<section class="wrap">
+  <p class="eyebrow">Ikigai</p>
+  <h2>The four lists</h2>
+  <div class="grid grid-4">
+    <div class="card"><div class="label">Love</div>{{LOVE_LIST}}</div>
+    <div class="card"><div class="label">Good at</div>{{GOODAT_LIST}}</div>
+    <div class="card"><div class="label">World needs</div>{{NEEDS_LIST}}</div>
+    <div class="card"><div class="label">Pays</div>{{PAYS_LIST}}</div>
+  </div>
+</section>
+
+<!-- 4 · NICHE STATEMENT -->
+<section class="wrap">
+  <p class="eyebrow">Positioning</p>
+  <blockquote>{{NICHE_STATEMENT}}</blockquote>
+</section>
+
+<!-- 5 · MARKET INTELLIGENCE -->
+<section class="wrap">
+  <p class="eyebrow">Market intelligence</p>
+  <h2>What the research found</h2>
+  <div class="grid grid-2">
+    <div class="card warn"><div class="label">Saturated · avoid</div>{{SATURATED}}</div>
+    <div class="card"><div class="label">Underserved · the gap</div>{{UNDERSERVED}}</div>
+    <div class="card"><div class="label">What people actually say</div><div class="quote-grid">{{VERBATIM_MARKET}}</div></div>
+    <div class="card"><div class="label">Why now</div>{{WHY_NOW}}</div>
+  </div>
+</section>
+
+<!-- 6 · COMPETITIVE LANDSCAPE -->
+<section class="wrap">
+  <p class="eyebrow">Competition</p>
+  <h2>Competitive landscape</h2>
+  <table>
+    <thead><tr><th>Competitor</th><th>Type</th><th>Pricing</th><th>Does well</th><th>Falls short</th></tr></thead>
+    <tbody>{{COMPETITOR_ROWS}}</tbody>
+  </table>
+  <blockquote style="margin-top:28px">{{COMPETITOR_QUOTE}}</blockquote>
+</section>
+
+<!-- 7 · AUDIENCE LANGUAGE MAP -->
+<section class="wrap">
+  <p class="eyebrow">Voice of customer</p>
+  <h2>Audience language map</h2>
+  <div class="grid grid-3">
+    <div class="card"><div class="label">Pain</div><div class="quote-grid">{{PAIN_LANG}}</div></div>
+    <div class="card"><div class="label">Aspiration</div><div class="quote-grid">{{ASPIRATION_LANG}}</div></div>
+    <div class="card"><div class="label">Questions</div><div class="quote-grid">{{QUESTION_LANG}}</div></div>
+  </div>
+</section>
+
+<!-- 8 · UNFAIR ADVANTAGE -->
+<section class="wrap">
+  <p class="eyebrow">Edge</p>
+  <h2>Your unfair advantage</h2>
+  <blockquote>{{UNFAIR_ADVANTAGE}}</blockquote>
+  <div class="grid grid-4" style="margin-top:28px">
+    <div class="card">{{EDGE_1}}</div>
+    <div class="card">{{EDGE_2}}</div>
+    <div class="card">{{EDGE_3}}</div>
+    <div class="card">{{EDGE_4}}</div>
+  </div>
+</section>
+
+<!-- 9 · VALIDATION SCORING -->
+<section class="wrap">
+  <p class="eyebrow">Validation</p>
+  <h2>Scoring</h2>
+  <!-- Repeat .score-row per dimension; width % = score×10 -->
+  {{SCORE_ROWS}}
+  <div style="margin-top:40px">
+    <div class="composite">{{SCORE}}<small>/100</small></div>
+    <p class="muted">{{SCORE_VERDICT}}</p>
+  </div>
+</section>
+
+<!-- 10 · OFFER + PRICING -->
+<section class="wrap">
+  <p class="eyebrow">Offer</p>
+  <h2>Architecture &amp; pricing</h2>
+  <div class="grid grid-3">
+    <div class="card tier"><div class="label">Foundation</div><div class="price">{{TIER1_PRICE}}</div>{{TIER1_DELIVERABLES}}<div class="commit">{{TIER1_COMMIT}}</div></div>
+    <div class="card tier featured"><div class="label">Engine · recommended</div><div class="price">{{TIER2_PRICE}}</div>{{TIER2_DELIVERABLES}}<div class="commit">{{TIER2_COMMIT}}</div></div>
+    <div class="card tier"><div class="label">Operator</div><div class="price">{{TIER3_PRICE}}</div>{{TIER3_DELIVERABLES}}<div class="commit">{{TIER3_COMMIT}}</div></div>
+  </div>
+  <table style="margin-top:32px">
+    <thead><tr><th>Goal</th><th>Math</th><th>Result</th></tr></thead>
+    <tbody>{{INCOME_MATH_ROWS}}</tbody>
+  </table>
+</section>
+
+<!-- 11 · SUMMARY + 7-DAY PLAN -->
+<section class="wrap">
+  <p class="eyebrow">Next 7 days</p>
+  <h2>Action plan</h2>
+  <ul class="actions">{{ACTION_ROWS}}</ul>
+  <blockquote class="closing" style="margin-top:44px">This is the starting point — not the finish line. Test the offer with 5 real sales conversations this week. The business gets sharpened on calls, not in docs.</blockquote>
+</section>
+
+</body>
+</html>
