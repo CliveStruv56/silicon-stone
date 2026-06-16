@@ -299,6 +299,15 @@ export default function ServicesPage() {
                   <em>your</em> people — delivered every month, in language a
                   semi-technical leadership team can act on.
                 </p>
+                <p className="mt-4 max-w-2xl leading-relaxed text-text-muted">
+                  Equally for{' '}
+                  <strong className="font-semibold text-text-primary">
+                    US companies operating in or entering Europe
+                  </strong>
+                  : a standing, independent read on how the AI Act, the sovereignty
+                  package, and the wider drift affect your European position — so
+                  compliance becomes a maintained state, not an annual panic.
+                </p>
                 <p className="mt-6 border-l-2 border-sister-indigo/50 pl-4 text-sm italic text-text-muted">
                   The same drift runs through individual careers as well as company
                   strategy. Where the brief is personal rather than organisational,{' '}
