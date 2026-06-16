@@ -100,7 +100,7 @@ export function EmailGateOverlay({ isOpen, onUnlock, onDismiss, toolName, result
             ref={dialogRef}
             role="dialog"
             aria-modal="true"
-            aria-label={`Unlock ${resultLabel} from the ${toolName}`}
+            aria-label={`View ${resultLabel} from the ${toolName}`}
             onKeyDown={handleKeyDown}
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -124,7 +124,7 @@ export function EmailGateOverlay({ isOpen, onUnlock, onDismiss, toolName, result
                   </div>
                 )}
                 <CardTitle className="text-xl text-text-primary">
-                  {status === 'success' ? 'Unlocking Results...' : `Unlock ${resultLabel}`}
+                  {status === 'success' ? 'Opening your results…' : `View ${resultLabel}`}
                 </CardTitle>
                 <CardDescription className="mt-2">
                   {status === 'success'

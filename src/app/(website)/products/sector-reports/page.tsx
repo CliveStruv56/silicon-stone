@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 
 import { Header, Footer } from '@/components/layout'
+import { AdvisoryNextStep } from '@/components/products/AdvisoryNextStep'
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -202,6 +203,8 @@ export default function BriefingsProductPage() {
             </div>
           </div>
         </section>
+
+        <AdvisoryNextStep />
       </main>
 
       <Footer />

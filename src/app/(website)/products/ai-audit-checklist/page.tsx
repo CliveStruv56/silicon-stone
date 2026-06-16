@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
+import { AdvisoryNextStep } from '@/components/products/AdvisoryNextStep'
 import { isConfiguredCheckout } from '@/lib/checkout'
 import {
   CheckCircle,
@@ -217,6 +218,8 @@ export default function AIAuditChecklistPage() {
             </div>
           </div>
         </section>
+
+        <AdvisoryNextStep />
       </main>
 
       <Footer />
