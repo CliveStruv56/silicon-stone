@@ -78,7 +78,7 @@ export default function EuExposurePage() {
                 For US companies operating in — or entering — Europe
               </Badge>
               <h1 className="text-4xl font-bold text-text-primary sm:text-5xl mb-6">
-                The deadline is weeks away. The requirement is permanent.
+                The deadline is the easy part. The requirement is permanent.
               </h1>
               <p className="text-xl text-text-muted leading-relaxed mb-6">
                 The EU AI Act’s high-risk obligations take effect on 2 August 2026, and their
