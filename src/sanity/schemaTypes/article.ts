@@ -155,7 +155,7 @@ export const article = defineType({
     defineField({
       group: 'content',
       name: 'actionableInsights',
-      title: 'Actionable Insights',
+      title: 'What to do next',
       description: 'Key takeaways for decision-makers (3-5 bullets)',
       type: 'array',
       of: [defineArrayMember({ type: 'text' })],
