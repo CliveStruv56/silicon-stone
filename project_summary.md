@@ -354,6 +354,14 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### June 16, 2026 — Site revision: Drift Retainer advisory spine (Wave One/Two)
+
+Implementing `docs/site-revision-spec.md` — re-orienting the site around a recurring advisory spine (the Drift Retainer, £3,500–5,000/mo). Finished copy in `docs/advisory-page-copy.md`; prices shipped as-is from that doc (calibrated UK mid-market placeholders). Five-commit sequence.
+
+| Commit | Description |
+|--------|-------------|
+| _(this change)_ | **Advisory page: Drift Retainer added as the spine + engagement options repriced.** `src/app/(website)/advisory/page.tsx`. (1) Replaced the "Recommended Starting Point" diagnostic band with a dominant **Drift Retainer** block (`id="retainer"`, `scroll-mt-24` for deep-links) — Most popular/Ongoing badges, "what it includes" card, **From £3,500/month · three-month minimum**, WaymarkPath aside. (2) Rebuilt the 3-card `tiers` array into **4 ascending priced tiers** (added a `Tier` type): Advisory Briefing **£450/one hour** (credits toward retainer), Focused Diagnostic **from £2,500** (on-ramp, fee credited to first quarter), **The Drift Retainer from £3,500/mo** (`highlighted`, "Most Popular" badge moved here from Focused Diagnostic), Strategic Assessment **from £8,000** (transitions to retainer). Grid `md:grid-cols-2 lg:grid-cols-4`; each one-off card carries an italic path-into-retainer note. (3) Sharpened hero intro ("both keep moving… stay ahead of it"). (4) Reframed Follow-on Modules intro (modules "folded into a Drift Retainer"). (5) Added "Drift Retainer" as first Area-of-Interest option on the contact form so retainer leads tag. Typecheck clean. |
+
 ### June 14, 2026 — About hero image + footer cleanup/differentiation
 
 | Commit | Description |
