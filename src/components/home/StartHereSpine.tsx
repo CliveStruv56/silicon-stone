@@ -43,11 +43,11 @@ const rungs: Rung[] = [
     tone: 'paid',
   },
   {
-    marker: 'Bespoke',
-    title: 'Engage',
-    body: 'Bring us in directly. Diagnostics and assessments scoped to your organisation.',
+    marker: 'From £3,500/mo',
+    title: 'Retain',
+    body: 'A standing read on the drift, so your leadership team is never blindsided. Diagnostics and assessments scope into an ongoing relationship.',
     cta: 'Explore Advisory',
-    href: '/advisory',
+    href: '/advisory#retainer',
     tone: 'paid',
   },
 ]
@@ -72,9 +72,9 @@ export function StartHereSpine() {
                 Four ways to use Silicon &amp; Stone
               </h2>
               <p className="text-lg italic text-text-primary/90 leading-relaxed">
-                Four ways to use Silicon &amp; Stone — from a free read to a bespoke
-                engagement. Most people start at the top and move down as the stakes
-                rise.
+                Four ways to use Silicon &amp; Stone — from a free read to a standing
+                advisory relationship. Most people start at the top and move down as the
+                stakes rise.
               </p>
             </div>
           </StaggerItem>
