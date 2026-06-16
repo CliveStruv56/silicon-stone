@@ -786,7 +786,7 @@ export default function SupplyChainMapperPage() {
 
           {/* CTA */}
           <div className="flex justify-center pt-8">
-            <Link href="/advisory#contact">
+            <Link href="/advisory#retainer">
               <Button className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90">
                 Request Supply Chain Exposure Report
               </Button>

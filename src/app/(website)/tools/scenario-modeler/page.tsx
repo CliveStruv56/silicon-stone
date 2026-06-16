@@ -810,7 +810,7 @@ export default function ScenarioModelerPage() {
                     return scenarioModelerMarkdown(primaryArgs)
                   }}
                 />
-                <Link href="/advisory#contact">
+                <Link href="/advisory#retainer">
                   <Button className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90">
                     Request Custom Scenario Analysis
                   </Button>

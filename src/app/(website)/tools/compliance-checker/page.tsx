@@ -439,6 +439,12 @@ export default function ComplianceCheckerPage() {
                         View compliance toolkit
                       </Button>
                     </Link>
+                    <p className="text-xs text-text-muted text-center">
+                      Need a standing read on your exposure?{' '}
+                      <Link href="/advisory#retainer" className="text-silicon-amber hover:underline">
+                        See the Drift Retainer
+                      </Link>
+                    </p>
                   </CardContent>
                 </Card>
               </div>
