@@ -317,10 +317,10 @@ export default async function ArticlePage({ params }: Props) {
             />
           )}
 
-          {/* Actionable Insights - longer tiers only; keep a Pulse within its scan-time promise */}
+          {/* What to do next - longer tiers only; keep a Pulse within its scan-time promise */}
           {article.intelligenceTier !== 'pulse' && article.actionableInsights && article.actionableInsights.length > 0 && (
             <div className="glass-plate tech-corners rounded-lg p-6 mb-8 border border-tier-briefing/30">
-              <h2 className="font-ui-mono text-tier-briefing text-sm mb-4">Actionable Insights</h2>
+              <h2 className="font-ui-mono text-tier-briefing text-sm mb-4">What to do next</h2>
               <ul className="space-y-3">
                 {article.actionableInsights.map((insight: string, index: number) => (
                   <li key={index} className="flex items-start gap-3">
