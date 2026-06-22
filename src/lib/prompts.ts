@@ -44,6 +44,12 @@ export interface DraftPromptInput {
      * to "rework this source" — preserve its facts, rewrite the prose.
      */
     sourceMaterial?: string;
+    /**
+     * Optional free-text editorial brief from the author (the `/create` form).
+     * Unlike research/sources this is TRUSTED guidance — angle, emphasis, things
+     * to include or avoid — and is emitted inside the authoritative task region.
+     */
+    brief?: string;
 }
 
 /**
@@ -57,7 +63,7 @@ export interface DraftPromptInput {
 export async function buildDraftPrompt(
     input: DraftPromptInput,
 ): Promise<{ systemPrompt: string; userPrompt: string }> {
-    const { topic, personaKey, format, research, priorCoverage, deepReport, sourceMaterial } = input;
+    const { topic, personaKey, format, research, priorCoverage, deepReport, sourceMaterial, brief } = input;
 
     const [persona, voice, profile, contentFocus] = await Promise.all([
         getSanityPersona(personaKey),
@@ -138,11 +144,21 @@ ${fenceUntrusted(sourceMaterial)}
 
     const task = getFormatTask(format, persona, voice);
 
+    // The author's brief is TRUSTED guidance (it came from the admin, not the
+    // untrusted research). It lives under YOUR TASK so it falls inside the
+    // authoritative region the SECURITY note above carves out.
+    const briefBlock = brief?.trim()
+        ? `
+
+EDITORIAL BRIEF FROM THE AUTHOR — authoritative. Follow this for angle, emphasis, framing, and anything to include or avoid. Where it conflicts with the generic format guidance above, the brief wins (but never invent facts the research does not support):
+${brief.trim()}`
+        : '';
+
     const userPrompt = `=== TOPIC ===
 ${topic}
 ${researchBlock}${deepReportBlock}${priorCoverageBlock}${sourceBlock}
 === YOUR TASK ===
-${task}`;
+${task}${briefBlock}`;
 
     return { systemPrompt, userPrompt };
 }

@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, Zap, FileText, Search, BrainCircuit, ExternalLink, Activity, Video, BookOpen } from "lucide-react";
 import { startResearch, pollResearchJob, createDraftFromResearch } from "./actions";
@@ -26,6 +27,8 @@ export function CreateForm({ initialPersonas, initialFormat = "signal" }: Create
     const [format, setFormat] = useState<FormatType>(initialFormat);
     const [personaSlug, setPersonaSlug] = useState<string>(initialPersonas[0]?.slug.current || "");
     const [topic, setTopic] = useState("");
+    const [brief, setBrief] = useState("");
+    const BRIEF_MAX = 2000;
 
     const [isResearching, setIsResearching] = useState(false);
     const [researchResult, setResearchResult] = useState<ResearchResult | null>(null);
@@ -40,7 +43,7 @@ export function CreateForm({ initialPersonas, initialFormat = "signal" }: Create
         const INTERVAL_MS = 4000;
         while (Date.now() - startedAt < TIMEOUT_MS) {
             await new Promise((r) => setTimeout(r, INTERVAL_MS));
-            const res = await pollResearchJob(jobId, topic);
+            const res = await pollResearchJob(jobId, topic, brief);
             if (res.status === "completed" && res.result) return res.result;
             if (res.status === "failed") throw new Error(res.error || "Deep research failed");
         }
@@ -56,7 +59,7 @@ export function CreateForm({ initialPersonas, initialFormat = "signal" }: Create
             // Deep Dive uses Exa's agentic Research API (slower, multi-step) and runs
             // as a Railway background job when configured; every other format uses the
             // fast recency-biased web search and returns inline.
-            const started = await startResearch(topic, format === "deep_dive");
+            const started = await startResearch(topic, format === "deep_dive", brief);
             const result = started.mode === "job"
                 ? await pollDeepJob(started.jobId)
                 : started.result;
@@ -78,7 +81,7 @@ export function CreateForm({ initialPersonas, initialFormat = "signal" }: Create
             // On failure it returns { error } — a specific message naming the
             // API/credential at fault. (The action intentionally does not
             // redirect() itself; that threw a spurious error on the client.)
-            const result = await createDraftFromResearch(researchResult, format as "pulse" | "signal" | "deep_dive" | "guide" | "youtube", personaSlug, topic);
+            const result = await createDraftFromResearch(researchResult, format as "pulse" | "signal" | "deep_dive" | "guide" | "youtube", personaSlug, topic, brief);
             if ("error" in result) {
                 alert(result.error);
                 setIsGenerating(false);
@@ -245,6 +248,29 @@ export function CreateForm({ initialPersonas, initialFormat = "signal" }: Create
                                 Deep Dive runs an agentic, multi-step research pass (Exa Research Pro). Expect a few minutes and a higher per-run cost than other formats.
                             </p>
                         )}
+                    </div>
+
+                    {/* Step 4: Context / Brief (optional) */}
+                    <div className="space-y-3">
+                        <Label className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                            <span className="flex items-center justify-center w-5 h-5 rounded-full bg-primary/10 text-primary text-xs">4</span>
+                            Context / Brief
+                            <span className="text-[10px] font-normal normal-case tracking-normal text-muted-foreground/70">optional</span>
+                        </Label>
+                        <Textarea
+                            value={brief}
+                            onChange={(e) => setBrief(e.target.value.slice(0, BRIEF_MAX))}
+                            placeholder={"Steer the research and the draft. e.g. Focus on the UK angle and the impact on SME compliance teams. Assume the reader already knows what the AI Act is. Lead with the Dresden fab delay. Avoid US politics. Reference the incident from last week."}
+                            className="min-h-[140px] text-base leading-relaxed"
+                        />
+                        <div className="flex justify-between text-xs text-muted-foreground">
+                            <span>
+                                Used twice: it steers what the research agent looks for, then guides how the draft is written (angle, emphasis, what to include or avoid). Unlike the topic line, the wording here is treated as your authoritative instruction.
+                            </span>
+                            <span className={brief.length >= BRIEF_MAX ? "text-amber-500 font-medium" : ""}>
+                                {brief.length}/{BRIEF_MAX}
+                            </span>
+                        </div>
                     </div>
                 </CardContent>
             </Card>

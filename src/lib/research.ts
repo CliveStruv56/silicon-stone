@@ -49,8 +49,11 @@ function formatExaResults(results: ExaResult[]): string {
  * in-process deep path (below) and the Railway background job, so the prompt
  * lives in exactly one place.
  */
-export function buildDeepInstructions(topic: string): string {
-    return `You are a forensic technopolitics analyst for "Silicon & Stone". Produce a thorough, board-grade research brief on: "${topic}".
+export function buildDeepInstructions(topic: string, brief?: string): string {
+    const focus = brief?.trim()
+        ? `\n\nThe author has supplied a specific editorial brief — treat it as authoritative steering for what to prioritise, what angle to take, and what to avoid:\n${brief.trim()}\n`
+        : '';
+    return `You are a forensic technopolitics analyst for "Silicon & Stone". Produce a thorough, board-grade research brief on: "${topic}".${focus}
 
 Cover, where the evidence supports it:
 - The physical / supply-chain layer (chokepoints, capacity, critical materials, who controls what).
@@ -64,7 +67,7 @@ Ground every claim in sources. Include specific figures, dates, named entities, 
 export async function performResearch(
     topic: string,
     inoreaderToken?: string,
-    opts: { deep?: boolean } = {}
+    opts: { deep?: boolean; brief?: string } = {}
 ): Promise<ResearchResult> {
     let searchContext = "";
     let deepReport: string | undefined;
@@ -102,7 +105,7 @@ export async function performResearch(
     //    the Railway backend or a background job rather than blocking the request.
     if (opts.deep) {
         console.log(`Deep research (Exa Research Pro) for: ${topic}`);
-        const instructions = buildDeepInstructions(topic);
+        const instructions = buildDeepInstructions(topic, opts.brief);
         try {
             const deep = await deepResearchExa(instructions);
             if (deep?.content) {
@@ -152,7 +155,7 @@ export async function performResearch(
     }
 
     // 3. Synthesize gathered context into the ResearchResult shape.
-    return synthesizeContext(topic, searchContext, deepReport);
+    return synthesizeContext(topic, searchContext, deepReport, opts.brief);
 }
 
 /**
@@ -162,8 +165,12 @@ export async function performResearch(
 async function synthesizeContext(
     topic: string,
     searchContext: string,
-    deepReport?: string
+    deepReport?: string,
+    brief?: string
 ): Promise<ResearchResult> {
+    const briefBlock = brief?.trim()
+        ? `\n\n    The author's editorial brief (prioritise this angle when extracting the signal):\n    ${brief.trim()}\n`
+        : '';
     const systemPrompt = `You are a Forensic Technopolitical Analyst.
     Your job is to synthesize raw search results into actionable intelligence.
 
@@ -177,7 +184,7 @@ async function synthesizeContext(
        }
     }`;
 
-    const userPrompt = `Analyze these search results for the topic: "${topic}".
+    const userPrompt = `Analyze these search results for the topic: "${topic}".${briefBlock}
 
     Search Results:
     ${searchContext}
@@ -223,7 +230,7 @@ async function synthesizeContext(
  * background job) into the ResearchResult shape, preserving the full report
  * so the Deep Dive writer builds on it verbatim.
  */
-export async function synthesizeDeepReport(topic: string, report: string): Promise<ResearchResult> {
+export async function synthesizeDeepReport(topic: string, report: string, brief?: string): Promise<ResearchResult> {
     const searchContext = `\n--- DEEP RESEARCH (EXA RESEARCH PRO) ---\n${report}\n`;
-    return synthesizeContext(topic, searchContext, report);
+    return synthesizeContext(topic, searchContext, report, brief);
 }

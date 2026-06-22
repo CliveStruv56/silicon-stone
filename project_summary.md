@@ -1,7 +1,7 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-06-14
+> Last Updated: 2026-06-22
 > Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing, 13 moderate transitive npm audit findings (uuid through Sanity packages)**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com. Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools (email-gated for lead capture, AI Act triage engine recently overhauled), product/commerce pages with an early-access enquiry fallback until Lemon Squeezy checkout URLs are configured, Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Awaiting Lemon Squeezy store setup, Plausible account, and content publishing for queued drafts.
@@ -353,6 +353,15 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### June 22, 2026 — `/create` UX: format carry-through + optional Context/Brief box
+
+Two changes to the admin content-creation flow.
+
+| Commit | Description |
+|--------|-------------|
+| _(format carry-through)_ | **Dashboard format choice now follows through to `/create`.** The `/admin` quick-action cards link to `/create?format=signal` and `/create?format=deep_dive`; `CreatePage` reads `searchParams.format` (validated against the six `FormatType`s, falls back to `signal`) and passes it as `initialFormat` to `CreateForm`. The format `RadioGroup` was changed from uncontrolled (`defaultValue`) to controlled (`value`) so the carried-in selection actually sticks. Previously `/create` always reset to Signal. (Research Topic card still routes to the separate `/research` page.) |
+| _(context brief)_ | **New optional "Context / Brief" box (Step 4) on `/create`.** A multi-line `Textarea` (2,000-char cap, live counter) below Primary Topic. The brief is **trusted author guidance** and is threaded through the whole pipeline: (1) research — `buildDeepInstructions(topic, brief)` steers the Exa deep-research pass, and `synthesizeContext(...,brief)` biases the standard-search synthesis; (2) draft — `buildDraftPrompt` gains a `brief` field emitted as an authoritative block *inside* the `=== YOUR TASK ===` region (so the prompt-injection SECURITY note still treats research/sources as untrusted, but the brief as instruction; "brief wins on conflict, but never invent facts"). Threaded via `startResearch(topic, deep, brief)`, `pollResearchJob(jobId, topic, brief)`, `createDraftFromResearch(..., brief)`. The pre-existing single-line **Primary Topic** field remains the 300-char search seed; the brief is the place for extended context. Typecheck + lint clean. |
 
 ### June 16, 2026 — Site revision: Drift Retainer advisory spine (Wave One/Two)
 

@@ -13,6 +13,7 @@ import { checkDurableRateLimit } from "@/lib/durable-rate-limit";
 import { getServerActionClientIp } from "@/lib/rate-limit";
 
 const MAX_TOPIC_LENGTH = 300
+const MAX_BRIEF_LENGTH = 2000
 
 export type StartResearchResponse =
     | { mode: "result"; result: ResearchResult }
@@ -24,9 +25,10 @@ export type StartResearchResponse =
  * everything else — and the local/dev fallback — runs in-process and returns a
  * result immediately.
  */
-export async function startResearch(topic: string, deep: boolean): Promise<StartResearchResponse> {
+export async function startResearch(topic: string, deep: boolean, brief: string = ""): Promise<StartResearchResponse> {
     await requireAdmin();
     const normalizedTopic = topic.trim().slice(0, MAX_TOPIC_LENGTH)
+    const normalizedBrief = brief.trim().slice(0, MAX_BRIEF_LENGTH)
     if (!normalizedTopic) {
         throw new Error("Topic is required.")
     }
@@ -39,10 +41,10 @@ export async function startResearch(topic: string, deep: boolean): Promise<Start
             }
         }
         if (deep && isBackendConfigured()) {
-            const jobId = await startDeepResearchJob(normalizedTopic, buildDeepInstructions(normalizedTopic));
+            const jobId = await startDeepResearchJob(normalizedTopic, buildDeepInstructions(normalizedTopic, normalizedBrief));
             return { mode: "job", jobId };
         }
-        const result = await researchPipeline(normalizedTopic, undefined, { deep });
+        const result = await researchPipeline(normalizedTopic, undefined, { deep, brief: normalizedBrief });
         return { mode: "result", result };
     } catch (error) {
         console.error("Error starting research:", error);
@@ -54,12 +56,13 @@ export async function startResearch(topic: string, deep: boolean): Promise<Start
 export async function pollResearchJob(
     jobId: string,
     topic: string,
+    brief: string = "",
 ): Promise<{ status: DeepJobStatus["status"]; result?: ResearchResult; error?: string }> {
     await requireAdmin();
     try {
         const job = await getDeepResearchJob(jobId);
         if (job.status === "completed" && job.report) {
-            const result = await synthesizeDeepReport(topic, job.report);
+            const result = await synthesizeDeepReport(topic, job.report, brief.trim().slice(0, MAX_BRIEF_LENGTH));
             return { status: "completed", result };
         }
         if (job.status === "failed") {
@@ -119,7 +122,8 @@ export async function createDraftFromResearch(
     researchResult: ResearchResult,
     format: DraftFormat,
     personaSlug: string,
-    topic: string = ""
+    topic: string = "",
+    brief: string = ""
 ): Promise<CreateDraftResult> {
     let stage = "initialising";
     try {
@@ -157,6 +161,7 @@ export async function createDraftFromResearch(
             },
             priorCoverage: priorCoverageBlock || undefined,
             deepReport: researchResult.deepReport,
+            brief: brief.trim().slice(0, MAX_BRIEF_LENGTH) || undefined,
         });
 
         // Deep Dives can exceed the 4096-token default — give them headroom
