@@ -354,6 +354,17 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### June 22, 2026 — Glossary: reader-controlled inline highlights + first two annotated articles (`2aa98468`)
+
+Turned on the inline-popover side of the glossary, with reader control and the first annotated content.
+
+| Piece | Detail |
+|-------|--------|
+| **Reader control** | Inline highlights are **off by default**. A `localStorage`-backed preference (`useGlossaryHighlights` / `setGlossaryHighlights`, built on `useSyncExternalStore` so SSR and first client render both read "off" — no hydration mismatch, no flash) drives a `role="switch"` **"Glossary highlights"** toggle (`GlossaryToggle.tsx`). The toggle renders **only on articles that actually carry annotations** (`hasGlossaryAnnotations()` scans body `markDefs` in the article server component), placed just above the body. Choice persists across every article. |
+| **Off vs on** | Highlights off → `GlossaryPopover` returns `{children}` as plain body text (no underline, no interactivity, reading undisturbed). On → the existing focusable/keyboard popover with hover + tap. |
+| **Annotations** | `scripts/annotate-glossary.ts` (`npm run glossary:annotate`) — idempotent, re-runnable, splits the target span and inserts a `glossaryTerm` markDef on the **first whole-word mention** in a normal paragraph (headings skipped; per-term skip if already marked). Seeded **6 terms** in `eu-ai-act-compliance-chasm-august-2026` and **18** in `korean-memory-fab-capacity-squeeze-2027`; all 24 refs resolve. Extend the `PLAN` map to annotate more articles. |
+| **Authoring rule** | Strengthened in both `style-guardrail.ts` (injected into every draft prompt) and `authoring-guide.md`: full name in full on first reference → acronym in brackets → acronym alone thereafter, mandatory for every org/company/institution/law/agency/product/technical term; AI/EU/UK/US exempt. |
+
 ### June 22, 2026 — Glossary: field index + inline definition popovers (`0c5a8d36`)
 
 New **field-index glossary** with plain-language definitions for the laws, institutions, AI techniques, models and semiconductor terms used across the site.
