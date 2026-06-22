@@ -1,5 +1,7 @@
 import { listSanityPersonas } from "@/lib/sanity";
-import { CreateForm } from "./create-form";
+import { CreateForm, type FormatType } from "./create-form";
+
+const VALID_FORMATS: FormatType[] = ["pulse", "signal", "deep_dive", "guide", "youtube", "research"];
 
 export const metadata = {
     title: "Create Content | Silicon & Stone",
@@ -15,8 +17,21 @@ export const metadata = {
 // 300s ceiling already used by /api/fact-check.
 export const maxDuration = 300;
 
-export default async function CreatePage() {
-    const personas = await listSanityPersonas();
+export default async function CreatePage({
+    searchParams,
+}: {
+    searchParams: Promise<{ format?: string }>;
+}) {
+    const [personas, { format }] = await Promise.all([
+        listSanityPersonas(),
+        searchParams,
+    ]);
+
+    // Carry the format chosen on the dashboard (?format=…) through to the form.
+    const initialFormat: FormatType =
+        format && VALID_FORMATS.includes(format as FormatType)
+            ? (format as FormatType)
+            : "signal";
 
     return (
         <div className="max-w-4xl mx-auto py-8">
@@ -25,7 +40,7 @@ export default async function CreatePage() {
                 <p className="text-muted-foreground">Select a format and persona to begin the forensic research pipeline.</p>
             </div>
 
-            <CreateForm initialPersonas={personas} />
+            <CreateForm initialPersonas={personas} initialFormat={initialFormat} />
         </div>
     );
 }

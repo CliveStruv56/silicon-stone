@@ -18,11 +18,12 @@ export type FormatType = "pulse" | "signal" | "deep_dive" | "guide" | "youtube" 
 
 interface CreateFormProps {
     initialPersonas: PersonaData[];
+    initialFormat?: FormatType;
 }
 
-export function CreateForm({ initialPersonas }: CreateFormProps) {
+export function CreateForm({ initialPersonas, initialFormat = "signal" }: CreateFormProps) {
     const router = useRouter();
-    const [format, setFormat] = useState<FormatType>("signal");
+    const [format, setFormat] = useState<FormatType>(initialFormat);
     const [personaSlug, setPersonaSlug] = useState<string>(initialPersonas[0]?.slug.current || "");
     const [topic, setTopic] = useState("");
 
@@ -110,7 +111,7 @@ export function CreateForm({ initialPersonas }: CreateFormProps) {
                             <span className="flex items-center justify-center w-5 h-5 rounded-full bg-primary/10 text-primary text-xs">1</span>
                             Format
                         </Label>
-                        <RadioGroup defaultValue={format} onValueChange={(v: string) => setFormat(v as FormatType)} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                        <RadioGroup value={format} onValueChange={(v: string) => setFormat(v as FormatType)} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                             <div>
                                 <RadioGroupItem value="pulse" id="format-pulse" className="peer sr-only" />
                                 <Label
