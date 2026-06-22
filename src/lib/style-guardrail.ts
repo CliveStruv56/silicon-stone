@@ -14,7 +14,7 @@ Write as a sharp, opinionated human with real expertise — not a neutral machin
 
 Mechanics:
 - UK English throughout (organisation, programme, optimise, analyse, licence, defence). No US spellings.
-- Expand an unfamiliar acronym on first use as Full Name (ACRONYM). Do not introduce an acronym that appears only once. AI, EU, UK and US may remain unexpanded.
+- Acronyms: ALWAYS write the full name in full on the FIRST reference, immediately followed by the acronym in parentheses — Full Name (ACRONYM) — then use the acronym alone for every later mention. This is mandatory for every organisation, company, institution, law, regulation, agency, product, model and technical term. Never use an acronym before it has been expanded. Do not introduce an acronym that appears only once; use the full term instead. Only AI, EU, UK and US may appear unexpanded.
 - Smart quotes (" " ' '), never straight quotes. No exclamation marks anywhere. No rhetorical questions in headlines or subheads.
 - Space-padded em-dashes ( — ), maximum three per paragraph.
 - Short, declarative sentences and concise paragraphs. Vary sentence length — avoid metronomic, parallel structure.

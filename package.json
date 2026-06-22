@@ -21,6 +21,7 @@
     "glossary:seed": "tsx scripts/seed-glossary.ts",
     "glossary:audit": "tsx scripts/glossary-audit.ts",
     "glossary:audit:published": "tsx scripts/glossary-audit.ts --published",
+    "glossary:annotate": "tsx scripts/annotate-glossary.ts",
     "test:knowledge-inbox": "tsx scripts/knowledge-inbox-checks.ts",
     "evidence:rebuild": "tsx scripts/rebuild-evidence-index.ts",
     "evidence:rebuild:dry": "tsx scripts/rebuild-evidence-index.ts --dry-run",

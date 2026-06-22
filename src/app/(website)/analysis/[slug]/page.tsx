@@ -14,6 +14,7 @@ import {
   DynamicCTA,
 } from '@/components/article'
 import { RelatedArticles } from '@/components/article/RelatedArticles'
+import { GlossaryToggle } from '@/components/glossary'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { sanityFetch } from '@/sanity/lib/live'
 import { ARTICLE_QUERY, ARTICLE_SLUGS_QUERY } from '@/sanity/lib/queries'
@@ -96,6 +97,16 @@ type PortableTextBlock = {
   _type?: string
   style?: string
   children?: Array<{ text?: string }>
+  markDefs?: Array<{ _type?: string }>
+}
+
+// Whether the body carries any inline glossary annotations — drives whether the
+// reader-facing "Glossary highlights" toggle is shown for this article at all.
+function hasGlossaryAnnotations(body: PortableTextBlock[]): boolean {
+  if (!Array.isArray(body)) return false
+  return body.some((block) =>
+    block.markDefs?.some((def) => def?._type === 'glossaryTerm')
+  )
 }
 
 function getReadingTime(body: PortableTextBlock[]): number {
@@ -146,6 +157,7 @@ export default async function ArticlePage({ params }: Props) {
   }
 
   const readingTime = getReadingTime(article.body || [])
+  const showGlossaryToggle = hasGlossaryAnnotations(article.body || [])
   const primaryPersona = article.personas?.[0]
   const hasIntelligenceFields = article.intelligenceTier || article.impactScore || article.stoneTruth
 
@@ -331,6 +343,14 @@ export default async function ArticlePage({ params }: Props) {
                   </li>
                 ))}
               </ul>
+            </div>
+          )}
+
+          {/* Reader control for inline glossary highlights — only on annotated
+              articles. Off by default; the body reads as clean text until opted in. */}
+          {showGlossaryToggle && (
+            <div className="mb-4 flex justify-end">
+              <GlossaryToggle />
             </div>
           )}
 

@@ -5,6 +5,7 @@ import { Popover } from 'radix-ui'
 import { useRef, useState, type ReactNode } from 'react'
 import { ArrowUpRight } from 'lucide-react'
 import type { GlossaryTerm } from '@/lib/glossary'
+import { useGlossaryHighlights } from './useGlossaryHighlights'
 
 type CompactGlossaryTerm = Pick<
   GlossaryTerm,
@@ -18,10 +19,13 @@ export function GlossaryPopover({
   term?: CompactGlossaryTerm | null
   children: ReactNode
 }) {
+  const highlightsEnabled = useGlossaryHighlights()
   const [open, setOpen] = useState(false)
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  if (!term?.slug) return <>{children}</>
+  // No usable term, or the reader has highlights off: render the term as plain
+  // body text — no underline, no interactivity, reading entirely undisturbed.
+  if (!term?.slug || !highlightsEnabled) return <>{children}</>
 
   const expansion = term.fullName || term.name
   const label = term.acronym

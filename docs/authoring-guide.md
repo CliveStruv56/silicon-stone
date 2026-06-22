@@ -63,7 +63,7 @@ The old no-research quick generator has been **merged into `/create` and deleted
 
 #### Acronyms and specialist terms
 
-- Expand an unfamiliar acronym on first use on each page: `General-purpose AI (GPAI)`. AI, EU, UK and US are the house exceptions.
+- Always write the full name in full on the **first** reference, immediately followed by the acronym in brackets — `General-purpose AI (GPAI)` — then use the acronym alone for every later mention. This applies to every organisation, company, institution, law, regulation, agency, product, model and technical term. Never use an acronym before it has been expanded. AI, EU, UK and US are the house exceptions.
 - Do not introduce an acronym that appears only once; use the full term instead.
 - When a specialist institution, law, model, technique or technical term is central to understanding the article, annotate its first meaningful occurrence with the **Glossary term** mark in Studio.
 - Keep definitions in the canonical `Glossary Term` document. Do not duplicate or improvise a definition in the article annotation.
