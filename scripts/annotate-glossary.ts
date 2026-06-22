@@ -125,12 +125,9 @@ const PLAN: Record<string, Annotation[]> = {
     { term: 'european-commission', match: 'EU Commission' },
     { term: 'foundation-model', match: 'foundation models' },
   ],
-  // Greenland is about critical minerals/Arctic extraction — almost no glossary
-  // vocabulary. The only two defined terms appear in its source-citation list.
-  'greenland-critical-minerals-transatlantic-scramble': [
-    { term: 'international-energy-agency', match: 'IEA' },
-    { term: 'european-commission', match: 'European Commission' },
-  ],
+  // Greenland (critical minerals/Arctic extraction) uses no glossary vocabulary
+  // in its prose — its only two defined terms sat in the source-citation list,
+  // so it is intentionally left unannotated (shows zero highlights).
   'welcome-to-silicon-and-stone': [
     { term: 'agentic-ai', match: 'Agentic AI' },
     { term: 'eu-ai-act', match: 'AI Act' },
