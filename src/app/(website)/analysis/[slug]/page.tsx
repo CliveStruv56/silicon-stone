@@ -26,6 +26,7 @@ import {
   buildArticleSchema,
   buildBreadcrumbSchema,
   cleanDescription,
+  completeSentence,
 } from '@/lib/seo'
 
 type Props = {
@@ -313,10 +314,10 @@ export default async function ArticlePage({ params }: Props) {
             </div>
           )}
 
-          {/* Excerpt */}
-          {article.excerpt && (
+          {/* Excerpt — always rendered as a complete sentence, never mid-word. */}
+          {article.excerpt && completeSentence(article.excerpt) && (
             <p className="text-xl text-text-muted leading-relaxed mb-8 font-serif italic">
-              {article.excerpt}
+              {completeSentence(article.excerpt)}
             </p>
           )}
 

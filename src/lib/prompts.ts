@@ -613,7 +613,16 @@ export async function extractArticleMetadata(
             if (typeof s !== 'string') return undefined;
             const trimmed = s.trim();
             if (!trimmed) return undefined;
-            return trimmed.length > max ? trimmed.slice(0, max).trimEnd() : trimmed;
+            if (trimmed.length <= max) return trimmed;
+            // Over length: end on a sentence boundary if one sits in the back
+            // portion, otherwise cut on a word boundary — never mid-word.
+            const slice = trimmed.slice(0, max);
+            const lastTerminator = Math.max(
+                slice.lastIndexOf('. '), slice.lastIndexOf('! '), slice.lastIndexOf('? ')
+            );
+            if (lastTerminator >= max * 0.6) return slice.slice(0, lastTerminator + 1).trim();
+            const lastSpace = slice.lastIndexOf(' ');
+            return (lastSpace > 0 ? slice.slice(0, lastSpace) : slice).trim();
         };
 
         const insights = Array.isArray(parsed.actionableInsights)

@@ -40,6 +40,30 @@ export function cleanDescription(input?: string | null, max = 160): string {
   return text.slice(0, text.lastIndexOf(' ', max) > 0 ? text.lastIndexOf(' ', max) : max).trim()
 }
 
+/**
+ * Trim a possibly-truncated summary so it always ends on a complete sentence,
+ * never mid-word. Strips markdown, takes the first item of a bullet list, drops
+ * trailing ellipses, trims back to the last sentence terminator, and (for a lone
+ * clause with no terminator) drops a dangling trailing fragment and adds a stop.
+ */
+export function completeSentence(input?: string | null): string {
+  if (!input) return ''
+  let s = input.replace(/\r/g, '').replace(/[*_`#>]/g, '').trim()
+  const nl = s.indexOf('\n')
+  if (nl >= 0) s = s.slice(0, nl).trim() // first bullet / line only
+  s = s.replace(/^[-•*]\s+/, '').trim() // leading bullet marker
+  s = s.replace(/\s*(?:…|\.{2,})\s*$/, '').trim() // trailing ellipsis
+  if (!s) return ''
+  if (/[.!?]["')\]]?$/.test(s)) return s // already a full sentence
+  const lastTerminator = Math.max(s.lastIndexOf('.'), s.lastIndexOf('!'), s.lastIndexOf('?'))
+  if (lastTerminator >= 0) return s.slice(0, lastTerminator + 1).trim()
+  // No sentence terminator at all: drop a dangling trailing clause, add a stop.
+  const sep = Math.max(s.lastIndexOf(' - '), s.lastIndexOf(' – '), s.lastIndexOf(' — '))
+  if (sep > s.length * 0.5) s = s.slice(0, sep).trim()
+  s = s.replace(/[\s,;:–—-]+$/, '').trim()
+  return s ? `${s}.` : ''
+}
+
 export function buildArticleSchema(a: SchemaArticle) {
   const url = absoluteUrl(`/analysis/${a.slug}`)
   // Current-affairs "signal" pieces are NewsArticle; everything else Article.
