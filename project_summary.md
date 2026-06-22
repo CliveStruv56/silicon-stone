@@ -361,7 +361,7 @@ The summary shown under each article's hero image was truncating mid-word (e.g. 
 - **`completeSentence()`** in `src/lib/seo.ts` — trims any summary back to its last whole sentence; handles bullet-list dumps (takes the first item), trailing ellipses, and dangling clauses (drops a trailing `" - fragment"`, adds a full stop to a lone clause).
 - **Render guard** — the article page renders `completeSentence(article.excerpt)`, so the visible summary is always complete regardless of stored data.
 - **Pipeline** — `clamp()` now ends on a sentence boundary (if one sits in the back ~40%) else a word boundary, never mid-word, so new drafts are clean at source.
-- **Data repair** — `scripts/fix-excerpts.ts` (`npm run fix:excerpts`, `--dry-run` supported) cleans both `excerpt` and `seo.metaDescription` via `completeSentence`; fixed **9** truncated excerpts and **4** truncated meta descriptions in production (already-complete values left untouched; idempotent). Verified live.
+- **Data repair** — `scripts/fix-excerpts.ts` (`npm run fix:excerpts`, `--dry-run` supported) cleans `excerpt`, `seo.metaDescription` **and `stoneTruth`** via `completeSentence`; fixed **9** excerpts, **4** meta descriptions and **3** stoneTruths in production (already-complete values untouched; idempotent). `stoneTruth` matters because the **/intelligence listing cards render it** (falling back to excerpt); the category/related/search cards use `excerpt`. `completeSentence`'s no-terminator fallback also keeps a complete first clause before a dash separator (so `<full clause> — <truncated tail>` trims to the clause). All card surfaces verified live (intelligence + category).
 
 ### June 22, 2026 — Glossary: reader-controlled inline highlights + first two annotated articles (`2aa98468`)
 
