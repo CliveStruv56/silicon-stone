@@ -354,6 +354,17 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### June 22, 2026 — Image-generation prompt suggestions in Studio + auto-fill on generation
+
+Added a way to suggest two AI prompts describing **what the article's main image should depict** (subject/metaphor only — the external image agent, Hyper Agent, owns the house diagrammatic style). Two surfaces, two commits:
+
+| Surface | Detail |
+|---------|--------|
+| **Studio panel** (`bc061bb3`) | New `imagePrompts` field on the `article` schema, rendered by `ImagePromptsInput.tsx` directly **under Main Image**. A "Suggest two prompts" button POSTs to `/api/image-prompts` → Claude → patches `imagePrompts` (live Studio sync). Each prompt shows in a card with **Copy**; **Regenerate** re-runs. Same auth model as fact-check: same-origin admin session cookie, so the editor must also be logged in at `/login`. Rate-limited 30/hr/IP (`imagePrompts` bucket). |
+| **Auto-fill on generation** (`30826655`) | `buildImagePrompts()` (pure, no Sanity I/O) extracted from the Studio path and called best-effort inside `finalizeDraft` (shared `/create` + `/import` pipeline), after the voice edit so prompts reflect the final body. Written onto the new draft via `createArticleInSanity`, so prompts are pre-filled before the editor opens the doc. Failure logs and the draft still saves. |
+
+Key files: `src/lib/image-prompts.ts`, `src/app/api/image-prompts/route.ts`, `src/sanity/components/ImagePromptsInput.tsx`, `src/sanity/schemaTypes/article.ts`, `src/lib/draft-pipeline.ts`, `src/lib/sanity.ts`, `src/lib/durable-rate-limit.ts`. The local Max-plan path (`ss-draft-local`) is intentionally **not** wired in — `buildImagePrompts` calls the paid API, which that flow exists to avoid.
+
 ### June 22, 2026 — Ideaverse vault sync (repo `docs/` → project canon)
 
 Swept the repo `docs/` folder against the Ideaverse Obsidian vault's S&S canon and brought it fully in sync. **No website code changed** — vault-only edits, committed + pushed to the `ideaverse-vault` repo (`CliveStruv56/ideaverse-vault`, `main`). Note the vault moved/reorganised since the last memory: path is now `~/Documents/Ideaverse` and the S&S canon lives at `Projects/Silicon-and-Stone/` (was a top-level `Project/`).
