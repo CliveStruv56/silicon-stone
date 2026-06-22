@@ -37,24 +37,34 @@ function completeSentence(input?: string | null): string {
 const DRY_RUN = process.argv.includes('--dry-run')
 
 async function run() {
-  const articles = await client.fetch<Array<{ _id: string; slug: string; excerpt?: string }>>(
-    `*[_type == "article" && !(_id in path("drafts.**")) && defined(excerpt)]{_id, "slug": slug.current, excerpt}`
+  const articles = await client.fetch<
+    Array<{ _id: string; slug: string; excerpt?: string; metaDescription?: string }>
+  >(
+    `*[_type == "article" && !(_id in path("drafts.**")) && (defined(excerpt) || defined(seo.metaDescription))]{
+      _id, "slug": slug.current, excerpt, "metaDescription": seo.metaDescription
+    }`
   )
 
   let changed = 0
   for (const article of articles) {
-    const fixed = completeSentence(article.excerpt)
-    if (!fixed || fixed === article.excerpt) continue
+    const patch: Record<string, string> = {}
+
+    const fixedExcerpt = completeSentence(article.excerpt)
+    if (fixedExcerpt && fixedExcerpt !== article.excerpt) patch.excerpt = fixedExcerpt
+
+    const fixedMeta = completeSentence(article.metaDescription)
+    if (fixedMeta && fixedMeta !== article.metaDescription) patch['seo.metaDescription'] = fixedMeta
+
+    if (!Object.keys(patch).length) continue
     changed += 1
     console.log(`\n${article.slug}`)
-    console.log(`  before: ${article.excerpt}`)
-    console.log(`  after:  ${fixed}`)
+    for (const [field, value] of Object.entries(patch)) console.log(`  ${field} → ${value}`)
     if (!DRY_RUN) {
-      await client.patch(article._id).set({ excerpt: fixed }).commit({ visibility: 'sync' })
+      await client.patch(article._id).set(patch).commit({ visibility: 'sync' })
     }
   }
 
-  console.log(`\n${DRY_RUN ? '[dry-run] ' : ''}${changed} excerpt(s) ${DRY_RUN ? 'would be' : ''} updated.`)
+  console.log(`\n${DRY_RUN ? '[dry-run] ' : ''}${changed} article(s) ${DRY_RUN ? 'would be' : ''} updated.`)
 }
 
 run().catch((error) => {
