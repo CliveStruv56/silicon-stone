@@ -354,6 +354,20 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### June 22, 2026 — Glossary: field index + inline definition popovers (`0c5a8d36`)
+
+New **field-index glossary** with plain-language definitions for the laws, institutions, AI techniques, models and semiconductor terms used across the site.
+
+| Surface | Detail |
+|---------|--------|
+| **Data model** | New `glossaryTerm` document type (`src/sanity/schemaTypes/glossaryTerm.ts`): canonical name, slug, acronym, fullName, aliases, `kind` (8 categories), 240-char definition, sourceUrl, reviewedAt, relatedTerms refs. Kinds + labels are the single source of truth in `src/lib/glossary.ts` (also home to `normaliseGlossaryText`, scoring, filtering). |
+| **Directory** | `/glossary` (`src/app/(website)/glossary/page.tsx` + `GlossaryDirectory.tsx`): letter grouping, live client-side filter, kind facets. Published-perspective fetch. Linked from Header + Footer, in the sitemap, and emits `DefinedTermSet` JSON-LD via `buildGlossarySchema()` in `seo.ts`. |
+| **Inline popovers** | New **"Glossary term"** annotation mark on the article body (`article.ts`), rendered by `GlossaryPopover.tsx` (radix Popover) — a real focusable/keyboard-accessible popover, not a `title` tooltip. The `ARTICLE_BY_SLUG` body query dereferences `markDefs[].term->` into the compact shape the popover consumes. |
+| **Search** | Global `/search` now returns glossary matches in a dedicated section alongside analysis (`SEARCH_GLOSSARY_QUERY`). |
+| **Editorial** | House-style + authoring-guide acronym rules. `npm run glossary:seed` — non-destructive seed (deterministic `glossary-<slug>` IDs, `createIfNotExists`, atomic transaction) of **72 reviewed terms** (`src/lib/glossary-seed.ts`). `npm run glossary:audit[:published]` flags unexpanded acronyms in source + published articles. |
+
+**ID gotcha (resolved):** dotted IDs like `glossary.gdpr` are reserved by Sanity's published perspective for path/version semantics and were invisible to published reads — IDs use `glossary-<slug>` instead. All **72 terms are live** in production (raw == published-readable == 72, zero stranded dotted IDs). Seed billed against the Sanity write token, not the Anthropic API. _Optional follow-up:_ `npx sanity schema deploy` if glossary annotations need to be authored via the Sanity MCP (the Vercel code deploy already refreshes the embedded `/studio`).
+
 ### June 22, 2026 — Image-generation prompt suggestions in Studio + auto-fill on generation
 
 Added a way to suggest two AI prompts describing **what the article's main image should depict** (subject/metaphor only — the external image agent, Hyper Agent, owns the house diagrammatic style). Two surfaces, two commits:
