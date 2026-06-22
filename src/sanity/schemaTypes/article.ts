@@ -2,6 +2,7 @@ import { defineType, defineField, defineArrayMember } from 'sanity'
 import { DocumentTextIcon } from '@sanity/icons'
 import { slugify } from '@/lib/utils'
 import { ClaimCheckInput } from '../components/ClaimCheckInput'
+import { ImagePromptsInput } from '../components/ImagePromptsInput'
 
 export const article = defineType({
   name: 'article',
@@ -55,6 +56,25 @@ export const article = defineType({
           title: 'Alternative Text',
           validation: (rule) => rule.required(),
         }),
+      ],
+    }),
+    defineField({
+      group: 'content',
+      name: 'imagePrompts',
+      title: 'Image generation prompts',
+      description:
+        'AI-suggested prompts describing what the main image should depict. Click "Suggest two prompts" to generate two options from the current article, then copy one into your image agent (which applies the house style).',
+      type: 'object',
+      components: { input: ImagePromptsInput },
+      fields: [
+        defineField({
+          name: 'prompts',
+          title: 'Prompts',
+          type: 'array',
+          of: [defineArrayMember({ type: 'text', rows: 3 })],
+        }),
+        defineField({ name: 'generatedAt', title: 'Generated At', type: 'datetime', readOnly: true }),
+        defineField({ name: 'model', title: 'Model', type: 'string', readOnly: true }),
       ],
     }),
     defineField({
