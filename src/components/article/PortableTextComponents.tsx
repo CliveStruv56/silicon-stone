@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { PortableTextComponents } from 'next-sanity'
 import { urlFor } from '@/sanity/lib/image'
+import { GlossaryPopover } from '@/components/glossary'
 
 export const portableTextComponents: PortableTextComponents = {
   block: {
@@ -30,6 +31,9 @@ export const portableTextComponents: PortableTextComponents = {
     ),
   },
   marks: {
+    glossaryTerm: ({ children, value }) => (
+      <GlossaryPopover term={value?.term}>{children}</GlossaryPopover>
+    ),
     strong: ({ children }) => (
       <strong className="font-bold text-text-primary">{children}</strong>
     ),

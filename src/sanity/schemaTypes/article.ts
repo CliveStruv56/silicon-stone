@@ -229,6 +229,21 @@ export const article = defineType({
             ],
             annotations: [
               {
+                name: 'glossaryTerm',
+                type: 'object',
+                title: 'Glossary term',
+                fields: [
+                  defineField({
+                    name: 'term',
+                    title: 'Term',
+                    type: 'reference',
+                    to: [{ type: 'glossaryTerm' }],
+                    options: { disableNew: true },
+                    validation: (rule) => rule.required(),
+                  }),
+                ],
+              },
+              {
                 name: 'link',
                 type: 'object',
                 title: 'Link',

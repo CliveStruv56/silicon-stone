@@ -61,6 +61,14 @@ The old no-research quick generator has been **merged into `/create` and deleted
 
 ### Voice & house style (applied automatically to every draft)
 
+#### Acronyms and specialist terms
+
+- Expand an unfamiliar acronym on first use on each page: `General-purpose AI (GPAI)`. AI, EU, UK and US are the house exceptions.
+- Do not introduce an acronym that appears only once; use the full term instead.
+- When a specialist institution, law, model, technique or technical term is central to understanding the article, annotate its first meaningful occurrence with the **Glossary term** mark in Studio.
+- Keep definitions in the canonical `Glossary Term` document. Do not duplicate or improvise a definition in the article annotation.
+- The glossary covers organisations and role titles, not individual public figures.
+
 Tone is enforced by the pipeline itself — you no longer rely on the draft "happening" to sound on-brand. Two things run on every `/create` and `/import` draft:
 
 - **Pass 1 — house-style guardrail (in the draft prompt).** Before drafting, the prompt now carries a condensed house-style guardrail: UK English, smart quotes, the em-dash cap, no hype/banned words, take a position rather than hedge, and demand concrete specifics. Built by `getStyleGuardrail()` and injected by `buildDraftPrompt` (`src/lib/prompts.ts`).

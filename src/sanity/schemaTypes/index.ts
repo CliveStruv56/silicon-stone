@@ -9,6 +9,7 @@ import { assetCollection } from './assetCollection'
 import { libraryImage } from './libraryImage'
 import { knowledgeCandidate } from './knowledgeCandidate'
 import { knowledgeSource } from './knowledgeSource'
+import { glossaryTerm } from './glossaryTerm'
 
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
@@ -22,5 +23,6 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     libraryImage,
     knowledgeSource,
     knowledgeCandidate,
+    glossaryTerm,
   ],
 }

@@ -65,7 +65,23 @@ export const ARTICLE_QUERY = defineQuery(`
     methodologyPillars,
     actionableInsights,
     mainImage,
-    body,
+    body[]{
+      ...,
+      markDefs[]{
+        ...,
+        _type == "glossaryTerm" => {
+          "term": term->{
+            _id,
+            name,
+            "slug": slug.current,
+            acronym,
+            fullName,
+            kind,
+            definition
+          }
+        }
+      }
+    },
     categories[]->{
       _id,
       title,
@@ -97,6 +113,47 @@ export const ARTICLE_QUERY = defineQuery(`
       metaTitle,
       metaDescription
     }
+  }
+`)
+
+// Glossary — compact index for inline definitions and full directory content.
+export const GLOSSARY_TERMS_QUERY = defineQuery(`
+  *[_type == "glossaryTerm" && defined(slug.current)]
+  | order(name asc) {
+    _id,
+    name,
+    "slug": slug.current,
+    acronym,
+    fullName,
+    aliases,
+    kind,
+    definition,
+    sourceUrl,
+    reviewedAt,
+    relatedTerms[]->{
+      _id,
+      name,
+      "slug": slug.current,
+      acronym,
+      kind
+    }
+  }
+`)
+
+export const SEARCH_GLOSSARY_QUERY = defineQuery(`
+  *[_type == "glossaryTerm" && defined(slug.current) && (
+    name match $query + "*" ||
+    acronym match $query + "*" ||
+    fullName match $query + "*" ||
+    aliases[] match $query + "*" ||
+    definition match $query + "*"
+  )] | order(name asc) [0...10] {
+    _id,
+    name,
+    "slug": slug.current,
+    acronym,
+    kind,
+    definition
   }
 `)
 

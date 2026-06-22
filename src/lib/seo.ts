@@ -1,4 +1,5 @@
 import { SITE_URL, absoluteUrl } from '@/lib/site'
+import type { GlossaryTerm } from '@/lib/glossary'
 
 /**
  * Schema.org builders for article pages. Pure functions over the article query
@@ -106,6 +107,27 @@ export function buildBreadcrumbSchema(a: SchemaArticle) {
       position: index + 1,
       name: item.name,
       item: item.url,
+    })),
+  }
+}
+
+export function buildGlossarySchema(terms: GlossaryTerm[]) {
+  const url = absoluteUrl('/glossary')
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'DefinedTermSet',
+    '@id': `${url}#term-set`,
+    name: 'Silicon and Stone glossary',
+    url,
+    description: 'Plain-language definitions for technology policy, AI and semiconductor analysis.',
+    hasDefinedTerm: terms.map((term) => ({
+      '@type': 'DefinedTerm',
+      '@id': `${url}#${term.slug}`,
+      name: term.acronym || term.name,
+      ...(term.acronym ? { alternateName: term.name } : {}),
+      description: term.definition,
+      url: `${url}#${term.slug}`,
+      inDefinedTermSet: { '@id': `${url}#term-set` },
     })),
   }
 }

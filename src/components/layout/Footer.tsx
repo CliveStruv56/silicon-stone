@@ -15,6 +15,7 @@ const footerNavigation = {
     { name: 'Products', href: '/products' },
     { name: 'Advisory', href: '/advisory' },
     { name: 'EU exposure (US firms)', href: '/eu-exposure' },
+    { name: 'Glossary', href: '/glossary' },
     { name: 'Methodology', href: '/methodology' },
     { name: 'About', href: '/about' },
   ],

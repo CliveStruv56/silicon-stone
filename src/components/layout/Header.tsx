@@ -49,6 +49,7 @@ const primaryNavigation: NavItem[] = [
 // Credibility pages — kept, but visually secondary (a lighter right-hand pair).
 const secondaryNavigation: NavItem[] = [
   { name: 'Methodology', href: '/methodology' },
+  { name: 'Glossary', href: '/glossary' },
   { name: 'About', href: '/about' },
 ]
 

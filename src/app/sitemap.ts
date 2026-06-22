@@ -25,6 +25,7 @@ const STATIC_ROUTES: Array<{
   { path: '/intelligence', changeFrequency: 'daily', priority: 0.9 },
   { path: '/about', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/methodology', changeFrequency: 'monthly', priority: 0.7 },
+  { path: '/glossary', changeFrequency: 'weekly', priority: 0.7 },
   { path: '/advisory', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/products', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/products/ai-act-toolkit', changeFrequency: 'monthly', priority: 0.6 },
