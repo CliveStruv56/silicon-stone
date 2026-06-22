@@ -57,9 +57,12 @@ export function completeSentence(input?: string | null): string {
   if (/[.!?]["')\]]?$/.test(s)) return s // already a full sentence
   const lastTerminator = Math.max(s.lastIndexOf('.'), s.lastIndexOf('!'), s.lastIndexOf('?'))
   if (lastTerminator >= 0) return s.slice(0, lastTerminator + 1).trim()
-  // No sentence terminator at all: drop a dangling trailing clause, add a stop.
+  // No sentence terminator at all. If a dash splits the text into clauses and the
+  // first is a substantial standalone clause, keep it and drop the dangling rest
+  // (handles "<complete clause> — <truncated continuation>"). Otherwise keep the
+  // whole clause. Either way, add a closing full stop.
   const sep = Math.max(s.lastIndexOf(' - '), s.lastIndexOf(' – '), s.lastIndexOf(' — '))
-  if (sep > s.length * 0.5) s = s.slice(0, sep).trim()
+  if (sep >= 40) s = s.slice(0, sep).trim()
   s = s.replace(/[\s,;:–—-]+$/, '').trim()
   return s ? `${s}.` : ''
 }

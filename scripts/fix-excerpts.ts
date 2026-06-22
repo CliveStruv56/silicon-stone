@@ -29,7 +29,7 @@ function completeSentence(input?: string | null): string {
   const lastTerminator = Math.max(s.lastIndexOf('.'), s.lastIndexOf('!'), s.lastIndexOf('?'))
   if (lastTerminator >= 0) return s.slice(0, lastTerminator + 1).trim()
   const sep = Math.max(s.lastIndexOf(' - '), s.lastIndexOf(' – '), s.lastIndexOf(' — '))
-  if (sep > s.length * 0.5) s = s.slice(0, sep).trim()
+  if (sep >= 40) s = s.slice(0, sep).trim()
   s = s.replace(/[\s,;:–—-]+$/, '').trim()
   return s ? `${s}.` : ''
 }
@@ -38,10 +38,10 @@ const DRY_RUN = process.argv.includes('--dry-run')
 
 async function run() {
   const articles = await client.fetch<
-    Array<{ _id: string; slug: string; excerpt?: string; metaDescription?: string }>
+    Array<{ _id: string; slug: string; excerpt?: string; metaDescription?: string; stoneTruth?: string }>
   >(
-    `*[_type == "article" && !(_id in path("drafts.**")) && (defined(excerpt) || defined(seo.metaDescription))]{
-      _id, "slug": slug.current, excerpt, "metaDescription": seo.metaDescription
+    `*[_type == "article" && !(_id in path("drafts.**")) && (defined(excerpt) || defined(seo.metaDescription) || defined(stoneTruth))]{
+      _id, "slug": slug.current, excerpt, "metaDescription": seo.metaDescription, stoneTruth
     }`
   )
 
@@ -54,6 +54,9 @@ async function run() {
 
     const fixedMeta = completeSentence(article.metaDescription)
     if (fixedMeta && fixedMeta !== article.metaDescription) patch['seo.metaDescription'] = fixedMeta
+
+    const fixedStone = completeSentence(article.stoneTruth)
+    if (fixedStone && fixedStone !== article.stoneTruth) patch.stoneTruth = fixedStone
 
     if (!Object.keys(patch).length) continue
     changed += 1
