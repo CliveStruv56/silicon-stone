@@ -59,3 +59,6 @@ debug_error.log
 /outputs/
 /.agents/
 .understand-anything/
+
+# local-draft pipeline scratch (intermediate JSON between model steps)
+.local-draft/

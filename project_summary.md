@@ -354,6 +354,21 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### June 22, 2026 — Local drafting pipeline (`ss-draft-local` skill) — generate on the Max plan
+
+Lets the `/create` article-generation flow be run **locally in Claude Code on the user's Claude Max subscription** instead of the website's paid Anthropic API (the site's API account was out of credits — see the bug note below). The four model steps (research synthesis, draft, voice edit, metadata) are performed by Claude Code; a thin CLI handles only the non-model I/O by **reusing the exact `src/lib` functions the site uses**, so output stays in lockstep with the site. **No website code changed** — the repo already exposed pure prompt builders (`buildDraftPrompt`, `buildVoiceEditPrompt`, `buildMetadataPrompt`).
+
+| Piece | Description |
+|--------|-------------|
+| `scripts/local-draft/pipeline.ts` | CLI (`npm run draft:local -- <cmd>`) with subcommands `research` (Exa, same params as `performResearch`), `draft-prompt` (Pinecone RAG + `buildDraftPrompt` → prints prompt), `voice-prompt` (`buildVoiceEditPrompt`), `metadata-prompt` (live Sanity categories + `buildMetadataPrompt`), `save` (`createArticleInSanity` → markdown→Portable-Text draft doc), `selftest`. Runtime imports are dynamic (after `dotenv`) so the libs see env at eval time. |
+| `scripts/local-draft/tsconfig.json` + `_shims/server-only.ts` | The reused libs (`sanity`/`exa`/`pinecone`/`embeddings`) start with `import 'server-only'`, which throws under `tsx`. The npm script sets `TSX_TSCONFIG_PATH` to this child tsconfig, which path-maps `server-only` to the empty shim (and re-declares `@/*`). Website resolves the real package unchanged. |
+| `.agent/skills/ss-draft-local/SKILL.md` | Drives the 7-step sequence; Claude Code is the model between prompt-printing steps. Committed to `.agent/skills/` and symlinked at `~/.claude/skills/ss-draft-local` (per-skill symlink pattern, same as `pd-ikigai-pro`). |
+| `.gitignore` | Added `.local-draft/` (scratch JSON passed between steps). |
+
+What still hits paid APIs (all small): Exa (research), OpenAI embeddings + Pinecone (RAG), the Sanity write token. The Claude steps cost nothing beyond the Max plan. Caveat: not byte-identical to the site — inference runs through Claude Code (Opus-tier) vs the site's Sonnet 4.6. Typecheck + lint clean on the new files (`npm run check` also flags pre-existing errors in the untracked `design-review/` dir — unrelated).
+
+**Known issue surfaced (separate, pre-existing):** the site's `/create` "Launch Agent" fails on production because the **Anthropic API account is out of credits** (`400 "credit balance is too low"`). The research step disguises it as the generic "Analysis failed to parse… debug_error.log" fallback in `synthesizeContext` (the draft path's `describeDraftError` already reports it correctly). Top up Anthropic credits to restore the in-app generator; the misleading research-synthesis error message is still worth fixing.
+
 ### June 22, 2026 — `/create` UX: format carry-through + optional Context/Brief box
 
 Two changes to the admin content-creation flow.

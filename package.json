@@ -23,6 +23,7 @@
     "evidence:rebuild:dry": "tsx scripts/rebuild-evidence-index.ts --dry-run",
     "test:evidence-index": "tsx scripts/evidence-index-checks.ts",
     "render-briefing": "tsx scripts/render-briefing-pdf.ts",
+    "draft:local": "TSX_TSCONFIG_PATH=scripts/local-draft/tsconfig.json tsx scripts/local-draft/pipeline.ts",
     "graph": "bash scripts/view-graph.sh"
   },
   "dependencies": {
