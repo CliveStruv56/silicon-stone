@@ -99,6 +99,40 @@ const PLAN: Record<string, Annotation[]> = {
     { term: 'agentic-ai', match: 'Agentic AI' },
     { term: 'export-controls', match: 'export control' },
   ],
+  'caidas-sovereignty-tiers-legal-architecture-or-hyperscaler': [
+    { term: 'european-commission', match: 'European Commission' },
+    { term: 'hyperscaler', match: 'hyperscalers' },
+    { term: 'amazon-web-services', match: 'AWS' },
+    { term: 'digital-sovereignty', match: 'digital sovereignty' },
+    { term: 'eucs', match: 'EUCS' },
+    { term: 'bsi', match: 'BSI' },
+    { term: 'anssi', match: 'ANSSI' },
+  ],
+  'open-source-sovereignty': [
+    { term: 'european-chips-act', match: 'Chips Act' },
+    { term: 'digital-sovereignty', match: 'digital sovereignty' },
+    { term: 'hyperscaler', match: 'hyperscalers' },
+    { term: 'amazon-web-services', match: 'AWS' },
+    { term: 'tsmc', match: 'TSMC' },
+    { term: 'open-weight-model', match: 'open-weight models' },
+    { term: 'openstack', match: 'OpenStack' },
+    { term: 'kubernetes', match: 'Kubernetes' },
+    { term: 'gaia-x', match: 'Gaia-X' },
+    { term: 'eu-ai-act', match: 'AI Act' },
+  ],
+  'tariff-enforcement-collision': [
+    { term: 'eu-ai-act', match: 'AI Act' },
+    { term: 'european-commission', match: 'EU Commission' },
+    { term: 'foundation-model', match: 'foundation models' },
+  ],
+  'welcome-to-silicon-and-stone': [
+    { term: 'agentic-ai', match: 'Agentic AI' },
+    { term: 'eu-ai-act', match: 'AI Act' },
+    { term: 'digital-sovereignty', match: 'digital sovereignty' },
+    { term: 'foundry', match: 'foundry' },
+    { term: 'export-controls', match: 'export controls' },
+    { term: 'original-equipment-manufacturer', match: 'OEM' },
+  ],
 }
 
 type Span = { _key: string; _type: string; text?: string; marks?: string[] }
@@ -112,6 +146,34 @@ function genKey(): string {
 
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+// Some drafts carry newsletter/production scaffolding as ordinary paragraphs
+// (subject lines, word counts, persona notes, source lists). Never annotate
+// inside those — first mentions must land in genuine body prose.
+const META_PREFIXES = [
+  'Subject Line:',
+  'Preview Text:',
+  'Word count:',
+  'Reading time:',
+  'Persona relevance:',
+  'Personas Target:',
+  'Persona Target:',
+  'Voice adjustment',
+  'Sources referenced:',
+  'Sources:',
+  'Cross-reference:',
+  'Tags:',
+  'Category:',
+]
+
+function blockText(block: Block): string {
+  return (block.children ?? []).map((span) => span.text ?? '').join('')
+}
+
+function isMetaBlock(block: Block): boolean {
+  const text = blockText(block).trimStart()
+  return META_PREFIXES.some((prefix) => text.startsWith(prefix))
 }
 
 function splitSpan(span: Span, start: number, length: number, markKey: string): Span[] {
@@ -176,7 +238,7 @@ async function annotateArticle(slug: string, annotations: Annotation[], validRef
     let placed = false
 
     for (const block of body) {
-      if (block._type !== 'block' || block.style !== 'normal') continue
+      if (block._type !== 'block' || block.style !== 'normal' || isMetaBlock(block)) continue
       const children = block.children ?? []
       for (let si = 0; si < children.length; si += 1) {
         const span = children[si]
