@@ -96,35 +96,51 @@ function parsePrompts(raw: string): string[] {
 }
 
 /**
- * Generate two prompts for the given article and write them onto
- * imagePrompts.prompts (plus generation metadata). Returns the prompts so the
- * caller can echo them back to the client without waiting on live sync.
+ * Core generator: ask Claude for two "what to depict" prompts from the article's
+ * text. No Sanity I/O — callers decide where the result goes (Studio patch, or
+ * the generation pipeline pre-filling a new draft). `text` is the article body
+ * as plain text or markdown; title/stoneTruth/excerpt sharpen the subject.
+ */
+export async function buildImagePrompts(input: {
+  title?: string
+  stoneTruth?: string
+  excerpt?: string
+  text: string
+}): Promise<string[]> {
+  const text = input.text.slice(0, ARTICLE_TEXT_CHARS)
+  const user = `Propose two image prompts for this article.
+
+TITLE: ${input.title ?? '(untitled)'}
+${input.stoneTruth ? `BOTTOM LINE: ${input.stoneTruth}\n` : ''}${input.excerpt ? `EXCERPT: ${input.excerpt}\n` : ''}
+ARTICLE TEXT:
+${text}`
+
+  const raw = await callClaude(SYSTEM, user, 0.8, 1024)
+  return parsePrompts(raw)
+}
+
+/** Shape the stored `imagePrompts` object — shared by the Studio patch and the pipeline. */
+export function imagePromptsField(prompts: string[]) {
+  return { prompts, generatedAt: new Date().toISOString(), model: CLAUDE_MODEL }
+}
+
+/**
+ * Generate two prompts for an existing article and write them onto
+ * imagePrompts (plus generation metadata). Returns the prompts so the caller
+ * can echo them back to the client without waiting on live sync.
  */
 export async function generateImagePrompts(
   targetId: string,
   article: ImagePromptArticle,
 ): Promise<string[]> {
-  const text = extractArticleText(article).slice(0, ARTICLE_TEXT_CHARS)
-  const user = `Propose two image prompts for this article.
+  const prompts = await buildImagePrompts({
+    title: article.title,
+    stoneTruth: article.stoneTruth,
+    excerpt: article.excerpt,
+    text: extractArticleText(article),
+  })
 
-TITLE: ${article.title ?? '(untitled)'}
-${article.stoneTruth ? `BOTTOM LINE: ${article.stoneTruth}\n` : ''}${article.excerpt ? `EXCERPT: ${article.excerpt}\n` : ''}
-ARTICLE TEXT:
-${text}`
-
-  const raw = await callClaude(SYSTEM, user, 0.8, 1024)
-  const prompts = parsePrompts(raw)
-
-  await writeClient
-    .patch(targetId)
-    .set({
-      imagePrompts: {
-        prompts,
-        generatedAt: new Date().toISOString(),
-        model: CLAUDE_MODEL,
-      },
-    })
-    .commit()
+  await writeClient.patch(targetId).set({ imagePrompts: imagePromptsField(prompts) }).commit()
 
   return prompts
 }

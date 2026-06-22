@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import { apiVersion, dataset, projectId } from '../sanity/env';
 import { CATEGORIES_QUERY } from '../sanity/lib/queries';
 import { markdownToPortableText } from './markdown-to-portable-text';
+import { CLAUDE_MODEL } from './anthropic';
 
 const token = process.env.SANITY_API_WRITE_TOKEN;
 
@@ -37,6 +38,7 @@ export interface ArticleData {
     source?: 'generated' | 'imported' | 'manual';
     sourceMaterial?: string;         // original text for imported articles
     voiceEditNotes?: string;         // Pass-3 voice-edit summary + [AUTHOR: …] list
+    imagePrompts?: string[];         // two "what to depict" prompts for the main image
 }
 
 export interface CategoryOption {
@@ -129,6 +131,13 @@ export async function createArticleInSanity(data: ArticleData) {
     if (data.source) doc.source = data.source;
     if (data.sourceMaterial) doc.sourceMaterial = data.sourceMaterial;
     if (data.voiceEditNotes) doc.voiceEditNotes = data.voiceEditNotes;
+    if (data.imagePrompts && data.imagePrompts.length > 0) {
+        doc.imagePrompts = {
+            prompts: data.imagePrompts,
+            generatedAt: new Date().toISOString(),
+            model: CLAUDE_MODEL,
+        };
+    }
 
     return await writeClient.createOrReplace(doc);
 }

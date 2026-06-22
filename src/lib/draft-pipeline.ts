@@ -1,5 +1,6 @@
 import 'server-only';
 import { extractArticleMetadata, runVoiceEditPass, type DraftFormat } from './prompts';
+import { buildImagePrompts } from './image-prompts';
 import { createArticleInSanity, listSanityCategories } from './sanity';
 import { slugify } from './utils';
 
@@ -164,6 +165,20 @@ export async function finalizeDraft({
         console.error(`[${logPrefix}] Metadata extraction failed:`, err);
     }
 
+    // Pre-fill two main-image prompts from the finalised body, so they're ready
+    // before the editor opens the draft. Best-effort — never blocks the save.
+    let imagePrompts: string[] | undefined;
+    try {
+        imagePrompts = await buildImagePrompts({
+            title: draft.title,
+            stoneTruth: metadata?.stoneTruth,
+            excerpt: metadata?.metaDescription ?? draft.excerpt,
+            text: draft.content,
+        });
+    } catch (err) {
+        console.error(`[${logPrefix}] Image-prompt generation failed:`, err);
+    }
+
     return createArticleInSanity({
         title: draft.title,
         slug: slugify(draft.title),
@@ -180,6 +195,7 @@ export async function finalizeDraft({
         methodologyPillars: metadata?.methodologyPillars,
         voiceEditNotes,
         source,
+        ...(imagePrompts?.length ? { imagePrompts } : {}),
         ...(sourceMaterial ? { sourceMaterial } : {}),
     });
 }
