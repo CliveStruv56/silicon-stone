@@ -354,6 +354,15 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### June 22, 2026 — Excerpts: under-image summary always a complete sentence (`8287cb0b`)
+
+The summary shown under each article's hero image was truncating mid-word (e.g. "...must act now on supp"). Root cause: `clamp()` in `prompts.ts` hard-`slice`d metaDescription/excerpt to 160 chars, and the excerpt is set from that clamped value — the dropped words were never stored. Three-part fix:
+
+- **`completeSentence()`** in `src/lib/seo.ts` — trims any summary back to its last whole sentence; handles bullet-list dumps (takes the first item), trailing ellipses, and dangling clauses (drops a trailing `" - fragment"`, adds a full stop to a lone clause).
+- **Render guard** — the article page renders `completeSentence(article.excerpt)`, so the visible summary is always complete regardless of stored data.
+- **Pipeline** — `clamp()` now ends on a sentence boundary (if one sits in the back ~40%) else a word boundary, never mid-word, so new drafts are clean at source.
+- **Data repair** — `scripts/fix-excerpts.ts` (`npm run fix:excerpts`, `--dry-run` supported) fixed **9** already-truncated excerpts in production (3 were already complete and left alone). Verified live on the helium article.
+
 ### June 22, 2026 — Glossary: reader-controlled inline highlights + first two annotated articles (`2aa98468`)
 
 Turned on the inline-popover side of the glossary, with reader control and the first annotated content.
