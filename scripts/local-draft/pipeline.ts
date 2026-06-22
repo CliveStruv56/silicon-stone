@@ -25,7 +25,7 @@ import * as path from 'node:path'
 import * as fs from 'node:fs'
 import type { DraftFormat } from '../../src/lib/prompts'
 
-dotenv.config({ path: path.join(process.cwd(), '.env.local') })
+dotenv.config({ path: path.join(process.cwd(), '.env.local'), quiet: true })
 
 type Flags = Record<string, string | boolean>
 
