@@ -354,6 +354,17 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### June 22, 2026 — Ideaverse vault sync (repo `docs/` → project canon)
+
+Swept the repo `docs/` folder against the Ideaverse Obsidian vault's S&S canon and brought it fully in sync. **No website code changed** — vault-only edits, committed + pushed to the `ideaverse-vault` repo (`CliveStruv56/ideaverse-vault`, `main`). Note the vault moved/reorganised since the last memory: path is now `~/Documents/Ideaverse` and the S&S canon lives at `Projects/Silicon-and-Stone/` (was a top-level `Project/`).
+
+| Action | Detail |
+|--------|--------|
+| Synced new guide | `docs/article-generation-guide.md` → `Projects/Silicon-and-Stone/ops/article-generation-guide.md` with standard vault frontmatter + reconciliation note; registered in `Project-Map.md`. This was the only genuine gap — almost everything else in `docs/` was already mirrored from the June sync. |
+| Archived 3 snapshots | `review-report.md` (2026-06-09), `next-phase-brief.md` (2026-06-09), and the executed `slug-renames-proposal.md` (2026-06-10) → `archive/`, each flagged as a dated snapshot / not live state, and registered in the map. |
+| Frontmatter consistency | Added the standard `type/area: aios/page_type/brand/source_doc/updated` frontmatter + reconciliation notes to `Systems/AIOS/editorial-aios-inbox.md` and `editorial-aios-manual.md` (content was already byte-identical to `docs/`). |
+| Skipped | `pd-ikigai-pro.skill` (generic skill, not project canon); published Sanity articles left out of the vault per the user's call (`Content/Articles/` stays empty for now). |
+
 ### June 22, 2026 — Local drafting pipeline (`ss-draft-local` skill) — generate on the Max plan
 
 Lets the `/create` article-generation flow be run **locally in Claude Code on the user's Claude Max subscription** instead of the website's paid Anthropic API (the site's API account was out of credits — see the bug note below). The four model steps (research synthesis, draft, voice edit, metadata) are performed by Claude Code; a thin CLI handles only the non-model I/O by **reusing the exact `src/lib` functions the site uses**, so output stays in lockstep with the site. **No website code changed** — the repo already exposed pure prompt builders (`buildDraftPrompt`, `buildVoiceEditPrompt`, `buildMetadataPrompt`).
