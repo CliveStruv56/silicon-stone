@@ -129,7 +129,7 @@ export function EmailGateOverlay({ isOpen, onUnlock, onDismiss, toolName, result
                 <CardDescription className="mt-2">
                   {status === 'success'
                     ? 'Thank you. Your results are ready.'
-                    : `Enter your email to view ${resultLabel} from the ${toolName}. You\u2019ll also receive our weekly intelligence briefing.`
+                    : `Enter your email to view ${resultLabel} from the ${toolName}. You\u2019ll also receive our twice-weekly intelligence briefings.`
                   }
                 </CardDescription>
               </CardHeader>

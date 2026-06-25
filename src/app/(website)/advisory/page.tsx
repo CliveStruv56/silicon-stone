@@ -23,60 +23,68 @@ import {
   Globe,
   FileText,
   Shield,
+  Users,
 } from 'lucide-react'
 
-const frameworks = [
+const domains = [
   {
     id: 'supply-chain',
     title: 'Supply Chain Forensics',
-    description: 'We trace the journey of critical components—from raw materials to finished products—identifying Day Zero failure points before they appear on news tickers.',
+    description: 'We trace critical components from raw materials to finished product, identifying the chokepoints and concentration risks before they reach a news ticker.',
     icon: Search,
     color: 'text-stone-teal',
     bgColor: 'bg-stone-teal/10',
     borderColor: 'border-stone-teal/30',
     hoverBorderColor: 'hover:border-stone-teal/30',
-    process: 'Map supplier networks, identify chokepoints, assess geographic concentration risk',
     tool: 'Supply Chain Mapper',
     toolHref: '/tools/supply-chain-mapper',
   },
   {
     id: 'policy-stress',
-    title: 'Comparative Policy Stress-Testing',
-    description: 'We analyse the Atlantic Drift by systematically contrasting US and EU regulatory approaches to predict where compliance friction will emerge.',
+    title: 'Policy Stress-Testing',
+    description: 'We run a single development through the US and EU regulatory systems to find where compliance with one becomes friction with the other.',
     icon: Scale,
     color: 'text-silicon-amber',
     bgColor: 'bg-silicon-amber/10',
     borderColor: 'border-silicon-amber/30',
     hoverBorderColor: 'hover:border-silicon-amber/30',
-    process: 'Compare jurisdictions, identify gaps, build transatlantic compliance roadmaps',
     tool: 'Policy Stress-Test',
     toolHref: '/tools/policy-stress-test',
   },
   {
-    id: 'scenario',
-    title: 'Scenario-Based Drift Modeling',
-    description: 'We use Value at Stake methodology to quantify the impact of geopolitical shifts, moving from narrative to metrics.',
+    id: 'talent-flow',
+    title: 'Talent & Capability Flow',
+    description: 'We track where senior engineers, fab technicians, and regulatory experts actually move, and what their landing and leaving does to capability — the layer most technology-policy commentary misses.',
+    icon: Users,
+    color: 'text-sister-indigo',
+    bgColor: 'bg-sister-indigo/10',
+    borderColor: 'border-sister-indigo/30',
+    hoverBorderColor: 'hover:border-sister-indigo/30',
+    tool: null,
+    toolHref: null,
+  },
+]
+
+const methods = [
+  {
+    id: 'scenario-modelling',
+    title: 'Scenario Modelling',
+    description: 'Three futures per question — low / medium / high friction — quantified with Value at Stake. A structured menu of preparation moves, not a prediction.',
     icon: TrendingUp,
     color: 'text-alert-red',
     bgColor: 'bg-alert-red/10',
     borderColor: 'border-alert-red/30',
     hoverBorderColor: 'hover:border-alert-red/30',
-    process: 'Build scenarios, model impacts by sector, quantify exposure in euros',
-    tool: 'Scenario Modeler',
-    toolHref: '/tools/scenario-modeler',
   },
   {
-    id: 'signal-filter',
-    title: 'Experience-Led Signal Filtering',
-    description: 'We apply a 30-year historical lens to modern hype, separating Silicon Hype from Stone Truth.',
+    id: 'long-memory-filter',
+    title: 'Long-Memory Filter',
+    description: 'Pattern-matching the present against thirty years of industrial cycles (the 1986 Semiconductor Agreement, the 1990s offshoring wave), separating structural change from hype.',
     icon: Clock,
     color: 'text-text-muted',
     bgColor: 'bg-surface-elevated',
     borderColor: 'border-border-subtle',
     hoverBorderColor: 'hover:border-border-subtle',
-    process: 'Compare to past cycles, identify structural vs. temporary changes',
-    tool: 'Compliance Checker',
-    toolHref: '/tools/compliance-checker',
   },
 ]
 
@@ -362,7 +370,7 @@ export default function ServicesPage() {
         <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
           <div className="mb-8">
             <h2 className="text-2xl font-semibold text-text-primary mb-4">
-              The 3 x 2 Method. Applied to Your Decision.
+              The 3×2 Method. Applied to Your Decision.
             </h2>
             <p className="text-text-muted max-w-3xl">
               Every engagement draws on the Forensic Technopolitics methodology: three
@@ -371,42 +379,75 @@ export default function ServicesPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {frameworks.map((framework, idx) => {
-              const Icon = framework.icon
+          <div className="mb-6 text-xs font-mono uppercase tracking-wider text-text-muted">
+            Three forensic domains
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {domains.map((domain, idx) => {
+              const Icon = domain.icon
               return (
                 <motion.div
-                  key={framework.id}
+                  key={domain.id}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.1 }}
                 >
-                  <Card className={`card-interactive h-full bg-stone-charcoal border-border-subtle ${framework.hoverBorderColor}`}>
+                  <Card className={`card-interactive h-full bg-stone-charcoal border-border-subtle ${domain.hoverBorderColor}`}>
                     <CardHeader>
-                      <div className={`w-10 h-10 rounded-lg ${framework.bgColor} ${framework.borderColor} border flex items-center justify-center mb-3`}>
-                        <Icon className={`w-5 h-5 ${framework.color}`} />
+                      <div className={`w-10 h-10 rounded-lg ${domain.bgColor} ${domain.borderColor} border flex items-center justify-center mb-3`}>
+                        <Icon className={`w-5 h-5 ${domain.color}`} />
                       </div>
                       <CardTitle className="text-lg text-text-primary">
-                        {framework.title}
+                        {domain.title}
                       </CardTitle>
                       <CardDescription className="text-sm">
-                        {framework.description}
+                        {domain.description}
                       </CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div>
-                        <div className="text-xs font-mono text-text-muted uppercase mb-1">Process</div>
-                        <p className="text-sm text-text-primary">{framework.process}</p>
+                    {domain.tool && domain.toolHref && (
+                      <CardContent>
+                        <Link
+                          href={domain.toolHref}
+                          className={`inline-flex items-center text-sm ${domain.color} hover:underline`}
+                        >
+                          Try {domain.tool}
+                          <ArrowRight className="w-3 h-3 ml-1" />
+                        </Link>
+                      </CardContent>
+                    )}
+                  </Card>
+                </motion.div>
+              )
+            })}
+          </div>
+
+          <div className="mt-10 mb-6 text-xs font-mono uppercase tracking-wider text-text-muted">
+            Two analytical methods · applied across all three domains
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {methods.map((method, idx) => {
+              const Icon = method.icon
+              return (
+                <motion.div
+                  key={method.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.1 }}
+                >
+                  <Card className={`card-interactive h-full bg-stone-charcoal border-border-subtle ${method.hoverBorderColor}`}>
+                    <CardHeader>
+                      <div className={`w-10 h-10 rounded-lg ${method.bgColor} ${method.borderColor} border flex items-center justify-center mb-3`}>
+                        <Icon className={`w-5 h-5 ${method.color}`} />
                       </div>
-                      <Link
-                        href={framework.toolHref}
-                        className={`inline-flex items-center text-sm ${framework.color} hover:underline`}
-                      >
-                        Try {framework.tool}
-                        <ArrowRight className="w-3 h-3 ml-1" />
-                      </Link>
-                    </CardContent>
+                      <CardTitle className="text-lg text-text-primary">
+                        {method.title}
+                      </CardTitle>
+                      <CardDescription className="text-sm">
+                        {method.description}
+                      </CardDescription>
+                    </CardHeader>
                   </Card>
                 </motion.div>
               )

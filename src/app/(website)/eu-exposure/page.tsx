@@ -81,20 +81,24 @@ export default function EuExposurePage() {
                 The deadline is the easy part. The requirement is permanent.
               </h1>
               <p className="text-xl text-text-muted leading-relaxed mb-6">
-                The EU AI Act’s high-risk obligations take effect on 2 August 2026, and their
-                reach is extraterritorial: if your AI touches the EU market or affects EU
-                residents, you are likely in scope — wherever you are headquartered. Miss it
-                and a national authority can pull your system from the EU market entirely.
+                The AI Act’s reach is extraterritorial: if your AI touches the EU market or
+                affects EU residents, you are likely in scope — wherever you are
+                headquartered. From 2 August 2026 the transparency duties and the penalty
+                regime apply, and a national authority can act against systems placed on the
+                EU market. The heavier high-risk obligations arrive in stages after that —
+                standalone high-risk from 2 December 2027, embedded high-risk from 2 August
+                2028 — which is precisely why this is a maintained state, not a one-time fix:
+                the obligations keep arriving, and the documentation behind them has to keep
+                pace.
               </p>
               <p className="text-text-muted leading-relaxed">
-                But the deadline is the easy part to understand. The harder truth is that
-                compliance is not a one-time fix: high-risk systems carry ongoing monitoring
-                and documentation duties, a further product-embedded tier lands in 2027, and
-                the EU’s 2026 Tech Sovereignty Package is already reshaping market access for
-                US providers. This is a maintained state, not a project with an end date.
+                The deadline is the easy part to understand. The harder truth is in the
+                upkeep: high-risk systems carry ongoing monitoring and documentation duties,
+                and the EU’s 2026 Tech Sovereignty Package is already reshaping market access
+                for US providers. A project ends; this does not.
               </p>
               <p className="mt-5 font-mono text-xs uppercase tracking-wider text-text-muted">
-                Regulatory copy last reviewed: 16 June 2026
+                Regulatory copy last reviewed: 25 June 2026
               </p>
             </div>
           </div>

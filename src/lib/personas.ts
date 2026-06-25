@@ -109,7 +109,7 @@ export const PERSONAS: Record<PersonaSlug, Persona> = {
     icon: 'user',
     color: 'text-muted',
     avatar: '/personas/citizen.jpg',
-    ctaCopy: 'The weekly read for those tracking the bigger picture',
+    ctaCopy: 'The twice-weekly read for those tracking the bigger picture',
     description: 'Seeking accessible understanding of complex tech-policy issues',
     contentNeeds: [
       'Accessible explainers',
@@ -144,7 +144,7 @@ export function getPersonaLabel(slug: string): string {
  */
 export function getPersonaCTA(slug: string): string {
   const persona = PERSONAS[slug as PersonaSlug]
-  return persona?.ctaCopy || 'Get weekly intelligence updates'
+  return persona?.ctaCopy || 'Get our twice-weekly briefings'
 }
 
 /**
@@ -190,8 +190,8 @@ export function getDynamicCTA(activePersona?: string | null): {
 } {
   if (!activePersona || !PERSONAS[activePersona as PersonaSlug]) {
     return {
-      headline: 'Weekly Intelligence Brief',
-      subheadline: 'Cut through complexity in AI regulation, semiconductor supply chains, and digital sovereignty.',
+      headline: 'Two briefings a week, from the edge of Europe',
+      subheadline: 'The Tuesday Stone Briefing on what just shifted in AI policy, semiconductors, supply chains, and digital sovereignty. The Friday Practical Move on what to do about it. Decision-grade, never breathless.',
     }
   }
 
@@ -217,7 +217,7 @@ export function getDynamicCTA(activePersona?: string | null): {
       subheadline: 'Read every shift for your own position. Where the durable bets are in a redrawn labour market.',
     },
     citizen: {
-      headline: 'Weekly Explainer',
+      headline: 'Twice-Weekly Explainer',
       subheadline: 'Complex tech-policy issues made accessible. No jargon, just clarity.',
     },
   }

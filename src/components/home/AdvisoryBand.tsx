@@ -10,6 +10,7 @@ type Tier = {
   label: string
   title: string
   body: string
+  href?: string
   popular?: boolean
 }
 
@@ -20,9 +21,15 @@ const tiers: Tier[] = [
     body: 'A one-hour strategic consultation built on your tool results and specific questions.',
   },
   {
-    label: 'Most popular',
+    label: 'First picture',
     title: 'Focused Diagnostic',
     body: 'AI-governance and dependency review; 15–25pp written report; executive summary; 30-day follow-up.',
+  },
+  {
+    label: 'Most popular · Ongoing',
+    title: 'The Drift Retainer',
+    body: 'A standing, independent read on how the drift affects your supply chains, procurement, and people — delivered monthly, so the leadership team is never blindsided. From £3,500/mo.',
+    href: '/advisory#retainer',
     popular: true,
   },
   {
@@ -61,10 +68,10 @@ export function AdvisoryBand() {
             </div>
           </StaggerItem>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {tiers.map((tier) => (
               <StaggerItem key={tier.title}>
-                <Link href="/advisory" className="block h-full">
+                <Link href={tier.href ?? '/advisory'} className="block h-full">
                   <ForensicCard
                     accent={tier.popular ? 'amber' : 'subtle'}
                     showMarkers={false}
