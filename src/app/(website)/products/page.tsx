@@ -16,6 +16,7 @@ import {
 export const metadata: Metadata = {
   title: 'Products | Silicon and Stone',
   description: 'Digital products for European businesses navigating AI regulation, supply chain risk, and digital sovereignty.',
+  alternates: { canonical: '/products' },
 }
 
 const products = [

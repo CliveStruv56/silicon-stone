@@ -11,6 +11,7 @@ import { ThreeReadings } from '@/components/ThreeReadings'
 export const metadata: Metadata = {
   title: 'Methodology | Silicon and Stone',
   description: 'Forensic Technopolitics: a 3 × 2 matrix of three forensic domains (Supply Chain, Policy, Talent) stress-tested by two analytical methods (Scenario Modelling, Long-Memory Filter).',
+  alternates: { canonical: '/methodology' },
 }
 
 const domains = [

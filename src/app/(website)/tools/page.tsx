@@ -6,6 +6,7 @@ import { ToolsGrid } from '@/components/home/ToolsGrid'
 export const metadata: Metadata = {
     title: 'Interactive Tools | Silicon and Stone',
     description: 'Forensic analysis tools for navigating the AI Act, supply chain vulnerabilities, and geopolitical scenarios.',
+    alternates: { canonical: '/tools' },
 }
 
 export default function ToolsPage() {

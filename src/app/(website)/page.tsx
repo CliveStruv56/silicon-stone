@@ -26,6 +26,16 @@ export const metadata: Metadata = {
     'Independent, decision-grade intelligence for UK and European leaders managing AI governance, technology dependency, and operational resilience.',
 }
 
+// Organization `sameAs` — entity-authority signal for the homepage JSON-LD (F9).
+// [AUTHOR: confirm exact profile URLs.] Add the live LinkedIn, Substack, YouTube,
+// and X profile URLs here; the array is omitted from the schema while empty.
+const ORG_SAME_AS: string[] = [
+  // 'https://www.linkedin.com/company/…',
+  // 'https://siliconandstone.substack.com',
+  // 'https://www.youtube.com/@…',
+  // 'https://x.com/…',
+]
+
 export default async function Home() {
   const [settingsRes, pulseRes, briefingRes, auditRes] = await Promise.all([
     sanityFetch({ query: SITE_SETTINGS_QUERY }),
@@ -79,6 +89,7 @@ export default async function Home() {
           'European technology policy',
           'The Atlantic Drift',
         ],
+        ...(ORG_SAME_AS.length > 0 ? { sameAs: ORG_SAME_AS } : {}),
       },
       {
         '@type': 'WebPage',

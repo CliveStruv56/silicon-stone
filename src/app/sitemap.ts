@@ -27,6 +27,9 @@ const STATIC_ROUTES: Array<{
   { path: '/methodology', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/glossary', changeFrequency: 'weekly', priority: 0.7 },
   { path: '/advisory', changeFrequency: 'monthly', priority: 0.6 },
+  // Footer-only US-inbound front door — kept out of primary nav, but in the
+  // sitemap so search/campaign discovery can reach it (F12).
+  { path: '/eu-exposure', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/products', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/products/ai-act-toolkit', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/products/ai-audit-checklist', changeFrequency: 'monthly', priority: 0.6 },

@@ -11,6 +11,7 @@ import { Separator } from '@/components/ui/separator'
 export const metadata: Metadata = {
   title: 'About | Silicon and Stone',
   description: 'Analysis from the Edge: 30 years of technology industry experience, delivered from Scotland\'s Atlantic coast.',
+  alternates: { canonical: '/about' },
 }
 
 const credentials = [
