@@ -1,7 +1,7 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-06-22
+> Last Updated: 2026-06-25
 > Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing, 13 moderate transitive npm audit findings (uuid through Sanity packages)**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com. Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools (email-gated for lead capture, AI Act triage engine recently overhauled), product/commerce pages with an early-access enquiry fallback until Lemon Squeezy checkout URLs are configured, Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Awaiting Lemon Squeezy store setup, Plausible account, and content publishing for queued drafts.
@@ -353,6 +353,24 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### June 25, 2026 — Site consistency fixes (F1–F13 brief)
+
+Worked through the "Site Consistency Fixes" brief, mostly reconciling every surface with the recalibrated EU AI Act timeline (the 2026 Digital Omnibus moved high-risk obligations off the single "August 2026 cliff" to **2 Dec 2027** standalone / **2 Aug 2028** embedded; **2 Aug 2026** is now transparency + penalties only) and the canonical **3×2** methodology (three domains × two methods; the old "Four Pillars / Signal Filtering" framing is superseded).
+
+- **F1 — EU AI Act article rewritten (Sanity DRAFT, not published).** Slug `eu-ai-act-compliance-chasm-august-2026`. New title, body, `stoneTruth`, `impactScore 7`, `personas [clara, sofia]`, `methodologyPillars [policy-long-memory-filter, policy-scenario-modelling, talent-scenario-modelling]`. Body carries two `[AUTHOR: source needed]` placeholders. **Action for Clive: fill/remove placeholders and publish the draft.**
+- **F2** `/eu-exposure` opening paragraph corrected to staged timeline; review date → 25 June 2026.
+- **F3** `/advisory` "3×2 Method" block restructured from four pillars to three domains + two methods (adds Talent & Capability Flow).
+- **F4** Homepage advisory band: added **The Drift Retainer** (badged "Most popular"), removed badge from Focused Diagnostic, four tiers ordered to match `/advisory`.
+- **F5** Newsletter/CTA cadence corrected to twice-weekly (Tue/Fri); removed banned phrase "Cut through complexity".
+- **F6** Homepage persona router now shows the **five** taggable personas (matching the `/intelligence` hub); "Positional" moved out of the grid into a separate WaymarkPath reading-lens card.
+- **F8** Self-referential canonicals added to `/about`, `/methodology`, `/products`, `/tools` (were inheriting root `/`).
+- **F9** Organization JSON-LD wired for `sameAs` via `ORG_SAME_AS` constant — **Action for Clive: add the live LinkedIn/Substack/YouTube/X URLs.**
+- **F12** `/eu-exposure` added to `sitemap.ts` (footer-only, not nav).
+- **F13** `/intelligence` hub now SSRs the initial article list (server `page.tsx` + client `IntelligenceFeed.tsx`); list + `/analysis/*` links render in the prerendered HTML (5-min ISR) instead of a "Loading intelligence…" shell.
+- **F10** — no action: per-article branded OG cards already implemented (`analysis/[slug]/opengraph-image.tsx`).
+- **F11** — **Action for Clive (Vercel dashboard):** apex `siliconandstone.com` → www is a 307; set the apex domain to redirect to www so it issues a permanent 308.
+- **F7** — pending: per-article audit sweep of the other early `/analysis/*` pieces (flag-only, no rewrites without sign-off).
 
 ### June 22, 2026 — Excerpts: under-image summary always a complete sentence (`8287cb0b`)
 
