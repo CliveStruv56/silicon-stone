@@ -147,19 +147,18 @@ Every analysis ends in a single declarative one-line verdict — the Stone Truth
 
 That's an example. Stone Truths are short, calibrated, opinionated where the analysis warrants, hedged where it does not.
 
-#### The audience — five personas
+#### The audience — four personas
 
-Every piece of content is tagged for relevance to one or more of these five decision-maker types. The full pain-points and content needs for each live in `docs/persona-profiles.md`. The persona documents in Sanity Studio currently hold a shorter version — bringing them in line with the markdown file is a v3 follow-up.
+Every piece of content is tagged for relevance to one or more of these four decision-maker types. The full pain-points and content needs for each live in `docs/persona-profiles.md`. The persona documents in Sanity Studio currently hold a shorter version — bringing them in line with the markdown file is a v3 follow-up.
 
 - **Compliance Clara** — Legal or compliance counsel at tech firms, large enterprises, law firms. Cares about: AI Act implementation timelines, risk classification, documentation, cross-border regulatory complexity.
 - **Industrial Ian** — Operations or supply chain manager at semiconductor companies, electronics manufacturers, automotive OEMs. Cares about: supply chain disruption risks, foundry capacity, export control implications, reshoring decisions.
 - **Sovereign Sofia** — Policy analyst or advisor at government agencies, think tanks, international organisations. Cares about: technology sovereignty strategies, industrial policy effectiveness, regulatory arbitrage, international governance.
-- **Remote Robert** — Regional development professional at agencies, local governments, economic partnerships. Cares about: regional economic impacts of tech shifts, workforce development, attracting tech investment, peripheral economies positioning.
 - **Global Citizen** — Informed general public — journalists, educators, generalists. Cares about: broad technology and society implications, consumer impacts, democratic oversight of technology.
 
-The first four are the high-priority audience for paid products. Global Citizen is the broader top-of-funnel reader who eventually self-sorts into one of the others.
+The first three are the high-priority audience for paid products. Global Citizen is the broader top-of-funnel reader who eventually self-sorts into one of the others.
 
-A note on slug naming: when you tag an article in Sanity's **Personas** field, you'll see short codes — `clara`, `ian`, `sofia`, `robert`, `citizen`. The persona documents themselves have longer slugs (`compliance-clara`, etc.). Both refer to the same person; the article-level field uses the short codes.
+A note on slug naming: when you tag an article in Sanity's **Personas** field, you'll see short codes — `clara`, `ian`, `sofia`, `citizen`. The persona documents themselves have longer slugs (`compliance-clara`, etc.). Both refer to the same person; the article-level field uses the short codes.
 
 ---
 
@@ -354,7 +353,6 @@ Don't try to make everything perfect. The first thirty days is calibration — g
 | Compliance Clara | `clara` | Legal/compliance counsel at tech firms |
 | Industrial Ian | `ian` | Supply chain and operations directors |
 | Sovereign Sofia | `sofia` | Policy analysts at think tanks and government |
-| Remote Robert | `robert` | Regional development strategists |
 | Global Citizen | `citizen` | Informed general public, journalists, educators |
 
 The persona documents in Sanity have longer slugs (`compliance-clara`, etc.). Same people; different field.

@@ -77,8 +77,10 @@ export async function createArticleInSanity(data: ArticleData) {
     const blocks = markdownToPortableText(data.body);
 
     // Map persona key to valid schema option
-    // Schema: 'clara', 'ian', 'sofia', 'robert', 'citizen'
-    // AI-Writer keys might differ, let's normalize or fallback
+    // Schema: 'clara', 'ian', 'sofia', 'citizen'
+    // AI-Writer keys might differ, let's normalize or fallback.
+    // The retired Remote Robert persona normalises to Global Citizen so any
+    // legacy generator output lands on a valid persona instead of erroring.
     const personaMap: Record<string, string> = {
         'compliance-clara': 'clara',
         'compliance_clara': 'clara',
@@ -86,8 +88,8 @@ export async function createArticleInSanity(data: ArticleData) {
         'industrial_ian': 'ian',
         'sovereign-sofia': 'sofia',
         'sovereign_sofia': 'sofia',
-        'remote-robert': 'robert',
-        'remote_robert': 'robert',
+        'remote-robert': 'citizen',
+        'remote_robert': 'citizen',
         'global-citizen': 'citizen',
         'global_citizen': 'citizen'
     };

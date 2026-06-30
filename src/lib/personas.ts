@@ -3,7 +3,7 @@
  * Based on content-focus-areas.md persona specifications
  */
 
-export type PersonaSlug = 'clara' | 'ian' | 'sofia' | 'robert' | 'positional' | 'citizen'
+export type PersonaSlug = 'clara' | 'ian' | 'sofia' | 'positional' | 'citizen'
 
 export interface Persona {
   slug: PersonaSlug
@@ -69,22 +69,6 @@ export const PERSONAS: Record<PersonaSlug, Persona> = {
       'Strategic forecasts',
     ],
   },
-  robert: {
-    slug: 'robert',
-    name: 'Remote Robert',
-    role: 'Regional Development Director',
-    icon: 'map-pin',
-    color: 'alert-red',
-    avatar: '/personas/robert.jpg',
-    ctaCopy: 'Where regional implications get read first',
-    description: 'Building regional technology capacity and resilience',
-    contentNeeds: [
-      'Regional case studies',
-      'Economic impact analysis',
-      'Investment opportunity mapping',
-      'Local implementation guides',
-    ],
-  },
   positional: {
     slug: 'positional',
     name: 'Positional',
@@ -120,7 +104,7 @@ export const PERSONAS: Record<PersonaSlug, Persona> = {
   },
 }
 
-export const PERSONA_ORDER: PersonaSlug[] = ['clara', 'ian', 'sofia', 'robert', 'positional', 'citizen']
+export const PERSONA_ORDER: PersonaSlug[] = ['clara', 'ian', 'sofia', 'positional', 'citizen']
 
 /**
  * Personas that filter the briefings content feed. Excludes any persona with an
@@ -165,7 +149,6 @@ const PERSONA_BADGE_CLASSES: Record<PersonaSlug, string> = {
   clara: 'border-silicon-amber/50 text-silicon-amber',
   ian: 'border-stone-teal/50 text-stone-teal',
   sofia: 'border-tier-pulse/50 text-tier-pulse',
-  robert: 'border-alert-red/50 text-alert-red',
   positional: 'border-sister-indigo/50 text-sister-indigo',
   citizen: 'border-border-subtle text-text-muted',
 }
@@ -207,10 +190,6 @@ export function getDynamicCTA(activePersona?: string | null): {
     sofia: {
       headline: 'Policy Intelligence',
       subheadline: 'Quantify the Atlantic Drift. Regulatory divergence analysis for strategic planning.',
-    },
-    robert: {
-      headline: 'Regional Impact Analysis',
-      subheadline: 'Local implementation insights. Economic impact data you won\'t find elsewhere.',
     },
     positional: {
       headline: 'Positional Intelligence',

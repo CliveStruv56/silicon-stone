@@ -1,6 +1,6 @@
 # Persona Profiles
 
-**Silicon and Stone · The five decision-makers we write for**
+**Silicon and Stone · The four decision-makers we write for**
 v1 · May 2026
 
 ---
@@ -20,11 +20,11 @@ The personas are also codified in `context/core/icp.json` (consumed by Hyperagen
 When polishing a draft in Sanity:
 
 1. **Read the piece's Stone Truth first.** Who is that line written for? That's almost always the primary persona.
-2. **Check the analytical moves applied.** Supply Chain Forensics is almost always Industrial Ian. Policy Stress-Testing tilts toward Compliance Clara and Sovereign Sofia. Talent & Capability Flow lifts Remote Robert and Global Citizen.
-3. **Cap persona tags at three.** A piece tagged for all five is a piece tagged for none — the filtering can't surface it for the people who need it.
-4. **Global Citizen is not a default.** Use it deliberately, for pieces that genuinely reach beyond the four specialised decision-maker types. It is not "everyone."
+2. **Check the analytical moves applied.** Supply Chain Forensics is almost always Industrial Ian. Policy Stress-Testing tilts toward Compliance Clara and Sovereign Sofia. Talent & Capability Flow lifts Global Citizen.
+3. **Cap persona tags at three.** A piece tagged for all four is a piece tagged for none — the filtering can't surface it for the people who need it.
+4. **Global Citizen is not a default.** Use it deliberately, for pieces that genuinely reach beyond the three specialised decision-maker types. It is not "everyone."
 
-The CMS uses **short slugs** at the article level: `clara`, `ian`, `sofia`, `robert`, `citizen`. The persona documents themselves use longer slugs: `compliance-clara`, `industrial-ian`, `sovereign-sofia`, `remote-robert`, `global-citizen`. Same people; different field.
+The CMS uses **short slugs** at the article level: `clara`, `ian`, `sofia`, `citizen`. The persona documents themselves use longer slugs: `compliance-clara`, `industrial-ian`, `sovereign-sofia`, `global-citizen`. Same people; different field.
 
 ---
 
@@ -154,49 +154,7 @@ She has to keep up with regulatory changes across multiple jurisdictions, in pol
 
 ---
 
-## 04 · Remote Robert
-
-**Role:** Regional Development Strategist
-**Slug:** `robert`
-**Persona doc slug:** `remote-robert`
-
-### Where he works
-
-- Regional development agencies (HIE, Scottish Enterprise, Welsh Government Innovation, Nordic regional bodies)
-- Economic development boards in the European periphery
-- Local-government innovation units in non-capital cities
-- Sub-national digital strategy units that have to compete for investment against Berlin, Paris, Amsterdam
-
-**Real-world example:** Head of digital strategy at a Scottish regional development agency positioning the region for AI infrastructure and semiconductor-adjacent investment, with the Highlands and Islands as both an asset and a constraint.
-
-### What keeps him up at night
-
-- Attracting technology investment to peripheral regions that don't appear on most tech maps
-- Workforce development for AI and advanced manufacturing when the talent is already moving to existing hubs
-- Infrastructure gaps — connectivity, compute capacity, energy supply, planning permission — that big-city competitors don't face
-- Competing with established tech hubs for the same pool of public-sector funding and private investment
-
-### What he reads us for
-
-- Case studies of regional tech strategies that worked, and forensic analysis of the ones that didn't
-- Investment trend analysis and opportunity mapping — where capital is actually flowing in 2026, not where it was 18 months ago
-- Policy frameworks for regional AI governance that don't simply mirror national policy
-- Skills-gap analysis and workforce planning data, including the talent-flow dynamics most reports gloss over
-
-### The pain point that drives him
-
-He needs to build compelling cases for technology investment in regions that compete against larger metropolitan centres with more resources, longer track records, and more political reach. His board wants headline wins; his ground reality is talent-flight, infrastructure constraints, and a planning regime that pre-dates the technology he's trying to attract. Most regional-development commentary is too generic to be useful; most tech commentary is too metropolitan to apply.
-
-### What a piece tagged for Robert looks like
-
-- The Stone Truth is about regional dynamics, talent flow, or the edge / centre asymmetry
-- The Methodology Audit almost always lights at least one `talent-*` cell, and often `supply-chain-long-memory-filter` (regional industrial cycles)
-- The piece engages with the "edge position" explicitly — using Sanday or another peripheral location as analytical advantage, not just brand colour
-- The piece often references where capability actually accumulates rather than where headlines say it does
-
----
-
-## 05 · Global Citizen
+## 04 · Global Citizen
 
 **Role:** Informed General Public
 **Slug:** `citizen`
@@ -206,7 +164,7 @@ He needs to build compelling cases for technology investment in regions that com
 
 - Independent professionals — consultants, freelance writers, podcast hosts
 - Journalists and commentators covering technology, business, or politics
-- Educators and researchers outside the four specialised decision-maker types
+- Educators and researchers outside the three specialised decision-maker types
 - Engaged citizens — informed readers without an operational stake but with substantive interest
 
 **Real-world example:** Technology journalist at a national broadsheet, or an informed professional in an adjacent field (medicine, law, education) who follows AI regulation debates and wants analysis beyond headline takes.
@@ -227,7 +185,7 @@ He needs to build compelling cases for technology investment in regions that com
 
 ### The pain point that drives them
 
-They want substantive analysis but find most coverage either too superficial (mainstream media) or too captured (trade press funded by the industry it covers). The independent commentary that does exist is mostly aimed at one of the specialised decision-maker types and assumes context they don't have. They need rigorous work pitched at a generalist register — and they're often the people who go on to recommend Silicon and Stone to the four specialised personas.
+They want substantive analysis but find most coverage either too superficial (mainstream media) or too captured (trade press funded by the industry it covers). The independent commentary that does exist is mostly aimed at one of the specialised decision-maker types and assumes context they don't have. They need rigorous work pitched at a generalist register — and they're often the people who go on to recommend Silicon and Stone to the three specialised personas.
 
 ### What a piece tagged for Global Citizen looks like
 
@@ -241,7 +199,7 @@ They want substantive analysis but find most coverage either too superficial (ma
 
 ## Shared psychographics
 
-All five personas — regardless of role — share a set of values and frustrations the framework is built to serve.
+All four personas — regardless of role — share a set of values and frustrations the framework is built to serve.
 
 ### Shared values
 
@@ -263,7 +221,7 @@ All five personas — regardless of role — share a set of values and frustrati
 - Policy briefings and think-tank reports (but they want shorter, sharper versions)
 - Industry conferences and working groups (where the best work is undocumented)
 - Curated newsletters and intelligence services (most are too generalist)
-- Peer networks and professional communities (Silicon and Stone aims to become one of these for the four specialised personas)
+- Peer networks and professional communities (Silicon and Stone aims to become one of these for the three specialised personas)
 
 This is the gap. Forensic Technopolitics, the four tools, and the planned YouTube cadence are all designed to occupy it.
 

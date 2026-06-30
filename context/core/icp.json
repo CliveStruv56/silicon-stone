@@ -73,29 +73,6 @@
       ],
       "pain_point": "Difficulty keeping up with rapid regulatory changes across jurisdictions while maintaining analytical rigour and policy relevance"
     },
-    "remote_robert": {
-      "role": "Regional Development Strategist",
-      "slug": "robert",
-      "organization_types": [
-        "Regional development agencies",
-        "Economic development boards",
-        "Local government innovation units"
-      ],
-      "example": "Head of digital strategy at a Scottish regional development agency positioning the region for AI and semiconductor investment",
-      "key_concerns": [
-        "Attracting technology investment to peripheral regions",
-        "Workforce development for AI and advanced manufacturing",
-        "Infrastructure gaps (connectivity, compute, talent)",
-        "Competing with established tech hubs for funding"
-      ],
-      "content_needs": [
-        "Case studies of successful regional tech strategies",
-        "Investment trend analysis and opportunity mapping",
-        "Policy frameworks for regional AI governance",
-        "Skills gap analysis and workforce planning data"
-      ],
-      "pain_point": "Needs to build compelling cases for technology investment in regions that don't appear on most tech maps, competing against larger metropolitan centres with more resources"
-    },
     "global_citizen": {
       "role": "Informed General Public",
       "slug": "citizen",

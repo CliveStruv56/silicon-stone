@@ -205,7 +205,7 @@ A reusable server component that injects JSON-LD from Sanity fields at render. V
 | transatlantic tech tariff / enforcement | INFO | LOW |
 | the Atlantic Drift / Forensic Technopolitics / Silicon and Stone | NAV | LOW (own) |
 
-### E — Talent & careers in European tech · *Remote Robert / Industrial Ian* (head: *European AI talent market*, MED)
+### E — Talent & careers in European tech · *Industrial Ian* (head: *European AI talent market*, MED)
 | Query | Intent | Comp |
 |---|---|---|
 | AI compliance engineer jobs Europe / salary | INV | LOW |

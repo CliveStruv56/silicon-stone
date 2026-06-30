@@ -51,7 +51,6 @@ export async function syncContent(_prevState: ActionState, _formData: FormData):
                     if (pText.includes('clara')) persona = 'compliance-clara';
                     if (pText.includes('ian')) persona = 'industrial-ian';
                     if (pText.includes('sofia')) persona = 'sovereign-sofia';
-                    if (pText.includes('robert')) persona = 'remote-robert';
                     break;
                 }
             }

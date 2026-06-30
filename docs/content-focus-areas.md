@@ -114,17 +114,6 @@ All content should be tagged for relevance to one or more of these decision-make
 > 
 > **Content Needs:** Comparative policy analysis, regulatory impact assessments, strategic frameworks
 
-### Remote Robert
-> **Role:** Regional Development Professional  
-> **Organization:** Regional development agencies, local governments, economic partnerships  
-> **Key Concerns:**
-> - Regional economic impacts of tech shifts
-> - Workforce development for tech sectors
-> - Attracting technology investment
-> - Peripheral economy positioning  
-> 
-> **Content Needs:** Regional case studies, economic impact analysis, opportunity assessments
-
 ### Global Citizen
 > **Role:** General Public/Generalist Reader  
 > **Organization:** N/A  

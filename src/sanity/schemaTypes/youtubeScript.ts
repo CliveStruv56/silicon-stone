@@ -79,7 +79,6 @@ export const youtubeScript = defineType({
           { title: 'Compliance Clara (Legal/Compliance)', value: 'clara' },
           { title: 'Industrial Ian (Operations/Supply Chain)', value: 'ian' },
           { title: 'Sovereign Sofia (Policy/Analysis)', value: 'sofia' },
-          { title: 'Remote Robert (Regional Development)', value: 'robert' },
           { title: 'Global Citizen (General Public)', value: 'citizen' },
         ],
       },

@@ -31,7 +31,7 @@ The site must revolve around the **Forensic Technopolitics** framework, not just
 
 ## 2. Tiered Intelligence UX ("Analysis Fatigue" Fix)
 
-Senior decision-makers (Personas: Clara, Ian, Sofia, Robert) require information at three speeds:
+Senior decision-makers (Personas: Clara, Ian, Sofia) require information at three speeds:
 
 ### The Three Tiers
 
@@ -114,7 +114,6 @@ Every post header requires:
 | **Compliance Clara** | Legal/Compliance Officer | Deadline trackers, risk frameworks, board-ready briefings |
 | **Industrial Ian** | Operations/Supply Chain | Supply chain maps, chokepoint analysis, scenario planning |
 | **Sovereign Sofia** | Policy/Strategy Analyst | Comparative policy analysis, sovereignty scorecards |
-| **Remote Robert** | Regional Development | Regional case studies, economic impact, local guides |
 | **Global Citizen** | Informed Observer | Accessible explainers, jargon-free analysis |
 
 ---

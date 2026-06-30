@@ -114,7 +114,6 @@ Topic: What the new US–Netherlands lithography export deal actually changes
 | Legal / Compliance | `compliance-clara` | Legal/Compliance Officer |
 | Operations / Supply Chain | `industrial-ian` | Operations/Supply Chain Manager |
 | Policy Analyst | `sovereign-sofia` | Policy Analyst/Advisor |
-| Regional Development | `remote-robert` | Regional Development Professional |
 | General Public | `global-citizen` | General Public/Generalist Reader |
 
 ### Formats

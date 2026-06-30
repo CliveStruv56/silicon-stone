@@ -14,6 +14,7 @@ const footerNavigation = {
     { name: 'Tools', href: '/tools' },
     { name: 'Products', href: '/products' },
     { name: 'Advisory', href: '/advisory' },
+    { name: 'Atlantic Drift (US execs)', href: '/atlantic-drift' },
     { name: 'EU exposure (US firms)', href: '/eu-exposure' },
     { name: 'Glossary', href: '/glossary' },
     { name: 'Methodology', href: '/methodology' },

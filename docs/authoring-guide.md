@@ -139,7 +139,7 @@ npm run sync-content:force # Overwrite ALL articles (use with caution)
     *   **Main Image:** Upload the cover image (articles without images show a branded placeholder on the site).
     *   **Content Type:** Set to `Signal`, `Deep Dive`, `Guide`, or `YouTube`.
     *   **Intelligence Tier:** Set to `Pulse`, `Briefing`, or `Audit` for the briefings page display.
-    *   **Personas:** Tag relevant personas (Clara, Ian, Sofia, Robert, Citizen).
+    *   **Personas:** Tag relevant personas (Clara, Ian, Sofia, Citizen).
     *   **Impact Score:** Set 1-10 for the briefings page impact bar.
     *   **Stone Truth:** Add a one-line forensic insight (displayed in italics on briefings cards).
 
@@ -169,7 +169,6 @@ npm run sync-content:force # Overwrite ALL articles (use with caution)
 | Compliance Clara | `clara` | Legal/compliance counsel at tech firms |
 | Industrial Ian | `ian` | Supply chain and operations directors |
 | Sovereign Sofia | `sofia` | Policy analysts at think tanks and government |
-| Remote Robert | `robert` | Regional development strategists |
 | Global Citizen | `citizen` | Informed general public, journalists, educators |
 
 ## 7. House Style & the Vault (source of truth)

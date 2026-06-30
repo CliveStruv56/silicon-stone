@@ -354,6 +354,30 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### June 30, 2026 — Retired Remote Robert persona + Atlantic Drift footer link
+
+- **Personas reduced 5 → 4 taggable** (Clara, Ian, Sofia, Citizen; Positional remains a reading
+  lens → WaymarkPath). **Remote Robert fully removed.**
+- **Sanity content migrated:** 7 articles tagged `robert` (6 published + 1 draft) reassigned to
+  Global Citizen (`citizen`), de-duped; previously-published ones re-published. Orphan
+  `persona.remote_robert` document deleted. Audit confirms **0** remaining `robert` tags.
+- **Code:** `robert` stripped from `src/lib/personas.ts` (`PersonaSlug` union, `PERSONAS`,
+  `PERSONA_ORDER`, badge classes, `getDynamicCTA`), `article.ts` + `youtubeScript.ts` schema
+  option lists, `queries.ts` byPersona count, `PersonaFilter.tsx` icon. `src/lib/sanity.ts`
+  legacy-key map now points `remote-robert`/`remote_robert` → `citizen`;
+  `content/actions.ts` import branch dropped. `context/core/icp.json` `remote_robert` block removed.
+- **Atlantic Drift discoverability:** added a footer link `Atlantic Drift (US execs)` →
+  `/atlantic-drift` in the Engage group, beside the existing `EU exposure (US firms)` link
+  (`Footer.tsx`). The page was previously orphan (in `sitemap.ts` only, reachable by direct URL).
+- **Docs:** Remote Robert removed from `persona-profiles.md` (section deleted, renumbered, counts
+  fixed), `authoring-guide.md`, `article-generation-guide.md`, `welcome-pack-jane-struver.md`,
+  `content-focus-areas.md`, `intelligence-portal-specification.md`, `SiliconandStoneSEOreport.md`.
+  Historical dated entries in `admin/context/homepage-redesign/CHANGELOG.md` left intact (they
+  record a real past commit).
+- **US persona:** deferred per Clive — will be a **podcast-only voice character** (name/identity
+  TBD). If ever promoted to the site it takes Robert's now-empty slot. Not built in this change.
+- `tsc --noEmit` + `npm run build` both pass.
+
 ### June 30, 2026 — Website build brief implementation (`docs/silicon-stone-website-build-brief-for-claude-code.md`)
 
 Implemented Parts A, B, D, E and most of Appendix F from the build brief (Part C — article specs — deferred; recorded in `docs/article-specs-todo.md`). House style applied throughout (UK spelling; operative 2 Aug 2026 vs adopted-pending 2 Dec 2027 / 2 Aug 2028; neutral-interpreter; no invented stats).
