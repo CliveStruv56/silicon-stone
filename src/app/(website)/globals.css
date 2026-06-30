@@ -176,7 +176,7 @@
   --color-sidebar-ring: var(--sidebar-ring);
 
   /* Fonts - Updated for Forensic Technopolitics */
-  --font-display: var(--font-unbounded), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), ui-serif, Georgia, Cambria, "Times New Roman", serif;
   --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
 
@@ -226,11 +226,12 @@ html.dark {
     line-height: 1.6;
   }
 
-  /* Headings use the display font (Unbounded) */
+  /* Headings use the display font (Fraunces — editorial serif) */
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-unbounded), ui-sans-serif, system-ui, sans-serif;
+    font-family: var(--font-fraunces), ui-serif, Georgia, Cambria, "Times New Roman", serif;
     font-weight: 600;
-    letter-spacing: -0.02em;
+    font-optical-sizing: auto;
+    letter-spacing: -0.015em;
   }
 }
 
@@ -343,11 +344,13 @@ html.dark {
 
 /* ===== Design-brief helpers (light + dark) ===== */
 
-/* Sentence-length headings: Unbounded is a display face for SHORT headers only.
-   Use .font-statement to set longer heading sentences in Outfit so they stay
-   readable rather than turning into a heavy wall. */
+/* Sentence-length headings. This helper predates the move to Fraunces (it used
+   to drop long headers out of the unreadable Unbounded display face into Outfit).
+   Fraunces reads cleanly at any length, so .font-statement now just keeps these
+   headings on the display serif with slightly looser tracking. */
 .font-statement {
-  font-family: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-fraunces), ui-serif, Georgia, Cambria, "Times New Roman", serif;
+  font-optical-sizing: auto;
   letter-spacing: -0.01em;
 }
 

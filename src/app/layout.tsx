@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { Unbounded, Outfit, JetBrains_Mono } from "next/font/google";
+import { Fraunces, Outfit, JetBrains_Mono } from "next/font/google";
 import { SITE_URL } from "@/lib/site";
 import "./(website)/globals.css";
 
-const unbounded = Unbounded({
-  variable: "--font-unbounded",
+// Display / heading face. Fraunces is a variable serif; include the optical-size
+// axis so large display headings get high contrast while small headings stay sturdy.
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
   subsets: ["latin"],
   display: "swap",
+  axes: ["opsz"],
 });
 
 const outfit = Outfit({
@@ -86,7 +89,7 @@ export default function RootLayout({
         )}
       </head>
       <body
-        className={`${unbounded.variable} ${outfit.variable} ${jetbrainsMono.variable} antialiased bg-slate-deep text-text-primary`}
+        className={`${fraunces.variable} ${outfit.variable} ${jetbrainsMono.variable} antialiased bg-slate-deep text-text-primary`}
         suppressHydrationWarning
       >
         {children}

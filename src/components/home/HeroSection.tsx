@@ -128,7 +128,7 @@ export function HeroSection({ settings }: HeroSectionProps) {
                             className="font-bold text-white mb-6 text-balance"
                             style={{
                                 fontSize: 'clamp(38px, 4.4vw, 60px)',
-                                letterSpacing: '-0.02em',
+                                letterSpacing: '-0.01em',
                                 lineHeight: 1.08,
                                 textShadow: '0 2px 30px rgba(0,0,0,0.45)',
                             }}

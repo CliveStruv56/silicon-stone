@@ -366,6 +366,15 @@ Re-pointed the homepage hero (`src/components/home/HeroSection.tsx`) from a maga
 - **Design tuning (post-review):** headline was out of proportion — reduced from `clamp(44px,6vw,80px)`/`lh 1.02` to `clamp(38px,4.4vw,60px)`/`lh 1.08` with `text-balance` so it sits on two even lines; accented the second sentence ("Have you governed it?") in brand amber `#F6AD55` to echo the badge; recoloured the "Read the methodology" link from white to brand seafoam-teal `#8fcbc4` and added `whitespace-nowrap` so it no longer wraps to two lines. Verified on desktop (1440) and mobile (390) via Playwright.
 - `npm run build` passes.
 
+### June 30, 2026 — Display typeface: Unbounded → Fraunces (site-wide)
+
+Replaced the heading/display font across the whole site. Unbounded (rounded geometric display sans) read soft/playful in bold and undercut the forensic-intelligence positioning; swapped to **Fraunces**, an editorial "old-style" serif that gives think-tank / publication-of-record authority and pairs with the existing Outfit body sans. Chosen from a 7-face specimen trial (Fraunces, Newsreader, Spectral, Space Grotesk, Archivo Expanded, Hanken Grotesk) rendered in-context over the hero photo.
+
+- `src/app/layout.tsx`: `Unbounded` → `Fraunces` (next/font/google), variable `--font-unbounded` → `--font-fraunces`, added the `opsz` (optical-size) axis so large display headings get high contrast while small headings stay sturdy.
+- `globals.css`: `--font-display` and the global `h1–h6` rule repointed to `var(--font-fraunces)` with a serif fallback stack, `font-optical-sizing: auto`, and slightly looser tracking (`-0.015em`). `.font-statement` helper (was an Unbounded-readability workaround forcing Outfit) repointed to Fraunces so all headings are consistent serif.
+- Hero `HeroSection.tsx`: loosened headline tracking to `-0.01em` to suit the serif.
+- Verified in the real app on the homepage hero (dark) and `/advisory` (light, smaller section headings); body text and mono labels unchanged. `npm run build` passes.
+
 ### June 25, 2026 — Site consistency fixes (F1–F13 brief)
 
 Worked through the "Site Consistency Fixes" brief, mostly reconciling every surface with the recalibrated EU AI Act timeline (the 2026 Digital Omnibus moved high-risk obligations off the single "August 2026 cliff" to **2 Dec 2027** standalone / **2 Aug 2028** embedded; **2 Aug 2026** is now transparency + penalties only) and the canonical **3×2** methodology (three domains × two methods; the old "Four Pillars / Signal Filtering" framing is superseded).
