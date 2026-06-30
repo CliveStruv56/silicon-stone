@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Header, Footer } from '@/components/layout'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -292,27 +293,48 @@ export default function ServicesPage() {
         {/* Hero Section */}
         <section className="bg-slate-deep border-b border-border-subtle">
           <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
-            <div className="max-w-3xl">
-              <Badge variant="outline" className="mb-4 border-stone-teal text-stone-teal">
-                Services
-              </Badge>
-              <h1 className="text-4xl font-bold text-text-primary sm:text-5xl mb-6">
-                Strategic Advisory for the Technopolitical Age
-              </h1>
-              <p className="text-xl text-text-muted leading-relaxed mb-6">
-                AI adoption creates a governance problem and a dependency problem at
-                the same time — and both keep moving. We help organisations map the
-                exposure, then stay ahead of it.
-              </p>
-              <p className="text-text-muted leading-relaxed">
-                Most engagements begin with a single diagnostic question and grow into a
-                standing relationship: the systems in use, the evidence missing from
-                vendors, the technology exposures that could become operating
-                constraints — read continuously, not once.
-              </p>
-              <p className="mt-5 font-mono text-xs uppercase tracking-wider text-text-muted">
-                Regulatory copy last reviewed: 30 June 2026
-              </p>
+            <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-center lg:gap-12">
+              <div>
+                <Badge variant="outline" className="mb-4 border-stone-teal text-stone-teal">
+                  Services
+                </Badge>
+                <h1 className="text-4xl font-bold text-text-primary sm:text-5xl mb-6">
+                  Strategic Advisory for the Technopolitical Age
+                </h1>
+                <p className="text-xl text-text-muted leading-relaxed mb-6">
+                  AI adoption creates a governance problem and a dependency problem at
+                  the same time — and both keep moving. We help organisations map the
+                  exposure, then stay ahead of it.
+                </p>
+                <p className="text-text-muted leading-relaxed">
+                  Most engagements begin with a single diagnostic question and grow into a
+                  standing relationship: the systems in use, the evidence missing from
+                  vendors, the technology exposures that could become operating
+                  constraints — read continuously, not once.
+                </p>
+                <p className="mt-5 font-mono text-xs uppercase tracking-wider text-text-muted">
+                  Regulatory copy last reviewed: 30 June 2026
+                </p>
+              </div>
+
+              <div className="relative">
+                <div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-border-subtle lg:aspect-square">
+                  <Image
+                    src="/intelligence-stream-bg.png"
+                    alt="A Forensic Technopolitics global risk map — supply-chain tracing, policy stress-testing and dependency mapping across the transatlantic system"
+                    fill
+                    priority
+                    sizes="(min-width: 1024px) 50vw, 100vw"
+                    className="object-cover object-center"
+                  />
+                  {/* Gradient scrim for caption legibility */}
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-deep via-slate-deep/70 to-transparent p-5 pt-16">
+                    <p className="text-sm italic text-white/90 [text-shadow:0_1px_8px_rgba(0,0,0,0.7)]">
+                      Three forensic domains, two analytical methods — applied to your decision.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>

@@ -114,9 +114,12 @@ export default function AboutPage() {
                     className="object-cover"
                     priority
                   />
-                  {/* Gradient scrim for caption legibility */}
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-deep/90 to-transparent p-6 pt-16">
-                    <p className="text-text-primary text-sm italic">
+                  {/* Gradient scrim for caption legibility. Caption text is
+                      FIXED light (it always sits on the dark scrim over the
+                      image) — it must not follow the theme tokens, which flip to
+                      dark ink in light mode and vanish against the scrim. */}
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-deep via-slate-deep/70 to-transparent p-6 pt-16">
+                    <p className="text-sm italic text-white/90 [text-shadow:0_1px_8px_rgba(0,0,0,0.7)]">
                       &ldquo;The edge is where you see what the centre misses&rdquo;
                     </p>
                   </div>
