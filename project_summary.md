@@ -1,7 +1,7 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-06-25
+> Last Updated: 2026-06-30
 > Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing, 13 moderate transitive npm audit findings (uuid through Sanity packages)**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com. Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools (email-gated for lead capture, AI Act triage engine recently overhauled), product/commerce pages with an early-access enquiry fallback until Lemon Squeezy checkout URLs are configured, Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Awaiting Lemon Squeezy store setup, Plausible account, and content publishing for queued drafts.
@@ -353,6 +353,17 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### June 30, 2026 — Homepage hero re-point (`docs/homepage-hero-prd.md`)
+
+Re-pointed the homepage hero (`src/components/home/HeroSection.tsx`) from a magazine/audience pitch to the paying buyer ("Clara" — compliance/country-manager at a mid-size European company), per the PRD. No layout change beyond one added button.
+
+- **Headline** (hard-coded fallback; Sanity `heroTitle` is `null` so the fallback is what renders): `AI. Policy. Power. Leadership.` → **"You've deployed AI. Have you governed it?"**
+- **Subhead** rewritten to name the buyer — *"for leaders at mid-size UK and European companies who have to act without a Big-Four budget"*; deleted the "AI governance as one application, not the whole map" clause.
+- **Removed** the "AI fluency… baseline, not the edge" supporting line (pointed at WaymarkPath/careers — different business; may relocate lower later).
+- **Added secondary CTA** — `Book a 20-minute AI exposure call` → `/advisory#contact` (the real contact form section). This is the first above-the-fold revenue path and doubles as the booking link for the 20 AI-Act validation calls.
+- Kept badge, primary CTA (`Get the Atlantic Drift Briefing`), "Read the methodology" text link, and cadence line. Final CTA order: **[Get the Briefing] · [Book a call] · Read the methodology**.
+- `npm run build` passes.
 
 ### June 25, 2026 — Site consistency fixes (F1–F13 brief)
 

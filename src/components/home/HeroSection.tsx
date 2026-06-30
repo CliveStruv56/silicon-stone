@@ -133,7 +133,7 @@ export function HeroSection({ settings }: HeroSectionProps) {
                                 textShadow: '0 2px 30px rgba(0,0,0,0.45)',
                             }}
                         >
-                            {settings?.heroTitle || 'AI. Policy. Power. Leadership.'}
+                            {settings?.heroTitle || "You've deployed AI. Have you governed it?"}
                         </motion.h1>
 
                         <motion.p
@@ -146,19 +146,7 @@ export function HeroSection({ settings }: HeroSectionProps) {
                                 textShadow: '0 2px 20px rgba(0,0,0,0.5)',
                             }}
                         >
-                            Independent, decision-grade intelligence on the technology supply chain and the geopolitics of dependency — read from thirty years inside the industry. For UK and European leaders, with AI governance as one application, not the whole map.
-                        </motion.p>
-
-                        <motion.p
-                            variants={itemVariants}
-                            className="mb-9 max-w-xl text-base font-medium leading-relaxed text-white/80"
-                            style={{
-                                textShadow: '0 2px 18px rgba(0, 0, 0, 0.6)',
-                            }}
-                        >
-                            AI fluency is fast becoming{' '}
-                            <span className="font-semibold text-[#F6AD55]">the baseline, not the edge</span>
-                            {' '}— for industries and the careers inside them.
+                            Independent, decision-grade intelligence and advisory on AI governance, the technology supply chain, and the geopolitics of dependency — for leaders at mid-size UK and European companies who have to act without a Big-Four budget. Read from thirty years inside the industry.
                         </motion.p>
 
                         <motion.div
@@ -171,6 +159,16 @@ export function HeroSection({ settings }: HeroSectionProps) {
                                     className="bg-[#1f807c] text-white hover:bg-[#27938d] transition-transform hover:scale-105 font-semibold text-base px-8 shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
                                 >
                                     Get the Atlantic Drift Briefing
+                                </Button>
+                            </Link>
+
+                            <Link href="/advisory#contact">
+                                <Button
+                                    size="lg"
+                                    variant="outline"
+                                    className="border-white/40 bg-white/5 text-white hover:bg-white/10 hover:text-white transition-transform hover:scale-105 font-semibold text-base px-8 shadow-[0_10px_30px_rgba(0,0,0,0.35)] backdrop-blur-sm"
+                                >
+                                    Book a 20-minute AI exposure call
                                 </Button>
                             </Link>
 
