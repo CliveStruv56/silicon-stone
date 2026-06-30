@@ -24,6 +24,8 @@ import {
   FileText,
   Shield,
   Users,
+  Layers,
+  type LucideIcon,
 } from 'lucide-react'
 
 const domains = [
@@ -88,7 +90,18 @@ const methods = [
   },
 ]
 
-const assessments = [
+type Assessment = {
+  title: string
+  description: string
+  deliverables: string[]
+  icon: LucideIcon
+  color: string
+  fromTool?: string
+  price?: string
+  priceNote?: string
+}
+
+const assessments: Assessment[] = [
   {
     title: 'Manufacturing Exposure Module',
     description: 'Add a focused view of semiconductor, cloud, supplier, and operational dependencies where they matter to your organisation.',
@@ -127,6 +140,34 @@ const assessments = [
     icon: FileText,
     fromTool: 'Policy Stress-Test',
     color: 'silicon-amber',
+  },
+  {
+    title: 'AI Bill of Materials',
+    description:
+      'Know what your AI is actually made of — every model, dataset, wrapper and API — before a regulator or a buyer asks.',
+    deliverables: [
+      'A complete AI bill of materials: each model, dataset, fine-tune, wrapper, API and library, version-tracked',
+      'Provenance and licence status for every component, with the gaps your vendors cannot yet evidence',
+      'A mapping to the Cyber Resilience Act’s SBOM duty and to AI Act Article 50 transparency',
+      'A prioritised remediation list — what to fix before the September 2026 reporting duties bite',
+    ],
+    icon: Layers,
+    price: 'From £4,500',
+    priceNote: 'Or added to an EU Exposure Briefing.',
+    color: 'stone-teal',
+  },
+  {
+    title: 'Sovereign Architecture Review',
+    description: 'Design for sovereignty as an option, not an emergency rebuild.',
+    deliverables: [
+      'A model-dependency map: where inference, weights and keys sit, and who can reach them',
+      'An abstraction-layer assessment — can you satisfy a buyer’s sovereignty demand without re-architecting?',
+      'A key-custody and admin-access review: EU-resident keys, and where a US administrative override still reaches EU data',
+      'A sovereignty roadmap that keeps your options open — it does not pick your vendors for you',
+    ],
+    icon: Shield,
+    price: 'From £6,500',
+    color: 'sister-indigo',
   },
 ]
 
@@ -270,7 +311,7 @@ export default function ServicesPage() {
                 constraints — read continuously, not once.
               </p>
               <p className="mt-5 font-mono text-xs uppercase tracking-wider text-text-muted">
-                Regulatory copy last reviewed: 2 June 2026
+                Regulatory copy last reviewed: 30 June 2026
               </p>
             </div>
           </div>
@@ -458,7 +499,7 @@ export default function ServicesPage() {
         <Separator className="mx-auto max-w-7xl bg-border-subtle" />
 
         {/* Assessment Offerings */}
-        <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
+        <section id="modules" className="scroll-mt-24 mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
           <div className="mb-8">
             <h2 className="text-2xl font-semibold text-text-primary mb-4">
               Follow-on Modules
@@ -485,9 +526,15 @@ export default function ServicesPage() {
                     <CardHeader>
                       <div className="flex items-start justify-between">
                         <Icon className={`w-6 h-6 text-${assessment.color}`} />
-                        <Badge variant="outline" className="text-[12px] text-text-muted border-border-subtle">
-                          From {assessment.fromTool}
-                        </Badge>
+                        {assessment.fromTool ? (
+                          <Badge variant="outline" className="text-[12px] text-text-muted border-border-subtle">
+                            From {assessment.fromTool}
+                          </Badge>
+                        ) : assessment.price ? (
+                          <Badge variant="outline" className="text-[12px] font-mono text-text-primary border-border-subtle">
+                            {assessment.price}
+                          </Badge>
+                        ) : null}
                       </div>
                       <CardTitle className="text-lg text-text-primary mt-3">
                         {assessment.title}
@@ -506,6 +553,9 @@ export default function ServicesPage() {
                           </li>
                         ))}
                       </ul>
+                      {assessment.priceNote && (
+                        <p className="mt-4 text-xs italic text-text-muted">{assessment.priceNote}</p>
+                      )}
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -582,6 +632,36 @@ export default function ServicesPage() {
                   </Card>
                 </motion.div>
               ))}
+            </div>
+
+            {/* Bespoke / enterprise band — the top of the ladder above the
+                Strategic Assessment, scoped one-to-one (A4). */}
+            <div className="mt-8 rounded-lg border border-border-subtle bg-stone-charcoal p-6 lg:p-8">
+              <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                <div className="max-w-2xl">
+                  <div className="mb-2 font-mono text-xs uppercase tracking-wider text-text-muted">
+                    Bespoke · enterprise
+                  </div>
+                  <h3 className="mb-2 text-xl font-semibold text-text-primary">
+                    Board-level and multi-entity engagements
+                  </h3>
+                  <p className="text-sm leading-relaxed text-text-muted">
+                    For a group, multi-jurisdiction exposure, or a board-level mandate — a
+                    bespoke engagement scoped to the question, which then settles into a
+                    Drift Retainer for ongoing oversight.
+                  </p>
+                </div>
+                <div className="flex flex-shrink-0 flex-col items-start gap-3 lg:items-end">
+                  <div className="font-mono text-lg font-semibold text-text-primary">
+                    £25,000–£50,000
+                  </div>
+                  <a href="#contact">
+                    <Button className="bg-surface-elevated text-text-primary hover:bg-surface-elevated/80">
+                      Discuss an engagement
+                    </Button>
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </section>

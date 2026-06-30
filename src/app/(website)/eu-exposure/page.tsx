@@ -104,6 +104,19 @@ export default function EuExposurePage() {
           </div>
         </section>
 
+        {/* Shadow-AI opener — the inventory comes first (B1) */}
+        <section className="mx-auto max-w-7xl px-6 pt-10 lg:px-8 lg:pt-12">
+          <div className="max-w-3xl border-l-2 border-silicon-amber/50 pl-5">
+            <p className="text-lg leading-relaxed text-text-primary/90">
+              You cannot govern — or vouch for — what you cannot see. Most organisations
+              cannot produce a straight list of the AI systems already in use across their
+              teams, let alone the vendors behind them. That is the first exposure: you
+              cannot meet an Article 26 deployer duty, or answer a buyer’s questionnaire, on
+              a system nobody logged. We start by making the inventory real.
+            </p>
+          </div>
+        </section>
+
         {/* What I do — neutral interpreter stance */}
         <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
           <div className="max-w-3xl">
@@ -188,6 +201,49 @@ export default function EuExposurePage() {
               from the Atlantic edge.
             </p>
           </div>
+        </section>
+
+        {/* Procurement Exposure — add-on to the briefing (A3) */}
+        <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
+          <Card className="bg-stone-charcoal border-border-subtle">
+            <CardHeader>
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge variant="outline" className="border-stone-teal text-stone-teal">
+                  Add-on
+                </Badge>
+                <span className="font-mono text-xs uppercase tracking-wider text-text-muted">
+                  To the EU Exposure Briefing
+                </span>
+              </div>
+              <h2 className="mt-3 text-2xl font-semibold text-text-primary">
+                Procurement Exposure
+              </h2>
+              <p className="mt-2 max-w-2xl text-text-muted">
+                See which missing evidence will actually stall your European deals — and
+                which is just box-ticking.
+              </p>
+            </CardHeader>
+            <CardContent>
+              <div className="mb-3 font-mono text-xs uppercase tracking-wider text-text-muted">
+                Deliverables
+              </div>
+              <ul className="space-y-2">
+                {[
+                  'Your AI systems mapped against the governance questionnaires European buyers now send',
+                  'A required-versus-theatre triage: the evidence that genuinely gates procurement, separated from the noise',
+                  'A review of the AI indemnification clauses appearing in EU enterprise contracts — what you’d be signing',
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-text-primary">
+                    <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-stone-teal" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-5 text-sm font-semibold text-text-primary">
+                Add-on from £1,500.
+              </p>
+            </CardContent>
+          </Card>
         </section>
 
         {/* Contact — self-contained */}

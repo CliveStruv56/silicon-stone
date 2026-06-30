@@ -8,10 +8,15 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 
+const aboutDescription =
+  'Analysis from the Edge: 30 years of technology industry experience, delivered from Scotland\'s Atlantic coast.'
+
 export const metadata: Metadata = {
   title: 'About | Silicon and Stone',
-  description: 'Analysis from the Edge: 30 years of technology industry experience, delivered from Scotland\'s Atlantic coast.',
+  description: aboutDescription,
   alternates: { canonical: '/about' },
+  openGraph: { title: 'About Silicon and Stone', description: aboutDescription, type: 'website' },
+  twitter: { card: 'summary_large_image', title: 'About Silicon and Stone', description: aboutDescription },
 }
 
 const credentials = [
@@ -118,6 +123,19 @@ export default function AboutPage() {
                 </div>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* EU–Japan capability note (D2) */}
+        <section className="mx-auto max-w-7xl px-6 pt-10 lg:px-8 lg:pt-12">
+          <div className="max-w-3xl rounded-lg border border-border-subtle bg-stone-charcoal/50 p-6">
+            <div className="mb-2 font-mono text-xs uppercase tracking-wider text-stone-teal">
+              The fourth leg
+            </div>
+            <p className="text-lg leading-relaxed text-text-primary/90">
+              Thirty years across Europe, the US and Japan — including a working grasp of the
+              EU–Japan digital partnership and DFFT that few US-facing advisers can offer.
+            </p>
           </div>
         </section>
 

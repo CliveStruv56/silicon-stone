@@ -154,6 +154,19 @@ export function HeroSection({ settings }: HeroSectionProps) {
                             Independent, decision-grade intelligence and advisory on AI governance, the technology supply chain, and the geopolitics of dependency — for leaders at mid-size UK and European companies who have to act without a Big-Four budget. Read from thirty years inside the industry.
                         </motion.p>
 
+                        <motion.p
+                            variants={itemVariants}
+                            className="mb-7 max-w-2xl text-white/82"
+                            style={{
+                                fontSize: 'clamp(15px, 1.4vw, 17px)',
+                                lineHeight: 1.55,
+                                textShadow: '0 2px 20px rgba(0,0,0,0.5)',
+                            }}
+                        >
+                            <strong className="font-semibold text-white">In Europe, your supply chain is your liability.</strong>{' '}
+                            The model you embed, the API you call, the training data you never saw — under the AI Act and the Cyber Resilience Act, your buyer&apos;s regulator treats them as yours. We map that dependency graph before it becomes a liability.
+                        </motion.p>
+
                         <motion.div
                             variants={itemVariants}
                             className="mt-2 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6"

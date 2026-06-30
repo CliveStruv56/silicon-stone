@@ -90,7 +90,7 @@ export default function AIAuditChecklistPage() {
                   Includes a £20 discount code for the full AI Act Compliance Toolkit.
                 </p>
                 <p className="mt-5 font-mono text-xs uppercase tracking-wider text-text-muted">
-                  Regulatory copy last reviewed: 2 June 2026
+                  Regulatory copy last reviewed: 30 June 2026
                 </p>
               </div>
 

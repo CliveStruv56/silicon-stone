@@ -17,6 +17,16 @@ export const metadata: Metadata = {
   title: 'Products | Silicon and Stone',
   description: 'Digital products for European businesses navigating AI regulation, supply chain risk, and digital sovereignty.',
   alternates: { canonical: '/products' },
+  openGraph: {
+    title: 'Products',
+    description: 'Digital products for European businesses navigating AI regulation, supply chain risk, and digital sovereignty.',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Products',
+    description: 'Digital products for European businesses navigating AI regulation, supply chain risk, and digital sovereignty.',
+  },
 }
 
 const products = [
@@ -102,7 +112,7 @@ export default function ProductsPage() {
                 prove, and what should trigger reassessment.
               </p>
               <p className="mt-5 font-mono text-xs uppercase tracking-wider text-text-muted">
-                Regulatory copy last reviewed: 2 June 2026
+                Regulatory copy last reviewed: 30 June 2026
               </p>
             </div>
           </div>

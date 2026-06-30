@@ -7,11 +7,15 @@ import { buildGlossarySchema } from '@/lib/seo'
 import { sanityFetch } from '@/sanity/lib/live'
 import { GLOSSARY_TERMS_QUERY } from '@/sanity/lib/queries'
 
+const glossaryDescription =
+  'Plain-language definitions of the institutions, laws, AI techniques, models and semiconductor terms used by Silicon and Stone.'
+
 export const metadata: Metadata = {
   title: 'Glossary | Silicon and Stone',
-  description:
-    'Plain-language definitions of the institutions, laws, AI techniques, models and semiconductor terms used by Silicon and Stone.',
+  description: glossaryDescription,
   alternates: { canonical: '/glossary' },
+  openGraph: { title: 'Glossary', description: glossaryDescription, type: 'website' },
+  twitter: { card: 'summary_large_image', title: 'Glossary', description: glossaryDescription },
 }
 
 export default async function GlossaryPage() {

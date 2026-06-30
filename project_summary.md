@@ -354,6 +354,24 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### June 30, 2026 — Website build brief implementation (`docs/silicon-stone-website-build-brief-for-claude-code.md`)
+
+Implemented Parts A, B, D, E and most of Appendix F from the build brief (Part C — article specs — deferred; recorded in `docs/article-specs-todo.md`). House style applied throughout (UK spelling; operative 2 Aug 2026 vs adopted-pending 2 Dec 2027 / 2 Aug 2028; neutral-interpreter; no invented stats).
+
+- **A1/A2 (`/advisory`):** added two follow-on modules — **AI Bill of Materials** (from £4,500) and **Sovereign Architecture Review** (from £6,500). Module cards now support a price badge + price note (new `Assessment` type). Section given `id="modules"`.
+- **A3 (`/eu-exposure`):** added **Procurement Exposure** add-on block (from £1,500).
+- **A4 (`/advisory`):** added a **bespoke/enterprise band (£25,000–£50,000)** below the tiers grid. Per Clive, the existing Strategic Assessment roadmap **stays at £8,000** (no reprice).
+- **B1 (`/eu-exposure`):** shadow-AI inventory opener above "What I do".
+- **B2 (homepage hero):** supply-chain-liability secondary line in `HeroSection.tsx`.
+- **D1:** built **`/atlantic-drift`** lead magnet (hero, problem, required-vs-noise, operative-vs-adopted timeline, 3-point self-check, email capture → `/api/subscribe`, next-step = fee-credited EU Exposure Briefing). Added to `sitemap.ts` (resolves the F8 sitemap 404). Email capture reuses the standard subscribe flow; a dedicated "Atlantic Drift" lead tag is a TODO pending backend whitelist.
+- **D2:** EU–Japan capability note on `/about`; appended the EU–Japan line to Clive's bio (**Sanity, published**).
+- **D3:** created + **published** three glossary terms in Sanity — **CRA** (law-policy), **AI-BOM** (technical-term, related to existing BOM), **DFFT** (technical-term).
+- **E1:** refreshed all four "Regulatory copy last reviewed" stamps 2 June → **30 June 2026** (advisory, products, ai-act-toolkit, ai-audit-checklist). **AI Act article**: an on-thesis draft rewrite already exists (`drafts.73345a32…`, "What 2 August 2026 Actually Requires…") but carries unresolved `[AUTHOR: source needed]` placeholders + a sources-cleanup note — **left unpublished, needs Clive's input** before it can replace the live "Compliance Chasm / full enforcement" version.
+- **F6:** added per-page `og:title`/`og:description` to advisory, eu-exposure, about, products, glossary, atlantic-drift. (Articles already have dynamic `opengraph-image.tsx`; per-page OG *images* for static pages still pending — they inherit the default the-watcher.png.)
+- **F7/F9/F10:** verified already resolved in repo (intelligence list is SSR-seeded; no "Weekly" remnant; "Most popular" on Drift Retainer + 5 personas). Will be live on next deploy.
+- **F4 (apex→www 307→308/301):** Vercel domain-level setting — handed to Clive with steps. **F5 (`sameAs`):** skipped — awaiting LinkedIn/Substack/YouTube URLs (`ORG_SAME_AS` scaffold already present in `src/app/(website)/page.tsx`).
+- `npm run typecheck` + targeted `eslint` pass.
+
 ### June 30, 2026 — Homepage hero re-point (`docs/homepage-hero-prd.md`)
 
 Re-pointed the homepage hero (`src/components/home/HeroSection.tsx`) from a magazine/audience pitch to the paying buyer ("Clara" — compliance/country-manager at a mid-size European company), per the PRD. No layout change beyond one added button.

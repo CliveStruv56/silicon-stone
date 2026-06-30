@@ -118,7 +118,7 @@ export default function AIActToolkitPage() {
                   {!standardCheckoutReady && ' Early access is open while fulfilment is finalised.'}
                 </p>
                 <p className="mt-5 font-mono text-xs uppercase tracking-wider text-text-muted">
-                  Regulatory copy last reviewed: 2 June 2026
+                  Regulatory copy last reviewed: 30 June 2026
                 </p>
               </div>
 
@@ -264,6 +264,13 @@ export default function AIActToolkitPage() {
                   Start with the Audit Checklist Pack (£24)
                 </Link>
                 {' '}and get a £20 discount on this toolkit.
+              </p>
+              <p className="mt-3 text-sm text-text-muted">
+                Need the systems register built and evidenced for you?{' '}
+                <Link href="/advisory#modules" className="text-stone-teal hover:underline">
+                  The AI Bill of Materials module
+                </Link>
+                {' '}version-tracks every model, dataset, wrapper and API, with provenance and licence status.
               </p>
               <div className="flex items-center justify-center gap-6 mt-8 text-xs text-text-muted">
                 <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> {standardCheckoutReady ? 'Digital delivery' : 'Early access enquiries open'}</span>
