@@ -366,6 +366,10 @@ Re-pointed the homepage hero (`src/components/home/HeroSection.tsx`) from a maga
 - **Design tuning (post-review):** headline was out of proportion — reduced from `clamp(44px,6vw,80px)`/`lh 1.02` to `clamp(38px,4.4vw,60px)`/`lh 1.08` with `text-balance` so it sits on two even lines; accented the second sentence ("Have you governed it?") in brand amber `#F6AD55` to echo the badge; recoloured the "Read the methodology" link from white to brand seafoam-teal `#8fcbc4` and added `whitespace-nowrap` so it no longer wraps to two lines. Verified on desktop (1440) and mobile (390) via Playwright.
 - `npm run build` passes.
 
+### June 30, 2026 — Methodology page: tighten paragraph spacing
+
+The "Why 'Forensic'?" intro block was wrapped in Tailwind `prose prose-lg`, whose paragraph margins (~1.33em ≈ 24px) overrode the `mb-4` and bumped font-size/line-height, leaving too much white space between paragraphs. Replaced the `prose` wrapper with a plain `space-y-3` container (12px gap, `leading-relaxed`) so the paragraphs read closer together while staying clearly separated. `src/app/(website)/methodology/page.tsx` only.
+
 ### June 30, 2026 — Display typeface: Unbounded → Fraunces (site-wide)
 
 Replaced the heading/display font across the whole site. Unbounded (rounded geometric display sans) read soft/playful in bold and undercut the forensic-intelligence positioning; swapped to **Fraunces**, an editorial "old-style" serif that gives think-tank / publication-of-record authority and pairs with the existing Outfit body sans. Chosen from a 7-face specimen trial (Fraunces, Newsreader, Spectral, Space Grotesk, Archivo Expanded, Hanken Grotesk) rendered in-context over the hero photo.

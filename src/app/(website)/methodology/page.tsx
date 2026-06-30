@@ -264,18 +264,18 @@ export default function MethodologyPage() {
             <h2 className="text-2xl font-semibold text-text-primary mb-6">
               Why &ldquo;Forensic&rdquo;?
             </h2>
-            <div className="prose prose-lg dark:prose-invert">
-              <p className="text-text-muted leading-relaxed mb-4">
+            <div className="space-y-3 text-text-muted leading-relaxed">
+              <p>
                 Most technology analysis works backwards from conclusions. Analysts start with a narrative—
                 &ldquo;AI will transform everything,&rdquo; &ldquo;Europe is falling behind,&rdquo; &ldquo;supply chains are resilient&rdquo;—
                 and find evidence to support it.
               </p>
-              <p className="text-text-muted leading-relaxed mb-4">
+              <p>
                 Forensic analysis works forwards from evidence. We start with physical facts: where materials
                 come from, how factories actually operate, what regulations actually say, how decisions
                 actually get made. Then we follow the evidence to conclusions, even uncomfortable ones.
               </p>
-              <p className="text-text-muted leading-relaxed">
+              <p>
                 This approach takes longer. It produces fewer confident predictions. But it catches
                 the things that matter—the single points of failure, the impossible compliance positions,
                 the scenarios everyone assumes away.
