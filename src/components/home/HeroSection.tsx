@@ -125,15 +125,20 @@ export function HeroSection({ settings }: HeroSectionProps) {
 
                         <motion.h1
                             variants={itemVariants}
-                            className="font-bold text-white mb-6"
+                            className="font-bold text-white mb-6 text-balance"
                             style={{
-                                fontSize: 'clamp(44px, 6vw, 80px)',
-                                letterSpacing: '-0.028em',
-                                lineHeight: 1.02,
+                                fontSize: 'clamp(38px, 4.4vw, 60px)',
+                                letterSpacing: '-0.02em',
+                                lineHeight: 1.08,
                                 textShadow: '0 2px 30px rgba(0,0,0,0.45)',
                             }}
                         >
-                            {settings?.heroTitle || "You've deployed AI. Have you governed it?"}
+                            {settings?.heroTitle || (
+                                <>
+                                    You&apos;ve deployed AI.{' '}
+                                    <span className="text-[#F6AD55]">Have you governed it?</span>
+                                </>
+                            )}
                         </motion.h1>
 
                         <motion.p
@@ -174,7 +179,7 @@ export function HeroSection({ settings }: HeroSectionProps) {
 
                             <Link
                                 href="/methodology"
-                                className="group inline-flex items-center gap-2 text-white/90 hover:text-white transition-colors font-medium"
+                                className="group inline-flex items-center gap-2 whitespace-nowrap font-medium text-[#8fcbc4] hover:text-[#b6e0da] transition-colors"
                             >
                                 Read the methodology
                                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />

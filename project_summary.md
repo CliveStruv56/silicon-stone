@@ -363,6 +363,7 @@ Re-pointed the homepage hero (`src/components/home/HeroSection.tsx`) from a maga
 - **Removed** the "AI fluency… baseline, not the edge" supporting line (pointed at WaymarkPath/careers — different business; may relocate lower later).
 - **Added secondary CTA** — `Book a 20-minute AI exposure call` → `/advisory#contact` (the real contact form section). This is the first above-the-fold revenue path and doubles as the booking link for the 20 AI-Act validation calls.
 - Kept badge, primary CTA (`Get the Atlantic Drift Briefing`), "Read the methodology" text link, and cadence line. Final CTA order: **[Get the Briefing] · [Book a call] · Read the methodology**.
+- **Design tuning (post-review):** headline was out of proportion — reduced from `clamp(44px,6vw,80px)`/`lh 1.02` to `clamp(38px,4.4vw,60px)`/`lh 1.08` with `text-balance` so it sits on two even lines; accented the second sentence ("Have you governed it?") in brand amber `#F6AD55` to echo the badge; recoloured the "Read the methodology" link from white to brand seafoam-teal `#8fcbc4` and added `whitespace-nowrap` so it no longer wraps to two lines. Verified on desktop (1440) and mobile (390) via Playwright.
 - `npm run build` passes.
 
 ### June 25, 2026 — Site consistency fixes (F1–F13 brief)
