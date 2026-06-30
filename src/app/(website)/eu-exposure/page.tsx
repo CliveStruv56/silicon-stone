@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Header, Footer } from '@/components/layout'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -73,33 +74,54 @@ export default function EuExposurePage() {
         {/* Hero */}
         <section className="bg-slate-deep border-b border-border-subtle">
           <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
-            <div className="max-w-3xl">
-              <Badge variant="outline" className="mb-4 border-stone-teal text-stone-teal">
-                For US companies operating in — or entering — Europe
-              </Badge>
-              <h1 className="text-4xl font-bold text-text-primary sm:text-5xl mb-6">
-                The deadline is the easy part. The requirement is permanent.
-              </h1>
-              <p className="text-xl text-text-muted leading-relaxed mb-6">
-                The AI Act’s reach is extraterritorial: if your AI touches the EU market or
-                affects EU residents, you are likely in scope — wherever you are
-                headquartered. From 2 August 2026 the transparency duties and the penalty
-                regime apply, and a national authority can act against systems placed on the
-                EU market. The heavier high-risk obligations arrive in stages after that —
-                standalone high-risk from 2 December 2027, embedded high-risk from 2 August
-                2028 — which is precisely why this is a maintained state, not a one-time fix:
-                the obligations keep arriving, and the documentation behind them has to keep
-                pace.
-              </p>
-              <p className="text-text-muted leading-relaxed">
-                The deadline is the easy part to understand. The harder truth is in the
-                upkeep: high-risk systems carry ongoing monitoring and documentation duties,
-                and the EU’s 2026 Tech Sovereignty Package is already reshaping market access
-                for US providers. A project ends; this does not.
-              </p>
-              <p className="mt-5 font-mono text-xs uppercase tracking-wider text-text-muted">
-                Regulatory copy last reviewed: 25 June 2026
-              </p>
+            <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-center lg:gap-12">
+              <div>
+                <Badge variant="outline" className="mb-4 border-stone-teal text-stone-teal">
+                  For US companies operating in — or entering — Europe
+                </Badge>
+                <h1 className="text-4xl font-bold text-text-primary sm:text-5xl mb-6">
+                  The deadline is the easy part. The requirement is permanent.
+                </h1>
+                <p className="text-xl text-text-muted leading-relaxed mb-6">
+                  The AI Act’s reach is extraterritorial: if your AI touches the EU market or
+                  affects EU residents, you are likely in scope — wherever you are
+                  headquartered. From 2 August 2026 the transparency duties and the penalty
+                  regime apply, and a national authority can act against systems placed on the
+                  EU market. The heavier high-risk obligations arrive in stages after that —
+                  standalone high-risk from 2 December 2027, embedded high-risk from 2 August
+                  2028 — which is precisely why this is a maintained state, not a one-time fix:
+                  the obligations keep arriving, and the documentation behind them has to keep
+                  pace.
+                </p>
+                <p className="text-text-muted leading-relaxed">
+                  The deadline is the easy part to understand. The harder truth is in the
+                  upkeep: high-risk systems carry ongoing monitoring and documentation duties,
+                  and the EU’s 2026 Tech Sovereignty Package is already reshaping market access
+                  for US providers. A project ends; this does not.
+                </p>
+                <p className="mt-5 font-mono text-xs uppercase tracking-wider text-text-muted">
+                  Regulatory copy last reviewed: 25 June 2026
+                </p>
+              </div>
+
+              <div className="relative">
+                <div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-border-subtle lg:aspect-square">
+                  <Image
+                    src="/intelligence-stream-bg.png"
+                    alt="A Forensic Technopolitics global risk map — the AI Act's extraterritorial reach traced across transatlantic data flows"
+                    fill
+                    priority
+                    sizes="(min-width: 1024px) 50vw, 100vw"
+                    className="object-cover object-center"
+                  />
+                  {/* Gradient scrim for caption legibility */}
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-deep/90 to-transparent p-5 pt-14">
+                    <p className="text-sm italic text-text-primary">
+                      The fault line itself, read independently — neither pro-US nor pro-Europe.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
