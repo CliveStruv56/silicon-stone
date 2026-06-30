@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Header, Footer } from '@/components/layout'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -89,21 +90,42 @@ export default function AtlanticDriftPage() {
         {/* Hero */}
         <section className="bg-slate-deep border-b border-border-subtle">
           <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
-            <div className="max-w-3xl">
-              <Badge variant="outline" className="mb-4 border-stone-teal text-stone-teal">
-                For US executives operating in — or entering — Europe
-              </Badge>
-              <h1 className="text-4xl font-bold text-text-primary sm:text-5xl mb-6">
-                The US Executive’s Guide to European Digital Sovereignty
-              </h1>
-              <p className="text-xl text-text-muted leading-relaxed mb-6">
-                An independent reading of what Europe’s digital rules actually require of a
-                US company — what is genuine obligation, what is noise, and what is still
-                moving. No vendor affiliations; interpretation, not sales-enablement.
-              </p>
-              <p className="font-mono text-xs uppercase tracking-wider text-text-muted">
-                A free guide · delivered to your inbox
-              </p>
+            <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-center lg:gap-12">
+              <div>
+                <Badge variant="outline" className="mb-4 border-stone-teal text-stone-teal">
+                  For US executives operating in — or entering — Europe
+                </Badge>
+                <h1 className="text-4xl font-bold text-text-primary sm:text-5xl mb-6">
+                  The US Executive’s Guide to European Digital Sovereignty
+                </h1>
+                <p className="text-xl text-text-muted leading-relaxed mb-6">
+                  An independent reading of what Europe’s digital rules actually require of a
+                  US company — what is genuine obligation, what is noise, and what is still
+                  moving. No vendor affiliations; interpretation, not sales-enablement.
+                </p>
+                <p className="font-mono text-xs uppercase tracking-wider text-text-muted">
+                  A free guide · delivered to your inbox
+                </p>
+              </div>
+
+              <div className="relative">
+                <div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-border-subtle lg:aspect-[3/2]">
+                  <Image
+                    src="/homepage-redesign-2026/the-watcher.png"
+                    alt="A figure on a clifftop looking out across the North Atlantic toward Europe — the view from the edge"
+                    fill
+                    priority
+                    sizes="(min-width: 1024px) 50vw, 100vw"
+                    className="object-cover object-[center_30%]"
+                  />
+                  {/* Gradient scrim for caption legibility */}
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-deep/90 to-transparent p-5 pt-14">
+                    <p className="text-sm italic text-text-primary">
+                      Published from the Atlantic edge — neutral ground between Washington and Brussels.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -136,10 +158,10 @@ export default function AtlanticDriftPage() {
               Genuinely required, versus the noise
             </h2>
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-              <Card className="bg-stone-charcoal border-stone-teal/30">
+              <Card className="min-w-0 bg-stone-charcoal border-stone-teal/30">
                 <CardHeader>
                   <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-stone-teal">
-                    <CheckCircle className="h-4 w-4" /> Genuinely required
+                    <CheckCircle className="h-4 w-4 flex-shrink-0" /> Genuinely required
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -147,16 +169,16 @@ export default function AtlanticDriftPage() {
                     {requiredNow.map((item, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm text-text-primary">
                         <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-stone-teal" />
-                        {item}
+                        <span className="min-w-0 break-words">{item}</span>
                       </li>
                     ))}
                   </ul>
                 </CardContent>
               </Card>
-              <Card className="bg-stone-charcoal border-border-subtle">
+              <Card className="min-w-0 bg-stone-charcoal border-border-subtle">
                 <CardHeader>
                   <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-text-muted">
-                    <Scale className="h-4 w-4" /> Mostly noise
+                    <Scale className="h-4 w-4 flex-shrink-0" /> Mostly noise
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -164,7 +186,7 @@ export default function AtlanticDriftPage() {
                     {mostlyNoise.map((item, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm text-text-muted">
                         <span aria-hidden="true" className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-text-muted/60" />
-                        {item}
+                        <span className="min-w-0 break-words">{item}</span>
                       </li>
                     ))}
                   </ul>
