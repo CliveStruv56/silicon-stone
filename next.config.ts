@@ -9,6 +9,31 @@ const scriptSrc = [
   'https://plausible.io',
 ].join(' ')
 
+// The Railway logic backend that IntelligenceFeed fetches briefings from
+// client-side. Derived from the env var (NEXT_PUBLIC_ vars are inlined at
+// build time) so connect-src stays in sync with the deploy target.
+const backendOrigin = (() => {
+  const url = process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_API_URL
+  if (!url) return null
+  try {
+    return new URL(url).origin
+  } catch {
+    return null
+  }
+})()
+
+const connectSrc = [
+  "'self'",
+  'https://plausible.io',
+  'https://api.kit.com',
+  'https://cdn.sanity.io',
+  'https://*.api.sanity.io',
+  'wss://*.api.sanity.io',
+  'https://basemaps.cartocdn.com',
+  'https://*.basemaps.cartocdn.com',
+  ...(backendOrigin ? [backendOrigin] : []),
+].join(' ')
+
 const contentSecurityPolicy = [
   "default-src 'self'",
   "base-uri 'self'",
@@ -19,7 +44,7 @@ const contentSecurityPolicy = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://cdn.sanity.io https://*.basemaps.cartocdn.com",
   "font-src 'self' data:",
-  "connect-src 'self' https://plausible.io https://api.kit.com https://cdn.sanity.io https://*.api.sanity.io wss://*.api.sanity.io https://basemaps.cartocdn.com https://*.basemaps.cartocdn.com",
+  `connect-src ${connectSrc}`,
   "worker-src 'self' blob:",
   "upgrade-insecure-requests",
 ].join("; ");

@@ -287,9 +287,10 @@ export function IntelligenceFeed({ initialArticles }: { initialArticles: Article
 
     async function fetchArticles() {
       const fallbackUrl = '/api/briefings'
-      const briefingsUrl = process.env.NEXT_PUBLIC_API_URL
-        ? `${process.env.NEXT_PUBLIC_API_URL}/v1/briefings`
-        : fallbackUrl
+      // Trailing slash stripped to match the server-side proxy (api/briefings)
+      // — a slash-terminated env var otherwise yields "//v1/briefings".
+      const backendApiUrl = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/+$/, '')
+      const briefingsUrl = backendApiUrl ? `${backendApiUrl}/v1/briefings` : fallbackUrl
 
       try {
         const data = await fetchBriefings(briefingsUrl, controller.signal)

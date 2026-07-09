@@ -354,6 +354,18 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### July 9, 2026 — Fixed client-side Railway briefings fetch (CSP + double slash)
+
+- The `/intelligence` client fetch to the Railway backend had been failing silently in
+  production (falling back to `/api/briefings`): the CSP `connect-src` never included the
+  Railway origin, and the slash-terminated `NEXT_PUBLIC_API_URL` produced `//v1/briefings`
+  (404 on Railway).
+- `next.config.ts`: `connect-src` now appends the backend origin derived from
+  `NEXT_PUBLIC_API_URL`/`BACKEND_API_URL` at build time (stays in sync with the deploy target).
+- `IntelligenceFeed.tsx`: trailing slash stripped before composing the URL, matching the
+  server-side proxy routes.
+- Verified: Railway CORS allowlist already covers both production origins and localhost:3000.
+
 ### July 9, 2026 — Added Transatlantic Troy persona (5th taggable persona)
 
 - **New persona:** Transatlantic Troy (slug `troy`) — US/Canadian founder/CEO assessing European
