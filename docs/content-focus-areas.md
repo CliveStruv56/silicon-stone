@@ -124,6 +124,17 @@ All content should be tagged for relevance to one or more of these decision-make
 > 
 > **Content Needs:** Accessible explainers, impact summaries, context pieces
 
+### Transatlantic Troy
+> **Role:** Founder / CEO  
+> **Organization:** US and Canadian startups and mid-market companies entering Europe  
+> **Key Concerns:**
+> - AI Act obligations for non-EU providers selling into Europe
+> - Data localisation and cross-border transfer requirements
+> - EU cloud certification and sovereignty tier schemes
+> - Public procurement rules favouring European suppliers  
+> 
+> **Content Needs:** Market-entry compliance checklists, cost-of-compliance analysis, EU regulatory timelines from a US vantage point
+
 ---
 
 ## Interactive Tool Content Integration

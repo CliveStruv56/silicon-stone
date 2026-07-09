@@ -115,6 +115,7 @@ Topic: What the new US–Netherlands lithography export deal actually changes
 | Operations / Supply Chain | `industrial-ian` | Operations/Supply Chain Manager |
 | Policy Analyst | `sovereign-sofia` | Policy Analyst/Advisor |
 | General Public | `global-citizen` | General Public/Generalist Reader |
+| Founder / CEO (US→EU) | `transatlantic-troy` | Founder/CEO entering the European market |
 
 ### Formats
 

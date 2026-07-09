@@ -96,6 +96,29 @@
         "Independent perspective free from industry bias"
       ],
       "pain_point": "Wants substantive analysis but finds most coverage either too superficial (mainstream media) or too captured by industry interests (trade press)"
+    },
+    "transatlantic_troy": {
+      "role": "Founder / CEO",
+      "slug": "troy",
+      "organization_types": [
+        "US and Canadian startups entering Europe",
+        "North American mid-market companies with EU customers",
+        "SaaS and AI product companies expanding transatlantically"
+      ],
+      "example": "CEO of a US B2B AI startup weighing whether EU market entry is worth the compliance cost, and what the AI Act and cloud certification rules require of a non-EU provider",
+      "key_concerns": [
+        "AI Act obligations for non-EU providers selling into Europe",
+        "Data localisation and cross-border transfer requirements",
+        "EU cloud certification and sovereignty tier schemes",
+        "Public procurement rules favouring European suppliers"
+      ],
+      "content_needs": [
+        "Market-entry compliance checklists",
+        "Cost-of-compliance analysis for non-EU entrants",
+        "EU regulatory timelines read from a US vantage point",
+        "Certification and procurement requirement breakdowns"
+      ],
+      "pain_point": "On the outside looking in — must judge whether the European market is worth entering and what the sovereignty landscape will cost to navigate, without an EU legal team on staff"
     }
   },
   "psychographics": {

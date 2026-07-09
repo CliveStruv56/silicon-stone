@@ -14,6 +14,7 @@ const ringMap: Record<string, string> = {
   'tier-pulse': 'border-silicon-cyan/50',
   'alert-red': 'border-alert-red/50',
   'text-muted': 'border-text-muted/50',
+  'troy-blue': 'border-troy-blue/50',
 }
 
 /**

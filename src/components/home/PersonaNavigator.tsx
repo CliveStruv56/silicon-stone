@@ -5,7 +5,7 @@ import { StaggerContainer, StaggerItem } from '@/components/ui/StaggerContainer'
 import { ForensicCard } from '@/components/ui/ForensicCard'
 import { Badge } from '@/components/ui/badge'
 import { PERSONAS, PERSONA_ORDER, BRIEFINGS_PERSONA_ORDER, type PersonaSlug } from '@/lib/personas'
-import { ShieldCheck, Truck, Globe, MapPin, User, Compass, ArrowRight } from 'lucide-react'
+import { ShieldCheck, Truck, Globe, MapPin, User, Compass, Plane, ArrowRight } from 'lucide-react'
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   'shield-check': ShieldCheck,
@@ -14,6 +14,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   'map-pin': MapPin,
   'user': User,
   'compass': Compass,
+  'plane': Plane,
 }
 
 const colorMap: Record<string, string> = {
@@ -23,6 +24,7 @@ const colorMap: Record<string, string> = {
   'alert-red': 'text-alert-red',
   'sister-indigo': 'text-sister-indigo',
   'text-muted': 'text-text-muted',
+  'troy-blue': 'text-troy-blue',
 }
 
 const hoverBorderMap: Record<string, string> = {
@@ -32,6 +34,7 @@ const hoverBorderMap: Record<string, string> = {
   'alert-red': 'hover:border-alert-red/60',
   'sister-indigo': 'hover:border-sister-indigo/60',
   'text-muted': 'hover:border-text-muted/60',
+  'troy-blue': 'hover:border-troy-blue/60',
 }
 
 export function PersonaNavigator() {

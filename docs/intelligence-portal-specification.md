@@ -115,6 +115,7 @@ Every post header requires:
 | **Industrial Ian** | Operations/Supply Chain | Supply chain maps, chokepoint analysis, scenario planning |
 | **Sovereign Sofia** | Policy/Strategy Analyst | Comparative policy analysis, sovereignty scorecards |
 | **Global Citizen** | Informed Observer | Accessible explainers, jargon-free analysis |
+| **Transatlantic Troy** | Founder / CEO (US→EU market entry) | Market-entry compliance checklists, cost-of-compliance analysis |
 
 ---
 

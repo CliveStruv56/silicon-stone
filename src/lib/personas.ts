@@ -3,7 +3,7 @@
  * Based on content-focus-areas.md persona specifications
  */
 
-export type PersonaSlug = 'clara' | 'ian' | 'sofia' | 'positional' | 'citizen'
+export type PersonaSlug = 'clara' | 'ian' | 'sofia' | 'positional' | 'citizen' | 'troy'
 
 export interface Persona {
   slug: PersonaSlug
@@ -102,9 +102,25 @@ export const PERSONAS: Record<PersonaSlug, Persona> = {
       'Jargon-free analysis',
     ],
   },
+  troy: {
+    slug: 'troy',
+    name: 'Transatlantic Troy',
+    role: 'Founder / CEO',
+    icon: 'plane',
+    color: 'troy-blue',
+    avatar: '/personas/troy.jpg',
+    ctaCopy: 'Price the sovereignty cost of European entry',
+    description: 'Decoding European compliance standards to compete across the Atlantic',
+    contentNeeds: [
+      'Market-entry compliance checklists',
+      'Cost-of-compliance analysis',
+      'EU regulatory timelines',
+      'Certification and procurement requirements',
+    ],
+  },
 }
 
-export const PERSONA_ORDER: PersonaSlug[] = ['clara', 'ian', 'sofia', 'positional', 'citizen']
+export const PERSONA_ORDER: PersonaSlug[] = ['clara', 'ian', 'sofia', 'positional', 'citizen', 'troy']
 
 /**
  * Personas that filter the briefings content feed. Excludes any persona with an
@@ -151,6 +167,7 @@ const PERSONA_BADGE_CLASSES: Record<PersonaSlug, string> = {
   sofia: 'border-tier-pulse/50 text-tier-pulse',
   positional: 'border-sister-indigo/50 text-sister-indigo',
   citizen: 'border-border-subtle text-text-muted',
+  troy: 'border-troy-blue/50 text-troy-blue',
 }
 
 export function getPersonaBadgeClasses(slug: string): string {
@@ -198,6 +215,10 @@ export function getDynamicCTA(activePersona?: string | null): {
     citizen: {
       headline: 'Twice-Weekly Explainer',
       subheadline: 'Complex tech-policy issues made accessible. No jargon, just clarity.',
+    },
+    troy: {
+      headline: 'Transatlantic Market Intelligence',
+      subheadline: 'Decode European compliance before you commit. What sovereignty rules cost US and Canadian entrants.',
     },
   }
 

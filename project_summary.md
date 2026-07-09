@@ -1,7 +1,7 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-06-30
+> Last Updated: 2026-07-09
 > Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing, 13 moderate transitive npm audit findings (uuid through Sanity packages)**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com. Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools (email-gated for lead capture, AI Act triage engine recently overhauled), product/commerce pages with an early-access enquiry fallback until Lemon Squeezy checkout URLs are configured, Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Awaiting Lemon Squeezy store setup, Plausible account, and content publishing for queued drafts.
@@ -353,6 +353,27 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### July 9, 2026 — Added Transatlantic Troy persona (5th taggable persona)
+
+- **New persona:** Transatlantic Troy (slug `troy`) — US/Canadian founder/CEO assessing European
+  market entry through the sovereignty/compliance lens. Spec: `docs/Transatlantic-Troy`.
+  Taggable set is now 5 (Clara, Ian, Sofia, Citizen, Troy; Positional remains a reading lens).
+- **New accent colour:** `troy-blue` (`#2c5282` light / `#6ea8dc` dark) added to `globals.css`
+  (raw vars + `--color-troy-blue` alias). Icon: lucide `Plane`.
+- **Code:** `troy` added to `src/lib/personas.ts` (`PersonaSlug`, `PERSONAS`, `PERSONA_ORDER`,
+  badge classes, `getDynamicCTA`), `PersonaFilter.tsx` icon map, `PersonaIntro.tsx` ring map,
+  `PersonaNavigator.tsx` icon/colour/hover maps, `article.ts` + `youtubeScript.ts` schema option
+  lists, `queries.ts` byPersona count, `sanity.ts` legacy-key map (`transatlantic-troy` → `troy`).
+  Card tags stay uniform `silicon-amber` by decision; Troy's blue shows on avatar ring, persona
+  card, and PulseHeader badge.
+- **Sanity content:** `persona.transatlantic_troy` document created + published (doc slug
+  `transatlantic-troy`, generator picks it up automatically). Tagged 4 existing briefings for
+  Troy: Atlantic Fault Lines, EU AI Act 2 Aug, US National AI Policy, CAIDA Sovereignty Tiers.
+- **Avatar:** `/public/personas/troy.jpg` — geometric vector portrait in Atlantic blue, matching
+  the existing avatar set (AI-generated).
+- **Docs:** Troy section 05 added to `persona-profiles.md` (v1.1); `transatlantic_troy` block
+  added to `context/core/icp.json`.
 
 ### June 30, 2026 — Retired Remote Robert persona + Atlantic Drift footer link
 

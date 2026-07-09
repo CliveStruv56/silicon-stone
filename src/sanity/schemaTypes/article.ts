@@ -97,6 +97,7 @@ export const article = defineType({
           { title: 'Industrial Ian (Operations/Supply Chain)', value: 'ian' },
           { title: 'Sovereign Sofia (Policy/Analysis)', value: 'sofia' },
           { title: 'Global Citizen (General Public)', value: 'citizen' },
+          { title: 'Transatlantic Troy (Founder/CEO, US–EU Market Entry)', value: 'troy' },
         ],
       },
     }),

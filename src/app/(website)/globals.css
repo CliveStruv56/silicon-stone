@@ -22,6 +22,9 @@
 
   --silicon-cyan: #0e7c8b;    /* deepened cyan for contrast on light */
 
+  /* Atlantic blue — Transatlantic Troy persona accent */
+  --troy-blue: #2c5282;
+
   /* Sister-product indigo — for WaymarkPath / Adjacent Block cross-links. */
   --sister-indigo: #4f46e5;
 
@@ -84,6 +87,7 @@
   --footer-bg: #161d2b;        /* raised slate band — footer */
   --border-subtle: rgba(255, 255, 255, 0.10);
   --silicon-cyan: #4fd1e0;
+  --troy-blue: #6ea8dc;        /* lifted Atlantic blue — readable on dark slate */
   --sister-indigo: #818cf8;
   --tier-pulse: #4fd1e0;
   --tier-briefing: #7fcbc4;
@@ -137,6 +141,7 @@
   --color-footer-bg: var(--footer-bg);
   --color-border-subtle: var(--border-subtle);
   --color-silicon-cyan: var(--silicon-cyan);
+  --color-troy-blue: var(--troy-blue);
   --color-sister-indigo: var(--sister-indigo);
   --color-tier-pulse: var(--tier-pulse);
   --color-tier-briefing: var(--tier-briefing);

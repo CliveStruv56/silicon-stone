@@ -1,7 +1,7 @@
 # Persona Profiles
 
-**Silicon and Stone · The four decision-makers we write for**
-v1 · May 2026
+**Silicon and Stone · The five decision-makers we write for**
+v1.1 · July 2026 (Transatlantic Troy added)
 
 ---
 
@@ -21,10 +21,10 @@ When polishing a draft in Sanity:
 
 1. **Read the piece's Stone Truth first.** Who is that line written for? That's almost always the primary persona.
 2. **Check the analytical moves applied.** Supply Chain Forensics is almost always Industrial Ian. Policy Stress-Testing tilts toward Compliance Clara and Sovereign Sofia. Talent & Capability Flow lifts Global Citizen.
-3. **Cap persona tags at three.** A piece tagged for all four is a piece tagged for none — the filtering can't surface it for the people who need it.
-4. **Global Citizen is not a default.** Use it deliberately, for pieces that genuinely reach beyond the three specialised decision-maker types. It is not "everyone."
+3. **Cap persona tags at three.** A piece tagged for all five is a piece tagged for none — the filtering can't surface it for the people who need it.
+4. **Global Citizen is not a default.** Use it deliberately, for pieces that genuinely reach beyond the specialised decision-maker types. It is not "everyone."
 
-The CMS uses **short slugs** at the article level: `clara`, `ian`, `sofia`, `citizen`. The persona documents themselves use longer slugs: `compliance-clara`, `industrial-ian`, `sovereign-sofia`, `global-citizen`. Same people; different field.
+The CMS uses **short slugs** at the article level: `clara`, `ian`, `sofia`, `citizen`, `troy`. The persona documents themselves use longer slugs: `compliance-clara`, `industrial-ian`, `sovereign-sofia`, `global-citizen`, `transatlantic-troy`. Same people; different field.
 
 ---
 
@@ -197,9 +197,50 @@ They want substantive analysis but find most coverage either too superficial (ma
 
 ---
 
+## 05 · Transatlantic Troy
+
+**Role:** Founder / CEO
+**Slug:** `troy`
+**Persona doc slug:** `transatlantic-troy`
+
+### Where he works
+
+- US and Canadian startups doing business — or wanting to do business — in Europe
+- North American mid-market companies with EU customers (not Big Tech giants)
+- SaaS and AI product companies expanding transatlantically
+
+**Real-world example:** CEO of a US B2B AI startup with early European traction, weighing whether full EU market entry is worth the compliance cost and what the AI Act, data localisation, and cloud certification rules require of a non-EU provider.
+
+### What keeps him up at night
+
+- AI Act obligations for non-EU providers selling into Europe — what applies to him and when
+- Data localisation and cross-border transfer requirements that reshape his architecture and cost base
+- EU cloud certification and sovereignty tier schemes that decide whether his stack is even eligible
+- Public procurement rules that quietly favour European suppliers over him
+
+### What he reads us for
+
+- Market-entry compliance checklists — what he must do differently because of the sovereignty landscape
+- Cost-of-compliance analysis for non-EU entrants — is the market worth it?
+- EU regulatory timelines read from a US vantage point
+- Certification and procurement requirement breakdowns before he commits engineering time
+
+### The pain point that drives him
+
+He is on the outside looking in. Where Compliance Clara is already inside a European operation managing deadlines, and Industrial Ian is running existing European supply chains, Troy is assessing whether the market is worth entering at all — and what digital sovereignty will cost him to navigate — without an EU legal team on staff. His question for every briefing: *"What does this mean for my European market entry, and what do I need to do differently because of it?"*
+
+### What a piece tagged for Troy looks like
+
+- The Stone Truth is about US-EU regulatory tension, market-access cost, or what sovereignty rules demand of non-EU providers
+- The piece reads through the Institutional lens (obligations, exposures, decisions) but from a transatlantic market-entry angle
+- The actionable insights are things he could raise with his leadership team before committing to a European go-to-market
+- Tags often pair with Clara (shared regulatory substance) but from the outside-in perspective
+
+---
+
 ## Shared psychographics
 
-All four personas — regardless of role — share a set of values and frustrations the framework is built to serve.
+All five personas — regardless of role — share a set of values and frustrations the framework is built to serve.
 
 ### Shared values
 
@@ -239,5 +280,5 @@ When the persona model evolves (a new persona is added, an existing one is split
 
 ---
 
-Silicon and Stone · Persona profiles v1 · May 2026
+Silicon and Stone · Persona profiles v1.1 · July 2026
 Drafted by Hyperagent for Clive Struver · Sanday, Orkney

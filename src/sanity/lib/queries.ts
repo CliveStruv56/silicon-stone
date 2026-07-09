@@ -374,7 +374,8 @@ export const CONTENT_STATS_QUERY = defineQuery(`{
     "clara": count(*[_type == "article" && !(_id in path("drafts.**")) && "clara" in personas]),
     "ian": count(*[_type == "article" && !(_id in path("drafts.**")) && "ian" in personas]),
     "sofia": count(*[_type == "article" && !(_id in path("drafts.**")) && "sofia" in personas]),
-    "citizen": count(*[_type == "article" && !(_id in path("drafts.**")) && "citizen" in personas])
+    "citizen": count(*[_type == "article" && !(_id in path("drafts.**")) && "citizen" in personas]),
+    "troy": count(*[_type == "article" && !(_id in path("drafts.**")) && "troy" in personas])
   },
   "youtubeScriptsTotal": count(*[_type == "youtubeScript" && !(_id in path("drafts.**"))]),
   "youtubeByPillar": {

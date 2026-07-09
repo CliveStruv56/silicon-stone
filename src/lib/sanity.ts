@@ -91,7 +91,9 @@ export async function createArticleInSanity(data: ArticleData) {
         'remote-robert': 'citizen',
         'remote_robert': 'citizen',
         'global-citizen': 'citizen',
-        'global_citizen': 'citizen'
+        'global_citizen': 'citizen',
+        'transatlantic-troy': 'troy',
+        'transatlantic_troy': 'troy'
     };
 
     const personaValue = personaMap[data.persona] || data.persona.split(' ')[0].toLowerCase(); // Fallback

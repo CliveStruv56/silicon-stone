@@ -1,6 +1,6 @@
 'use client'
 
-import { Shield, Truck, Globe, User, Compass } from 'lucide-react'
+import { Shield, Truck, Globe, User, Compass, Plane } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { PERSONAS, BRIEFINGS_PERSONA_ORDER, type PersonaSlug } from '@/lib/personas'
@@ -18,6 +18,7 @@ const PERSONA_ICONS: Record<PersonaSlug, React.ReactNode> = {
   sofia: <Globe className="h-4 w-4" />,
   positional: <Compass className="h-4 w-4" />,
   citizen: <User className="h-4 w-4" />,
+  troy: <Plane className="h-4 w-4" />,
 }
 
 export function PersonaFilter({

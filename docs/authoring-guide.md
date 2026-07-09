@@ -170,6 +170,7 @@ npm run sync-content:force # Overwrite ALL articles (use with caution)
 | Industrial Ian | `ian` | Supply chain and operations directors |
 | Sovereign Sofia | `sofia` | Policy analysts at think tanks and government |
 | Global Citizen | `citizen` | Informed general public, journalists, educators |
+| Transatlantic Troy | `troy` | US/Canadian founders and CEOs entering the European market |
 
 ## 7. House Style & the Vault (source of truth)
 
