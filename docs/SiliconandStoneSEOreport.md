@@ -158,7 +158,7 @@ A reusable server component that injects JSON-LD from Sanity fields at render. V
 
 *Intent: INFO / INV (investigating) / NAV (brand) · Comp (small-site read): LOW winnable now · MED via clusters · HIGH aspirational. Validate demand free via Google autocomplete + "People Also Ask" and Search Console "queries" — exact volumes are unavailable and largely irrelevant at this audience size.*
 
-### A — EU AI Act & AI regulation · *Compliance Clara* (head: *EU AI Act compliance*, HIGH)
+### A — EU AI Act & AI regulation · *Compliance Clara / Transatlantic Troy* (head: *EU AI Act compliance*, HIGH)
 | Query | Intent | Comp |
 |---|---|---|
 | EU AI Act August 2026 deadline | INFO | LOW–MED |
@@ -197,7 +197,7 @@ A reusable server component that injects JSON-LD from Sanity fields at render. V
 | **Q:** can Europe build a sovereign AI stack? | INFO (AI) | LOW |
 | **Q:** did Mistral's AI Act lobbying help Europe or US rivals? | INFO (AI) | LOW |
 
-### D — Atlantic Drift / US–EU divergence · *Global Citizen* funnel + brand (head: *the Atlantic Drift*, BRAND — own it)
+### D — Atlantic Drift / US–EU divergence · *Global Citizen / Transatlantic Troy* funnel + brand (head: *the Atlantic Drift*, BRAND — own it)
 | Query | Intent | Comp |
 |---|---|---|
 | US–EU technology divergence / decoupling | INFO | MED |

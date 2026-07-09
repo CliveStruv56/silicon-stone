@@ -385,7 +385,12 @@ SESSION_SECRET=<long random secret, 32+ characters>
 - **Avatar:** `/public/personas/troy.jpg` — geometric vector portrait in Atlantic blue, matching
   the existing avatar set (AI-generated).
 - **Docs:** Troy section 05 added to `persona-profiles.md` (v1.1); `transatlantic_troy` block
-  added to `context/core/icp.json`.
+  added to `context/core/icp.json`; persona tables updated in the welcome pack, authoring guide,
+  generation guide, portal spec, content-focus-areas; Troy added to SEO report clusters A + D
+  and the Atlantic Drift briefing-outline audience. Ideaverse vault mirrors re-synced same day
+  (also purging stale Remote Robert references from `_Instructions.md`, `platform-overview.md`,
+  `content-source-stack.md`, and the Inoreader triage mapping — the vault had not been swept
+  since 2026-06-22, pre-retirement).
 
 ### June 30, 2026 — Retired Remote Robert persona + Atlantic Drift footer link
 

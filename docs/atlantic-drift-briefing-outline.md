@@ -23,7 +23,7 @@ Every design decision in the document should serve at least one of these three. 
 ## Audience
 
 Primary: **Industrial Ian** — supply chain and operations directors, particularly in European semiconductor, automotive, and industrial manufacturing.
-Secondary: **Compliance Clara** (export control implications), **Sovereign Sofia** (strategic autonomy framing).
+Secondary: **Compliance Clara** (export control implications), **Sovereign Sofia** (strategic autonomy framing), **Transatlantic Troy** (what US–EU divergence costs a North American entrant).
 Tertiary: **Global Citizen** — informed professionals who want substance.
 
 The PDF should work for an Ian first. The other personas pick up adjacent value.
