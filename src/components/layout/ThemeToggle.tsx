@@ -38,6 +38,9 @@ export function ThemeToggle({ className = '' }: { className?: string }) {
     } catch {
       /* ignore */
     }
+    // Keep the PWA status-bar color in sync (helper defined in the root layout
+    // inline script; window typing augmented in src/types/theme-color.d.ts).
+    window.__ssThemeColor?.()
   }, [])
 
   useEffect(() => {
