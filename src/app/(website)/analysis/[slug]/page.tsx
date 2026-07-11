@@ -12,6 +12,7 @@ import {
   PulseHeader,
   MethodologyChecklist,
   DynamicCTA,
+  ReadingProgress,
 } from '@/components/article'
 import { RelatedArticles } from '@/components/article/RelatedArticles'
 import { GlossaryToggle } from '@/components/glossary'
@@ -197,6 +198,7 @@ export default async function ArticlePage({ params }: Props) {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+      <ReadingProgress />
 
       <JsonLd
         data={[buildArticleSchema(schemaInput), buildBreadcrumbSchema(schemaInput)]}

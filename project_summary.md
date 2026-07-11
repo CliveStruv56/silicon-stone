@@ -354,6 +354,14 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### July 11, 2026 — PWA Phase 2 (reading product)
+
+- **P2-1**: reading-progress indicator — `src/components/article/
+  ReadingProgress.tsx`, a 2px gradient bar fixed above the header (z-60,
+  safe-area aware), scaleX-transformed inside rAF (compositor-only, no
+  layout work). Mounted only by `/analysis/[slug]`, so it exists only on
+  article routes. Verified 0 → 0.5 → 1 against article scroll depth.
+
 ### July 11, 2026 — PWA Phase 1 (P1-1/P1-2): mobile app shell + bottom tab bar
 
 - **P1-1**: responsive shell — `BottomTabBar` mounted in the `(website)`
