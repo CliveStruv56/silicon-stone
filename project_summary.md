@@ -373,6 +373,18 @@ SESSION_SECRET=<long random secret, 32+ characters>
   tab; per-tab scroll position saved to sessionStorage on tab switch and
   restored on return (re-tapping the active tab scrolls to top). Both new
   pages are `robots: noindex`.
+- **P1-5**: Intelligence filter bottom-sheet — on mobile the stacked pill
+  rows collapse to a "Filters" trigger (active-count badge + live result
+  count) opening a `BottomSheet` (new reusable `src/components/ui/
+  BottomSheet.tsx`, built on native `<dialog>`: focus trap, Esc, inert
+  background and focus-return come free; scrim tap + grab-handle swipe-down
+  added; body scroll locked; safe-area bottom padding). Desktop keeps the
+  pill rows (shared `TopicPills`/`TierPills` extracted). Filter state now
+  seeds from `searchParams` server-side, so filtered deep links SSR filtered
+  — `/intelligence` is dynamic now (revalidate export removed); param
+  validators moved to `intelligence/filters.ts`. `updateFilters` fires the
+  **`Feed Filter`** Plausible event (props persona/tier/topic) — add this
+  goal to the dashboard list.
 - **P1-4**: condensing header — hides on scroll-down past 96px, reveals on
   scroll-up (8px hysteresis, rAF-throttled, mobile-only via matchMedia guard).
   Transform is the only animated property so CLS stays 0;

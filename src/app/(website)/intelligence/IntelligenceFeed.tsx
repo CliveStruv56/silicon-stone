@@ -3,8 +3,10 @@
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { SlidersHorizontal } from 'lucide-react'
 import { Header, Footer } from '@/components/layout'
 import { Badge } from '@/components/ui/badge'
+import { BottomSheet } from '@/components/ui/BottomSheet'
 import { PersonaFilter } from '@/components/briefings/PersonaFilter'
 import { PersonaIntro } from '@/components/briefings/PersonaIntro'
 import { ThreeReadings } from '@/components/ThreeReadings'
@@ -12,6 +14,14 @@ import { DynamicCTA } from '@/components/article'
 import { cn } from '@/lib/utils'
 import { getPersonaLabel, PERSONAS, type PersonaSlug } from '@/lib/personas'
 import { formatDate } from '@/lib/format'
+import { track } from '@/lib/track'
+import {
+  getPersonaParam,
+  getTierParam,
+  getTopicParam,
+  type FeedFilters,
+  type IntelligenceTier,
+} from './filters'
 
 // Types for Sanity data
 export interface Article {
@@ -38,25 +48,11 @@ export interface Article {
   }>
 }
 
-type IntelligenceTier = 'pulse' | 'briefing' | 'audit'
-
 const INTELLIGENCE_TIERS: Array<{ value: IntelligenceTier; label: string }> = [
   { value: 'pulse', label: 'Pulse (30s)' },
   { value: 'briefing', label: 'Briefing (5min)' },
   { value: 'audit', label: 'Audit (Deep)' },
 ]
-
-function getPersonaParam(value: string | null): string | null {
-  return value && value in PERSONAS ? value : null
-}
-
-function getTierParam(value: string | null): IntelligenceTier | null {
-  return value === 'pulse' || value === 'briefing' || value === 'audit' ? value : null
-}
-
-function getTopicParam(value: string | null): string | null {
-  return value && /^[a-z0-9-]+$/i.test(value) ? value : null
-}
 
 type BriefingsResponse = Article[] | {
   result?: Article[]
@@ -262,12 +258,124 @@ function FeaturedArticle({ article }: { article: Article }) {
   )
 }
 
-export function IntelligenceFeed({ initialArticles }: { initialArticles: Article[] }) {
+interface TopicOption {
+  slug: string
+  title: string
+}
+
+// Shared by the desktop pill rows and the mobile filter sheet (P1-5).
+function TopicPills({
+  topics,
+  counts,
+  selected,
+  onChange,
+}: {
+  topics: TopicOption[]
+  counts: Record<string, number>
+  selected: string | null
+  onChange: (topic: string | null) => void
+}) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      <button
+        type="button"
+        onClick={() => onChange(null)}
+        className={cn(
+          'flex items-center gap-2 px-3 py-2 rounded-lg border transition-all text-sm font-medium',
+          !selected
+            ? 'bg-silicon-cyan/20 border-silicon-cyan text-silicon-cyan'
+            : 'bg-stone-charcoal/50 border-border-subtle text-text-muted hover:border-stone-teal hover:text-text-primary'
+        )}
+      >
+        <span>All Topics</span>
+        <Badge variant="secondary" className="text-xs px-1.5 py-0">{counts.all}</Badge>
+      </button>
+      {topics.map((topic) => (
+        <button
+          key={topic.slug}
+          type="button"
+          onClick={() => onChange(selected === topic.slug ? null : topic.slug)}
+          className={cn(
+            'flex items-center gap-2 px-3 py-2 rounded-lg border transition-all text-sm',
+            selected === topic.slug
+              ? 'bg-silicon-amber/20 border-silicon-amber text-silicon-amber'
+              : 'bg-stone-charcoal/50 border-border-subtle text-text-muted hover:border-stone-teal hover:text-text-primary'
+          )}
+        >
+          <span>{topic.title}</span>
+          {(counts[topic.slug] || 0) > 0 && (
+            <Badge variant="secondary" className="text-xs px-1.5 py-0">
+              {counts[topic.slug]}
+            </Badge>
+          )}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+function TierPills({
+  counts,
+  selected,
+  onChange,
+}: {
+  counts: Record<string, number>
+  selected: IntelligenceTier | null
+  onChange: (tier: IntelligenceTier | null) => void
+}) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      <button
+        type="button"
+        onClick={() => onChange(null)}
+        className={cn(
+          'flex items-center gap-2 px-3 py-2 rounded-lg border transition-all text-sm font-medium',
+          !selected
+            ? 'bg-silicon-cyan/20 border-silicon-cyan text-silicon-cyan'
+            : 'bg-stone-charcoal/50 border-border-subtle text-text-muted hover:border-stone-teal hover:text-text-primary'
+        )}
+      >
+        <span>All Tiers</span>
+        <Badge variant="secondary" className="text-xs px-1.5 py-0">{counts.all}</Badge>
+      </button>
+      {INTELLIGENCE_TIERS.map((tier) => (
+        <button
+          key={tier.value}
+          type="button"
+          onClick={() => onChange(selected === tier.value ? null : tier.value)}
+          className={cn(
+            'flex items-center gap-2 px-3 py-2 rounded-lg border transition-all text-sm',
+            selected === tier.value
+              ? 'bg-silicon-amber/20 border-silicon-amber text-silicon-amber'
+              : 'bg-stone-charcoal/50 border-border-subtle text-text-muted hover:border-stone-teal hover:text-text-primary'
+          )}
+        >
+          <span>{tier.label}</span>
+          {(counts[tier.value] || 0) > 0 && (
+            <Badge variant="secondary" className="text-xs px-1.5 py-0">
+              {counts[tier.value]}
+            </Badge>
+          )}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+export function IntelligenceFeed({
+  initialArticles,
+  initialFilters,
+}: {
+  initialArticles: Article[]
+  initialFilters?: FeedFilters
+}) {
   const [articles, setArticles] = useState<Article[]>(initialArticles)
   const [loading, setLoading] = useState(initialArticles.length === 0)
-  const [selectedPersona, setSelectedPersona] = useState<string | null>(null)
-  const [selectedTier, setSelectedTier] = useState<IntelligenceTier | null>(null)
-  const [selectedTopic, setSelectedTopic] = useState<string | null>(null)
+  // Seeded from the URL server-side so filtered deep links SSR filtered (P1-5).
+  const [selectedPersona, setSelectedPersona] = useState<string | null>(initialFilters?.persona ?? null)
+  const [selectedTier, setSelectedTier] = useState<IntelligenceTier | null>(initialFilters?.tier ?? null)
+  const [selectedTopic, setSelectedTopic] = useState<string | null>(initialFilters?.topic ?? null)
+  const [filterSheetOpen, setFilterSheetOpen] = useState(false)
 
   useEffect(() => {
     function syncFiltersFromUrl() {
@@ -354,6 +462,12 @@ export function IntelligenceFeed({ initialArticles }: { initialArticles: Article
 
     const query = params.toString()
     window.history.pushState(null, '', `${window.location.pathname}${query ? `?${query}` : ''}`)
+
+    track('Feed Filter', {
+      persona: persona ?? 'all',
+      tier: tier ?? 'all',
+      topic: topic ?? 'all',
+    })
   }
 
   // Topic options derived from the categories present on the fetched articles.
@@ -376,6 +490,8 @@ export function IntelligenceFeed({ initialArticles }: { initialArticles: Article
   const filteredArticles = selectedPersona
     ? articlesForTier.filter((article) => article.personas?.includes(selectedPersona))
     : articlesForTier
+
+  const activeFilterCount = [selectedTopic, selectedTier, selectedPersona].filter(Boolean).length
 
   // Get featured article (highest impact or most recent)
   const featuredArticle = filteredArticles[0]
@@ -453,90 +569,32 @@ export function IntelligenceFeed({ initialArticles }: { initialArticles: Article
         {/* Persona Introduction */}
         <PersonaIntro />
 
-        {/* Feed Filters */}
+        {/* Feed Filters — stacked pills on desktop, compact trigger + bottom
+            sheet on mobile (P1-5) */}
         <section className="border-b border-border-subtle bg-stone-charcoal/30">
-          <div className="mx-auto max-w-7xl px-6 py-4 lg:px-8 space-y-5">
+          <div className="hidden md:block mx-auto max-w-7xl px-6 py-4 lg:px-8 space-y-5">
             {topicOptions.length > 0 && (
               <div>
                 <div className="font-ui-mono text-xs uppercase tracking-wider text-text-muted mb-3">
                   Filter by topic
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    onClick={() => updateFilters(selectedPersona, selectedTier, null)}
-                    className={cn(
-                      'flex items-center gap-2 px-3 py-2 rounded-lg border transition-all text-sm font-medium',
-                      !selectedTopic
-                        ? 'bg-silicon-cyan/20 border-silicon-cyan text-silicon-cyan'
-                        : 'bg-stone-charcoal/50 border-border-subtle text-text-muted hover:border-stone-teal hover:text-text-primary'
-                    )}
-                  >
-                    <span>All Topics</span>
-                    <Badge variant="secondary" className="text-xs px-1.5 py-0">{topicCounts.all}</Badge>
-                  </button>
-                  {topicOptions.map((topic) => (
-                    <button
-                      key={topic.slug}
-                      type="button"
-                      onClick={() => updateFilters(selectedPersona, selectedTier, selectedTopic === topic.slug ? null : topic.slug)}
-                      className={cn(
-                        'flex items-center gap-2 px-3 py-2 rounded-lg border transition-all text-sm',
-                        selectedTopic === topic.slug
-                          ? 'bg-silicon-amber/20 border-silicon-amber text-silicon-amber'
-                          : 'bg-stone-charcoal/50 border-border-subtle text-text-muted hover:border-stone-teal hover:text-text-primary'
-                      )}
-                    >
-                      <span>{topic.title}</span>
-                      {(topicCounts[topic.slug] || 0) > 0 && (
-                        <Badge variant="secondary" className="text-xs px-1.5 py-0">
-                          {topicCounts[topic.slug]}
-                        </Badge>
-                      )}
-                    </button>
-                  ))}
-                </div>
+                <TopicPills
+                  topics={topicOptions}
+                  counts={topicCounts}
+                  selected={selectedTopic}
+                  onChange={(topic) => updateFilters(selectedPersona, selectedTier, topic)}
+                />
               </div>
             )}
             <div>
               <div className="font-ui-mono text-xs uppercase tracking-wider text-text-muted mb-3">
                 Filter by tier
               </div>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={() => updateFilters(selectedPersona, null)}
-                  className={cn(
-                    'flex items-center gap-2 px-3 py-2 rounded-lg border transition-all text-sm font-medium',
-                    !selectedTier
-                      ? 'bg-silicon-cyan/20 border-silicon-cyan text-silicon-cyan'
-                      : 'bg-stone-charcoal/50 border-border-subtle text-text-muted hover:border-stone-teal hover:text-text-primary'
-                  )}
-                >
-                  <span>All Tiers</span>
-                  <Badge variant="secondary" className="text-xs px-1.5 py-0">{tierCounts.all}</Badge>
-                </button>
-                {INTELLIGENCE_TIERS.map((tier) => (
-                  <button
-                    key={tier.value}
-                    type="button"
-                    onClick={() => updateFilters(selectedPersona, selectedTier === tier.value ? null : tier.value)}
-                    className={cn(
-                      'flex items-center gap-2 px-3 py-2 rounded-lg border transition-all text-sm',
-                      selectedTier === tier.value
-                        ? 'bg-silicon-amber/20 border-silicon-amber text-silicon-amber'
-                        : 'bg-stone-charcoal/50 border-border-subtle text-text-muted hover:border-stone-teal hover:text-text-primary'
-                    )}
-                  >
-                    <span>{tier.label}</span>
-                    {(tierCounts[tier.value] || 0) > 0 && (
-                      <Badge variant="secondary" className="text-xs px-1.5 py-0">
-                        {tierCounts[tier.value]}
-                      </Badge>
-                    )}
-                  </button>
-                ))}
-              </div>
+              <TierPills
+                counts={tierCounts}
+                selected={selectedTier}
+                onChange={(tier) => updateFilters(selectedPersona, tier)}
+              />
             </div>
             <div>
               <div className="font-ui-mono text-xs uppercase tracking-wider text-text-muted mb-3">
@@ -549,7 +607,92 @@ export function IntelligenceFeed({ initialArticles }: { initialArticles: Article
               />
             </div>
           </div>
+
+          <div className="md:hidden mx-auto flex max-w-7xl items-center justify-between gap-3 px-6 py-3">
+            <button
+              type="button"
+              onClick={() => setFilterSheetOpen(true)}
+              className={cn(
+                'flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition-all',
+                activeFilterCount > 0
+                  ? 'border-silicon-cyan bg-silicon-cyan/20 text-silicon-cyan'
+                  : 'border-border-subtle bg-stone-charcoal/50 text-text-muted'
+              )}
+            >
+              <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
+              <span>Filters</span>
+              {activeFilterCount > 0 && (
+                <Badge variant="secondary" className="px-1.5 py-0 text-xs">
+                  {activeFilterCount}
+                </Badge>
+              )}
+            </button>
+            <span className="text-sm text-text-muted" aria-live="polite">
+              {filteredArticles.length} briefing{filteredArticles.length === 1 ? '' : 's'}
+            </span>
+          </div>
         </section>
+
+        <BottomSheet
+          open={filterSheetOpen}
+          onClose={() => setFilterSheetOpen(false)}
+          title="Filter intelligence"
+        >
+          <div className="space-y-6 px-6 pt-1">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-text-primary">Filters</h2>
+              {activeFilterCount > 0 && (
+                <button
+                  type="button"
+                  onClick={() => updateFilters(null, null, null)}
+                  className="text-sm text-text-muted transition-colors hover:text-text-primary"
+                >
+                  Clear all
+                </button>
+              )}
+            </div>
+            {topicOptions.length > 0 && (
+              <div>
+                <div className="font-ui-mono text-xs uppercase tracking-wider text-text-muted mb-3">
+                  Topic
+                </div>
+                <TopicPills
+                  topics={topicOptions}
+                  counts={topicCounts}
+                  selected={selectedTopic}
+                  onChange={(topic) => updateFilters(selectedPersona, selectedTier, topic)}
+                />
+              </div>
+            )}
+            <div>
+              <div className="font-ui-mono text-xs uppercase tracking-wider text-text-muted mb-3">
+                Tier
+              </div>
+              <TierPills
+                counts={tierCounts}
+                selected={selectedTier}
+                onChange={(tier) => updateFilters(selectedPersona, tier)}
+              />
+            </div>
+            <div>
+              <div className="font-ui-mono text-xs uppercase tracking-wider text-text-muted mb-3">
+                Perspective
+              </div>
+              <PersonaFilter
+                selectedPersona={selectedPersona}
+                onPersonaChange={(persona) => updateFilters(persona, selectedTier)}
+                personaCounts={personaCounts}
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => setFilterSheetOpen(false)}
+              className="w-full rounded-lg bg-primary px-4 py-3 font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+            >
+              Show {filteredArticles.length} briefing{filteredArticles.length === 1 ? '' : 's'}
+            </button>
+          </div>
+        </BottomSheet>
 
         {/* Content */}
         <section className="py-10">

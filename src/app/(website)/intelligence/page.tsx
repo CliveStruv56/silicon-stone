@@ -1,6 +1,7 @@
 import { client } from '@/sanity/lib/client'
 import { urlFor } from '@/sanity/lib/image'
 import { IntelligenceFeed, type Article } from './IntelligenceFeed'
+import { getPersonaParam, getTierParam, getTopicParam } from './filters'
 
 // Published-only feed query — mirrors /api/briefings so the server-rendered list
 // matches what the client refreshes to (F13). Rendering the list (with
@@ -28,9 +29,10 @@ const BRIEFINGS_QUERY = `
   }
 `
 
-// Refresh the server-rendered list periodically; the client still re-fetches
+// Reading searchParams makes this route dynamic (renders per request), so
+// filtered deep links SSR with the filter already applied (P1-5). Sanity's
+// API CDN keeps the per-request fetch cheap; the client still re-fetches
 // /api/briefings (which includes the Railway proxy) on mount for live data.
-export const revalidate = 300
 
 async function getInitialArticles(): Promise<Article[]> {
   try {
@@ -47,7 +49,24 @@ async function getInitialArticles(): Promise<Article[]> {
   }
 }
 
-export default async function IntelligencePage() {
+export default async function IntelligencePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
+  const params = await searchParams
+  const first = (value: string | string[] | undefined) =>
+    (Array.isArray(value) ? value[0] : value) ?? null
+
   const initialArticles = await getInitialArticles()
-  return <IntelligenceFeed initialArticles={initialArticles} />
+  return (
+    <IntelligenceFeed
+      initialArticles={initialArticles}
+      initialFilters={{
+        persona: getPersonaParam(first(params.persona)),
+        tier: getTierParam(first(params.tier)),
+        topic: getTopicParam(first(params.topic)),
+      }}
+    />
+  )
 }
