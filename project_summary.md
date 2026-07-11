@@ -373,6 +373,13 @@ SESSION_SECRET=<long random secret, 32+ characters>
   tab; per-tab scroll position saved to sessionStorage on tab switch and
   restored on return (re-tapping the active tab scrolls to top). Both new
   pages are `robots: noindex`.
+- **P1-4**: condensing header — hides on scroll-down past 96px, reveals on
+  scroll-up (8px hysteresis, rAF-throttled, mobile-only via matchMedia guard).
+  Transform is the only animated property so CLS stays 0;
+  `motion-reduce:transition-none` gives reduced-motion users an instant state
+  change. Mobile back chevron on `/analysis/[slug]` and `/products/[slug]`
+  (router.back() with parent-route fallback for deep links); header never
+  hides while the mobile menu is open.
 - **P1-3**: safe-area insets — `.safe-top` / `.safe-x` utilities in
   globals.css applied to the sticky header; tab bar carries bottom + side
   insets inline. `viewport-fit=cover` was already set in P0. **Pending: a

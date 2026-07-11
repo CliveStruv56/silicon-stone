@@ -1,8 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/layout/ThemeToggle'
 
@@ -55,9 +55,53 @@ const secondaryNavigation: NavItem[] = [
 
 const mobileNavigation: NavItem[] = [...primaryNavigation, ...secondaryNavigation]
 
+// Detail routes get a mobile back affordance (P1-4); the fallback target is
+// used when the page was deep-linked and there is no history to go back to.
+function backFallback(pathname: string): string | null {
+  if (/^\/analysis\/.+/.test(pathname)) return '/intelligence'
+  if (/^\/products\/.+/.test(pathname)) return '/products'
+  return null
+}
+
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [condensed, setCondensed] = useState(false)
   const pathname = usePathname()
+  const router = useRouter()
+  const fallback = backFallback(pathname)
+
+  // Hide-on-scroll-down / reveal-on-scroll-up, mobile only (P1-4). Transform
+  // is the only animated property, so the content below never reflows (CLS 0).
+  useEffect(() => {
+    let lastY = window.scrollY
+    let ticking = false
+    const onScroll = () => {
+      if (ticking) return
+      ticking = true
+      requestAnimationFrame(() => {
+        ticking = false
+        if (window.matchMedia('(min-width: 768px)').matches) {
+          setCondensed(false)
+          lastY = window.scrollY
+          return
+        }
+        const y = window.scrollY
+        const delta = y - lastY
+        // 8px hysteresis so momentum jitter doesn't flicker the header.
+        if (Math.abs(delta) > 8) {
+          setCondensed(y > 96 && delta > 0)
+          lastY = y
+        }
+      })
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  const goBack = () => {
+    if (window.history.length > 1) router.back()
+    else if (fallback) router.push(fallback)
+  }
 
   const matchesHref = (href: string) => {
     const path = href.split('?')[0]
@@ -111,10 +155,33 @@ export function Header() {
   )
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border-subtle glass-plate noise-overlay safe-top safe-x">
+    <header
+      className={`sticky top-0 z-50 w-full border-b border-border-subtle glass-plate noise-overlay safe-top safe-x transition-transform duration-200 motion-reduce:transition-none ${
+        condensed && !mobileMenuOpen ? '-translate-y-full' : 'translate-y-0'
+      }`}
+    >
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
-        {/* Logo */}
-        <div className="flex lg:flex-1">
+        {/* Logo, with a back affordance on detail routes (mobile only) */}
+        <div className="flex items-center gap-1 lg:flex-1">
+          {fallback && (
+            <button
+              type="button"
+              onClick={goBack}
+              aria-label="Back"
+              className="-ml-2 p-1.5 text-text-muted transition-colors hover:text-text-primary md:hidden"
+            >
+              <svg
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+                aria-hidden="true"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+              </svg>
+            </button>
+          )}
           <Link href="/" className="-m-1.5 p-1.5">
             <span className="text-xl font-bold tracking-tight">
               <span className="text-silicon-amber">Silicon</span>
