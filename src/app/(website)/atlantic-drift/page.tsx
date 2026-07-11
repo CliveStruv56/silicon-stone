@@ -75,7 +75,7 @@ export default function AtlanticDriftPage() {
 
       setStatus('success')
       setEmail('')
-      window.plausible?.('Atlantic+Drift+Signup')
+      window.plausible?.('Atlantic Drift Signup')
     } catch (err) {
       setStatus('error')
       setErrorMsg(err instanceof Error ? err.message : 'Something went wrong')

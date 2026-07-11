@@ -30,7 +30,7 @@ export function SubscribeCTA() {
 
       setStatus('success')
       setEmail('')
-      window.plausible?.('Newsletter+Subscribe')
+      window.plausible?.('Newsletter Subscribe')
     } catch (err) {
       setStatus('error')
       setErrorMsg(err instanceof Error ? err.message : 'Something went wrong')

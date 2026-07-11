@@ -26,7 +26,7 @@ export function CopyMarkdownButton({
     try {
       await navigator.clipboard.writeText(text)
       setCopied(true)
-      window.plausible?.('Tool+Copy+Markdown', { props: { tool: toolName } })
+      window.plausible?.('Tool Copy Markdown', { props: { tool: toolName } })
       setTimeout(() => setCopied(false), 2000)
     } catch {
       // Fallback: select-into-textarea approach for older browsers
@@ -57,7 +57,7 @@ export function CopyMarkdownButton({
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
-    window.plausible?.('Tool+Download+Markdown', { props: { tool: toolName } })
+    window.plausible?.('Tool Download Markdown', { props: { tool: toolName } })
   }
 
   return (

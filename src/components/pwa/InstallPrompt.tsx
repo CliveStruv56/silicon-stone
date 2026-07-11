@@ -66,7 +66,7 @@ export function InstallPrompt() {
     window.addEventListener("beforeinstallprompt", onBeforeInstallPrompt);
 
     const onInstalled = () => {
-      track("PWA+Install");
+      track("PWA Install");
       setMode("hidden");
     };
     window.addEventListener("appinstalled", onInstalled);
@@ -92,7 +92,7 @@ export function InstallPrompt() {
     if (!deferred) return;
     await deferred.prompt();
     const { outcome } = await deferred.userChoice;
-    if (outcome === "accepted") track("PWA+Install");
+    if (outcome === "accepted") track("PWA Install");
     setDeferred(null);
     setMode("hidden");
   }, [deferred]);

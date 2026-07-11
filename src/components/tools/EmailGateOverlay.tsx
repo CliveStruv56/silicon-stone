@@ -75,7 +75,7 @@ export function EmailGateOverlay({ isOpen, onUnlock, onDismiss, toolName, result
       }
 
       setStatus('success')
-      window.plausible?.('Tool+Email+Gate', { props: { tool: toolName } })
+      window.plausible?.('Tool Email Gate', { props: { tool: toolName } })
 
       // Brief success animation, then unlock
       setTimeout(() => {

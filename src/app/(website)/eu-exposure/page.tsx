@@ -58,7 +58,7 @@ export default function EuExposurePage() {
       }
 
       setFormSubmitted(true)
-      window.plausible?.('EU+Exposure+Form+Submit')
+      window.plausible?.('EU Exposure Form Submit')
     } catch (err) {
       setFormError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
     } finally {

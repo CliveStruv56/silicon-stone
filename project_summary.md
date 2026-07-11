@@ -376,8 +376,14 @@ SESSION_SECRET=<long random secret, 32+ characters>
 - **P0-6**: `scripts/pwa-checks.ts` + `npm run test:pwa` CI job asserting
   manifest/SW/offline/icons (replaces the spec's Lighthouse PWA gate — that
   category was removed in Lighthouse v12).
-- **User actions pending**: register Plausible goals (PWA+Install etc.), verify
-  install on a real iPhone/Android, sign off icon artwork.
+- **User actions pending**: create the Plausible account (none exists —
+  confirmed 2026-07-11: no plausible.io emails, signup was left pending in
+  March; env var set ~May so events have been silently dropped) and register
+  goals; verify install on a real iPhone/Android; sign off icon artwork.
+- **Event-name normalisation (2026-07-11)**: all JS-fired Plausible events
+  renamed from `+`-separated to spaces (e.g. `Newsletter Subscribe`,
+  `PWA Install`) so they match how CSS-tagged events record. Every dashboard
+  goal is now created with spaces. Safe because no data was ever collected.
 - Next up: Phase 1 (bottom tab bar, safe areas, condensing header, filter
   bottom-sheet) + P3-0 Lemon Squeezy store setup (user dashboard work).
 
