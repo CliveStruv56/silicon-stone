@@ -356,6 +356,15 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ### July 11, 2026 — PWA Phase 2 (reading product)
 
+- **P2-2**: portrait typography + text-size stepper — article body container
+  now reads `font-size: var(--article-size, 1.125rem)` with line-height 1.6;
+  PortableText components converted from rem to **em** sizes (paragraphs
+  1.05em/1.62 ≈ 18.9px, headings 1.65/1.35/1.15/1.05em) so the entire piece
+  scales together; measure capped at 64ch (≈65 serif ch, in the 60–66 spec
+  band). New `TextSizeStepper` (A−/A/A+, 16–21px, default 18) persists to
+  `localStorage['ss:article-size']`; the root-layout no-flash script seeds
+  the CSS var pre-paint so returning readers see their size immediately.
+  Verified: no horizontal overflow at 320px; stepper persists across reload.
 - **P2-1**: reading-progress indicator — `src/components/article/
   ReadingProgress.tsx`, a 2px gradient bar fixed above the header (z-60,
   safe-area aware), scaleX-transformed inside rAF (compositor-only, no

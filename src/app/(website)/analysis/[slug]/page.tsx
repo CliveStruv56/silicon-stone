@@ -13,6 +13,7 @@ import {
   MethodologyChecklist,
   DynamicCTA,
   ReadingProgress,
+  TextSizeStepper,
 } from '@/components/article'
 import { RelatedArticles } from '@/components/article/RelatedArticles'
 import { GlossaryToggle } from '@/components/glossary'
@@ -349,19 +350,24 @@ export default async function ArticlePage({ params }: Props) {
             </div>
           )}
 
-          {/* Reader control for inline glossary highlights — only on annotated
-              articles. Off by default; the body reads as clean text until opted in. */}
-          {showGlossaryToggle && (
-            <div className="mb-4 flex justify-end">
-              <GlossaryToggle />
-            </div>
-          )}
+          {/* Reader controls: text size on every article; the glossary toggle
+              only on annotated articles (off by default — the body reads as
+              clean text until opted in). */}
+          <div className="mb-4 flex items-center justify-end gap-3">
+            {showGlossaryToggle && <GlossaryToggle />}
+            <TextSizeStepper />
+          </div>
 
           <Separator className="mb-10 bg-border-subtle" />
 
-          {/* Article Body — reading measure capped (~70ch) for comfortable long-form reading.
-              Drop the in-body "Sources" section when we render structured citations below. */}
-          <div className="prose prose-lg dark:prose-invert max-w-[70ch]">
+          {/* Article Body — measure capped at 66ch, 18px/1.6 body scaled by the
+              reader-controlled --article-size var (P2-2; children are em-based
+              so the whole piece scales). Drop the in-body "Sources" section
+              when we render structured citations below. */}
+          <div
+            className="prose prose-lg dark:prose-invert max-w-[64ch]"
+            style={{ fontSize: 'var(--article-size, 1.125rem)', lineHeight: 1.6 }}
+          >
             {article.body && (
               <PortableText
                 value={

@@ -4,25 +4,27 @@ import { PortableTextComponents } from 'next-sanity'
 import { urlFor } from '@/sanity/lib/image'
 import { GlossaryPopover } from '@/components/glossary'
 
+// All sizes are em-based so the body scales with the container's font-size —
+// which the A−/A/A+ stepper drives via the --article-size CSS var (P2-2).
 export const portableTextComponents: PortableTextComponents = {
   block: {
     // Body markdown that starts with `# Heading` would otherwise emit a second
     // <h1>, duplicating the page title. Render it as an <h2> (keeping the larger
     // visual weight) so each article has exactly one <h1>.
     h1: ({ children }) => (
-      <h2 className="text-3xl font-bold text-text-primary mt-10 mb-4">{children}</h2>
+      <h2 className="text-[1.65em] font-bold text-text-primary mt-10 mb-4">{children}</h2>
     ),
     h2: ({ children }) => (
-      <h2 className="text-2xl font-bold text-text-primary mt-8 mb-4">{children}</h2>
+      <h2 className="text-[1.35em] font-bold text-text-primary mt-8 mb-4">{children}</h2>
     ),
     h3: ({ children }) => (
-      <h3 className="text-xl font-semibold text-text-primary mt-6 mb-3">{children}</h3>
+      <h3 className="text-[1.15em] font-semibold text-text-primary mt-6 mb-3">{children}</h3>
     ),
     h4: ({ children }) => (
-      <h4 className="text-lg font-semibold text-text-primary mt-4 mb-2">{children}</h4>
+      <h4 className="text-[1.05em] font-semibold text-text-primary mt-4 mb-2">{children}</h4>
     ),
     normal: ({ children }) => (
-      <p className="font-serif text-[1.18rem] leading-[1.72] text-text-primary mb-5">{children}</p>
+      <p className="font-serif text-[1.05em] leading-[1.62] text-text-primary mb-5">{children}</p>
     ),
     blockquote: ({ children }) => (
       <blockquote className="border-l-4 border-silicon-amber pl-6 py-2 my-6 italic text-text-muted font-serif">
@@ -39,7 +41,7 @@ export const portableTextComponents: PortableTextComponents = {
     ),
     em: ({ children }) => <em className="italic">{children}</em>,
     code: ({ children }) => (
-      <code className="bg-stone-charcoal px-1.5 py-0.5 rounded text-sm font-mono text-silicon-amber">
+      <code className="bg-stone-charcoal px-1.5 py-0.5 rounded text-[0.85em] font-mono text-silicon-amber">
         {children}
       </code>
     ),
