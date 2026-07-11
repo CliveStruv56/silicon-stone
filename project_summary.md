@@ -1,7 +1,7 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-07-09
+> Last Updated: 2026-07-11
 > Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing, 13 moderate transitive npm audit findings (uuid through Sanity packages)**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com. Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools (email-gated for lead capture, AI Act triage engine recently overhauled), product/commerce pages with an early-access enquiry fallback until Lemon Squeezy checkout URLs are configured, Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Awaiting Lemon Squeezy store setup, Plausible account, and content publishing for queued drafts.
@@ -353,6 +353,33 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### July 11, 2026 — PWA Phase 0 shipped: site is installable + offline-capable
+
+- Implements Phase 0 of `docs/pwa-phased-engineering-build-spec-phases-0-3.md`
+  (full 0–3 plan agreed; executing phase-by-phase). Spec adapted to the stack —
+  see the approved plan for the six documented overrides.
+- **P0-1/P0-2**: `src/app/manifest.ts` (standalone, `start_url /?source=pwa`,
+  Intelligence/Tools shortcuts), 192/512 + maskable icons and 180px
+  apple-touch-icon rasterised from the favicon mark, `viewport` export with
+  `viewport-fit=cover` + light/dark `themeColor`; the inline theme script now
+  syncs `meta theme-color` with the class-based toggle (`window.__ssThemeColor`).
+- **P0-3/P0-4**: Serwist (`@serwist/next` 9.5.11) service worker —
+  `src/app/sw.ts`, precache + `/offline` fallback page, skipWaiting/clientsClaim
+  (immediate activation, no update prompt), custom runtime caching: `/api/*`
+  NetworkOnly, `/studio` `/admin` `/login` NetworkOnly, `cdn.sanity.io`
+  StaleWhileRevalidate capped 200 entries/30 days. `sw.js` served no-cache;
+  generated worker gitignored; SW disabled in dev.
+- **P0-5**: `src/lib/track.ts` (Plausible event helper), `useStandalone()` hook,
+  branded InstallPrompt (2nd-session threshold, iOS share-sheet fallback,
+  30-day dismissal, `PWA+Install` goal) mounted in the (website) layout.
+- **P0-6**: `scripts/pwa-checks.ts` + `npm run test:pwa` CI job asserting
+  manifest/SW/offline/icons (replaces the spec's Lighthouse PWA gate — that
+  category was removed in Lighthouse v12).
+- **User actions pending**: register Plausible goals (PWA+Install etc.), verify
+  install on a real iPhone/Android, sign off icon artwork.
+- Next up: Phase 1 (bottom tab bar, safe areas, condensing header, filter
+  bottom-sheet) + P3-0 Lemon Squeezy store setup (user dashboard work).
 
 ### July 9, 2026 — Fixed client-side Railway briefings fetch (CSP + double slash)
 

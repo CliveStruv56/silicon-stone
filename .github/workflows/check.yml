@@ -27,3 +27,9 @@ jobs:
         env:
           NEXT_PUBLIC_SANITY_PROJECT_ID: 3q59mpd7
           NEXT_PUBLIC_SANITY_DATASET: production
+      # PWA installability gate: manifest, service worker, offline fallback,
+      # and icon assets must all be served (reuses the build above).
+      - run: npm run test:pwa
+        env:
+          NEXT_PUBLIC_SANITY_PROJECT_ID: 3q59mpd7
+          NEXT_PUBLIC_SANITY_DATASET: production
