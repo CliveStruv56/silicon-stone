@@ -383,3 +383,16 @@ html.dark {
   .card-interactive:hover { transform: none; }
 }
 
+/* ===== PWA app shell (Phase 1) ===== */
+
+/* Installed/standalone chrome polish: no rubber-band overscroll behind the
+   app shell, no grey tap flashes — the bits that make it feel like a page. */
+@media (display-mode: standalone) {
+  html {
+    overscroll-behavior-y: none;
+  }
+  body {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+

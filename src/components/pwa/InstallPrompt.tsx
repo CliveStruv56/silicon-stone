@@ -102,8 +102,7 @@ export function InstallPrompt() {
   return (
     <aside
       aria-label="Install Silicon and Stone"
-      className="fixed inset-x-3 z-40 rounded-lg border border-border-subtle bg-surface-elevated p-4 shadow-lg motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 md:left-auto md:right-6 md:w-96"
-      style={{ bottom: "calc(0.75rem + env(safe-area-inset-bottom))" }}
+      className="fixed inset-x-3 bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-40 rounded-lg border border-border-subtle bg-surface-elevated p-4 shadow-lg motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 md:bottom-[calc(0.75rem+env(safe-area-inset-bottom))] md:left-auto md:right-6 md:w-96"
     >
       <div className="flex items-start gap-3">
         {/* eslint-disable-next-line @next/next/no-img-element */}

@@ -354,6 +354,26 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### July 11, 2026 — PWA Phase 1 (P1-1/P1-2): mobile app shell + bottom tab bar
+
+- **P1-1**: responsive shell — `BottomTabBar` mounted in the `(website)`
+  layout, hidden ≥768px purely via CSS (`md:hidden`, identical SSR/client DOM
+  → no hydration flash); layout wrapper gets mobile-only bottom padding
+  (`4.25rem + env(safe-area-inset-bottom)`) so content clears the fixed bar.
+  Standalone chrome polish in globals.css (`overscroll-behavior-y: none`,
+  transparent tap highlight under `@media (display-mode: standalone)`).
+  Install-prompt suppression when standalone was already in from P0-5; the
+  prompt card now sits above the tab bar on mobile.
+- **P1-2**: five tabs — Home / Read (Intelligence, also lights on
+  `/analysis/*`) / Tools / Saved / **More**. "More" replaces the spec's
+  "Account" (no user accounts per the Phase 3 decision) and lands on a new
+  `/more` page (secondary nav: Products, Advisory, Methodology, Glossary,
+  About, Search + theme toggle + subscribe). New `/saved` page is the
+  empty-state shell P2-4 will populate. `aria-current="page"` on the active
+  tab; per-tab scroll position saved to sessionStorage on tab switch and
+  restored on return (re-tapping the active tab scrolls to top). Both new
+  pages are `robots: noindex`.
+
 ### July 11, 2026 — PWA Phase 0 shipped: site is installable + offline-capable
 
 - Implements Phase 0 of `docs/pwa-phased-engineering-build-spec-phases-0-3.md`
