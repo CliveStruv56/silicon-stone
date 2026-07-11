@@ -37,23 +37,41 @@ const runtimeCaching: RuntimeCaching[] = [
         pathname.startsWith("/login")),
     handler: new NetworkOnly(),
   },
-  // Sanity image CDN: serve from cache immediately, refresh in the background.
-  // Bounded so article-heavy browsing can't grow the cache without limit.
+  // Sanity image CDN. Saved-for-later images live in a dedicated cache the
+  // save action populates (see src/lib/offline/article-store.ts) and are
+  // served from there first — they must survive offline regardless of what
+  // the bounded browsing cache below has evicted. Everything else is
+  // stale-while-revalidate with an LRU cap.
   {
     matcher: ({ url }) => url.hostname === "cdn.sanity.io",
-    handler: new StaleWhileRevalidate({
-      cacheName: "sanity-images",
-      plugins: [
-        new ExpirationPlugin({
-          maxEntries: 200,
-          maxAgeSeconds: 30 * 24 * 60 * 60,
-          maxAgeFrom: "last-used",
-        }),
-      ],
-    }),
+    handler: (options) => savedImagesFirst(options),
   },
   ...defaultCache,
 ];
+
+/** Keep in sync with IMAGES_CACHE in src/lib/offline/article-store.ts. */
+const SAVED_IMAGES_CACHE = "ss-saved-images";
+
+const sanityImagesBrowsing = new StaleWhileRevalidate({
+  cacheName: "sanity-images",
+  plugins: [
+    new ExpirationPlugin({
+      maxEntries: 200,
+      maxAgeSeconds: 30 * 24 * 60 * 60,
+      maxAgeFrom: "last-used",
+    }),
+  ],
+});
+
+async function savedImagesFirst(
+  options: Parameters<StaleWhileRevalidate["handle"]>[0],
+): Promise<Response> {
+  const saved = await caches.match(options.request, {
+    cacheName: SAVED_IMAGES_CACHE,
+  });
+  if (saved) return saved;
+  return sanityImagesBrowsing.handle(options);
+}
 
 const serwist = new Serwist({
   precacheEntries: self.__SW_MANIFEST,

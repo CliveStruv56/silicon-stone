@@ -138,6 +138,9 @@ const withSerwist = withSerwistInit({
     // Offline fallback document (see fallbacks in src/app/sw.ts). Fresh
     // revision per build so a deploy refreshes the cached copy.
     { url: "/offline", revision: crypto.randomUUID() },
+    // Saved-articles shell: must open with the network disabled — the reader
+    // inside it renders saved articles from IndexedDB (P2-4).
+    { url: "/saved", revision: crypto.randomUUID() },
   ],
 });
 

@@ -15,6 +15,7 @@ import {
   ReadingProgress,
   TextSizeStepper,
 } from '@/components/article'
+import { SaveButton, type SavePayload } from '@/components/article/SaveButton'
 import { RelatedArticles } from '@/components/article/RelatedArticles'
 import { GlossaryToggle } from '@/components/glossary'
 import { JsonLd } from '@/components/seo/JsonLd'
@@ -127,6 +128,15 @@ function getReadingTime(body: PortableTextBlock[]): number {
   return Math.ceil(words / 200) // Average reading speed
 }
 
+// Body images the offline store must cache — same size the offline reader
+// requests (see OfflinePortableTextComponents), so cache lookups hit exactly.
+function collectBodyImageUrls(body: PortableTextBlock[]): string[] {
+  if (!Array.isArray(body)) return []
+  return (body as Array<{ _type?: string; asset?: { _ref?: string } }>)
+    .filter((block) => block._type === 'image' && block.asset?._ref)
+    .map((block) => urlFor(block).width(1200).height(675).url())
+}
+
 // Many generated articles end the body with a "Sources" heading + list, which
 // duplicates the structured `citations[]` rendered separately below. When we have
 // citations to show, drop the trailing in-body Sources section (the heading and
@@ -171,6 +181,51 @@ export default async function ArticlePage({ params }: Props) {
     new Date(article.updatedAt).getTime() > new Date(article.publishedAt).getTime()
       ? article.updatedAt
       : null
+
+  // Offline save payload (P2-4): the rendered content model with image URLs
+  // pre-resolved to cdn.sanity.io, so offline reads never touch GROQ or the
+  // /_next/image optimizer.
+  const mainImageUrl = article.mainImage?.asset
+    ? urlFor(article.mainImage).width(1200).height(675).url()
+    : null
+  const authorImageUrl = article.author?.image
+    ? urlFor(article.author.image).width(128).height(128).url()
+    : null
+  const savePayload: SavePayload = {
+    slug: article.slug,
+    title: article.title,
+    excerpt: article.excerpt || null,
+    stoneTruth: article.stoneTruth || null,
+    impactScore: article.impactScore || null,
+    intelligenceTier: article.intelligenceTier || null,
+    publishedAt: article.publishedAt || null,
+    readingTime,
+    personas: article.personas || [],
+    categories:
+      article.categories?.map((category: Category) => ({
+        title: category.title,
+        slug: category.slug,
+      })) || [],
+    citations: article.citations || [],
+    actionableInsights: article.actionableInsights || [],
+    mainImageUrl,
+    mainImageAlt: article.mainImage?.alt || null,
+    author: article.author
+      ? {
+          name: article.author.name || null,
+          role: article.author.role || null,
+          bio: article.author.bio || null,
+          slug: article.author.slug || null,
+          imageUrl: authorImageUrl,
+        }
+      : null,
+    body: article.body || [],
+    imageUrls: [
+      ...(mainImageUrl ? [mainImageUrl] : []),
+      ...(authorImageUrl ? [authorImageUrl] : []),
+      ...collectBodyImageUrls(article.body || []),
+    ],
+  }
 
   const schemaInput = {
     title: article.title,
@@ -350,12 +405,15 @@ export default async function ArticlePage({ params }: Props) {
             </div>
           )}
 
-          {/* Reader controls: text size on every article; the glossary toggle
-              only on annotated articles (off by default — the body reads as
-              clean text until opted in). */}
-          <div className="mb-4 flex items-center justify-end gap-3">
-            {showGlossaryToggle && <GlossaryToggle />}
-            <TextSizeStepper />
+          {/* Reader controls: save-for-later left; text size (every article)
+              and the glossary toggle (annotated articles only, off by default)
+              right. */}
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <SaveButton payload={savePayload} />
+            <div className="flex items-center gap-3">
+              {showGlossaryToggle && <GlossaryToggle />}
+              <TextSizeStepper />
+            </div>
           </div>
 
           <Separator className="mb-10 bg-border-subtle" />

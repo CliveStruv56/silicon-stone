@@ -356,6 +356,24 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ### July 11, 2026 — PWA Phase 2 (reading product)
 
+- **P2-4**: save-for-later + offline article store (device-local) —
+  `src/lib/offline/article-store.ts` (IndexedDB via `idb`, DB `ss-offline`):
+  stores the rendered content model (Portable Text + pre-resolved
+  cdn.sanity.io image URLs — NOT /_next/image URLs, which vary by DPR).
+  Images cached at save time into Cache-API bucket `ss-saved-images` with
+  **no-cors fetch + cache.put** (Sanity CDN sends no CORS headers, so
+  cache.add fails — responses are opaque, fine for <img>). The SW's
+  cdn.sanity.io route now checks `ss-saved-images` first, then the bounded
+  SWR browsing cache, so LRU eviction can't break saved articles.
+  `SaveButton` on articles (payload built server-side; quota errors surface
+  via `StorageQuotaError` messaging; `navigator.storage.persist()`
+  requested on save). `/saved` is a single **precached static document**
+  (added to additionalPrecacheEntries): list ↔ reader switch via
+  `?read=<slug>` + pushState so no offline navigation needs the network;
+  reader uses `offlinePortableTextComponents` (plain <img> at the exact
+  cached size) and fires **`Offline Read`** (props: article) when opened
+  with no connection — another Plausible goal for the dashboard. Unsave
+  purges the record and any cached images no other saved article uses.
 - **P2-2**: portrait typography + text-size stepper — article body container
   now reads `font-size: var(--article-size, 1.125rem)` with line-height 1.6;
   PortableText components converted from rem to **em** sizes (paragraphs
