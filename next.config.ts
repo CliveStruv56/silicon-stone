@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import withSerwistInit from "@serwist/next";
 import { articleRedirectRules } from "./src/lib/slug-redirects";
 
 const isDevelopment = process.env.NODE_ENV === 'development'
@@ -81,6 +82,17 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        // The service worker must never be served stale, or deploys would
+        // take a full HTTP-cache TTL to reach installed clients.
+        source: '/sw.js',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-cache, no-store, must-revalidate',
+          },
+        ],
+      },
+      {
         source: '/(.*)',
         headers: [
           {
@@ -117,4 +129,16 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+const withSerwist = withSerwistInit({
+  swSrc: "src/app/sw.ts",
+  swDest: "public/sw.js",
+  // No service worker in `next dev` — HMR and the SW cache fight each other.
+  disable: isDevelopment,
+  additionalPrecacheEntries: [
+    // Offline fallback document (see fallbacks in src/app/sw.ts). Fresh
+    // revision per build so a deploy refreshes the cached copy.
+    { url: "/offline", revision: crypto.randomUUID() },
+  ],
+});
+
+export default withSerwist(nextConfig);

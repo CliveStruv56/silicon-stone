@@ -62,3 +62,8 @@ debug_error.log
 
 # local-draft pipeline scratch (intermediate JSON between model steps)
 .local-draft/
+
+# serwist build output (generated from src/app/sw.ts at build time)
+/public/sw.js
+/public/sw.js.map
+/public/swe-worker*
