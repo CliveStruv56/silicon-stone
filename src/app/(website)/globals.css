@@ -385,6 +385,17 @@ html.dark {
 
 /* ===== PWA app shell (Phase 1) ===== */
 
+/* Safe-area helpers (P1-3): keep fixed/sticky chrome clear of the notch,
+   home indicator, and rounded corners. viewport-fit=cover is set in the root
+   layout's viewport export; env() is 0 wherever there is no inset. */
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+.safe-x {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
 /* Installed/standalone chrome polish: no rubber-band overscroll behind the
    app shell, no grey tap flashes — the bits that make it feel like a page. */
 @media (display-mode: standalone) {

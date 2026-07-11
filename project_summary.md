@@ -373,6 +373,11 @@ SESSION_SECRET=<long random secret, 32+ characters>
   tab; per-tab scroll position saved to sessionStorage on tab switch and
   restored on return (re-tapping the active tab scrolls to top). Both new
   pages are `robots: noindex`.
+- **P1-3**: safe-area insets — `.safe-top` / `.safe-x` utilities in
+  globals.css applied to the sticky header; tab bar carries bottom + side
+  insets inline. `viewport-fit=cover` was already set in P0. **Pending: a
+  quick spot-check on a real notched phone (iOS Safari + Android Chrome,
+  portrait + landscape)** — desktop browsers report all insets as 0.
 
 ### July 11, 2026 — PWA Phase 0 shipped: site is installable + offline-capable
 

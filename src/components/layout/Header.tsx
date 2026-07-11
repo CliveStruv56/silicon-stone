@@ -111,7 +111,7 @@ export function Header() {
   )
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border-subtle glass-plate noise-overlay">
+    <header className="sticky top-0 z-50 w-full border-b border-border-subtle glass-plate noise-overlay safe-top safe-x">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
         {/* Logo */}
         <div className="flex lg:flex-1">
