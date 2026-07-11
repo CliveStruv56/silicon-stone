@@ -2,6 +2,7 @@ import { SanityLive } from "@/sanity/lib/live";
 import { DraftModeBanner } from "@/components/DraftModeBanner";
 import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 import { BottomTabBar } from "@/components/pwa/BottomTabBar";
+import { OfflineBanner } from "@/components/pwa/OfflineBanner";
 
 export default function WebsiteLayout({
   children,
@@ -15,6 +16,7 @@ export default function WebsiteLayout({
       <SanityLive />
       <DraftModeBanner />
       <InstallPrompt />
+      <OfflineBanner />
       <BottomTabBar />
     </div>
   );

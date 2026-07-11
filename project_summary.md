@@ -356,6 +356,16 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ### July 11, 2026 — PWA Phase 2 (reading product)
 
+- **P2-5**: offline state UI + fallback — `OfflineBanner` in the (website)
+  layout: non-blocking pill (role=status) on the offline/online events,
+  linking to /saved, with a 2.5s "Back online" confirmation before
+  auto-clearing. The /offline fallback page now lists saved articles
+  (`SavedOffline`, links to `/saved?read=…`) and reloads itself on
+  reconnect — the fallback serves at the *originally requested* URL, so the
+  reload resumes the interrupted navigation. SW `precacheOptions.
+  ignoreURLParametersMatching` now ignores `read`/`source` params so
+  offline navigations to `/saved?read=x` and `/?source=pwa` hit the
+  precached shells.
 - **P2-4**: save-for-later + offline article store (device-local) —
   `src/lib/offline/article-store.ts` (IndexedDB via `idb`, DB `ss-offline`):
   stores the rendered content model (Portable Text + pre-resolved

@@ -75,6 +75,13 @@ async function savedImagesFirst(
 
 const serwist = new Serwist({
   precacheEntries: self.__SW_MANIFEST,
+  precacheOptions: {
+    // Ignore client-state params when matching precached documents, so an
+    // offline navigation to /saved?read=<slug> (the saved-article reader,
+    // P2-4/P2-5) or /?source=pwa (manifest start_url) still hits the
+    // precached shell.
+    ignoreURLParametersMatching: [/^utm_/, /^fbclid$/, /^read$/, /^source$/],
+  },
   // Immediate activation on deploy: this is a content site with no long-lived
   // client state, so we prefer never-stale over an update prompt.
   skipWaiting: true,
