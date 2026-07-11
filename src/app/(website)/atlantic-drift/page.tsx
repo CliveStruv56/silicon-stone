@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Header, Footer } from '@/components/layout'
+import { submitWithOfflineQueue } from '@/lib/offline/submit'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -50,7 +51,7 @@ const selfCheck = [
 
 export default function AtlanticDriftPage() {
   const [email, setEmail] = useState('')
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'queued' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -62,11 +63,13 @@ export default function AtlanticDriftPage() {
       // Reuses the standard subscribe flow. A dedicated "Atlantic Drift" lead
       // tag can be added once the backend whitelists it (see ALLOWED_TAGS in
       // /api/subscribe and the Railway /v1/subscribe handler).
-      const res = await fetch('/api/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      })
+      const result = await submitWithOfflineQueue('/api/subscribe', { email })
+      if (result.queued) {
+        setStatus('queued')
+        setEmail('')
+        return
+      }
+      const res = result.response
 
       if (!res.ok) {
         const data = await res.json()
@@ -290,7 +293,7 @@ export default function AtlanticDriftPage() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                {status === 'success' ? (
+                {status === 'success' || status === 'queued' ? (
                   <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -298,10 +301,12 @@ export default function AtlanticDriftPage() {
                   >
                     <CheckCircle className="mx-auto mb-3 h-10 w-10 text-stone-teal" />
                     <h3 className="mb-1 text-lg font-semibold text-text-primary">
-                      You’re in
+                      {status === 'queued' ? 'Signup queued' : 'You’re in'}
                     </h3>
                     <p className="text-sm text-text-muted">
-                      Check your inbox to confirm — the guide follows.
+                      {status === 'queued'
+                        ? 'You’re offline — your signup will send when the connection returns.'
+                        : 'Check your inbox to confirm — the guide follows.'}
                     </p>
                   </motion.div>
                 ) : (

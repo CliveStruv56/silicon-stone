@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Shield, Loader2, CheckCircle, Lock } from 'lucide-react'
+import { submitWithOfflineQueue } from '@/lib/offline/submit'
 
 interface EmailGateOverlayProps {
   isOpen: boolean
@@ -63,19 +64,23 @@ export function EmailGateOverlay({ isOpen, onUnlock, onDismiss, toolName, result
     setErrorMsg('')
 
     try {
-      const res = await fetch('/api/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, tag: 'Tool_Lead' }),
+      // Offline submissions queue in the service worker and send on
+      // reconnect (P2-6) — the gate still unlocks; the email was captured.
+      const result = await submitWithOfflineQueue('/api/subscribe', {
+        email,
+        tag: 'Tool_Lead',
       })
 
-      if (!res.ok) {
-        const data = await res.json()
-        throw new Error(data.error || 'Failed to subscribe')
+      if (!result.queued) {
+        const res = result.response
+        if (!res.ok) {
+          const data = await res.json()
+          throw new Error(data.error || 'Failed to subscribe')
+        }
+        window.plausible?.('Tool Email Gate', { props: { tool: toolName } })
       }
 
       setStatus('success')
-      window.plausible?.('Tool Email Gate', { props: { tool: toolName } })
 
       // Brief success animation, then unlock
       setTimeout(() => {

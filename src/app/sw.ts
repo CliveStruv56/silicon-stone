@@ -2,6 +2,7 @@
 import type { PrecacheEntry, RuntimeCaching, SerwistGlobalConfig } from "serwist";
 import { defaultCache } from "@serwist/next/worker";
 import {
+  BackgroundSyncQueue,
   ExpirationPlugin,
   NetworkOnly,
   Serwist,
@@ -17,9 +18,38 @@ declare global {
 
 declare const self: ServiceWorkerGlobalScope;
 
+// Offline action queue (P2-6): outbound form submissions that fail at the
+// network level are stored (IndexedDB, 24h retention) and replayed — via the
+// Background Sync API where supported (Chromium), or when the page reports
+// the connection returned (REPLAY_SUBMISSIONS message below; Safari/iOS has
+// no Background Sync). Only network failures queue; HTTP errors pass through
+// to the form, so rejected submissions are never retried (no duplicates).
+const submissionQueue = new BackgroundSyncQueue("ss-submissions", {
+  maxRetentionTime: 24 * 60,
+});
+
+const QUEUEABLE_SUBMISSIONS = new Set(["/api/subscribe", "/api/contact"]);
+
 // Custom routes run before defaultCache, overriding its generic handling
 // where the defaults are wrong for this site.
 const runtimeCaching: RuntimeCaching[] = [
+  // Newsletter signups and contact messages: send, and queue on network
+  // failure. Must precede the generic /api/* NetworkOnly route.
+  {
+    matcher: ({ sameOrigin, request, url: { pathname } }) =>
+      sameOrigin &&
+      request.method === "POST" &&
+      QUEUEABLE_SUBMISSIONS.has(pathname),
+    method: "POST",
+    handler: async ({ request }) => {
+      try {
+        return await fetch(request.clone());
+      } catch (error) {
+        await submissionQueue.pushRequest({ request });
+        throw error;
+      }
+    },
+  },
   // Never cache API responses. defaultCache would NetworkFirst-cache them;
   // /api/* carries newsletter, live briefings and (later) commerce and
   // entitlement payloads that must never be served stale or offline.
@@ -102,3 +132,17 @@ const serwist = new Serwist({
 });
 
 serwist.addEventListeners();
+
+// Safari/iOS fallback: no Background Sync, so the page pings us when the
+// 'online' event fires (see OfflineBanner) and we drain the queue then.
+// Harmless on Chromium — replaying an empty queue is a no-op.
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "REPLAY_SUBMISSIONS") {
+    event.waitUntil(
+      submissionQueue.replayRequests().catch(() => {
+        // A replay that fails mid-way re-queues the remainder; the next
+        // sync event or online ping tries again.
+      }),
+    );
+  }
+});

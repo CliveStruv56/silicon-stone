@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { getDynamicCTA } from '@/lib/personas'
+import { submitWithOfflineQueue } from '@/lib/offline/submit'
 
 interface DynamicCTAProps {
   primaryPersona?: string
@@ -17,7 +18,7 @@ export function DynamicCTA({
   className,
 }: DynamicCTAProps) {
   const [email, setEmail] = useState('')
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'queued' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
 
   const { headline, subheadline } = getDynamicCTA(primaryPersona)
@@ -30,11 +31,13 @@ export function DynamicCTA({
     setErrorMsg('')
 
     try {
-      const res = await fetch('/api/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      })
+      const result = await submitWithOfflineQueue('/api/subscribe', { email })
+      if (result.queued) {
+        setStatus('queued')
+        setEmail('')
+        return
+      }
+      const res = result.response
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
@@ -81,6 +84,10 @@ export function DynamicCTA({
       {status === 'success' ? (
         <div className="text-stone-teal text-sm">
           <span className="font-medium">Confirmed.</span> You&apos;ll receive your first briefing shortly.
+        </div>
+      ) : status === 'queued' ? (
+        <div className="text-stone-teal text-sm">
+          <span className="font-medium">Queued.</span> You&apos;re offline — your signup will send when the connection returns.
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">

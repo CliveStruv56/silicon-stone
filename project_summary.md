@@ -356,6 +356,19 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ### July 11, 2026 — PWA Phase 2 (reading product)
 
+- **P2-6**: offline action queue — SW `BackgroundSyncQueue`
+  ("ss-submissions", 24h retention) captures **network-failed** POSTs to
+  `/api/subscribe` + `/api/contact` (route precedes the generic /api
+  NetworkOnly rule; HTTP errors pass through, so rejected submissions never
+  retry → no duplicates). Replay: Background Sync event (Chromium) or a
+  `REPLAY_SUBMISSIONS` message the OfflineBanner posts on the 'online'
+  event (Safari/iOS fallback; empty-queue replay is a no-op on Chromium).
+  New `src/lib/offline/submit.ts` helper wraps the fetch in all seven forms
+  (SubscribeCTA, DynamicCTA, EmailGateOverlay, atlantic-drift, waymarkpath,
+  sector-reports, eu-exposure, advisory) — network failure under a
+  controlling SW shows a "queued — sends on reconnect" state instead of an
+  error; the tool email gate still unlocks. Without a SW (dev) it errors
+  as before. **Queue replay needs a prod SW — verify after deploy.**
 - **P2-5**: offline state UI + fallback — `OfflineBanner` in the (website)
   layout: non-blocking pill (role=status) on the offline/online events,
   linking to /saved, with a 2.5s "Back online" confirmation before

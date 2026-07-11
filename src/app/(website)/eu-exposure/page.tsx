@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Header, Footer } from '@/components/layout'
+import { submitWithOfflineQueue } from '@/lib/offline/submit'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -37,6 +38,7 @@ export default function EuExposurePage() {
     message: '',
   })
   const [formSubmitted, setFormSubmitted] = useState(false)
+  const [formQueued, setFormQueued] = useState(false)
   const [formLoading, setFormLoading] = useState(false)
   const [formError, setFormError] = useState('')
 
@@ -46,11 +48,13 @@ export default function EuExposurePage() {
     setFormError('')
 
     try {
-      const res = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      })
+      const result = await submitWithOfflineQueue('/api/contact', formData)
+      if (result.queued) {
+        setFormQueued(true)
+        setFormSubmitted(true)
+        return
+      }
+      const res = result.response
 
       if (!res.ok) {
         const data = await res.json()
@@ -317,10 +321,12 @@ export default function EuExposurePage() {
                 >
                   <CheckCircle className="w-12 h-12 text-stone-teal mx-auto mb-4" />
                   <h3 className="text-xl font-semibold text-text-primary mb-2">
-                    Enquiry received
+                    {formQueued ? 'Enquiry queued' : 'Enquiry received'}
                   </h3>
                   <p className="text-text-muted">
-                    Thank you for reaching out. I will review your enquiry and respond within 48 hours.
+                    {formQueued
+                      ? 'You’re offline — your enquiry will send automatically when the connection returns.'
+                      : 'Thank you for reaching out. I will review your enquiry and respond within 48 hours.'}
                   </p>
                 </motion.div>
               ) : (

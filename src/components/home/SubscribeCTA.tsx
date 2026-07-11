@@ -4,10 +4,11 @@ import { useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { submitWithOfflineQueue } from '@/lib/offline/submit'
 
 export function SubscribeCTA() {
   const [email, setEmail] = useState('')
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'queued' | 'error'>('idle')
 
   const [errorMsg, setErrorMsg] = useState('')
 
@@ -17,11 +18,13 @@ export function SubscribeCTA() {
     setErrorMsg('')
 
     try {
-      const res = await fetch('/api/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      })
+      const result = await submitWithOfflineQueue('/api/subscribe', { email })
+      if (result.queued) {
+        setStatus('queued')
+        setEmail('')
+        return
+      }
+      const res = result.response
 
       if (!res.ok) {
         const data = await res.json()
@@ -84,6 +87,11 @@ export function SubscribeCTA() {
         {status === 'success' ? (
           <div className="text-sm text-stone-teal">
             Subscribed. Check your inbox to confirm.
+          </div>
+        ) : status === 'queued' ? (
+          <div className="text-sm text-stone-teal">
+            You&apos;re offline — your signup is queued and will send when the
+            connection returns.
           </div>
         ) : (
           <>

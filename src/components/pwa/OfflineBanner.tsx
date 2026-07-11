@@ -24,6 +24,11 @@ export function OfflineBanner() {
       setOffline(false);
       setReconnected(true);
       setTimeout(() => setReconnected(false), 2500);
+      // Drain the offline submission queue (P2-6) — the Background Sync API
+      // does this itself on Chromium, but Safari/iOS needs the nudge.
+      navigator.serviceWorker?.controller?.postMessage({
+        type: "REPLAY_SUBMISSIONS",
+      });
     };
 
     window.addEventListener("offline", onOffline);

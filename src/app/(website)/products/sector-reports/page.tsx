@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 
 import { Header, Footer } from '@/components/layout'
+import { submitWithOfflineQueue } from '@/lib/offline/submit'
 import { AdvisoryNextStep } from '@/components/products/AdvisoryNextStep'
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -46,20 +47,21 @@ const briefings = [
 
 export default function BriefingsProductPage() {
   const [email, setEmail] = useState('')
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'queued' | 'error'>('idle')
 
   const handleNotify = async (e: React.FormEvent) => {
     e.preventDefault()
     setStatus('loading')
 
     try {
-      const res = await fetch('/api/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      })
+      const result = await submitWithOfflineQueue('/api/subscribe', { email })
+      if (result.queued) {
+        setStatus('queued')
+        setEmail('')
+        return
+      }
 
-      if (!res.ok) throw new Error('Failed to subscribe')
+      if (!result.response.ok) throw new Error('Failed to subscribe')
 
       setStatus('success')
       setEmail('')
@@ -165,6 +167,10 @@ export default function BriefingsProductPage() {
               {status === 'success' ? (
                 <div className="text-sm text-stone-teal">
                   You&apos;re on the list. We&apos;ll notify you when briefings launch.
+                </div>
+              ) : status === 'queued' ? (
+                <div className="text-sm text-stone-teal">
+                  You&apos;re offline — your signup will send when the connection returns.
                 </div>
               ) : (
                 <form onSubmit={handleNotify} className="flex gap-2 max-w-md mx-auto">

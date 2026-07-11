@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Header, Footer } from '@/components/layout'
+import { submitWithOfflineQueue } from '@/lib/offline/submit'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -53,7 +54,7 @@ const features = [
 
 export default function WaymarkPathPage() {
   const [email, setEmail] = useState('')
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'queued' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -62,11 +63,16 @@ export default function WaymarkPathPage() {
     setErrorMsg('')
 
     try {
-      const res = await fetch('/api/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, tag: 'WaymarkPath_Early_Access' }),
+      const result = await submitWithOfflineQueue('/api/subscribe', {
+        email,
+        tag: 'WaymarkPath_Early_Access',
       })
+      if (result.queued) {
+        setStatus('queued')
+        setEmail('')
+        return
+      }
+      const res = result.response
 
       if (!res.ok) {
         const data = await res.json()
@@ -108,11 +114,13 @@ export default function WaymarkPathPage() {
               </p>
 
               {/* Signup form */}
-              {status === 'success' ? (
+              {status === 'success' || status === 'queued' ? (
                 <div className="flex items-center gap-3 p-4 rounded-lg bg-stone-teal/10 border border-stone-teal/30">
                   <CheckCircle className="w-5 h-5 text-stone-teal flex-shrink-0" />
                   <p className="text-stone-teal">
-                    You&apos;re on the list. We&apos;ll notify you when early access opens.
+                    {status === 'queued'
+                      ? "You're offline — your signup will send when the connection returns."
+                      : "You're on the list. We'll notify you when early access opens."}
                   </p>
                 </div>
               ) : (
@@ -262,10 +270,12 @@ export default function WaymarkPathPage() {
                 to be notified when the first version launches.
               </p>
 
-              {status === 'success' ? (
+              {status === 'success' || status === 'queued' ? (
                 <div className="flex items-center justify-center gap-3 p-4 rounded-lg bg-stone-teal/10 border border-stone-teal/30 max-w-md mx-auto">
                   <CheckCircle className="w-5 h-5 text-stone-teal flex-shrink-0" />
-                  <p className="text-stone-teal">You&apos;re on the list.</p>
+                  <p className="text-stone-teal">
+                    {status === 'queued' ? 'Signup queued — sends when you reconnect.' : "You're on the list."}
+                  </p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
