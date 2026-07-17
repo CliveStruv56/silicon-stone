@@ -440,10 +440,15 @@ export default function ComplianceCheckerPage() {
                       </Button>
                     </Link>
                     <p className="text-xs text-text-muted text-center">
-                      Need a standing read on your exposure?{' '}
-                      <Link href="/advisory#retainer" className="text-silicon-amber hover:underline">
-                        See the Drift Retainer
+                      Need it interpreted for your business?{' '}
+                      <Link href="/eu-exposure" className="text-silicon-amber hover:underline">
+                        See the Post-Omnibus Briefing
                       </Link>
+                      , or a standing read via the{' '}
+                      <Link href="/advisory#retainer" className="text-silicon-amber hover:underline">
+                        Drift Retainer
+                      </Link>
+                      .
                     </p>
                   </CardContent>
                 </Card>

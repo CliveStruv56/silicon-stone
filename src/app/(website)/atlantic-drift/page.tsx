@@ -278,10 +278,10 @@ export default function AtlanticDriftPage() {
                   When you want this read against your own systems rather than in general,
                   the{' '}
                   <Link href="/eu-exposure" className="text-silicon-amber hover:underline">
-                    EU Exposure Briefing
+                    Post-Omnibus Briefing
                   </Link>{' '}
-                  is the fixed-scope diagnostic — and its fee is credited toward the first
-                  quarter of a Drift Retainer if you go on to one.
+                  is the fixed-price, fixed-scope engagement — what the AI Act now requires of
+                  your business, and the decisions to take this quarter.
                 </p>
               </div>
             </div>
