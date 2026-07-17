@@ -11,6 +11,7 @@ import {
 import { Header, Footer } from '@/components/layout'
 import { ThemeToggle } from '@/components/layout/ThemeToggle'
 import { Button } from '@/components/ui/button'
+import { PushOptIn } from '@/components/pwa/PushOptIn'
 
 export const metadata: Metadata = {
   title: 'More | Silicon and Stone',
@@ -99,7 +100,11 @@ export default function MorePage() {
             })}
           </ul>
 
-          <div className="mt-10 rounded-lg border border-border-subtle bg-stone-charcoal/30 p-6 text-center">
+          <div className="mt-10">
+            <PushOptIn />
+          </div>
+
+          <div className="mt-6 rounded-lg border border-border-subtle bg-stone-charcoal/30 p-6 text-center">
             <p className="mb-4 text-sm text-text-muted">
               Decision-grade intelligence in your inbox — the Atlantic Drift
               briefing.

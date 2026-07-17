@@ -146,3 +146,61 @@ self.addEventListener("message", (event) => {
     );
   }
 });
+
+// Web Push (P3-6): two editorial topics. The payload carries title/body and a
+// same-site deep-link path; the click focuses an existing tab or opens one.
+interface PushPayload {
+  title?: string;
+  body?: string;
+  url?: string;
+}
+
+self.addEventListener("push", (event) => {
+  let payload: PushPayload = {};
+  try {
+    payload = event.data?.json() ?? {};
+  } catch {
+    payload = { body: event.data?.text() };
+  }
+
+  const title = payload.title || "Silicon & Stone";
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body: payload.body || "",
+      icon: "/icons/icon-192.png",
+      badge: "/icons/icon-192.png",
+      data: { url: payload.url || "/" },
+    }),
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const target = new URL(
+    (event.notification.data as { url?: string } | undefined)?.url || "/",
+    self.location.origin,
+  );
+
+  event.waitUntil(
+    (async () => {
+      const clientList = await self.clients.matchAll({
+        type: "window",
+        includeUncontrolled: true,
+      });
+      // Focus an open tab already on the target path; else navigate one; else
+      // open a new window.
+      for (const client of clientList) {
+        const clientUrl = new URL(client.url);
+        if (clientUrl.pathname === target.pathname && "focus" in client) {
+          return client.focus();
+        }
+      }
+      const existing = clientList[0];
+      if (existing && "navigate" in existing) {
+        await existing.navigate(target.href);
+        return existing.focus();
+      }
+      await self.clients.openWindow(target.href);
+    })(),
+  );
+});
