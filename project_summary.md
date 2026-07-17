@@ -377,10 +377,15 @@ brief — decision was to keep the drift as the headline differentiator, so
   `policy-data.ts` / `scenario-data.ts` to the Digital Omnibus dates.
 - **Sanity article `tariff-enforcement-collision` (published)**: corrected the
   superseded "high-risk audit-ready by 2 Aug 2026" claim in-body, prepended an
-  italic "Update, 17 July 2026" post-Omnibus note, and set `seo.metaDescription`
+  italic "Update, 17 July 2026" post-Omnibus note, set `seo.metaDescription`
   (previously null → fell back to the excerpt) to carry the post-Omnibus
-  correction — it now drives the article's `<meta description>` / OG / Twitter
-  card. Doc id `CjEVBYMTl7DBSXjfwh3zy7`.
+  correction (now drives the article's `<meta description>` / OG / Twitter card),
+  and rewrote the closing Stone Truth verdict (block `651b627c`) so the "…is
+  real" triad names the full timetable (2 Aug 2026 transparency/penalties; 2 Dec
+  2027 + 2 Aug 2028 high-risk) — "Plan for the whole timetable, not just August."
+  NB the mid-body H3 literally titled "The Stone Truth" is structural framing
+  with no date claim (untouched); the `stoneTruth` field is empty. Doc id
+  `CjEVBYMTl7DBSXjfwh3zy7`.
 - **SEO**: advisory + eu-exposure titles/descriptions updated.
 
 ### July 17, 2026 — PWA Phase 3 (ladder & monetisation)
