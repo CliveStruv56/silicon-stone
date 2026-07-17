@@ -39,6 +39,13 @@ export function AdvisoryNextStep() {
               </span>
             </Link>
           </div>
+          <p className="mt-5 text-sm text-text-muted">
+            Selling into Europe under the AI Act? The{' '}
+            <Link href="/eu-exposure" className="text-silicon-amber hover:underline">
+              Post-Omnibus Briefing
+            </Link>{' '}
+            is the fixed-price read on what now applies to your business.
+          </p>
         </div>
       </div>
     </section>

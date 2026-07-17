@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Header, Footer } from '@/components/layout'
 import { submitWithOfflineQueue } from '@/lib/offline/submit'
@@ -23,7 +24,7 @@ import {
 
 const briefingIncludes = [
   'AI Act scope classification — which of your systems are in scope, at which risk tier',
-  'The August 2026 reality — what the deadline genuinely requires versus what can follow',
+  'The post-Omnibus reality — what applies from 2 August 2026, what moved, and what can follow',
   'Sovereignty-package exposure — where procurement preferences threaten your market access',
   'Durable-obligation map — what becomes an ongoing operating requirement',
   'Prioritised first actions, and a clear view of what needs a standing relationship',
@@ -34,7 +35,7 @@ export default function EuExposurePage() {
     name: '',
     email: '',
     company: '',
-    interest: 'EU Exposure Briefing',
+    interest: 'Post-Omnibus Briefing',
     message: '',
   })
   const [formSubmitted, setFormSubmitted] = useState(false)
@@ -87,24 +88,24 @@ export default function EuExposurePage() {
                   The deadline is the easy part. The requirement is permanent.
                 </h1>
                 <p className="text-xl text-text-muted leading-relaxed mb-6">
-                  The AI Act’s reach is extraterritorial: if your AI touches the EU market or
-                  affects EU residents, you are likely in scope — wherever you are
-                  headquartered. From 2 August 2026 the transparency duties and the penalty
-                  regime apply, and a national authority can act against systems placed on the
-                  EU market. The heavier high-risk obligations arrive in stages after that —
-                  standalone high-risk from 2 December 2027, embedded high-risk from 2 August
-                  2028 — which is precisely why this is a maintained state, not a one-time fix:
-                  the obligations keep arriving, and the documentation behind them has to keep
-                  pace.
+                  In May 2026 the EU agreed the Digital Omnibus and rewrote the AI Act’s
+                  timetable. The headline said “delay”. The reality is sharper: some
+                  obligations moved by sixteen months, others did not move at all. The
+                  transparency duties still apply from 2 August 2026; watermarking for
+                  systems already on the market moves to 2 December 2026; standalone high-risk
+                  moves to 2 December 2027 and embedded high-risk to 2 August 2028. If your
+                  compliance calendar was built before May, parts of it are now wrong.
                 </p>
                 <p className="text-text-muted leading-relaxed">
-                  The deadline is the easy part to understand. The harder truth is in the
-                  upkeep: high-risk systems carry ongoing monitoring and documentation duties,
-                  and the EU’s 2026 Tech Sovereignty Package is already reshaping market access
-                  for US providers. A project ends; this does not.
+                  The AI Act’s reach is extraterritorial: if your AI touches the EU market or
+                  affects EU residents, you are likely in scope — wherever you are
+                  headquartered. And the deadline is the easy part. High-risk systems carry
+                  ongoing monitoring and documentation duties, and the EU’s 2026 Tech
+                  Sovereignty Package is already reshaping market access for US providers. A
+                  project ends; this does not.
                 </p>
                 <p className="mt-5 font-mono text-xs uppercase tracking-wider text-text-muted">
-                  Regulatory copy last reviewed: 25 June 2026
+                  Regulatory copy last reviewed: 17 July 2026
                 </p>
               </div>
 
@@ -173,19 +174,20 @@ export default function EuExposurePage() {
           <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
             <div className="grid grid-cols-1 gap-10 lg:grid-cols-[3fr_2fr] lg:items-start">
               <div>
-                <Badge className="mb-4 bg-silicon-amber text-ink-on-accent">Fixed scope</Badge>
+                <Badge className="mb-4 bg-silicon-amber text-ink-on-accent">Fixed price, fixed scope</Badge>
                 <h2 className="mb-3 text-3xl font-bold text-text-primary sm:text-4xl">
-                  The EU Exposure Briefing
+                  The Post-Omnibus Briefing
                 </h2>
                 <p className="mb-6 max-w-2xl text-lg text-text-primary/90">
-                  A fixed-scope diagnostic for US firms with EU customers, operations, or
-                  ambitions.
+                  What the EU AI Act now actually requires of you — in plain English, priced
+                  fixed. For US and UK companies selling into Europe.
                 </p>
                 <p className="max-w-2xl leading-relaxed text-text-muted">
-                  The deadline opens the door; the ongoing requirement keeps it open. This
-                  briefing separates what the August 2026 date genuinely requires from what
-                  becomes a durable operating obligation — and shows where a standing
-                  relationship earns its place.
+                  A written briefing specific to your products and market entry: what applies
+                  now, what moved under the Digital Omnibus, what your counsel’s memo means
+                  operationally, and the decisions to take this quarter. Independent judgement
+                  from thirty years inside the technology industry — not a law firm’s hedge,
+                  and not a vendor’s pitch. Delivered within three weeks.
                 </p>
               </div>
 
@@ -209,18 +211,25 @@ export default function EuExposurePage() {
                   </div>
                   <div className="border-t border-border-subtle pt-4">
                     <div className="text-lg font-semibold text-text-primary">
-                      From £3,500<span className="text-text-muted">, fixed</span>
+                      From £2,500<span className="text-text-muted">, fixed</span>
                     </div>
                     <div className="text-sm text-text-muted">
-                      Fee credited toward the first quarter of a Drift Retainer.
+                      Scope agreed in a 25-minute conversation before any commitment. Can
+                      extend into a Drift Retainer where the exposure is ongoing.
                     </div>
                   </div>
                   <a href="#contact" className="block">
                     <Button size="lg" className="w-full bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90">
-                      Request the EU Exposure Briefing
+                      Book a 25-minute conversation
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </a>
+                  <Link
+                    href="/tools/compliance-checker"
+                    className="block text-center text-sm text-stone-teal hover:underline"
+                  >
+                    Or start free with the Compliance Checker
+                  </Link>
                 </CardContent>
               </Card>
             </div>
@@ -228,6 +237,53 @@ export default function EuExposurePage() {
             <p className="mt-8 max-w-2xl text-sm italic text-text-muted">
               No vendor affiliations. No axe to grind. Independent interpretation, published
               from the Atlantic edge.
+            </p>
+          </div>
+        </section>
+
+        {/* The timetable, post-Omnibus — the four dates that matter */}
+        <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
+          <div className="max-w-3xl">
+            <h2 className="mb-2 text-2xl font-semibold text-text-primary">
+              The timetable, post-Omnibus
+            </h2>
+            <p className="mb-6 leading-relaxed text-text-muted">
+              Four dates decide most of the work. The Digital Omnibus moved some and left
+              others untouched — the briefing reads each one against your systems.
+            </p>
+            <ul className="space-y-4">
+              {[
+                {
+                  date: '2 August 2026',
+                  text: 'Article 50 transparency obligations apply. Not deferred. Users must be told when they are interacting with AI and when content is AI-generated.',
+                },
+                {
+                  date: '2 December 2026',
+                  text: 'Watermarking requirements (Article 50(2)) apply to systems already on the market; a new prohibition on AI systems generating non-consensual intimate imagery takes effect.',
+                },
+                {
+                  date: '2 December 2027',
+                  text: 'High-risk obligations apply to standalone (Annex III) systems: recruitment, credit scoring, education, critical infrastructure and similar.',
+                },
+                {
+                  date: '2 August 2028',
+                  text: 'High-risk obligations apply to AI embedded in regulated products (Annex I): medical devices, machinery, vehicles and similar.',
+                },
+              ].map((row) => (
+                <li
+                  key={row.date}
+                  className="flex flex-col gap-1 border-l-2 border-silicon-amber/50 pl-4 sm:flex-row sm:gap-4"
+                >
+                  <span className="min-w-[8.5rem] font-mono text-sm font-semibold text-silicon-amber">
+                    {row.date}
+                  </span>
+                  <span className="text-sm leading-relaxed text-text-muted">{row.text}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-6 font-mono text-xs uppercase tracking-wider text-text-muted">
+              National regulatory sandboxes: 2 August 2027. Status: adopted under the Digital
+              Omnibus.
             </p>
           </div>
         </section>
@@ -241,7 +297,7 @@ export default function EuExposurePage() {
                   Add-on
                 </Badge>
                 <span className="font-mono text-xs uppercase tracking-wider text-text-muted">
-                  To the EU Exposure Briefing
+                  To the Post-Omnibus Briefing
                 </span>
               </div>
               <h2 className="mt-3 text-2xl font-semibold text-text-primary">
@@ -280,7 +336,7 @@ export default function EuExposurePage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             <div>
               <h2 className="text-2xl font-semibold text-text-primary mb-4">
-                Request the EU Exposure Briefing
+                Book a 25-minute conversation
               </h2>
               <p className="text-text-muted mb-6">
                 Tell me where your AI touches Europe and what you are trying to protect. I will
@@ -401,7 +457,7 @@ export default function EuExposurePage() {
                     disabled={formLoading}
                     className="w-full bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90"
                   >
-                    {formLoading ? 'Sending...' : 'Request the EU Exposure Briefing'}
+                    {formLoading ? 'Sending...' : 'Book a 25-minute conversation'}
                     {!formLoading && <ArrowRight className="w-4 h-4 ml-2" />}
                   </Button>
 

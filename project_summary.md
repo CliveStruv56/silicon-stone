@@ -354,6 +354,32 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### July 17, 2026 — Advisory repositioning (Drift Retainer reprice + Post-Omnibus Briefing)
+
+On branch **`reposition-drift-retainer`** (preview deploy; `main`/production
+untouched pending review). Repositioning tweaks off the external "Integration
+Room" brief — decision was to keep the drift as the headline differentiator, so
+**no rename** of the Drift Retainer, only reprice + sharpen.
+
+- **`/advisory`**: Drift Retainer £3,500 → **£2,000/mo**; four concrete
+  components (monthly briefing, working session, The Line, quarterly review);
+  new Baseline Month opener; capacity line; single "Book a 25-minute
+  conversation" CTA. Name + `#retainer` anchor + Focused Diagnostic kept.
+- **Homepage**: ladder card + spine to £2,000/mo; hero primary CTA now the
+  conversation booking (newsletter CTA demoted to secondary).
+- **`/eu-exposure`**: productised as **The Post-Omnibus Briefing, from £2,500
+  fixed** (was £3,500); Digital Omnibus hero; four-date AI Act timeline;
+  decoupled from the retainer; Compliance Checker secondary link. Lead-tag
+  value changed to `'Post-Omnibus Briefing'` (see EU-exposure lead tagging memo).
+- **Date audit**: `content-audit-ai-act-dates.md` at repo root. Code layer was
+  already clean; added watermarking (2 Dec 2026), NCII, sandboxes (2 Aug 2027).
+  Settled the stale "political agreement, subject to formal adoption" hedging in
+  `policy-data.ts` / `scenario-data.ts` to the Digital Omnibus dates.
+- **Sanity draft (unpublished)**: article `tariff-enforcement-collision`
+  corrected — it stated high-risk audit-ready by 2 Aug 2026 (superseded).
+  **Review + publish or discard in Studio.** Doc id `CjEVBYMTl7DBSXjfwh3zy7`.
+- **SEO**: advisory + eu-exposure titles/descriptions updated.
+
 ### July 17, 2026 — PWA Phase 3 (ladder & monetisation)
 
 All Phase 3 tickets that don't require the Lemon Squeezy store shipped. **P3-4

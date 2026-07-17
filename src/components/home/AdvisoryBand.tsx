@@ -28,7 +28,7 @@ const tiers: Tier[] = [
   {
     label: 'Most popular · Ongoing',
     title: 'The Drift Retainer',
-    body: 'A standing, independent read on how the drift affects your supply chains, procurement, and people — delivered monthly, so the leadership team is never blindsided. From £3,500/mo.',
+    body: 'When the board asks what has actually changed, a standing independent read on how the drift affects your supply chains, procurement, and people — delivered monthly, so the leadership team is never blindsided. From £2,000/mo.',
     href: '/advisory#retainer',
     popular: true,
   },

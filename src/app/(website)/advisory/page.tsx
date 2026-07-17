@@ -218,17 +218,17 @@ const tiers: Tier[] = [
   },
   {
     name: 'The Drift Retainer',
-    price: 'From £3,500/mo',
-    priceNote: 'three-month minimum',
-    description: 'The standing relationship. Monthly briefing call, ad-hoc interpretation between calls, and a quarterly written exposure review. For leadership teams that need to stay ahead of the drift, not catch up to it.',
+    price: 'From £2,000/mo',
+    priceNote: 'three-month initial term',
+    description: 'The standing relationship. A board-forwardable monthly briefing, a working session on one live decision, a direct line between sessions, and a quarterly written exposure review. For leadership teams that stay ahead of the drift, not catch up to it.',
     features: [
-      'Monthly briefing call, calibrated to your exposure',
-      'Ad-hoc reads when something breaks',
-      'Quarterly written exposure review',
-      'Direct line to thirty years inside the industry',
-      'Follow-on modules folded in as needed',
+      'A board-forwardable monthly briefing — what shifted, and the decision it changes',
+      'A working session on one live decision, externally refereed',
+      'The Line — direct access between sessions for the awkward questions',
+      'A quarterly written exposure review on the 3×2 method',
+      'A standing line to thirty years inside the industry',
     ],
-    cta: 'Start a conversation',
+    cta: 'Book a 25-minute conversation',
     highlighted: true,
   },
   {
@@ -362,10 +362,12 @@ export default function ServicesPage() {
                   blindsided.
                 </p>
                 <p className="mb-4 max-w-2xl leading-relaxed text-text-muted">
-                  A one-off assessment answers a question once. The drift does not hold
-                  still. Export controls shift, a fab reports delays, a regulatory
-                  position diverges across the Atlantic — and the exposure you mapped in
-                  spring reads differently by autumn.
+                  You have bought the licences and your people are experimenting. When the
+                  board asks what has actually changed in how the business makes money,
+                  manages risk, or serves customers, the honest answer is often: not much.
+                  Meanwhile the drift does not hold still. Export controls shift, a fab
+                  reports delays, a regulatory position diverges across the Atlantic — and
+                  the exposure you mapped in spring reads differently by autumn.
                 </p>
                 <p className="max-w-2xl leading-relaxed text-text-muted">
                   The Drift Retainer is the relationship behind the analysis: a senior,
@@ -382,6 +384,15 @@ export default function ServicesPage() {
                   : a standing, independent read on how the AI Act, the sovereignty
                   package, and the wider drift affect your European position — so
                   compliance becomes a maintained state, not an annual panic.
+                </p>
+                <p className="mt-6 max-w-2xl leading-relaxed text-text-muted">
+                  <strong className="font-semibold text-text-primary">How it starts.</strong>{' '}
+                  Every engagement opens with the Baseline Month: a structured read of where
+                  AI and the drift currently touch your operations, built from your org chart,
+                  your current tools and spend, and short conversations with three or four
+                  process owners. It ends with a Baseline Briefing — the two or three places
+                  where the exposure is real and where the next quarter&rsquo;s focus belongs.
+                  You know within thirty days whether the relationship earns its fee.
                 </p>
                 <p className="mt-6 border-l-2 border-sister-indigo/50 pl-4 text-sm italic text-text-muted">
                   The same drift runs through individual careers as well as company
@@ -402,10 +413,10 @@ export default function ServicesPage() {
                 <CardContent className="space-y-5">
                   <ul className="space-y-3">
                     {[
-                      'A monthly briefing call — what just shifted, and what it means for you specifically',
-                      'Ad-hoc interpretation between calls when something breaks — a short, calibrated read rather than a panic',
-                      'A quarterly written exposure review, drawing on the same 3×2 method and tools the public analysis uses',
-                      'A standing line to thirty years inside the industry, on call rather than on retainer-search',
+                      'The monthly briefing — a short, board-forwardable written read plus a call: what shifted in the drift this month, and the decision it changes',
+                      'The working session — ninety minutes on one live decision, externally refereed',
+                      'The Line — direct access between sessions to challenge a vendor claim, sanity-check a proposal, or prepare a board answer',
+                      'The quarterly exposure review — a deeper written read on the same 3×2 method the public analysis uses, traced to your exposure',
                     ].map((item, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm text-text-primary">
                         <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-silicon-amber" />
@@ -415,15 +426,16 @@ export default function ServicesPage() {
                   </ul>
                   <div className="border-t border-border-subtle pt-4">
                     <div className="text-lg font-semibold text-text-primary">
-                      From £3,500<span className="text-text-muted">/month</span>
+                      £2,000<span className="text-text-muted">/month</span>
                     </div>
                     <div className="text-sm text-text-muted">
-                      Three-month minimum · scope set with you
+                      Three-month initial term, then rolling monthly · limited to a handful
+                      of client companies at any time
                     </div>
                   </div>
                   <a href="#contact" className="block">
                     <Button size="lg" className="w-full bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90">
-                      Start a conversation
+                      Book a 25-minute conversation
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </a>

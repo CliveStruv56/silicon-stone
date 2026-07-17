@@ -43,7 +43,7 @@ const rungs: Rung[] = [
     tone: 'paid',
   },
   {
-    marker: 'From £3,500/mo',
+    marker: 'From £2,000/mo',
     title: 'Retain',
     body: 'A standing read on the drift, so your leadership team is never blindsided. Diagnostics and assessments scope into an ongoing relationship.',
     cta: 'Explore Advisory',

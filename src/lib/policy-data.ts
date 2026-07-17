@@ -9,7 +9,7 @@ export const POLICIES: Policy[] = [
     name: 'EU AI Act',
     shortName: 'AI Act',
     jurisdiction: 'EU',
-    effectiveDate: 'Phased application; transparency rules from 2 Aug 2026. High-risk transition dates remain subject to formal adoption of the 7 May 2026 political agreement.',
+    effectiveDate: 'Phased application; transparency rules from 2 Aug 2026. Under the Digital Omnibus, standalone (Annex III) high-risk obligations move to 2 Dec 2027 and product-integrated (Annex I) to 2 Aug 2028.',
     status: 'Phasing In',
     description: 'World\'s first comprehensive AI regulation, establishing risk-based classification and mandatory requirements for high-risk AI systems.',
     scope: 'All AI systems placed on EU market or affecting EU residents',
@@ -41,7 +41,7 @@ export const POLICIES: Policy[] = [
           '2 Feb 2025: prohibited practices and AI literacy obligations apply',
           '2 Aug 2025: governance rules and GPAI obligations apply',
           '2 Aug 2026: transparency obligations remain relevant',
-          'Political agreement: certain high-risk rules would move to 2 Dec 2027, subject to formal adoption',
+          'Digital Omnibus: standalone (Annex III) high-risk obligations move to 2 Dec 2027',
         ],
       },
       'Healthcare': {
@@ -58,7 +58,7 @@ export const POLICIES: Policy[] = [
           { priority: '30-days', action: 'Assess dual-regulation gaps' },
           { priority: '90-days', action: 'Update quality management systems' },
         ],
-        keyDeadlines: ['Political agreement: product-integrated high-risk rules would move to 2 Aug 2028, subject to formal adoption'],
+        keyDeadlines: ['Digital Omnibus: product-integrated (Annex I) high-risk obligations move to 2 Aug 2028'],
       },
       'Financial Services': {
         relevance: 'high',
@@ -89,7 +89,7 @@ export const POLICIES: Policy[] = [
           { priority: '90-days', action: 'Align AI Act with UNECE regulations' },
           { priority: '180-days', action: 'Update type approval documentation' },
         ],
-        keyDeadlines: ['Political agreement: product-integrated high-risk rules would move to 2 Aug 2028, subject to formal adoption'],
+        keyDeadlines: ['Digital Omnibus: product-integrated (Annex I) high-risk obligations move to 2 Aug 2028'],
       },
       'Manufacturing': {
         relevance: 'medium',

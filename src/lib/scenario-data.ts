@@ -306,7 +306,7 @@ export const SCENARIOS: Scenario[] = [
     name: 'AI Act Enforcement & Digital Simplification',
     shortName: 'AI Act',
     frictionLevel: 'medium',
-    triggerEvent: '2 August 2026 transparency obligations remain relevant while the 7 May 2026 political agreement changes the expected timetable for certain high-risk rules, subject to formal adoption',
+    triggerEvent: '2 August 2026 transparency obligations remain relevant while the Digital Omnibus moves high-risk obligations to 2 December 2027 (Annex III) and 2 August 2028 (Annex I)',
     timeframe: '2026-2027',
     probability: '80-90%',
     confidence: 'High',
@@ -362,7 +362,7 @@ export const SCENARIOS: Scenario[] = [
     },
     keyIndicators: [
       'AI Office and national authority guidance on GPAI, high-risk systems, and transparency duties',
-      'Formal adoption and publication of the 7 May 2026 political agreement affecting certain high-risk timelines',
+      'Digital Omnibus implementation and guidance on the revised high-risk timelines (Annex III: 2 Dec 2027; Annex I: 2 Aug 2028)',
       'CEN/CENELEC harmonised standards, common specifications, and notified-body capacity',
       'First national enforcement actions, procurement exclusions, or customer audit clauses',
     ],
@@ -378,7 +378,7 @@ export const SCENARIOS: Scenario[] = [
         implication: 'The tool should show staged operational exposure rather than implying one universal enforcement date.',
       },
       {
-        fact: 'A 7 May 2026 political agreement would move rules for certain high-risk areas to 2 December 2027 and product-integrated systems to 2 August 2028. Formal adoption and Official Journal publication remain relevant before the amendments enter force.',
+        fact: 'The Digital Omnibus (agreed May 2026, adopted June 2026) moves standalone (Annex III) high-risk obligations to 2 December 2027 and product-integrated (Annex I) systems to 2 August 2028.',
         implication: 'The scenario is an evidence-readiness risk, not a penalty-countdown story.',
       },
     ],
