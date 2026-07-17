@@ -171,22 +171,22 @@ export function HeroSection({ settings }: HeroSectionProps) {
                             variants={itemVariants}
                             className="mt-2 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6"
                         >
-                            <Link href="/#subscribe">
+                            <Link href="/advisory#contact">
                                 <Button
                                     size="lg"
                                     className="bg-[#1f807c] text-white hover:bg-[#27938d] transition-transform hover:scale-105 font-semibold text-base px-8 shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
                                 >
-                                    Get the Atlantic Drift Briefing
+                                    Book a 25-minute conversation
                                 </Button>
                             </Link>
 
-                            <Link href="/advisory#contact">
+                            <Link href="/#subscribe">
                                 <Button
                                     size="lg"
                                     variant="outline"
                                     className="border-white/40 bg-white/5 text-white hover:bg-white/10 hover:text-white transition-transform hover:scale-105 font-semibold text-base px-8 shadow-[0_10px_30px_rgba(0,0,0,0.35)] backdrop-blur-sm"
                                 >
-                                    Book a 20-minute AI exposure call
+                                    Get the Atlantic Drift Briefing
                                 </Button>
                             </Link>
 
