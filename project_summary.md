@@ -1,7 +1,7 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-07-11
+> Last Updated: 2026-07-17
 > Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing, 13 moderate transitive npm audit findings (uuid through Sanity packages)**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com. Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools (email-gated for lead capture, AI Act triage engine recently overhauled), product/commerce pages with an early-access enquiry fallback until Lemon Squeezy checkout URLs are configured, Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Awaiting Lemon Squeezy store setup, Plausible account, and content publishing for queued drafts.
@@ -353,6 +353,50 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### July 17, 2026 — PWA Phase 3 (ladder & monetisation)
+
+All Phase 3 tickets that don't require the Lemon Squeezy store shipped. **P3-4
+(checkout+fulfilment) and P3-5 (paid content licence unlock) remain blocked on
+the user creating the LS store** — runbook in `docs/lemonsqueezy-setup.md`.
+
+- **P3-1**: reusable end-of-article `Gate` (`src/components/article/Gate.tsx`)
+  with three Sanity-driven modes — email/newsletter, commerce (product upsell),
+  lead (book a call) — plus `auto` and `none`. Appended below the body, so free
+  reading is never blocked. Config on `article.gate` (mode, product ref, href,
+  copy overrides); resolution in `src/lib/gate.ts`. Fires `Gate Impression` +
+  a per-mode interaction (`Email Capture` / `Product View` / `Advisory Lead`).
+- **P3-3**: new `product` document type (`src/sanity/schemaTypes/product.ts`) is
+  the deploy-free mapping layer (topics→category refs, price, blurb, optional
+  `checkoutUrl`, `isDefault`). Seeded + published 3 products (checklist/toolkit/
+  sector-reports). Upsell resolves explicit→topic-match→default (commerce only;
+  `auto` falls back to newsletter, NOT the default product). Commerce CTA opens
+  `checkoutUrl` when set (has `lemonsqueezy-button` class for P3-4 Lemon.js),
+  else links to the product page.
+- **P3-2**: `InReadCapture` — Atlantic Drift email capture injected mid-body at
+  a paragraph boundary (~55% via `splitBodyForCapture` in the article page),
+  after value, never an entry wall. Per-device localStorage suppression
+  (`ss:drift-capture:dismissed`) + Kit dedupe; suppressed entirely when the end
+  gate is already the newsletter; GDPR copy. Only on bodies ≥8 blocks.
+- **P3-0**: signed LS webhook at `/api/webhooks/lemonsqueezy` (HMAC-SHA256
+  verify, idempotent via Upstash body-hash key released on handler error,
+  dispatch by event name; fulfilment handlers stubbed with P3-4/P3-5 TODOs).
+  Licence API helpers `validateLicense`/`activateLicense` wired for P3-5.
+  Shared Upstash client `src/lib/redis.ts`. **Needs LS env vars** (see runbook):
+  `LEMONSQUEEZY_API_KEY`, `_STORE_ID`, `_WEBHOOK_SECRET`,
+  `NEXT_PUBLIC_LEMONSQUEEZY_SERIES_URL`.
+- **P3-6**: restrained Web Push, two topics (AI Act deadline alerts, new
+  Audit-tier deep dives). `web-push` + VAPID; SW `push`/`notificationclick`
+  handlers in `src/app/sw.ts`; device-keyed subscriptions in Upstash
+  (`src/lib/push/store.ts`); API `/api/push/{subscribe,unsubscribe,topics,send}`
+  (send is admin-gated). Opt-in UI `PushOptIn` on `/more` (post-value) with
+  per-topic toggles + turn-off; iOS Add-to-Home-Screen caveat shown instead of
+  a dead button when iOS-not-standalone. Fires `Push Opt In`. **Needs VAPID env
+  vars**: `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`.
+  Live subscribe/send needs a registered SW + real device (prod verify).
+
+Plausible goals added this phase (create when the account exists): `Gate
+Impression`, `Email Capture`, `Product View`, `Advisory Lead`, `Push Opt In`.
 
 ### July 11, 2026 — PWA Phase 2 (reading product)
 
