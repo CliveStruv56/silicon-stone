@@ -356,9 +356,9 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ### July 17, 2026 — Advisory repositioning (Drift Retainer reprice + Post-Omnibus Briefing)
 
-On branch **`reposition-drift-retainer`** (preview deploy; `main`/production
-untouched pending review). Repositioning tweaks off the external "Integration
-Room" brief — decision was to keep the drift as the headline differentiator, so
+**Shipped to production** (PR #9 merged to `main`, deploy verified live on
+siliconandstone.com). Repositioning tweaks off the external "Integration Room"
+brief — decision was to keep the drift as the headline differentiator, so
 **no rename** of the Drift Retainer, only reprice + sharpen.
 
 - **`/advisory`**: Drift Retainer £3,500 → **£2,000/mo**; four concrete
@@ -375,9 +375,12 @@ Room" brief — decision was to keep the drift as the headline differentiator, s
   already clean; added watermarking (2 Dec 2026), NCII, sandboxes (2 Aug 2027).
   Settled the stale "political agreement, subject to formal adoption" hedging in
   `policy-data.ts` / `scenario-data.ts` to the Digital Omnibus dates.
-- **Sanity draft (unpublished)**: article `tariff-enforcement-collision`
-  corrected — it stated high-risk audit-ready by 2 Aug 2026 (superseded).
-  **Review + publish or discard in Studio.** Doc id `CjEVBYMTl7DBSXjfwh3zy7`.
+- **Sanity article `tariff-enforcement-collision` (published)**: corrected the
+  superseded "high-risk audit-ready by 2 Aug 2026" claim in-body, prepended an
+  italic "Update, 17 July 2026" post-Omnibus note, and set `seo.metaDescription`
+  (previously null → fell back to the excerpt) to carry the post-Omnibus
+  correction — it now drives the article's `<meta description>` / OG / Twitter
+  card. Doc id `CjEVBYMTl7DBSXjfwh3zy7`.
 - **SEO**: advisory + eu-exposure titles/descriptions updated.
 
 ### July 17, 2026 — PWA Phase 3 (ladder & monetisation)
