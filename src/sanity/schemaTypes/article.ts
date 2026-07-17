@@ -182,6 +182,77 @@ export const article = defineType({
     }),
     defineField({
       group: 'content',
+      name: 'gate',
+      title: 'End-of-article gate',
+      description:
+        'The conversion surface shown after the article body (P3-1). The body is never blocked — this only appends below it. ' +
+        'Auto = commerce upsell if a product maps to this topic, otherwise the newsletter. Choose a specific mode to override.',
+      type: 'object',
+      options: { collapsible: true, collapsed: true },
+      fields: [
+        defineField({
+          name: 'mode',
+          title: 'Mode',
+          type: 'string',
+          options: {
+            list: [
+              { title: 'Auto (product upsell if mapped, else newsletter)', value: 'auto' },
+              { title: 'Newsletter / email capture', value: 'email' },
+              { title: 'Commerce (product upsell / unlock)', value: 'commerce' },
+              { title: 'Lead (book a call)', value: 'lead' },
+              { title: 'None', value: 'none' },
+            ],
+            layout: 'radio',
+          },
+          initialValue: 'auto',
+        }),
+        defineField({
+          name: 'product',
+          title: 'Product (commerce mode)',
+          description: 'Overrides the automatic topic → product mapping. Leave blank to auto-resolve from categories.',
+          type: 'reference',
+          to: [{ type: 'product' }],
+          hidden: ({ parent }) => parent?.mode !== 'commerce' && parent?.mode !== 'auto',
+        }),
+        defineField({
+          name: 'href',
+          title: 'Link target (lead mode)',
+          description: 'Where the "book a call" CTA points. Defaults to /advisory#contact.',
+          type: 'string',
+          hidden: ({ parent }) => parent?.mode !== 'lead',
+        }),
+        defineField({
+          name: 'headline',
+          title: 'Headline override',
+          description: 'Optional. Overrides the default headline for the chosen mode.',
+          type: 'string',
+        }),
+        defineField({
+          name: 'body',
+          title: 'Body override',
+          description: 'Optional. Overrides the default supporting copy for the chosen mode.',
+          type: 'text',
+          rows: 2,
+        }),
+        defineField({
+          name: 'ctaLabel',
+          title: 'CTA label override',
+          type: 'string',
+        }),
+      ],
+    }),
+    defineField({
+      group: 'content',
+      name: 'inReadCapture',
+      title: 'In-read newsletter capture',
+      description:
+        'Show the Atlantic Drift email capture partway through the article, after the reader has scrolled past the value (P3-2). ' +
+        'Never an entry wall; suppressed per-device once dismissed or subscribed. On by default.',
+      type: 'boolean',
+      initialValue: true,
+    }),
+    defineField({
+      group: 'content',
       name: 'relatedArticles',
       title: 'Related Articles',
       description:

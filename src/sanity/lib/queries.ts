@@ -112,7 +112,46 @@ export const ARTICLE_QUERY = defineQuery(`
     seo {
       metaTitle,
       metaDescription
+    },
+    inReadCapture,
+    gate {
+      mode,
+      href,
+      headline,
+      body,
+      ctaLabel,
+      product->{
+        name,
+        "slug": slug.current,
+        kind,
+        priceLabel,
+        blurb,
+        productPath,
+        checkoutUrl,
+        deliveryModel,
+        badge,
+        isDefault,
+        "topics": topics[]->slug.current
+      }
     }
+  }
+`)
+
+// Products for the contextual upsell mapping (P3-3). Small set; resolved
+// against an article's categories on the server. `topics` are category slugs.
+export const UPSELL_PRODUCTS_QUERY = defineQuery(`
+  *[_type == "product"] {
+    name,
+    "slug": slug.current,
+    kind,
+    priceLabel,
+    blurb,
+    productPath,
+    checkoutUrl,
+    deliveryModel,
+    badge,
+    isDefault,
+    "topics": topics[]->slug.current
   }
 `)
 

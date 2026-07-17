@@ -11,18 +11,20 @@ import {
   portableTextComponents,
   PulseHeader,
   MethodologyChecklist,
-  DynamicCTA,
   ReadingProgress,
   TextSizeStepper,
+  Gate,
+  InReadCapture,
 } from '@/components/article'
 import { SaveButton, type SavePayload } from '@/components/article/SaveButton'
 import { RelatedArticles } from '@/components/article/RelatedArticles'
 import { GlossaryToggle } from '@/components/glossary'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { sanityFetch } from '@/sanity/lib/live'
-import { ARTICLE_QUERY, ARTICLE_SLUGS_QUERY } from '@/sanity/lib/queries'
+import { ARTICLE_QUERY, ARTICLE_SLUGS_QUERY, UPSELL_PRODUCTS_QUERY } from '@/sanity/lib/queries'
 import { urlFor } from '@/sanity/lib/image'
-import { getPersonaLabel } from '@/lib/personas'
+import { getPersonaLabel, getDynamicCTA } from '@/lib/personas'
+import { resolveGate, resolveUpsellProduct, findDefaultProduct, type GateProduct } from '@/lib/gate'
 import { formatDate } from '@/lib/format'
 import { absoluteUrl } from '@/lib/site'
 import {
@@ -158,12 +160,33 @@ function stripTrailingSourcesSection(body: PortableTextBlock[]): PortableTextBlo
   return cut >= 0 ? body.slice(0, cut) : body
 }
 
+// Split the body at a paragraph boundary near the 55% mark so the in-read
+// capture (P3-2) lands after the reader has consumed the value, never as an
+// entry wall. Returns null for pieces too short to carry a mid-article break.
+function splitBodyForCapture(
+  body: PortableTextBlock[],
+): { before: PortableTextBlock[]; after: PortableTextBlock[] } | null {
+  if (!Array.isArray(body) || body.length < 8) return null
+  const target = Math.floor(body.length * 0.55)
+  // Snap to the next normal paragraph so we never break inside a heading run.
+  let cut = -1
+  for (let i = target; i < body.length - 2; i++) {
+    const block = body[i]
+    if (block?._type === 'block' && (!block.style || block.style === 'normal')) {
+      cut = i
+      break
+    }
+  }
+  if (cut < 2 || cut > body.length - 2) return null
+  return { before: body.slice(0, cut), after: body.slice(cut) }
+}
+
 export default async function ArticlePage({ params }: Props) {
   const { slug } = await params
-  const { data: article } = await sanityFetch({
-    query: ARTICLE_QUERY,
-    params: { slug },
-  })
+  const [{ data: article }, { data: upsellProducts }] = await Promise.all([
+    sanityFetch({ query: ARTICLE_QUERY, params: { slug } }),
+    sanityFetch({ query: UPSELL_PRODUCTS_QUERY }),
+  ])
 
   if (!article) {
     notFound()
@@ -173,6 +196,38 @@ export default async function ArticlePage({ params }: Props) {
   const showGlossaryToggle = hasGlossaryAnnotations(article.body || [])
   const primaryPersona = article.personas?.[0]
   const hasIntelligenceFields = article.intelligenceTier || article.impactScore || article.stoneTruth
+
+  // End-of-article gate (P3-1/P3-3): resolve mode + copy from Sanity, mapping
+  // the article's topics to a product for the commerce/auto upsell. The
+  // newsletter fallback reuses the persona-aware CTA copy.
+  const articleCategorySlugs: string[] = (article.categories || [])
+    .map((category: Category) => category.slug)
+    .filter(Boolean)
+  const emailCta = getDynamicCTA(primaryPersona)
+  const productList = (upsellProducts || []) as GateProduct[]
+  const upsellProduct = resolveUpsellProduct(
+    article.gate?.product as GateProduct | null | undefined,
+    articleCategorySlugs,
+    productList,
+  )
+  const resolvedGate = resolveGate({
+    gate: article.gate,
+    upsellProduct,
+    defaultProduct: findDefaultProduct(productList),
+    emailFallback: { headline: emailCta.headline, body: emailCta.subheadline },
+  })
+
+  // In-read newsletter capture (P3-2): on by default, but suppressed when the
+  // end gate is already the newsletter (avoid a double email ask), and only on
+  // pieces long enough to carry a mid-article break.
+  const bodyForRender: PortableTextBlock[] =
+    article.citations && article.citations.length > 0
+      ? stripTrailingSourcesSection(article.body || [])
+      : article.body || []
+  const bodySplit =
+    article.inReadCapture !== false && resolvedGate.mode !== 'email'
+      ? splitBodyForCapture(bodyForRender)
+      : null
 
   // Show a visible "Updated" date only when an editor set updatedAt after publish.
   const updatedDate =
@@ -426,15 +481,14 @@ export default async function ArticlePage({ params }: Props) {
             className="prose prose-lg dark:prose-invert max-w-[64ch]"
             style={{ fontSize: 'var(--article-size, 1.125rem)', lineHeight: 1.6 }}
           >
-            {article.body && (
-              <PortableText
-                value={
-                  article.citations && article.citations.length > 0
-                    ? stripTrailingSourcesSection(article.body)
-                    : article.body
-                }
-                components={portableTextComponents}
-              />
+            {bodySplit ? (
+              <>
+                <PortableText value={bodySplit.before} components={portableTextComponents} />
+                <InReadCapture />
+                <PortableText value={bodySplit.after} components={portableTextComponents} />
+              </>
+            ) : (
+              <PortableText value={bodyForRender} components={portableTextComponents} />
             )}
           </div>
 
@@ -531,11 +585,9 @@ export default async function ArticlePage({ params }: Props) {
             </div>
           )}
 
-          {/* Dynamic CTA - Newsletter with persona-aware copy */}
-          <DynamicCTA
-            primaryPersona={primaryPersona}
-            intelligenceTier={article.intelligenceTier}
-          />
+          {/* End-of-article gate (P3-1): newsletter, product upsell, or lead —
+              mode + copy from Sanity, never blocking the body above. */}
+          <Gate gate={resolvedGate} intelligenceTier={article.intelligenceTier} />
 
           {/* Related Articles - semantic similarity via Pinecone */}
           <RelatedArticles articles={article.relatedArticles} />
