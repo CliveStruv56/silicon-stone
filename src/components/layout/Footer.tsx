@@ -116,7 +116,7 @@ export function Footer() {
                   rel="noopener noreferrer"
                   className="text-sm text-sister-indigo hover:text-sister-indigo/80 transition-colors"
                 >
-                  WaymarkPath &nearr;
+                  WaymarkPath ↗
                 </Link>
               </li>
             </ul>

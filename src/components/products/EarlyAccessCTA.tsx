@@ -78,7 +78,9 @@ export function EarlyAccessCTA({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex w-full max-w-sm flex-col gap-2 sm:flex-row">
+    // Stacked (input above button) so the expanded form never fights
+    // neighbouring CTAs for width in a side-by-side button row.
+    <form onSubmit={handleSubmit} className="flex w-full min-w-0 max-w-sm flex-col gap-2">
       <input
         type="email"
         value={email}
@@ -87,13 +89,13 @@ export function EarlyAccessCTA({
         aria-label="Email address for early access"
         required
         autoFocus
-        className="flex-1 rounded-md border border-border-subtle bg-slate-deep px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-silicon-amber"
+        className="w-full rounded-md border border-border-subtle bg-slate-deep px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-silicon-amber"
       />
       <Button type="submit" size={size} variant={variant} disabled={status === 'loading'} className={buttonClassName}>
         {status === 'loading' ? 'Sending…' : label}
       </Button>
       {status === 'error' && (
-        <p className="text-sm text-alert-red sm:basis-full">
+        <p className="text-sm text-alert-red">
           {errorMsg || 'Something went wrong. Please try again.'}
         </p>
       )}
