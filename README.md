@@ -13,6 +13,8 @@ deployment model.
 - Next.js API routes for Sanity, search, newsletter/contact proxying, and vectorization.
 - Railway FastAPI backend scaffold in `backend/`.
 - Operational docs in `docs/` and the session handoff in `project_summary.md`.
+- `LAUNCH.md` — the go-live runbook: launch flags to flip, Lemon Squeezy store
+  and discount-code setup, Kit tag mapping, and launch-day verification steps.
 
 ## Getting Started
 

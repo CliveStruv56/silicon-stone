@@ -393,6 +393,18 @@ Kit tags to map, verification steps.
   variants, `LAUNCH48` + £20 discount codes, booking URL, LinkedIn URL. If the
   Railway `/v1/subscribe` proxy is live it must accept the forwarded `tags`
   array.
+- **Deploy verified on production** (same day): all new copy/pages live on
+  siliconandstone.com; pre-launch state correct (early-access CTAs, zero LS
+  checkout links); `/products/success` 200 for both SKU variants; visual
+  browser review done (two fixes shipped from it: footer `&nearr;` literal,
+  early-access form overlap — commit `82a233e5`).
+- 🔴 **P0 found during verification**: `POST /api/subscribe` on production
+  returns **503 "Newsletter service not configured"** from the Railway proxy —
+  **pre-existing** (reproduced with the legacy request shape). All subscribe
+  forms and the early-access capture depend on it. Fix per LAUNCH.md "Current
+  state": configure ConvertKit on the Railway backend (+ `tags` support), or
+  drop `BACKEND_API_URL` from Vercel so the Next route's direct Kit fallback
+  takes over.
 
 ### July 17, 2026 — Advisory repositioning (Drift Retainer reprice + Post-Omnibus Briefing)
 

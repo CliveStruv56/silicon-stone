@@ -1,5 +1,14 @@
 # Lemon Squeezy setup (P3-0)
 
+> **Superseded for launch (2026-07-19): follow `LAUNCH.md` at the repo root.**
+> The pre-launch packaging release changed the store shape this doc describes:
+> the Toolkit is now **two one-time variants** (Standard £79 / Professional
+> £149), each product needs a **redirect URL** to
+> `/products/success?product={sku}`, the `order_created` webhook now **tags
+> buyers in Kit** (no longer a stub) via `LEMONSQUEEZY_VARIANT_ID_*` env vars,
+> and two **discount codes** (`LAUNCH48`, £20/90-day) are required. This doc
+> remains for the Intelligence Series / licence-key (Model B) background only.
+
 Everything on the code side is built and verified. This is the manual checklist
 to stand up the store so checkout (P3-4) and paid content (P3-5) can proceed.
 Lemon Squeezy is the **Merchant of Record** — it handles VAT/tax, receipts, and

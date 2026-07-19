@@ -8,6 +8,44 @@ checklist to flip the site live.
 All flags are env vars read by `src/lib/flags.ts`; flipping any of them is a
 Vercel env change + redeploy — never a code edit.
 
+## Current state (verified on production, 2026-07-19)
+
+- ✅ Deployed and verified live on siliconandstone.com: pre-launch CTAs
+  (early-access capture, zero LS checkout links), toolkit price table,
+  90-day credit copy, guarantees, Ladder box, `/products/success` both SKU
+  variants, all §4 advisory changes (Exposure Diagnostic, founding rate,
+  Baseline Month guarantee), unified subscribe copy, tool subscribe cards,
+  footer LinkedIn placeholder.
+- 🔴 **P0 — subscribe is failing in production.** `POST /api/subscribe`
+  returns **503 "Newsletter service not configured"** from the Railway
+  backend proxy (pre-existing — reproduced with the legacy request shape,
+  not caused by this release). Every subscribe form AND the early-access
+  capture depend on this endpoint. Fix one of:
+  1. set the ConvertKit env vars on the **Railway backend** (its
+     `/v1/subscribe` handler reports itself unconfigured), **and** teach it
+     to accept + apply the new `tags: string[]` field; or
+  2. remove `BACKEND_API_URL` from Vercel so the Next route's built-in Kit
+     fallback (`CONVERTKIT_API_KEY` + `CONVERTKIT_FORM_ID`, already in
+     Vercel per project_summary) handles subscribe + tagging directly —
+     the simpler option until the backend needs to own it.
+- ⏳ Everything in §0 below is owner setup that code cannot do (Kit tags,
+  LS store, discount codes, booking URL, LinkedIn URL).
+
+## Go-live quick reference (the whole process in order)
+
+1. Fix the P0 subscribe 503 above — nothing else matters until capture works.
+2. Create the 14 Kit tags, paste IDs into Vercel env (§0 Kit table).
+3. Create the 3 LS products in test mode: files attached, redirect URLs to
+   `/products/success?product={sku}`, checkout links + variant IDs into env (§0 LS).
+4. Configure the LS webhook with `order_created` + signing secret (§0 webhook).
+5. Create the `LAUNCH48` and £20/90-day discount codes; test in LS test mode (§0 discounts).
+6. Set `NEXT_PUBLIC_BOOKING_URL` and the real `NEXT_PUBLIC_LINKEDIN_URL` (§0 misc).
+7. Launch day: `NEXT_PUBLIC_PRE_LAUNCH=false`, set `NEXT_PUBLIC_FREE_INTRO_END`,
+   redeploy (§1).
+8. Verify: one real £24 purchase end-to-end, tag checks in Kit, discount codes
+   apply (§2). Announce `LAUNCH48` with its 48-hour window.
+9. After five retainer clients: `NEXT_PUBLIC_FOUNDING_OFFER_ACTIVE=false`.
+
 ## 0. Before launch day (prep)
 
 ### Kit (ConvertKit)
