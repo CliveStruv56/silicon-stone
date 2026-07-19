@@ -22,7 +22,7 @@ const tiers: Tier[] = [
   },
   {
     label: 'First picture',
-    title: 'Focused Diagnostic',
+    title: 'The Exposure Diagnostic',
     body: 'AI-governance and dependency review; 15–25pp written report; executive summary; 30-day follow-up.',
   },
   {

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { track } from '@/lib/track'
 import { submitWithOfflineQueue } from '@/lib/offline/submit'
+import { PRE_LAUNCH } from '@/lib/flags'
 import type { ResolvedGate } from '@/lib/gate'
 
 interface GateProps {
@@ -157,8 +158,11 @@ function EmailGate({ gate }: { gate: Extract<ResolvedGate, { mode: 'email' }> })
 
 function CommerceGate({ gate }: { gate: Extract<ResolvedGate, { mode: 'commerce' }> }) {
   const { product } = gate
-  const usesCheckout = Boolean(product.checkoutUrl)
-  const href = product.checkoutUrl || product.productPath
+  // While PRE_LAUNCH is on, no Lemon Squeezy checkout may be invoked anywhere
+  // (spec §0.3) — fall back to the product page even if a Sanity product doc
+  // carries a checkoutUrl.
+  const usesCheckout = Boolean(product.checkoutUrl) && !PRE_LAUNCH
+  const href = usesCheckout ? product.checkoutUrl! : product.productPath
 
   const handleClick = () => {
     track('Product View', { product: product.slug, surface: 'gate' })

@@ -7,6 +7,7 @@ import { ArrowRight } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { urlFor } from '@/sanity/lib/image'
+import { FREE_INTRO_WINDOW } from '@/lib/flags'
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -171,14 +172,21 @@ export function HeroSection({ settings }: HeroSectionProps) {
                             variants={itemVariants}
                             className="mt-2 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6"
                         >
-                            <Link href="/advisory#contact">
-                                <Button
-                                    size="lg"
-                                    className="bg-[#1f807c] text-white hover:bg-[#27938d] transition-transform hover:scale-105 font-semibold text-base px-8 shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
-                                >
-                                    Book a 25-minute conversation
-                                </Button>
-                            </Link>
+                            <div className="flex flex-col gap-1.5">
+                                <Link href="/advisory#contact">
+                                    <Button
+                                        size="lg"
+                                        className="bg-[#1f807c] text-white hover:bg-[#27938d] transition-transform hover:scale-105 font-semibold text-base px-8 shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
+                                    >
+                                        Book a 25-minute conversation
+                                    </Button>
+                                </Link>
+                                {FREE_INTRO_WINDOW && (
+                                    <span className="text-center text-xs italic text-white/75 [text-shadow:0_1px_8px_rgba(0,0,0,0.6)]">
+                                        Free during our launch window — the first ninety days.
+                                    </span>
+                                )}
+                            </div>
 
                             <Link href="/#subscribe">
                                 <Button
@@ -186,7 +194,7 @@ export function HeroSection({ settings }: HeroSectionProps) {
                                     variant="outline"
                                     className="border-white/40 bg-white/5 text-white hover:bg-white/10 hover:text-white transition-transform hover:scale-105 font-semibold text-base px-8 shadow-[0_10px_30px_rgba(0,0,0,0.35)] backdrop-blur-sm"
                                 >
-                                    Get the Atlantic Drift Briefing
+                                    Get the briefing — free
                                 </Button>
                             </Link>
 

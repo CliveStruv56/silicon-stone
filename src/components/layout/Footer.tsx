@@ -1,7 +1,12 @@
 import Link from 'next/link'
+import { Linkedin } from 'lucide-react'
 
 const WAYMARKPATH_URL =
   process.env.NEXT_PUBLIC_WAYMARKPATH_URL ?? 'https://waymarkpath.vercel.app'
+
+// TODO(owner): replace with company/founder LinkedIn URL (via
+// NEXT_PUBLIC_LINKEDIN_URL or this fallback).
+const LINKEDIN_URL = process.env.NEXT_PUBLIC_LINKEDIN_URL || 'https://www.linkedin.com/'
 
 const footerNavigation = {
   intelligence: [
@@ -45,6 +50,15 @@ export function Footer() {
               Forensic Technopolitics for the senior leaders defining the AI power shift.
               Published from Sanday, Orkney.
             </p>
+            <a
+              href={LINKEDIN_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Silicon and Stone on LinkedIn"
+              className="inline-flex text-text-muted hover:text-stone-teal transition-colors"
+            >
+              <Linkedin className="h-5 w-5" />
+            </a>
           </div>
 
           {/* Intelligence */}

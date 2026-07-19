@@ -7,7 +7,10 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { AdvisoryNextStep } from '@/components/products/AdvisoryNextStep'
+import { EarlyAccessCTA } from '@/components/products/EarlyAccessCTA'
+import { GuaranteeNote } from '@/components/products/GuaranteeNote'
 import { isConfiguredCheckout } from '@/lib/checkout'
+import { PRE_LAUNCH } from '@/lib/flags'
 import {
   Shield,
   CheckCircle,
@@ -70,8 +73,11 @@ const checkoutUrls = {
 }
 
 export default function AIActToolkitPage() {
-  const standardCheckoutReady = isConfiguredCheckout(checkoutUrls.standard)
-  const professionalCheckoutReady = isConfiguredCheckout(checkoutUrls.professional)
+  // Buy buttons go live only when pre-launch mode is off AND the Lemon Squeezy
+  // checkout URL is configured; otherwise the tier shows the early-access
+  // capture (PRE_LAUNCH, spec §0.3).
+  const standardBuyable = !PRE_LAUNCH && isConfiguredCheckout(checkoutUrls.standard)
+  const professionalBuyable = !PRE_LAUNCH && isConfiguredCheckout(checkoutUrls.professional)
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -102,21 +108,41 @@ export default function AIActToolkitPage() {
                   </div>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <Button size="lg" className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90 font-semibold" asChild>
-                    <a href={standardCheckoutReady ? checkoutUrls.standard : '/advisory#contact'} target={standardCheckoutReady ? '_blank' : undefined} rel={standardCheckoutReady ? 'noopener noreferrer' : undefined} className="plausible-event-name=Buy+Toolkit+Standard">
-                      {standardCheckoutReady ? 'Buy Standard — £79' : 'Request Early Access'}
-                    </a>
-                  </Button>
-                  <Button size="lg" variant="outline" className="border-stone-teal text-stone-teal hover:bg-stone-teal/10" asChild>
-                    <a href={professionalCheckoutReady ? checkoutUrls.professional : '/advisory#contact'} target={professionalCheckoutReady ? '_blank' : undefined} rel={professionalCheckoutReady ? 'noopener noreferrer' : undefined} className="plausible-event-name=Buy+Toolkit+Professional">
-                      {professionalCheckoutReady ? 'Buy Professional — £149' : 'Ask About Professional'}
-                    </a>
-                  </Button>
+                  {standardBuyable ? (
+                    <Button size="lg" className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90 font-semibold" asChild>
+                      <a href={checkoutUrls.standard} target="_blank" rel="noopener noreferrer" className="plausible-event-name=Buy+Toolkit+Standard">
+                        Buy Standard — £79
+                      </a>
+                    </Button>
+                  ) : (
+                    <EarlyAccessCTA
+                      tierTag="tier-toolkit-standard"
+                      label="Request Early Access — Standard"
+                      buttonClassName="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90 font-semibold"
+                    />
+                  )}
+                  {professionalBuyable ? (
+                    <Button size="lg" variant="outline" className="border-stone-teal text-stone-teal hover:bg-stone-teal/10" asChild>
+                      <a href={checkoutUrls.professional} target="_blank" rel="noopener noreferrer" className="plausible-event-name=Buy+Toolkit+Professional">
+                        Buy Professional — £149
+                      </a>
+                    </Button>
+                  ) : (
+                    <EarlyAccessCTA
+                      tierTag="tier-toolkit-professional"
+                      label="Request Early Access — Professional"
+                      variant="outline"
+                      buttonClassName="border-stone-teal text-stone-teal hover:bg-stone-teal/10"
+                    />
+                  )}
                 </div>
                 <p className="text-xs text-text-muted mt-3">
                   Professional includes a 30-minute video walkthrough.
-                  {!standardCheckoutReady && ' Early access is open while fulfilment is finalised.'}
+                  {!standardBuyable && ' Early access is open while fulfilment is finalised.'}
                 </p>
+                <div className="mt-4">
+                  <GuaranteeNote />
+                </div>
                 <p className="mt-5 font-mono text-xs uppercase tracking-wider text-text-muted">
                   Regulatory copy last reviewed: 30 June 2026
                 </p>
@@ -208,6 +234,51 @@ export default function AIActToolkitPage() {
           </div>
         </section>
 
+        {/* Pricing — published two-tier price table (spec §2.1) */}
+        <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
+          <h2 className="text-2xl font-semibold text-text-primary mb-6">
+            Two Tiers, One Toolkit
+          </h2>
+          <div className="overflow-x-auto rounded-lg border border-border-subtle">
+            <table className="w-full min-w-[560px] text-left text-sm">
+              <thead className="bg-stone-charcoal">
+                <tr className="border-b border-border-subtle">
+                  <th scope="col" className="px-4 py-3 font-semibold text-text-primary">Tier</th>
+                  <th scope="col" className="px-4 py-3 font-semibold text-text-primary">Contents</th>
+                  <th scope="col" className="px-4 py-3 font-semibold text-text-primary">Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b border-border-subtle">
+                  <td className="whitespace-nowrap px-4 py-4 align-top font-semibold text-text-primary">Standard</td>
+                  <td className="px-4 py-4 align-top text-text-muted">
+                    45–60 page PDF guide with decision trees, checklists and templates;
+                    AI Systems Register spreadsheet; Compliance Tracker with dashboard;
+                    quarterly update emails
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-4 align-top font-mono font-bold text-silicon-amber">£79</td>
+                </tr>
+                <tr>
+                  <td className="whitespace-nowrap px-4 py-4 align-top font-semibold text-text-primary">Professional</td>
+                  <td className="px-4 py-4 align-top text-text-muted">
+                    Everything in Standard,{' '}
+                    <strong className="font-semibold text-text-primary">
+                      plus a 30-minute video walkthrough
+                    </strong>{' '}
+                    recorded by the author — how to apply each section to your specific
+                    situation
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-4 align-top font-mono font-bold text-silicon-amber">£149</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-4 max-w-3xl text-sm italic text-text-muted">
+            Professional: thirty minutes of video, applying each section to a business
+            like yours. £149 — still less than an hour of any consultant&rsquo;s time.
+          </p>
+        </section>
+
         <Separator className="mx-auto max-w-7xl bg-border-subtle" />
 
         {/* Who It's For */}
@@ -249,17 +320,37 @@ export default function AIActToolkitPage() {
                 Start with a structured record of systems, roles, vendors, evidence gaps,
                 owners, and review triggers. Use formal counsel where your findings require it.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
-                <Button size="lg" className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90 font-semibold" asChild>
-                  <a href={standardCheckoutReady ? checkoutUrls.standard : '/advisory#contact'} target={standardCheckoutReady ? '_blank' : undefined} rel={standardCheckoutReady ? 'noopener noreferrer' : undefined}>
-                    {standardCheckoutReady ? 'Buy Standard — £79' : 'Request Early Access'}
-                  </a>
-                </Button>
-                <Button size="lg" variant="outline" className="border-stone-teal text-stone-teal hover:bg-stone-teal/10" asChild>
-                  <a href={professionalCheckoutReady ? checkoutUrls.professional : '/advisory#contact'} target={professionalCheckoutReady ? '_blank' : undefined} rel={professionalCheckoutReady ? 'noopener noreferrer' : undefined}>
-                    {professionalCheckoutReady ? 'Buy Professional — £149' : 'Ask About Professional'}
-                  </a>
-                </Button>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
+                {standardBuyable ? (
+                  <Button size="lg" className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90 font-semibold" asChild>
+                    <a href={checkoutUrls.standard} target="_blank" rel="noopener noreferrer">
+                      Buy Standard — £79
+                    </a>
+                  </Button>
+                ) : (
+                  <EarlyAccessCTA
+                    tierTag="tier-toolkit-standard"
+                    label="Request Early Access — Standard"
+                    buttonClassName="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90 font-semibold"
+                  />
+                )}
+                {professionalBuyable ? (
+                  <Button size="lg" variant="outline" className="border-stone-teal text-stone-teal hover:bg-stone-teal/10" asChild>
+                    <a href={checkoutUrls.professional} target="_blank" rel="noopener noreferrer">
+                      Buy Professional — £149
+                    </a>
+                  </Button>
+                ) : (
+                  <EarlyAccessCTA
+                    tierTag="tier-toolkit-professional"
+                    label="Request Early Access — Professional"
+                    variant="outline"
+                    buttonClassName="border-stone-teal text-stone-teal hover:bg-stone-teal/10"
+                  />
+                )}
+              </div>
+              <div className="mb-6 flex justify-center">
+                <GuaranteeNote className="justify-center" />
               </div>
               <p className="text-sm text-text-muted">
                 Not sure yet?{' '}
@@ -276,7 +367,7 @@ export default function AIActToolkitPage() {
                 {' '}version-tracks every model, dataset, wrapper and API, with provenance and licence status.
               </p>
               <div className="flex items-center justify-center gap-6 mt-8 text-xs text-text-muted">
-                <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> {standardCheckoutReady ? 'Digital delivery' : 'Early access enquiries open'}</span>
+                <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> {standardBuyable ? 'Digital delivery' : 'Early access enquiries open'}</span>
                 <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> Quarterly updates</span>
                 <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> EU VAT handled</span>
               </div>

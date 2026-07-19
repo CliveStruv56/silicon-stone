@@ -29,6 +29,7 @@ import {
   getVisibleQuestions,
 } from '@/lib/ai-act-assessment'
 import { CopyMarkdownButton } from '@/components/tools/CopyMarkdownButton'
+import { ToolSubscribeCard } from '@/components/tools/ToolSubscribeCard'
 import { complianceCheckerMarkdown } from '@/lib/tools-markdown'
 
 function values(value: AssessmentValue | undefined): string[] {
@@ -536,6 +537,8 @@ export default function ComplianceCheckerPage() {
                   getMarkdown={() => complianceCheckerMarkdown(result, answers, assessmentQuestions)}
                 />
               </div>
+
+              <ToolSubscribeCard tool="compliance-checker" />
             </motion.div>
           )}
         </section>

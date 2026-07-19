@@ -2,11 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { getClientIp } from "@/lib/rate-limit";
 import { checkDurableRateLimit } from "@/lib/durable-rate-limit";
 import { redactForLog } from "@/lib/utils";
+import { SUBSCRIBE_TAG_IDS } from "@/lib/kit";
 
 const KIT_API_KEY = process.env.CONVERTKIT_API_KEY || "";
 const KIT_FORM_ID = process.env.CONVERTKIT_FORM_ID || "";
 const MAX_BODY_BYTES = 2_000;
-const ALLOWED_TAGS = new Set(["Tool_Lead", "WaymarkPath_Early_Access"]);
+// One Kit list site-wide; every segment is a tag from this allow-list.
+const ALLOWED_TAGS = new Set(Object.keys(SUBSCRIBE_TAG_IDS));
+const MAX_TAGS = 4;
 
 function getBackendApiUrl() {
   const value = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_API_URL || "";
@@ -26,7 +29,7 @@ function getBackendHeaders() {
   return headers;
 }
 
-async function proxySubscribe(body: { email: string; tag?: string }) {
+async function proxySubscribe(body: { email: string; tag?: string; tags?: string[] }) {
   const backendApiUrl = getBackendApiUrl();
   if (!backendApiUrl) return null;
 
@@ -116,6 +119,12 @@ export async function POST(request: NextRequest) {
     }
     const email = typeof body.email === "string" ? body.email.trim().slice(0, 254).toLowerCase() : "";
     const tag = typeof body.tag === "string" && ALLOWED_TAGS.has(body.tag) ? body.tag : undefined;
+    // Multi-tag support (e.g. early-access + the tier requested). Allow-listed,
+    // deduped, capped.
+    const requestedTags = Array.isArray(body.tags)
+      ? body.tags.filter((t): t is string => typeof t === "string" && ALLOWED_TAGS.has(t))
+      : [];
+    const tags = [...new Set(tag ? [tag, ...requestedTags] : requestedTags)].slice(0, MAX_TAGS);
 
     if (!email || typeof email !== "string") {
       return NextResponse.json(
@@ -133,7 +142,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const railwayResponse = await proxySubscribe({ email, tag });
+    const railwayResponse = await proxySubscribe({ email, tag, tags });
     if (railwayResponse) {
       return railwayResponse;
     }
@@ -168,28 +177,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // If a tag name was provided and we have a tag ID mapping, apply it
-    const tagIdMap: Record<string, string | undefined> = {
-      Tool_Lead: process.env.CONVERTKIT_TOOL_LEAD_TAG_ID,
-      WaymarkPath_Early_Access: process.env.CONVERTKIT_WAYMARKPATH_TAG_ID,
-    };
-
-    const tagId = tag ? tagIdMap[tag] : undefined;
-    if (tagId) {
+    // Apply each allow-listed tag that has a Kit tag ID configured. A missing
+    // ID skips that tag only — the subscribe itself has already succeeded.
+    const tagIds = tags
+      .map((name) => SUBSCRIBE_TAG_IDS[name])
+      .filter((id): id is string => Boolean(id));
+    if (tagIds.length > 0) {
       const formData = await response.json();
       const subscriberId = formData.subscriber?.id;
       if (subscriberId) {
-        await fetch(
-          `https://api.kit.com/v4/tags/${tagId}/subscribers/${subscriberId}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-Kit-Api-Key": KIT_API_KEY,
-            },
-            body: JSON.stringify({}),
-          }
-        );
+        for (const tagId of tagIds) {
+          await fetch(
+            `https://api.kit.com/v4/tags/${tagId}/subscribers/${subscriberId}`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "X-Kit-Api-Key": KIT_API_KEY,
+              },
+              body: JSON.stringify({}),
+            }
+          );
+        }
       }
     }
 

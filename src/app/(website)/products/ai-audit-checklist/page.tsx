@@ -7,7 +7,10 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { AdvisoryNextStep } from '@/components/products/AdvisoryNextStep'
+import { EarlyAccessCTA } from '@/components/products/EarlyAccessCTA'
+import { GuaranteeNote } from '@/components/products/GuaranteeNote'
 import { isConfiguredCheckout } from '@/lib/checkout'
+import { PRE_LAUNCH } from '@/lib/flags'
 import {
   CheckCircle,
   FileSpreadsheet,
@@ -52,7 +55,9 @@ const contents = [
 const checkoutUrl = process.env.NEXT_PUBLIC_LEMONSQUEEZY_CHECKLIST_URL
 
 export default function AIAuditChecklistPage() {
-  const checkoutReady = isConfiguredCheckout(checkoutUrl)
+  // Live only when pre-launch mode is off AND the checkout URL is configured
+  // (PRE_LAUNCH, spec §0.3).
+  const buyable = !PRE_LAUNCH && isConfiguredCheckout(checkoutUrl)
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -78,17 +83,27 @@ export default function AIAuditChecklistPage() {
                   <div className="text-3xl font-mono font-bold text-stone-teal">£24</div>
                   <div className="text-sm text-text-muted">
                   2 spreadsheets + 2 PDFs<br />
-                    {checkoutReady ? 'Digital delivery' : 'Early access'}
+                    {buyable ? 'Digital delivery' : 'Early access'}
                   </div>
                 </div>
-                <Button size="lg" className="bg-stone-teal text-ink-on-accent hover:bg-stone-teal/90 font-semibold" asChild>
-                  <a href={checkoutReady ? checkoutUrl : '/advisory#contact'} target={checkoutReady ? '_blank' : undefined} rel={checkoutReady ? 'noopener noreferrer' : undefined} className="plausible-event-name=Buy+Checklist+Pack">
-                    {checkoutReady ? 'Buy Checklist Pack — £24' : 'Request Early Access'}
-                  </a>
-                </Button>
+                {buyable ? (
+                  <Button size="lg" className="bg-stone-teal text-ink-on-accent hover:bg-stone-teal/90 font-semibold" asChild>
+                    <a href={checkoutUrl} target="_blank" rel="noopener noreferrer" className="plausible-event-name=Buy+Checklist+Pack">
+                      Buy Checklist Pack — £24
+                    </a>
+                  </Button>
+                ) : (
+                  <EarlyAccessCTA
+                    tierTag="tier-checklist"
+                    buttonClassName="bg-stone-teal text-ink-on-accent hover:bg-stone-teal/90 font-semibold"
+                  />
+                )}
                 <p className="text-xs text-text-muted mt-3">
-                  Includes a £20 discount code for the full AI Act Compliance Toolkit.
+                  Includes a £20 discount code for the full AI Act Compliance Toolkit (valid 90 days).
                 </p>
+                <div className="mt-4">
+                  <GuaranteeNote />
+                </div>
                 <p className="mt-5 font-mono text-xs uppercase tracking-wider text-text-muted">
                   Regulatory copy last reviewed: 30 June 2026
                 </p>
@@ -198,13 +213,25 @@ export default function AIAuditChecklistPage() {
                 At £24, this is less than the cost of a business book — and it gives you
                 a structured picture of your AI exposure in a single afternoon.
               </p>
-              <Button size="lg" className="bg-stone-teal text-ink-on-accent hover:bg-stone-teal/90 font-semibold" asChild>
-                <a href={checkoutReady ? checkoutUrl : '/advisory#contact'} target={checkoutReady ? '_blank' : undefined} rel={checkoutReady ? 'noopener noreferrer' : undefined}>
-                  {checkoutReady ? 'Buy Checklist Pack — £24' : 'Request Early Access'}
-                </a>
-              </Button>
+              {buyable ? (
+                <Button size="lg" className="bg-stone-teal text-ink-on-accent hover:bg-stone-teal/90 font-semibold" asChild>
+                  <a href={checkoutUrl} target="_blank" rel="noopener noreferrer">
+                    Buy Checklist Pack — £24
+                  </a>
+                </Button>
+              ) : (
+                <div className="flex justify-center">
+                  <EarlyAccessCTA
+                    tierTag="tier-checklist"
+                    buttonClassName="bg-stone-teal text-ink-on-accent hover:bg-stone-teal/90 font-semibold"
+                  />
+                </div>
+              )}
+              <div className="mt-6 flex justify-center">
+                <GuaranteeNote className="justify-center" />
+              </div>
               <div className="flex items-center justify-center gap-6 mt-6 text-xs text-text-muted">
-                <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> {checkoutReady ? 'Digital delivery' : 'Early access enquiries open'}</span>
+                <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> {buyable ? 'Digital delivery' : 'Early access enquiries open'}</span>
                 <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> £20 Toolkit discount included</span>
                 <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> EU VAT handled</span>
               </div>

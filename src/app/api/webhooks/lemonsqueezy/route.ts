@@ -6,6 +6,12 @@ import {
   releaseWebhookDelivery,
   deliveryKey,
 } from '@/lib/lemonsqueezy'
+import {
+  BUYER_TAG_IDS,
+  ensureSubscriber,
+  kitConfigured,
+  tagSubscriber,
+} from '@/lib/kit'
 
 // Node runtime (HMAC via node:crypto) and never cached — this is a signed,
 // side-effecting endpoint.
@@ -13,6 +19,57 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 const MAX_BODY_BYTES = 100_000
+
+/**
+ * Map an LS variant ID to the Kit buyer tag for that SKU. Variant IDs are
+ * env-configured (LEMONSQUEEZY_VARIANT_ID_*, see LAUNCH.md) — never hard-coded.
+ */
+function buyerTagForVariant(variantId: number | string | undefined): keyof typeof BUYER_TAG_IDS | null {
+  const id = variantId === undefined || variantId === null ? '' : String(variantId)
+  if (!id) return null
+  if (id === process.env.LEMONSQUEEZY_VARIANT_ID_CHECKLIST) return 'buyer-checklist'
+  if (id === process.env.LEMONSQUEEZY_VARIANT_ID_TOOLKIT_STANDARD) return 'buyer-toolkit-standard'
+  if (id === process.env.LEMONSQUEEZY_VARIANT_ID_TOOLKIT_PRO) return 'buyer-toolkit-pro'
+  return null
+}
+
+/**
+ * order_created fulfilment (spec §3.2): delivery itself is Lemon Squeezy's
+ * built-in file-delivery email — our only job is to tag the buyer in Kit
+ * (buyer-checklist / buyer-toolkit-standard / buyer-toolkit-pro) so
+ * post-purchase sequences can run from Kit. Throws on transient Kit failures
+ * so the caller releases the delivery claim and LS retries.
+ */
+async function tagBuyerInKit(data: unknown): Promise<void> {
+  const attributes = (data as { attributes?: Record<string, unknown> } | undefined)?.attributes
+  const email =
+    typeof attributes?.user_email === 'string' ? attributes.user_email.trim().toLowerCase() : ''
+  const firstItem = attributes?.first_order_item as { variant_id?: number } | undefined
+  const tagName = buyerTagForVariant(firstItem?.variant_id)
+
+  if (!email || !tagName) {
+    console.info('[ls-webhook] order_created without mappable buyer tag', {
+      hasEmail: Boolean(email),
+      variantId: firstItem?.variant_id,
+    })
+    return
+  }
+  if (!kitConfigured()) {
+    console.error('[ls-webhook] Kit not configured; cannot tag buyer')
+    return
+  }
+  const tagId = BUYER_TAG_IDS[tagName]
+  if (!tagId) {
+    console.warn(`[ls-webhook] no Kit tag ID configured for ${tagName}; skipping`)
+    return
+  }
+
+  const subscriberId = await ensureSubscriber(email)
+  if (!subscriberId) throw new Error('Kit ensureSubscriber failed')
+  const tagged = await tagSubscriber(tagId, subscriberId)
+  if (!tagged) throw new Error(`Kit tagSubscriber failed for ${tagName}`)
+  console.info(`[ls-webhook] tagged buyer as ${tagName}`)
+}
 
 /**
  * Lemon Squeezy webhook endpoint (P3-0). Verifies the signature, drops
@@ -68,10 +125,9 @@ export async function POST(request: NextRequest) {
   try {
     switch (eventName) {
       case 'order_created':
-        // TODO(P3-4): Model-A fulfilment — email/download link for the variant.
-        // TODO(P3-5): if the variant issues licence keys, no action here (see
-        // license_key_created); otherwise deliver the artefact.
-        console.info('[ls-webhook] order_created')
+        // File delivery is LS's native order email (Model A) — nothing custom.
+        // Our side tags the buyer in Kit for post-purchase sequences.
+        await tagBuyerInKit(payload.data)
         break
       case 'license_key_created':
         // TODO(P3-5): record the issued key so the post-checkout redirect can

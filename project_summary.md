@@ -1,7 +1,7 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-07-17
+> Last Updated: 2026-07-19
 > Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing, 13 moderate transitive npm audit findings (uuid through Sanity packages)**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com. Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools (email-gated for lead capture, AI Act triage engine recently overhauled), product/commerce pages with an early-access enquiry fallback until Lemon Squeezy checkout URLs are configured, Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Awaiting Lemon Squeezy store setup, Plausible account, and content publishing for queued drafts.
@@ -353,6 +353,46 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### July 19, 2026 — Pre-launch packaging & pricing changes (competitive-review spec)
+
+Full implementation of the pre-launch packaging spec. New launch-day runbook at
+**`LAUNCH.md`** (repo root) — flags to flip, LS products/discounts to create,
+Kit tags to map, verification steps.
+
+- **Flags** (`src/lib/flags.ts`, all env-driven, default true):
+  `NEXT_PUBLIC_PRE_LAUNCH` (true → every product CTA is a "Request Early
+  Access" Kit capture, no LS checkout anywhere incl. article commerce gate;
+  false → Buy buttons to LS), `NEXT_PUBLIC_FOUNDING_OFFER_ACTIVE`,
+  `NEXT_PUBLIC_FREE_INTRO_WINDOW` (+ `NEXT_PUBLIC_FREE_INTRO_END` auto-expiry),
+  `NEXT_PUBLIC_BOOKING_URL`.
+- **Subscribe architecture**: one Kit form site-wide; `/api/subscribe` now
+  accepts a `tags: string[]` allow-list (map in `src/lib/kit.ts`, ~14 tags:
+  early-access + tier-\*, atlantic-drift, eu-exposure, tool-\*, buyer-\*).
+  Unified briefing copy ("The Silicon & Stone briefing — two editions a week,
+  free") on SubscribeCTA, /atlantic-drift (now tagged, "read from the US side"
+  framing), new /eu-exposure subscribe block; hero secondary CTA renamed.
+  Dismissible `ToolSubscribeCard` on all four tools' results screens.
+- **Products**: toolkit page has a published two-tier price table (£79/£149,
+  "Ask About Professional" removed); checklist £20 credit now "(valid 90
+  days)"; 30-day guarantee note on all three product pages; `LadderBox`
+  credit box on /products and /advisory; new `/products/success?product=sku`
+  thank-you page with per-SKU next-rung offers (LS redirect target).
+- **Checkout/fulfilment**: LS webhook `order_created` now tags buyers in Kit
+  by variant ID (`LEMONSQUEEZY_VARIANT_ID_*` → buyer-\* tags) via
+  `src/lib/kit.ts`; delivery stays LS-native.
+- **Advisory**: "Focused Diagnostic" → **"The Exposure Diagnostic"**
+  (positioning, new scope bullets, 50%-refund clause); Briefing credit line +
+  free-intro distinction; Retainer software-vs-retainer paragraph, Baseline
+  Month guarantee line, founding block (£1,500/mo × 6, first five, flag-gated),
+  annual copy (£20,000/yr); enquiry-form success now surfaces the booking link
+  when `NEXT_PUBLIC_BOOKING_URL` is set.
+- **Small**: footer LinkedIn icon (placeholder URL, TODO(owner));
+  `.env.example` documents everything. Build green, `npx eslint src` clean.
+- **Owner setup pending** (all in LAUNCH.md): Kit tag IDs, LS store/products/
+  variants, `LAUNCH48` + £20 discount codes, booking URL, LinkedIn URL. If the
+  Railway `/v1/subscribe` proxy is live it must accept the forwarded `tags`
+  array.
 
 ### July 17, 2026 — Advisory repositioning (Drift Retainer reprice + Post-Omnibus Briefing)
 

@@ -5,7 +5,9 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Header, Footer } from '@/components/layout'
+import { LadderBox } from '@/components/products/LadderBox'
 import { submitWithOfflineQueue } from '@/lib/offline/submit'
+import { BOOKING_URL, FOUNDING_OFFER_ACTIVE, FREE_INTRO_WINDOW } from '@/lib/flags'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -177,10 +179,20 @@ type Tier = {
   name: string
   price: string
   priceNote?: string
+  /** Italic line rendered directly under the price (credit / guarantee copy). */
+  priceDetail?: string
+  /** Shown under priceDetail only while FREE_INTRO_WINDOW is on. */
+  introDistinction?: string
+  /** Positioning paragraph at the top of the card body. */
+  positioning?: string
   description: string
   features: string[]
   pathNote?: string
+  /** Italic satisfaction/guarantee clause after the features. */
+  guaranteeNote?: string
   cta: string
+  /** Append the free-intro launch-window line under the CTA while the flag is on. */
+  ctaLaunchLine?: boolean
   highlighted: boolean
 }
 
@@ -189,6 +201,10 @@ const tiers: Tier[] = [
     name: 'Advisory Briefing',
     price: '£450',
     priceNote: 'one hour',
+    priceDetail:
+      '£450. Credited in full toward your first month on the Drift Retainer if you proceed within 30 days — so if we work together, the conversation was free.',
+    introDistinction:
+      'New here? Start with the free 25-minute conversation (launch offer). The Briefing is the working session: your tool results, your specific question, a written follow-up.',
     description: 'A focused strategic consultation built on your tool results and a specific question. The low-commitment way to test the water.',
     features: [
       'Review of your interactive tool results',
@@ -196,23 +212,26 @@ const tiers: Tier[] = [
       'Initial recommendations',
       'Follow-up summary document',
     ],
-    pathNote: 'Credited in full toward a Drift Retainer if you go on to one within 30 days.',
     cta: 'Request a briefing',
     highlighted: false,
   },
   {
-    name: 'Focused Diagnostic',
+    name: 'The Exposure Diagnostic',
     price: 'From £2,500',
     priceNote: 'custom scope',
+    positioning:
+      'If you need template policies and a document pack, a fixed-price compliance shop will do it cheaper — our own £79 toolkit covers the essentials. The Exposure Diagnostic is for the questions documents can’t answer: where your dependency on specific vendors, models and jurisdictions becomes an operating constraint, and what to do about it this quarter.',
     description: 'A focused review of your AI governance, evidence gaps, and technology dependencies — the clearest first picture of where you stand.',
     features: [
-      'AI system and vendor-evidence review',
-      'Written report (15–25 pages)',
-      'Executive summary',
-      'Prioritised actions',
+      'AI system and vendor-evidence review — what you run, and what your vendors can prove',
+      'Dependency mapping — models, APIs, cloud, and jurisdiction exposure across your stack',
+      'Regulatory-friction read — where US/EU divergence touches your operations',
+      'Written report (15–25 pages) with executive summary and prioritised actions',
       '30-day follow-up call',
     ],
     pathNote: 'Designed as an on-ramp: the diagnostic scopes naturally into a Drift Retainer, and its fee is credited toward your first quarter.',
+    guaranteeNote:
+      'If the final report contains nothing actionable for your situation, a full second revision round or a 50% refund — your call.',
     cta: 'Request a diagnostic',
     highlighted: false,
   },
@@ -220,6 +239,8 @@ const tiers: Tier[] = [
     name: 'The Drift Retainer',
     price: 'From £2,000/mo',
     priceNote: 'three-month initial term',
+    priceDetail:
+      'The Baseline Month guarantee: after month one, walk away paying that month only. You know within thirty days whether the relationship earns its fee.',
     description: 'The standing relationship. A board-forwardable monthly briefing, a working session on one live decision, a direct line between sessions, and a quarterly written exposure review. For leadership teams that stay ahead of the drift, not catch up to it.',
     features: [
       'A board-forwardable monthly briefing — what shifted, and the decision it changes',
@@ -229,12 +250,15 @@ const tiers: Tier[] = [
       'A standing line to thirty years inside the industry',
     ],
     cta: 'Book a 25-minute conversation',
+    ctaLaunchLine: true,
     highlighted: true,
   },
   {
     name: 'Strategic Assessment',
     price: 'From £8,000',
     priceNote: 'then transitions to retainer',
+    positioning:
+      'Before you commit €1,000–€3,100 a month to governance software, know what you actually need it to do. The Strategic Assessment gives your board a framework-neutral decision document — vendor-agnostic, because we sell no software and take no referral fees.',
     description: 'Comprehensive multi-framework analysis with a board-ready presentation and implementation roadmap — the deep one-off for a high-stakes decision, which then settles into an ongoing Drift Retainer.',
     features: [
       'Multi-framework analysis',
@@ -424,6 +448,14 @@ export default function ServicesPage() {
                       </li>
                     ))}
                   </ul>
+                  <p className="border-t border-border-subtle pt-4 text-sm leading-relaxed text-text-muted">
+                    Software tracks your controls. It doesn&rsquo;t read export controls. A
+                    governance platform will tell you what&rsquo;s in your inventory; the
+                    Drift Retainer tells you what&rsquo;s about to change around it — and
+                    which decision it changes. Most clients eventually run both; the
+                    Retainer also tells you which platform you actually need before you
+                    buy one.
+                  </p>
                   <div className="border-t border-border-subtle pt-4">
                     <div className="text-lg font-semibold text-text-primary">
                       £2,000<span className="text-text-muted">/month</span>
@@ -432,13 +464,38 @@ export default function ServicesPage() {
                       Three-month initial term, then rolling monthly · limited to a handful
                       of client companies at any time
                     </div>
+                    <p className="mt-3 text-sm italic text-text-muted">
+                      The Baseline Month guarantee: after month one, walk away paying that
+                      month only. You know within thirty days whether the relationship
+                      earns its fee.
+                    </p>
+                    <p className="mt-3 text-sm italic text-text-muted">
+                      Prefer annual? Twelve months for the price of ten (£20,000/year).
+                    </p>
                   </div>
-                  <a href="#contact" className="block">
-                    <Button size="lg" className="w-full bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90">
-                      Book a 25-minute conversation
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </a>
+                  {FOUNDING_OFFER_ACTIVE && (
+                    <div className="rounded-lg border border-silicon-amber/40 bg-silicon-amber/10 p-4 text-sm leading-relaxed text-text-primary">
+                      <strong className="font-semibold text-silicon-amber">
+                        Founding rate — five companies, launch only.
+                      </strong>{' '}
+                      The first five retainer clients join at{' '}
+                      <strong className="font-semibold">£1,500/month for the first six months</strong>,
+                      then the standard rate. Same Baseline Month guarantee.
+                    </div>
+                  )}
+                  <div>
+                    <a href="#contact" className="block">
+                      <Button size="lg" className="w-full bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90">
+                        Book a 25-minute conversation
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </a>
+                    {FREE_INTRO_WINDOW && (
+                      <p className="mt-2 text-center text-xs italic text-text-muted">
+                        Free during our launch window — the first ninety days.
+                      </p>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             </div>
@@ -643,6 +700,15 @@ export default function ServicesPage() {
                           <span className="ml-2 text-xs text-text-muted">{tier.priceNote}</span>
                         )}
                       </div>
+                      {tier.priceDetail && (
+                        <p className="mt-2 text-xs italic text-text-muted">{tier.priceDetail}</p>
+                      )}
+                      {tier.introDistinction && FREE_INTRO_WINDOW && (
+                        <p className="mt-2 text-xs italic text-text-muted">{tier.introDistinction}</p>
+                      )}
+                      {tier.positioning && (
+                        <p className="mt-2 text-xs leading-relaxed text-text-muted">{tier.positioning}</p>
+                      )}
                       <CardDescription className="mt-2">
                         {tier.description}
                       </CardDescription>
@@ -659,13 +725,23 @@ export default function ServicesPage() {
                       {tier.pathNote && (
                         <p className="text-xs italic text-text-muted">{tier.pathNote}</p>
                       )}
-                      <a href="#contact" className="mt-auto block">
-                        <Button
-                          className={`w-full ${tier.highlighted ? 'bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90' : 'bg-surface-elevated text-text-primary hover:bg-surface-elevated/80'}`}
-                        >
-                          {tier.cta}
-                        </Button>
-                      </a>
+                      {tier.guaranteeNote && (
+                        <p className="text-xs italic text-text-muted">{tier.guaranteeNote}</p>
+                      )}
+                      <div className="mt-auto">
+                        <a href="#contact" className="block">
+                          <Button
+                            className={`w-full ${tier.highlighted ? 'bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90' : 'bg-surface-elevated text-text-primary hover:bg-surface-elevated/80'}`}
+                          >
+                            {tier.cta}
+                          </Button>
+                        </a>
+                        {tier.ctaLaunchLine && FREE_INTRO_WINDOW && (
+                          <p className="mt-2 text-center text-xs italic text-text-muted">
+                            Free during our launch window — the first ninety days.
+                          </p>
+                        )}
+                      </div>
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -700,6 +776,11 @@ export default function ServicesPage() {
                   </a>
                 </div>
               </div>
+            </div>
+
+            {/* The Ladder — every paid step credits toward the next (§2.4) */}
+            <div className="mt-8">
+              <LadderBox />
             </div>
           </div>
         </section>
@@ -757,6 +838,25 @@ export default function ServicesPage() {
                       ? 'You’re offline — your message will send automatically when the connection returns.'
                       : "Thank you for reaching out. We'll review your inquiry and respond within 48 hours."}
                   </p>
+                  {/* Cut the email round-trip: offer the 25-minute booking link
+                      immediately on submit (§4.4). BOOKING_URL is env-driven;
+                      until it's configured the 48-hour promise stands alone. */}
+                  {!formQueued && BOOKING_URL && (
+                    <div className="mt-6">
+                      <p className="mb-3 text-sm text-text-muted">
+                        Don&rsquo;t want to wait? Pick a time for your 25-minute
+                        conversation now.
+                        {FREE_INTRO_WINDOW &&
+                          ' Free during our launch window — the first ninety days.'}
+                      </p>
+                      <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer">
+                        <Button className="bg-stone-teal text-ink-on-accent hover:bg-stone-teal/90">
+                          Book your 25-minute call
+                          <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+                      </a>
+                    </div>
+                  )}
                 </motion.div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4">

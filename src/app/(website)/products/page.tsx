@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 import { Header, Footer } from '@/components/layout'
+import { LadderBox } from '@/components/products/LadderBox'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -179,6 +180,11 @@ export default function ProductsPage() {
                 </Card>
               )
             })}
+          </div>
+
+          {/* The Ladder — every paid step credits toward the next (§2.4) */}
+          <div className="mt-10">
+            <LadderBox />
           </div>
         </section>
 

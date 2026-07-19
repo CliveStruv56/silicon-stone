@@ -60,10 +60,12 @@ export default function AtlanticDriftPage() {
     setErrorMsg('')
 
     try {
-      // Reuses the standard subscribe flow. A dedicated "Atlantic Drift" lead
-      // tag can be added once the backend whitelists it (see ALLOWED_TAGS in
-      // /api/subscribe and the Railway /v1/subscribe handler).
-      const result = await submitWithOfflineQueue('/api/subscribe', { email })
+      // Same site-wide Kit form; `atlantic-drift` is the source segment tag —
+      // never a separate subscription (spec §1.2).
+      const result = await submitWithOfflineQueue('/api/subscribe', {
+        email,
+        tags: ['atlantic-drift'],
+      })
       if (result.queued) {
         setStatus('queued')
         setEmail('')
@@ -263,11 +265,15 @@ export default function AtlanticDriftPage() {
               <h2 className="mb-3 text-3xl font-bold text-text-primary sm:text-4xl">
                 Get the guide
               </h2>
+              <p className="mb-4 max-w-2xl leading-relaxed text-text-muted">
+                Enter your email and the guide arrives in your inbox. You will also
+                receive the Silicon &amp; Stone briefing — two editions a week, free,
+                read from the US side.
+              </p>
               <p className="mb-6 max-w-2xl leading-relaxed text-text-muted">
-                Enter your email and the guide arrives in your inbox. You will also receive
-                the twice-weekly Atlantic Drift Briefing — the Tuesday read on what just
-                shifted, and the Friday note on what to do about it. Free, and you can
-                unsubscribe at any time.
+                Tuesday: the Stone Briefing — structural analysis of the AI power shift.
+                Friday: the Practical Move — what to do about it. Unsubscribe at any
+                time.
               </p>
 
               <div className="rounded-lg border border-silicon-amber/30 bg-silicon-amber/5 p-5">

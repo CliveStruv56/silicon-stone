@@ -43,6 +43,33 @@ export default function EuExposurePage() {
   const [formLoading, setFormLoading] = useState(false)
   const [formError, setFormError] = useState('')
 
+  const [subEmail, setSubEmail] = useState('')
+  const [subStatus, setSubStatus] = useState<'idle' | 'loading' | 'success' | 'queued' | 'error'>('idle')
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setSubStatus('loading')
+
+    try {
+      // Same site-wide Kit form; `eu-exposure` is the source segment tag (§1.2).
+      const result = await submitWithOfflineQueue('/api/subscribe', {
+        email: subEmail,
+        tags: ['eu-exposure'],
+      })
+      if (result.queued) {
+        setSubStatus('queued')
+        setSubEmail('')
+        return
+      }
+      if (!result.response.ok) throw new Error('Failed to subscribe')
+      setSubStatus('success')
+      setSubEmail('')
+      window.plausible?.('EU Exposure Signup')
+    } catch {
+      setSubStatus('error')
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setFormLoading(true)
@@ -329,6 +356,53 @@ export default function EuExposurePage() {
               </p>
             </CardContent>
           </Card>
+        </section>
+
+        {/* Briefing subscribe — same site-wide Kit form, eu-exposure segment (§1.2) */}
+        <section className="border-y border-border-subtle bg-stone-charcoal/40">
+          <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
+            <div className="max-w-2xl">
+              <h2 className="mb-2 text-2xl font-semibold text-text-primary">
+                The Silicon &amp; Stone briefing — two editions a week, free.
+              </h2>
+              <p className="mb-5 leading-relaxed text-text-muted">
+                Tuesday: the Stone Briefing — structural analysis of the AI power shift.
+                <br />
+                Friday: the Practical Move — what to do about it.
+              </p>
+
+              {subStatus === 'success' || subStatus === 'queued' ? (
+                <div className="text-sm text-stone-teal">
+                  {subStatus === 'queued'
+                    ? 'You’re offline — your signup will send when the connection returns.'
+                    : 'Subscribed. Check your inbox to confirm.'}
+                </div>
+              ) : (
+                <form onSubmit={handleSubscribe} className="flex max-w-md gap-2">
+                  <input
+                    type="email"
+                    value={subEmail}
+                    onChange={(e) => setSubEmail(e.target.value)}
+                    placeholder="you@company.com"
+                    aria-label="Email address"
+                    required
+                    className="flex-1 rounded-md border border-border-subtle bg-slate-deep px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-silicon-amber"
+                  />
+                  <Button
+                    type="submit"
+                    disabled={subStatus === 'loading'}
+                    className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90"
+                  >
+                    {subStatus === 'loading' ? 'Subscribing…' : 'Get it free'}
+                  </Button>
+                </form>
+              )}
+              {subStatus === 'error' && (
+                <p className="mt-2 text-sm text-alert-red">Something went wrong. Please try again.</p>
+              )}
+              <p className="mt-3 text-xs text-text-muted">Free. Unsubscribe anytime.</p>
+            </div>
+          </div>
         </section>
 
         {/* Contact — self-contained */}

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Header, Footer } from '@/components/layout'
 import { CopyMarkdownButton } from '@/components/tools/CopyMarkdownButton'
+import { ToolSubscribeCard } from '@/components/tools/ToolSubscribeCard'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -816,6 +817,8 @@ export default function ScenarioModelerPage() {
                   </Button>
                 </Link>
               </div>
+
+              <ToolSubscribeCard tool="scenario-modeler" />
             </motion.div>
           </AnimatePresence>
         </section>

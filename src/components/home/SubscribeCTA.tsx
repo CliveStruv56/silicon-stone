@@ -60,21 +60,16 @@ export function SubscribeCTA() {
             lineHeight: 1.15,
           }}
         >
-          Get the Atlantic Drift Briefing
+          The Silicon &amp; Stone briefing — two editions a week, free.
         </CardTitle>
       </CardHeader>
       <CardContent>
         <p className="text-sm text-text-muted mb-5 leading-relaxed">
-          <strong className="text-silicon-amber font-medium">
-            Twice a week from the edge of Europe
-          </strong>
-          {' '}— Tuesday Stone Briefing on what just shifted in AI policy,
-          semiconductors, supply chains, and digital sovereignty. Friday
-          Practical Move on what to do about it.{' '}
-          <strong className="text-text-primary font-semibold">
-            Decision-grade analysis from thirty years inside the industry.
-          </strong>
-          {' '}A welcome Atlantic Drift Briefing arrives on signup.
+          <strong className="text-silicon-amber font-medium">Tuesday:</strong>
+          {' '}the Stone Briefing — structural analysis of the AI power shift.
+          <br />
+          <strong className="text-silicon-amber font-medium">Friday:</strong>
+          {' '}the Practical Move — what to do about it.
         </p>
 
         <div className="my-8 max-w-xl mx-auto text-center">
@@ -97,7 +92,7 @@ export function SubscribeCTA() {
           <>
             <div className="font-mono text-[12.5px] tracking-[0.10em] uppercase text-silicon-amber mb-2 flex items-center gap-1.5">
               <span aria-hidden="true">○</span>
-              Get the Atlantic Drift Briefing
+              Get the briefing
             </div>
             <form onSubmit={handleSubmit} className="flex gap-2">
               <input

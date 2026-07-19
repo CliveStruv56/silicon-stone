@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { Header, Footer } from '@/components/layout'
 import { submitWithOfflineQueue } from '@/lib/offline/submit'
 import { AdvisoryNextStep } from '@/components/products/AdvisoryNextStep'
+import { GuaranteeNote } from '@/components/products/GuaranteeNote'
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -54,7 +55,10 @@ export default function BriefingsProductPage() {
     setStatus('loading')
 
     try {
-      const result = await submitWithOfflineQueue('/api/subscribe', { email })
+      const result = await submitWithOfflineQueue('/api/subscribe', {
+        email,
+        tags: ['early-access', 'tier-sector-reports'],
+      })
       if (result.queued) {
         setStatus('queued')
         setEmail('')
@@ -195,6 +199,10 @@ export default function BriefingsProductPage() {
               {status === 'error' && (
                 <p className="text-sm text-alert-red mt-2">Something went wrong. Please try again.</p>
               )}
+
+              <div className="mt-6 flex justify-center">
+                <GuaranteeNote future className="justify-center" />
+              </div>
 
               <p className="text-sm text-text-muted mt-6">
                 Available now:{' '}

@@ -7,6 +7,7 @@ import { Header, Footer } from '@/components/layout'
 import { EmailGateOverlay } from '@/components/tools/EmailGateOverlay'
 import { usePrintGate } from '@/components/tools/usePrintGate'
 import { CopyMarkdownButton } from '@/components/tools/CopyMarkdownButton'
+import { ToolSubscribeCard } from '@/components/tools/ToolSubscribeCard'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -691,6 +692,8 @@ export default function PolicyStressTestPage() {
                     </Button>
                   </Link>
                 </div>
+
+                <ToolSubscribeCard tool="policy-stress-test" />
               </motion.div>
             )}
           </AnimatePresence>
