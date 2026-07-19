@@ -398,13 +398,15 @@ Kit tags to map, verification steps.
   checkout links); `/products/success` 200 for both SKU variants; visual
   browser review done (two fixes shipped from it: footer `&nearr;` literal,
   early-access form overlap — commit `82a233e5`).
-- 🔴 **P0 found during verification**: `POST /api/subscribe` on production
-  returns **503 "Newsletter service not configured"** from the Railway proxy —
-  **pre-existing** (reproduced with the legacy request shape). All subscribe
-  forms and the early-access capture depend on it. Fix per LAUNCH.md "Current
-  state": configure ConvertKit on the Railway backend (+ `tags` support), or
-  drop `BACKEND_API_URL` from Vercel so the Next route's direct Kit fallback
-  takes over.
+- 🟠 **P0 subscribe fix — code shipped, one owner step left**: production
+  subscribe 503'd via the unconfigured Railway proxy (pre-existing). Commit
+  `1bb7f59e` makes subscribe post **direct to Kit** (Railway proxy now opt-in
+  via `SUBSCRIBE_VIA_BACKEND=true`; `BACKEND_API_URL` untouched — it also
+  powers usage tracking, deep research, contact). Verified live: the direct
+  path now returns **Kit 401 "The API key is invalid"** — the Vercel
+  `CONVERTKIT_API_KEY` is likely a legacy v3 key; api.kit.com/v4 needs a
+  **v4 API key**. Owner: replace it in Vercel env + redeploy (steps in
+  LAUNCH.md "Current state"), then re-test subscribe.
 
 ### July 17, 2026 — Advisory repositioning (Drift Retainer reprice + Post-Omnibus Briefing)
 

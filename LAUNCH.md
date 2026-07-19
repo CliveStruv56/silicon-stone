@@ -16,22 +16,30 @@ Vercel env change + redeploy — never a code edit.
   variants, all §4 advisory changes (Exposure Diagnostic, founding rate,
   Baseline Month guarantee), unified subscribe copy, tool subscribe cards,
   footer LinkedIn placeholder.
-- ✅ **P0 resolved (2026-07-19): subscribe now goes direct to Kit.**
-  Production subscribe was 503ing because the Railway backend's newsletter
-  service is unconfigured (pre-existing). Fix shipped in code: the subscribe
-  route now posts **directly to Kit** (`CONVERTKIT_API_KEY` +
-  `CONVERTKIT_FORM_ID` in Vercel) and only proxies to Railway when
-  `SUBSCRIBE_VIA_BACKEND=true` is explicitly set. `BACKEND_API_URL` stays in
-  Vercel untouched — it also powers usage tracking, deep research, and the
-  contact proxy. To hand subscribe back to the backend later: configure
-  ConvertKit there, add `tags: string[]` support to its `/v1/subscribe`,
-  then set `SUBSCRIBE_VIA_BACKEND=true`.
+- 🟠 **P0 nearly resolved — one owner step left (invalid Kit API key).**
+  Production subscribe was 503ing via the unconfigured Railway proxy. Code
+  fix shipped and verified live: the subscribe route now posts **directly
+  to Kit** and only proxies to Railway when `SUBSCRIBE_VIA_BACKEND=true`
+  (`BACKEND_API_URL` stays in Vercel untouched — it also powers usage
+  tracking, deep research, and the contact proxy). The direct path now
+  fails with **Kit 401 "The API key is invalid"** (Vercel runtime logs,
+  2026-07-19) — the stored `CONVERTKIT_API_KEY` is likely a legacy v3 key;
+  `api.kit.com/v4` needs a **v4 API key**.
+  **Owner fix:** Kit app → Settings → Developer → API Keys → create/copy
+  the **v4 API Key** → Vercel → silicon-stone → Settings → Environment
+  Variables → update `CONVERTKIT_API_KEY` (Production) → redeploy. Then
+  verify: `POST /api/subscribe` with a test email returns
+  `{"success":true}` and the subscriber appears in Kit.
+  To hand subscribe back to the backend later: configure ConvertKit there,
+  add `tags: string[]` support to its `/v1/subscribe`, then set
+  `SUBSCRIBE_VIA_BACKEND=true`.
 - ⏳ Everything in §0 below is owner setup that code cannot do (Kit tags,
   LS store, discount codes, booking URL, LinkedIn URL).
 
 ## Go-live quick reference (the whole process in order)
 
-1. Fix the P0 subscribe 503 above — nothing else matters until capture works.
+1. Fix the P0 above: set a valid **Kit v4 API key** as `CONVERTKIT_API_KEY`
+   in Vercel and redeploy — nothing else matters until capture works.
 2. Create the 14 Kit tags, paste IDs into Vercel env (§0 Kit table).
 3. Create the 3 LS products in test mode: files attached, redirect URLs to
    `/products/success?product={sku}`, checkout links + variant IDs into env (§0 LS).
