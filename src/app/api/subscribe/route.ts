@@ -30,6 +30,14 @@ function getBackendHeaders() {
 }
 
 async function proxySubscribe(body: { email: string; tag?: string; tags?: string[] }) {
+  // Subscribe goes DIRECT to Kit by default. The Railway proxy is opt-in via
+  // SUBSCRIBE_VIA_BACKEND=true only — the backend's newsletter service was
+  // found unconfigured in production (503 on every subscribe, 2026-07-19),
+  // and BACKEND_API_URL itself must stay set for usage tracking, deep
+  // research, and the contact proxy. Re-enable only once the backend has
+  // ConvertKit configured AND applies the `tags` array.
+  if (process.env.SUBSCRIBE_VIA_BACKEND !== "true") return null;
+
   const backendApiUrl = getBackendApiUrl();
   if (!backendApiUrl) return null;
 

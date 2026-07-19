@@ -16,18 +16,16 @@ Vercel env change + redeploy — never a code edit.
   variants, all §4 advisory changes (Exposure Diagnostic, founding rate,
   Baseline Month guarantee), unified subscribe copy, tool subscribe cards,
   footer LinkedIn placeholder.
-- 🔴 **P0 — subscribe is failing in production.** `POST /api/subscribe`
-  returns **503 "Newsletter service not configured"** from the Railway
-  backend proxy (pre-existing — reproduced with the legacy request shape,
-  not caused by this release). Every subscribe form AND the early-access
-  capture depend on this endpoint. Fix one of:
-  1. set the ConvertKit env vars on the **Railway backend** (its
-     `/v1/subscribe` handler reports itself unconfigured), **and** teach it
-     to accept + apply the new `tags: string[]` field; or
-  2. remove `BACKEND_API_URL` from Vercel so the Next route's built-in Kit
-     fallback (`CONVERTKIT_API_KEY` + `CONVERTKIT_FORM_ID`, already in
-     Vercel per project_summary) handles subscribe + tagging directly —
-     the simpler option until the backend needs to own it.
+- ✅ **P0 resolved (2026-07-19): subscribe now goes direct to Kit.**
+  Production subscribe was 503ing because the Railway backend's newsletter
+  service is unconfigured (pre-existing). Fix shipped in code: the subscribe
+  route now posts **directly to Kit** (`CONVERTKIT_API_KEY` +
+  `CONVERTKIT_FORM_ID` in Vercel) and only proxies to Railway when
+  `SUBSCRIBE_VIA_BACKEND=true` is explicitly set. `BACKEND_API_URL` stays in
+  Vercel untouched — it also powers usage tracking, deep research, and the
+  contact proxy. To hand subscribe back to the backend later: configure
+  ConvertKit there, add `tags: string[]` support to its `/v1/subscribe`,
+  then set `SUBSCRIBE_VIA_BACKEND=true`.
 - ⏳ Everything in §0 below is owner setup that code cannot do (Kit tags,
   LS store, discount codes, booking URL, LinkedIn URL).
 
