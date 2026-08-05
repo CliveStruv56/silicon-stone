@@ -94,3 +94,6 @@ __pycache__/
 /public/sw.js
 /public/sw.js.map
 /public/swe-worker*
+
+# Local design/reference drops — not site assets
+/Images/
