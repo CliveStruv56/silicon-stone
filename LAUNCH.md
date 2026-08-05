@@ -36,6 +36,18 @@ Vercel env change + redeploy — never a code edit.
 - ⏳ Everything in §0 below is owner setup that code cannot do (Kit tags,
   LS store, discount codes, booking URL, LinkedIn URL).
 
+**Re-verified 2026-08-05** (no owner steps taken since; step 1 still blocks the
+other eight):
+
+- Pre-launch state unchanged and correct — `/products/ai-act-toolkit` serves
+  8× "Request Early Access" and zero checkout links.
+- `NEXT_PUBLIC_BOOKING_URL` still unset: `/advisory` shows the "Book a
+  25-minute conversation" CTA with no calendar link behind it.
+- Plausible **is** live (`script.tagged-events.js` served on production).
+- The product files in §0 are **already built** — see the paths added below.
+- The Kit 401 has not been re-tested since 2026-07-19; assume unchanged until
+  the v4 key is swapped.
+
 ## Go-live quick reference (the whole process in order)
 
 1. Fix the P0 above: set a valid **Kit v4 API key** as `CONVERTKIT_API_KEY`
@@ -90,16 +102,25 @@ Vercel env change + redeploy — never a code edit.
 Create **three one-time products** (LS is Merchant of Record — UK/EU VAT is
 handled by LS; there is deliberately no tax logic in the site):
 
-- [ ] **AI Audit Checklist Pack — £24.** Attach the deliverable files
-      (2 spreadsheets + 2 PDFs) so LS's native order email delivers them.
-- [ ] **AI Act Compliance Toolkit — Standard — £79.** Attach PDF guide +
-      AI Systems Register + Compliance Tracker.
-- [ ] **AI Act Compliance Toolkit — Professional — £149.** Same files plus the
-      30-minute video walkthrough (file or unlisted link in the delivery note).
-- [ ] Set each product's **receipt / redirect ("Continue") URL**:
-  - Checklist → `https://siliconandstone.com/products/success?product=checklist`
-  - Toolkit Standard → `https://siliconandstone.com/products/success?product=toolkit-standard`
-  - Toolkit Professional → `https://siliconandstone.com/products/success?product=toolkit-pro`
+The files are **already built** and live in `deliverables/dist/` (gitignored —
+regenerate with `deliverables/src/assemble-toolkit.mjs` and
+`build-spreadsheets.mjs`; the sources are committed):
+
+- [ ] **AI Audit Checklist Pack — £24.** Attach `Quick Compliance Gap
+      Analysis.pdf`, `Board-Ready Risk Summary.pdf`, `Vendor Dependency
+      Scorecard.xlsx`, `AI Systems Inventory Template.xlsx` (the 2 PDFs +
+      2 spreadsheets) so LS's native order email delivers them.
+- [ ] **AI Act Compliance Toolkit — Standard — £79.** Attach `AI Act Compliance
+      Toolkit.pdf` + `AI Systems Register.xlsx` + `Compliance Tracker.xlsx`.
+- [ ] **AI Act Compliance Toolkit — Professional — £149.** Same three files plus
+      the 30-minute video walkthrough — **not yet recorded**; this is the only
+      product asset still missing (file or unlisted link in the delivery note).
+- [ ] Set each product's **receipt / redirect ("Continue") URL**. Use the **`www`
+      host** — `src/lib/site.ts` makes `www` canonical and the apex 307s to it,
+      so an apex URL adds a redirect hop through the payment callback:
+  - Checklist → `https://www.siliconandstone.com/products/success?product=checklist`
+  - Toolkit Standard → `https://www.siliconandstone.com/products/success?product=toolkit-standard`
+  - Toolkit Professional → `https://www.siliconandstone.com/products/success?product=toolkit-pro`
 - [ ] Copy each **checkout link** into:
   - `NEXT_PUBLIC_LEMONSQUEEZY_CHECKLIST_URL`
   - `NEXT_PUBLIC_LEMONSQUEEZY_TOOLKIT_STANDARD_URL`
@@ -113,7 +134,7 @@ handled by LS; there is deliberately no tax logic in the site):
 ### Lemon Squeezy — webhook
 
 - [ ] Settings → Webhooks → URL
-      `https://siliconandstone.com/api/webhooks/lemonsqueezy`, events at least
+      `https://www.siliconandstone.com/api/webhooks/lemonsqueezy`, events at least
       `order_created`, signing secret into `LEMONSQUEEZY_WEBHOOK_SECRET`.
       (The route verifies HMAC signatures and is idempotent; on
       `order_created` it tags the buyer in Kit by variant ID.)

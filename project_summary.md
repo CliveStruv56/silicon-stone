@@ -4,7 +4,7 @@
 > Last Updated: 2026-08-05
 > Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (71 static pages), 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
-**Current State**: Full-featured intelligence portal live at siliconandstone.com. Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools (email-gated for lead capture, AI Act triage engine recently overhauled), product/commerce pages with an early-access enquiry fallback until Lemon Squeezy checkout URLs are configured, Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Awaiting Lemon Squeezy store setup, Plausible account, and content publishing for queued drafts.
+**Current State**: Full-featured intelligence portal live at siliconandstone.com. Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools (email-gated for lead capture, AI Act triage engine recently overhauled), product/commerce pages with an early-access enquiry fallback until Lemon Squeezy checkout URLs are configured, Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production. **The blocker is a P0: the production Kit API key is a legacy v3 key, so `/api/subscribe` 401s and — because `NEXT_PUBLIC_PRE_LAUNCH` is still `true`, making every product CTA an email capture — the entire funnel currently terminates in a failed POST.** Beyond that: Lemon Squeezy store not yet created, 9 drafts unpublished, and 7 of 12 published articles still lack cover images. Go-live sequence lives in `LAUNCH.md`; defects and debt in §10.
 
 ---
 
@@ -373,6 +373,45 @@ blockers in `LAUNCH.md` are untouched and still owner-side.
   **71 static pages** (the doc's "58 pages" figure was stale too). Audit
   re-baselined at 24 — see §10; the remainder is the Sanity v4 CLI/export
   subtree and clears at the Next 16 upgrade.
+### August 5, 2026 — §10/§11 reconciled against production and the live dataset
+
+The known-issues and priorities sections had drifted far enough to be
+misleading. Every row was re-verified against production HTTP and GROQ queries
+on the live dataset rather than edited in place. `LAUNCH.md` is now declared the
+single source of truth for launch state, and §10/§11 no longer duplicate it.
+
+**Corrections found by verification:**
+
+- **Plausible is live**, not "not configured" — `plausible.io/js/script.tagged-events.js`
+  is served on production, so `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` is set.
+- **The "legacy articles have no categories" issue is gone** — GROQ across drafts
+  and published returns zero articles with an empty `categories[]`.
+- **Drafts have grown 2 → 9**, not the two recorded in May, and 8 of the 9 have no
+  image. Several are time-sensitive.
+- **7 of 12 published articles have no `mainImage`** — a live-site quality issue the
+  old doc understated as a soft "upload real images" line.
+- **`article.gate` is set on zero articles** — the Phase 3 monetisation ladder
+  shipped 2026-07-17 and no content uses it.
+- **The persona-backfill blocker was stale** — it cited the schema-deploy gap that
+  was resolved on 2026-05-21; the work is simply undone, and MCP can now do it.
+- **"Automated Tests" and "CI/CD Pipeline" were still listed as future work** while
+  §10 recorded both as resolved on 2026-06-10. `.github/workflows/check.yml` runs
+  check + test + four invariant suites + `test:pwa` + `next build`.
+- **Digital products were listed as unwritten** — they are built and sitting in
+  `deliverables/dist/` (toolkit PDF, 4 spreadsheets, 2 PDFs).
+- **`LAUNCH.md` gave the Lemon Squeezy redirect + webhook URLs on the apex host**
+  while `src/lib/site.ts` makes `www` canonical (locked in the SEO sprint) — a
+  needless redirect hop through a payment callback. Corrected in `LAUNCH.md`.
+- Confirmed still true: pre-launch flags on (8× "Request Early Access" on
+  `/products/ai-act-toolkit`, zero checkout links), `NEXT_PUBLIC_BOOKING_URL`
+  unset, legacy `methodologyPillars` on exactly 2 documents, 3 `product` docs
+  seeded, 5 personas incl. Troy.
+
+The Kit 401 was promoted to an explicit **P0** row: with `NEXT_PUBLIC_PRE_LAUNCH`
+true every product CTA is an email capture, so a broken subscribe endpoint means
+the whole site converts nothing. Resolved items older than a month were dropped
+from §10 — git history holds them.
+
 ### August 5, 2026 — Repo hygiene: gitignore, eslint scope, untracked specs
 
 - **`.gitignore` hygiene.** The working tree had 41 uncommitted entries, most of
@@ -1099,61 +1138,92 @@ Implementing `docs/site-revision-spec.md` — re-orienting the site around a rec
 
 ## 10. Known Issues / Technical Debt
 
+Re-verified against production and the live Sanity dataset on **2026-08-05**.
+Resolved items older than a month have been dropped — git history holds them.
+
+**Launch configuration is not tracked here.** `LAUNCH.md` is the single source of
+truth for everything blocking go-live (Kit key + tag IDs, Lemon Squeezy store,
+discount codes, booking URL, LinkedIn URL). This table is for defects and debt.
+
 | Issue | Notes | Priority |
 |-------|-------|----------|
-| Legacy articles have no categories | Anything generated before commit `d8c4875` has empty `categories[]` and won't appear on `/analysis/category/*` pages. Backfill manually in Studio or via a one-off script. | Medium |
-| ~~Sanity schema not fully deployed to manifest~~ **RESOLVED** | Resolved 2026-05-21: `npx sanity schema deploy` ran during the image-library work — the hosted manifest now carries all 8 types (`article`, `author`, `category`, `persona`, `siteSettings`, `youtubeScript`, `assetCollection`, `libraryImage`). MCP writes against all types now work. | — |
-| Inoreader redirect URI | Still points to localhost — user needs to update in Inoreader dev portal to `https://siliconandstone.com/api/auth/callback/inoreader` | Medium |
-| Lemon Squeezy not configured | Checkout env vars not yet set (no store created); paid-product buttons route to the early-access enquiry fallback | Medium |
-| Plausible not configured | Script deployed but env var not set (no account created) | Medium |
-| ConvertKit/Kit not configured + lead-tag segmentation pending | Contact + subscribe forms post to `/api/contact` (proxy to `BACKEND_API_URL` and/or Kit), but `CONVERTKIT_API_KEY`/`CONVERTKIT_FORM_ID` are not set in production. **When set up:** create a segment/automation filtering on the contact `interest` value — at least **"EU Exposure Briefing"** (US-inbound, from `/eu-exposure`) and **"Drift Retainer"** — so high-intent leads route separately. Tags are captured now but unfiltered. See auto-memory `project_eu_exposure_lead_tagging`. | Medium |
-| Draft articles unpublished | Verified via GROQ 2026-05-20: 10 articles published, 2 still in draft — *Iran Conflict Reshapes European Semiconductor Supply Chains* (`drafts.1344add1-…`) and *Gulf Tensions and Your Phone Bill* (`drafts.b7326125-…`). Both need cover images before publishing in Studio. | Medium |
-| Atlantic Drift Briefing PDF unwritten | Lead magnet referenced in the Welcome Pack and required before YouTube launch. Outline now drafted at `docs/atlantic-drift-briefing-outline.md`; full PDF still to write. | Medium |
-| Sanity persona docs hold short version | Persona documents in Sanity carry shorter pain-points / content-needs than `docs/persona-profiles.md`. MCP backfill blocked by the schema-deploy gap above; can be done manually in Studio or after schema deploy. | Low |
-| Legacy methodologyPillars on 2 articles | Verified via GROQ 2026-05-20: only 2 documents still hold legacy 4-lens slugs — the published *Atlantic Fault Lines Deepen* (`2oGVswEwQBfyYUvi889ioS`, `policy-stress-testing`) and the draft *Iran Conflict Reshapes…* (`drafts.1344add1-…`, `supply-chain-forensics`). All other articles with pillars are on the new 6-cell vocabulary. `MethodologyChecklist` normalises legacy slugs at render via a legacy map so the UI is never blank; backfill these 2 in Studio to retire the map. | Medium |
+| **Kit API key invalid — nothing on the site can capture a lead** | Production `/api/subscribe` returns Kit **401 "The API key is invalid"**; the stored `CONVERTKIT_API_KEY` is a legacy v3 key and `api.kit.com/v4` needs a v4 key. Because `NEXT_PUBLIC_PRE_LAUNCH` is `true`, *every* product CTA is an early-access email capture — so the entire funnel currently terminates in a failed POST. Verified still pre-launch on 2026-08-05: `/products/ai-act-toolkit` serves 8× "Request Early Access" and zero checkout links. Code side is done; this is one Vercel env var. Fix + verification steps in `LAUNCH.md` "Current state". | **P0** |
+| 7 of 12 published articles have no cover image | Verified via GROQ 2026-08-05 — `mainImage` is undefined on `welcome-to-silicon-and-stone`, `atlantic-fault-lines-us-tech-policy-eu-autonomy`, `tariff-enforcement-collision`, `semiconductor-testing-bottleneck-ai-accelerators`, `korean-memory-fab-capacity-squeeze-2027`, `greenland-critical-minerals-transatlantic-scramble`, `open-source-sovereignty`. Placeholders render on the live site and in OG cards. The Studio has image-prompt suggestions + a media library to speed this up. | **High** |
+| 9 unpublished drafts, 8 of them without images | Verified 2026-08-05: drafts have grown from 2 (May) to **9** while publishing stalled — GPAI enforcement, EU Chips Act mid-point, China mineral licences, the token-bill piece, Fable 5 shutdown (the only one with an image), open-source exemption, GPT-5.6 two-tier market, plus the two long-standing Iran/Gulf drafts. Several are time-sensitive and decaying. | **High** |
+| `article.gate` configured on zero articles | The PWA Phase 3 `Gate` component (email / commerce / lead) shipped 2026-07-17 but **no article document sets `gate`**, so the whole ladder falls back to `auto` → newsletter. The monetisation surface exists in code and is unused in content. | Medium |
+| Docs use the apex host, but `www` is canonical | `SITE_URL` in `src/lib/site.ts` is `https://www.siliconandstone.com` — canonical host = www was locked during the SEO sprint (commit `b599df1`), and the apex 307s to it. That is correct behaviour; the defect is that `LAUNCH.md` §0 gave the Lemon Squeezy redirect targets and webhook URL on the **apex**, adding a needless redirect hop through a payment callback. Corrected in `LAUNCH.md` on 2026-08-05; prose elsewhere still says "siliconandstone.com" informally, which is harmless. | Low |
+| Inoreader redirect URI still localhost | `http://localhost:3000/api/auth/callback/inoreader` in the Inoreader dev portal. Research-pipeline OAuth therefore cannot complete in production; it works locally. Change to `https://www.siliconandstone.com/api/auth/callback/inoreader`. | Medium |
+| Atlantic Drift Briefing PDF unwritten | Lead magnet referenced in the Welcome Pack and required before YouTube launch. Outline at `docs/atlantic-drift-briefing-outline.md`; full PDF still to write. Note the *product* deliverables (toolkit, spreadsheets, checklist) **are** built — `deliverables/dist/`. | Medium |
+| Legacy `methodologyPillars` on 2 articles | Re-verified 2026-08-05, unchanged: published *Atlantic Fault Lines Deepen* (`2oGVswEwQBfyYUvi889ioS`, `policy-stress-testing`) and draft *Iran Conflict Reshapes…* (`drafts.1344add1-…`, `supply-chain-forensics`). `MethodologyChecklist` normalises legacy slugs at render, so the UI is never blank; backfill these 2 in Studio to retire the legacy map. | Medium |
+| Sanity persona docs hold the short version | Re-verified 2026-08-05: all 5 personas carry a one-sentence `painPoints` string vs the fuller treatment in `docs/persona-profiles.md`. The old blocker ("MCP writes blocked by the schema-deploy gap") is **stale** — schema deploy was resolved 2026-05-21, so this is now simply undone, and MCP `patch_documents` can do it. | Low |
 | Transitive npm audit findings (Sanity v4 toolchain + sharp) | Re-baselined 2026-08-05 at **24 findings** (1 critical, 13 high, 9 moderate, 1 low) after the direct Next.js and PostCSS advisories were patched. The remainder is structural: `sanity@4` pulls its own CLI/export toolchain into the production tree (`@sanity/cli` → `@sanity/runtime-cli` → adm-zip; `@sanity/export` → tar; `@sanity/template-validator` → undici; `preferred-pm` → js-yaml), none of which is reachable from a served route. Also `sharp` (libvips CVEs, fixed in ≥0.35 but Next 15.5 declares `^0.34.3`) and `ws` via `openai`/`exa-js`. **Do not run `npm audit fix --force`** — the only fix npm offers is `next@16`, forbidden by the Sanity v4 pin. Clears at the Next 16 / Sanity v5 upgrade. | Medium |
-| Markdown-to-PDF pipeline | `scripts/render-briefing-pdf.ts` + `npm run render-briefing` render lead-magnet / Intelligence Series PDFs. Committed 2026-05-20 (`21eb123`; overwrite-guard `570ab13`). `puppeteer` / `marked` / `gray-matter` are devDependencies — `puppeteer` pulls ~170MB Chromium on install. Dev-only, never invoked by Vercel/Railway. Docs: `docs/markdown-to-pdf-pipeline.md`. | Info |
-| Studio reference-array UX trap | Clicking "Add item" in a Sanity reference array and saving without picking a doc leaves an orphan row (`_type`/`_key` but no `_ref`). One of these was found and cleaned up on the Helium article draft on 2026-04-14. | Low |
-| ~~No unit tests for app logic~~ **RESOLVED** | Resolved 2026-06-10: vitest suite (54 specs, `npm test`) covers the AI Act engine, slug/redirect utils, log redaction, and the markdown→Portable Text converter; runs in CI alongside the four invariant suites, and CI now also runs `next build`. | — |
-| ~~Legacy slug renames awaiting sign-off~~ **RESOLVED** | Resolved 2026-06-10: Clive approved the recommended slugs; all 7 renamed in Sanity + 301s live in `ARTICLE_SLUG_REDIRECTS` (explicit 301, matching the Phase B convention). Verified on production: old→new 301s, new URLs 200, sitemap + canonicals updated. Optional: GSC reindex request for the 7 new URLs. | — |
+| `dist/static/*.create-schema.json` accumulates | One hash-named artifact per `npx sanity schema deploy`, all tracked in git, ~580KB so far and unbounded. Decide whether to keep them under version control or gitignore the directory. | Low |
+| Markdown-to-PDF pipeline | `scripts/render-briefing-pdf.ts` + `npm run render-briefing` render lead-magnet / Intelligence Series PDFs. `puppeteer` / `marked` / `gray-matter` are devDependencies — `puppeteer` pulls ~170MB Chromium on install. Dev-only, never invoked by Vercel/Railway. Docs: `docs/markdown-to-pdf-pipeline.md`. | Info |
+| Studio reference-array UX trap | Clicking "Add item" in a Sanity reference array and saving without picking a doc leaves an orphan row (`_type`/`_key` but no `_ref`). One was found and cleaned up on the Helium article draft on 2026-04-14. | Low |
+
+**Resolved since the last review** (2026-08-05 verification):
+
+- ~~Legacy articles have no categories~~ — GROQ across drafts **and** published now
+  returns **zero** articles with an empty `categories[]`. Backfilled at some point
+  between May and now; the `/analysis/category/*` pages are fully populated.
+- ~~Plausible not configured~~ — `plausible.io/js/script.tagged-events.js` is live
+  on production, so `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` is set. Account exists with
+  goals configured (user-confirmed 2026-07-17). Outstanding: confirm the Phase 3
+  goal names (`Gate Impression`, `Email Capture`, `Product View`, `Advisory Lead`,
+  `Push Opt In`) and the three in `LAUNCH.md` §3 exist by exact name.
+- ~~Sanity schema not fully deployed to manifest~~ — resolved 2026-05-21.
+- ~~No unit tests for app logic~~ — 58 specs across 5 files, green.
+- ~~No CI gates~~ — `.github/workflows/check.yml` runs `npm run check`, `npm test`,
+  four invariant suites, `test:pwa`, and `next build` on every push.
+- ~~Legacy slug renames awaiting sign-off~~ — resolved 2026-06-10, 301s live.
 
 ---
 
 ## 11. What's Next (Current Priorities)
 
-### Priority 1: User Configuration (No Code Changes Needed)
+### Priority 0 — Go-live: see `LAUNCH.md`
 
-| Task | Status | Description |
-|------|--------|-------------|
-| **Update Inoreader redirect URI** | Pending | Change to `https://siliconandstone.com/api/auth/callback/inoreader` in Inoreader dev portal |
-| **Create Lemon Squeezy store** | Pending | Create store, 3 products, add checkout URLs as env vars in Vercel |
-| **Set up Plausible** | Pending | Sign up, add site, create 6 custom event goals, add `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` env var in Vercel |
-| **Publish content** | Pending | Move draft articles to published in Sanity Studio, add cover images |
+**`LAUNCH.md` is the single source of truth for launch state.** It carries the
+ordered go-live sequence, the 14 Kit tag→env mappings, the Lemon Squeezy product
+/ variant / webhook / discount setup, and launch-day verification. Do not
+duplicate that checklist here — this section only records what is *not* covered
+there.
 
-### Priority 2: Content & Growth
+The one-line status: **blocked at step 1 of 9** — the invalid Kit v4 API key.
+Nothing downstream matters until email capture works.
 
-| Task | Description |
-|------|-------------|
-| **Create digital products** | Write/assemble the actual Toolkit PDF, spreadsheets, and Checklist pack files |
-| **Article cover images** | Upload real images to articles in Sanity (placeholders show until then) |
-| **Consulting booking** | Embed Calendly or Cal.com on Services page |
-
-### Priority 3: Premium Tier (Future)
+### Priority 1 — Content (the actual bottleneck)
 
 | Task | Description |
 |------|-------------|
-| **Authentication** | Supabase Auth with social login for premium content access |
-| **Subscription billing** | Recurring subscription for premium content tier |
-| **Content gating** | Audit-tier articles locked for non-subscribers |
+| **Cover images for 7 published articles** | Live-site quality issue; see §10. Studio has image-prompt suggestions + media library. |
+| **Publish or kill the 9 drafts** | Several are time-sensitive (GPAI enforcement, Chips Act mid-point) and decay with every week. |
+| **Wire `article.gate` on published articles** | The Phase 3 ladder is shipped but unused — pick commerce gates for the toolkit-adjacent pieces and lead gates for the advisory-adjacent ones. |
+| **Atlantic Drift Briefing PDF** | Outline exists; required before YouTube launch. |
+
+### Priority 2 — Config not covered by LAUNCH.md
+
+| Task | Description |
+|------|-------------|
+| **Inoreader redirect URI** | Update the dev portal to the production callback so research OAuth works outside localhost. |
+| **VAPID keys for Web Push** | `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` — Phase 3 push is code-complete but cannot send until these are set and verified on a real device. |
+| **Confirm Plausible goal names** | Phase 3 + `LAUNCH.md` §3 events must exist by exact name (with spaces) to register. |
+
+### Priority 3 — Premium tier (future)
+
+| Task | Description |
+|------|-------------|
+| **PWA P3-4 / P3-5** | Checkout + fulfilment and the paid content-licence unlock. Hard-blocked on the Lemon Squeezy store existing; runbook in `docs/lemonsqueezy-setup.md`. |
+| **Authentication** | Supabase Auth with social login for premium content access. |
+| **Subscription billing** | Recurring subscription for the premium content tier. |
 
 ### Future Enhancements
 
 | Task | Description |
 |------|-------------|
-| **Sanity v5 Upgrade** | When Next.js 16 is stable (all packages together) |
-| **Advanced Search** | Faceted search with filters |
-| **Automated Tests** | Test suite implementation |
-| **CI/CD Pipeline** | Add test/lint gates before deploy |
+| **Sanity v5 / Next 16 upgrade** | All packages together when Next.js 16 is stable. Also clears the remaining npm audit tree (§10). |
+| **Advanced search** | Faceted search with filters. |
+| **`sharp` ≥0.35** | Blocked until Next declares a compatible range; closes the last non-Sanity audit finding. |
 
 ---
 
@@ -1192,13 +1262,14 @@ When starting a new Claude Code session:
 1. **Read this document first** for full context
 2. **The app builds cleanly** — `npm run build` should produce 71 static pages, 0 errors
 3. **24 npm audit findings** (1 critical / 13 high / 9 moderate / 1 low, as of 2026-08-05) — all in the Sanity v4 toolchain subtree (CLI/export code, not reachable from served routes) plus `sharp` and `ws`. Do not run `npm audit fix --force`; npm proposes `next@16`, which the Sanity v4 pin forbids. Anything new on top of this baseline is real.
-4. **All APIs are working** — Anthropic, Exa, Inoreader, Sanity, ConvertKit
+4. **APIs**: Anthropic, Exa, Sanity, Pinecone working. **Kit is 401ing in production** (legacy v3 key — see §10 P0). **Inoreader** OAuth cannot complete in production (redirect URI still localhost); it works locally.
 5. **Admin password** is deployment-specific and must not be committed or recorded in docs. `SESSION_SECRET` is required for signed admin sessions and must be 32+ characters.
 6. **Inoreader** is connected as `clive4` (tokens in cookies, may need re-auth)
 7. **Do NOT upgrade Sanity to v5** until Next.js 16 is stable
-8. **Live at siliconandstone.com** — Vercel auto-deploys from main branch
-9. **Lemon Squeezy** — early-access enquiry fallback remains active until checkout URLs are configured
-10. **Plausible** — script deployed but may not yet have account/env var configured
+8. **Live at siliconandstone.com** — Vercel auto-deploys from main branch; note the apex 307s to `www.siliconandstone.com`
+9. **Lemon Squeezy** — no store yet; `NEXT_PUBLIC_PRE_LAUNCH=true` keeps every product CTA on the early-access capture (verified live 2026-08-05)
+10. **Plausible** — live on production (`script.tagged-events.js` served); confirm the Phase 3 goal names exist by exact name
+11. **`LAUNCH.md` is the single source of truth for launch state** — §10/§11 here deliberately do not duplicate its checklist
 
 ### Quick Verification
 
