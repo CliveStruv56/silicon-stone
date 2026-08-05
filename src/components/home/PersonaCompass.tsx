@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
+import { motion, useReducedMotion } from 'framer-motion'
 import { StaggerContainer, StaggerItem } from '@/components/ui/StaggerContainer'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
@@ -11,11 +12,11 @@ import { PERSONAS, BRIEFINGS_PERSONA_ORDER, type PersonaSlug } from '@/lib/perso
 // Complete class literals per persona accent token — Tailwind v4 only emits
 // classes it can see as whole strings, so these are never interpolated.
 const borderMap: Record<string, string> = {
-  'silicon-amber': 'border-silicon-amber/30 hover:border-silicon-amber/70',
-  'stone-teal': 'border-stone-teal/30 hover:border-stone-teal/70',
-  'tier-pulse': 'border-silicon-cyan/30 hover:border-silicon-cyan/70',
-  'text-muted': 'border-border-subtle hover:border-text-muted/60',
-  'troy-blue': 'border-troy-blue/30 hover:border-troy-blue/70',
+  'silicon-amber': 'border-silicon-amber/40 hover:border-silicon-amber/80',
+  'stone-teal': 'border-stone-teal/40 hover:border-stone-teal/80',
+  'tier-pulse': 'border-silicon-cyan/40 hover:border-silicon-cyan/80',
+  'text-muted': 'border-text-muted/30 hover:border-text-muted/60',
+  'troy-blue': 'border-troy-blue/40 hover:border-troy-blue/80',
 }
 
 const ringMap: Record<string, string> = {
@@ -34,19 +35,32 @@ const textMap: Record<string, string> = {
   'troy-blue': 'text-troy-blue',
 }
 
-// Where each persona sits on the desktop compass: north, east, south-east,
-// south-west, west — reading clockwise from the top, as the source diagram does.
-const placement: Record<PersonaSlug, string> = {
-  clara: 'lg:col-start-2 lg:row-start-1',
-  ian: 'lg:col-start-3 lg:row-start-2',
-  sofia: 'lg:col-start-3 lg:row-start-3',
-  citizen: 'lg:col-start-1 lg:row-start-3',
-  troy: 'lg:col-start-1 lg:row-start-2',
+/**
+ * Desktop compass geometry. The five nodes sit on a true pentagon — 72° apart,
+ * starting due north — so they read as orbiting the hub rather than as a grid
+ * with one card parked on top. Offsets are pre-computed rather than derived at
+ * runtime so Tailwind sees complete class strings.
+ *
+ *   x = R·sin θ, y = −R·cos θ, with R = 350
+ *
+ * Vertical offsets are absolute rather than `50% ± y` because the pentagon is
+ * taller above the hub than below it; anchoring to a fixed centre (505px in a
+ * 970px box) keeps the slack even top and bottom.
+ */
+const orbit: Record<PersonaSlug, string> = {
+  clara: 'lg:left-1/2 lg:top-[155px]',
+  ian: 'lg:left-[calc(50%+333px)] lg:top-[397px]',
+  sofia: 'lg:left-[calc(50%+206px)] lg:top-[788px]',
+  citizen: 'lg:left-[calc(50%-206px)] lg:top-[788px]',
+  troy: 'lg:left-[calc(50%-333px)] lg:top-[397px]',
   positional: '',
 }
 
-/** Ray bearings in degrees clockwise from north, matching `placement`. */
-const RAY_ANGLES = [0, 90, 140, 220, 270]
+/** Ray bearings in degrees clockwise from north, matching `orbit`. */
+const RAY_ANGLES = [0, 72, 144, 216, 288]
+
+/** Compass tick marks every 15°, with the cardinals drawn longer. */
+const TICKS = Array.from({ length: 24 }, (_, i) => i * 15)
 
 function PersonaNode({ slug }: { slug: PersonaSlug }) {
   const persona = PERSONAS[slug]
@@ -54,11 +68,14 @@ function PersonaNode({ slug }: { slug: PersonaSlug }) {
   return (
     <Link
       href={`/intelligence?persona=${slug}`}
-      className={cn('group block h-full lg:h-auto', placement[slug])}
+      className={cn(
+        'group block h-full lg:absolute lg:h-auto lg:w-[270px] lg:-translate-x-1/2 lg:-translate-y-1/2',
+        orbit[slug],
+      )}
     >
       <div
         className={cn(
-          'mx-auto flex h-full w-full max-w-[290px] flex-col items-center rounded-lg border bg-stone-charcoal p-5 text-center transition-all duration-300 hover:-translate-y-1 lg:h-auto',
+          'mx-auto flex h-full w-full max-w-[290px] flex-col items-center rounded-3xl border bg-stone-charcoal p-5 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md lg:h-[310px] lg:max-w-none',
           borderMap[persona.color] ?? borderMap['text-muted'],
         )}
       >
@@ -68,54 +85,117 @@ function PersonaNode({ slug }: { slug: PersonaSlug }) {
           width={96}
           height={96}
           className={cn(
-            'h-24 w-24 rounded-md border-2 object-cover',
+            'h-24 w-24 rounded-2xl border-2 object-cover',
             ringMap[persona.color] ?? ringMap['text-muted'],
           )}
         />
 
-        <h3 className="mt-4 text-base font-semibold leading-tight text-text-primary">
+        <h3 className="mt-4 text-lg font-semibold leading-tight text-text-primary">
           {persona.name}
         </h3>
-        <div className="mt-1.5 font-mono text-[11px] uppercase leading-tight tracking-[0.08em] text-text-muted">
+        <div className="mt-1.5 font-mono text-[11.5px] uppercase leading-tight tracking-[0.08em] text-text-muted">
           {persona.role}
         </div>
 
-        <p className="mt-3 text-xs leading-relaxed text-text-muted">
+        <p className="mt-3 text-sm leading-relaxed text-text-muted">
           {persona.description}.
         </p>
 
         <div
           className={cn(
-            'mt-auto flex items-center gap-1 pt-4 text-xs lg:mt-4 lg:pt-0',
+            'mt-auto flex items-center gap-1 pt-4 text-sm',
             textMap[persona.color] ?? textMap['text-muted'],
           )}
         >
           <span>Explore</span>
-          <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+          <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
         </div>
       </div>
     </Link>
   )
 }
 
-/** The ring and its five outward arrows. Purely decorative. */
-function CompassRing() {
+/**
+ * The hub dial: a gridded face, bearing ticks, a slow-turning dashed outer ring
+ * and five arrows out to the nodes. Decorative — the hub's words are marked
+ * aria-hidden and the real heading lives in the section header.
+ */
+function CompassDial() {
+  const reduceMotion = useReducedMotion()
+
   return (
     <svg
       aria-hidden="true"
       viewBox="0 0 400 400"
       className="pointer-events-none absolute inset-0 h-full w-full"
     >
+      <defs>
+        <radialGradient id="hub-face" cx="50%" cy="42%" r="60%">
+          <stop offset="0%" stopColor="var(--silicon-amber)" stopOpacity="0.10" />
+          <stop offset="60%" stopColor="var(--stone-teal)" stopOpacity="0.06" />
+          <stop offset="100%" stopColor="var(--stone-teal)" stopOpacity="0" />
+        </radialGradient>
+        <pattern id="hub-grid" width="16" height="16" patternUnits="userSpaceOnUse">
+          <path
+            d="M16 0H0V16"
+            fill="none"
+            stroke="var(--stone-teal)"
+            strokeWidth="0.5"
+            opacity="0.18"
+          />
+        </pattern>
+      </defs>
+
+      {/* Face — gradient wash under a fine grid, echoing the persona portraits. */}
+      <circle cx="200" cy="200" r="135" fill="url(#hub-face)" />
+      <circle cx="200" cy="200" r="135" fill="url(#hub-grid)" />
+
+      {/* Bearing ticks, cardinals longer. */}
+      {TICKS.map((angle) => {
+        const cardinal = angle % 90 === 0
+        return (
+          <line
+            key={angle}
+            x1="200"
+            y1={200 - 135}
+            x2="200"
+            y2={200 - (cardinal ? 121 : 128)}
+            transform={`rotate(${angle} 200 200)`}
+            stroke="var(--stone-teal)"
+            strokeWidth={cardinal ? 2 : 1}
+            opacity={cardinal ? 0.6 : 0.3}
+            strokeLinecap="round"
+          />
+        )
+      })}
+
       <circle
         cx="200"
         cy="200"
-        r="145"
+        r="135"
         fill="none"
         stroke="var(--stone-teal)"
-        strokeWidth="3"
-        opacity="0.55"
+        strokeWidth="2.5"
+        opacity="0.6"
       />
-      {/* y = 200 − radius, so each ray runs outward from just beyond the ring. */}
+
+      {/* Slow-turning outer ring — held still when the visitor prefers reduced motion. */}
+      <motion.circle
+        cx="200"
+        cy="200"
+        r="155"
+        fill="none"
+        stroke="var(--stone-teal)"
+        strokeWidth="1.5"
+        strokeDasharray="2 10"
+        strokeLinecap="round"
+        opacity="0.45"
+        style={{ transformOrigin: '200px 200px' }}
+        animate={reduceMotion ? undefined : { rotate: 360 }}
+        transition={{ duration: 90, ease: 'linear', repeat: Infinity }}
+      />
+
+      {/* Arrows out to each node. y = 200 − radius. */}
       {RAY_ANGLES.map((angle) => (
         <g
           key={angle}
@@ -124,7 +204,7 @@ function CompassRing() {
           fill="var(--stone-teal)"
           opacity="0.75"
         >
-          <line x1="200" y1="47" x2="200" y2="22" strokeWidth="3" strokeLinecap="round" />
+          <line x1="200" y1="37" x2="200" y2="22" strokeWidth="2.5" strokeLinecap="round" />
           <polygon points="200,6 192,22 208,22" stroke="none" />
         </g>
       ))}
@@ -133,11 +213,10 @@ function CompassRing() {
 }
 
 /**
- * Persona routing rendered as a compass: the five taggable personas arranged
- * around a hub that carries the section title, stacking to a plain card list
- * below `lg` where a radial layout would be unreadable. Replaces the former
- * PersonaNavigator grid and sits inside the "Read" run of the page, between the
- * tier ladder and the tools gallery.
+ * Persona routing rendered as a compass: the five taggable personas orbit a hub
+ * that carries the section title, collapsing to a plain card list below `lg`
+ * where a radial layout would be unreadable. Sits inside the "Read" run of the
+ * page, between the tier ladder and the tools gallery.
  *
  * The heading lives in the hub on desktop. To keep one real `h2` in the
  * document, the header block above stays in the DOM and goes `sr-only` at `lg`,
@@ -179,31 +258,28 @@ export function PersonaCompass() {
         </StaggerItem>
 
         <StaggerItem>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:items-center lg:gap-x-6 lg:gap-y-8">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:relative lg:block lg:h-[970px]">
             {BRIEFINGS_PERSONA_ORDER.map((slug: PersonaSlug) => (
               <PersonaNode key={slug} slug={slug} />
             ))}
 
-            {/* Hub — centre cell on desktop only. Its fixed height sets the
-                middle row, so the ring never collides with the outer nodes. */}
-            <div className="hidden lg:col-start-2 lg:row-start-2 lg:flex lg:items-center lg:justify-center">
-              <div className="relative flex h-[420px] w-[420px] items-center justify-center">
-                <CompassRing />
-                <div className="max-w-[230px] px-4 text-center" aria-hidden="true">
-                  <p
-                    className="font-bold text-text-primary"
-                    style={{
-                      fontSize: 'clamp(24px, 2.2vw, 32px)',
-                      letterSpacing: '-0.02em',
-                      lineHeight: 1.1,
-                    }}
-                  >
-                    Find Your Perspective.
-                  </p>
-                  <p className="mt-3 text-sm leading-relaxed text-text-muted">
-                    Intelligence tailored to your seat at the table.
-                  </p>
-                </div>
+            {/* Hub — desktop only; below lg its words are carried by the header. */}
+            <div className="hidden lg:absolute lg:left-1/2 lg:top-[505px] lg:flex lg:h-[400px] lg:w-[400px] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:items-center lg:justify-center">
+              <CompassDial />
+              <div className="max-w-[240px] px-4 text-center" aria-hidden="true">
+                <p
+                  className="font-bold text-text-primary"
+                  style={{
+                    fontSize: 'clamp(28px, 2.6vw, 38px)',
+                    letterSpacing: '-0.02em',
+                    lineHeight: 1.08,
+                  }}
+                >
+                  Find Your Perspective.
+                </p>
+                <p className="mt-3 text-base leading-relaxed text-text-muted">
+                  Intelligence tailored to your seat at the table.
+                </p>
               </div>
             </div>
           </div>
@@ -214,7 +290,7 @@ export function PersonaCompass() {
         <StaggerItem>
           <Link
             href={PERSONAS.positional.href as string}
-            className="group mt-5 flex flex-col gap-2 rounded-lg border border-sister-indigo/40 bg-stone-charcoal p-4 transition-colors hover:border-sister-indigo/70 sm:flex-row sm:items-center sm:justify-between"
+            className="group mt-5 flex flex-col gap-2 rounded-2xl border border-sister-indigo/40 bg-stone-charcoal p-4 transition-colors hover:border-sister-indigo/70 sm:flex-row sm:items-center sm:justify-between"
           >
             <p className="text-sm leading-relaxed text-text-muted">
               <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-text-muted">
