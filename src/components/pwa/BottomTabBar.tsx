@@ -68,9 +68,17 @@ export function BottomTabBar() {
   useEffect(() => {
     try {
       const target = sessionStorage.getItem(NAV_FLAG);
-      if (target !== pathname) return;
+      // The flag is single-use: any navigation that isn't the awaited tab
+      // destination clears it. Otherwise an abandoned tab tap (tap Read, then
+      // go back before the feed renders) leaves the flag set for the rest of
+      // the session, and the next arrival at that path — an in-page link such
+      // as "Browse Briefings" — gets thrown down to a stale offset.
+      if (target === null) return;
       sessionStorage.removeItem(NAV_FLAG);
-      const stored = Number(sessionStorage.getItem(scrollKey(pathname)) ?? "0");
+      if (target !== pathname) return;
+      const key = scrollKey(pathname);
+      const stored = Number(sessionStorage.getItem(key) ?? "0");
+      sessionStorage.removeItem(key);
       requestAnimationFrame(() => window.scrollTo(0, stored));
     } catch {
       /* sessionStorage unavailable — plain navigation still works */

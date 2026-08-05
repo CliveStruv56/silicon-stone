@@ -31,7 +31,7 @@ export function CredibilityBlock() {
                 The View from the Edge
               </h2>
               <p className="font-mono text-xs uppercase tracking-[0.10em] text-silicon-amber">
-                Thirty years inside. Sixty miles north.
+                Clearer than the view from any centre.
               </p>
             </div>
           </StaggerItem>

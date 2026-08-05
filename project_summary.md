@@ -354,6 +354,32 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 5, 2026 — Homepage copy + UI polish pass
+
+Ten review notes from a live read-through of the homepage. Detail in
+`src/app/(admin)/context/homepage-redesign/CHANGELOG.md`; `COPY.md` updated to
+match on every copy row.
+
+- Copy: hero lede "Read from" → "Insights from thirty years inside the
+  industry"; View from the Edge subhead → "Clearer than the view from any
+  centre."; Stone Truth opens "Determine which side…"; §Decision Tools subhead
+  drops "in the first session".
+- Eyebrows brought onto the Read→Use→Buy→Engage pattern: "Read · subscription
+  tiers" and "Use · decision tools"; the §Decision Tools intro block is now
+  left-aligned like §Intelligence Tiers.
+- New `--silicon-amber-strong` token (`#8f4e17` light) + `font-semibold` fixes
+  the unreadable "5 MIN · THE STONE BRIEFING" label in light mode.
+- **Two real bugs found while doing it.** `calculateReadTime()` derived the tier
+  cards' read-time from the article *excerpt*, so every card rendered
+  "1 min read" — now fixed per-tier labels (`30 sec scan` / `5 min read` /
+  `Deep Dive`), with the `·` separator made conditional because these articles
+  have no `publishedAt`. And `BottomTabBar`'s `ss:tab-nav` flag was never
+  cleared on a non-matching arrival, so an abandoned tab tap left it set for the
+  session and the next arrival at `/intelligence` — including via "Browse
+  Briefings" — replayed a stale scroll offset. Flag is now single-use.
+- Verified: `npx tsc --noEmit`, `npm run lint`, `npm run build` (71 pages) all
+  clean; homepage walked in Playwright at 1280px and 390px, light and dark.
+
 ### August 5, 2026 — Security patch bump (Next.js + PostCSS)
 
 Maintenance after a 17-day quiet period. No product or copy changes; the launch

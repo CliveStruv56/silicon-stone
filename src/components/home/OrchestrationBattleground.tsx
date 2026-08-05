@@ -122,7 +122,7 @@ const fallbackStance02Bullets: ReactNode[] = [
 
 const fallbackStoneTruthBody: ReactNode = (
     <>
-        Read which side of the orchestration divide your industry sits on.{' '}
+        Determine which side of the orchestration divide your industry sits on.{' '}
         <em className="text-silicon-amber not-italic font-medium">
             The 2030 league table is being set there — not at the model layer where everyone else is looking.
         </em>{' '}

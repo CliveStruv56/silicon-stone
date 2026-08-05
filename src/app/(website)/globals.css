@@ -12,6 +12,7 @@
   --slate-deep: #efece4;      /* page background — warm stone */
   --stone-charcoal: #ffffff;  /* cards / panels */
   --silicon-amber: #b5651d;   /* burnt amber — accent that stays readable on light */
+  --silicon-amber-strong: #8f4e17; /* deeper amber for small text on amber-tinted fills */
   --stone-teal: #16615f;      /* deep weathered teal — links, accent */
   --text-primary: #14181f;    /* ink — primary text */
   --text-muted: #586072;      /* muted text — meta, secondary */
@@ -79,6 +80,7 @@
   --slate-deep: #0f141e;
   --stone-charcoal: #1c2330;
   --silicon-amber: #f0a33d;    /* phosphor amber glows on dark */
+  --silicon-amber-strong: #f0a33d; /* dark needs no extra depth — same phosphor amber */
   --stone-teal: #7fcbc4;       /* light teal — visible links on dark */
   --text-primary: #f5f1ea;
   --text-muted: #8b93a0;
@@ -132,6 +134,7 @@
   --color-slate-deep: var(--slate-deep);
   --color-stone-charcoal: var(--stone-charcoal);
   --color-silicon-amber: var(--silicon-amber);
+  --color-silicon-amber-strong: var(--silicon-amber-strong);
   --color-stone-teal: var(--stone-teal);
   --color-ink-on-accent: var(--ink-on-accent);
   --color-text-primary: var(--text-primary);

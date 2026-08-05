@@ -2,6 +2,44 @@
 
 > Track every change shipped as part of the 2026 homepage redesign here. Append-only.
 
+## 2026-08-05 — Homepage copy + UI polish pass
+
+Ten review notes from a live read-through. Copy, one contrast fix, one alignment
+fix, two wrong meta strings, and a scroll bug.
+
+- **Copy.** Hero lede `Read from thirty years inside…` → `Insights from thirty
+  years inside…`. §View from the Edge subhead `Thirty years inside. Sixty miles
+  north.` → `Clearer than the view from any centre.` (the stat cards below still
+  carry the 30 / 60 mi N figures, so the subhead no longer just repeats them).
+  Stone Truth body opens `Determine which side…` rather than `Read which side…`.
+  §Decision Tools subhead drops `in the first session`.
+- **Eyebrows now follow the Read→Use→Buy→Engage pattern** already used by
+  `Buy · self-serve products` / `Engage · advisory`: `Subscription Tiers` →
+  `Read · subscription tiers` (`IntelligenceTiers.tsx`), `Decision Tools` →
+  `Use · decision tools` (`ToolsGallery.tsx`). `COPY.md` updated to match.
+- **§Decision Tools intro block left-aligned** (`text-center max-w-2xl mx-auto`
+  → `max-w-3xl`, and `justify-center` off the CTA row) so the lozenge, H2,
+  subhead and both CTAs line up with §Intelligence Tiers above.
+- **`5 MIN · THE STONE BRIEFING` was unreadable in light mode** — amber `#b5651d`
+  on the featured card's own amber tint. New `--silicon-amber-strong` token
+  (`#8f4e17` light, unchanged `#f0a33d` dark) plus `font-semibold`; ~4.4:1 →
+  ~5.8:1.
+- **Tier card read-times were wrong for every article.** `calculateReadTime()`
+  derived minutes from the *excerpt* (~40 words), so every card rendered
+  `1 min read`. Replaced with fixed per-tier labels matching each card's own
+  timer heading: `30 sec scan` / `5 min read` / `Deep Dive`. Also made the `·`
+  separator conditional — these articles have no `publishedAt`, so the meta row
+  was rendering a dangling leading dot.
+- **`Browse Briefings` / `Browse Audits` could land part-way down
+  `/intelligence`.** Root cause in `BottomTabBar.tsx`: the `ss:tab-nav` flag was
+  only cleared when the arriving pathname matched it, so an abandoned tab tap
+  (tap Read, go back before the feed renders) left the flag set for the rest of
+  the session — and the next arrival at `/intelligence`, including via an
+  in-page link, replayed a stale saved offset. The flag is now single-use
+  (cleared on any pathname change) and the restored offset is consumed with it.
+  Verified: staged stale flag scrolled to 472px before, 0 after; genuine tab
+  restoration still works.
+
 ## 2026-06-02 — Homepage handoff reconciliation
 - Reconciled `COPY.md`, `SPEC.md`, `DESIGN-TOKENS.md`, and the redesign implementation skill with the shipped homepage.
 - §8 is now documented as a static phased-readiness strip rather than a preserved deadline countdown.

@@ -67,12 +67,13 @@ const tiers: Tier[] = [
   },
 ]
 
-function calculateReadTime(tier: TierKey, excerpt?: string): string | null {
-  if (tier === 'pulse') return '30 sec scan'
-  if (!excerpt) return null
-  const words = excerpt.trim().split(/\s+/).length
-  const minutes = Math.max(1, Math.round(words / 200))
-  return `${minutes} min read`
+// Fixed per-tier labels matching each card's own timer heading. These used to
+// be derived from the excerpt word count, which is ~40 words for every article
+// and so always rendered "1 min read".
+const READ_LABEL: Record<TierKey, string> = {
+  pulse: '30 sec scan',
+  briefing: '5 min read',
+  audit: 'Deep Dive',
 }
 
 export function IntelligenceTiers({
@@ -98,7 +99,7 @@ export function IntelligenceTiers({
               variant="outline"
               className="mb-6 border-silicon-amber/60 text-silicon-amber font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
             >
-              Subscription Tiers
+              Read · subscription tiers
             </Badge>
             <h2
               id="tiers-heading"
@@ -144,7 +145,9 @@ export function IntelligenceTiers({
                   >
                     <div
                       className={`font-mono text-[12.5px] tracking-[0.10em] uppercase mb-4 ${
-                        featured ? 'text-silicon-amber' : 'text-text-muted'
+                        featured
+                          ? 'text-silicon-amber-strong font-semibold'
+                          : 'text-text-muted'
                       }`}
                     >
                       {tier.timer}
@@ -169,14 +172,12 @@ export function IntelligenceTiers({
                           </h4>
                           <div className="flex items-center gap-2 text-xs font-mono text-text-muted">
                             {article.publishedAt && (
-                              <span>{formatDate(article.publishedAt, 'gb')}</span>
-                            )}
-                            {calculateReadTime(tier.key, article.excerpt) && (
                               <>
+                                <span>{formatDate(article.publishedAt, 'gb')}</span>
                                 <span aria-hidden="true">·</span>
-                                <span>{calculateReadTime(tier.key, article.excerpt)}</span>
                               </>
                             )}
+                            <span>{READ_LABEL[tier.key]}</span>
                           </div>
                         </Link>
                       ) : (

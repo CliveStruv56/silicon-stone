@@ -54,7 +54,7 @@
 |---|---|
 | `eyebrow` | `Brand Position` |
 | `h2` | `The View from the Edge` |
-| `subhead` | `Thirty years inside. Sixty miles north.` |
+| `subhead` | `Clearer than the view from any centre.` |
 
 ### Body — three paragraphs
 
@@ -128,7 +128,7 @@
 | Field | Value |
 |---|---|
 | `label` | `Stone Truth` |
-| `body` (italic on the second sentence) | Read which side of the orchestration divide your industry sits on. *The 2030 league table is being set there — not at the model layer where everyone else is looking.* |
+| `body` (italic on the second sentence) | Determine which side of the orchestration divide your industry sits on. *The 2030 league table is being set there — not at the model layer where everyone else is looking.* |
 
 ---
 
@@ -136,7 +136,7 @@
 
 | Field | Value |
 |---|---|
-| `eyebrow` | `Subscription Tiers` |
+| `eyebrow` | `Read · subscription tiers` |
 | `h2` | `Intelligence at Your Pace` |
 | `subhead` | `Three tiers. From a 30-second signal to a forensic deep dive.` |
 
@@ -194,9 +194,9 @@ This block sits below the persona navigator. WaymarkPath gets one row of visibil
 
 | Field | Value |
 |---|---|
-| `eyebrow` | `Decision Tools` |
+| `eyebrow` | `Use · decision tools` |
 | `h2` | `From Analysis to Action` *(or keep current `Execution Engines` — see SPEC.md §5 on rename)* |
-| `subhead` | `Four tools that solve high-stakes problems in the first session — calibrated against the same intelligence the briefings draw from.` |
+| `subhead` | `Four tools that solve high-stakes problems — calibrated against the same intelligence the briefings draw from.` |
 | `primaryPathway` | `Assess AI governance exposure` → `/tools/compliance-checker` |
 | `secondaryPathway` | `Map technology dependency` → `/tools/supply-chain-mapper` |
 

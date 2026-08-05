@@ -254,12 +254,12 @@ export function ToolsGallery() {
       <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8 lg:py-14">
         <StaggerContainer>
           <StaggerItem>
-            <div className="text-center max-w-2xl mx-auto mb-8">
+            <div className="max-w-3xl mb-8">
               <Badge
                 variant="outline"
                 className="mb-5 border-silicon-amber/60 text-silicon-amber font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
               >
-                Decision Tools
+                Use · decision tools
               </Badge>
               <h2
                 id="tools-heading"
@@ -273,11 +273,10 @@ export function ToolsGallery() {
                 From Analysis to Action
               </h2>
               <p className="text-base text-text-muted leading-relaxed">
-                Four tools that solve high-stakes problems in the first session
-                — calibrated against the same intelligence the briefings draw
-                from.
+                Four tools that solve high-stakes problems — calibrated against
+                the same intelligence the briefings draw from.
               </p>
-              <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
+              <div className="mt-7 flex flex-col gap-3 sm:flex-row">
                 <Link
                   href="/tools/supply-chain-mapper"
                   className="inline-flex items-center justify-center gap-1.5 rounded-md border border-stone-teal/60 bg-stone-teal/5 px-4 py-2 text-sm font-medium text-stone-teal transition-colors hover:bg-stone-teal/10"

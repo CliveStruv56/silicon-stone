@@ -152,7 +152,7 @@ export function HeroSection({ settings }: HeroSectionProps) {
                                 textShadow: '0 2px 20px rgba(0,0,0,0.5)',
                             }}
                         >
-                            Independent, decision-grade intelligence and advisory on AI governance, the technology supply chain, and the geopolitics of dependency — for leaders at mid-size UK and European companies who have to act without a Big-Four budget. Read from thirty years inside the industry.
+                            Independent, decision-grade intelligence and advisory on AI governance, the technology supply chain, and the geopolitics of dependency — for leaders at mid-size UK and European companies who have to act without a Big-Four budget. Insights from thirty years inside the industry.
                         </motion.p>
 
                         <motion.p
