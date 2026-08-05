@@ -41,18 +41,18 @@ const textMap: Record<string, string> = {
  * with one card parked on top. Offsets are pre-computed rather than derived at
  * runtime so Tailwind sees complete class strings.
  *
- *   x = R·sin θ, y = −R·cos θ, with R = 350
+ *   x = R·sin θ, y = −R·cos θ, with R = 320
  *
  * Vertical offsets are absolute rather than `50% ± y` because the pentagon is
- * taller above the hub than below it; anchoring to a fixed centre (505px in a
- * 970px box) keeps the slack even top and bottom.
+ * taller above the hub than below it; anchoring to a fixed centre (485px in a
+ * 910px box) keeps the slack even top and bottom.
  */
 const orbit: Record<PersonaSlug, string> = {
-  clara: 'lg:left-1/2 lg:top-[155px]',
-  ian: 'lg:left-[calc(50%+333px)] lg:top-[397px]',
-  sofia: 'lg:left-[calc(50%+206px)] lg:top-[788px]',
-  citizen: 'lg:left-[calc(50%-206px)] lg:top-[788px]',
-  troy: 'lg:left-[calc(50%-333px)] lg:top-[397px]',
+  clara: 'lg:left-1/2 lg:top-[165px]',
+  ian: 'lg:left-[calc(50%+304px)] lg:top-[386px]',
+  sofia: 'lg:left-[calc(50%+188px)] lg:top-[744px]',
+  citizen: 'lg:left-[calc(50%-188px)] lg:top-[744px]',
+  troy: 'lg:left-[calc(50%-304px)] lg:top-[386px]',
   positional: '',
 }
 
@@ -130,10 +130,10 @@ function CompassDial() {
       className="pointer-events-none absolute inset-0 h-full w-full"
     >
       <defs>
-        <radialGradient id="hub-face" cx="50%" cy="42%" r="60%">
-          <stop offset="0%" stopColor="var(--silicon-amber)" stopOpacity="0.10" />
-          <stop offset="60%" stopColor="var(--stone-teal)" stopOpacity="0.06" />
-          <stop offset="100%" stopColor="var(--stone-teal)" stopOpacity="0" />
+        <radialGradient id="hub-face" cx="50%" cy="38%" r="68%">
+          <stop offset="0%" stopColor="var(--silicon-amber)" stopOpacity="0.16" />
+          <stop offset="55%" stopColor="var(--stone-teal)" stopOpacity="0.10" />
+          <stop offset="100%" stopColor="var(--stone-teal)" stopOpacity="0.02" />
         </radialGradient>
         <pattern id="hub-grid" width="16" height="16" patternUnits="userSpaceOnUse">
           <path
@@ -141,16 +141,18 @@ function CompassDial() {
             fill="none"
             stroke="var(--stone-teal)"
             strokeWidth="0.5"
-            opacity="0.18"
+            opacity="0.20"
           />
         </pattern>
       </defs>
 
-      {/* Face — gradient wash under a fine grid, echoing the persona portraits. */}
+      {/* Face — a solid panel, then a gradient wash under a fine grid that
+          echoes the grid backdrop in the persona portraits. */}
+      <circle cx="200" cy="200" r="135" fill="var(--stone-charcoal)" />
       <circle cx="200" cy="200" r="135" fill="url(#hub-face)" />
       <circle cx="200" cy="200" r="135" fill="url(#hub-grid)" />
 
-      {/* Bearing ticks, cardinals longer. */}
+      {/* Bearing ticks, cardinals longer and amber. */}
       {TICKS.map((angle) => {
         const cardinal = angle % 90 === 0
         return (
@@ -159,31 +161,41 @@ function CompassDial() {
             x1="200"
             y1={200 - 135}
             x2="200"
-            y2={200 - (cardinal ? 121 : 128)}
+            y2={200 - (cardinal ? 119 : 127)}
             transform={`rotate(${angle} 200 200)`}
-            stroke="var(--stone-teal)"
-            strokeWidth={cardinal ? 2 : 1}
-            opacity={cardinal ? 0.6 : 0.3}
+            stroke={cardinal ? 'var(--silicon-amber)' : 'var(--stone-teal)'}
+            strokeWidth={cardinal ? 2.5 : 1}
+            opacity={cardinal ? 0.75 : 0.35}
             strokeLinecap="round"
           />
         )
       })}
 
+      {/* Rim — a soft halo under a heavy ring. */}
+      <circle
+        cx="200"
+        cy="200"
+        r="138"
+        fill="none"
+        stroke="var(--stone-teal)"
+        strokeWidth="10"
+        opacity="0.10"
+      />
       <circle
         cx="200"
         cy="200"
         r="135"
         fill="none"
         stroke="var(--stone-teal)"
-        strokeWidth="2.5"
-        opacity="0.6"
+        strokeWidth="5"
+        opacity="0.75"
       />
 
       {/* Slow-turning outer ring — held still when the visitor prefers reduced motion. */}
       <motion.circle
         cx="200"
         cy="200"
-        r="155"
+        r="150"
         fill="none"
         stroke="var(--stone-teal)"
         strokeWidth="1.5"
@@ -202,10 +214,10 @@ function CompassDial() {
           transform={`rotate(${angle} 200 200)`}
           stroke="var(--stone-teal)"
           fill="var(--stone-teal)"
-          opacity="0.75"
+          opacity="0.8"
         >
-          <line x1="200" y1="37" x2="200" y2="22" strokeWidth="2.5" strokeLinecap="round" />
-          <polygon points="200,6 192,22 208,22" stroke="none" />
+          <line x1="200" y1="44" x2="200" y2="30" strokeWidth="2.5" strokeLinecap="round" />
+          <polygon points="200,18 192,30 208,30" stroke="none" />
         </g>
       ))}
     </svg>
@@ -258,26 +270,29 @@ export function PersonaCompass() {
         </StaggerItem>
 
         <StaggerItem>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:relative lg:block lg:h-[970px]">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:relative lg:block lg:h-[910px]">
             {BRIEFINGS_PERSONA_ORDER.map((slug: PersonaSlug) => (
               <PersonaNode key={slug} slug={slug} />
             ))}
 
             {/* Hub — desktop only; below lg its words are carried by the header. */}
-            <div className="hidden lg:absolute lg:left-1/2 lg:top-[505px] lg:flex lg:h-[400px] lg:w-[400px] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:items-center lg:justify-center">
+            <div className="hidden lg:absolute lg:left-1/2 lg:top-[485px] lg:flex lg:h-[360px] lg:w-[360px] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:items-center lg:justify-center">
               <CompassDial />
-              <div className="max-w-[240px] px-4 text-center" aria-hidden="true">
+              {/* `relative` keeps the words above the dial — the SVG is
+                  positioned and now paints a solid face. */}
+              <div className="relative max-w-[205px] px-2 text-center" aria-hidden="true">
                 <p
                   className="font-bold text-text-primary"
                   style={{
-                    fontSize: 'clamp(28px, 2.6vw, 38px)',
+                    fontSize: 'clamp(26px, 2.4vw, 34px)',
                     letterSpacing: '-0.02em',
                     lineHeight: 1.08,
                   }}
                 >
-                  Find Your Perspective.
+                  Find Your{' '}
+                  <span className="text-silicon-amber-strong">Perspective.</span>
                 </p>
-                <p className="mt-3 text-base leading-relaxed text-text-muted">
+                <p className="mt-3 text-sm leading-relaxed text-text-muted">
                   Intelligence tailored to your seat at the table.
                 </p>
               </div>
