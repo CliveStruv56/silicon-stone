@@ -1,8 +1,8 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-07-19
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing, 13 moderate transitive npm audit findings (uuid through Sanity packages)**
+> Last Updated: 2026-08-05
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (71 static pages), 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com. Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools (email-gated for lead capture, AI Act triage engine recently overhauled), product/commerce pages with an early-access enquiry fallback until Lemon Squeezy checkout URLs are configured, Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Awaiting Lemon Squeezy store setup, Plausible account, and content publishing for queued drafts.
 
@@ -13,8 +13,8 @@
 This is the **Silicon & Stone intelligence portal** — a Next.js 15 + Sanity CMS platform for "Forensic Technopolitics" analysis. It combines a public website, admin research/authoring tools, digital product sales pages, and an embedded CMS Studio.
 
 **Key facts:**
-- Build passes cleanly (`npm run build` — 58 static pages, 0 errors)
-- `npm audit --audit-level=moderate` baseline: 13 moderate transitive findings. `brace-expansion` was remediated with a normal `npm audit fix` on 2026-05-29, and a narrow `postcss` override now resolves the previous Next/PostCSS finding. Remaining advisory is `uuid <11.1.1` through Sanity packages. **Do not run `npm audit fix --force`** — npm currently proposes unsafe Sanity/Vision downgrade paths. The practical runtime risk is low because the app does not pass attacker-controlled buffers to uuid helpers.
+- Build passes cleanly (`npm run build` — 71 static pages, 0 errors)
+- `npm audit` baseline (2026-08-05): **24 findings — 1 critical, 13 high, 9 moderate, 1 low.** The old "13 moderate / uuid only" baseline was stale; the tree drifted while the repo was quiet. Next.js was bumped 15.5.18 → **15.5.21** (closes two HIGH Server Actions advisories: DoS + SSRF) and the `postcss` override was refreshed to `^8.5.23` (resolves 8.5.25, clearing both PostCSS path-traversal advisories). Everything remaining traces through `sanity@4` — `@sanity/cli` → `@sanity/runtime-cli` (adm-zip), `@sanity/export` (tar, critical), `@sanity/template-validator` (undici), `preferred-pm` (js-yaml) — i.e. Studio CLI/export tooling that is not reachable from any served route, plus `sharp` (libvips CVEs; needs ≥0.35 but Next 15.5 declares `^0.34.3`) and `ws` via `openai`/`exa-js`. **Do not run `npm audit fix --force`** — npm proposes `next@16`, which the Sanity v4 pin forbids. These clear together at the Next 16 / Sanity v5 upgrade.
 - All API integrations verified working: Anthropic, Exa.ai, Inoreader, Sanity, ConvertKit
 - Admin login: configured via `ADMIN_PASSWORD` in the deployment environment. Do not store the live password in project docs.
 - Inoreader connected as user `clive4`
@@ -354,6 +354,25 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 5, 2026 — Security patch bump (Next.js + PostCSS)
+
+Maintenance after a 17-day quiet period. No product or copy changes; the launch
+blockers in `LAUNCH.md` are untouched and still owner-side.
+
+- **Next.js 15.5.18 → 15.5.21.** The documented "13 moderate / uuid only" audit
+  baseline had gone stale — the real tree was 25 findings including 1 critical
+  and 14 high, with **`next` itself carrying two HIGH advisories**: DoS in App
+  Router Server Actions (GHSA-m99w-x7hq-7vfj) and SSRF in Server Actions on
+  custom servers (GHSA-89xv-2m56-2m9x), plus three moderate cache-confusion /
+  unbounded-payload advisories. All five are fixed in 15.5.21 — a patch bump
+  inside 15.5.x, so it does **not** touch the Sanity v4 / Next 16 constraint.
+- **`postcss` override `^8.5.10` → `^8.5.23`** (resolves 8.5.25). The old
+  override had drifted below the advisory range and no longer did anything;
+  this clears both PostCSS path-traversal findings.
+- Verified: `npm run check` clean, `npm test` 58/58, `npm run build` green at
+  **71 static pages** (the doc's "58 pages" figure was stale too). Audit
+  re-baselined at 24 — see §10; the remainder is the Sanity v4 CLI/export
+  subtree and clears at the Next 16 upgrade.
 ### July 19, 2026 — Pre-launch packaging & pricing changes (competitive-review spec)
 
 Full implementation of the pre-launch packaging spec. New launch-day runbook at
@@ -1070,7 +1089,7 @@ Implementing `docs/site-revision-spec.md` — re-orienting the site around a rec
 | Atlantic Drift Briefing PDF unwritten | Lead magnet referenced in the Welcome Pack and required before YouTube launch. Outline now drafted at `docs/atlantic-drift-briefing-outline.md`; full PDF still to write. | Medium |
 | Sanity persona docs hold short version | Persona documents in Sanity carry shorter pain-points / content-needs than `docs/persona-profiles.md`. MCP backfill blocked by the schema-deploy gap above; can be done manually in Studio or after schema deploy. | Low |
 | Legacy methodologyPillars on 2 articles | Verified via GROQ 2026-05-20: only 2 documents still hold legacy 4-lens slugs — the published *Atlantic Fault Lines Deepen* (`2oGVswEwQBfyYUvi889ioS`, `policy-stress-testing`) and the draft *Iran Conflict Reshapes…* (`drafts.1344add1-…`, `supply-chain-forensics`). All other articles with pillars are on the new 6-cell vocabulary. `MethodologyChecklist` normalises legacy slugs at render via a legacy map so the UI is never blank; backfill these 2 in Studio to retire the map. | Medium |
-| Transitive npm audit findings (uuid via Sanity) | `npm audit --audit-level=moderate` shows 13 moderate findings after a normal `npm audit fix` cleared `brace-expansion` and a narrow `postcss` override cleared the previous Next/PostCSS finding on 2026-05-29. Remaining advisory: `uuid <11.1.1` via Sanity packages. **Do not run `npm audit fix --force`** — npm currently proposes unsafe Sanity/Vision downgrade paths. Practical runtime risk is low: the app does not pass attacker-controlled buffers into uuid helpers. Revisit when Sanity publishes a patched compatible dependency tree. | Low |
+| Transitive npm audit findings (Sanity v4 toolchain + sharp) | Re-baselined 2026-08-05 at **24 findings** (1 critical, 13 high, 9 moderate, 1 low) after the direct Next.js and PostCSS advisories were patched. The remainder is structural: `sanity@4` pulls its own CLI/export toolchain into the production tree (`@sanity/cli` → `@sanity/runtime-cli` → adm-zip; `@sanity/export` → tar; `@sanity/template-validator` → undici; `preferred-pm` → js-yaml), none of which is reachable from a served route. Also `sharp` (libvips CVEs, fixed in ≥0.35 but Next 15.5 declares `^0.34.3`) and `ws` via `openai`/`exa-js`. **Do not run `npm audit fix --force`** — the only fix npm offers is `next@16`, forbidden by the Sanity v4 pin. Clears at the Next 16 / Sanity v5 upgrade. | Medium |
 | Markdown-to-PDF pipeline | `scripts/render-briefing-pdf.ts` + `npm run render-briefing` render lead-magnet / Intelligence Series PDFs. Committed 2026-05-20 (`21eb123`; overwrite-guard `570ab13`). `puppeteer` / `marked` / `gray-matter` are devDependencies — `puppeteer` pulls ~170MB Chromium on install. Dev-only, never invoked by Vercel/Railway. Docs: `docs/markdown-to-pdf-pipeline.md`. | Info |
 | Studio reference-array UX trap | Clicking "Add item" in a Sanity reference array and saving without picking a doc leaves an orphan row (`_type`/`_key` but no `_ref`). One of these was found and cleaned up on the Helium article draft on 2026-04-14. | Low |
 | ~~No unit tests for app logic~~ **RESOLVED** | Resolved 2026-06-10: vitest suite (54 specs, `npm test`) covers the AI Act engine, slug/redirect utils, log redaction, and the markdown→Portable Text converter; runs in CI alongside the four invariant suites, and CI now also runs `next build`. | — |
@@ -1123,7 +1142,7 @@ Implementing `docs/site-revision-spec.md` — re-orienting the site around a rec
 npm run dev              # Start dev server on localhost:3000
 
 # Production
-npm run build            # Build for production (verify: 58 static pages, 0 errors)
+npm run build            # Build for production (verify: 71 static pages, 0 errors)
 npm start                # Start production server
 
 # Content Sync
@@ -1136,7 +1155,7 @@ npm run test:style-rules # Assert the guardrail + full rules reach the bundle (g
 # To change the rules: edit Style/*.md in the Ideaverse vault, then run its sync-style.sh
 
 # Audit
-npm audit                # Expect 13 moderate (uuid via Sanity packages)
+npm audit                # Expect 24 findings (Sanity toolchain subtree + sharp)
 
 # Linting
 npm run lint             # Run ESLint
@@ -1149,8 +1168,8 @@ npm run lint             # Run ESLint
 When starting a new Claude Code session:
 
 1. **Read this document first** for full context
-2. **The app builds cleanly** — `npm run build` should produce 58 static pages, 0 errors
-3. **13 moderate npm audit findings** — remaining baseline is transitive `uuid <11.1.1` via Sanity packages. Do not run `npm audit fix --force`; npm proposes unsafe Sanity/Vision downgrade paths. Anything new on top of this baseline is real.
+2. **The app builds cleanly** — `npm run build` should produce 71 static pages, 0 errors
+3. **24 npm audit findings** (1 critical / 13 high / 9 moderate / 1 low, as of 2026-08-05) — all in the Sanity v4 toolchain subtree (CLI/export code, not reachable from served routes) plus `sharp` and `ws`. Do not run `npm audit fix --force`; npm proposes `next@16`, which the Sanity v4 pin forbids. Anything new on top of this baseline is real.
 4. **All APIs are working** — Anthropic, Exa, Inoreader, Sanity, ConvertKit
 5. **Admin password** is deployment-specific and must not be committed or recorded in docs. `SESSION_SECRET` is required for signed admin sessions and must be 32+ characters.
 6. **Inoreader** is connected as `clive4` (tokens in cookies, may need re-auth)
@@ -1162,8 +1181,8 @@ When starting a new Claude Code session:
 ### Quick Verification
 
 ```bash
-npm run build            # Should pass with 58 static pages
-npm audit                # Expect 13 moderate (uuid via Sanity packages)
+npm run build            # Should pass with 71 static pages
+npm audit                # Expect 24 findings (Sanity toolchain subtree + sharp)
 npm run dev              # Start dev server, visit localhost:3000
 ```
 
