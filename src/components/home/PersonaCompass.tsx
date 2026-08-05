@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowRight, Compass } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import { StaggerContainer, StaggerItem } from '@/components/ui/StaggerContainer'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
@@ -19,11 +19,11 @@ const borderMap: Record<string, string> = {
 }
 
 const ringMap: Record<string, string> = {
-  'silicon-amber': 'border-silicon-amber/50',
-  'stone-teal': 'border-stone-teal/50',
-  'tier-pulse': 'border-silicon-cyan/50',
+  'silicon-amber': 'border-silicon-amber/60',
+  'stone-teal': 'border-stone-teal/60',
+  'tier-pulse': 'border-silicon-cyan/60',
   'text-muted': 'border-border-subtle',
-  'troy-blue': 'border-troy-blue/50',
+  'troy-blue': 'border-troy-blue/60',
 }
 
 const textMap: Record<string, string> = {
@@ -45,14 +45,8 @@ const placement: Record<PersonaSlug, string> = {
   positional: '',
 }
 
-/** Ray angles in degrees, clockwise from north, matching `placement`. */
-const RAYS: { slug: PersonaSlug; angle: number; stroke: string }[] = [
-  { slug: 'clara', angle: 0, stroke: 'var(--silicon-amber)' },
-  { slug: 'ian', angle: 90, stroke: 'var(--stone-teal)' },
-  { slug: 'sofia', angle: 140, stroke: 'var(--silicon-cyan)' },
-  { slug: 'citizen', angle: 220, stroke: 'var(--text-muted)' },
-  { slug: 'troy', angle: 270, stroke: 'var(--troy-blue)' },
-]
+/** Ray bearings in degrees clockwise from north, matching `placement`. */
+const RAY_ANGLES = [0, 90, 140, 220, 270]
 
 function PersonaNode({ slug }: { slug: PersonaSlug }) {
   const persona = PERSONAS[slug]
@@ -60,33 +54,30 @@ function PersonaNode({ slug }: { slug: PersonaSlug }) {
   return (
     <Link
       href={`/intelligence?persona=${slug}`}
-      className={cn('group block h-full', placement[slug])}
+      className={cn('group block h-full lg:h-auto', placement[slug])}
     >
       <div
         className={cn(
-          'flex h-full flex-col rounded-lg border bg-stone-charcoal p-4 transition-all duration-300 hover:-translate-y-1',
+          'mx-auto flex h-full w-full max-w-[290px] flex-col items-center rounded-lg border bg-stone-charcoal p-5 text-center transition-all duration-300 hover:-translate-y-1 lg:h-auto',
           borderMap[persona.color] ?? borderMap['text-muted'],
         )}
       >
-        <div className="flex items-center gap-3">
-          <Image
-            src={persona.avatar}
-            alt=""
-            width={56}
-            height={56}
-            className={cn(
-              'h-14 w-14 flex-shrink-0 rounded-md border object-cover',
-              ringMap[persona.color] ?? ringMap['text-muted'],
-            )}
-          />
-          <div className="min-w-0">
-            <h3 className="text-sm font-semibold leading-tight text-text-primary">
-              {persona.name}
-            </h3>
-            <div className="mt-1 font-mono text-[11px] uppercase tracking-[0.08em] text-text-muted">
-              {persona.role}
-            </div>
-          </div>
+        <Image
+          src={persona.avatar}
+          alt=""
+          width={96}
+          height={96}
+          className={cn(
+            'h-24 w-24 rounded-md border-2 object-cover',
+            ringMap[persona.color] ?? ringMap['text-muted'],
+          )}
+        />
+
+        <h3 className="mt-4 text-base font-semibold leading-tight text-text-primary">
+          {persona.name}
+        </h3>
+        <div className="mt-1.5 font-mono text-[11px] uppercase leading-tight tracking-[0.08em] text-text-muted">
+          {persona.role}
         </div>
 
         <p className="mt-3 text-xs leading-relaxed text-text-muted">
@@ -95,7 +86,7 @@ function PersonaNode({ slug }: { slug: PersonaSlug }) {
 
         <div
           className={cn(
-            'mt-3 flex items-center gap-1 text-xs',
+            'mt-auto flex items-center gap-1 pt-4 text-xs lg:mt-4 lg:pt-0',
             textMap[persona.color] ?? textMap['text-muted'],
           )}
         >
@@ -107,26 +98,34 @@ function PersonaNode({ slug }: { slug: PersonaSlug }) {
   )
 }
 
-/** Decorative hub-and-spoke ring behind the desktop grid. */
+/** The ring and its five outward arrows. Purely decorative. */
 function CompassRing() {
   return (
     <svg
       aria-hidden="true"
-      viewBox="0 0 200 200"
-      className="pointer-events-none absolute left-1/2 top-1/2 hidden h-[260px] w-[260px] -translate-x-1/2 -translate-y-1/2 lg:block"
+      viewBox="0 0 400 400"
+      className="pointer-events-none absolute inset-0 h-full w-full"
     >
       <circle
-        cx="100"
-        cy="100"
-        r="52"
+        cx="200"
+        cy="200"
+        r="145"
         fill="none"
-        stroke="var(--border-subtle)"
-        strokeWidth="1.5"
+        stroke="var(--stone-teal)"
+        strokeWidth="3"
+        opacity="0.55"
       />
-      {RAYS.map(({ slug, angle, stroke }) => (
-        <g key={slug} transform={`rotate(${angle} 100 100)`} stroke={stroke} fill={stroke}>
-          <line x1="100" y1="46" x2="100" y2="22" strokeWidth="1.5" strokeLinecap="round" />
-          <polygon points="100,14 95,26 105,26" stroke="none" />
+      {/* y = 200 − radius, so each ray runs outward from just beyond the ring. */}
+      {RAY_ANGLES.map((angle) => (
+        <g
+          key={angle}
+          transform={`rotate(${angle} 200 200)`}
+          stroke="var(--stone-teal)"
+          fill="var(--stone-teal)"
+          opacity="0.75"
+        >
+          <line x1="200" y1="47" x2="200" y2="22" strokeWidth="3" strokeLinecap="round" />
+          <polygon points="200,6 192,22 208,22" stroke="none" />
         </g>
       ))}
     </svg>
@@ -135,10 +134,14 @@ function CompassRing() {
 
 /**
  * Persona routing rendered as a compass: the five taggable personas arranged
- * around a hub on desktop, stacking to a plain card list below `lg` where a
- * radial layout would be unreadable. Replaces the former PersonaNavigator grid
- * and sits inside the "Read" run of the page, between the tier ladder and the
- * tools gallery.
+ * around a hub that carries the section title, stacking to a plain card list
+ * below `lg` where a radial layout would be unreadable. Replaces the former
+ * PersonaNavigator grid and sits inside the "Read" run of the page, between the
+ * tier ladder and the tools gallery.
+ *
+ * The heading lives in the hub on desktop. To keep one real `h2` in the
+ * document, the header block above stays in the DOM and goes `sr-only` at `lg`,
+ * and the hub's copy is `aria-hidden`.
  */
 export function PersonaCompass() {
   return (
@@ -155,42 +158,52 @@ export function PersonaCompass() {
             >
               Read · persona routing
             </Badge>
-            <h2
-              id="persona-heading"
-              className="font-bold text-text-primary mb-4"
-              style={{
-                fontSize: 'clamp(32px, 4vw, 48px)',
-                letterSpacing: '-0.02em',
-                lineHeight: 1.1,
-              }}
-            >
-              Find Your Perspective
-            </h2>
-            <p className="text-base text-text-muted leading-relaxed">
-              Intelligence tailored to your seat at the table. Every briefing is
-              tagged for the roles its analysis serves most.
-            </p>
+            <div className="lg:sr-only">
+              <h2
+                id="persona-heading"
+                className="font-bold text-text-primary mb-4"
+                style={{
+                  fontSize: 'clamp(32px, 4vw, 48px)',
+                  letterSpacing: '-0.02em',
+                  lineHeight: 1.1,
+                }}
+              >
+                Find Your Perspective
+              </h2>
+              <p className="text-base text-text-muted leading-relaxed">
+                Intelligence tailored to your seat at the table. Every briefing
+                is tagged for the roles its analysis serves most.
+              </p>
+            </div>
           </div>
         </StaggerItem>
 
         <StaggerItem>
-          <div className="relative grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-6">
-            <CompassRing />
-
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:items-center lg:gap-x-6 lg:gap-y-8">
             {BRIEFINGS_PERSONA_ORDER.map((slug: PersonaSlug) => (
               <PersonaNode key={slug} slug={slug} />
             ))}
 
-            {/* Hub — centre cell on desktop only; below lg its message is
-                already carried by the section subhead above. */}
+            {/* Hub — centre cell on desktop only. Its fixed height sets the
+                middle row, so the ring never collides with the outer nodes. */}
             <div className="hidden lg:col-start-2 lg:row-start-2 lg:flex lg:items-center lg:justify-center">
-              <div className="flex h-[150px] w-[150px] flex-col items-center justify-center gap-2 rounded-full border border-border-subtle bg-stone-charcoal/60 px-4 text-center">
-                <Compass className="h-5 w-5 text-silicon-amber" />
-                <span className="font-mono text-[11px] uppercase leading-tight tracking-[0.08em] text-text-muted">
-                  Five seats
-                  <br />
-                  one feed
-                </span>
+              <div className="relative flex h-[420px] w-[420px] items-center justify-center">
+                <CompassRing />
+                <div className="max-w-[230px] px-4 text-center" aria-hidden="true">
+                  <p
+                    className="font-bold text-text-primary"
+                    style={{
+                      fontSize: 'clamp(24px, 2.2vw, 32px)',
+                      letterSpacing: '-0.02em',
+                      lineHeight: 1.1,
+                    }}
+                  >
+                    Find Your Perspective.
+                  </p>
+                  <p className="mt-3 text-sm leading-relaxed text-text-muted">
+                    Intelligence tailored to your seat at the table.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -201,7 +214,7 @@ export function PersonaCompass() {
         <StaggerItem>
           <Link
             href={PERSONAS.positional.href as string}
-            className="group mt-4 flex flex-col gap-2 rounded-lg border border-sister-indigo/40 bg-stone-charcoal p-4 transition-colors hover:border-sister-indigo/70 sm:flex-row sm:items-center sm:justify-between"
+            className="group mt-5 flex flex-col gap-2 rounded-lg border border-sister-indigo/40 bg-stone-charcoal p-4 transition-colors hover:border-sister-indigo/70 sm:flex-row sm:items-center sm:justify-between"
           >
             <p className="text-sm leading-relaxed text-text-muted">
               <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-text-muted">
