@@ -354,6 +354,23 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 5, 2026 — Persona routing rebuilt as a compass, moved up the page
+
+- `PersonaNavigator` (the "Find Your Perspective" five-card grid that sat at
+  position 10, below the Advisory band) **deleted** — the component file is gone
+  and it had no other usage.
+- Replaced by `src/components/home/PersonaCompass.tsx` at **position 7**,
+  between Intelligence Tiers and the Tools Gallery, so persona routing now sits
+  inside the "Read" run rather than trailing the commerce bands.
+- Hub-and-spoke compass on `lg+` (five nodes at N/E/SE/SW/W around a "Five seats
+  · one feed" mark, SVG ring stroked in each persona's accent token); stacks to
+  a card list below `lg`. Built natively rather than as a raster image, so it is
+  responsive, theme-aware and every node links to `/intelligence?persona=<slug>`.
+  Node copy comes from `src/lib/personas.ts` — persona strings stay
+  single-sourced.
+- Positional keeps its WaymarkPath strip below the compass; the Adjacent Block
+  near the page foot is untouched.
+
 ### August 5, 2026 — Homepage copy + UI polish pass
 
 Ten review notes from a live read-through of the homepage. Detail in

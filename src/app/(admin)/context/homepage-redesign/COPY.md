@@ -213,23 +213,34 @@ This block sits below the persona navigator. WaymarkPath gets one row of visibil
 
 ## §Personas (Find Your Perspective)
 
+Renders as `PersonaCompass` — a hub-and-spoke compass on `lg+`, stacking to a
+plain card list below that. Sits between §Intelligence Tiers and §Decision
+Tools (2026-08-05); it previously sat after §Advisory near the foot of the page.
+
 | Field | Value |
 |---|---|
-| `eyebrow` | `Persona Routing` |
+| `eyebrow` | `Read · persona routing` |
 | `h2` | `Find Your Perspective` |
-| `subhead` | `Intelligence tailored to your seat at the table.` |
+| `subhead` | `Intelligence tailored to your seat at the table. Every briefing is tagged for the roles its analysis serves most.` |
+| `hub` | `Five seats / one feed` (compass mark, desktop only) |
 
-### Persona cards (5)
+### Persona nodes (5)
 
-| # | Role chip | Title | Description |
-|---|---|---|---|
-| 1 | `Legal · Compliance` | `Compliance Lead` | `Stay ahead of compliance deadlines` |
-| 2 | `Operations · Industrial` | `Industrial Operator` | `Get supply chain alerts before they hit` |
-| 3 | `Policy · Sovereign` | `Policy Strategist` | `Quantify the Atlantic Drift` |
-| 4 | `Regional · Remote` | `Regional Director` | `Where regional implications get read first` |
-| 5 | `Informed · Global` | `Global Citizen` | `The weekly read for those tracking the bigger picture` |
+Names, roles and body copy come straight from `src/lib/personas.ts`
+(`BRIEFINGS_PERSONA_ORDER`) — the node body is each persona's `description`,
+not the shorter `ctaCopy` used by the old card grid. Do not fork the strings
+here; edit the persona definitions.
 
-(Compare with current site — only 4 and 5 changed.)
+| Compass position | Persona | Role |
+|---|---|---|
+| North | `Compliance Clara` | Legal/Compliance Officer |
+| East | `Industrial Ian` | Operations/Supply Chain Manager |
+| South-east | `Sovereign Sofia` | Policy/Strategy Analyst |
+| South-west | `Global Citizen` | Informed Observer |
+| West | `Transatlantic Troy` | Founder / CEO |
+
+Positional keeps its own strip below the compass and routes to WaymarkPath
+rather than a feed filter.
 
 ---
 

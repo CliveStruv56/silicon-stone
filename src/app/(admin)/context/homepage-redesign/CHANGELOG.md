@@ -2,6 +2,28 @@
 
 > Track every change shipped as part of the 2026 homepage redesign here. Append-only.
 
+## 2026-08-05 — §Personas rebuilt as a compass and moved up the page
+
+- **Old `PersonaNavigator` deleted** (file removed; it was only ever used on the
+  home page). The five-card grid at position 10, below §Advisory, is gone.
+- **New `PersonaCompass` at position 7**, between §Intelligence Tiers and
+  §Decision Tools — persona routing now sits inside the "Read" run of the page
+  rather than trailing the commerce bands.
+- Rendered as a hub-and-spoke compass on `lg+`: five persona nodes at N / E /
+  SE / SW / W around a "Five seats · one feed" mark, with a decorative SVG ring
+  whose rays are stroked in each persona's accent token. Below `lg` it stacks to
+  a one- or two-column card list and the ring is dropped — a radial layout is
+  unreadable at 390px.
+- Built natively rather than as a raster: same layout and the same persona
+  avatars as the reference artwork, but responsive, theme-aware, and every node
+  is a real link to `/intelligence?persona=<slug>`. Node body copy is the
+  persona `description` from `src/lib/personas.ts`, so there is still exactly
+  one source of truth for persona strings.
+- Eyebrow follows the section convention: `Read · persona routing`. Header block
+  left-aligned like its neighbours.
+- Positional keeps its WaymarkPath strip below the compass. §Adjacent Block near
+  the foot of the page is unchanged, so WaymarkPath still has its own placement.
+
 ## 2026-08-05 — Homepage copy + UI polish pass
 
 Ten review notes from a live read-through. Copy, one contrast fix, one alignment

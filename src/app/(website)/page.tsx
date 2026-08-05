@@ -10,7 +10,7 @@ import {
   IntelligenceTiers,
   AdjacentBlock,
   ToolsGallery,
-  PersonaNavigator,
+  PersonaCompass,
   SubscribeCTA,
   StartHereSpine,
   ProductsBand,
@@ -142,22 +142,22 @@ export default async function Home() {
           auditArticle={auditArticle}
         />
 
-        {/* 7. Tool Gallery — Use, with take-it-further bridges */}
+        {/* 7. Persona Compass — Find Your Perspective (+ Positional lens) */}
+        <PersonaCompass />
+
+        {/* 8. Tool Gallery — Use, with take-it-further bridges */}
         <ToolsGallery />
 
-        {/* 8. Products band — Buy */}
+        {/* 9. Products band — Buy */}
         <ProductsBand />
 
-        {/* 9. Advisory band — Engage */}
+        {/* 10. Advisory band — Engage */}
         <AdvisoryBand />
-
-        {/* 10. Persona Navigator — Find Your Perspective (+ Positional tile) */}
-        <PersonaNavigator />
 
         {/* 11. Adjacent Block — WaymarkPath as a "Related" companion */}
         <AdjacentBlock />
 
-        {/* 8. Subscribe CTA */}
+        {/* 12. Subscribe CTA */}
         <div className="bg-stone-charcoal/30 border-t border-border-subtle">
           <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
             <div className="max-w-md mx-auto">
