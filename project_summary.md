@@ -373,6 +373,28 @@ blockers in `LAUNCH.md` are untouched and still owner-side.
   **71 static pages** (the doc's "58 pages" figure was stale too). Audit
   re-baselined at 24 — see §10; the remainder is the Sanity v4 CLI/export
   subtree and clears at the Next 16 upgrade.
+### August 5, 2026 — Repo hygiene: gitignore, eslint scope, untracked specs
+
+- **`.gitignore` hygiene.** The working tree had 41 uncommitted entries, most of
+  it scratch that a reflexive `git add .` would have committed: `/design-review/`
+  (~60MB of puppeteer screenshots), root-level verification screenshots
+  (`/*.png`, `/*.jpg`, `/*.jpeg` — real assets live in `/public`),
+  `__pycache__/`, `/deliverables/dist/` (regenerable from `deliverables/src`),
+  the stray `/studio-silicon-and-stone/` lockfile, `/skills/` (generic skills
+  belong in `~/.claude/skills`, domain skills in `.agent/skills/`), and the
+  packaged `docs/*.skill` duplicate of `.agent/skills/pd-ikigai-pro`.
+- **`npm run check` is meaningful again.** It ran bare `eslint` over the whole
+  repo, so 37 errors + 111 warnings from `design-review/*.js`,
+  `deliverables/src/*.mjs` and the generated `public/sw.js` were burying real
+  results (`npx eslint src` was clean the whole time). Those paths are now in
+  `eslint.config.mjs` `ignores`; `npm run check` exits 0.
+- **Committed the previously-untracked specs** already referenced elsewhere in
+  this document: `site-revision-spec.md`, `homepage-hero-prd.md`,
+  `silicon-stone-website-build-brief-for-claude-code.md`, `advisory-page-copy.md`,
+  `admin-research-workflow.md`, `monetisation_strategy.md`, the subscription
+  budget CSV, the Legal firm partnership plan, and `deliverables/src/` (the
+  source + build scripts for the Lemon Squeezy product files).
+
 ### July 19, 2026 — Pre-launch packaging & pricing changes (competitive-review spec)
 
 Full implementation of the pre-launch packaging spec. New launch-day runbook at

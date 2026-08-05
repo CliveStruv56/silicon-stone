@@ -60,6 +60,33 @@ debug_error.log
 /.agents/
 .understand-anything/
 
+# Visual-review scratch: throwaway puppeteer scripts + full-page screenshots
+# (~60MB and growing). Regenerate with the scripts inside it, never commit.
+/design-review/
+
+# Ad-hoc verification screenshots dropped at the repo root by browser tooling
+# (p1-*.png, troy-*.jpeg, etc.). Real site assets live in /public.
+/*.png
+/*.jpg
+/*.jpeg
+
+# Built product deliverables — regenerable from deliverables/src via
+# assemble-toolkit.mjs / build-spreadsheets.mjs; the PDFs/spreadsheets are
+# uploaded to Lemon Squeezy, not served from the repo.
+/deliverables/dist/
+
+# Python bytecode from the Railway backend
+__pycache__/
+*.py[cod]
+
+# Stray `sanity init` artifact (a lone package-lock.json, no project)
+/studio-silicon-and-stone/
+
+# Generic skills live in ~/.claude/skills; domain skills belong in .agent/skills
+/skills/
+# Packaged (zipped) skill exports — the unpacked copy in .agent/skills is source
+/docs/*.skill
+
 # local-draft pipeline scratch (intermediate JSON between model steps)
 .local-draft/
 
