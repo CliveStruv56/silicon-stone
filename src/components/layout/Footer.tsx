@@ -16,8 +16,8 @@ const footerNavigation = {
     { name: 'Tools', href: '/tools' },
     { name: 'Products', href: '/products' },
     { name: 'Advisory', href: '/advisory' },
-    { name: 'Atlantic Drift (US execs)', href: '/atlantic-drift' },
-    { name: 'EU exposure (US firms)', href: '/eu-exposure' },
+    // The US-facing landing pages (/atlantic-drift, /eu-exposure) are still
+    // built and routable — they are just not linked from the footer for now.
     { name: 'Glossary', href: '/glossary' },
     { name: 'Methodology', href: '/methodology' },
     { name: 'About', href: '/about' },
