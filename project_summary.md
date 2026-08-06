@@ -1,7 +1,7 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-08-05
+> Last Updated: 2026-08-06
 > Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (71 static pages), 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com. Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools (email-gated for lead capture, AI Act triage engine recently overhauled), product/commerce pages with an early-access enquiry fallback until Lemon Squeezy checkout URLs are configured, Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production. **The blocker is a P0: the production Kit API key is a legacy v3 key, so `/api/subscribe` 401s and — because `NEXT_PUBLIC_PRE_LAUNCH` is still `true`, making every product CTA an email capture — the entire funnel currently terminates in a failed POST.** Beyond that: Lemon Squeezy store not yet created, 9 drafts unpublished, and 7 of 12 published articles still lack cover images. Go-live sequence lives in `LAUNCH.md`; defects and debt in §10.
@@ -353,6 +353,21 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 6, 2026 — Decision Tools previews replaced with commissioned artwork
+
+The four generated previews rebuilt earlier the same day (below) are now gone,
+superseded by commissioned isometric illustrations — one per tool, Option A of
+each set, used unedited. `ToolsGallery.tsx` renders them through `next/image`
+with the frame locked to the artwork's native 3168×1344 ratio, so nothing is
+cropped; the preview panels are ~230px tall instead of ~160px and the cards sit
+taller as a result. `CompliancePreview`, `SupplyChainPreview`,
+`ScenarioPreview` and `StressTestPreview` (~240 lines of animated SVG/DOM) are
+deleted.
+
+Assets live in `public/tools/`: 1600px WebP renders (~290KB for all four) are
+what the panels load, with the untouched 3168px PNG originals kept beside them
+in-repo (8.1MB) as the source of truth.
 
 ### August 6, 2026 — Decision Tools previews rebuilt
 

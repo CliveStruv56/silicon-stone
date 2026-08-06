@@ -2,6 +2,28 @@
 
 > Track every change shipped as part of the 2026 homepage redesign here. Append-only.
 
+## 2026-08-06 — §Decision Tools: previews replaced with commissioned artwork
+
+The four generated SVG/DOM previews are retired in favour of the commissioned
+isometric illustrations (one per tool, "Option A" of each set). This supersedes
+the preview rebuild logged below — those components are deleted, not adjusted.
+
+- Files changed: `src/components/home/ToolsGallery.tsx`, `public/tools/` (new)
+- Reviewed by: Clive (art direction — picked Option A for all four)
+- Notes:
+  - Artwork used unedited. All four are 3168×1344 (≈2.36:1), so the preview
+    frame is locked to that ratio rather than the previous `aspect-[13/4]`;
+    nothing is cropped. Panels are ~230px tall now, up from ~160px, so the
+    cards sit taller.
+  - `public/tools/*.webp` (1600px wide, q82, ~290KB for all four) are what the
+    panels load. The untouched 3168px PNG originals sit beside them as the
+    source of truth — 8.1MB, deliberately kept in-repo.
+  - Deleted `CompliancePreview`, `SupplyChainPreview`, `ScenarioPreview` and
+    `StressTestPreview` (~240 lines) along with the `useRef` / `useInView` /
+    `motion` imports they needed. The section no longer animates its previews.
+  - `alt=""` on all four — the artwork is decorative beside the tool name and
+    tagline it sits above.
+
 ## 2026-08-06 — §Decision Tools: previews rebuilt to fill their panels
 
 The four mini-previews were rendering tiny in the middle of a large empty
