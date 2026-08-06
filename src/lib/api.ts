@@ -94,12 +94,12 @@ export function getStyleGuardrail(): string {
     return STYLE_GUARDRAIL;
 }
 
-/** Full canonical house-style rules (Pass-3 voice edit). Generated from the vault SSOT. */
+/** Full canonical house-style rules (Pass-3 voice edit). Generated from .agent/rules/style/. */
 export function getHouseStyleRules(): string {
     return HOUSE_STYLE_RULES;
 }
 
-/** Full AI-tells detection/removal reference (Pass-3 voice edit). Generated from the vault SSOT. */
+/** Full AI-tells detection/removal reference (Pass-3 voice edit). Generated from .agent/rules/style/. */
 export function getAITells(): string {
     return AI_TELLS_RULES;
 }

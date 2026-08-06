@@ -25,9 +25,12 @@ local Obsidian vault at `AIOS_VAULT_PATH`, and patched the record back to
 vault.** Review happens in the Sanity Studio inbox instead; there is no local
 filing step and nothing to commit.
 
-The `npm run knowledge:pull` script and the `AIOS_VAULT_PATH` env var still exist
-in the codebase (`scripts/pull-knowledge-source.ts`) but are unused and
-unsupported. Retire or repoint them before relying on them.
+`scripts/pull-knowledge-source.ts`, the `knowledge:pull` npm script, the
+`AIOS_VAULT_PATH` env var and the manifest builders in `src/lib/knowledge-inbox.ts`
+have all been **deleted**. `scripts/knowledge-inbox-checks.ts` asserts they stay
+gone. What survives in that module is the shared validation the live
+`/api/knowledge/*` routes use: `KNOWLEDGE_SOURCE_TYPES`, `KNOWLEDGE_BRAND_TAGS`
+and `assertValidSourceId`.
 
 ## Separate Pinecone Evidence Index
 

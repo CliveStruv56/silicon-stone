@@ -362,15 +362,19 @@ Ideaverse vault has been removed from the docs. Two couplings mattered:
 - **House style was vault-SSOT.** `.agent/rules/style/house-style.md` and
   `ai-tells.md` were rsynced in by a `sync-style.sh` living in the vault root.
   **Those repo files are now the source of truth — edit them directly**, then run
-  `npm run gen:style` (also on `prebuild`). One gap remains: `gen:style`
-  regenerates the bundled module only, so `.agent/skills/voice-edit/references/`
-  must be refreshed by hand (`cp` commands are in `docs/authoring-guide.md` §7).
-  A small repo-side sync script would close it.
-- **Editorial knowledge review was vault-local.** Sanity is now both the
-  operational queue and the reviewed store. `npm run knowledge:pull` and
-  `AIOS_VAULT_PATH` still exist in code (`scripts/pull-knowledge-source.ts`) but
-  are unused and unsupported — **not yet retired or repointed; a decision is
-  outstanding.**
+  `npm run gen:style` (also on `prebuild`). `gen:style` now also mirrors both
+  files into `.agent/skills/voice-edit/references/`, which is what the vault
+  script used to do, so the manual `/voice-edit` pass cannot drift from the
+  automated one.
+- **Editorial knowledge review was vault-local — now deleted.**
+  `scripts/pull-knowledge-source.ts`, the `knowledge:pull` npm script,
+  `AIOS_VAULT_PATH`, and the manifest builders in `src/lib/knowledge-inbox.ts`
+  are all gone; `scripts/knowledge-inbox-checks.ts` asserts they stay gone. That
+  module keeps only what the live `/api/knowledge/*` routes import
+  (`KNOWLEDGE_SOURCE_TYPES`, `KNOWLEDGE_BRAND_TAGS`, `assertValidSourceId`).
+  Sanity is now both the queue and the reviewed store. The `manifestId` field
+  survives on `knowledgeSource` as a legacy column — old records still carry
+  values, nothing writes it now.
 
 Docs touched: `docs/authoring-guide.md` §7, `docs/editorial-aios-manual.md`,
 `docs/editorial-aios-inbox.md`, `README.md`, `.env.example`, §8 of this file, and

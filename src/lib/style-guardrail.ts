@@ -5,9 +5,9 @@
  * system prompt — the full HOUSE_STYLE_RULES + AI_TELLS_RULES are reserved for
  * the Pass-3 voice-edit pass (see style-rules.generated.ts).
  *
- * Hand-maintained on purpose. Keep it in step with the canonical rules in the
- * Ideaverse vault (.agent/rules/style/house-style.md + ai-tells.md). It is a
- * curated condensation, not generated output.
+ * Hand-maintained on purpose. Keep it in step with the canonical rules at
+ * .agent/rules/style/house-style.md + ai-tells.md. It is a curated
+ * condensation, not generated output.
  */
 export const STYLE_GUARDRAIL = `=== HOUSE STYLE — NON-NEGOTIABLE ===
 Write as a sharp, opinionated human with real expertise — not a neutral machine. Good, specific, opinionated writing is the goal.

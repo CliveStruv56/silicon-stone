@@ -6,12 +6,10 @@ This document explains the full workflow for the editorial knowledge system:
 - the embedded Sanity Studio inbox
 - what is stored in each place
 
-> **Status (August 2026): the local Obsidian vault step is retired.** The author no
-> longer keeps an Obsidian vault, so there is no local review store and no
-> `npm run knowledge:pull` step in the workflow below. Sanity is now the only
-> reviewed store. The `knowledge:pull` script and the `AIOS_VAULT_PATH` env var
-> still exist in the codebase but are unused and unsupported — decide whether to
-> retire or repoint them before relying on anything they do.
+> **Status (August 2026): the local Obsidian vault step is retired and its code
+> is deleted.** There is no local review store, no `npm run knowledge:pull`, and
+> no `AIOS_VAULT_PATH`. Sanity is now both the operational queue and the reviewed
+> store. See `editorial-aios-inbox.md` for exactly what was removed.
 
 The system is additive. It does not replace the existing article pipeline, draft flow, publishing flow, or article-level semantic search.
 
@@ -205,143 +203,21 @@ It contains:
 - Candidates Awaiting Filing
 - All Candidates
 
-## The Local Vault Workflow
+## The Review Workflow
 
-This is the step where reviewed knowledge is created.
+Review happens in the embedded Sanity Studio, under **Knowledge Inbox**.
 
-### Step 1: Prepare the vault path
+1. A captured source arrives with `status: pending`.
+2. Read it, check the extracted text and locators, and decide whether it earns a place.
+3. If it does, write the synthesis as a `knowledgeCandidate` and set the source to `processed`.
+4. If it does not, set the source to `error` with a note, or leave it pending.
 
-Set this in `.env.local`:
+> **Retired (August 2026).** This step used to happen in a local Obsidian vault:
+> `npm run knowledge:pull` wrote a `Sources/<id>.md` manifest, you updated a
+> `Wiki/*.md` page by hand, then confirmed the filing back to Sanity. The vault is
+> gone and so is that script — there is no local filing step, no manifest, and
+> nothing to commit. Existing `manifestId` values on old records are historical.
 
-```text
-AIOS_VAULT_PATH=/absolute/path/to/your/obsidian-vault
-```
-
-The command-line tool checks that the vault contains:
-
-- `AIOS-SCHEMA.md`
-- `Sources/`
-
-before it writes anything.
-
-### Step 2: Pull one pending source
-
-Run:
-
-```bash
-npm run knowledge:pull
-```
-
-This does one thing:
-
-- it finds the oldest pending `knowledgeSource`
-- it writes a compact manifest into `Sources/<source-id>.md`
-- it leaves the Sanity record as `pending`
-
-The manifest contains the source metadata and review instructions.
-It does not duplicate the full source text into the vault.
-
-### Step 3: Review the vault file
-
-Open the generated manifest in Obsidian and review the linked wiki page.
-
-Typical review work:
-
-- correct the source summary
-- add or update claim-level citations
-- create or update a `Wiki/*.md` page
-- add related links
-- append the log entry if needed
-
-The goal is not to write a polished article.
-The goal is to produce a compact reviewed knowledge note.
-
-### Step 4: Mark the local manifest as processed
-
-When the vault file has been reviewed, change:
-
-```md
-status: pending
-```
-
-to:
-
-```md
-status: processed
-```
-
-This is the local proof that the source has been reviewed.
-
-### Step 5: Confirm the reviewed filing back to Sanity
-
-Run:
-
-```bash
-npm run knowledge:pull -- --confirm-reviewed <source-id>
-```
-
-This updates the Sanity `knowledgeSource` record to `processed`.
-
-It does not commit Git.
-It does not push Git.
-It only confirms that the local vault review is complete.
-
-## What a Wiki Page Is
-
-A `Wiki/*.md` page is a small reviewed knowledge note.
-
-It is not:
-
-- a published article
-- a blog post
-- a full report
-- a transcript
-
-It is:
-
-- a durable synthesis
-- grounded in source claims
-- short enough to trust later
-- linked to the sources that support it
-
-Good wiki page types include:
-
-- concept
-- entity
-- comparison
-- synthesis
-
-Example:
-
-- source evidence says how sovereignty controls work
-- candidate says the stronger pattern is selective sovereignty
-- the wiki page stores that conclusion in a short, cited note
-
-That is the synthesis function.
-
-## How Commit and Push Fit In
-
-Confirming a source is not the same as committing it.
-
-There are three separate states:
-
-### Reviewed locally
-
-The vault file has been checked, edited, and marked `status: processed`.
-
-### Confirmed in Sanity
-
-`npm run knowledge:pull -- --confirm-reviewed <source-id>` has updated the Sanity inbox record.
-
-### Committed to Git
-
-You then commit and push the reviewed vault changes like any other repo update.
-
-The normal order is:
-
-1. review locally
-2. confirm in Sanity
-3. commit and push the vault
 
 ## Example End-to-End Flow
 
@@ -351,27 +227,16 @@ Here is the full loop in plain language.
 2. You open `/knowledge`.
 3. You capture the source with title, URL, tags, and extracted text.
 4. The source appears in Sanity as pending.
-5. You run `npm run knowledge:pull`.
-6. The command creates a compact manifest in `Sources/` in the vault.
-7. You open the vault file in Obsidian.
-8. You update or create the matching `Wiki/*.md` page.
-9. You add claim-level citations and related links.
-10. You change the manifest to `status: processed`.
-11. You run `npm run knowledge:pull -- --confirm-reviewed <source-id>`.
-12. You commit and push the reviewed vault changes.
+5. You open Studio under **Knowledge Inbox** and read it.
+6. You write the synthesis as a knowledge candidate, with claim-level citations.
+7. You set the source to `processed`.
 
 ## What You Should Expect to Store
 
 ### In Sanity
 
 - captured sources waiting for review
-- candidate syntheses waiting for local filing
-
-### In the vault
-
-- source manifests
-- reviewed wiki pages
-- log entries
+- reviewed candidate syntheses
 
 ### In Pinecone
 
@@ -380,24 +245,21 @@ Here is the full loop in plain language.
 
 ## What Not to Do
 
-- Do not treat `/knowledge` as the final knowledge store.
-- Do not skip local review.
-- Do not write directly into the vault from Studio.
-- Do not assume a candidate is ready to file just because it was saved.
-- Do not use a wiki page as a substitute for source evidence.
+- Do not treat `/knowledge` as the final knowledge store — it is a capture surface.
+- Do not skip review; a captured source is not reviewed knowledge.
+- Do not assume a candidate is sound just because it was saved.
+- Do not use a candidate synthesis as a substitute for source evidence.
 
 ## When to Use Which Tool
 
 - Use `/knowledge` when capturing or searching.
-- Use Studio when checking Sanity inbox records.
-- Use the vault when reviewing and filing durable knowledge.
-- Use the command line when preparing or confirming the local review state.
+- Use Studio when reviewing inbox records and writing candidates.
 
 ## Practical Rule
 
-If the content is still being checked, it belongs in Sanity.
+If the content is still being checked, it is a pending source in Sanity.
 
-If the content has been reviewed and is meant to last, it belongs in the vault.
+If it has been reviewed and is meant to last, it is a candidate in Sanity.
 
-If the content is being searched, it may also live in Pinecone.
+If it is being searched, it may also live in Pinecone.
 

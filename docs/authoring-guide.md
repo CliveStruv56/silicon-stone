@@ -186,12 +186,7 @@ npm run sync-content:force # Overwrite ALL articles (use with caution)
 
 After editing any file in `.agent/rules/style/`, run `npm run gen:style` and commit both the rule file and the regenerated module. (`gen:style` also runs on `prebuild`, so a deploy can never ship stale rules.)
 
-**One manual step remains.** `gen:style` regenerates the bundled module only — it does *not* refresh `.agent/skills/voice-edit/references/`, which the old vault script used to copy. If you change `house-style.md` or `ai-tells.md`, copy them across by hand so the `/voice-edit` skill doesn't drift:
-
-```bash
-cp .agent/rules/style/house-style.md .agent/skills/voice-edit/references/HOUSE-STYLE.md
-cp .agent/rules/style/ai-tells.md    .agent/skills/voice-edit/references/AI-TELLS.md
-```
+`gen:style` also mirrors `house-style.md` and `ai-tells.md` into `.agent/skills/voice-edit/references/` — the job the old vault script did — so the manual `/voice-edit` pass can never enforce different rules from the automated one. Commit those copies along with the rule change.
 
 **Why a bundled module and not a runtime file read?** Reading repo `.md` at runtime is unreliable on Vercel (the file may not be traced into the serverless bundle). Importing a generated module is reliable — the same mechanism that makes `context/core/voice-dna.json` dependable.
 

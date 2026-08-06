@@ -16,7 +16,7 @@ export const knowledgeSource = defineType({
     defineField({
       name: 'sourceId',
       title: 'Source ID',
-      description: 'Stable lower-case kebab-case ID used by the reviewed vault manifest.',
+      description: 'Stable lower-case kebab-case ID for this source.',
       type: 'string',
       validation: (rule) =>
         rule.required().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
@@ -101,7 +101,7 @@ export const knowledgeSource = defineType({
       options: {
         list: [
           { title: 'Pending local review', value: 'pending' },
-          { title: 'Processed into reviewed vault', value: 'processed' },
+          { title: 'Processed (reviewed)', value: 'processed' },
           { title: 'Error', value: 'error' },
         ],
         layout: 'radio',
@@ -111,8 +111,8 @@ export const knowledgeSource = defineType({
     }),
     defineField({
       name: 'manifestId',
-      title: 'Vault Manifest ID',
-      description: 'Set only after the reviewed local filing pass is confirmed.',
+      title: 'Manifest ID (legacy)',
+      description: 'Legacy field from the retired local-vault filing pass. No longer written.',
       type: 'string',
     }),
   ],

@@ -66,7 +66,7 @@ export const knowledgeCandidate = defineType({
       options: {
         list: [
           { title: 'Pending local review', value: 'pending' },
-          { title: 'Filed into reviewed vault', value: 'filed' },
+          { title: 'Filed (reviewed)', value: 'filed' },
           { title: 'Rejected', value: 'rejected' },
         ],
         layout: 'radio',

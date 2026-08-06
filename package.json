@@ -17,7 +17,6 @@
     "sync-content": "tsx scripts/sync-content.ts",
     "sync-content:dry": "tsx scripts/sync-content.ts --dry-run",
     "sync-content:force": "tsx scripts/sync-content.ts --force",
-    "knowledge:pull": "tsx scripts/pull-knowledge-source.ts",
     "glossary:seed": "tsx scripts/seed-glossary.ts",
     "glossary:audit": "tsx scripts/glossary-audit.ts",
     "glossary:audit:published": "tsx scripts/glossary-audit.ts --published",

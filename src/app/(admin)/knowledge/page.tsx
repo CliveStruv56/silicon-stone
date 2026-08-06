@@ -125,7 +125,7 @@ export default function KnowledgePage() {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Source capture failed')
-      setCaptureMessage(`Captured ${data.sourceId}. Run npm run knowledge:pull locally to prepare its vault manifest.`)
+      setCaptureMessage(`Captured ${data.sourceId}. Review it in the Source Inbox below, or in Studio under Knowledge Inbox.`)
       form.reset()
       await loadSources()
     } catch (captureFailure) {
@@ -231,7 +231,7 @@ export default function KnowledgePage() {
           <h2 className="font-semibold text-foreground">Capture Source</h2>
         </div>
         <p className="text-xs text-muted-foreground mb-4">
-          Add a URL or upload an original. Extracted text stays in Sanity; the local vault receives only a compact manifest.
+          Add a URL or upload an original. Extracted text and the reviewed record both stay in Sanity.
         </p>
         <form onSubmit={handleCapture} className="grid gap-3">
           <div className="grid sm:grid-cols-2 gap-3">
