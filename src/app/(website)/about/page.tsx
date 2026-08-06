@@ -114,11 +114,12 @@ export default function AboutPage() {
                     className="object-cover"
                     priority
                   />
-                  {/* Gradient scrim for caption legibility. Caption text is
-                      FIXED light (it always sits on the dark scrim over the
-                      image) — it must not follow the theme tokens, which flip to
-                      dark ink in light mode and vanish against the scrim. */}
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-deep via-slate-deep/70 to-transparent p-6 pt-12">
+                  {/* Gradient scrim for caption legibility. Both the caption and
+                      the scrim under it are FIXED dark-on-light: `scrim-ink`
+                      does not flip between themes. Do not swap it back to
+                      `slate-deep` — that token lightens to warm stone in light
+                      mode and the white caption disappears into it. */}
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-scrim-ink via-scrim-ink/70 to-transparent p-6 pt-12">
                     <p className="text-sm italic text-white/90 [text-shadow:0_1px_8px_rgba(0,0,0,0.7)]">
                       &ldquo;The edge is where you see what the centre misses&rdquo;
                     </p>

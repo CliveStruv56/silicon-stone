@@ -356,7 +356,7 @@ export default function ServicesPage() {
                     className="object-cover object-center"
                   />
                   {/* Gradient scrim for caption legibility */}
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-deep via-slate-deep/70 to-transparent p-5 pt-16">
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-scrim-ink via-scrim-ink/70 to-transparent p-5 pt-16">
                     <p className="text-sm italic text-white/90 [text-shadow:0_1px_8px_rgba(0,0,0,0.7)]">
                       Three forensic domains, two analytical methods — applied to your decision.
                     </p>

@@ -19,7 +19,9 @@
   --alert-red: #c2410c;       /* deadlines / risk */
   --surface-elevated: #f5f3ed;/* lighter raised band */
   --footer-bg: #e8e3d7;       /* deeper grounded stone — footer band */
-  --border-subtle: #e2dccf;   /* warm hairline */
+  --border-subtle: #d2c9b5;   /* warm hairline — deep enough to read as a
+                                 divider on the #efece4 page (the old #e2dccf
+                                 sat at ~1.1:1 and vanished) */
 
   --silicon-cyan: #0e7c8b;    /* deepened cyan for contrast on light */
 
@@ -37,6 +39,12 @@
   /* Fixed dark ink for text placed ON bright accent chips (amber/teal/cyan
      fills). Does NOT flip between themes — replaces former text-slate-deep use. */
   --ink-on-accent: #14181f;
+
+  /* Fixed dark scrim for caption gradients laid over (always-dark) hero
+     artwork. Does NOT flip between themes: the captions on top of it are fixed
+     white, so a scrim that lightened in light mode would erase them. Using
+     slate-deep here was the old bug. */
+  --scrim-ink: #0f141e;
 
   --radius: 0.625rem;
 
@@ -56,8 +64,8 @@
   --accent: #16615f;
   --accent-foreground: #ffffff;
   --destructive: #c2410c;
-  --border: #e2dccf;
-  --input: #e2dccf;
+  --border: #d2c9b5;          /* kept in step with --border-subtle */
+  --input: #d2c9b5;
   --ring: #16615f;
   --chart-1: #f6ad55;
   --chart-2: #4a9b9b;
@@ -137,6 +145,7 @@
   --color-silicon-amber-strong: var(--silicon-amber-strong);
   --color-stone-teal: var(--stone-teal);
   --color-ink-on-accent: var(--ink-on-accent);
+  --color-scrim-ink: var(--scrim-ink);
   --color-text-primary: var(--text-primary);
   --color-text-muted: var(--text-muted);
   --color-alert-red: var(--alert-red);

@@ -354,6 +354,23 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 6, 2026 — Light-mode fixes: caption scrims and hairline dividers
+
+Two light-theme defects, both global rather than About-specific:
+
+- **Caption scrims used a theme-flipping token.** The hero caption gradients were
+  `from-slate-deep via-slate-deep/70`, but `--slate-deep` resolves to warm stone
+  (`#efece4`) in light mode — so the "dark scrim" turned cream while the caption
+  text stayed fixed `text-white/90`, i.e. white on cream. Added a **fixed**
+  `--scrim-ink: #0f141e` token (same value in both themes, mapped as
+  `--color-scrim-ink`) and switched all four scrims to it: `/about`,
+  `/advisory`, `/eu-exposure`, `/atlantic-drift`. Dark mode is byte-identical —
+  the token's value is the old dark `--slate-deep`.
+- **Light-mode hairlines were invisible.** `--border-subtle` / `--border` /
+  `--input` were `#e2dccf` against an `#efece4` page — roughly 1.1:1, so section
+  dividers and card outlines effectively disappeared. Deepened to `#d2c9b5`
+  (~1.4:1 on the page, ~1.7:1 on white cards). Dark mode untouched.
+
 ### August 6, 2026 — About hero artwork swapped for the network/chokepoint render
 
 The `/about` hero image is now `public/about-edge-network.png` (1400×779, 403KB —
