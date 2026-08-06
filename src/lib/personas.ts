@@ -198,7 +198,7 @@ export function getDynamicCTA(activePersona?: string | null): {
   const ctaMap: Record<PersonaSlug, { headline: string; subheadline: string }> = {
     clara: {
       headline: 'Compliance Intelligence',
-      subheadline: 'Secure your August 2nd AI Act signal. Deadline trackers and obligation breakdowns.',
+      subheadline: 'What the AI Act now requires, and what is still ahead. Obligation breakdowns and date trackers.',
     },
     ian: {
       headline: 'Supply Chain Alerts',

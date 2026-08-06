@@ -214,7 +214,7 @@ export default function AtlanticDriftPage() {
               Operative now, versus adopted-but-pending
             </h2>
             <p className="mb-4 leading-relaxed text-text-muted">
-              <strong className="text-text-primary">Operative from 2 August 2026:</strong>{' '}
+              <strong className="text-text-primary">In force since 2 August 2026:</strong>{' '}
               the Article 50 transparency duties and the penalty and governance regime that
               gives the Act teeth. This is the part that binds first.
             </p>

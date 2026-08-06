@@ -116,7 +116,7 @@ export default async function CategoryPage({ params }: Props) {
                   <div className="w-px bg-border-subtle" />
                   <div>
                     <div className="text-xs text-text-muted uppercase tracking-wider">Next Deadline</div>
-                    <div className="text-xl font-bold text-text-primary">AI Act (Aug)</div>
+                    <div className="text-xl font-bold text-text-primary">Watermarking (Dec)</div>
                   </div>
                 </div>
               )}

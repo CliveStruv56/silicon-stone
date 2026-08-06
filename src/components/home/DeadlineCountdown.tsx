@@ -16,7 +16,8 @@ export function DeadlineCountdown() {
 
         <p className="text-xs leading-relaxed text-text-muted md:max-w-2xl">
           Catalogue your systems. Clarify your role. Capture vendor evidence. Set review triggers.
-          Transparency obligations remain relevant from 2 August 2026.
+          Article 50 transparency obligations have applied since 2 August 2026; watermarking
+          for systems already on the market follows on 2 December 2026.
         </p>
 
         <Link

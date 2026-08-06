@@ -126,7 +126,7 @@ export default function ProductsPage() {
               <Shield className="w-5 h-5 text-silicon-amber flex-shrink-0" />
               <p className="text-sm text-text-primary">
                 <span className="font-semibold text-silicon-amber">The AI Act is already applying in phases.</span>
-                {' '}Transparency obligations remain relevant from 2 August 2026. The timetable is moving. The evidence gap remains.{' '}
+                {' '}Transparency obligations have applied since 2 August 2026. The timetable is moving. The evidence gap remains.{' '}
                 <Link href="/eu-exposure" className="font-medium text-silicon-amber underline">
                   Need it interpreted for your business? See the Post-Omnibus Briefing.
                 </Link>

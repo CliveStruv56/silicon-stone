@@ -24,7 +24,7 @@ import {
 
 const briefingIncludes = [
   'AI Act scope classification — which of your systems are in scope, at which risk tier',
-  'The post-Omnibus reality — what applies from 2 August 2026, what moved, and what can follow',
+  'The post-Omnibus reality — what has applied since 2 August 2026, what moved, and what can follow',
   'Sovereignty-package exposure — where procurement preferences threaten your market access',
   'Durable-obligation map — what becomes an ongoing operating requirement',
   'Prioritised first actions, and a clear view of what needs a standing relationship',
@@ -118,7 +118,7 @@ export default function EuExposurePage() {
                   In May 2026 the EU agreed the Digital Omnibus and rewrote the AI Act’s
                   timetable. The headline said “delay”. The reality is sharper: some
                   obligations moved by sixteen months, others did not move at all. The
-                  transparency duties still apply from 2 August 2026; watermarking for
+                  transparency duties have applied since 2 August 2026; watermarking for
                   systems already on the market moves to 2 December 2026; standalone high-risk
                   moves to 2 December 2027 and embedded high-risk to 2 August 2028. If your
                   compliance calendar was built before May, parts of it are now wrong.
@@ -282,31 +282,49 @@ export default function EuExposurePage() {
               {[
                 {
                   date: '2 August 2026',
-                  text: 'Article 50 transparency obligations apply. Not deferred. Users must be told when they are interacting with AI and when content is AI-generated.',
+                  status: 'In force' as const,
+                  text: 'Article 50 transparency obligations. Not deferred. Users must be told when they are interacting with AI and when content is AI-generated.',
                 },
                 {
                   date: '2 December 2026',
+                  status: 'Ahead' as const,
                   text: 'Watermarking requirements (Article 50(2)) apply to systems already on the market; a new prohibition on AI systems generating non-consensual intimate imagery takes effect.',
                 },
                 {
                   date: '2 December 2027',
+                  status: 'Ahead' as const,
                   text: 'High-risk obligations apply to standalone (Annex III) systems: recruitment, credit scoring, education, critical infrastructure and similar.',
                 },
                 {
                   date: '2 August 2028',
+                  status: 'Ahead' as const,
                   text: 'High-risk obligations apply to AI embedded in regulated products (Annex I): medical devices, machinery, vehicles and similar.',
                 },
-              ].map((row) => (
-                <li
-                  key={row.date}
-                  className="flex flex-col gap-1 border-l-2 border-silicon-amber/50 pl-4 sm:flex-row sm:gap-4"
-                >
-                  <span className="min-w-[8.5rem] font-mono text-sm font-semibold text-silicon-amber">
-                    {row.date}
-                  </span>
-                  <span className="text-sm leading-relaxed text-text-muted">{row.text}</span>
-                </li>
-              ))}
+              ].map((row) => {
+                const live = row.status === 'In force'
+                return (
+                  <li
+                    key={row.date}
+                    className={`flex flex-col gap-1 border-l-2 pl-4 sm:flex-row sm:gap-4 ${
+                      live ? 'border-stone-teal' : 'border-silicon-amber/50'
+                    }`}
+                  >
+                    <span className="min-w-[8.5rem] font-mono text-sm font-semibold text-silicon-amber">
+                      {row.date}
+                    </span>
+                    <span className="text-sm leading-relaxed text-text-muted">
+                      <span
+                        className={`mr-2 font-mono text-[11px] uppercase tracking-[0.08em] ${
+                          live ? 'text-stone-teal' : 'text-text-muted'
+                        }`}
+                      >
+                        {row.status}
+                      </span>
+                      {row.text}
+                    </span>
+                  </li>
+                )
+              })}
             </ul>
             <p className="mt-6 font-mono text-xs uppercase tracking-wider text-text-muted">
               National regulatory sandboxes: 2 August 2027. Status: adopted under the Digital

@@ -306,7 +306,7 @@ export const SCENARIOS: Scenario[] = [
     name: 'AI Act Enforcement & Digital Simplification',
     shortName: 'AI Act',
     frictionLevel: 'medium',
-    triggerEvent: '2 August 2026 transparency obligations remain relevant while the Digital Omnibus moves high-risk obligations to 2 December 2027 (Annex III) and 2 August 2028 (Annex I)',
+    triggerEvent: 'Transparency obligations in force since 2 August 2026 while the Digital Omnibus moves high-risk obligations to 2 December 2027 (Annex III) and 2 August 2028 (Annex I)',
     timeframe: '2026-2027',
     probability: '80-90%',
     confidence: 'High',
@@ -374,7 +374,7 @@ export const SCENARIOS: Scenario[] = [
     ],
     evidenceNotes: [
       {
-        fact: 'The AI Act applies progressively: prohibitions and AI literacy from 2 February 2025, governance rules and GPAI obligations from 2 August 2025, and transparency rules from 2 August 2026.',
+        fact: 'The AI Act has applied progressively: prohibitions and AI literacy since 2 February 2025, governance rules and GPAI obligations since 2 August 2025, and transparency rules since 2 August 2026 — all now in force.',
         implication: 'The tool should show staged operational exposure rather than implying one universal enforcement date.',
       },
       {
