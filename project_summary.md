@@ -380,8 +380,9 @@ replacing the Scottish-island photo. The frame moved from `aspect-[4/3]` to
 padding dropped `pt-16` → `pt-12` so the shorter frame isn't half-covered by the
 gradient. The quote — *"The edge is where you see what the centre misses"* — is
 retained: the artwork now depicts it literally (three domed city-nodes wired
-through flagged chokepoints, watched from a separate cliff-top station). Alt text
-rewritten to describe the illustration. `public/about-edge-island.png` deleted.
+through flagged chokepoints, watched from a separate cliff-top station), and
+carries `text-balance` so its two-line mobile wrap doesn't orphan the last word.
+Alt text rewritten to describe the illustration. `public/about-edge-island.png` deleted.
 File: `src/app/(website)/about/page.tsx`.
 
 ### August 6, 2026 — Obsidian vault retired; style rules become repo-canonical

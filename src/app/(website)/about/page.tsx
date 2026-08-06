@@ -120,7 +120,7 @@ export default function AboutPage() {
                       `slate-deep` — that token lightens to warm stone in light
                       mode and the white caption disappears into it. */}
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-scrim-ink via-scrim-ink/70 to-transparent p-6 pt-12">
-                    <p className="text-sm italic text-white/90 [text-shadow:0_1px_8px_rgba(0,0,0,0.7)]">
+                    <p className="text-sm italic text-balance text-white/90 [text-shadow:0_1px_8px_rgba(0,0,0,0.7)]">
                       &ldquo;The edge is where you see what the centre misses&rdquo;
                     </p>
                   </div>
