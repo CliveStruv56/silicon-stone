@@ -290,6 +290,12 @@ Keep all four tools and vignettes — these are strong as-is. Single change: CTA
 - WAS: `Launch Engine`
 - NOW: `Launch tool`
 
+> **Superseded 2026-08-06 (visual only).** Each card now carries a commissioned
+> isometric illustration in place of the generated preview graphic; the frame
+> follows the artwork's native ratio, so the cards are taller than this spec
+> assumed. Vignettes, titles, descriptions and CTA are unchanged. See
+> `CHANGELOG.md`.
+
 ### Full copy in COPY.md §Decision Tools.
 
 ---

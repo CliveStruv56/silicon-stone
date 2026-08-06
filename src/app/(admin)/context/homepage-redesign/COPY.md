@@ -209,6 +209,14 @@ This block sits below the persona navigator. WaymarkPath gets one row of visibil
 | 3 | `"The CFO wants three futures modelled by Thursday. You have them by lunch."` | `Scenario Modeler` | `Compare strategic outcomes under competing geopolitical scenarios.` | `Launch tool` |
 | 4 | `"New US export controls drop. You score the friction against EU operations in minutes."` | `Policy Stress-Test` | `Measure regulatory divergence between US and EU policy positions.` | `Launch tool` |
 
+### Card artwork (2026-08-06)
+
+Each card carries a commissioned isometric illustration above the title, from
+`public/tools/*-preview.webp`. The copy above is unchanged — the artwork
+replaced the generated SVG/DOM previews, not any text. Alt text lives on
+`previewAlt` in the `tools` array in `ToolsGallery.tsx`; edit it there if the
+artwork is ever swapped.
+
 ---
 
 ## §Personas (Find Your Perspective)
