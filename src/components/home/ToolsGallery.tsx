@@ -8,56 +8,86 @@ import { ForensicCard } from '@/components/ui/ForensicCard'
 import { Badge } from '@/components/ui/badge'
 import { ArrowRight } from 'lucide-react'
 
-/* ─── Mini-Preview: Compliance Checker (Decision Tree) ──────────── */
+/* Preview frames.
+ *
+ * SVG previews all use a 260×80 viewBox and a frame locked to that same 13:4
+ * ratio, so `meet` scaling fills the frame edge to edge at every width. The
+ * previous frames were a fixed 112px tall against a ~560px-wide panel, which
+ * sized each drawing off its short axis and stranded it in the middle.
+ *
+ * The two DOM-built previews (bars, gauges) keep explicit heights — they have
+ * their own intrinsic sizing and no viewBox to match. */
+const PREVIEW_SVG_BOX = 'relative w-full overflow-hidden aspect-[13/4]'
+const PREVIEW_BOX = 'relative h-40 overflow-hidden sm:h-44'
+
+/* ─── Mini-Preview: Compliance Checker (Risk-tier decision tree) ── */
 function CompliancePreview() {
   const ref = useRef<HTMLDivElement>(null)
   const inView = useInView(ref, { once: true, margin: '-50px' })
 
-  const nodes = [
-    { label: 'AI System', x: 50, y: 10, color: 'var(--text-muted)' },
-    { label: 'Prohibited', x: 10, y: 55, color: 'var(--alert-red)' },
-    { label: 'High-Risk', x: 37, y: 55, color: 'var(--silicon-amber)' },
-    { label: 'Limited', x: 63, y: 55, color: 'var(--stone-teal)' },
-    { label: 'Minimal', x: 90, y: 55, color: 'var(--tier-pulse)' },
+  const tiers = [
+    { label: 'Prohibited', x: 40, color: 'var(--alert-red)' },
+    { label: 'High-Risk', x: 100, color: 'var(--silicon-amber)' },
+    { label: 'Limited', x: 160, color: 'var(--stone-teal)' },
+    { label: 'Minimal', x: 220, color: 'var(--tier-pulse)' },
   ]
 
   return (
-    <div ref={ref} className="relative h-28 overflow-hidden">
-      <svg viewBox="0 0 100 70" className="w-full h-full" preserveAspectRatio="xMidYMid meet">
-        {[10, 37, 63, 90].map((x, i) => (
+    <div ref={ref} className={PREVIEW_SVG_BOX}>
+      <svg viewBox="0 0 260 80" className="h-full w-full" preserveAspectRatio="xMidYMid meet">
+        {/* Root — the system under assessment. */}
+        <motion.g
+          initial={{ opacity: 0, y: -4 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.35, delay: 0.15 }}
+        >
+          <rect
+            x="100" y="6" width="60" height="20" rx="5"
+            fill="var(--stone-charcoal)"
+            stroke="var(--text-muted)"
+            strokeWidth="1"
+          />
+          <text
+            x="130" y="16"
+            textAnchor="middle" dominantBaseline="central"
+            fill="var(--text-primary)" fontSize="9" fontFamily="var(--font-mono)"
+          >
+            AI System
+          </text>
+        </motion.g>
+
+        {tiers.map((tier, i) => (
           <motion.line
-            key={x}
-            x1="50" y1="18" x2={x} y2="48"
+            key={`line-${tier.label}`}
+            x1="130" y1="26" x2={tier.x} y2="52"
             stroke="var(--border-subtle)"
-            strokeWidth="0.5"
+            strokeWidth="1.5"
             initial={{ pathLength: 0, opacity: 0 }}
-            animate={inView ? { pathLength: 1, opacity: 0.6 } : {}}
+            animate={inView ? { pathLength: 1, opacity: 0.8 } : {}}
             transition={{ duration: 0.5, delay: 0.3 + i * 0.1 }}
           />
         ))}
-        {nodes.map((node, i) => (
+
+        {tiers.map((tier, i) => (
           <motion.g
-            key={node.label}
-            initial={{ opacity: 0, scale: 0 }}
+            key={tier.label}
+            initial={{ opacity: 0, scale: 0.8 }}
             animate={inView ? { opacity: 1, scale: 1 } : {}}
-            transition={{ duration: 0.3, delay: i === 0 ? 0.2 : 0.6 + i * 0.1 }}
+            style={{ transformOrigin: `${tier.x}px 61px` }}
+            transition={{ duration: 0.3, delay: 0.6 + i * 0.1 }}
           >
             <rect
-              x={node.x - 12} y={node.y - 6}
-              width="24" height="12" rx="2"
+              x={tier.x - 28} y="52" width="56" height="19" rx="5"
               fill="var(--stone-charcoal)"
-              stroke={node.color}
-              strokeWidth="0.5"
+              stroke={tier.color}
+              strokeWidth="1.2"
             />
             <text
-              x={node.x} y={node.y + 1}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              fill={node.color}
-              fontSize="3"
-              fontFamily="var(--font-mono)"
+              x={tier.x} y="62"
+              textAnchor="middle" dominantBaseline="central"
+              fill={tier.color} fontSize="8.5" fontFamily="var(--font-mono)"
             >
-              {node.label}
+              {tier.label}
             </text>
           </motion.g>
         ))}
@@ -72,59 +102,62 @@ function SupplyChainPreview() {
   const inView = useInView(ref, { once: true, margin: '-50px' })
 
   const chokepoints = [
-    { label: 'USA', x: 22, y: 35, color: 'var(--silicon-amber)' },
-    { label: 'NLD', x: 48, y: 28, color: 'var(--stone-teal)' },
-    { label: 'DEU', x: 52, y: 30, color: 'var(--stone-teal)' },
-    { label: 'TWN', x: 78, y: 42, color: 'var(--alert-red)' },
-    { label: 'KOR', x: 80, y: 34, color: 'var(--silicon-amber)' },
+    { label: 'USA', x: 34, y: 44, color: 'var(--silicon-amber)' },
+    { label: 'NLD', x: 112, y: 26, color: 'var(--stone-teal)' },
+    { label: 'DEU', x: 142, y: 50, color: 'var(--stone-teal)' },
+    { label: 'KOR', x: 206, y: 24, color: 'var(--silicon-amber)' },
+    { label: 'TWN', x: 228, y: 52, color: 'var(--alert-red)' },
   ]
 
   const connections = [
-    [22, 35, 48, 28],
-    [48, 28, 78, 42],
-    [78, 42, 80, 34],
-    [80, 34, 52, 30],
-    [52, 30, 22, 35],
+    [34, 44, 112, 26],
+    [112, 26, 228, 52],
+    [228, 52, 206, 24],
+    [206, 24, 142, 50],
+    [142, 50, 34, 44],
   ]
 
   return (
-    <div ref={ref} className="relative h-28 overflow-hidden">
-      <svg viewBox="0 0 100 65" className="w-full h-full" preserveAspectRatio="xMidYMid meet">
-        <ellipse cx="25" cy="35" rx="18" ry="14" fill="none" stroke="var(--border-subtle)" strokeWidth="0.3" opacity="0.3" />
-        <ellipse cx="50" cy="30" rx="12" ry="16" fill="none" stroke="var(--border-subtle)" strokeWidth="0.3" opacity="0.3" />
-        <ellipse cx="78" cy="38" rx="16" ry="14" fill="none" stroke="var(--border-subtle)" strokeWidth="0.3" opacity="0.3" />
+    <div ref={ref} className={PREVIEW_SVG_BOX}>
+      <svg viewBox="0 0 260 80" className="h-full w-full" preserveAspectRatio="xMidYMid meet">
+        {/* Faint land masses — Americas, Europe, East Asia. */}
+        <ellipse cx="40" cy="42" rx="34" ry="26" fill="none" stroke="var(--border-subtle)" strokeWidth="1" opacity="0.45" />
+        <ellipse cx="128" cy="38" rx="28" ry="30" fill="none" stroke="var(--border-subtle)" strokeWidth="1" opacity="0.45" />
+        <ellipse cx="216" cy="40" rx="32" ry="28" fill="none" stroke="var(--border-subtle)" strokeWidth="1" opacity="0.45" />
+
         {connections.map(([x1, y1, x2, y2], i) => (
           <motion.line
             key={i}
             x1={x1} y1={y1} x2={x2} y2={y2}
             stroke="var(--stone-teal)"
-            strokeWidth="0.3"
-            strokeDasharray="2 1"
+            strokeWidth="1"
+            strokeDasharray="4 3"
             initial={{ pathLength: 0, opacity: 0 }}
-            animate={inView ? { pathLength: 1, opacity: 0.4 } : {}}
-            transition={{ duration: 0.8, delay: 0.5 + i * 0.15 }}
+            animate={inView ? { pathLength: 1, opacity: 0.55 } : {}}
+            transition={{ duration: 0.8, delay: 0.4 + i * 0.15 }}
           />
         ))}
+
         {chokepoints.map((node, i) => (
           <motion.g
             key={node.label}
-            initial={{ opacity: 0, scale: 0 }}
-            animate={inView ? { opacity: 1, scale: 1 } : {}}
-            transition={{ duration: 0.3, delay: 0.3 + i * 0.1 }}
+            initial={{ opacity: 0 }}
+            animate={inView ? { opacity: 1 } : {}}
+            transition={{ duration: 0.3, delay: 0.25 + i * 0.1 }}
           >
             <motion.circle
-              cx={node.x} cy={node.y} r="3"
-              fill="none" stroke={node.color} strokeWidth="0.3"
-              initial={{ r: 1.5, opacity: 0.8 }}
-              animate={inView ? { r: 4, opacity: 0 } : {}}
+              cx={node.x} cy={node.y} r="5"
+              fill="none" stroke={node.color} strokeWidth="1"
+              initial={{ r: 4, opacity: 0.8 }}
+              animate={inView ? { r: 12, opacity: 0 } : {}}
               transition={{ duration: 2, repeat: Infinity, delay: i * 0.4 }}
             />
-            <circle cx={node.x} cy={node.y} r="1.5" fill={node.color} />
+            <circle cx={node.x} cy={node.y} r="4" fill={node.color} />
             <text
-              x={node.x} y={node.y + 5}
+              x={node.x} y={node.y + 14}
               textAnchor="middle"
               fill={node.color}
-              fontSize="2.5"
+              fontSize="8.5"
               fontFamily="var(--font-mono)"
             >
               {node.label}
@@ -147,18 +180,31 @@ function ScenarioPreview() {
     { label: 'High', value: 88, color: 'var(--alert-red)' },
   ]
 
+  // Bar heights are resolved to pixels against this track rather than left as
+  // percentages: the column that used to hold them had no definite height, so
+  // `height: 88%` collapsed to nothing and the bars never rendered.
+  const TRACK = 104
+
   return (
-    <div ref={ref} className="h-28 flex items-end justify-center gap-4 px-4 pb-2">
+    <div ref={ref} className={`${PREVIEW_BOX} flex items-end gap-5 px-6 pb-5 pt-4`}>
       {scenarios.map((s, i) => (
-        <div key={s.label} className="flex flex-col items-center gap-1 flex-1">
+        <div key={s.label} className="flex flex-1 flex-col items-center gap-2">
+          <motion.span
+            className="font-mono text-xs text-text-primary"
+            initial={{ opacity: 0 }}
+            animate={inView ? { opacity: 1 } : {}}
+            transition={{ duration: 0.3, delay: 0.6 + i * 0.15 }}
+          >
+            {s.value}
+          </motion.span>
           <motion.div
-            className="w-full rounded-t"
+            className="w-full rounded-t-md"
             style={{ backgroundColor: s.color }}
             initial={{ height: 0 }}
-            animate={inView ? { height: `${s.value}%` } : {}}
+            animate={inView ? { height: Math.round((TRACK * s.value) / 100) } : {}}
             transition={{ duration: 0.6, delay: 0.3 + i * 0.15, ease: 'easeOut' }}
           />
-          <span className="font-mono text-[12.5px] text-text-muted">{s.label}</span>
+          <span className="font-mono text-xs text-text-muted">{s.label}</span>
         </div>
       ))}
     </div>
@@ -170,39 +216,51 @@ function StressTestPreview() {
   const ref = useRef<HTMLDivElement>(null)
   const inView = useInView(ref, { once: true, margin: '-50px' })
 
-  return (
-    <div ref={ref} className="h-28 flex items-center justify-center gap-6">
-      {[
-        { label: 'US', score: 3.2, color: 'var(--stone-teal)' },
-        { label: 'EU', score: 7.8, color: 'var(--silicon-amber)' },
-      ].map((gauge) => {
-        const circumference = 2 * Math.PI * 28
-        const dashOffset = circumference * (1 - gauge.score / 10)
+  const gauges = [
+    { label: 'US', score: 3.2, color: 'var(--stone-teal)' },
+    { label: 'EU', score: 7.8, color: 'var(--silicon-amber)' },
+  ]
+  const divergence = (gauges[1].score - gauges[0].score).toFixed(1)
 
-        return (
-          <div key={gauge.label} className="text-center">
-            <div className="relative w-16 h-16">
-              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 64 64">
-                <circle cx="32" cy="32" r="28" fill="none" stroke="var(--surface-elevated)" strokeWidth="4" />
-                <motion.circle
-                  cx="32" cy="32" r="28" fill="none"
-                  stroke={gauge.color}
-                  strokeWidth="4"
-                  strokeLinecap="round"
-                  strokeDasharray={circumference}
-                  initial={{ strokeDashoffset: circumference }}
-                  animate={inView ? { strokeDashoffset: dashOffset } : {}}
-                  transition={{ duration: 1, delay: 0.5, ease: 'easeOut' }}
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="font-mono text-xs text-text-primary">{gauge.score}</span>
+  return (
+    <div ref={ref} className={`${PREVIEW_BOX} flex flex-col items-center justify-center gap-3`}>
+      <div className="flex items-center gap-10">
+        {gauges.map((gauge) => {
+          const circumference = 2 * Math.PI * 28
+          const dashOffset = circumference * (1 - gauge.score / 10)
+
+          return (
+            <div key={gauge.label} className="text-center">
+              <div className="relative h-24 w-24">
+                <svg className="h-full w-full -rotate-90" viewBox="0 0 64 64">
+                  <circle cx="32" cy="32" r="28" fill="none" stroke="var(--surface-elevated)" strokeWidth="5" />
+                  <motion.circle
+                    cx="32" cy="32" r="28" fill="none"
+                    stroke={gauge.color}
+                    strokeWidth="5"
+                    strokeLinecap="round"
+                    strokeDasharray={circumference}
+                    initial={{ strokeDashoffset: circumference }}
+                    animate={inView ? { strokeDashoffset: dashOffset } : {}}
+                    transition={{ duration: 1, delay: 0.5, ease: 'easeOut' }}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="font-mono text-lg font-semibold text-text-primary">
+                    {gauge.score}
+                  </span>
+                </div>
               </div>
+              <span className="font-mono text-xs uppercase tracking-[0.08em] text-text-muted">
+                {gauge.label}
+              </span>
             </div>
-            <span className="font-mono text-[12px] text-text-muted">{gauge.label}</span>
-          </div>
-        )
-      })}
+          )
+        })}
+      </div>
+      <span className="font-mono text-xs text-text-muted">
+        Divergence {divergence} pts
+      </span>
     </div>
   )
 }

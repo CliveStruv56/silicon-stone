@@ -2,6 +2,32 @@
 
 > Track every change shipped as part of the 2026 homepage redesign here. Append-only.
 
+## 2026-08-06 — §Decision Tools: previews rebuilt to fill their panels
+
+The four mini-previews were rendering tiny in the middle of a large empty
+frame. Two causes, both fixed:
+
+- **Frames were sized off the short axis.** Each preview sat in a fixed
+  `h-28` (112px) box inside a ~560px-wide panel, and the SVGs used
+  `preserveAspectRatio="xMidYMid meet"` — so the drawing scaled to the 112px
+  height and left ~400px of dead space either side. Both SVG previews now use a
+  260×80 viewBox in a frame locked to the same 13:4 ratio (`aspect-[13/4]`), so
+  they fill edge to edge at every width.
+- **The Scenario Modeler bars never rendered at all.** They animated to
+  `height: <n>%` inside a column that had no definite height, so the percentage
+  resolved against auto and collapsed to zero — the panel showed the axis
+  labels over blank space. Heights are now resolved to pixels against a fixed
+  104px track.
+
+Per-panel treatment, each keeping its original metaphor but legible at a glance:
+
+| Panel | Preview |
+|---|---|
+| Supply Chain Mapper | Five chokepoints (USA/NLD/DEU/KOR/TWN) across three faint land masses, dashed trade lines drawing in, pulse ring on each node |
+| Compliance Checker | Risk-tier decision tree — `AI System` root branching to Prohibited / High-Risk / Limited / Minimal chips, each in its own tier colour |
+| Scenario Modeler | Three scenario bars with value labels above and Low / Medium / High beneath |
+| Policy Stress-Test | Two 96px dial gauges (US 3.2, EU 7.8) with a `Divergence 4.6 pts` caption — the number the tool actually produces |
+
 ## 2026-08-06 — §Adjacent Block points at the internal WaymarkPath page
 
 `See WaymarkPath` now links to `/waymarkpath` in-tab instead of opening the

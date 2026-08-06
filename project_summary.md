@@ -354,6 +354,19 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 6, 2026 — Decision Tools previews rebuilt
+
+The four tool-card previews in §From Analysis to Action rendered tiny inside
+large empty frames. Fixed frames of `h-28` (112px) in ~560px panels meant the
+SVGs scaled off their short axis; both now use a 260×80 viewBox in an
+`aspect-[13/4]` frame and fill edge to edge. Detail per panel in the
+homepage-redesign `CHANGELOG.md`.
+
+Also fixed a preview that had never worked: the Scenario Modeler bars animated
+to a percentage height inside a column with no definite height, so they
+collapsed to zero and the panel showed only its axis labels. Heights now
+resolve to pixels against a fixed track.
+
 ### August 5, 2026 — Persona routing rebuilt as a compass, moved up the page
 
 - `PersonaNavigator` (the "Find Your Perspective" five-card grid that sat at
