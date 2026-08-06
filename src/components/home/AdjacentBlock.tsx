@@ -4,11 +4,10 @@ import { ArrowRight } from 'lucide-react'
 // WaymarkPath is adjacent to the Read → Use → Buy → Engage ladder, not a rung on it.
 // This is a deliberately lighter "Related" card, not a peer offering section.
 //
-// Points at the internal /waymarkpath page rather than the external app
-// (NEXT_PUBLIC_WAYMARKPATH_URL, which the footer still uses): the page explains
-// the companion and carries the early-access capture, so it is the right first
-// stop from the home page. It became the home page's only route to /waymarkpath
-// when the persona compass's Positional strip was removed.
+// Points at the internal /waymarkpath page rather than the external app: the
+// page explains the companion and carries the early-access capture, so it is
+// the right first stop from the home page. The footer link matches, so
+// NEXT_PUBLIC_WAYMARKPATH_URL is no longer read anywhere in src.
 export function AdjacentBlock() {
     return (
         <section

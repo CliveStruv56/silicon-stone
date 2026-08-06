@@ -10,10 +10,12 @@ explains the companion and carries the early-access capture, so it is the right
 first stop from the home page — and with the persona compass's Positional strip
 gone, this is the home page's only route to it.
 
-The footer link is unchanged and still goes to the external app, so
-`NEXT_PUBLIC_WAYMARKPATH_URL` remains live; only the local const in
-`AdjacentBlock.tsx` is gone. SPEC.md §Adjacent still describes the old external
-target and should be read against this entry.
+The footer link followed the same day: `WaymarkPath ↗` in the Company column is
+now plain `WaymarkPath` pointing at `/waymarkpath` in-tab (the ↗ went with the
+external target). `NEXT_PUBLIC_WAYMARKPATH_URL` is therefore **no longer read
+anywhere in `src/`** — it stays documented in `.env.example`, marked unused, for
+whenever the external app is linked again. SPEC.md §Adjacent still describes the
+old external target and should be read against this entry.
 
 ## 2026-08-06 — §Personas: WaymarkPath strip removed
 

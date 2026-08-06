@@ -1,9 +1,6 @@
 import Link from 'next/link'
 import { Linkedin } from 'lucide-react'
 
-const WAYMARKPATH_URL =
-  process.env.NEXT_PUBLIC_WAYMARKPATH_URL ?? 'https://waymarkpath.vercel.app'
-
 // TODO(owner): replace with company/founder LinkedIn URL (via
 // NEXT_PUBLIC_LINKEDIN_URL or this fallback).
 const LINKEDIN_URL = process.env.NEXT_PUBLIC_LINKEDIN_URL || 'https://www.linkedin.com/'
@@ -110,13 +107,14 @@ export function Footer() {
                 </li>
               ))}
               <li>
+                {/* Internal explainer, not the external app — see the
+                    2026-08-06 CHANGELOG entry in the homepage-redesign
+                    context folder. */}
                 <Link
-                  href={WAYMARKPATH_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href="/waymarkpath"
                   className="text-sm text-sister-indigo hover:text-sister-indigo/80 transition-colors"
                 >
-                  WaymarkPath ↗
+                  WaymarkPath
                 </Link>
               </li>
             </ul>
