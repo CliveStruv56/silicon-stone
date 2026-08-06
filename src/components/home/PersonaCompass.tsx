@@ -300,26 +300,9 @@ export function PersonaCompass() {
           </div>
         </StaggerItem>
 
-        {/* Positional is a reading lens, not a sixth filterable persona — it
-            routes to WaymarkPath rather than a hub filter, so it sits apart. */}
-        <StaggerItem>
-          <Link
-            href={PERSONAS.positional.href as string}
-            className="group mt-5 flex flex-col gap-2 rounded-2xl border border-sister-indigo/40 bg-stone-charcoal p-4 transition-colors hover:border-sister-indigo/70 sm:flex-row sm:items-center sm:justify-between"
-          >
-            <p className="text-sm leading-relaxed text-text-muted">
-              <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-text-muted">
-                A reading lens · not a feed filter ·{' '}
-              </span>
-              Reading every shift for its impact on your own position and career?{' '}
-              {PERSONAS.positional.ctaCopy}
-            </p>
-            <span className="flex flex-shrink-0 items-center gap-1 text-sm text-sister-indigo">
-              Visit WaymarkPath
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-            </span>
-          </Link>
-        </StaggerItem>
+        {/* Positional (the WaymarkPath reading lens) deliberately has no strip
+            here — the Adjacent Block near the foot of the page carries that
+            cross-link, and repeating it mid-page read as double-billing. */}
       </StaggerContainer>
     </section>
   )

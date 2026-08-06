@@ -2,6 +2,14 @@
 
 > Track every change shipped as part of the 2026 homepage redesign here. Append-only.
 
+## 2026-08-06 — §Personas: WaymarkPath strip removed
+
+The Positional / "a reading lens · not a feed filter" strip under the compass is
+gone. §Adjacent Block near the foot of the page already cross-links WaymarkPath,
+so the mid-page strip was double-billing the same destination. Nothing else in
+the section changes, and `PERSONAS.positional` is untouched in
+`src/lib/personas.ts` — it simply has no home-page placement now.
+
 ## 2026-08-05 — §Personas rebuilt as a compass and moved up the page
 
 - **Old `PersonaNavigator` deleted** (file removed; it was only ever used on the

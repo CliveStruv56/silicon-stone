@@ -239,8 +239,10 @@ here; edit the persona definitions.
 | South-west | `Global Citizen` | Informed Observer |
 | West | `Transatlantic Troy` | Founder / CEO |
 
-Positional keeps its own strip below the compass and routes to WaymarkPath
-rather than a feed filter.
+Positional is deliberately absent. It is a reading lens rather than a feed
+filter, and §Adjacent Block near the foot of the page already carries the
+WaymarkPath cross-link — a second strip under the compass read as
+double-billing (removed 2026-08-06).
 
 ---
 

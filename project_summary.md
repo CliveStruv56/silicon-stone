@@ -368,8 +368,9 @@ SESSION_SECRET=<long random secret, 32+ characters>
   responsive, theme-aware and every node links to `/intelligence?persona=<slug>`.
   Node copy comes from `src/lib/personas.ts` — persona strings stay
   single-sourced.
-- Positional keeps its WaymarkPath strip below the compass; the Adjacent Block
-  near the page foot is untouched.
+- Positional's WaymarkPath strip sat below the compass at first and was removed
+  on 2026-08-06 — the Adjacent Block near the page foot already carries that
+  cross-link.
 
 ### August 5, 2026 — Homepage copy + UI polish pass
 
