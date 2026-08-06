@@ -128,7 +128,7 @@ export default function AtlanticDriftPage() {
                       image) — it must not follow the theme tokens, which flip to
                       dark ink in light mode and vanish against the scrim. */}
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-scrim-ink via-scrim-ink/70 to-transparent p-5 pt-16">
-                    <p className="text-sm italic text-white/90 [text-shadow:0_1px_8px_rgba(0,0,0,0.7)]">
+                    <p className="text-sm italic text-balance text-white/90 [text-shadow:0_1px_8px_rgba(0,0,0,0.7)]">
                       Published from the Atlantic edge — neutral ground between Washington and Brussels.
                     </p>
                   </div>
