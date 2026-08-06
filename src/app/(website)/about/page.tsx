@@ -105,10 +105,10 @@ export default function AboutPage() {
                 </p>
               </div>
               <div className="relative">
-                <div className="aspect-[4/3] rounded-lg border border-border-subtle overflow-hidden">
+                <div className="aspect-[16/9] rounded-lg border border-border-subtle overflow-hidden">
                   <Image
-                    src="/about-edge-island.png"
-                    alt="A small island off Scotland's Atlantic coast, ringed by the sea"
+                    src="/about-edge-network.png"
+                    alt="Isometric illustration: three domed city-states linked by glowing data cables that pass through red warning markers where the routes cross, with a separate cliff-top listening station wired into the same network."
                     fill
                     sizes="(min-width: 1024px) 50vw, 100vw"
                     className="object-cover"
@@ -118,7 +118,7 @@ export default function AboutPage() {
                       FIXED light (it always sits on the dark scrim over the
                       image) — it must not follow the theme tokens, which flip to
                       dark ink in light mode and vanish against the scrim. */}
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-deep via-slate-deep/70 to-transparent p-6 pt-16">
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-deep via-slate-deep/70 to-transparent p-6 pt-12">
                     <p className="text-sm italic text-white/90 [text-shadow:0_1px_8px_rgba(0,0,0,0.7)]">
                       &ldquo;The edge is where you see what the centre misses&rdquo;
                     </p>

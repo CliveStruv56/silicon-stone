@@ -354,6 +354,19 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 6, 2026 — About hero artwork swapped for the network/chokepoint render
+
+The `/about` hero image is now `public/about-edge-network.png` (1400×779, 403KB —
+downscaled and palette-quantised from a 2000×1113 / 3.5MB source via `sharp`),
+replacing the Scottish-island photo. The frame moved from `aspect-[4/3]` to
+`aspect-[16/9]` to match the render's native ratio, and the caption scrim's top
+padding dropped `pt-16` → `pt-12` so the shorter frame isn't half-covered by the
+gradient. The quote — *"The edge is where you see what the centre misses"* — is
+retained: the artwork now depicts it literally (three domed city-nodes wired
+through flagged chokepoints, watched from a separate cliff-top station). Alt text
+rewritten to describe the illustration. `public/about-edge-island.png` deleted.
+File: `src/app/(website)/about/page.tsx`.
+
 ### August 6, 2026 — Obsidian vault retired; style rules become repo-canonical
 
 The author no longer uses Obsidian, so every instruction pointing at the
