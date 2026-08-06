@@ -21,8 +21,9 @@ the preview rebuild logged below — those components are deleted, not adjusted.
   - Deleted `CompliancePreview`, `SupplyChainPreview`, `ScenarioPreview` and
     `StressTestPreview` (~240 lines) along with the `useRef` / `useInView` /
     `motion` imports they needed. The section no longer animates its previews.
-  - `alt=""` on all four — the artwork is decorative beside the tool name and
-    tagline it sits above.
+  - Each panel carries descriptive `alt` text (`previewAlt` on the tool
+    record) describing what the illustration depicts, rather than being
+    marked decorative.
 
 ## 2026-08-06 — §Decision Tools: previews rebuilt to fill their panels
 

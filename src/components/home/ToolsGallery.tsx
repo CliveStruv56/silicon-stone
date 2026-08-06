@@ -28,6 +28,8 @@ const tools = [
     href: '/tools/supply-chain-mapper',
     accent: 'teal' as const,
     preview: '/tools/supply-chain-mapper-preview.webp',
+    previewAlt:
+      'Isometric illustration: supply routes from a mine, a chemical plant and a container port converge on a single mountain pass marked with a red warning symbol, then continue to a semiconductor fabrication plant.',
     takeFurther: { label: 'Manufacturing Exposure Module', href: '/advisory' },
   },
   {
@@ -37,6 +39,8 @@ const tools = [
     href: '/tools/compliance-checker',
     accent: 'amber' as const,
     preview: '/tools/compliance-checker-preview.webp',
+    previewAlt:
+      'Isometric illustration: circuit traces run from a server rack out to four graded tiers — red and flagged with a warning symbol, amber, teal, then unlit grey — echoing the EU AI Act risk classes from prohibited down to minimal.',
     takeFurther: { label: 'AI Act Compliance Toolkit (£79)', href: '/products' },
   },
   {
@@ -46,6 +50,8 @@ const tools = [
     href: '/tools/scenario-modeler',
     accent: 'amber' as const,
     preview: '/tools/scenario-modeler-preview.webp',
+    previewAlt:
+      'Isometric illustration: three coloured paths leave one office tower for three different futures — a fractured red plateau under a warning symbol, a cracked sandstone block, and intact teal ground carrying a smaller building.',
     takeFurther: { label: 'Scenario Impact Analysis', href: '/advisory' },
   },
   {
@@ -55,6 +61,8 @@ const tools = [
     href: '/tools/policy-stress-test',
     accent: 'teal' as const,
     preview: '/tools/policy-stress-test-preview.webp',
+    previewAlt:
+      'Isometric illustration: the US Capitol and a European institutional building sit on opposite sides of a deep rift, their green policy routes reaching the edge and stopping at red warning symbols rather than meeting.',
     takeFurther: { label: 'Regulatory Friction Assessment', href: '/advisory' },
   },
 ]
@@ -129,7 +137,7 @@ export function ToolsGallery() {
                   >
                     <Image
                       src={tool.preview}
-                      alt=""
+                      alt={tool.previewAlt}
                       fill
                       sizes="(min-width: 1280px) 548px, (min-width: 640px) 44vw, 88vw"
                       className="object-cover"
