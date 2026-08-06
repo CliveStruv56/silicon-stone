@@ -47,7 +47,7 @@ The main end-to-end content workflow is `/create`:
 
 `/generate` has been **removed** and merged into `/create`; every draft is now
 research-backed. For intel without a draft, use **Research Only**. The house-style
-rules are synced from the Ideaverse vault — see `docs/authoring-guide.md` §7.
+rules are canonical in this repo at `.agent/rules/style/` — see `docs/authoring-guide.md` §7.
 
 Generated Pulse articles are stored as `contentType: signal` with
 `intelligenceTier: pulse`; Sanity treats editorial format and reading-speed tier as

@@ -332,9 +332,9 @@ SESSION_SECRET=<long random secret, 32+ characters>
 | Pass-1 house-style guardrail (hand-curated) | `src/lib/style-guardrail.ts` |
 | Full house-style + AI-tells rules (bundled, generated) | `src/lib/style-rules.generated.ts` |
 | Style codegen (.md → bundled module) | `scripts/gen-style-rules.mjs` (`npm run gen:style`) |
-| Canonical style rules (synced from vault) | `.agent/rules/style/house-style.md`, `ai-tells.md` |
+| Canonical style rules (edit here — SSOT) | `.agent/rules/style/house-style.md`, `ai-tells.md` |
 | `voice-edit` skill (committed canonical / local mirror) | `.agent/skills/voice-edit/`, `.claude/skills/voice-edit/` |
-| Vault → repo style sync (SSOT) | `sync-style.sh` in the Ideaverse 2 Silicon and Stone vault |
+| Style rules → bundled module | `npm run gen:style` (also runs on `prebuild`) |
 | Sanity schemas | `src/sanity/schemaTypes/` |
 | Sanity queries | `src/sanity/lib/queries.ts` |
 | Content sync | `scripts/sync-content.ts` |
@@ -353,6 +353,31 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 6, 2026 — Obsidian vault retired; style rules become repo-canonical
+
+The author no longer uses Obsidian, so every instruction pointing at the
+Ideaverse vault has been removed from the docs. Two couplings mattered:
+
+- **House style was vault-SSOT.** `.agent/rules/style/house-style.md` and
+  `ai-tells.md` were rsynced in by a `sync-style.sh` living in the vault root.
+  **Those repo files are now the source of truth — edit them directly**, then run
+  `npm run gen:style` (also on `prebuild`). One gap remains: `gen:style`
+  regenerates the bundled module only, so `.agent/skills/voice-edit/references/`
+  must be refreshed by hand (`cp` commands are in `docs/authoring-guide.md` §7).
+  A small repo-side sync script would close it.
+- **Editorial knowledge review was vault-local.** Sanity is now both the
+  operational queue and the reviewed store. `npm run knowledge:pull` and
+  `AIOS_VAULT_PATH` still exist in code (`scripts/pull-knowledge-source.ts`) but
+  are unused and unsupported — **not yet retired or repointed; a decision is
+  outstanding.**
+
+Docs touched: `docs/authoring-guide.md` §7, `docs/editorial-aios-manual.md`,
+`docs/editorial-aios-inbox.md`, `README.md`, `.env.example`, §8 of this file, and
+two Obsidian artefacts inside `house-style.md` (a `[[Me]]` wikilink and an
+"Obsidian variants" phrasing) — which changed the generated style module, so it
+is regenerated and committed. Historical §9 entries below still mention the vault
+sync; those are a record of what happened and are left as-is.
 
 ### August 6, 2026 — Decision Tools previews replaced with commissioned artwork
 

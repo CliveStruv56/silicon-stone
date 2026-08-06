@@ -14,46 +14,20 @@ For the full user-facing walkthrough, see [Editorial AIOS User Manual](./editori
 
 Both appear in the embedded Sanity Studio under **Knowledge Inbox**.
 
-## Local Vault Configuration
+## Local Vault Workflow (retired)
 
-Set the absolute reviewed-vault path in `.env.local`:
+This document previously described a command-line loop that pulled each pending
+`knowledgeSource` out of Sanity, wrote a `Sources/<source-id>.md` manifest into a
+local Obsidian vault at `AIOS_VAULT_PATH`, and patched the record back to
+`processed` once you confirmed the local filing.
 
-```text
-AIOS_VAULT_PATH=/absolute/path/to/your/obsidian-vault
-```
+**That workflow is retired (August 2026) — the author no longer keeps an Obsidian
+vault.** Review happens in the Sanity Studio inbox instead; there is no local
+filing step and nothing to commit.
 
-The command validates that the directory contains `AIOS-SCHEMA.md` and
-`Sources/` before writing.
-
-## Process One Pending Source
-
-Prepare one compact pending manifest:
-
-```bash
-npm run knowledge:pull
-```
-
-The command:
-
-1. Fetches the oldest pending `knowledgeSource`.
-2. Writes `Sources/<source-id>.md` in the reviewed local vault.
-3. Leaves Sanity status as `pending`.
-4. Does not copy extracted source text into the vault.
-
-Process the source locally according to `AIOS-SCHEMA.md`: update the manifest,
-compiled wiki, and append-only log, then review the diff.
-
-After review, change the local manifest to `status: processed` and run:
-
-```bash
-npm run knowledge:pull -- --confirm-reviewed <source-id>
-```
-
-The confirmation command refuses to patch Sanity unless the reviewed local
-manifest exists and says `status: processed`. It then stores the `manifestId`
-and updates the Sanity inbox record to `processed`.
-
-The portal has no Git commit or push path. Vault review remains local.
+The `npm run knowledge:pull` script and the `AIOS_VAULT_PATH` env var still exist
+in the codebase (`scripts/pull-knowledge-source.ts`) but are unused and
+unsupported. Retire or repoint them before relying on them.
 
 ## Separate Pinecone Evidence Index
 

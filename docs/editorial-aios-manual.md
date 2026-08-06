@@ -4,9 +4,14 @@ This document explains the full workflow for the editorial knowledge system:
 
 - the `/knowledge` page in the website
 - the embedded Sanity Studio inbox
-- the local vault review step
-- the command-line handoff back to Sanity
 - what is stored in each place
+
+> **Status (August 2026): the local Obsidian vault step is retired.** The author no
+> longer keeps an Obsidian vault, so there is no local review store and no
+> `npm run knowledge:pull` step in the workflow below. Sanity is now the only
+> reviewed store. The `knowledge:pull` script and the `AIOS_VAULT_PATH` env var
+> still exist in the codebase but are unused and unsupported — decide whether to
+> retire or repoint them before relying on anything they do.
 
 The system is additive. It does not replace the existing article pipeline, draft flow, publishing flow, or article-level semantic search.
 
@@ -15,14 +20,10 @@ The system is additive. It does not replace the existing article pipeline, draft
 Use the system in this order:
 
 1. Capture a source in `/knowledge`.
-2. Pull the source into the local vault with `npm run knowledge:pull`.
-3. Review the generated vault manifest and update the relevant `Wiki/*.md` page.
-4. Change the local manifest from `status: pending` to `status: processed`.
-5. Confirm the reviewed filing with `npm run knowledge:pull -- --confirm-reviewed <source-id>`.
-6. Optionally save a useful synthesis as a knowledge candidate in Sanity.
-7. Commit and push the reviewed vault changes when the local review is complete.
+2. Triage it in the Sanity Studio inbox.
+3. Save a useful synthesis as a knowledge candidate in Sanity.
 
-The website captures inputs. The vault stores reviewed knowledge. Sanity stores inbox records and candidates. Pinecone stores evidence chunks and article search vectors.
+The website captures inputs. Sanity stores inbox records, candidates, and the reviewed synthesis. Pinecone stores evidence chunks and article search vectors.
 
 ## What Lives Where
 
@@ -39,7 +40,7 @@ Use it to:
 - open the existing article search
 - open Studio for structured review
 
-It does not write to the vault directly.
+It does not write anywhere outside Sanity and Pinecone.
 
 ### Sanity
 
@@ -48,23 +49,16 @@ Sanity stores the live inbox and candidate records.
 Two new document types matter here:
 
 - `knowledgeSource`: a source that has been captured but not yet filed locally
-- `knowledgeCandidate`: a useful synthesis that should be reviewed before entering the vault
+- `knowledgeCandidate`: a useful synthesis worth keeping after review
 
-Sanity is the operational queue, not the reviewed source of truth.
+Sanity is both the operational queue and — since the vault was retired — the reviewed store.
 
-### Local Vault
+### Local Vault (retired)
 
-The reviewed Obsidian vault is the durable knowledge store.
-
-It contains:
-
-- `AIOS-SCHEMA.md`
-- `Sources/*.md` source manifests
-- `Wiki/*.md` reviewed synthesis pages
-- `Candidates/*.md` or candidate notes if you use them locally
-- `Logs/knowledge-os-log.md`
-
-The vault is where the human-reviewed knowledge lives.
+This system was originally designed around a local Obsidian vault as the durable
+knowledge store, with `Sources/*.md` manifests and `Wiki/*.md` synthesis pages
+filed by hand. **That vault is no longer used.** Nothing files locally any more;
+treat any surviving `AIOS_VAULT_PATH` wiring as dead configuration.
 
 ### Pinecone
 
@@ -114,11 +108,11 @@ What happens after you submit:
 
 - Sanity gets a `knowledgeSource` record with `status: pending`
 - the record appears in the source inbox
-- the source is ready for local vault review
+- the source is ready for review in the Studio inbox
 
 ### 2. Source Inbox
 
-This section shows captured sources waiting for local review.
+This section shows captured sources waiting for review.
 
 Use it to check:
 
@@ -129,7 +123,7 @@ Use it to check:
 - capture date
 - original URL
 
-This list is informational. It does not file anything into the vault by itself.
+This list is informational. It does not file anything by itself.
 
 ### 3. Deep Evidence Search
 
@@ -186,7 +180,7 @@ This is the existing semantic search for published articles.
 
 It remains unchanged.
 
-It is separate from deep evidence search and separate from the local vault workflow.
+It is separate from deep evidence search.
 
 ## The Embedded Studio
 
@@ -197,9 +191,9 @@ Use it to:
 - inspect `knowledgeSource` records
 - inspect `knowledgeCandidate` records
 - review pending inbox items
-- confirm what is sitting in Sanity before local filing
+- confirm what is sitting in Sanity before it is worked on
 
-Studio is not the reviewed vault.
+Studio is where review happens.
 Studio is the inbox and editing surface for Sanity records.
 
 The main Studio section for this workflow is **Knowledge Inbox**.

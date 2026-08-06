@@ -15,7 +15,7 @@ updated: 2026-06-08
 
 - **UK English** spelling and idiom throughout.
 - **Present tense** as the default for published content.
-- Clive's voice — see [[Me]].
+- Clive's voice — see `context/core/voice-dna.json`.
 
 ## Conventions
 
@@ -29,7 +29,7 @@ updated: 2026-06-08
   - Main markdown file layout requires: `# Title of the Article`, followed by `**Subject Line:**`, `**Preview Text:**`, then `## Article` for the body.
   - The closing Stone Truth verdict gets its own callout (slim left-border, italicised accent).
   - Bold text is used for emphasis; avoid over-formatting.
-- **Variant mapping:** Use [[variant-map]] when translating Obsidian variants
+- **Variant mapping:** Use [[variant-map]] when translating draft variants
   into website `contentType` and `intelligenceTier` fields.
 
 ## What to avoid

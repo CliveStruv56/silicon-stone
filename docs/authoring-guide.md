@@ -14,7 +14,7 @@ This guide outlines the workflows for researching topics, generating drafts, and
     *   Type a natural language query in the search bar.
     *   *Example:* "European battery passport implementation timeline and blockers"
     *   The system runs a live **Exa.ai** web search (Deep Dive uses the agentic Exa Research Pro pass), then Claude synthesises a **Forensic Summary**. It also surfaces semantically similar **prior articles** from the Pinecone index so the draft extends rather than repeats past coverage.
-    *   *(Note: `/create` does **not** read your Inoreader subscriptions — that is the `/research` route. In practice you browse Inoreader yourself, pick a story, and type its topic here. See `Project/ops/inoreader-intelligence-engine-v2.md`.)*
+    *   *(Note: `/create` does **not** read your Inoreader subscriptions — that is the `/research` route. In practice you browse Inoreader yourself, pick a story, and type its topic here. See `docs/admin-research-workflow.md`.)*
 
 3.  **Review Intelligence:**
     *   **Summary:** High-level overview of the topic.
@@ -78,7 +78,7 @@ Tone is enforced by the pipeline itself — you no longer rely on the draft "hap
   - Where only you can supply a fact, figure, name, or anecdote, it inserts an inline **`[AUTHOR: …]`** placeholder rather than inventing one, and writes a summary (tells removed, house-style fixes, and the full `[AUTHOR: …]` list) to the article's **Voice Edit Notes** field in Studio.
   - The pass is best-effort: if it fails, the Pass-1 draft still saves.
 
-**Where the rules come from.** The canonical rules live in the Ideaverse vault (`Style/house-style.md` + `Style/ai-tells.md`). `sync-style.sh` syncs them into `.agent/rules/style/`, then `npm run gen:style` codegens the bundled module the app imports (`src/lib/style-rules.generated.ts`) so the rules always reach the production prompt. See *House style & the vault* below. The same references back the terminal **`/voice-edit`** skill for manual passes on any draft.
+**Where the rules come from.** The canonical rules live in this repo at `.agent/rules/style/house-style.md` + `ai-tells.md`. `npm run gen:style` codegens the bundled module the app imports (`src/lib/style-rules.generated.ts`) so the rules always reach the production prompt. See *House style* below. The same references back the terminal **`/voice-edit`** skill for manual passes on any draft.
 
 ## 2. Research Portal (`/research`)
 **Best for:** Exploring topics without immediately generating a full draft.
@@ -89,7 +89,7 @@ Tone is enforced by the pipeline itself — you no longer rely on the draft "hap
 4.  Optionally click **"Draft"** to create a Signal-type draft in Sanity.
 
 ## 3. Markdown Content Sync (Bulk/External Authoring)
-**Best for:** Writing long-form content in an external editor (Obsidian, VS Code) and syncing in bulk.
+**Best for:** Writing long-form content in an external editor (VS Code, or any Markdown editor) and syncing in bulk.
 
 ### File Format
 Create markdown files (`.md`) in your content directory (default: `../content/substack`).
@@ -172,19 +172,26 @@ npm run sync-content:force # Overwrite ALL articles (use with caution)
 | Global Citizen | `citizen` | Informed general public, journalists, educators |
 | Transatlantic Troy | `troy` | US/Canadian founders and CEOs entering the European market |
 
-## 7. House Style & the Vault (source of truth)
+## 7. House Style (source of truth)
 
-The **Ideaverse 2 Silicon and Stone** Obsidian vault is the single source of truth for house style and variant rules. **Yes — we still sync from it.** The website repo *consumes* these rules and never edits them.
+**This repo is the single source of truth for house style and variant rules.** Edit them here.
+
+> Until August 2026 the canonical copies lived in an Obsidian vault and were rsynced in by a `sync-style.sh` script living in the vault root. **That vault is retired — do not sync from it, and do not treat any copy outside this repo as canonical.**
 
 ```
-Vault  Style/house-style.md, Style/ai-tells.md, pulse/briefing/deep-dive/variant-map.md   ← edit here
-  │   (run sync-style.sh in the vault after editing)
-  ├─ rsync → .agent/rules/style/*.md            (editorial reference for agents/humans)
+.agent/rules/style/house-style.md, ai-tells.md, variant-map.md   ← edit here
   ├─ codegen → src/lib/style-rules.generated.ts (npm run gen:style — bundled, what the web app imports)
-  └─ copy  → .agent/skills/voice-edit/references/  and  .claude/skills/voice-edit/references/
+  └─ copy    → .agent/skills/voice-edit/references/  (and the .claude/ mirror, which is gitignored)
 ```
 
-`sync-style.sh` lives in the vault root. After editing any `Style/*.md` file, run it: it rsyncs the Markdown into the repo, regenerates the bundled rules module, and refreshes both copies of the `voice-edit` skill's references. Then commit the repo changes. (`gen:style` also runs automatically on `prebuild`, so a deploy can never ship stale rules.)
+After editing any file in `.agent/rules/style/`, run `npm run gen:style` and commit both the rule file and the regenerated module. (`gen:style` also runs on `prebuild`, so a deploy can never ship stale rules.)
+
+**One manual step remains.** `gen:style` regenerates the bundled module only — it does *not* refresh `.agent/skills/voice-edit/references/`, which the old vault script used to copy. If you change `house-style.md` or `ai-tells.md`, copy them across by hand so the `/voice-edit` skill doesn't drift:
+
+```bash
+cp .agent/rules/style/house-style.md .agent/skills/voice-edit/references/HOUSE-STYLE.md
+cp .agent/rules/style/ai-tells.md    .agent/skills/voice-edit/references/AI-TELLS.md
+```
 
 **Why a bundled module and not a runtime file read?** Reading repo `.md` at runtime is unreliable on Vercel (the file may not be traced into the serverless bundle). Importing a generated module is reliable — the same mechanism that makes `context/core/voice-dna.json` dependable.
 
@@ -193,8 +200,8 @@ Vault  Style/house-style.md, Style/ai-tells.md, pulse/briefing/deep-dive/variant
 | File | Role |
 |------|------|
 | `context/core/voice-dna.json` | Structured voice spec (traits, banned phrases) — also injected into the draft prompt |
-| `.agent/rules/style/house-style.md` | Canonical house style (UK English, banned words, punctuation, regulatory discipline) — synced from the vault |
-| `.agent/rules/style/ai-tells.md` | AI-register tells to strip (hedging, rule-of-three, false balance, the absence test) — synced from the vault |
+| `.agent/rules/style/house-style.md` | Canonical house style (UK English, banned words, punctuation, regulatory discipline) — **edit here** |
+| `.agent/rules/style/ai-tells.md` | AI-register tells to strip (hedging, rule-of-three, false balance, the absence test) — **edit here** |
 | `src/lib/style-guardrail.ts` | Hand-curated condensed guardrail for Pass 1 (keep in step with the canonical rules) |
 | `src/lib/style-rules.generated.ts` | Auto-generated full rules the web app imports — do not edit by hand |
 | `.agent/skills/voice-edit/` | Committed, versioned `/voice-edit` editorial skill (manual passes) |
