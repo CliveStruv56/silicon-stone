@@ -369,8 +369,10 @@ SESSION_SECRET=<long random secret, 32+ characters>
   Node copy comes from `src/lib/personas.ts` — persona strings stay
   single-sourced.
 - Positional's WaymarkPath strip sat below the compass at first and was removed
-  on 2026-08-06 — the Adjacent Block near the page foot already carries that
-  cross-link.
+  on 2026-08-06 — the Adjacent Block near the page foot carries that cross-link
+  instead, and now points at the internal `/waymarkpath` page in-tab rather than
+  opening the external app. The footer link still uses
+  `NEXT_PUBLIC_WAYMARKPATH_URL`.
 
 ### August 5, 2026 — Homepage copy + UI polish pass
 

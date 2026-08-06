@@ -2,6 +2,19 @@
 
 > Track every change shipped as part of the 2026 homepage redesign here. Append-only.
 
+## 2026-08-06 — §Adjacent Block points at the internal WaymarkPath page
+
+`See WaymarkPath` now links to `/waymarkpath` in-tab instead of opening the
+external app (`NEXT_PUBLIC_WAYMARKPATH_URL`) in a new tab. The internal page
+explains the companion and carries the early-access capture, so it is the right
+first stop from the home page — and with the persona compass's Positional strip
+gone, this is the home page's only route to it.
+
+The footer link is unchanged and still goes to the external app, so
+`NEXT_PUBLIC_WAYMARKPATH_URL` remains live; only the local const in
+`AdjacentBlock.tsx` is gone. SPEC.md §Adjacent still describes the old external
+target and should be read against this entry.
+
 ## 2026-08-06 — §Personas: WaymarkPath strip removed
 
 The Positional / "a reading lens · not a feed filter" strip under the compass is

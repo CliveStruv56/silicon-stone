@@ -1,11 +1,14 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 
-const WAYMARKPATH_URL =
-    process.env.NEXT_PUBLIC_WAYMARKPATH_URL ?? 'https://waymarkpath.vercel.app'
-
 // WaymarkPath is adjacent to the Read → Use → Buy → Engage ladder, not a rung on it.
 // This is a deliberately lighter "Related" card, not a peer offering section.
+//
+// Points at the internal /waymarkpath page rather than the external app
+// (NEXT_PUBLIC_WAYMARKPATH_URL, which the footer still uses): the page explains
+// the companion and carries the early-access capture, so it is the right first
+// stop from the home page. It became the home page's only route to /waymarkpath
+// when the persona compass's Positional strip was removed.
 export function AdjacentBlock() {
     return (
         <section
@@ -28,9 +31,7 @@ export function AdjacentBlock() {
 
                 <div className="flex-shrink-0">
                     <Link
-                        href={WAYMARKPATH_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        href="/waymarkpath"
                         className="group inline-flex items-center gap-2 px-4 py-2 rounded-md border border-sister-indigo/40 text-sister-indigo hover:bg-sister-indigo/10 transition-colors text-sm font-medium"
                     >
                         See WaymarkPath
