@@ -372,10 +372,16 @@ not apex → www (which had been a 307).
   domain (`siliconandstone.com`), the documented Lemon Squeezy webhook URL, and
   the Inoreader OAuth callback. Sanity CORS allows both hosts.
 
-**Owner follow-up (external dashboards, cannot be done from the repo):** add and
-verify the apex property in Google Search Console and resubmit
-`https://siliconandstone.com/sitemap.xml`; expect a few weeks of reindexing
-churn as Google moves the indexed host across the 308.
+**Google Search Console — set up the same day.** The site had **no** GSC
+property at all before this (neither host, on either Google account). Created as
+a **Domain property** `sc-domain:siliconandstone.com` under
+**clive@platform91.com**, verified by DNS TXT on the Vercel-managed zone
+(`google-site-verification=ig1LTu00…`, record `rec_19d282278239a1369db1a625` —
+**deleting it loses verification**). A Domain property spans apex + www +
+http/https, so future redirect flips need no GSC change.
+`https://siliconandstone.com/sitemap.xml` submitted: status Success, 41 pages
+discovered. Expect a few weeks of reindexing churn as Google moves the indexed
+host across the 308.
 
 ### August 6, 2026 — Light-mode fixes: caption scrims and hairline dividers
 
