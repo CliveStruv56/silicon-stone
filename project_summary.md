@@ -354,6 +354,29 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 6, 2026 — Canonical host switched from www to the bare apex
+
+**This reverses the June 8 decision** recorded further down this section
+("canonical host = **www**"). The live redirect now runs **www → apex (308)**,
+not apex → www (which had been a 307).
+
+- **Vercel** (`silicon-stone` project domains, changed via the REST API — the
+  CLI has no redirect flag): cleared the redirect on `siliconandstone.com`, then
+  set `www.siliconandstone.com` → `siliconandstone.com` with status 308. Cleared
+  first, so the two were never pointed at each other.
+- **`src/lib/site.ts`**: `SITE_URL` fallback → `https://siliconandstone.com`.
+  `NEXT_PUBLIC_SITE_URL` is **not set** on Vercel, so this fallback is what
+  production actually serves — it drives canonicals, OG, JSON-LD `@id`s, the
+  sitemap, robots, RSS and llms.txt. `.env.example` updated to match.
+- **Already apex, no change needed:** `NEXT_PUBLIC_APP_URL`, the Plausible
+  domain (`siliconandstone.com`), the documented Lemon Squeezy webhook URL, and
+  the Inoreader OAuth callback. Sanity CORS allows both hosts.
+
+**Owner follow-up (external dashboards, cannot be done from the repo):** add and
+verify the apex property in Google Search Console and resubmit
+`https://siliconandstone.com/sitemap.xml`; expect a few weeks of reindexing
+churn as Google moves the indexed host across the 308.
+
 ### August 6, 2026 — Light-mode fixes: caption scrims and hairline dividers
 
 Two light-theme defects, both global rather than About-specific:
