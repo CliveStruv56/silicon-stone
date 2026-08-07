@@ -105,10 +105,17 @@ export default function AboutPage() {
                 </p>
               </div>
               <div className="relative">
-                <div className="aspect-[16/9] rounded-lg border border-border-subtle overflow-hidden">
+                {/* The artwork is a transparent PNG, so the frame supplies its
+                    own background. `scrim-ink` is FIXED dark — the same token as
+                    the caption scrim below — so the render sits on the dark
+                    ground it was lit for in BOTH themes. Do not drop this to let
+                    the page background through: in light mode the stone page
+                    colour shows behind the render and the dark caption scrim
+                    stops making sense. */}
+                <div className="aspect-[16/9] rounded-lg border border-border-subtle overflow-hidden bg-scrim-ink">
                   <Image
-                    src="/about-edge-network.png"
-                    alt="Isometric illustration: three domed city-states linked by glowing data cables that pass through red warning markers where the routes cross, with a separate cliff-top listening station wired into the same network."
+                    src="/about-edge-observatory.png"
+                    alt="Isometric illustration: three domed city-states linked by glowing data cables that pass through red warning markers where the routes cross, with a separate cliff-top listening station, antenna mast and dish array wired into the same network."
                     fill
                     sizes="(min-width: 1024px) 50vw, 100vw"
                     className="object-cover"

@@ -1,7 +1,7 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-08-06
+> Last Updated: 2026-08-07
 > Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (71 static pages), 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com. Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools (email-gated for lead capture, AI Act triage engine recently overhauled), product/commerce pages with an early-access enquiry fallback until Lemon Squeezy checkout URLs are configured, Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production. **The blocker is a P0: the production Kit API key is a legacy v3 key, so `/api/subscribe` 401s and — because `NEXT_PUBLIC_PRE_LAUNCH` is still `true`, making every product CTA an email capture — the entire funnel currently terminates in a failed POST.** Beyond that: Lemon Squeezy store not yet created, 9 drafts unpublished, and 7 of 12 published articles still lack cover images. Go-live sequence lives in `LAUNCH.md`; defects and debt in §10.
@@ -353,6 +353,25 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 7, 2026 — About hero artwork replaced with the transparent observatory render
+
+`public/about-edge-network.png` is gone; the `/about` hero is now
+`public/about-edge-observatory.png` (1400×781, 345KB — downscaled and
+palette-quantised from a 2752×1536 / 5.4MB source via `sharp`, same treatment as
+its predecessor). Same scene, cleaner render: three domed city-nodes wired
+through flagged chokepoints, watched from a cliff-top station whose antenna mast
+and dish array are now legible. The frame ratio (`aspect-[16/9]`) and the caption
+are unchanged — the new source is 1.792:1, so `object-cover` crops under 1%.
+
+**The one structural change: the new PNG has a genuinely transparent background**
+(~50% of pixels are non-opaque, including the gaps between the domes), where the
+old one baked in its dark navy. The frame therefore carries `bg-scrim-ink` so the
+render sits on the dark ground it was lit for in both themes. Without it, light
+mode shows warm stone through the artwork and the fixed-dark caption scrim below
+it stops reading as part of the same picture. Verified in both colour schemes at
+1440×900. Alt text extended to name the mast and dish array.
+File: `src/app/(website)/about/page.tsx`.
 
 ### August 6, 2026 — Canonical host switched from www to the bare apex
 
