@@ -354,24 +354,35 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
-### August 7, 2026 — About hero artwork replaced with the transparent observatory render
+### August 7, 2026 — About hero: transparent observatory render, one variant per theme
 
-`public/about-edge-network.png` is gone; the `/about` hero is now
-`public/about-edge-observatory.png` (1400×781, 345KB — downscaled and
-palette-quantised from a 2752×1536 / 5.4MB source via `sharp`, same treatment as
-its predecessor). Same scene, cleaner render: three domed city-nodes wired
-through flagged chokepoints, watched from a cliff-top station whose antenna mast
-and dish array are now legible. The frame ratio (`aspect-[16/9]`) and the caption
-are unchanged — the new source is 1.792:1, so `object-cover` crops under 1%.
+`public/about-edge-network.png` is gone. The `/about` hero is now **two** files —
+`public/about-edge-observatory-dark.webp` (173KB) and
+`-light.webp` (205KB), both 1400×781 — swapped on the `.dark` class via
+`dark:hidden` / `hidden dark:block`. Same scene as before, cleaner render: three
+domed city-nodes wired through flagged chokepoints, watched from a cliff-top
+station whose antenna mast and dish array are now legible.
 
-**The one structural change: the new PNG has a genuinely transparent background**
-(~50% of pixels are non-opaque, including the gaps between the domes), where the
-old one baked in its dark navy. The frame therefore carries `bg-scrim-ink` so the
-render sits on the dark ground it was lit for in both themes. Without it, light
-mode shows warm stone through the artwork and the fixed-dark caption scrim below
-it stops reading as part of the same picture. Verified in both colour schemes at
-1440×900. Alt text extended to name the mast and dish array.
-File: `src/app/(website)/about/page.tsx`.
+**Why two files.** Both renders are transparent, and neither works on both
+grounds. The dark variant's dome glass is a dark tint that turns to murk on the
+light stone; the light variant's glass is pale and reads as white eggshells on
+the dark slate. The first cut of this change tried to serve one transparent PNG
+on a `bg-scrim-ink` frame, which put a black slab behind the artwork in light
+mode. Swap the file per theme; do not try to restyle one render to cover both.
+
+The frame is now bare — no fill, no border, no overlay scrim — and the caption
+moved from an absolute overlay to a `<figcaption>` below the image. With only
+page colour behind the render there is no dark ground to carry white text, and
+the old fixed-dark gradient band would read as a stray black bar on light stone.
+`object-cover` → `object-contain`, since a transparent render must not be cropped
+to fill.
+
+**Encoding gotcha.** `sharp`'s `.png()` palette-quantises by default and crushed
+the alpha channel from 256 levels to 24 — invisible against an opaque backdrop,
+badly visible on a transparent one. Full-alpha PNG is ~1.5MB; **WebP at
+`{quality: 90, alphaQuality: 100}` holds all 256 alpha levels at ~180KB**. Use
+WebP for any transparent artwork here. Verified in both colour schemes at
+1440×900 and at 390×844. File: `src/app/(website)/about/page.tsx`.
 
 ### August 6, 2026 — Canonical host switched from www to the bare apex
 

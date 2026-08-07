@@ -76,6 +76,11 @@ const editorialStandards = [
   },
 ]
 
+// Shared by both theme variants of the hero render — they depict the same scene,
+// so only the visible one carries the description and the other is aria-hidden.
+const observatoryAlt =
+  'Isometric illustration: three domed city-states linked by glowing data cables that pass through red warning markers where the routes cross, with a separate cliff-top listening station, antenna mast and dish array wired into the same network.'
+
 const linkedinUrl = process.env.NEXT_PUBLIC_LINKEDIN_URL
 
 export default function AboutPage() {
@@ -104,35 +109,44 @@ export default function AboutPage() {
                   that comes from distance: geographic, temporal, and intellectual.
                 </p>
               </div>
-              <div className="relative">
-                {/* The artwork is a transparent PNG, so the frame supplies its
-                    own background. `scrim-ink` is FIXED dark — the same token as
-                    the caption scrim below — so the render sits on the dark
-                    ground it was lit for in BOTH themes. Do not drop this to let
-                    the page background through: in light mode the stone page
-                    colour shows behind the render and the dark caption scrim
-                    stops making sense. */}
-                <div className="aspect-[16/9] rounded-lg border border-border-subtle overflow-hidden bg-scrim-ink">
+              {/* Two renders of the same scene, swapped on the `.dark` class.
+                  Both are transparent and float directly on the page — no frame
+                  fill, no border, no overlay scrim.
+
+                  They are NOT interchangeable. The dark render's dome glass is a
+                  dark tint that turns to murk on the light stone; the light
+                  render's glass is pale and reads as white eggshells on the dark
+                  slate. Each only works on the ground it was lit for, so swap
+                  the file rather than trying to restyle one of them.
+
+                  The caption sits BELOW the image for the same reason the frame
+                  has no fill: with only page colour behind the render there is
+                  no dark ground to carry white text, and a fixed-dark gradient
+                  band would read as a stray black bar in light mode. */}
+              <figure className="m-0">
+                <div className="relative aspect-[16/9]">
                   <Image
-                    src="/about-edge-observatory.png"
-                    alt="Isometric illustration: three domed city-states linked by glowing data cables that pass through red warning markers where the routes cross, with a separate cliff-top listening station, antenna mast and dish array wired into the same network."
+                    src="/about-edge-observatory-light.webp"
+                    alt={observatoryAlt}
                     fill
                     sizes="(min-width: 1024px) 50vw, 100vw"
-                    className="object-cover"
+                    className="object-contain dark:hidden"
                     priority
                   />
-                  {/* Gradient scrim for caption legibility. Both the caption and
-                      the scrim under it are FIXED dark-on-light: `scrim-ink`
-                      does not flip between themes. Do not swap it back to
-                      `slate-deep` — that token lightens to warm stone in light
-                      mode and the white caption disappears into it. */}
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-scrim-ink via-scrim-ink/70 to-transparent p-6 pt-12">
-                    <p className="text-sm italic text-balance text-white/90 [text-shadow:0_1px_8px_rgba(0,0,0,0.7)]">
-                      &ldquo;The edge is where you see what the centre misses&rdquo;
-                    </p>
-                  </div>
+                  <Image
+                    src="/about-edge-observatory-dark.webp"
+                    alt=""
+                    aria-hidden
+                    fill
+                    sizes="(min-width: 1024px) 50vw, 100vw"
+                    className="hidden object-contain dark:block"
+                    priority
+                  />
                 </div>
-              </div>
+                <figcaption className="mt-4 text-sm italic text-balance text-text-muted">
+                  &ldquo;The edge is where you see what the centre misses&rdquo;
+                </figcaption>
+              </figure>
             </div>
           </div>
         </section>
