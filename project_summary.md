@@ -381,8 +381,23 @@ to fill.
 the alpha channel from 256 levels to 24 — invisible against an opaque backdrop,
 badly visible on a transparent one. Full-alpha PNG is ~1.5MB; **WebP at
 `{quality: 90, alphaQuality: 100}` holds all 256 alpha levels at ~180KB**. Use
-WebP for any transparent artwork here. Verified in both colour schemes at
-1440×900 and at 390×844. File: `src/app/(website)/about/page.tsx`.
+WebP for any transparent artwork here.
+
+**Edge fade (`edgeFadeMask`).** Both renders are cropped flat by their own canvas
+along the bottom and right — the cliff runs off both — which read as hard cuts
+against the page. Two intersected CSS gradients (`mask-composite: intersect`)
+feather the outer band of the frame so the artwork falls away instead.
+
+This was tried first by feathering the alpha channel itself, and that approach is
+a dead end worth not repeating: spreading alpha outward requires bleeding colour
+into the new semi-transparent ring, and both renders carry light matting fringes
+on thin geometry (antenna mast, dish array) which the bleed amplifies into a
+white halo around every thin part. Note also that a box blur clamps at the buffer
+edge, so the boundary cuts stay hard at any radius unless the canvas is padded
+first. Masking the frame leaves every pixel untouched and is instantly tunable.
+
+Verified in both colour schemes at 1440×900 and at 390×844.
+File: `src/app/(website)/about/page.tsx`.
 
 ### August 6, 2026 — Canonical host switched from www to the bare apex
 

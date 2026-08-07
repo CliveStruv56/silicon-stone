@@ -81,6 +81,28 @@ const editorialStandards = [
 const observatoryAlt =
   'Isometric illustration: three domed city-states linked by glowing data cables that pass through red warning markers where the routes cross, with a separate cliff-top listening station, antenna mast and dish array wired into the same network.'
 
+// The render is cropped flat by its own canvas along the bottom and right — the
+// cliff runs off both — which reads as a hard cut against the page. Two
+// intersected gradients feather the outer band of the frame so the artwork falls
+// away into the background instead.
+//
+// Done in CSS rather than baked into the alpha channel on purpose. Feathering the
+// PNG means bleeding colour outward to fill the new semi-transparent ring, and
+// both renders carry light matting fringes on thin geometry (the antenna mast,
+// the dish array) that the bleed amplifies into a white halo. Masking the frame
+// leaves every pixel of the artwork untouched.
+//
+// `mask-composite` is what makes the two gradients intersect rather than stack.
+// Where it is unsupported the mask is a no-op and the edges are merely hard —
+// the pre-existing behaviour, not a broken one.
+const edgeFadeMask = {
+  maskImage:
+    'linear-gradient(to bottom, transparent 0, #000 9%, #000 91%, transparent 100%), ' +
+    'linear-gradient(to right, transparent 0, #000 7%, #000 93%, transparent 100%)',
+  maskComposite: 'intersect',
+  WebkitMaskComposite: 'source-in',
+} as const
+
 const linkedinUrl = process.env.NEXT_PUBLIC_LINKEDIN_URL
 
 export default function AboutPage() {
@@ -124,7 +146,7 @@ export default function AboutPage() {
                   no dark ground to carry white text, and a fixed-dark gradient
                   band would read as a stray black bar in light mode. */}
               <figure className="m-0">
-                <div className="relative aspect-[16/9]">
+                <div className="relative aspect-[16/9]" style={edgeFadeMask}>
                   <Image
                     src="/about-edge-observatory-light.webp"
                     alt={observatoryAlt}
