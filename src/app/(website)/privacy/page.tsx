@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 
 import { Header, Footer } from '@/components/layout'
 import { Badge } from '@/components/ui/badge'
@@ -58,6 +59,14 @@ export default function PrivacyPage() {
                   <span className="text-stone-teal mt-1">-</span>
                   <span><strong className="text-text-primary">Website analytics:</strong> We use privacy-friendly analytics that do not track individual users or use cookies for tracking purposes.</span>
                 </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-stone-teal mt-1">-</span>
+                  <span><strong className="text-text-primary">Compliance Checker assessments:</strong> The interactive tools at <Link href="/tools" className="text-silicon-amber hover:underline">/tools</Link> can be used without giving us anything. If you ask the AI Act Compliance Checker for a written report, we store the email address you give us, the report it generated, and a record of the consent wording you were shown. Your answers describe an AI system in your organisation, so treat them as commercially sensitive: we hold reports for 30 days and consent records for two years, we do not add the address to any mailing list unless you separately tick to say so, and we do not share either with anyone.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-stone-teal mt-1">-</span>
+                  <span><strong className="text-text-primary">Assessments in progress:</strong> While you are working through a tool, your answers are saved against an anonymous identifier in a cookie so a refresh does not lose them. They expire after 24 hours and are not linked to you.</span>
+                </li>
               </ul>
             </div>
 
@@ -75,6 +84,10 @@ export default function PrivacyPage() {
                 <li className="flex items-start gap-2">
                   <span className="text-stone-teal mt-1">-</span>
                   <span>To deliver digital products you have purchased</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-stone-teal mt-1">-</span>
+                  <span>To generate and deliver a tool report you asked for, and to answer you about it. This is separate from the newsletter: asking for a report does not subscribe you to anything</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-stone-teal mt-1">-</span>

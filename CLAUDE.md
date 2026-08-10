@@ -31,14 +31,24 @@ not in TypeScript constants. Two rules:
   `02024R1689-20260727`. Verify against that before changing one; do not take a
   date from a summary, a blog post, or a build spec.
 
-Two invariants the tool promises on screen and must keep:
+Three invariants the tool promises on screen and must keep:
 
 - **The model never decides the tier.** Agentic intake proposes answers the user
-  confirms; classification is the deterministic engine's alone.
+  confirms; classification is the deterministic engine's alone. The report route
+  re-runs the engine server-side rather than trusting a browser-supplied verdict,
+  and a generation that restates tier, role or confidence differently is
+  discarded whole (`src/lib/report/schema.ts`).
 - **Confidence is categorical, never a percentage.**
+- **No generated legal quotation reaches a screen unverified.** Every claim in a
+  generated report is string-matched against the pinned corpus
+  (`src/lib/report/verify.ts`); an unmatched claim renders an explicit note in
+  place of the quote, and three failures withhold the whole report.
 
 Corpus coverage is partial (19 Articles). `verifyCitation()` returns
 `uncovered` for anything else — treat that as unverifiable, never as a pass.
+The report generator only supplies Articles the pack covers, so an `uncovered`
+verdict means the model cited outside its evidence, not merely that coverage is
+thin.
 
 ## Model routing
 

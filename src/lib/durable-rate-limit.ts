@@ -30,6 +30,11 @@ const configs = {
   // the ceiling is the cost control — generous enough to retry a description a
   // few times, tight enough that the free path cannot be farmed.
   checkerIntake: { limit: 10, window: '1 h', prefix: 'sas:checker-intake' },
+  // The report is the only frontier-model call on the free path, and each one
+  // is several thousand tokens of statute in and a few thousand out. Tighter
+  // than intake by an order of magnitude, deliberately: nobody legitimately
+  // needs three reports an hour, and the ceiling is the cost control.
+  checkerReport: { limit: 3, window: '1 h', prefix: 'sas:checker-report' },
 } satisfies Record<string, RateLimitConfig>
 
 export type DurableRateLimitKey = keyof typeof configs

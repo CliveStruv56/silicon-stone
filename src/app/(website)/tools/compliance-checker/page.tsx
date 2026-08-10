@@ -30,6 +30,7 @@ import {
 import { AI_ACT_TIMELINE, PENALTY_TIERS } from '@/lib/ai-act-timeline'
 import { RULE_PACK } from '@/lib/rulepack'
 import { ComplianceIntake } from '@/components/tools/ComplianceIntake'
+import { ReportGate } from '@/components/tools/ReportGate'
 import { CopyMarkdownButton } from '@/components/tools/CopyMarkdownButton'
 import { ToolSubscribeCard } from '@/components/tools/ToolSubscribeCard'
 import { complianceCheckerMarkdown } from '@/lib/tools-markdown'
@@ -541,6 +542,13 @@ export default function ComplianceCheckerPage() {
                   )}
                 </CardContent>
               </Card>
+
+              {/*
+                The gate sits below the complete, ungated result — never in
+                front of it. Everything above this line is what the tool gave
+                away before the report existed, and still does.
+              */}
+              <ReportGate answers={answers} />
 
               <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
                 <Card className="bg-stone-charcoal border-border-subtle">

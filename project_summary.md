@@ -2,11 +2,11 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-08-10
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (72 static pages), 147 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (74 static pages), 181 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages with an early-access enquiry fallback until Lemon Squeezy checkout URLs are configured, Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
-**The AI Act Compliance Checker was rebuilt on 2026-08-10** (Stages 0–2 of the agentic build spec): the rule base is corrected and versioned at `v2026-08-10`, backed by a git-tracked rule pack carrying 19 Articles of verbatim consolidated statute; a conversational intake now proposes answers the user confirms before the unchanged deterministic engine classifies. Stage 3 (email gate + agentic report) is spec'd and partly blocked — see §11.
+**The AI Act Compliance Checker was rebuilt on 2026-08-10** (Stages 0–3 of the agentic build spec): the rule base is corrected and versioned at `v2026-08-10`, backed by a git-tracked rule pack carrying 19 Articles of verbatim consolidated statute; a conversational intake proposes answers the user confirms before the unchanged deterministic engine classifies; and the result screen now offers an email-gated written report whose every legal quotation is string-matched against that corpus before a reader sees it. The paid half of Stage 3 — the £39 Evidence Pack and the £39→£79 credit — is built dark behind a flag and blocked on the Lemon Squeezy store. A legal review of the report template, disclaimer and credit terms is an open item before it ships. See §11.
 
 **The blocker is a P0: the production Kit API key is a legacy v3 key, so `/api/subscribe` 401s and — because `NEXT_PUBLIC_PRE_LAUNCH` is still `true`, making every product CTA an email capture — the entire funnel currently terminates in a failed POST.** Beyond that: Lemon Squeezy store not yet created, 9 drafts unpublished, and 7 of 12 published articles still lack cover images. Go-live sequence lives in `LAUNCH.md`; defects and debt in §10.
 
@@ -17,7 +17,7 @@
 This is the **Silicon & Stone intelligence portal** — a Next.js 15 + Sanity CMS platform for "Forensic Technopolitics" analysis. It combines a public website, admin research/authoring tools, digital product sales pages, and an embedded CMS Studio.
 
 **Key facts:**
-- Build passes cleanly (`npm run build` — 71 static pages, 0 errors)
+- Build passes cleanly (`npm run build` — 74 static pages, 0 errors)
 - `npm audit` baseline (2026-08-05): **24 findings — 1 critical, 13 high, 9 moderate, 1 low.** The old "13 moderate / uuid only" baseline was stale; the tree drifted while the repo was quiet. Next.js was bumped 15.5.18 → **15.5.21** (closes two HIGH Server Actions advisories: DoS + SSRF) and the `postcss` override was refreshed to `^8.5.23` (resolves 8.5.25, clearing both PostCSS path-traversal advisories). Everything remaining traces through `sanity@4` — `@sanity/cli` → `@sanity/runtime-cli` (adm-zip), `@sanity/export` (tar, critical), `@sanity/template-validator` (undici), `preferred-pm` (js-yaml) — i.e. Studio CLI/export tooling that is not reachable from any served route, plus `sharp` (libvips CVEs; needs ≥0.35 but Next 15.5 declares `^0.34.3`) and `ws` via `openai`/`exa-js`. **Do not run `npm audit fix --force`** — npm proposes `next@16`, which the Sanity v4 pin forbids. These clear together at the Next 16 / Sanity v5 upgrade.
 - All API integrations verified working: Anthropic, Exa.ai, Inoreader, Sanity, ConvertKit
 - Admin login: configured via `ADMIN_PASSWORD` in the deployment environment. Do not store the live password in project docs.
@@ -262,6 +262,20 @@ ANTHROPIC_INTAKE_MODEL=claude-haiku-4-5    # Optional: overrides the small extra
                                            # model. Intake degrades to the click path
                                            # when ANTHROPIC_API_KEY is absent.
 
+# Compliance Checker report (Stage 3)
+ANTHROPIC_REPORT_MODEL=claude-sonnet-4-6   # Optional: overrides the frontier model
+                                           # used for the email-gated report.
+AI_MONTHLY_BUDGET_USD=                     # Optional: monthly model-spend ceiling,
+                                           # checked before dispatch. Unset = no
+                                           # ceiling. When SET and the usage ledger
+                                           # is unreadable, generation blocks — by
+                                           # design, not a bug.
+NEXT_PUBLIC_EVIDENCE_PACK_ENABLED=false    # £39 Evidence Pack + £39→£79 credit.
+                                           # Defaults FALSE; blocked on the Lemon
+                                           # Squeezy store. Enabling it surfaces the
+                                           # offer but checkout is not built.
+# SESSION_SECRET (below) is also required here — it signs report links.
+
 # AI Act rule pack (Compliance Checker)
 NEXT_PUBLIC_RULEPACK_VERSION=2026-08-10   # Optional: pins the rule pack. Must be a
                                           # version present in rulepack/versions/ and
@@ -344,6 +358,12 @@ SESSION_SECRET=<long random secret, 32+ characters>
 | Checker session autosave (Upstash, 24h) | `src/lib/checker-session.ts`, `-schema.ts`, `src/app/api/tools/compliance-checker/session/` |
 | Agentic intake (vocabulary, validator, extraction) | `src/lib/intake/`, `src/app/api/tools/compliance-checker/intake/` |
 | Intake UI (Art 50(1) disclosure + review screen) | `src/components/tools/ComplianceIntake.tsx` |
+| **Report generation + citation verifier** | `src/lib/report/` (`schema.ts` rejects, `verify.ts` checks, `generate.ts` calls) |
+| Report API (202 + poll) | `src/app/api/tools/compliance-checker/report/` |
+| Report UI (gate, view, dark paid teaser) | `src/components/tools/ReportGate.tsx`, `ReportView.tsx`, `EvidencePackTeaser.tsx` |
+| Report permanent link (signed token) | `src/app/(website)/tools/compliance-checker/report/[id]/` |
+| Email capture + `onEmailCaptured` seam | `src/lib/report/capture.ts` |
+| Monthly model-spend ceiling | `src/lib/model-budget.ts` |
 | Product pages | `src/app/(website)/products/*/page.tsx` |
 | Legal pages | `src/app/(website)/privacy/`, `src/app/(website)/terms/` |
 | Admin routes | `src/app/(admin)/*/` |
@@ -375,6 +395,79 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 10, 2026 — Stage 3 (free half): email-gated report with a citation verifier
+
+The checker's result screen now offers a written report: role analysis worked
+through the value chain, the expanded classification rationale including the
+mandatory **"what we did not ask you"**, and a review schedule dated against the
+user's own answers. Free, behind an email address.
+
+**The gate sits in front of something new.** Tool entry, the full on-screen
+result and the `.md` export are all exactly as free as they were yesterday. That
+was the promise, and adding a gate is not an excuse to quietly withdraw it — the
+`ReportGate` card renders *below* the complete result, never in front of it.
+
+**The classification is input, not output.** The route does not accept a tier
+from the browser: it takes sanitised answers, re-runs `evaluateAssessment()`
+server-side, and hands the verdict to generation as a settled fact. The model
+echoes tier, role and confidence back in three required fields, and any mismatch
+discards the whole generation rather than patching it — a model that restated
+the tier wrongly was reasoning from the wrong tier throughout. Measured on the
+Part E high-risk path: `Likely high-risk / Deployer / High`, identical to the
+click path, in 137 seconds.
+
+**Every quotation is checked before a reader sees it.** `verifyReport()` runs
+each `verbatim_quote` past the pinned corpus. Verified quotes render in a
+blockquote; everything else renders the proposition with an explicit note and
+*no quote at all* — an unmatched quotation attributed to the Official Journal is
+the precise failure this pipeline exists to prevent. Three failures withhold the
+entire report. **`uncovered` counts as a failure, never as a pass**, and the
+prompt only supplies Articles the pack actually carries, so an uncovered
+citation means the model went outside its evidence rather than that coverage is
+partial. Two runs of the same path: 12/12 verified, and 11/13 with two
+not-found — so the failure mode is real and the threshold is doing work.
+
+**Three deviations from the spec worth knowing about.**
+
+1. **No Vercel Workflows.** `after()` from `next/server` gives the same
+   202-then-poll shape without adding a workflow runtime to a repo pinned below
+   Next 16. The cost is durability: an instance dying mid-generation orphans a
+   `pending` record. That case is handled rather than ignored — a pending record
+   older than the route's own 300s ceiling is reported as failed and can be
+   retried.
+2. **No verification email, because there is no sender.** The spec wants a
+   short-lived email verification link; this build is forbidden from integrating
+   a mailing platform. So the report is delivered on screen via a signed link,
+   the address is captured for the delivery basis only, and `onEmailCaptured()`
+   is the single documented seam where a platform attaches. Disposable-domain
+   blocking and rate limiting still apply.
+3. **The in-memory store fallback lives on `globalThis`.** A module-level `Map`
+   gave the POST route and the polling route *different* maps under Next's
+   per-route compilation, and every poll 404'd. Production uses Upstash; this
+   only matters for local development, where it now works.
+
+**Cost control, which Part G asked for and §10 recorded as missing.** A monthly
+ceiling (`AI_MONTHLY_BUDGET_USD`, unset = off) is checked before dispatch via
+the usage ledger. When a ceiling is set and the ledger cannot be read, it
+**blocks** — someone who configures a spending limit wants it enforced, and "we
+could not tell how much you have spent, so we spent more" is not enforcement.
+Rate limit is 3 reports/hour/IP against intake's 10, and the corpus prefix is
+prompt-cached, which is the difference between pennies and pounds per report.
+
+Marketing consent is a separate, separately-stored, default-off tick. Capture
+records carry `consent_text_version`, because "they consented" is not a record
+unless you can say to what. The privacy notice now names the tool and states
+both retention periods (reports 30 days, consent records two years).
+
+The £39 Evidence Pack sits behind `NEXT_PUBLIC_EVIDENCE_PACK_ENABLED`, default
+**false** — the only flag in `flags.ts` that defaults off. It stays dark until
+the Lemon Squeezy store exists; the flag surfaces the offer and the £39→£79
+credit terms, but checkout and single-use code issuance are still unbuilt.
+
+Model is `claude-sonnet-4-6`, env-overridable via `ANTHROPIC_REPORT_MODEL`.
+34 new specs (181 total). Legal review of the report template, disclaimer and
+credit terms remains an open item before the paid half ships.
 
 ### August 10, 2026 — Stage 2: agentic intake in front of the unchanged engine
 
@@ -1732,7 +1825,9 @@ discount codes, booking URL, LinkedIn URL). This table is for defects and debt.
 | ~~`LAUNCH.md` URLs named `www`~~ — corrected 2026-08-10 | **The canonical host is the bare apex** as of 2026-08-06 (commit `50996d27`) — `SITE_URL` in `src/lib/site.ts` is `https://siliconandstone.com` and `www` 308s to it, reversing the June decision. The Lemon Squeezy redirect targets and webhook URL in `LAUNCH.md` still gave `www`, which would have put a redirect hop inside a payment callback; both now use the apex. Historical `www` mentions in §9 changelog entries are left as written. | Resolved |
 | Inoreader redirect URI still localhost | `http://localhost:3000/api/auth/callback/inoreader` in the Inoreader dev portal. Research-pipeline OAuth therefore cannot complete in production; it works locally. Change to `https://siliconandstone.com/api/auth/callback/inoreader` (apex, not www). | Medium |
 | Rule-pack corpus covers 19 Articles, not all of them | `rulepack/versions/2026-08-10/corpus/` holds Arts 3, 5, 6, 9, 11, 12, 13, 17, 19, 26, 49, 50, 57, 72, 73, 99, 101, 111, 113. `hasCorpus()` answers honestly and `verifyCitation()` returns `uncovered` for anything else. **Stage 3's verifier must treat `uncovered` as unverifiable, never as a pass.** Extending coverage is a data task (re-scrape from the same CELEX id), not a code change. | Medium |
-| No monthly model-spend ceiling | Part G of the build spec calls for a budget ceiling enforced at the gateway rather than discovered on the invoice. What exists is per-IP rate limiting (`checkerIntake`: 10/hour) and the `usage.ts` ledger. Intake is the only metered call on a free, ungated tool, so this matters more once Stage 3's email-gated report adds a frontier-model call. | Medium |
+| ~~No monthly model-spend ceiling~~ — shipped 2026-08-10 | `src/lib/model-budget.ts` checks `AI_MONTHLY_BUDGET_USD` against the `mtd` usage summary before dispatching a report. **Unset by default, so no ceiling is currently enforced** — set it in Vercel to turn it on. Note the deliberate fail-closed: a configured ceiling plus an unreadable ledger blocks generation. | Resolved (needs the env var set) |
+| Report generation is not durable across an instance death | Generation runs in `after()` rather than a Vercel Workflow (see §9 for why). An instance evicted mid-generation orphans a `pending` record, which the status route converts to `failed` after 320s so the user can retry. The user-visible cost is a wasted wait plus a re-request; the model spend is already incurred. Revisit if Next 16 lands and `workflow` becomes viable. | Low |
+| Report gate renders even where generation is unconfigured | The checker page is a client component and cannot read `ANTHROPIC_API_KEY`, so the "Get the written report" card always shows and a deployment without the key fails at submit with an honest 503. Production has the key, so this is cosmetic — but a `NEXT_PUBLIC_` capability flag would remove the dead-end. | Low |
 | Intake normaliser is duplicated in a build script | `scripts/rulepack-check.mjs` re-implements `normaliseLegalText` because `prebuild` runs before any TypeScript build. The manifest records `normalisation: "v1"` so a divergence is visible, but the two copies must be edited together. | Low |
 | Atlantic Drift Briefing PDF unwritten | Lead magnet referenced in the Welcome Pack and required before YouTube launch. Outline at `docs/atlantic-drift-briefing-outline.md`; full PDF still to write. Note the *product* deliverables (toolkit, spreadsheets, checklist) **are** built — `deliverables/dist/`. | Medium |
 | Legacy `methodologyPillars` on 2 articles | Re-verified 2026-08-05, unchanged: published *Atlantic Fault Lines Deepen* (`2oGVswEwQBfyYUvi889ioS`, `policy-stress-testing`) and draft *Iran Conflict Reshapes…* (`drafts.1344add1-…`, `supply-chain-forensics`). `MethodologyChecklist` normalises legacy slugs at render, so the UI is never blank; backfill these 2 in Studio to retire the legacy map. | Medium |
@@ -1753,8 +1848,9 @@ discount codes, booking URL, LinkedIn URL). This table is for defects and debt.
   goal names (`Gate Impression`, `Email Capture`, `Product View`, `Advisory Lead`,
   `Push Opt In`) and the three in `LAUNCH.md` §3 exist by exact name.
 - ~~Sanity schema not fully deployed to manifest~~ — resolved 2026-05-21.
-- ~~No unit tests for app logic~~ — **147 specs across 8 files**, green. The AI Act
-  engine, rule pack, session schema, and intake validator carry the bulk of them.
+- ~~No unit tests for app logic~~ — **181 specs across 9 files**, green. The AI Act
+  engine, rule pack, session schema, intake validator, and the report schema /
+  citation verifier carry the bulk of them.
 - ~~Compliance Checker rule base stale and Step 10 incomplete~~ — resolved
   2026-08-10 across Stages 0–2; see §9. Rule base is `v2026-08-10`.
 - ~~No CI gates~~ — `.github/workflows/check.yml` runs `npm run check`, `npm test`,
@@ -1802,10 +1898,11 @@ the reviewed implementation plan is in
 
 | Task | Description |
 |------|-------------|
-| **Free preview (components 1–3) behind an email gate** | Buildable now. Role analysis, classification rationale with the mandatory "what we did not ask you", and the dated review schedule. Nothing currently free becomes gated — the gate sits in front of something new. |
-| **Citation verification pass** | Every legal claim carries a `verbatim_quote` + `article_reference`; `verifyCitation()` in `src/lib/rulepack/corpus.ts` already returns `verified` / `not-found` / `uncovered`. Unmatched claims are dropped with an explicit note; 3+ failures withholds the report. Track the failure rate — it is the canary. |
-| **Email capture → Upstash, no mailing platform** | Write behind a no-op `onEmailCaptured(record)` hook with a `TODO: wire to list platform` marker. Separate the report-delivery basis from marketing consent; add the tool to the privacy notice. |
-| **£39 Evidence Pack + the £39→£79 credit** | **Blocked on the Lemon Squeezy store existing**, same blocker as PWA P3-4/P3-5. Build behind a flag; confirm the provider supports single-use codes scoped to a SKU before starting. |
+| ~~Free preview (components 1–3) behind an email gate~~ | **Shipped 2026-08-10** — see §9. |
+| ~~Citation verification pass~~ | **Shipped 2026-08-10.** Watch the failure rate: it is logged per generation as `Report citation check — verified N/M, …`. Two early runs gave 12/12 and 11/13. A sustained rise is the canary that generated legal claims have stopped tracking the primary source. |
+| ~~Email capture → Upstash, no mailing platform~~ | **Shipped 2026-08-10.** `onEmailCaptured()` in `src/lib/report/capture.ts` is the seam, still a no-op. Wiring it is the first thing to do when a mail sender exists — that also unblocks the emailed delivery link the spec wants. |
+| **Send the report by email** | Blocked on there being any mail sender at all. Today the report is delivered on screen via a signed permanent link. Once Kit (or anything else) is wired, add the short-lived verification link the spec asks for and send the delivery email. |
+| **£39 Evidence Pack + the £39→£79 credit** | **Blocked on the Lemon Squeezy store existing**, same blocker as PWA P3-4/P3-5. The flag exists (`NEXT_PUBLIC_EVIDENCE_PACK_ENABLED`, default false) and renders the offer plus the credit terms; components 4–11, checkout, and single-use code issuance are all still to build. Confirm the provider supports single-use codes scoped to a SKU before starting. |
 | **Legal review before Stage 3 ships** | Open item of record: the report template, the disclaimer, and the credit terms (a consumer-facing commercial promise). |
 
 **Two constraints carried forward from Stages 0–2.** The deterministic
@@ -1837,7 +1934,7 @@ no percentage confidence scores anywhere — the tool uses categorical labels.
 npm run dev              # Start dev server on localhost:3000
 
 # Production
-npm run build            # Build for production (verify: 71 static pages, 0 errors)
+npm run build            # Build for production (verify: 74 static pages, 0 errors)
 npm start                # Start production server
 
 # Content Sync
@@ -1863,7 +1960,7 @@ npm run lint             # Run ESLint
 When starting a new Claude Code session:
 
 1. **Read this document first** for full context
-2. **The app builds cleanly** — `npm run build` should produce 72 static pages, 0 errors. `prebuild` now runs two gates: the style codegen and `rulepack-check.mjs`
+2. **The app builds cleanly** — `npm run build` should produce 74 static pages, 0 errors. `prebuild` now runs two gates: the style codegen and `rulepack-check.mjs`
 3. **24 npm audit findings** (1 critical / 13 high / 9 moderate / 1 low, as of 2026-08-05) — all in the Sanity v4 toolchain subtree (CLI/export code, not reachable from served routes) plus `sharp` and `ws`. Do not run `npm audit fix --force`; npm proposes `next@16`, which the Sanity v4 pin forbids. Anything new on top of this baseline is real.
 4. **APIs**: Anthropic, Exa, Sanity, Pinecone working. **Kit is 401ing in production** (legacy v3 key — see §10 P0). **Inoreader** OAuth cannot complete in production (redirect URI still localhost); it works locally.
 5. **Admin password** is deployment-specific and must not be committed or recorded in docs. `SESSION_SECRET` is required for signed admin sessions and must be 32+ characters.
@@ -1871,7 +1968,8 @@ When starting a new Claude Code session:
 7. **Do NOT upgrade Sanity to v5** until Next.js 16 is stable
 8. **Live at siliconandstone.com** — Vercel auto-deploys from main. **The bare apex is canonical** (since 2026-08-06); `www` 308s to it. Do not reintroduce `www` URLs
 8b. **Never edit a rule-pack corpus file without bumping the pack version** — `prebuild` fails closed on drift, by design. Intentional change: bump the version, then `npm run rulepack:hash`. Every figure in the pack is a legal claim traceable to CELEX `02024R1689-20260727`
-8c. **The Compliance Checker's model never decides the tier.** Intake proposes answers the user confirms; the deterministic engine classifies. Keep it that way — the result screen promises it in writing
+8c. **The Compliance Checker's model never decides the tier.** Intake proposes answers the user confirms; the deterministic engine classifies. The report route re-runs the engine server-side and never accepts a classification from the browser. Keep it that way — the result screen promises it in writing
+8d. **No generated legal quotation reaches a screen unverified.** `verifyReport()` matches every quote against the pinned corpus; unmatched claims render a note instead of the quote, and three failures withhold the report. `uncovered` is a failure, never a pass. Watch the per-generation `Report citation check` log line — a rising failure rate is the canary
 9. **Lemon Squeezy** — no store yet; `NEXT_PUBLIC_PRE_LAUNCH=true` keeps every product CTA on the early-access capture (verified live 2026-08-05)
 10. **Plausible** — live on production (`script.tagged-events.js` served); confirm the Phase 3 goal names exist by exact name
 11. **`LAUNCH.md` is the single source of truth for launch state** — §10/§11 here deliberately do not duplicate its checklist
@@ -1879,8 +1977,8 @@ When starting a new Claude Code session:
 ### Quick Verification
 
 ```bash
-npm run build            # Should pass with 72 static pages
-npm test                 # 147 specs across 8 files, all green
+npm run build            # Should pass with 74 static pages
+npm test                 # 181 specs across 9 files, all green
 npm run rulepack:check   # 19 corpus files verified against the manifest
 npm audit                # Expect 24 findings (Sanity toolchain subtree + sharp)
 npm run dev              # Start dev server, visit localhost:3000
