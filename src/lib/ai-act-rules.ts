@@ -37,6 +37,13 @@ export interface RuleFinding {
   role?: UserRole
   scoreDelta: number
   confidenceImpact: number
+  /**
+   * Raises the reported confidence when the *law* is unambiguous on this path,
+   * regardless of how many evidence gaps the answer set carries. Only ever
+   * raises — a rule cannot use this to talk confidence down, and the aggregate
+   * takes the strongest override that fired.
+   */
+  confidenceOverride?: 'High' | 'Medium'
   reasons: string[]
   missingFacts: string[]
   obligations: string[]
@@ -185,6 +192,81 @@ const primaryUseAnnexIII: Record<string, string> = {
   biometrics: 'Biometric identification, categorisation, or emotion detection',
   'critical-infrastructure': 'Critical infrastructure, safety system, or industrial control',
   'law-justice': 'Legal, migration, law enforcement, or democratic process',
+}
+
+/**
+ * Step 7 answers that describe evaluating a person rather than assisting one.
+ * Combined with a materially-affected natural person, these are profiling in
+ * the GDPR Art 4(4) sense that Article 6(3) borrows.
+ */
+const profilingDecisionImpacts = ['ranking', 'eligibility', 'automated-adverse']
+
+/** Natural-person categories at Step 6. 'none' is deliberately absent. */
+const naturalPersonGroups = ['workers', 'applicants', 'customers', 'patients', 'students', 'public']
+
+/**
+ * Primary uses that profile natural persons regardless of how the output is
+ * described at Step 7 — HR/workforce, credit/insurance, and biometric
+ * categorisation are evaluations of people by construction.
+ */
+const profilingPrimaryUses = ['employment', 'financial', 'biometrics']
+
+export type ProfilingBasis = 'confirmed' | 'assumed' | 'declined' | 'none'
+
+export interface ProfilingAssessment {
+  value: boolean
+  basis: ProfilingBasis
+}
+
+/**
+ * Whether the answers so far *suggest* profiling, which is what gates the
+ * confirmation question. Deliberately broad: a false positive costs one extra
+ * question, a false negative silently loses the Article 6(3) override.
+ */
+export function derivesProfiling(answers: AssessmentAnswers): boolean {
+  if (hasAny(answers, 'primary_use', profilingPrimaryUses)) return true
+  return (
+    hasAny(answers, 'affected_people', naturalPersonGroups) &&
+    hasAny(answers, 'decision_impact', profilingDecisionImpacts)
+  )
+}
+
+/**
+ * Resolve `performs_profiling` from the derivation plus the user's confirmation.
+ *
+ * The derivation gates everything: if the answers no longer suggest profiling,
+ * a stale confirmation left behind by an edited answer is ignored rather than
+ * carried forward. "Not sure" resolves TRUE — the conservative reading — but
+ * records itself as `assumed` so the rationale can say the tier rests on an
+ * assumption rather than a fact.
+ */
+export function performsProfiling(answers: AssessmentAnswers): ProfilingAssessment {
+  if (!derivesProfiling(answers)) return { value: false, basis: 'none' }
+
+  const confirmation = first(answers, 'profiling_confirm')
+  if (confirmation === 'yes') return { value: true, basis: 'confirmed' }
+  if (confirmation === 'no') return { value: false, basis: 'declined' }
+  return { value: true, basis: 'assumed' }
+}
+
+/** Whether any Annex III domain is in play, by either route the engine uses. */
+function inAnnexIIIDomain(answers: AssessmentAnswers): boolean {
+  if (hasAny(answers, 'sensitive_domains', annexIIIDomains)) return true
+  const primaryUse = first(answers, 'primary_use')
+  return Boolean(primaryUse && primaryUseAnnexIII[primaryUse])
+}
+
+/**
+ * True while a threshold question is unresolved. The profiling override is a
+ * statement about the *classification*, so it may only raise confidence once
+ * territorial scope and role are settled — those sit upstream of it.
+ */
+function thresholdFactsUnresolved(answers: AssessmentAnswers): boolean {
+  return (
+    values(answers, 'eu_scope').length === 0 ||
+    has(answers, 'eu_scope', 'not-sure') ||
+    first(answers, 'origin') === 'not-sure'
+  )
 }
 
 function values(answers: AssessmentAnswers, id: string): string[] {
@@ -479,9 +561,15 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
       scoreDelta: 4,
       confidenceImpact: 1,
       reasons: [`The use touches sensitive AI Act areas: ${selected(answers, 'sensitive_domains')}.`],
-      missingFacts: ['Annex III use cases default to high-risk under the AI Act. Article 6(3) offers a narrow-task exemption (narrow procedural tasks, improving prior human activity, etc.) — confirm the vendor classification and intended purpose before assuming a lower tier applies.'],
+      // Where the profiling override fires the exemption is unavailable as a
+      // matter of law, so pointing the user at it would contradict the result.
+      missingFacts: performsProfiling(answers).value
+        ? []
+        : ['Annex III use cases default to high-risk under the AI Act. Article 6(3) offers a narrow-task exemption (narrow procedural tasks, improving prior human activity, etc.) — confirm the vendor classification and intended purpose before assuming a lower tier applies.'],
       obligations: ['Treat this as a likely high-risk candidate until the vendor classification and intended-purpose evidence are confirmed.'],
-      vendorQuestions: ['Does the vendor classify this as an Annex III high-risk system, and what Article 6(3) exemption analysis, if any, does it rely on?'],
+      vendorQuestions: performsProfiling(answers).value
+        ? []
+        : ['Does the vendor classify this as an Annex III high-risk system, and what Article 6(3) exemption analysis, if any, does it rely on?'],
       adjacentRisks: [],
       reviewTriggers: ['Use expands into a new Annex III domain or affects a new group of people'],
       reportSections: ['Annex III classification rationale'],
@@ -509,9 +597,60 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
         reasons: [`The primary use (${primaryUseAnnexIII[primaryUse] ?? primaryUse}) sits inside an Annex III high-risk area, even though no specific sensitive-domain box was ticked.`],
         missingFacts: ['Confirm the specific sensitive-domain breakdown — the primary use suggests Annex III applicability that should be cross-checked against the actual workflow.'],
         obligations: ['Treat this as a likely high-risk candidate until the vendor classification and intended-purpose evidence are confirmed.'],
-        vendorQuestions: ['Does the vendor classify this use case as high-risk under Annex III?'],
+        vendorQuestions: performsProfiling(answers).value
+          ? []
+          : ['Does the vendor classify this use case as high-risk under Annex III?'],
         adjacentRisks: [],
         reviewTriggers: ['Use case or affected group changes'],
+        reportSections: ['Annex III classification rationale'],
+      }
+    },
+  }),
+  rule({
+    id: 'annex-iii-profiling-override',
+    title: 'Article 6(3) profiling override — high-risk is not rebuttable',
+    category: 'high-risk',
+    legalStatus: 'current-law',
+    source: sources.article6,
+    priority: 199,
+    when: (answers) => inAnnexIIIDomain(answers) && performsProfiling(answers).value,
+    build: (answers) => {
+      const { basis } = performsProfiling(answers)
+      const assumed = basis === 'assumed'
+      const confidenceOverride = thresholdFactsUnresolved(answers)
+        ? undefined
+        : assumed
+          ? ('Medium' as const)
+          : ('High' as const)
+
+      return {
+        evidence: [
+          assumed
+            ? 'Profiling of natural persons: assumed from the use case and decision impact'
+            : 'Profiling of natural persons: confirmed',
+        ],
+        explanation:
+          'Article 6(3)’s final subparagraph provides that an Annex III system performing profiling of natural persons shall always be considered high-risk. The provision is unqualified: none of the four narrow-task conditions can rescue such a system.',
+        classification: 'Likely high-risk',
+        scoreDelta: 4,
+        confidenceImpact: 0,
+        confidenceOverride,
+        reasons: [
+          assumed
+            ? 'This system operates in an Annex III domain and appears to perform profiling of natural persons. Article 6(3) states that such a system shall always be considered high-risk — the narrow-task exemption is not available to it. This rests on an assumption about profiling rather than a confirmed answer, so confirm it before relying on the tier.'
+            : 'This system operates in an Annex III domain and performs profiling of natural persons. Article 6(3) states that such a system shall always be considered high-risk — the narrow-task exemption is not available to it. Treat the high-risk classification as firm rather than provisional.',
+        ],
+        missingFacts: assumed
+          ? ['Confirm whether the system evaluates personal aspects of an individual. The high-risk tier here follows from an assumed answer to that question.']
+          : [],
+        obligations: [
+          'Do not plan around an Article 6(3) narrow-task exemption for this system. Where profiling of natural persons is performed, the exemption is unavailable as a matter of law.',
+        ],
+        vendorQuestions: [
+          'Does the vendor acknowledge that Article 6(3)’s profiling proviso removes the narrow-task exemption for this system, and does its classification reflect that?',
+        ],
+        adjacentRisks: [],
+        reviewTriggers: ['The system stops evaluating personal aspects of individuals, or leaves the Annex III domain'],
         reportSections: ['Annex III classification rationale'],
       }
     },
@@ -1036,7 +1175,10 @@ export function evaluateRuleLibrary(answers: AssessmentAnswers): RuleEvaluation 
     score,
     role,
     classification,
-    confidence: confidenceImpact >= 3 || missingFacts.length >= 3 ? 'Low' : confidenceImpact >= 1 || missingFacts.length >= 1 ? 'Medium' : 'High',
+    confidence: applyConfidenceOverride(
+      confidenceImpact >= 3 || missingFacts.length >= 3 ? 'Low' : confidenceImpact >= 1 || missingFacts.length >= 1 ? 'Medium' : 'High',
+      firedRules
+    ),
     reasons: reasons.length ? reasons : ['No high-risk, prohibited-practice, transparency, or GPAI trigger was selected, based on the answers provided.'],
     missingFacts,
     obligations,
@@ -1045,6 +1187,28 @@ export function evaluateRuleLibrary(answers: AssessmentAnswers): RuleEvaluation 
     reviewTriggers,
     reportSections,
   }
+}
+
+const confidenceRank: Record<'Low' | 'Medium' | 'High', number> = { Low: 0, Medium: 1, High: 2 }
+
+/**
+ * Confidence is normally derived from how much the answer set leaves unknown.
+ * That is the right default, but it under-reports the cases where the law is
+ * unambiguous and the remaining gaps are about *readiness*, not about which
+ * tier applies — a system caught by the Article 6(3) profiling proviso is
+ * high-risk whether or not its vendor has produced a DPA.
+ *
+ * An override only ever raises the reported confidence, and the strongest one
+ * that fired wins.
+ */
+function applyConfidenceOverride(
+  base: 'High' | 'Medium' | 'Low',
+  rules: RuleFinding[]
+): 'High' | 'Medium' | 'Low' {
+  return rules.reduce<'High' | 'Medium' | 'Low'>((current, item) => {
+    if (!item.confidenceOverride) return current
+    return confidenceRank[item.confidenceOverride] > confidenceRank[current] ? item.confidenceOverride : current
+  }, base)
 }
 
 function pickClassification(rules: RuleFinding[], score: number): Classification {

@@ -354,6 +354,45 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 10, 2026 — Compliance Checker: the Article 6(3) profiling override
+
+The checker's most consequential defect was not an omission but an active
+misdirection. On an Annex III path it told the user to go and check whether the
+Article 6(3) narrow-task exemption applied — and on any path that profiles
+natural persons, it cannot. Article 6(3)'s final subparagraph is unqualified:
+an Annex III system performing profiling of natural persons *shall always* be
+considered high-risk. The tool was pointing people at an exit that is walled up.
+
+`annex-iii-profiling-override` now fires when an Annex III domain is present and
+`performs_profiling` resolves true, and where it fires both Annex III rules drop
+their exemption language rather than contradict it.
+
+**Deriving profiling.** `derivesProfiling()` is TRUE where a natural person is
+materially affected (Step 6) *and* the output ranks, determines eligibility, or
+takes adverse action (Step 7) — or where the primary use is HR/workforce,
+credit/insurance, or biometric categorisation regardless of Step 7. Deliberately
+broad: a false positive costs one extra question, a false negative silently
+loses the override. That derivation gates a new conditional question after Step
+7 (the first real use of the `showIf` hook, which had been declared and never
+exercised), and it also gates *reading* the answer — a stale "yes" left behind
+when someone edits an upstream answer is ignored rather than carried forward.
+
+**Confidence needed a new mechanism, and a narrower rule than first specified.**
+Confidence is derived from `confidenceImpact` + `missingFacts.length`, so on the
+walked HR path vendor-evidence gaps alone forced "Low" — no amount of tuning
+gets to "High". Hence `confidenceOverride` on `RuleFinding`, which only ever
+raises, with the strongest override winning. The rationale: the remaining gaps
+on that path are about *readiness*, not about which tier applies.
+
+But it is applied more narrowly than "High whenever the override fires".
+Confirmed "yes" → **High**. Derived-only or "not sure" → **Medium**, with the
+rationale stating the tier rests on an assumption. And while territorial scope
+or role is unresolved, the override raises nothing at all — those sit upstream
+of classification, so claiming High confidence beneath an unanswered threshold
+question would be the same species of overclaim the tool exists to avoid.
+"Not sure" still resolves TRUE for the classification itself; it is the
+conservative reading, and the result says so out loud.
+
 ### August 10, 2026 — Compliance Checker: all ten Article 5(1) practices, and a future-dated prohibition tier
 
 Step 10 of the checker listed **five** prohibited practices. Article 5(1) as

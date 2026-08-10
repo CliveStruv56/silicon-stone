@@ -97,8 +97,8 @@ const observatoryAlt =
 // the pre-existing behaviour, not a broken one.
 const edgeFadeMask = {
   maskImage:
-    'linear-gradient(to bottom, transparent 0, #000 9%, #000 91%, transparent 100%), ' +
-    'linear-gradient(to right, transparent 0, #000 7%, #000 93%, transparent 100%)',
+    'linear-gradient(to bottom, transparent 0, #000 16%, #000 84%, transparent 100%), ' +
+    'linear-gradient(to right, transparent 0, #000 13%, #000 87%, transparent 100%)',
   maskComposite: 'intersect',
   WebkitMaskComposite: 'source-in',
 } as const

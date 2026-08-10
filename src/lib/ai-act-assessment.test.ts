@@ -37,9 +37,28 @@ describe('evaluateAssessment', () => {
 })
 
 describe('getVisibleQuestions', () => {
-  it('returns every question when none define a showIf condition', () => {
+  it('hides conditional questions on an empty answer set', () => {
     const visible = getVisibleQuestions({})
-    expect(visible.length).toBe(assessmentQuestions.length)
+    const conditional = assessmentQuestions.filter((question) => question.showIf)
+    expect(conditional.length).toBeGreaterThan(0)
+    expect(visible.length).toBe(assessmentQuestions.length - conditional.length)
+    expect(visible.map((question) => question.id)).not.toContain('profiling_confirm')
+  })
+
+  it('reveals the profiling confirmation once the answers suggest profiling', () => {
+    const visible = getVisibleQuestions({
+      affected_people: ['applicants'],
+      decision_impact: 'ranking',
+    })
+    expect(visible.map((question) => question.id)).toContain('profiling_confirm')
+  })
+
+  it('places the profiling confirmation immediately after the decision-impact step', () => {
+    const ids = getVisibleQuestions({
+      affected_people: ['applicants'],
+      decision_impact: 'ranking',
+    }).map((question) => question.id)
+    expect(ids.indexOf('profiling_confirm')).toBe(ids.indexOf('decision_impact') + 1)
   })
 
   it('all question ids are unique', () => {

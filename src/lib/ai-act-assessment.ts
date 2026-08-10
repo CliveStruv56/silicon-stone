@@ -1,4 +1,4 @@
-import { evaluateRuleLibrary, type RuleFinding } from './ai-act-rules'
+import { derivesProfiling, evaluateRuleLibrary, type RuleFinding } from './ai-act-rules'
 
 export type AssessmentValue = string | string[]
 
@@ -166,6 +166,24 @@ export const assessmentQuestions: AssessmentQuestion[] = [
       { label: 'Determines access, eligibility, pricing, approval, refusal, or other significant outcomes', value: 'eligibility' },
       { label: 'Automatically blocks, refuses, freezes, disciplines, or otherwise takes adverse action', value: 'automated-adverse' },
       { label: 'Controls a safety-related product, process, or infrastructure system', value: 'safety-control' },
+    ],
+  },
+  {
+    id: 'profiling_confirm',
+    section: 'Impact',
+    text: 'Does the system evaluate personal aspects of an individual — such as work performance, economic situation, health, preferences, reliability, behaviour, location, or movements?',
+    help: 'Article 6(3) provides that an Annex III system performing profiling of natural persons is always high-risk, with no narrow-task exemption available. This question only appears when your earlier answers suggest profiling may be involved.',
+    type: 'single',
+    required: true,
+    showIf: derivesProfiling,
+    options: [
+      { label: 'Yes', value: 'yes' },
+      { label: 'No', value: 'no' },
+      {
+        label: 'Not sure',
+        value: 'not-sure',
+        description: 'Treated as “yes” for the classification — the conservative reading — and the result says so.',
+      },
     ],
   },
   {

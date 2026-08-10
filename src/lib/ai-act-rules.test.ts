@@ -156,6 +156,116 @@ describe('Annex III high-risk default', () => {
   })
 })
 
+describe('Article 6(3) profiling override', () => {
+  // The canonical walked path: third-party HR screening tool, EU decision
+  // impact, applicant shortlisting, rubber-stamp oversight.
+  const hrScreening: AssessmentAnswers = {
+    ...inScopeBase,
+    primary_use: 'employment',
+    affected_people: ['applicants'],
+    decision_impact: 'ranking',
+    human_oversight: 'rubber-stamp',
+    sensitive_domains: ['employment'],
+  }
+
+  it('a confirmed profiling answer returns high-risk with High confidence', () => {
+    const result = evaluateRuleLibrary({ ...hrScreening, profiling_confirm: 'yes' })
+    expect(result.classification).toBe('Likely high-risk')
+    expect(result.confidence).toBe('High')
+    expect(result.firedRules.map((rule) => rule.id)).toContain('annex-iii-profiling-override')
+  })
+
+  it('suppresses the narrow-task exemption caveat, which would contradict it', () => {
+    const result = evaluateRuleLibrary({ ...hrScreening, profiling_confirm: 'yes' })
+    const surfaced = [...result.missingFacts, ...result.vendorQuestions].join(' ')
+    expect(surfaced).not.toMatch(/narrow-task exemption \(/i)
+    expect(surfaced).not.toMatch(/what Article 6\(3\) exemption analysis/i)
+    expect(result.obligations.join(' ')).toMatch(/not available|unavailable/i)
+  })
+
+  it('"not sure" fires the override but holds confidence at Medium', () => {
+    const result = evaluateRuleLibrary({ ...hrScreening, profiling_confirm: 'not-sure' })
+    expect(result.firedRules.map((rule) => rule.id)).toContain('annex-iii-profiling-override')
+    expect(result.confidence).toBe('Medium')
+    expect(result.reasons.join(' ')).toMatch(/rests on an assumption/i)
+  })
+
+  it('an unanswered confirmation behaves like "not sure"', () => {
+    const result = evaluateRuleLibrary(hrScreening)
+    expect(result.firedRules.map((rule) => rule.id)).toContain('annex-iii-profiling-override')
+    expect(result.confidence).toBe('Medium')
+  })
+
+  it('an explicit "no" does not fire the override and restores the exemption caveat', () => {
+    const result = evaluateRuleLibrary({ ...hrScreening, profiling_confirm: 'no' })
+    expect(result.firedRules.map((rule) => rule.id)).not.toContain('annex-iii-profiling-override')
+    expect(result.missingFacts.join(' ')).toMatch(/narrow-task exemption/i)
+  })
+
+  it('never raises confidence while territorial scope is unresolved', () => {
+    const result = evaluateRuleLibrary({
+      ...hrScreening,
+      eu_scope: ['not-sure'],
+      profiling_confirm: 'yes',
+    })
+    expect(result.firedRules.map((rule) => rule.id)).toContain('annex-iii-profiling-override')
+    expect(result.confidence).not.toBe('High')
+  })
+
+  it('never raises confidence while the user role is unresolved', () => {
+    const result = evaluateRuleLibrary({
+      ...hrScreening,
+      origin: 'not-sure',
+      profiling_confirm: 'yes',
+    })
+    expect(result.confidence).not.toBe('High')
+  })
+
+  it('does not fire for a drafting tool with no Annex III domain', () => {
+    const ids = fired({
+      ...inScopeBase,
+      primary_use: 'general-productivity',
+      affected_people: ['workers'],
+      decision_impact: 'assistive',
+      sensitive_domains: ['none'],
+    })
+    expect(ids).not.toContain('annex-iii-profiling-override')
+  })
+
+  it('does not fire in an Annex III domain where no person is evaluated', () => {
+    const ids = fired({
+      ...inScopeBase,
+      primary_use: 'general-productivity',
+      affected_people: ['none'],
+      decision_impact: 'assistive',
+      sensitive_domains: ['critical-infrastructure'],
+    })
+    expect(ids).not.toContain('annex-iii-profiling-override')
+  })
+
+  it('ignores a stale confirmation once the answers no longer suggest profiling', () => {
+    // The user answered "yes", then went back and changed the decision impact.
+    const ids = fired({
+      ...inScopeBase,
+      primary_use: 'general-productivity',
+      affected_people: ['customers'],
+      decision_impact: 'assistive',
+      sensitive_domains: ['none'],
+      profiling_confirm: 'yes',
+    })
+    expect(ids).not.toContain('annex-iii-profiling-override')
+  })
+
+  it('a prohibited practice still outranks the override', () => {
+    const result = evaluateRuleLibrary({
+      ...hrScreening,
+      profiling_confirm: 'yes',
+      prohibited_screen: ['art5-c'],
+    })
+    expect(result.classification).toBe('Prohibited practice')
+  })
+})
+
 describe('Article 50 transparency', () => {
   it('a declared chatbot interaction is likely limited-risk', () => {
     const result = evaluateRuleLibrary({
