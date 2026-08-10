@@ -253,6 +253,11 @@ EXA_API_KEY=<key>
 INOREADER_APP_ID=1000008617
 INOREADER_APP_KEY=<key>
 
+# Compliance Checker agentic intake
+ANTHROPIC_INTAKE_MODEL=claude-haiku-4-5    # Optional: overrides the small extraction
+                                           # model. Intake degrades to the click path
+                                           # when ANTHROPIC_API_KEY is absent.
+
 # AI Act rule pack (Compliance Checker)
 NEXT_PUBLIC_RULEPACK_VERSION=2026-08-10   # Optional: pins the rule pack. Must be a
                                           # version present in rulepack/versions/ and
@@ -359,6 +364,75 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 10, 2026 — Stage 2: agentic intake in front of the unchanged engine
+
+The checker now opens with "describe the system in your own words". A small
+model maps that description onto the questionnaire, the user confirms every
+proposed answer, and the confirmed values enter the **unchanged** deterministic
+engine. The sixteen-step click path is untouched and one click away.
+
+**The model never classifies anything.** It describes. That is what keeps the
+tool's standing on-screen promise — "the result uses rule-based triage, not a
+model guess" — true now that there is a model in the product at all.
+
+**`src/lib/intake/parse.ts` is the whole safety property.** Three rules, in
+order of how much they matter:
+
+1. Only values from the controlled vocabulary survive. An unrecognised slug is
+   dropped, never mapped to the nearest legal one — a wrong answer the user has
+   to spot beats a blank only if you never think about who is reading.
+2. Every proposal must quote a verbatim span of the user's own text. A proposal
+   the model cannot point at is a guess in an answer's clothes.
+3. Low confidence renders as unanswered, so the user answers it rather than
+   rubber-stamping a coin flip.
+
+A partially-valid multi-select is taken as *entirely* invalid — a list that is
+half in-vocabulary means the model was guessing at the vocabulary, and a
+filtered subset is not what it meant to say.
+
+**The vocabulary derives from `assessmentQuestions`**, so a new question or
+option reaches the model the moment it exists in the form. There is no second
+list to keep in sync and no way for the two to drift. It takes the question
+schema as an argument rather than hard-coding the checker's variables — the seam
+that lets the same intake serve the other three tools without a rewrite.
+
+**Live adversarial testing found a real hole, which is now closed.** Structured
+separation held on every axis that matters: an "IGNORE ALL PREVIOUS
+INSTRUCTIONS" description could not produce prose (forced `tool_choice`), could
+not invent a question (`risk_tier` discarded), and could not shift the
+classification. But it *did* put the entire injected paragraph into the
+free-text tool-name field — because grounding cannot catch that case: every
+description is a verbatim substring of itself. Free text is now capped at 80
+characters and rejected outright rather than truncated, since trimming would
+put words in the user's mouth. Re-verified against the live model.
+
+**Step 10 is never skipped.** The intake lands the user on the first question it
+could not fill and walks forward from there, so the prohibited-practice screen
+is always presented. Confirmed in a browser run: 11 proposals accepted, the
+red-flag question still asked, and the Part E test sentence — *"We use a
+third-party AI tool to screen and rank job applicants across our EU offices; a
+recruiter reviews the shortlist but usually goes with it"* — produced **Likely
+high-risk, High confidence, profiling override fired**, identical to the click
+path.
+
+**Article 50(1) disclosure** sits above the textarea before any interaction. It
+would be a poor look to miss that inside a compliance tool.
+
+Model is `claude-haiku-4-5` ($1/$5 per MTok, added to `pricing.ts`), env-
+overridable via `ANTHROPIC_INTAKE_MODEL`. Node runtime, `maxDuration = 60`.
+Deviation from the spec worth noting: **no streaming**. The output is a set of
+proposals rendered as a review form, and there is nothing useful to stream into
+a form — a single forced tool call is simpler and more robust. Rate limit is 10
+per hour per IP, which is the real cost control since this is the only metered
+model call on a free, ungated tool.
+
+Also deferred deliberately: the spec's adaptive branching of the *click path*
+(e.g. hiding vendor-documentation questions from someone building their own
+system). Hiding `vendor_docs` would leave it empty, which fires
+`vendor-docs-none-or-unknown` and every `vendor-*-missing` rule — turning a
+UX tidy-up into a mis-classification. Doing it properly means gating those rules
+on `origin` too, and that belongs in its own change.
 
 ### August 10, 2026 — Stage 1: the AI Act rule pack, with a real legal corpus
 

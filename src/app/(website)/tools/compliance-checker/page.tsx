@@ -29,6 +29,7 @@ import {
 } from '@/lib/ai-act-assessment'
 import { AI_ACT_TIMELINE, PENALTY_TIERS } from '@/lib/ai-act-timeline'
 import { RULE_PACK } from '@/lib/rulepack'
+import { ComplianceIntake } from '@/components/tools/ComplianceIntake'
 import { CopyMarkdownButton } from '@/components/tools/CopyMarkdownButton'
 import { ToolSubscribeCard } from '@/components/tools/ToolSubscribeCard'
 import { complianceCheckerMarkdown } from '@/lib/tools-markdown'
@@ -127,6 +128,9 @@ export default function ComplianceCheckerPage() {
   // Until the restore round-trip settles, autosave must stay quiet — otherwise
   // the empty initial state races the response and overwrites a stored run.
   const [restored, setRestored] = useState(false)
+  // The intake is offered first but is never the only way in: skipping it, or
+  // resuming a saved run, drops straight into the fourteen-step click path.
+  const [showIntake, setShowIntake] = useState(true)
 
   useEffect(() => {
     let cancelled = false
@@ -140,6 +144,8 @@ export default function ComplianceCheckerPage() {
           setAnswers(storedAnswers)
           setCurrentIndex(step ?? 0)
           setShowResult(Boolean(storedShowResult))
+          // Someone mid-assessment wants their answers back, not a fresh start.
+          setShowIntake(false)
         }
       })
       .catch(() => {
@@ -219,10 +225,28 @@ export default function ComplianceCheckerPage() {
     setCurrentIndex((index) => Math.max(index - 1, 0))
   }
 
+  /**
+   * Confirmed intake answers enter the engine exactly as click-path answers do.
+   * The user lands on the first question the extraction did not fill, so the
+   * remaining ones are asked rather than assumed — and Step 10, the prohibited-
+   * practice screen, is always among them because the walk starts from index 0
+   * and every unanswered required question still gates Continue.
+   */
+  const applyIntake = (proposed: AssessmentAnswers) => {
+    setAnswers(proposed)
+    setShowIntake(false)
+    const visible = getVisibleQuestions(proposed)
+    const firstUnanswered = visible.findIndex(
+      (question) => values(proposed[question.id]).length === 0,
+    )
+    setCurrentIndex(firstUnanswered === -1 ? 0 : firstUnanswered)
+  }
+
   const reset = () => {
     setAnswers({})
     setCurrentIndex(0)
     setShowResult(false)
+    setShowIntake(true)
     fetch(SESSION_ENDPOINT, { method: 'DELETE' }).catch(() => {
       // Nothing to do — the local reset has already happened.
     })
@@ -266,7 +290,13 @@ export default function ComplianceCheckerPage() {
         </section>
 
         <section className="mx-auto max-w-5xl px-6 py-10">
-          {!showResult && currentQuestion ? (
+          {showIntake && !showResult ? (
+            <ComplianceIntake
+              questions={assessmentQuestions}
+              onConfirm={applyIntake}
+              onSkip={() => setShowIntake(false)}
+            />
+          ) : !showResult && currentQuestion ? (
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentQuestion.id}

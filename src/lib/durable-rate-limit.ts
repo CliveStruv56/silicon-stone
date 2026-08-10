@@ -26,6 +26,10 @@ const configs = {
   // Autosave for the compliance checker: one write per answer, so the ceiling
   // has to clear a fast full run of the form without inviting a write flood.
   checkerSession: { limit: 120, window: '15 m', prefix: 'sas:checker-session' },
+  // Agentic intake is the only metered model call on a free, ungated tool, so
+  // the ceiling is the cost control — generous enough to retry a description a
+  // few times, tight enough that the free path cannot be farmed.
+  checkerIntake: { limit: 10, window: '1 h', prefix: 'sas:checker-intake' },
 } satisfies Record<string, RateLimitConfig>
 
 export type DurableRateLimitKey = keyof typeof configs

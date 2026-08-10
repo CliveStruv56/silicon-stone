@@ -27,6 +27,8 @@ interface TokenRate {
 const TOKEN_RATES: Record<string, TokenRate> = {
     // Anthropic — Claude Sonnet 4.x (verify current rate)
     "claude-sonnet-4-6": { input: 3, output: 15 },
+    // Anthropic — Claude Haiku 4.5, used for compliance-checker intake
+    "claude-haiku-4-5": { input: 1, output: 5 },
     // OpenAI — embeddings (output side is free)
     "text-embedding-3-small": { input: 0.02, output: 0 },
 };
