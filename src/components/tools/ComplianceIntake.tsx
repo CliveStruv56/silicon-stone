@@ -125,9 +125,9 @@ export function ComplianceIntake({ questions, onConfirm, onSkip }: Props) {
                 </div>
                 <div className="mt-2 text-xs text-text-muted">
                   From your description:{' '}
-                  <span className="italic text-silicon-amber">“{proposal.sourcePhrase}”</span>
+                  <span className="italic text-silicon-amber-strong">“{proposal.sourcePhrase}”</span>
                   {proposal.confidence === 'medium' && (
-                    <Badge variant="outline" className="ml-2 border-silicon-amber text-silicon-amber">
+                    <Badge variant="outline" className="ml-2 border-silicon-amber text-silicon-amber-strong">
                       Worth checking
                     </Badge>
                   )}
@@ -151,7 +151,7 @@ export function ComplianceIntake({ questions, onConfirm, onSkip }: Props) {
             <Button
               type="button"
               onClick={accept}
-              className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90"
+              className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90"
             >
               Use {acceptedCount} {acceptedCount === 1 ? 'answer' : 'answers'} and continue
             </Button>
@@ -177,7 +177,7 @@ export function ComplianceIntake({ questions, onConfirm, onSkip }: Props) {
           look to get this wrong inside a compliance tool.
         */}
         <div className="flex items-start gap-3 rounded-lg border border-silicon-amber/40 bg-silicon-amber/10 p-4">
-          <Bot className="mt-0.5 h-4 w-4 flex-shrink-0 text-silicon-amber" />
+          <Bot className="mt-0.5 h-4 w-4 flex-shrink-0 text-silicon-amber-strong" />
           <p className="text-sm text-text-primary">
             <span className="font-semibold">You are interacting with an AI system.</span> It reads your
             description and proposes answers to the questionnaire. It does not decide your risk tier —
@@ -219,7 +219,7 @@ export function ComplianceIntake({ questions, onConfirm, onSkip }: Props) {
             type="button"
             onClick={submit}
             disabled={tooShort || pending}
-            className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90"
+            className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90"
           >
             {pending ? (
               <>

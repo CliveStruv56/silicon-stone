@@ -14,6 +14,7 @@ import {
   SCENARIOS,
   FRICTION_COLORS,
   SEVERITY_COLORS,
+  SEVERITY_TEXT_COLORS,
   getAdjustedBoardBrief,
   getAdjustedImpacts,
   getExposureBand,
@@ -101,7 +102,7 @@ function ImpactChart({ impacts, maxValue }: { impacts: SectorImpact[]; maxValue:
               <span className="text-sm text-text-primary font-medium">{impact.sector}</span>
               <span
                 className="text-sm font-mono font-bold"
-                style={{ color: SEVERITY_COLORS[impact.severity] }}
+                style={{ color: SEVERITY_TEXT_COLORS[impact.severity] }}
               >
                 {impact.valueAtStake}
               </span>
@@ -154,7 +155,7 @@ function CascadeFlow({ cascade }: { cascade: Scenario['cascade'] }) {
         transition={{ delay: 0.2 }}
         className="flex-1 bg-silicon-amber/10 border border-silicon-amber/30 rounded-lg p-4"
       >
-        <div className="text-xs font-mono text-silicon-amber uppercase mb-2">Secondary</div>
+        <div className="text-xs font-mono text-silicon-amber-strong uppercase mb-2">Secondary</div>
         <p className="text-sm text-text-primary">{cascade.secondary}</p>
       </motion.div>
 
@@ -335,7 +336,7 @@ export default function ScenarioModelerPage() {
           <Card className="bg-stone-charcoal border-border-subtle mb-6">
             <CardHeader>
               <CardTitle className="text-lg text-text-primary flex items-center gap-2">
-                <Target className="w-5 h-5 text-silicon-amber" />
+                <Target className="w-5 h-5 text-silicon-amber-strong" />
                 Selected Scenario
               </CardTitle>
               <CardDescription>
@@ -377,7 +378,7 @@ export default function ScenarioModelerPage() {
           <Card className="bg-stone-charcoal border-border-subtle mb-6">
             <CardHeader>
               <CardTitle className="text-lg text-text-primary flex items-center gap-2">
-                <GitCompareArrows className="w-5 h-5 text-silicon-amber" />
+                <GitCompareArrows className="w-5 h-5 text-silicon-amber-strong" />
                 Compare a second scenario
               </CardTitle>
               <CardDescription>
@@ -529,7 +530,7 @@ export default function ScenarioModelerPage() {
                 <Card className="lg:col-span-2 bg-stone-charcoal border-border-subtle">
                   <CardHeader>
                     <CardTitle className="text-lg text-text-primary flex items-center gap-2">
-                      <TrendingDown className="w-5 h-5 text-silicon-amber" />
+                      <TrendingDown className="w-5 h-5 text-silicon-amber-strong" />
                       Sector Impact Analysis
                     </CardTitle>
                     <CardDescription>
@@ -564,7 +565,7 @@ export default function ScenarioModelerPage() {
               <Card className="bg-stone-charcoal border-border-subtle">
                 <CardHeader>
                   <CardTitle className="text-lg text-text-primary flex items-center gap-2">
-                    <BriefcaseBusiness className="w-5 h-5 text-silicon-amber" />
+                    <BriefcaseBusiness className="w-5 h-5 text-silicon-amber-strong" />
                     Board Brief
                   </CardTitle>
                   <CardDescription>
@@ -578,7 +579,7 @@ export default function ScenarioModelerPage() {
                       <p className="text-sm text-text-primary">{adjustedBoardBrief.firstImpact}</p>
                     </div>
                     <div className="bg-surface-elevated rounded-lg border border-border-subtle p-4">
-                      <div className="text-xs font-mono text-silicon-amber uppercase mb-2">90-Day Action</div>
+                      <div className="text-xs font-mono text-silicon-amber-strong uppercase mb-2">90-Day Action</div>
                       <p className="text-sm text-text-primary">{adjustedBoardBrief.ninetyDayAction}</p>
                     </div>
                     <div className="bg-surface-elevated rounded-lg border border-border-subtle p-4">
@@ -642,7 +643,7 @@ export default function ScenarioModelerPage() {
                 <Card className="bg-stone-charcoal border-border-subtle">
                   <CardHeader>
                     <CardTitle className="text-lg text-text-primary flex items-center gap-2">
-                      <Shield className="w-5 h-5 text-silicon-amber" />
+                      <Shield className="w-5 h-5 text-silicon-amber-strong" />
                       Mitigation Options
                     </CardTitle>
                     <CardDescription>
@@ -691,7 +692,7 @@ export default function ScenarioModelerPage() {
                       >
                         <div className="text-xs font-mono text-text-muted uppercase mb-2">Evidence</div>
                         <p className="text-sm text-text-primary mb-3">{note.fact}</p>
-                        <div className="text-xs font-mono text-silicon-amber uppercase mb-2">Implication</div>
+                        <div className="text-xs font-mono text-silicon-amber-strong uppercase mb-2">Implication</div>
                         <p className="text-sm text-text-muted">{note.implication}</p>
                       </motion.div>
                     ))}
@@ -704,7 +705,7 @@ export default function ScenarioModelerPage() {
                 <Card className="bg-stone-charcoal border-silicon-amber/30">
                   <CardHeader>
                     <CardTitle className="text-lg text-text-primary flex items-center gap-2">
-                      <GitCompareArrows className="w-5 h-5 text-silicon-amber" />
+                      <GitCompareArrows className="w-5 h-5 text-silicon-amber-strong" />
                       {selectedScenario.shortName} vs {secondary.scenario.shortName}
                     </CardTitle>
                     <CardDescription>
@@ -743,8 +744,8 @@ export default function ScenarioModelerPage() {
                           </tr>
                           <tr>
                             <td className="p-3 text-text-muted">Profile-adjusted value at stake</td>
-                            <td className="p-3 font-mono text-silicon-amber">{totalValueAtStake}</td>
-                            <td className="p-3 font-mono text-silicon-amber">{secondary.totalValueAtStake}</td>
+                            <td className="p-3 font-mono text-silicon-amber-strong">{totalValueAtStake}</td>
+                            <td className="p-3 font-mono text-silicon-amber-strong">{secondary.totalValueAtStake}</td>
                           </tr>
                           <tr>
                             <td className="p-3 text-text-muted">Exposure band</td>
@@ -812,7 +813,7 @@ export default function ScenarioModelerPage() {
                   }}
                 />
                 <Link href="/advisory#retainer">
-                  <Button className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90">
+                  <Button className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90">
                     Request Custom Scenario Analysis
                   </Button>
                 </Link>

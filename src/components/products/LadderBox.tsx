@@ -20,7 +20,7 @@ export function LadderBox() {
         {rungs.map((rung, i) => (
           <li key={i} className="flex flex-wrap items-center gap-2 text-sm text-text-muted">
             <span className="font-mono text-text-primary">{rung.from}</span>
-            <ArrowRight className="h-4 w-4 flex-shrink-0 text-silicon-amber" aria-label="leads to" />
+            <ArrowRight className="h-4 w-4 flex-shrink-0 text-silicon-amber-strong" aria-label="leads to" />
             <span>{rung.to}</span>
           </li>
         ))}

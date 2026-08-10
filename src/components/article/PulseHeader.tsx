@@ -83,7 +83,7 @@ export function PulseHeader({
       {/* Stone Truth */}
       {stoneTruth && (
         <div className="mb-4">
-          <span className="font-ui-mono text-xs text-silicon-amber block mb-2">Stone Truth</span>
+          <span className="font-ui-mono text-xs text-silicon-amber-strong block mb-2">Stone Truth</span>
           <p className="text-lg text-text-primary font-serif italic leading-relaxed">
             &ldquo;{stoneTruth}&rdquo;
           </p>

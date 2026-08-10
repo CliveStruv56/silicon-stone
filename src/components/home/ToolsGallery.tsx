@@ -77,7 +77,7 @@ export function ToolsGallery() {
             <div className="max-w-3xl mb-8">
               <Badge
                 variant="outline"
-                className="mb-5 border-silicon-amber/60 text-silicon-amber font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
+                className="mb-5 border-silicon-amber/60 text-silicon-amber-strong font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
               >
                 Use · decision tools
               </Badge>
@@ -106,7 +106,7 @@ export function ToolsGallery() {
                 </Link>
                 <Link
                   href="/tools/compliance-checker"
-                  className="inline-flex items-center justify-center gap-1.5 rounded-md border border-silicon-amber/60 bg-silicon-amber/5 px-4 py-2 text-sm font-medium text-silicon-amber transition-colors hover:bg-silicon-amber/10"
+                  className="inline-flex items-center justify-center gap-1.5 rounded-md border border-silicon-amber/60 bg-silicon-amber/5 px-4 py-2 text-sm font-medium text-silicon-amber-strong transition-colors hover:bg-silicon-amber/10"
                 >
                   Assess AI governance exposure
                   <ArrowRight className="h-4 w-4" />
@@ -151,7 +151,7 @@ export function ToolsGallery() {
                   {/* CTA — launch the free tool */}
                   <Link
                     href={tool.href}
-                    className={`inline-flex items-center gap-1.5 text-sm font-medium transition-colors ${tool.accent === 'amber' ? 'text-silicon-amber hover:text-silicon-amber/80' : 'text-stone-teal hover:text-stone-teal/80'}`}
+                    className={`inline-flex items-center gap-1.5 text-sm font-medium transition-colors ${tool.accent === 'amber' ? 'text-silicon-amber-strong hover:text-silicon-amber-strong/80' : 'text-stone-teal hover:text-stone-teal/80'}`}
                   >
                     <span>Launch tool</span>
                     <ArrowRight className="w-4 h-4" />

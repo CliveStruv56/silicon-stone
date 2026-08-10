@@ -88,7 +88,7 @@ export function ToolSubscribeCard({ tool }: ToolSubscribeCardProps) {
             <Button
               type="submit"
               disabled={status === 'loading'}
-              className="bg-silicon-amber font-semibold text-ink-on-accent hover:bg-silicon-amber/90"
+              className="bg-accent-fill font-semibold text-ink-on-accent hover:bg-accent-fill/90"
             >
               {status === 'loading' ? 'Sending…' : 'Get it free'}
             </Button>

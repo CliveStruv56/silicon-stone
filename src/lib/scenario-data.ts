@@ -609,7 +609,7 @@ export function getAdjustedImpacts(
 // Color mapping
 export const FRICTION_COLORS: Record<FrictionLevel, { bg: string; text: string; border: string }> = {
   low: { bg: 'bg-stone-teal/20', text: 'text-stone-teal', border: 'border-stone-teal/40' },
-  medium: { bg: 'bg-silicon-amber/20', text: 'text-silicon-amber', border: 'border-silicon-amber/40' },
+  medium: { bg: 'bg-silicon-amber/20', text: 'text-silicon-amber-strong', border: 'border-silicon-amber/40' },
   high: { bg: 'bg-alert-red/20', text: 'text-alert-red', border: 'border-alert-red/40' },
 }
 
@@ -618,4 +618,17 @@ export const SEVERITY_COLORS: Record<string, string> = {
   neutral: '#6b7280',   // gray
   negative: '#f59e0b',  // amber
   severe: '#ef4444',    // red
+}
+
+/**
+ * Same severities, but for the figures printed beside the bars. The vivid fills
+ * above are graphics (3:1) and fail as text on a white card — #f59e0b lands at
+ * 2.2:1. These resolve through the theme tokens, so they stay readable on the
+ * warm stone in light mode and on slate in dark.
+ */
+export const SEVERITY_TEXT_COLORS: Record<string, string> = {
+  positive: 'var(--stone-teal)',
+  neutral: 'var(--text-muted)',
+  negative: 'var(--silicon-amber-strong)',
+  severe: 'var(--alert-red)',
 }

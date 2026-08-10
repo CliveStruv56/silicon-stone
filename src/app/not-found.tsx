@@ -15,7 +15,7 @@ export default function NotFound() {
           The page you&apos;re looking for doesn&apos;t exist or has been moved.
         </p>
         <Link href="/">
-          <Button className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90">
+          <Button className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90">
             <Home className="w-4 h-4 mr-2" />
             Go home
           </Button>

@@ -138,7 +138,7 @@ export function PushOptIn() {
       <div className="flex items-start gap-3">
         <div className="mt-0.5 rounded-md bg-silicon-amber/10 p-2">
           {subscribed ? (
-            <Bell className="h-5 w-5 text-silicon-amber" />
+            <Bell className="h-5 w-5 text-silicon-amber-strong" />
           ) : (
             <BellOff className="h-5 w-5 text-text-muted" />
           )}
@@ -204,7 +204,7 @@ export function PushOptIn() {
                   <Button
                     onClick={enable}
                     disabled={busy}
-                    className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90 font-medium"
+                    className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90 font-medium"
                   >
                     {busy ? (
                       <Loader2 className="h-4 w-4 animate-spin" />

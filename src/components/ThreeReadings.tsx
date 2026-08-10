@@ -21,7 +21,7 @@ const readings: Reading[] = [
     name: 'Political',
     lens: 'For the balance of power',
     body: 'How it moves the contest between states, blocs and incumbents — the structural rebalancing beneath the headline.',
-    accent: 'text-silicon-amber',
+    accent: 'text-silicon-amber-strong',
   },
   {
     name: 'Positional',

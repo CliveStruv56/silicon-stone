@@ -15,7 +15,7 @@ export function CredibilityBlock() {
             <div className="text-center mb-10">
               <Badge
                 variant="outline"
-                className="mb-5 border-silicon-amber/60 text-silicon-amber font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
+                className="mb-5 border-silicon-amber/60 text-silicon-amber-strong font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
               >
                 Brand Position
               </Badge>
@@ -30,7 +30,7 @@ export function CredibilityBlock() {
               >
                 The View from the Edge
               </h2>
-              <p className="font-mono text-xs uppercase tracking-[0.10em] text-silicon-amber">
+              <p className="font-mono text-xs uppercase tracking-[0.10em] text-silicon-amber-strong">
                 Clearer than the view from any centre.
               </p>
             </div>
@@ -42,7 +42,7 @@ export function CredibilityBlock() {
                 <blockquote className="space-y-5">
                   <p className="text-xl lg:text-2xl leading-relaxed text-text-primary font-light">
                     Distilled from{' '}
-                    <span className="text-silicon-amber font-medium">
+                    <span className="text-silicon-amber-strong font-medium">
                       three decades at the heart of the technology industry
                     </span>{' '}
                     and observed from a small island sixty miles north of the
@@ -50,7 +50,7 @@ export function CredibilityBlock() {
                   </p>
                   <p className="text-lg leading-relaxed text-text-muted">
                     While the mainland reacts to the noise, we identify{' '}
-                    <strong className="text-silicon-amber font-medium">the Drift</strong>
+                    <strong className="text-silicon-amber-strong font-medium">the Drift</strong>
                     {' '}— the structural shifts in policy, capital, and supply
                     chains that will define{' '}
                     <strong className="text-text-primary font-semibold">
@@ -61,7 +61,7 @@ export function CredibilityBlock() {
                   <p className="text-lg leading-relaxed text-text-muted">
                     Decision-grade analysis from thirty years inside the
                     industry.{' '}
-                    <em className="text-silicon-amber font-medium">
+                    <em className="text-silicon-amber-strong font-medium">
                       Calibrated where the evidence supports it, hedged where
                       it doesn&apos;t.
                     </em>{' '}
@@ -71,7 +71,7 @@ export function CredibilityBlock() {
 
                 <div className="lg:border-l lg:border-border-subtle lg:pl-8 space-y-6 lg:max-w-[220px]">
                   <div>
-                    <div className="font-mono text-3xl font-bold text-silicon-amber leading-none">
+                    <div className="font-mono text-3xl font-bold text-silicon-amber-strong leading-none">
                       30
                     </div>
                     <div className="font-mono text-xs uppercase tracking-[0.10em] text-text-muted mt-2">

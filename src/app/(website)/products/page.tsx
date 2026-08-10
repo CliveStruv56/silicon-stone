@@ -56,9 +56,9 @@ const products = [
     description: 'A structured governance toolkit for cataloguing systems, classifying risk, collecting vendor evidence, and planning against phased AI Act implementation.',
     price: 'From £79',
     badge: 'Flagship',
-    badgeColor: 'bg-silicon-amber text-ink-on-accent',
+    badgeColor: 'bg-accent-fill text-ink-on-accent',
     icon: Shield,
-    iconColor: 'text-silicon-amber',
+    iconColor: 'text-silicon-amber-strong',
     iconBg: 'bg-silicon-amber/10',
     highlights: [
       'Risk classification decision tree',
@@ -101,7 +101,7 @@ export default function ProductsPage() {
         <section className="bg-slate-deep border-b border-border-subtle">
           <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
             <div className="max-w-3xl">
-              <Badge variant="outline" className="mb-4 border-silicon-amber text-silicon-amber">
+              <Badge variant="outline" className="mb-4 border-silicon-amber text-silicon-amber-strong">
                 Digital Products
               </Badge>
               <h1 className="text-4xl font-bold text-text-primary sm:text-5xl mb-6">
@@ -123,11 +123,11 @@ export default function ProductsPage() {
         <section className="bg-silicon-amber/10 border-b border-silicon-amber/20">
           <div className="mx-auto max-w-7xl px-6 py-4 lg:px-8">
             <div className="flex items-center gap-3">
-              <Shield className="w-5 h-5 text-silicon-amber flex-shrink-0" />
+              <Shield className="w-5 h-5 text-silicon-amber-strong flex-shrink-0" />
               <p className="text-sm text-text-primary">
-                <span className="font-semibold text-silicon-amber">The AI Act is already applying in phases.</span>
+                <span className="font-semibold text-silicon-amber-strong">The AI Act is already applying in phases.</span>
                 {' '}Transparency obligations have applied since 2 August 2026. The timetable is moving. The evidence gap remains.{' '}
-                <Link href="/eu-exposure" className="font-medium text-silicon-amber underline">
+                <Link href="/eu-exposure" className="font-medium text-silicon-amber-strong underline">
                   Need it interpreted for your business? See the Post-Omnibus Briefing.
                 </Link>
               </p>
@@ -154,7 +154,7 @@ export default function ProductsPage() {
                     <CardTitle className="text-xl text-text-primary">
                       {product.title}
                     </CardTitle>
-                    <div className="text-lg font-mono text-silicon-amber mt-1">
+                    <div className="text-lg font-mono text-silicon-amber-strong mt-1">
                       {product.price}
                     </div>
                     <CardDescription className="mt-2">
@@ -215,7 +215,7 @@ export default function ProductsPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/advisory#contact">
-                  <Button className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90">
+                  <Button className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90">
                     Discuss Advisory Services
                   </Button>
                 </Link>

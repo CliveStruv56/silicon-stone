@@ -87,34 +87,34 @@ const fallbackStance01Bullets: ReactNode[] = [
 const fallbackStance02Bullets: ReactNode[] = [
     <>
         Tasks routed across multiple models.{' '}
-        <em className="text-silicon-amber not-italic font-medium">
+        <em className="text-silicon-amber-strong not-italic font-medium">
             The decision layer — what runs where, when — is held in-house.
         </em>
     </>,
     <>
         Providers audited, swapped, and benchmarked{' '}
-        <em className="text-silicon-amber not-italic font-medium">
+        <em className="text-silicon-amber-strong not-italic font-medium">
             without operational disruption
         </em>
         .
     </>,
     <>
         Data sovereignty and compliance{' '}
-        <em className="text-silicon-amber not-italic font-medium">
+        <em className="text-silicon-amber-strong not-italic font-medium">
             designed into the architecture
         </em>
         , not appended after procurement.
     </>,
     <>
         Capability{' '}
-        <em className="text-silicon-amber not-italic font-medium">
+        <em className="text-silicon-amber-strong not-italic font-medium">
             compounds across vendor cycles
         </em>
         . Each model swap leaves institutional learning intact.
     </>,
     <>
         Architecture sets the strategy.{' '}
-        <em className="text-silicon-amber not-italic font-medium">
+        <em className="text-silicon-amber-strong not-italic font-medium">
             Strategy doesn&apos;t follow whichever model is currently leading the benchmarks.
         </em>
     </>,
@@ -123,7 +123,7 @@ const fallbackStance02Bullets: ReactNode[] = [
 const fallbackStoneTruthBody: ReactNode = (
     <>
         Determine which side of the orchestration divide your industry sits on.{' '}
-        <em className="text-silicon-amber not-italic font-medium">
+        <em className="text-silicon-amber-strong not-italic font-medium">
             The 2030 league table is being set there — not at the model layer where everyone else is looking.
         </em>{' '}
         <strong className="text-text-primary font-semibold">
@@ -156,7 +156,7 @@ const stance02PortableComponents: PortableTextComponents = {
     marks: {
         strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
         em: ({ children }) => (
-            <em className="text-silicon-amber not-italic font-medium">{children}</em>
+            <em className="text-silicon-amber-strong not-italic font-medium">{children}</em>
         ),
     },
 }
@@ -170,7 +170,7 @@ const stoneTruthPortableComponents: PortableTextComponents = {
     marks: {
         strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
         em: ({ children }) => (
-            <em className="text-silicon-amber not-italic font-medium">{children}</em>
+            <em className="text-silicon-amber-strong not-italic font-medium">{children}</em>
         ),
     },
 }
@@ -266,7 +266,7 @@ export function OrchestrationBattleground({ settings }: OrchestrationBattlegroun
                     <div className="max-w-3xl mb-8">
                         <Badge
                             variant="outline"
-                            className="mb-6 border-silicon-amber/60 text-silicon-amber font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
+                            className="mb-6 border-silicon-amber/60 text-silicon-amber-strong font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
                         >
                             {eyebrow}
                         </Badge>
@@ -282,7 +282,7 @@ export function OrchestrationBattleground({ settings }: OrchestrationBattlegroun
                             {h2}
                         </h2>
                         <p
-                            className="text-silicon-amber font-medium mb-6"
+                            className="text-silicon-amber-strong font-medium mb-6"
                             style={{
                                 fontSize: 'clamp(18px, 1.8vw, 22px)',
                                 lineHeight: 1.45,
@@ -312,7 +312,7 @@ export function OrchestrationBattleground({ settings }: OrchestrationBattlegroun
                             fallbackBullets={fallbackStance02Bullets}
                             accent="amber"
                             portableComponents={stance02PortableComponents}
-                            tagClassName="text-silicon-amber"
+                            tagClassName="text-silicon-amber-strong"
                         />
                     </StaggerItem>
                 </div>
@@ -324,7 +324,7 @@ export function OrchestrationBattleground({ settings }: OrchestrationBattlegroun
                             'linear-gradient(to right, rgba(232,154,60,0.06), rgba(74,155,155,0.04))',
                     }}
                 >
-                    <div className="font-mono text-[12.5px] tracking-[0.10em] uppercase text-silicon-amber mb-3">
+                    <div className="font-mono text-[12.5px] tracking-[0.10em] uppercase text-silicon-amber-strong mb-3">
                         {stoneTruthLabel}
                     </div>
                     {stoneTruthSanityBody && stoneTruthSanityBody.length > 0 ? (

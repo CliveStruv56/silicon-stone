@@ -167,7 +167,7 @@ function ArticleCard({ article }: { article: Article }) {
           {article.personas?.slice(0, 2).map((persona) => (
             <span
               key={persona}
-              className="text-xs text-silicon-amber/80"
+              className="text-xs text-silicon-amber-strong/80"
               title={getPersonaLabel(persona)}
             >
               {PERSONAS[persona as PersonaSlug]?.name.split(' ')[1]?.slice(0, 1) || persona[0]}
@@ -244,7 +244,7 @@ function FeaturedArticle({ article }: { article: Article }) {
                   <Badge
                     key={persona}
                     variant="outline"
-                    className="text-xs border-silicon-amber/30 text-silicon-amber"
+                    className="text-xs border-silicon-amber/30 text-silicon-amber-strong"
                   >
                     {getPersonaLabel(persona)}
                   </Badge>
@@ -298,7 +298,7 @@ function TopicPills({
           className={cn(
             'flex items-center gap-2 px-3 py-2 rounded-lg border transition-all text-sm',
             selected === topic.slug
-              ? 'bg-silicon-amber/20 border-silicon-amber text-silicon-amber'
+              ? 'bg-silicon-amber/20 border-silicon-amber text-silicon-amber-strong'
               : 'bg-stone-charcoal/50 border-border-subtle text-text-muted hover:border-stone-teal hover:text-text-primary'
           )}
         >
@@ -346,7 +346,7 @@ function TierPills({
           className={cn(
             'flex items-center gap-2 px-3 py-2 rounded-lg border transition-all text-sm',
             selected === tier.value
-              ? 'bg-silicon-amber/20 border-silicon-amber text-silicon-amber'
+              ? 'bg-silicon-amber/20 border-silicon-amber text-silicon-amber-strong'
               : 'bg-stone-charcoal/50 border-border-subtle text-text-muted hover:border-stone-teal hover:text-text-primary'
           )}
         >
@@ -710,7 +710,7 @@ export function IntelligenceFeed({
                 {/* Featured */}
                 {featuredArticle && (
                   <div>
-                    <h2 className="font-ui-mono text-silicon-amber text-sm mb-4">
+                    <h2 className="font-ui-mono text-silicon-amber-strong text-sm mb-4">
                       Latest Intelligence
                     </h2>
                     <FeaturedArticle article={featuredArticle} />

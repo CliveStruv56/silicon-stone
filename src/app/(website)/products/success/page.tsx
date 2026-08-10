@@ -53,7 +53,7 @@ export default async function PurchaseSuccessPage({
               {sku ? `Thank you — your ${SKUS[sku].name} is on its way.` : 'Thank you — your order is confirmed.'}
             </h1>
             <p className="mx-auto flex max-w-xl items-center justify-center gap-2 text-lg text-text-muted">
-              <Mail className="h-5 w-5 flex-shrink-0 text-silicon-amber" />
+              <Mail className="h-5 w-5 flex-shrink-0 text-silicon-amber-strong" />
               Check your email for your download links — they arrive within a few
               minutes from Lemon Squeezy, our payment provider.
             </p>
@@ -77,11 +77,11 @@ export default async function PurchaseSuccessPage({
               </p>
               <div className="mb-6 rounded-lg border border-border-subtle bg-slate-deep p-4 text-sm text-text-muted">
                 Total investment for audit + toolkit:{' '}
-                <span className="font-mono text-silicon-amber">£83</span> (vs £103
+                <span className="font-mono text-silicon-amber-strong">£83</span> (vs £103
                 separately)
               </div>
               <Link href="/products/ai-act-toolkit">
-                <Button className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90 font-semibold">
+                <Button className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90 font-semibold">
                   View the AI Act Compliance Toolkit
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
@@ -93,7 +93,7 @@ export default async function PurchaseSuccessPage({
         {isToolkit && (
           <section className="mx-auto max-w-3xl px-6 py-12 lg:px-8">
             <div className="rounded-xl border border-silicon-amber/30 bg-stone-charcoal p-8">
-              <div className="mb-4 font-mono text-xs uppercase tracking-wider text-silicon-amber">
+              <div className="mb-4 font-mono text-xs uppercase tracking-wider text-silicon-amber-strong">
                 Your next step
               </div>
               <h2 className="mb-3 text-2xl font-semibold text-text-primary">
@@ -109,7 +109,7 @@ export default async function PurchaseSuccessPage({
                 free.
               </p>
               <Link href="/advisory#contact">
-                <Button className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90 font-semibold">
+                <Button className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90 font-semibold">
                   Book an Advisory Briefing
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>

@@ -165,7 +165,7 @@ function MethodologyCard({
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-sm font-mono text-silicon-amber">
+                <span className="text-sm font-mono text-silicon-amber-strong">
                   {prefix}
                   {index + 1}
                 </span>
@@ -212,7 +212,7 @@ function MethodologyCard({
           </div>
 
           <Link href={entry.link}>
-            <div className="text-sm font-medium text-stone-teal hover:text-silicon-amber transition-colors flex items-center gap-1">
+            <div className="text-sm font-medium text-stone-teal hover:text-silicon-amber-strong transition-colors flex items-center gap-1">
               See Analysis &rarr;
             </div>
           </Link>
@@ -234,7 +234,7 @@ export default function MethodologyPage() {
             <div className="max-w-3xl">
               <Badge
                 variant="outline"
-                className="mb-5 border-silicon-amber/60 text-silicon-amber font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
+                className="mb-5 border-silicon-amber/60 text-silicon-amber-strong font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
               >
                 Forensic Technopolitics
               </Badge>
@@ -400,12 +400,12 @@ export default function MethodologyPage() {
                 'linear-gradient(to right, rgba(232,154,60,0.06), rgba(74,155,155,0.04))',
             }}
           >
-            <div className="font-mono text-[12.5px] tracking-[0.10em] uppercase text-silicon-amber mb-3">
+            <div className="font-mono text-[12.5px] tracking-[0.10em] uppercase text-silicon-amber-strong mb-3">
               Stone Truth
             </div>
             <p className="text-base leading-relaxed text-text-primary">
               Hedging is not weakness.{' '}
-              <em className="text-silicon-amber not-italic font-medium">
+              <em className="text-silicon-amber-strong not-italic font-medium">
                 It is the calibration.
               </em>
             </p>
@@ -426,7 +426,7 @@ export default function MethodologyPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/intelligence">
-                  <Button className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90">
+                  <Button className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90">
                     Read Our Analysis
                   </Button>
                 </Link>

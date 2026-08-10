@@ -124,7 +124,7 @@ export default async function CategoryPage({ params }: Props) {
                 <div className="flex gap-4 p-4 bg-stone-charcoal/50 border border-border-subtle rounded-lg">
                   <div>
                     <div className="text-xs text-text-muted uppercase tracking-wider">Supply Risk</div>
-                    <div className="text-xl font-bold text-silicon-amber">Critical</div>
+                    <div className="text-xl font-bold text-silicon-amber-strong">Critical</div>
                   </div>
                   <div className="w-px bg-border-subtle" />
                   <div>
@@ -180,7 +180,7 @@ export default async function CategoryPage({ params }: Props) {
               ) : (
                 <div className="text-center py-10">
                   <p className="text-text-muted mb-4">No articles in this category yet.</p>
-                  <Link href="/intelligence" className="text-stone-teal hover:text-silicon-amber">
+                  <Link href="/intelligence" className="text-stone-teal hover:text-silicon-amber-strong">
                     &larr; View all articles
                   </Link>
                 </div>

@@ -695,7 +695,7 @@ export const RELEVANCE_COLORS: Record<Relevance, string> = {
 
 export const PRIORITY_COLORS: Record<Priority, { bg: string; text: string; border: string }> = {
   immediate: { bg: 'bg-alert-red/10', text: 'text-alert-red', border: 'border-alert-red/30' },
-  '30-days': { bg: 'bg-silicon-amber/10', text: 'text-silicon-amber', border: 'border-silicon-amber/30' },
+  '30-days': { bg: 'bg-silicon-amber/10', text: 'text-silicon-amber-strong', border: 'border-silicon-amber/30' },
   '90-days': { bg: 'bg-stone-teal/10', text: 'text-stone-teal', border: 'border-stone-teal/30' },
   '180-days': { bg: 'bg-text-muted/10', text: 'text-text-muted', border: 'border-text-muted/30' },
 }

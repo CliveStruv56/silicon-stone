@@ -541,7 +541,7 @@ export default async function ArticlePage({ params }: Props) {
               <ul className="space-y-3">
                 {article.actionableInsights.map((insight: string, index: number) => (
                   <li key={index} className="flex items-start gap-3">
-                    <span className="text-silicon-amber font-mono text-sm mt-0.5">
+                    <span className="text-silicon-amber-strong font-mono text-sm mt-0.5">
                       {String(index + 1).padStart(2, '0')}
                     </span>
                     <span className="text-text-primary">{insight}</span>
@@ -566,7 +566,7 @@ export default async function ArticlePage({ params }: Props) {
                         href={citation.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-stone-teal hover:text-silicon-amber underline underline-offset-2 transition-colors"
+                        className="text-stone-teal hover:text-silicon-amber-strong underline underline-offset-2 transition-colors"
                       >
                         {citation.title}
                       </a>
@@ -633,7 +633,7 @@ export default async function ArticlePage({ params }: Props) {
                   <Badge
                     key={persona}
                     variant="outline"
-                    className="text-silicon-amber border-silicon-amber/30"
+                    className="text-silicon-amber-strong border-silicon-amber/30"
                   >
                     {getPersonaLabel(persona)}
                   </Badge>

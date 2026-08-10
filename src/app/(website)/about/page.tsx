@@ -229,7 +229,7 @@ export default function AboutPage() {
             {credentials.map((cred) => (
               <Card key={cred.period} className="bg-stone-charcoal border-border-subtle">
                 <CardContent className="p-6">
-                  <div className="text-silicon-amber font-mono font-bold text-lg mb-2">
+                  <div className="text-silicon-amber-strong font-mono font-bold text-lg mb-2">
                     {cred.period}
                   </div>
                   <h3 className="text-text-primary font-semibold mb-2">
@@ -279,7 +279,7 @@ export default function AboutPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
               <Card className="bg-stone-charcoal border-border-subtle">
                 <CardContent className="p-6">
-                  <div className="text-silicon-amber mb-4">
+                  <div className="text-silicon-amber-strong mb-4">
                     <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
@@ -387,7 +387,7 @@ export default function AboutPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a href="mailto:hello@siliconandstone.com">
-                <Button className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90">
+                <Button className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90">
                   <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>

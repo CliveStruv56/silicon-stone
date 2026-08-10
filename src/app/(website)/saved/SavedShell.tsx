@@ -114,7 +114,7 @@ function SavedList({
               type="button"
               onClick={() => onRemove(article.slug)}
               aria-label={`Remove ${article.title} from saved`}
-              className="shrink-0 p-2 text-text-muted transition-colors hover:text-silicon-amber"
+              className="shrink-0 p-2 text-text-muted transition-colors hover:text-silicon-amber-strong"
             >
               <Trash2 className="h-4 w-4" aria-hidden="true" />
             </button>
@@ -204,7 +204,7 @@ function SavedReader({
                   href={citation.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-stone-teal hover:text-silicon-amber underline underline-offset-2 transition-colors"
+                  className="text-stone-teal hover:text-silicon-amber-strong underline underline-offset-2 transition-colors"
                 >
                   {citation.title}
                 </a>
@@ -220,7 +220,7 @@ function SavedReader({
           <p className="text-sm text-text-muted mb-2">Relevant for:</p>
           <div className="flex flex-wrap gap-2">
             {article.personas.map((persona) => (
-              <Badge key={persona} variant="outline" className="text-silicon-amber border-silicon-amber/30">
+              <Badge key={persona} variant="outline" className="text-silicon-amber-strong border-silicon-amber/30">
                 {getPersonaLabel(persona)}
               </Badge>
             ))}
@@ -232,7 +232,7 @@ function SavedReader({
         Reading the saved copy.{' '}
         <Link
           href={`/analysis/${article.slug}`}
-          className="text-stone-teal underline underline-offset-2 hover:text-silicon-amber"
+          className="text-stone-teal underline underline-offset-2 hover:text-silicon-amber-strong"
         >
           View the live article
         </Link>{' '}
@@ -314,7 +314,7 @@ export function SavedShell() {
           This article isn&apos;t in your saved list.{' '}
           <Link
             href={`/analysis/${readingSlug}`}
-            className="text-stone-teal underline underline-offset-2 hover:text-silicon-amber"
+            className="text-stone-teal underline underline-offset-2 hover:text-silicon-amber-strong"
           >
             Read it live
           </Link>{' '}

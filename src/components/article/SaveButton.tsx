@@ -70,7 +70,7 @@ export function SaveButton({ payload }: { payload: SavePayload }) {
         className={cn(
           'flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm font-medium transition-all',
           saved
-            ? 'border-silicon-amber bg-silicon-amber/20 text-silicon-amber'
+            ? 'border-silicon-amber bg-silicon-amber/20 text-silicon-amber-strong'
             : 'border-border-subtle bg-stone-charcoal/30 text-text-muted hover:border-stone-teal hover:text-text-primary',
         )}
       >
@@ -82,7 +82,7 @@ export function SaveButton({ payload }: { payload: SavePayload }) {
         <span>{saved ? 'Saved' : 'Save'}</span>
       </button>
       {error && (
-        <p role="alert" className="text-xs text-silicon-amber">
+        <p role="alert" className="text-xs text-silicon-amber-strong">
           {error}
         </p>
       )}

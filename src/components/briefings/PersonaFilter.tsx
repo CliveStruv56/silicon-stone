@@ -62,7 +62,7 @@ export function PersonaFilter({
               'flex items-center gap-2 px-3 py-2 rounded-lg border transition-all',
               'text-sm',
               isSelected
-                ? 'bg-silicon-amber/20 border-silicon-amber text-silicon-amber'
+                ? 'bg-silicon-amber/20 border-silicon-amber text-silicon-amber-strong'
                 : 'bg-stone-charcoal/50 border-border-subtle text-text-muted hover:border-stone-teal hover:text-text-primary'
             )}
           >

@@ -11,19 +11,25 @@
      resolve to warm stone; in .dark they flip back to Atlantic slate. */
   --slate-deep: #efece4;      /* page background — warm stone */
   --stone-charcoal: #ffffff;  /* cards / panels */
-  --silicon-amber: #b5651d;   /* burnt amber — accent that stays readable on light */
-  --silicon-amber-strong: #8f4e17; /* deeper amber for small text on amber-tinted fills */
+  --silicon-amber: #b5651d;   /* burnt amber — tints, borders, graphic marks.
+                                 NOT for small text or solid fills on light:
+                                 it sits at 3.7:1 on the stone page and ~4.3:1
+                                 against either white or ink. */
+  --silicon-amber-strong: #8f4e17; /* the readable amber — text on light, and
+                                 the solid fill under white ink (6.4:1) */
   --stone-teal: #16615f;      /* deep weathered teal — links, accent */
   --text-primary: #14181f;    /* ink — primary text */
   --text-muted: #586072;      /* muted text — meta, secondary */
-  --alert-red: #c2410c;       /* deadlines / risk */
+  --alert-red: #b03a0a;       /* deadlines / risk — deepened to 5.1:1 on the
+                                 stone page (the old #c2410c sat at 4.4:1) */
   --surface-elevated: #f5f3ed;/* lighter raised band */
   --footer-bg: #e8e3d7;       /* deeper grounded stone — footer band */
   --border-subtle: #d2c9b5;   /* warm hairline — deep enough to read as a
                                  divider on the #efece4 page (the old #e2dccf
                                  sat at ~1.1:1 and vanished) */
 
-  --silicon-cyan: #0e7c8b;    /* deepened cyan for contrast on light */
+  --silicon-cyan: #0a6b78;    /* deepened cyan — 5.3:1 as text on the stone page,
+                                 6.2:1 as a fill under white ink */
 
   /* Atlantic blue — Transatlantic Troy persona accent */
   --troy-blue: #2c5282;
@@ -31,14 +37,24 @@
   /* Sister-product indigo — for WaymarkPath / Adjacent Block cross-links. */
   --sister-indigo: #4f46e5;
 
-  /* Intelligence tier accent colors */
-  --tier-pulse: #0e7c8b;
+  /* Intelligence tier accent colors — the tier chips carry text, so each value
+     has to clear AA against --ink-on-accent in both themes. */
+  --tier-pulse: var(--silicon-cyan);
   --tier-briefing: #16615f;
-  --tier-audit: #b5651d;
+  --tier-audit: var(--silicon-amber-strong);
 
-  /* Fixed dark ink for text placed ON bright accent chips (amber/teal/cyan
-     fills). Does NOT flip between themes — replaces former text-slate-deep use. */
-  --ink-on-accent: #14181f;
+  /* Ink for text placed ON a solid accent fill (amber/teal/cyan chips and
+     buttons). This FLIPS with the theme: light-mode accents are deep colours
+     that need white ink, dark-mode accents are bright and need slate ink.
+     Pinning it to slate for both themes was the bug — it left dark ink on the
+     deep teal fills at 2.5:1. */
+  --ink-on-accent: #ffffff;
+
+  /* Solid amber fill for anything that carries text (buttons, badges). Deeper
+     than --silicon-amber so white ink clears AA; in .dark it resolves to
+     phosphor amber and --ink-on-accent flips to slate underneath it. Use
+     --silicon-amber itself only for tints, borders and graphic marks. */
+  --accent-fill: var(--silicon-amber-strong);
 
   /* Fixed dark scrim for caption gradients laid over (always-dark) hero
      artwork. Does NOT flip between themes: the captions on top of it are fixed
@@ -63,7 +79,7 @@
   --muted-foreground: #586072;
   --accent: #16615f;
   --accent-foreground: #ffffff;
-  --destructive: #c2410c;
+  --destructive: #b03a0a;     /* kept in step with --alert-red */
   --border: #d2c9b5;          /* kept in step with --border-subtle */
   --input: #d2c9b5;
   --ring: #16615f;
@@ -102,6 +118,9 @@
   --tier-pulse: #4fd1e0;
   --tier-briefing: #7fcbc4;
   --tier-audit: #f0a33d;
+
+  /* Dark accents are bright fills, so the ink on top flips back to slate. */
+  --ink-on-accent: #14181f;
 
   /* ---- shadcn surface tokens (dark) ---- */
   --background: #0f141e;
@@ -145,6 +164,7 @@
   --color-silicon-amber-strong: var(--silicon-amber-strong);
   --color-stone-teal: var(--stone-teal);
   --color-ink-on-accent: var(--ink-on-accent);
+  --color-accent-fill: var(--accent-fill);
   --color-scrim-ink: var(--scrim-ink);
   --color-text-primary: var(--text-primary);
   --color-text-muted: var(--text-muted);
@@ -224,7 +244,7 @@ html.dark {
 
 /* Selection styling */
 ::selection {
-  background: var(--silicon-amber);
+  background: var(--accent-fill);
   color: var(--ink-on-accent);
 }
 

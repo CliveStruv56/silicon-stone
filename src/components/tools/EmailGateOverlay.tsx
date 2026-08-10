@@ -125,7 +125,7 @@ export function EmailGateOverlay({ isOpen, onUnlock, onDismiss, toolName, result
                   </motion.div>
                 ) : (
                   <div className="w-12 h-12 rounded-full bg-silicon-amber/10 border border-silicon-amber/30 flex items-center justify-center mx-auto mb-3">
-                    <Lock className="w-6 h-6 text-silicon-amber" />
+                    <Lock className="w-6 h-6 text-silicon-amber-strong" />
                   </div>
                 )}
                 <CardTitle className="text-xl text-text-primary">
@@ -159,7 +159,7 @@ export function EmailGateOverlay({ isOpen, onUnlock, onDismiss, toolName, result
                     <Button
                       type="submit"
                       disabled={status === 'loading'}
-                      className="w-full bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90 font-semibold"
+                      className="w-full bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90 font-semibold"
                     >
                       {status === 'loading' ? (
                         <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...</>

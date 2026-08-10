@@ -89,7 +89,7 @@ export default function AIActToolkitPage() {
           <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div>
-                <Badge className="mb-4 bg-silicon-amber text-ink-on-accent">
+                <Badge className="mb-4 bg-accent-fill text-ink-on-accent">
                   Flagship Product
                 </Badge>
                 <h1 className="text-4xl font-bold text-text-primary sm:text-5xl mb-6">
@@ -101,7 +101,7 @@ export default function AIActToolkitPage() {
                   and set review triggers.
                 </p>
                 <div className="flex items-center gap-4 mb-8">
-                  <div className="text-3xl font-mono font-bold text-silicon-amber">£79</div>
+                  <div className="text-3xl font-mono font-bold text-silicon-amber-strong">£79</div>
                   <div className="text-sm text-text-muted">
                     Standard Package<br />
                     PDF + Spreadsheets
@@ -109,7 +109,7 @@ export default function AIActToolkitPage() {
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3">
                   {standardBuyable ? (
-                    <Button size="lg" className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90 font-semibold" asChild>
+                    <Button size="lg" className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90 font-semibold" asChild>
                       <a href={checkoutUrls.standard} target="_blank" rel="noopener noreferrer" className="plausible-event-name=Buy+Toolkit+Standard">
                         Buy Standard — £79
                       </a>
@@ -118,7 +118,7 @@ export default function AIActToolkitPage() {
                     <EarlyAccessCTA
                       tierTag="tier-toolkit-standard"
                       label="Request Early Access — Standard"
-                      buttonClassName="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90 font-semibold"
+                      buttonClassName="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90 font-semibold"
                     />
                   )}
                   {professionalBuyable ? (
@@ -149,7 +149,7 @@ export default function AIActToolkitPage() {
               </div>
 
               <div className="bg-stone-charcoal border border-border-subtle rounded-xl p-8">
-                <div className="text-sm font-mono text-silicon-amber uppercase tracking-wider mb-4">
+                <div className="text-sm font-mono text-silicon-amber-strong uppercase tracking-wider mb-4">
                   What You Get
                 </div>
                 <ul className="space-y-3">
@@ -188,11 +188,11 @@ export default function AIActToolkitPage() {
         <section className="bg-silicon-amber/10 border-b border-silicon-amber/20">
           <div className="mx-auto max-w-7xl px-6 py-4 lg:px-8">
             <div className="flex items-center gap-3">
-              <Shield className="w-5 h-5 text-silicon-amber flex-shrink-0" />
+              <Shield className="w-5 h-5 text-silicon-amber-strong flex-shrink-0" />
               <p className="text-sm text-text-primary">
-                <span className="font-semibold text-silicon-amber">AI Act implementation is phased.</span>
+                <span className="font-semibold text-silicon-amber-strong">AI Act implementation is phased.</span>
                 {' '}Transparency obligations have applied since 2 August 2026. The Digital Omnibus — Regulation (EU) 2026/1744, in force 27 July 2026 — moves standalone high-risk to 2 December 2027 and embedded high-risk to 2 August 2028. The evidence work continues.{' '}
-                <Link href="/eu-exposure" className="font-medium text-silicon-amber underline">
+                <Link href="/eu-exposure" className="font-medium text-silicon-amber-strong underline">
                   See the Post-Omnibus Briefing.
                 </Link>
               </p>
@@ -217,7 +217,7 @@ export default function AIActToolkitPage() {
                 <Card key={section.title} className="bg-stone-charcoal border-border-subtle">
                   <CardHeader className="pb-2">
                     <div className="flex items-center gap-3">
-                      <span className="text-sm font-mono text-silicon-amber">0{idx + 1}</span>
+                      <span className="text-sm font-mono text-silicon-amber-strong">0{idx + 1}</span>
                       <Icon className="w-5 h-5 text-stone-teal" />
                     </div>
                     <CardTitle className="text-lg text-text-primary mt-2">
@@ -256,7 +256,7 @@ export default function AIActToolkitPage() {
                     AI Systems Register spreadsheet; Compliance Tracker with dashboard;
                     quarterly update emails
                   </td>
-                  <td className="whitespace-nowrap px-4 py-4 align-top font-mono font-bold text-silicon-amber">£79</td>
+                  <td className="whitespace-nowrap px-4 py-4 align-top font-mono font-bold text-silicon-amber-strong">£79</td>
                 </tr>
                 <tr>
                   <td className="whitespace-nowrap px-4 py-4 align-top font-semibold text-text-primary">Professional</td>
@@ -268,7 +268,7 @@ export default function AIActToolkitPage() {
                     recorded by the author — how to apply each section to your specific
                     situation
                   </td>
-                  <td className="whitespace-nowrap px-4 py-4 align-top font-mono font-bold text-silicon-amber">£149</td>
+                  <td className="whitespace-nowrap px-4 py-4 align-top font-mono font-bold text-silicon-amber-strong">£149</td>
                 </tr>
               </tbody>
             </table>
@@ -322,7 +322,7 @@ export default function AIActToolkitPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
                 {standardBuyable ? (
-                  <Button size="lg" className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90 font-semibold" asChild>
+                  <Button size="lg" className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90 font-semibold" asChild>
                     <a href={checkoutUrls.standard} target="_blank" rel="noopener noreferrer">
                       Buy Standard — £79
                     </a>
@@ -331,7 +331,7 @@ export default function AIActToolkitPage() {
                   <EarlyAccessCTA
                     tierTag="tier-toolkit-standard"
                     label="Request Early Access — Standard"
-                    buttonClassName="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90 font-semibold"
+                    buttonClassName="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90 font-semibold"
                   />
                 )}
                 {professionalBuyable ? (

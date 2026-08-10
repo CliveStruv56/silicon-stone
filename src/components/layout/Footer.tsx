@@ -38,7 +38,7 @@ export function Footer() {
           <div className="col-span-2 md:col-span-1 space-y-4">
             <Link href="/" className="inline-block">
               <span className="text-xl font-bold tracking-tight">
-                <span className="text-silicon-amber">Silicon</span>
+                <span className="text-silicon-amber-strong">Silicon</span>
                 <span className="text-text-muted"> & </span>
                 <span className="text-stone-teal">Stone</span>
               </span>

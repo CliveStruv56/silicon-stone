@@ -82,10 +82,10 @@ export function StartHereSpine() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {rungs.map((rung) => {
               const isFree = rung.tone === 'free'
-              const accentText = isFree ? 'text-stone-teal' : 'text-silicon-amber'
+              const accentText = isFree ? 'text-stone-teal' : 'text-silicon-amber-strong'
               const markerClasses = isFree
                 ? 'bg-stone-teal/10 text-stone-teal'
-                : 'bg-silicon-amber/10 text-silicon-amber'
+                : 'bg-silicon-amber/10 text-silicon-amber-strong'
               return (
                 <StaggerItem key={rung.title}>
                   <Link href={rung.href} className="block h-full">

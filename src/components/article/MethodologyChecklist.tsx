@@ -155,7 +155,7 @@ export function MethodologyChecklist({
             return (
               <li key={cellKey} className="flex items-center gap-2">
                 {isApplied ? (
-                  <Check className="h-4 w-4 text-silicon-amber flex-shrink-0" />
+                  <Check className="h-4 w-4 text-silicon-amber-strong flex-shrink-0" />
                 ) : (
                   <Circle className="h-4 w-4 text-stone-teal/40 flex-shrink-0" />
                 )}
@@ -235,7 +235,7 @@ export function MethodologyChecklist({
                       <div className="flex items-start gap-2">
                         {isApplied ? (
                           <div className="w-5 h-5 rounded bg-silicon-amber/20 flex items-center justify-center mt-0.5 flex-shrink-0">
-                            <Check className="h-3.5 w-3.5 text-silicon-amber" />
+                            <Check className="h-3.5 w-3.5 text-silicon-amber-strong" />
                           </div>
                         ) : (
                           <div className="w-5 h-5 rounded border border-stone-teal/30 flex items-center justify-center mt-0.5 flex-shrink-0">

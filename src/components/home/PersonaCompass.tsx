@@ -28,7 +28,7 @@ const ringMap: Record<string, string> = {
 }
 
 const textMap: Record<string, string> = {
-  'silicon-amber': 'text-silicon-amber',
+  'silicon-amber': 'text-silicon-amber-strong',
   'stone-teal': 'text-stone-teal',
   'tier-pulse': 'text-silicon-cyan',
   'text-muted': 'text-text-muted',
@@ -245,7 +245,7 @@ export function PersonaCompass() {
           <div className="max-w-3xl mb-8">
             <Badge
               variant="outline"
-              className="mb-6 border-silicon-amber/60 text-silicon-amber font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
+              className="mb-6 border-silicon-amber/60 text-silicon-amber-strong font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
             >
               Read · persona routing
             </Badge>

@@ -50,7 +50,7 @@ function Claim({ claim }: { claim: CheckedClaim }) {
             Matched against the primary text
           </span>
         ) : (
-          <span className="inline-flex items-center gap-1 text-xs text-silicon-amber">
+          <span className="inline-flex items-center gap-1 text-xs text-silicon-amber-strong">
             <CircleHelp className="h-3.5 w-3.5" />
             Unverified
           </span>
@@ -195,7 +195,7 @@ export function ReportView({ record }: { record: ReportRecord }) {
               <Prose text={report.classificationRationale.body.narrative} />
 
               <div className="mt-6 rounded-lg border border-silicon-amber/40 bg-silicon-amber/5 p-5">
-                <div className="text-sm font-semibold text-silicon-amber">What we did not ask you</div>
+                <div className="text-sm font-semibold text-silicon-amber-strong">What we did not ask you</div>
                 <p className="mt-1 text-xs text-text-muted">
                   A short questionnaire cannot establish everything the classification depends on.
                   These are the facts it never asked for, and what each would change.
@@ -249,7 +249,7 @@ export function ReportView({ record }: { record: ReportRecord }) {
             <Card className="bg-stone-charcoal border-border-subtle">
               <CardHeader>
                 <CardTitle className="text-lg text-text-primary flex items-center gap-2">
-                  <CircleHelp className="h-5 w-5 text-silicon-amber" />
+                  <CircleHelp className="h-5 w-5 text-silicon-amber-strong" />
                   What these answers cannot settle
                 </CardTitle>
                 <CardDescription>

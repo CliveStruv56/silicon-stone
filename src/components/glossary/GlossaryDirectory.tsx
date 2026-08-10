@@ -109,7 +109,7 @@ export function GlossaryDirectory({ terms }: { terms: GlossaryTerm[] }) {
                 setQuery('')
                 setKind('all')
               }}
-              className="font-mono text-xs uppercase tracking-[0.08em] text-stone-teal hover:text-silicon-amber"
+              className="font-mono text-xs uppercase tracking-[0.08em] text-stone-teal hover:text-silicon-amber-strong"
             >
               Clear filters
             </button>
@@ -126,7 +126,7 @@ export function GlossaryDirectory({ terms }: { terms: GlossaryTerm[] }) {
             {[...groups].map(([letter, letterTerms]) => (
               <section key={letter} id={`letter-${letter.toLowerCase()}`} className="scroll-mt-28">
                 <div className="mb-2 flex items-end gap-4 border-b border-border-subtle pb-2">
-                  <h2 className="text-3xl font-semibold text-silicon-amber">{letter}</h2>
+                  <h2 className="text-3xl font-semibold text-silicon-amber-strong">{letter}</h2>
                   <span className="pb-1 font-mono text-xs uppercase tracking-[0.1em] text-text-muted">
                     {letterTerms.length} {letterTerms.length === 1 ? 'entry' : 'entries'}
                   </span>
@@ -137,7 +137,7 @@ export function GlossaryDirectory({ terms }: { terms: GlossaryTerm[] }) {
                       <div className="grid gap-2 md:grid-cols-[minmax(12rem,0.8fr)_minmax(0,1.6fr)] md:gap-8">
                         <div>
                           {term.acronym && (
-                            <div className="font-mono text-sm font-semibold uppercase tracking-[0.1em] text-silicon-amber">
+                            <div className="font-mono text-sm font-semibold uppercase tracking-[0.1em] text-silicon-amber-strong">
                               <abbr>{term.acronym}</abbr>
                             </div>
                           )}
@@ -156,7 +156,7 @@ export function GlossaryDirectory({ terms }: { terms: GlossaryTerm[] }) {
                                 href={term.sourceUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 text-stone-teal hover:text-silicon-amber"
+                                className="inline-flex items-center gap-1 text-stone-teal hover:text-silicon-amber-strong"
                               >
                                 Primary source <ExternalLink className="h-3 w-3" aria-hidden="true" />
                               </a>
@@ -170,7 +170,7 @@ export function GlossaryDirectory({ terms }: { terms: GlossaryTerm[] }) {
                                 <Link
                                   key={related._id}
                                   href={`/glossary#${related.slug}`}
-                                  className="text-stone-teal hover:text-silicon-amber"
+                                  className="text-stone-teal hover:text-silicon-amber-strong"
                                 >
                                   {related.acronym || related.name}
                                 </Link>

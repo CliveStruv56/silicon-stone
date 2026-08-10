@@ -41,7 +41,7 @@ export const portableTextComponents: PortableTextComponents = {
     ),
     em: ({ children }) => <em className="italic">{children}</em>,
     code: ({ children }) => (
-      <code className="bg-stone-charcoal px-1.5 py-0.5 rounded text-[0.85em] font-mono text-silicon-amber">
+      <code className="bg-stone-charcoal px-1.5 py-0.5 rounded text-[0.85em] font-mono text-silicon-amber-strong">
         {children}
       </code>
     ),
@@ -55,7 +55,7 @@ export const portableTextComponents: PortableTextComponents = {
             href={href}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-stone-teal hover:text-silicon-amber underline underline-offset-2 transition-colors"
+            className="text-stone-teal hover:text-silicon-amber-strong underline underline-offset-2 transition-colors"
           >
             {children}
           </a>
@@ -65,7 +65,7 @@ export const portableTextComponents: PortableTextComponents = {
       return (
         <Link
           href={href}
-          className="text-stone-teal hover:text-silicon-amber underline underline-offset-2 transition-colors"
+          className="text-stone-teal hover:text-silicon-amber-strong underline underline-offset-2 transition-colors"
         >
           {children}
         </Link>

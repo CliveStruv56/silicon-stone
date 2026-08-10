@@ -138,7 +138,7 @@ export default async function AuthorPage({ params }: Props) {
                         href={url}
                         target="_blank"
                         rel="noopener noreferrer me"
-                        className="text-stone-teal hover:text-silicon-amber underline underline-offset-2 transition-colors"
+                        className="text-stone-teal hover:text-silicon-amber-strong underline underline-offset-2 transition-colors"
                       >
                         {linkLabel(url)}
                       </a>

@@ -66,7 +66,7 @@ function clampScore(score: number) {
 
 function getFrictionBand(score: number) {
   if (score >= 7.5) return { label: 'High friction', tone: 'text-alert-red', summary: 'Requires executive visibility and a dated remediation plan.' }
-  if (score >= 4.5) return { label: 'Material friction', tone: 'text-silicon-amber', summary: 'Needs a coordinated policy, product, and operations workstream.' }
+  if (score >= 4.5) return { label: 'Material friction', tone: 'text-silicon-amber-strong', summary: 'Needs a coordinated policy, product, and operations workstream.' }
   if (score > 0) return { label: 'Manageable friction', tone: 'text-stone-teal', summary: 'Useful for early triage, vendor review, and monitoring.' }
   return { label: 'No mapped exposure', tone: 'text-text-muted', summary: 'No industry-specific mapping is available for this policy pair.' }
 }
@@ -247,7 +247,7 @@ function PolicyCard({
 
             {impact.keyDeadlines && impact.keyDeadlines.length > 0 && (
               <div className="bg-silicon-amber/10 border border-silicon-amber/30 rounded-lg p-3">
-                <h4 className="text-xs font-mono text-silicon-amber uppercase mb-2">Key Deadlines</h4>
+                <h4 className="text-xs font-mono text-silicon-amber-strong uppercase mb-2">Key Deadlines</h4>
                 <ul className="space-y-1">
                   {impact.keyDeadlines.map((deadline, idx) => (
                     <li key={idx} className="text-xs text-text-primary">{deadline}</li>
@@ -404,7 +404,7 @@ export default function PolicyStressTestPage() {
                 {/* EU Policy */}
                 <div>
                   <label className="text-sm font-medium text-text-primary mb-2 block flex items-center gap-2">
-                    <Globe className="w-4 h-4 text-blue-400" />
+                    <Globe className="w-4 h-4 text-troy-blue" />
                     EU Policy
                   </label>
                   <div className="space-y-2">
@@ -417,7 +417,7 @@ export default function PolicyStressTestPage() {
                         }}
                         className={`w-full text-left p-3 rounded-lg border transition-all ${
                           selectedEuPolicy === policy.id
-                            ? 'bg-blue-500/10 border-blue-500/40'
+                            ? 'bg-blue-500/10 border-troy-blue/40'
                             : 'bg-surface-elevated border-border-subtle hover:border-blue-500/30'
                         }`}
                       >
@@ -431,7 +431,7 @@ export default function PolicyStressTestPage() {
                 {/* US Policy */}
                 <div>
                   <label className="text-sm font-medium text-text-primary mb-2 block flex items-center gap-2">
-                    <Globe className="w-4 h-4 text-red-400" />
+                    <Globe className="w-4 h-4 text-alert-red" />
                     US Policy
                   </label>
                   <div className="space-y-2">
@@ -444,7 +444,7 @@ export default function PolicyStressTestPage() {
                         }}
                         className={`w-full text-left p-3 rounded-lg border transition-all ${
                           selectedUsPolicy === policy.id
-                            ? 'bg-red-500/10 border-red-500/40'
+                            ? 'bg-red-500/10 border-alert-red/40'
                             : 'bg-surface-elevated border-border-subtle hover:border-red-500/30'
                         }`}
                       >
@@ -482,7 +482,7 @@ export default function PolicyStressTestPage() {
                 <Button
                   onClick={handleAnalyze}
                   disabled={!selectedIndustry}
-                  className="w-full bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90 disabled:opacity-50"
+                  className="w-full bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90 disabled:opacity-50"
                 >
                 <Scale className="w-4 h-4 mr-2" />
                 Analyze Compliance Friction
@@ -519,7 +519,7 @@ export default function PolicyStressTestPage() {
                     <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                       <div>
                         <CardTitle className="text-lg text-text-primary flex items-center gap-2">
-                          <AlertTriangle className="w-5 h-5 text-silicon-amber" />
+                          <AlertTriangle className="w-5 h-5 text-silicon-amber-strong" />
                           Decision Brief: {selectedIndustry}
                         </CardTitle>
                         <CardDescription className="mt-2">
@@ -548,7 +548,7 @@ export default function PolicyStressTestPage() {
                         <Button
                           variant="outline"
                           onClick={requestBrief}
-                          className="border-silicon-amber text-silicon-amber hover:bg-silicon-amber/10"
+                          className="border-silicon-amber text-silicon-amber-strong hover:bg-silicon-amber/10"
                         >
                           <Mail className="w-4 h-4 mr-2" />
                           Email me the brief
@@ -645,8 +645,8 @@ export default function PolicyStressTestPage() {
                               <Badge
                                 variant="outline"
                                 className={action.source === 'EU'
-                                  ? 'border-blue-500/40 text-blue-400'
-                                  : 'border-red-500/40 text-red-400'
+                                  ? 'border-troy-blue/40 text-troy-blue'
+                                  : 'border-alert-red/40 text-alert-red'
                                 }
                               >
                                 {action.source}
@@ -686,7 +686,7 @@ export default function PolicyStressTestPage() {
                 {/* CTA */}
                 <div className="flex justify-center pt-6">
                   <Link href="/advisory#retainer">
-                    <Button className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90">
+                    <Button className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90">
                       <FileText className="w-4 h-4 mr-2" />
                       Request Detailed Compliance Assessment
                     </Button>

@@ -110,7 +110,7 @@ export function ReportGate({ answers }: { answers: AssessmentAnswers }) {
         {link && (
           <p className="text-center text-xs text-text-muted">
             Keep this report:{' '}
-            <a href={link} className="text-silicon-amber hover:underline">
+            <a href={link} className="text-silicon-amber-strong hover:underline">
               permanent link
             </a>
             . It stays available for 30 days.
@@ -160,7 +160,7 @@ export function ReportGate({ answers }: { answers: AssessmentAnswers }) {
           <Button
             type="button"
             onClick={() => setStage('form')}
-            className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90"
+            className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90"
           >
             <Mail className="h-4 w-4" />
             Get the written report
@@ -225,7 +225,7 @@ export function ReportGate({ answers }: { answers: AssessmentAnswers }) {
             type="button"
             onClick={submit}
             disabled={email.trim().length < 5}
-            className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90"
+            className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90"
           >
             Generate my report
           </Button>
@@ -233,7 +233,7 @@ export function ReportGate({ answers }: { answers: AssessmentAnswers }) {
 
         <p className="text-xs text-text-muted">
           We hold this address to deliver the report and to answer you about it. See the{' '}
-          <a href="/privacy" className="text-silicon-amber hover:underline">
+          <a href="/privacy" className="text-silicon-amber-strong hover:underline">
             privacy notice
           </a>
           .

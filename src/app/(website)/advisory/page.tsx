@@ -50,7 +50,7 @@ const domains = [
     title: 'Policy Stress-Testing',
     description: 'We run a single development through the US and EU regulatory systems to find where compliance with one becomes friction with the other.',
     icon: Scale,
-    color: 'text-silicon-amber',
+    color: 'text-silicon-amber-strong',
     bgColor: 'bg-silicon-amber/10',
     borderColor: 'border-silicon-amber/30',
     hoverBorderColor: 'hover:border-silicon-amber/30',
@@ -373,8 +373,8 @@ export default function ServicesPage() {
             <div className="grid grid-cols-1 gap-10 lg:grid-cols-[3fr_2fr] lg:items-start">
               <div>
                 <div className="mb-4 flex flex-wrap items-center gap-2">
-                  <Badge className="bg-silicon-amber text-ink-on-accent">Most popular</Badge>
-                  <Badge variant="outline" className="border-silicon-amber text-silicon-amber">
+                  <Badge className="bg-accent-fill text-ink-on-accent">Most popular</Badge>
+                  <Badge variant="outline" className="border-silicon-amber text-silicon-amber-strong">
                     Ongoing
                   </Badge>
                 </div>
@@ -443,7 +443,7 @@ export default function ServicesPage() {
                       'The quarterly exposure review — a deeper written read on the same 3×2 method the public analysis uses, traced to your exposure',
                     ].map((item, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm text-text-primary">
-                        <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-silicon-amber" />
+                        <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-silicon-amber-strong" />
                         {item}
                       </li>
                     ))}
@@ -475,7 +475,7 @@ export default function ServicesPage() {
                   </div>
                   {FOUNDING_OFFER_ACTIVE && (
                     <div className="rounded-lg border border-silicon-amber/40 bg-silicon-amber/10 p-4 text-sm leading-relaxed text-text-primary">
-                      <strong className="font-semibold text-silicon-amber">
+                      <strong className="font-semibold text-silicon-amber-strong">
                         Founding rate — five companies, launch only.
                       </strong>{' '}
                       The first five retainer clients join at{' '}
@@ -485,7 +485,7 @@ export default function ServicesPage() {
                   )}
                   <div>
                     <a href="#contact" className="block">
-                      <Button size="lg" className="w-full bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90">
+                      <Button size="lg" className="w-full bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90">
                         Book a 25-minute conversation
                         <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
@@ -685,7 +685,7 @@ export default function ServicesPage() {
                   <Card className={`card-interactive h-full ${tier.highlighted ? 'bg-slate-deep border-silicon-amber' : 'bg-stone-charcoal border-border-subtle'}`}>
                     <CardHeader>
                       {tier.highlighted && (
-                        <Badge className="w-fit mb-2 bg-silicon-amber text-ink-on-accent">
+                        <Badge className="w-fit mb-2 bg-accent-fill text-ink-on-accent">
                           Most Popular
                         </Badge>
                       )}
@@ -693,7 +693,7 @@ export default function ServicesPage() {
                         {tier.name}
                       </CardTitle>
                       <div className="mt-1">
-                        <span className={`font-mono text-base font-semibold ${tier.highlighted ? 'text-silicon-amber' : 'text-text-primary'}`}>
+                        <span className={`font-mono text-base font-semibold ${tier.highlighted ? 'text-silicon-amber-strong' : 'text-text-primary'}`}>
                           {tier.price}
                         </span>
                         {tier.priceNote && (
@@ -717,7 +717,7 @@ export default function ServicesPage() {
                       <ul className="space-y-2">
                         {tier.features.map((feature, i) => (
                           <li key={i} className="flex items-start gap-2 text-sm text-text-primary">
-                            <CheckCircle className={`w-4 h-4 flex-shrink-0 mt-0.5 ${tier.highlighted ? 'text-silicon-amber' : 'text-stone-teal'}`} />
+                            <CheckCircle className={`w-4 h-4 flex-shrink-0 mt-0.5 ${tier.highlighted ? 'text-silicon-amber-strong' : 'text-stone-teal'}`} />
                             {feature}
                           </li>
                         ))}
@@ -731,7 +731,7 @@ export default function ServicesPage() {
                       <div className="mt-auto">
                         <a href="#contact" className="block">
                           <Button
-                            className={`w-full ${tier.highlighted ? 'bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90' : 'bg-surface-elevated text-text-primary hover:bg-surface-elevated/80'}`}
+                            className={`w-full ${tier.highlighted ? 'bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90' : 'bg-surface-elevated text-text-primary hover:bg-surface-elevated/80'}`}
                           >
                             {tier.cta}
                           </Button>
@@ -949,7 +949,7 @@ export default function ServicesPage() {
                   <Button
                     type="submit"
                     disabled={formLoading}
-                    className="w-full bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90"
+                    className="w-full bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90"
                   >
                     {formLoading ? 'Sending...' : 'Send Inquiry'}
                     {!formLoading && <ArrowRight className="w-4 h-4 ml-2" />}

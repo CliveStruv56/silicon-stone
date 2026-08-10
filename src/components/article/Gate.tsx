@@ -138,7 +138,7 @@ function EmailGate({ gate }: { gate: Extract<ResolvedGate, { mode: 'email' }> })
           <Button
             type="submit"
             disabled={status === 'loading'}
-            className="w-full sm:w-auto bg-silicon-amber hover:bg-silicon-amber/90 text-ink-on-accent font-medium"
+            className="w-full sm:w-auto bg-accent-fill hover:bg-accent-fill/90 text-ink-on-accent font-medium"
           >
             {status === 'loading' ? 'Subscribing...' : gate.ctaLabel}
           </Button>
@@ -172,7 +172,7 @@ function CommerceGate({ gate }: { gate: Extract<ResolvedGate, { mode: 'commerce'
     <>
       <div className="flex items-center gap-2 mb-2">
         {product.badge && (
-          <span className="font-ui-mono text-xs uppercase tracking-wider text-silicon-amber">
+          <span className="font-ui-mono text-xs uppercase tracking-wider text-silicon-amber-strong">
             {product.badge}
           </span>
         )}
@@ -189,7 +189,7 @@ function CommerceGate({ gate }: { gate: Extract<ResolvedGate, { mode: 'commerce'
           target="_blank"
           rel="noopener noreferrer"
           onClick={handleClick}
-          className="lemonsqueezy-button inline-flex items-center justify-center gap-2 rounded-md bg-silicon-amber px-4 py-2 font-medium text-ink-on-accent transition-colors hover:bg-silicon-amber/90"
+          className="lemonsqueezy-button inline-flex items-center justify-center gap-2 rounded-md bg-accent-fill px-4 py-2 font-medium text-ink-on-accent transition-colors hover:bg-accent-fill/90"
         >
           {gate.ctaLabel}
           <ArrowRight className="h-4 w-4" />
@@ -198,7 +198,7 @@ function CommerceGate({ gate }: { gate: Extract<ResolvedGate, { mode: 'commerce'
         <Link
           href={href}
           onClick={handleClick}
-          className="inline-flex items-center justify-center gap-2 rounded-md bg-silicon-amber px-4 py-2 font-medium text-ink-on-accent transition-colors hover:bg-silicon-amber/90"
+          className="inline-flex items-center justify-center gap-2 rounded-md bg-accent-fill px-4 py-2 font-medium text-ink-on-accent transition-colors hover:bg-accent-fill/90"
         >
           {gate.ctaLabel}
           <ArrowRight className="h-4 w-4" />

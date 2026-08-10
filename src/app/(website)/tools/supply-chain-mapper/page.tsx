@@ -243,7 +243,7 @@ export default function SupplyChainMapperPage() {
         {/* Hero Section */}
         <section className="bg-slate-deep border-b border-border-subtle py-8">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
-            <Badge variant="outline" className="mb-4 border-silicon-amber text-silicon-amber">
+            <Badge variant="outline" className="mb-4 border-silicon-amber text-silicon-amber-strong">
               Interactive Tool
             </Badge>
             <h1 className="text-3xl font-bold text-text-primary sm:text-4xl mb-4">
@@ -338,7 +338,7 @@ export default function SupplyChainMapperPage() {
             <Card className="bg-stone-charcoal border-border-subtle py-5">
               <CardHeader className="pb-0">
                 <CardTitle className="flex items-center gap-2 text-text-primary">
-                  <Activity className="w-5 h-5 text-silicon-amber" />
+                  <Activity className="w-5 h-5 text-silicon-amber-strong" />
                   Stress Scenario
                 </CardTitle>
                 <CardDescription>{selectedScenario.summary}</CardDescription>
@@ -410,7 +410,7 @@ export default function SupplyChainMapperPage() {
               <Card className="mb-4 bg-stone-charcoal border-border-subtle py-5">
                 <CardHeader className="pb-0">
                   <CardTitle className="flex items-center gap-2 text-sm uppercase tracking-wider text-text-muted">
-                    <Gauge className="w-4 h-4 text-silicon-amber" />
+                    <Gauge className="w-4 h-4 text-silicon-amber-strong" />
                     Top Exposure Nodes
                   </CardTitle>
                   <CardDescription>
@@ -426,7 +426,7 @@ export default function SupplyChainMapperPage() {
                     >
                       <div className="flex items-center justify-between gap-3">
                         <span className="text-sm font-medium text-text-primary">{node.name}</span>
-                        <span className="font-mono text-sm text-silicon-amber">{node.exposureScore}/10</span>
+                        <span className="font-mono text-sm text-silicon-amber-strong">{node.exposureScore}/10</span>
                       </div>
                       <div className="mt-1 flex items-center gap-2 text-xs text-text-muted">
                         <span
@@ -491,14 +491,14 @@ export default function SupplyChainMapperPage() {
                         {selectedNode.marketShare && (
                           <div className="bg-surface-elevated px-3 py-2 rounded-lg border border-border-subtle">
                             <span className="text-xs text-text-muted uppercase">Market Position</span>
-                            <p className="text-silicon-amber font-medium">{selectedNode.marketShare}</p>
+                            <p className="text-silicon-amber-strong font-medium">{selectedNode.marketShare}</p>
                           </div>
                         )}
 
                         <div className="grid grid-cols-2 gap-2">
                           <div className="rounded-lg border border-border-subtle bg-surface-elevated px-3 py-2">
                             <span className="text-xs uppercase text-text-muted">Scenario Score</span>
-                            <p className="font-mono text-2xl text-silicon-amber">{selectedNodeScenarioScore}/10</p>
+                            <p className="font-mono text-2xl text-silicon-amber-strong">{selectedNodeScenarioScore}/10</p>
                           </div>
                           <div className="rounded-lg border border-border-subtle bg-surface-elevated px-3 py-2">
                             <span className="text-xs uppercase text-text-muted">Your Exposure</span>
@@ -573,7 +573,7 @@ export default function SupplyChainMapperPage() {
 
                         {selectedNode.supplierQuestions && (
                           <div>
-                            <h4 className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-silicon-amber">
+                            <h4 className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-silicon-amber-strong">
                               <FileText className="w-4 h-4" />
                               Supplier Questions
                             </h4>
@@ -616,7 +616,7 @@ export default function SupplyChainMapperPage() {
                                   href={source.url}
                                   target="_blank"
                                   rel="noreferrer"
-                                  className="flex items-center gap-1.5 text-xs text-stone-teal hover:text-silicon-amber"
+                                  className="flex items-center gap-1.5 text-xs text-stone-teal hover:text-silicon-amber-strong"
                                 >
                                   <ExternalLink className="w-3 h-3" />
                                   {source.label}
@@ -734,7 +734,7 @@ export default function SupplyChainMapperPage() {
                   <Button
                     variant="outline"
                     onClick={requestBrief}
-                    className="border-silicon-amber text-silicon-amber hover:bg-silicon-amber/10"
+                    className="border-silicon-amber text-silicon-amber-strong hover:bg-silicon-amber/10"
                   >
                     <Mail className="w-4 h-4" />
                     Email me the brief
@@ -750,7 +750,7 @@ export default function SupplyChainMapperPage() {
                     <div key={node.id} className="rounded-md border border-border-subtle bg-surface-elevated px-3 py-2">
                       <div className="flex items-center justify-between gap-3">
                         <span className="text-sm font-medium text-text-primary">{node.name}</span>
-                        <span className="font-mono text-sm text-silicon-amber">{node.exposureScore}/10</span>
+                        <span className="font-mono text-sm text-silicon-amber-strong">{node.exposureScore}/10</span>
                       </div>
                       <p className="mt-1 text-xs text-text-muted">{node.impact}</p>
                     </div>
@@ -790,7 +790,7 @@ export default function SupplyChainMapperPage() {
           {/* CTA */}
           <div className="flex justify-center pt-8">
             <Link href="/advisory#retainer">
-              <Button className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90">
+              <Button className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90">
                 Request Supply Chain Exposure Report
               </Button>
             </Link>

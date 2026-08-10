@@ -74,8 +74,8 @@ export function MapFilters({
       {/* Risk Levels */}
       <div>
         <div className="flex items-center gap-2 mb-2">
-          <AlertTriangle className="w-4 h-4 text-silicon-amber" />
-          <span className="text-xs font-mono text-silicon-amber uppercase">Risk Level</span>
+          <AlertTriangle className="w-4 h-4 text-silicon-amber-strong" />
+          <span className="text-xs font-mono text-silicon-amber-strong uppercase">Risk Level</span>
         </div>
         <div className="flex flex-wrap gap-2">
           {RISK_LEVEL_OPTIONS.map(({ value, label, color }) => {

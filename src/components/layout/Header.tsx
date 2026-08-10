@@ -184,7 +184,7 @@ export function Header() {
           )}
           <Link href="/" className="-m-1.5 p-1.5">
             <span className="text-xl font-bold tracking-tight">
-              <span className="text-silicon-amber">Silicon</span>
+              <span className="text-silicon-amber-strong">Silicon</span>
               <span className="text-text-muted"> & </span>
               <span className="text-stone-teal">Stone</span>
             </span>

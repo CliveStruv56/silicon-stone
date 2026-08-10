@@ -43,7 +43,7 @@ export default function AdminError({
             Try again
           </Button>
           <Link href="/admin">
-            <Button className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90 w-full">
+            <Button className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90 w-full">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Admin
             </Button>

@@ -202,7 +202,7 @@ export default function EuExposurePage() {
           <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
             <div className="grid grid-cols-1 gap-10 lg:grid-cols-[3fr_2fr] lg:items-start">
               <div>
-                <Badge className="mb-4 bg-silicon-amber text-ink-on-accent">Fixed price, fixed scope</Badge>
+                <Badge className="mb-4 bg-accent-fill text-ink-on-accent">Fixed price, fixed scope</Badge>
                 <h2 className="mb-3 text-3xl font-bold text-text-primary sm:text-4xl">
                   The Post-Omnibus Briefing
                 </h2>
@@ -229,7 +229,7 @@ export default function EuExposurePage() {
                   <ul className="space-y-3">
                     {briefingIncludes.map((item, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm text-text-primary">
-                        <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-silicon-amber" />
+                        <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-silicon-amber-strong" />
                         {item}
                       </li>
                     ))}
@@ -247,7 +247,7 @@ export default function EuExposurePage() {
                     </div>
                   </div>
                   <a href="#contact" className="block">
-                    <Button size="lg" className="w-full bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90">
+                    <Button size="lg" className="w-full bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90">
                       Book a 25-minute conversation
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
@@ -310,7 +310,7 @@ export default function EuExposurePage() {
                       live ? 'border-stone-teal' : 'border-silicon-amber/50'
                     }`}
                   >
-                    <span className="min-w-[8.5rem] font-mono text-sm font-semibold text-silicon-amber">
+                    <span className="min-w-[8.5rem] font-mono text-sm font-semibold text-silicon-amber-strong">
                       {row.date}
                     </span>
                     <span className="text-sm leading-relaxed text-text-muted">
@@ -410,7 +410,7 @@ export default function EuExposurePage() {
                   <Button
                     type="submit"
                     disabled={subStatus === 'loading'}
-                    className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90"
+                    className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90"
                   >
                     {subStatus === 'loading' ? 'Subscribing…' : 'Get it free'}
                   </Button>
@@ -548,7 +548,7 @@ export default function EuExposurePage() {
                   <Button
                     type="submit"
                     disabled={formLoading}
-                    className="w-full bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90"
+                    className="w-full bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90"
                   >
                     {formLoading ? 'Sending...' : 'Book a 25-minute conversation'}
                     {!formLoading && <ArrowRight className="w-4 h-4 ml-2" />}

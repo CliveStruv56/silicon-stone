@@ -18,7 +18,7 @@ export default function ToolsPage() {
                 <section className="bg-slate-deep border-b border-border-subtle">
                     <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
                         <div className="max-w-3xl">
-                            <Badge variant="outline" className="mb-4 border-silicon-amber text-silicon-amber">
+                            <Badge variant="outline" className="mb-4 border-silicon-amber text-silicon-amber-strong">
                                 Interactive Analysis
                             </Badge>
                             <h1 className="text-4xl font-bold text-text-primary sm:text-5xl mb-6">

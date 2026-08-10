@@ -135,7 +135,7 @@ export function InstallPrompt() {
               <button
                 type="button"
                 onClick={install}
-                className="rounded-md bg-silicon-amber px-4 py-1.5 text-sm font-semibold text-stone-charcoal transition-colors hover:opacity-90"
+                className="rounded-md bg-accent-fill px-4 py-1.5 text-sm font-semibold text-ink-on-accent transition-colors hover:opacity-90"
               >
                 Add
               </button>

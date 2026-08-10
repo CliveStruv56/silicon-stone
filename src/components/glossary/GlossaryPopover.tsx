@@ -71,7 +71,7 @@ export function GlossaryPopover({
           <div className="mb-2 flex items-start justify-between gap-4">
             <div>
               {term.acronym && (
-                <div className="font-mono text-xs font-semibold uppercase tracking-[0.12em] text-silicon-amber">
+                <div className="font-mono text-xs font-semibold uppercase tracking-[0.12em] text-silicon-amber-strong">
                   {term.acronym}
                 </div>
               )}
@@ -87,7 +87,7 @@ export function GlossaryPopover({
           <p className="text-sm leading-relaxed text-text-muted">{term.definition}</p>
           <Link
             href={`/glossary#${term.slug}`}
-            className="mt-3 inline-flex items-center gap-1 font-mono text-xs font-semibold uppercase tracking-[0.08em] text-stone-teal hover:text-silicon-amber focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-teal"
+            className="mt-3 inline-flex items-center gap-1 font-mono text-xs font-semibold uppercase tracking-[0.08em] text-stone-teal hover:text-silicon-amber-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-teal"
           >
             Open in glossary <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
           </Link>

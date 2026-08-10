@@ -49,11 +49,11 @@ export function OfflineBanner() {
     >
       {offline ? (
         <p className="pointer-events-auto flex items-center gap-2 rounded-full border border-border-subtle bg-surface-elevated px-4 py-2 text-sm text-text-primary shadow-lg">
-          <CloudOff className="h-4 w-4 shrink-0 text-silicon-amber" aria-hidden="true" />
+          <CloudOff className="h-4 w-4 shrink-0 text-silicon-amber-strong" aria-hidden="true" />
           <span>You&apos;re offline.</span>
           <Link
             href="/saved"
-            className="font-medium text-stone-teal underline underline-offset-2 hover:text-silicon-amber"
+            className="font-medium text-stone-teal underline underline-offset-2 hover:text-silicon-amber-strong"
           >
             Saved articles
           </Link>

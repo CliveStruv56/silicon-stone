@@ -47,7 +47,7 @@ export function ProductsBand() {
             <div className="max-w-2xl mb-8">
               <Badge
                 variant="outline"
-                className="mb-4 border-silicon-amber/60 text-silicon-amber font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
+                className="mb-4 border-silicon-amber/60 text-silicon-amber-strong font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
               >
                 Buy · self-serve products
               </Badge>
@@ -76,7 +76,7 @@ export function ProductsBand() {
                     className="h-full cursor-pointer"
                   >
                     <div className="flex items-center gap-2 mb-3">
-                      <span className="font-mono text-sm font-semibold text-silicon-amber">
+                      <span className="font-mono text-sm font-semibold text-silicon-amber-strong">
                         {product.price}
                       </span>
                       {product.label && (
@@ -91,7 +91,7 @@ export function ProductsBand() {
                     <p className="text-sm text-text-muted leading-relaxed mb-4">
                       {product.body}
                     </p>
-                    <div className="flex items-center gap-1.5 text-sm font-medium text-silicon-amber">
+                    <div className="flex items-center gap-1.5 text-sm font-medium text-silicon-amber-strong">
                       <span>See products</span>
                       <ArrowRight className="w-4 h-4" />
                     </div>

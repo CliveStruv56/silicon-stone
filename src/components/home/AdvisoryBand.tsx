@@ -51,7 +51,7 @@ export function AdvisoryBand() {
             <div className="max-w-2xl mb-8">
               <Badge
                 variant="outline"
-                className="mb-4 border-silicon-amber/60 text-silicon-amber font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
+                className="mb-4 border-silicon-amber/60 text-silicon-amber-strong font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
               >
                 Engage · advisory
               </Badge>
@@ -81,7 +81,7 @@ export function AdvisoryBand() {
                   >
                     <span
                       className={`font-mono text-[12px] uppercase tracking-[0.10em] mb-2 block ${
-                        tier.popular ? 'text-silicon-amber' : 'text-text-muted'
+                        tier.popular ? 'text-silicon-amber-strong' : 'text-text-muted'
                       }`}
                     >
                       {tier.label}
@@ -92,7 +92,7 @@ export function AdvisoryBand() {
                     <p className="text-sm text-text-muted leading-relaxed mb-4">
                       {tier.body}
                     </p>
-                    <div className="flex items-center gap-1.5 text-sm font-medium text-silicon-amber">
+                    <div className="flex items-center gap-1.5 text-sm font-medium text-silicon-amber-strong">
                       <span>Explore advisory</span>
                       <ArrowRight className="w-4 h-4" />
                     </div>

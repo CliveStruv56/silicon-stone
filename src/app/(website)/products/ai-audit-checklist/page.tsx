@@ -122,7 +122,7 @@ export default function AIAuditChecklistPage() {
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-full bg-silicon-amber/20 text-silicon-amber flex items-center justify-center text-sm font-mono flex-shrink-0">2</div>
+                    <div className="w-8 h-8 rounded-full bg-silicon-amber/20 text-silicon-amber-strong flex items-center justify-center text-sm font-mono flex-shrink-0">2</div>
                     <div>
                       <div className="text-text-primary font-medium">Upgrade to full Toolkit — £59</div>
                       <p className="text-sm text-text-muted">Use your £20 discount to get the complete compliance framework</p>
@@ -137,7 +137,7 @@ export default function AIAuditChecklistPage() {
                   </div>
                 </div>
                 <div className="mt-6 pt-4 border-t border-border-subtle text-sm text-text-muted">
-                  Total investment for audit + toolkit: <span className="font-mono text-silicon-amber">£83</span> (vs £103 separately)
+                  Total investment for audit + toolkit: <span className="font-mono text-silicon-amber-strong">£83</span> (vs £103 separately)
                 </div>
               </div>
             </div>
@@ -237,7 +237,7 @@ export default function AIAuditChecklistPage() {
               </div>
               <p className="text-sm text-text-muted mt-6">
                 Ready for the full framework?{' '}
-                <Link href="/products/ai-act-toolkit" className="text-silicon-amber hover:underline">
+                <Link href="/products/ai-act-toolkit" className="text-silicon-amber-strong hover:underline">
                   View the AI Act Compliance Toolkit
                   <ArrowRight className="w-3 h-3 inline ml-1" />
                 </Link>

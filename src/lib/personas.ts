@@ -162,7 +162,7 @@ export function getPersonaColor(slug: string): string {
  * v4 only generates classes it sees as complete strings.
  */
 const PERSONA_BADGE_CLASSES: Record<PersonaSlug, string> = {
-  clara: 'border-silicon-amber/50 text-silicon-amber',
+  clara: 'border-silicon-amber/50 text-silicon-amber-strong',
   ian: 'border-stone-teal/50 text-stone-teal',
   sofia: 'border-tier-pulse/50 text-tier-pulse',
   positional: 'border-sister-indigo/50 text-sister-indigo',

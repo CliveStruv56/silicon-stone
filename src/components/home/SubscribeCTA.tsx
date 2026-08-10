@@ -48,7 +48,7 @@ export function SubscribeCTA() {
       <CardHeader className="space-y-3">
         <Badge
           variant="outline"
-          className="self-start border-silicon-amber/60 text-silicon-amber font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
+          className="self-start border-silicon-amber/60 text-silicon-amber-strong font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
         >
           Newsletter
         </Badge>
@@ -65,10 +65,10 @@ export function SubscribeCTA() {
       </CardHeader>
       <CardContent>
         <p className="text-sm text-text-muted mb-5 leading-relaxed">
-          <strong className="text-silicon-amber font-medium">Tuesday:</strong>
+          <strong className="text-silicon-amber-strong font-medium">Tuesday:</strong>
           {' '}the Stone Briefing — structural analysis of the AI power shift.
           <br />
-          <strong className="text-silicon-amber font-medium">Friday:</strong>
+          <strong className="text-silicon-amber-strong font-medium">Friday:</strong>
           {' '}the Practical Move — what to do about it.
         </p>
 
@@ -90,7 +90,7 @@ export function SubscribeCTA() {
           </div>
         ) : (
           <>
-            <div className="font-mono text-[12.5px] tracking-[0.10em] uppercase text-silicon-amber mb-2 flex items-center gap-1.5">
+            <div className="font-mono text-[12.5px] tracking-[0.10em] uppercase text-silicon-amber-strong mb-2 flex items-center gap-1.5">
               <span aria-hidden="true">○</span>
               Get the briefing
             </div>
@@ -106,7 +106,7 @@ export function SubscribeCTA() {
               <Button
                 type="submit"
                 disabled={status === 'loading'}
-                className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90"
+                className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90"
               >
                 {status === 'loading' ? 'Subscribing...' : 'Subscribe'}
               </Button>

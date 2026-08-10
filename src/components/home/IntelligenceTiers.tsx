@@ -97,7 +97,7 @@ export function IntelligenceTiers({
           <div className="max-w-3xl mb-8">
             <Badge
               variant="outline"
-              className="mb-6 border-silicon-amber/60 text-silicon-amber font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
+              className="mb-6 border-silicon-amber/60 text-silicon-amber-strong font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
             >
               Read · subscription tiers
             </Badge>
@@ -167,7 +167,7 @@ export function IntelligenceTiers({
                           <div className="font-mono text-[12px] tracking-[0.10em] uppercase text-text-muted mb-2">
                             Latest
                           </div>
-                          <h4 className="text-sm font-medium text-text-primary group-hover:text-silicon-amber transition-colors line-clamp-2 mb-1.5">
+                          <h4 className="text-sm font-medium text-text-primary group-hover:text-silicon-amber-strong transition-colors line-clamp-2 mb-1.5">
                             {article.title}
                           </h4>
                           <div className="flex items-center gap-2 text-xs font-mono text-text-muted">
@@ -191,8 +191,8 @@ export function IntelligenceTiers({
                       href={tier.href}
                       className={`group inline-flex items-center gap-1.5 mt-5 text-sm font-medium transition-colors ${
                         featured
-                          ? 'text-silicon-amber hover:text-silicon-amber/80'
-                          : 'text-text-primary hover:text-silicon-amber'
+                          ? 'text-silicon-amber-strong hover:text-silicon-amber-strong/80'
+                          : 'text-text-primary hover:text-silicon-amber-strong'
                       }`}
                     >
                       <span>{tier.browseLabel}</span>

@@ -206,7 +206,7 @@ export default function BriefingsProductPage() {
 
               <p className="text-sm text-text-muted mt-6">
                 Available now:{' '}
-                <Link href="/products/ai-act-toolkit" className="text-silicon-amber hover:underline">
+                <Link href="/products/ai-act-toolkit" className="text-silicon-amber-strong hover:underline">
                   AI Act Compliance Toolkit
                 </Link>
                 {' '}&bull;{' '}

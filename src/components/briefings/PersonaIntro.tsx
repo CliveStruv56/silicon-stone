@@ -34,7 +34,7 @@ export function PersonaIntro() {
             <div className="text-center max-w-2xl mx-auto mb-10">
               <Badge
                 variant="outline"
-                className="mb-5 border-silicon-amber/60 text-silicon-amber font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
+                className="mb-5 border-silicon-amber/60 text-silicon-amber-strong font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
               >
                 Persona Routing
               </Badge>

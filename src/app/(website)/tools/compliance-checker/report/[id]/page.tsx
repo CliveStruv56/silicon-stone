@@ -57,7 +57,7 @@ export default async function ReportPage({
           )}
 
           <p className="mt-8 text-center text-sm text-text-muted">
-            <Link href="/tools/compliance-checker" className="text-silicon-amber hover:underline">
+            <Link href="/tools/compliance-checker" className="text-silicon-amber-strong hover:underline">
               Assess another system
             </Link>
           </p>

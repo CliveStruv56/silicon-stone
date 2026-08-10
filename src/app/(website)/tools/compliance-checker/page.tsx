@@ -56,8 +56,8 @@ function resultTone(classification: string) {
     return {
       border: 'border-silicon-amber/40',
       bg: 'bg-silicon-amber/10',
-      text: 'text-silicon-amber',
-      badge: 'border-silicon-amber text-silicon-amber',
+      text: 'text-silicon-amber-strong',
+      badge: 'border-silicon-amber text-silicon-amber-strong',
     }
   }
 
@@ -336,7 +336,7 @@ export default function ComplianceCheckerPage() {
                         <span>Your answers form a reusable AI system record.</span>
                       </div>
                       <div className="flex gap-2">
-                        <Gauge className="w-4 h-4 text-silicon-amber mt-0.5 flex-shrink-0" />
+                        <Gauge className="w-4 h-4 text-silicon-amber-strong mt-0.5 flex-shrink-0" />
                         <span>The result uses rule-based triage, not a model guess.</span>
                       </div>
                     </CardContent>
@@ -427,7 +427,7 @@ export default function ComplianceCheckerPage() {
                                   <span className="min-w-0">
                                     <span className="block font-medium text-text-primary">{option.label}</span>
                                     {option.badge && (
-                                      <span className="mt-2 inline-block rounded border border-silicon-amber px-2 py-0.5 text-xs font-medium text-silicon-amber">
+                                      <span className="mt-2 inline-block rounded border border-silicon-amber px-2 py-0.5 text-xs font-medium text-silicon-amber-strong">
                                         {option.badge}
                                       </span>
                                     )}
@@ -458,7 +458,7 @@ export default function ComplianceCheckerPage() {
                         type="button"
                         onClick={goNext}
                         disabled={!canContinue}
-                        className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90"
+                        className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90"
                       >
                         {currentIndex >= visibleQuestions.length - 1 ? 'Generate result' : 'Continue'}
                         <ArrowRight className="w-4 h-4" />
@@ -505,7 +505,7 @@ export default function ComplianceCheckerPage() {
                   items={result.reasons}
                 />
                 <ResultCard
-                  icon={<AlertTriangle className="w-5 h-5 text-silicon-amber" />}
+                  icon={<AlertTriangle className="w-5 h-5 text-silicon-amber-strong" />}
                   title="Missing evidence"
                   items={result.missingFacts.length ? result.missingFacts : ['No critical missing facts were identified from this answer set.']}
                 />
@@ -515,7 +515,7 @@ export default function ComplianceCheckerPage() {
                   items={result.obligations}
                 />
                 <ResultCard
-                  icon={<FileText className="w-5 h-5 text-silicon-amber" />}
+                  icon={<FileText className="w-5 h-5 text-silicon-amber-strong" />}
                   title="Vendor questions"
                   items={result.vendorQuestions.length ? result.vendorQuestions : ['Keep current vendor evidence on file and refresh it when the system changes.']}
                 />
@@ -572,7 +572,7 @@ export default function ComplianceCheckerPage() {
 
                 <Card className="bg-surface-elevated border-silicon-amber/30">
                   <CardHeader>
-                    <div className="flex items-center gap-2 text-silicon-amber">
+                    <div className="flex items-center gap-2 text-silicon-amber-strong">
                       <ClipboardCheck className="w-5 h-5" />
                       <CardTitle className="text-lg">Your next step</CardTitle>
                     </div>
@@ -584,7 +584,7 @@ export default function ComplianceCheckerPage() {
                   <CardContent className="space-y-4">
                     <div>
                       <Link href={cta.primary.href}>
-                        <Button className="w-full bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90">
+                        <Button className="w-full bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90">
                           {cta.primary.label}
                         </Button>
                       </Link>
@@ -606,11 +606,11 @@ export default function ComplianceCheckerPage() {
                     </div>
                     <p className="text-xs text-text-muted text-center border-t border-border-subtle pt-4">
                       Need it interpreted for your business?{' '}
-                      <Link href="/eu-exposure" className="text-silicon-amber hover:underline">
+                      <Link href="/eu-exposure" className="text-silicon-amber-strong hover:underline">
                         See the Post-Omnibus Briefing
                       </Link>
                       , or a standing read via the{' '}
-                      <Link href="/advisory#retainer" className="text-silicon-amber hover:underline">
+                      <Link href="/advisory#retainer" className="text-silicon-amber-strong hover:underline">
                         Drift Retainer
                       </Link>
                       .
@@ -705,7 +705,7 @@ export default function ComplianceCheckerPage() {
                         href={source.url}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-sm text-stone-teal hover:text-silicon-amber"
+                        className="text-sm text-stone-teal hover:text-silicon-amber-strong"
                       >
                         {source.label}
                       </a>

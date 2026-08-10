@@ -97,7 +97,7 @@ export default function WaymarkPathPage() {
         <section className="bg-slate-deep border-b border-border-subtle">
           <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
             <div className="max-w-3xl">
-              <Badge className="mb-4 bg-silicon-amber/20 text-silicon-amber border-silicon-amber/30">
+              <Badge className="mb-4 bg-silicon-amber/20 text-silicon-amber-strong border-silicon-amber/30">
                 Early Access — Coming Soon
               </Badge>
               <h1 className="text-4xl font-bold text-text-primary sm:text-5xl lg:text-6xl leading-tight mb-6">
@@ -137,7 +137,7 @@ export default function WaymarkPathPage() {
                     type="submit"
                     disabled={status === 'loading'}
                     size="lg"
-                    className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90 font-semibold whitespace-nowrap"
+                    className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90 font-semibold whitespace-nowrap"
                   >
                     {status === 'loading' ? (
                       <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Joining...</>
@@ -199,7 +199,7 @@ export default function WaymarkPathPage() {
                 <Card key={feature.title} className="bg-stone-charcoal border-border-subtle">
                   <CardContent className="pt-6">
                     <div className="flex items-center gap-3 mb-3">
-                      <span className="font-mono text-xs text-silicon-amber">0{idx + 1}</span>
+                      <span className="font-mono text-xs text-silicon-amber-strong">0{idx + 1}</span>
                       <Icon className="w-5 h-5 text-stone-teal" />
                     </div>
                     <h3 className="text-lg font-semibold text-text-primary mb-2">
@@ -244,7 +244,7 @@ export default function WaymarkPathPage() {
                   },
                 ].map((item) => (
                   <div key={item.step} className="flex gap-4">
-                    <div className="font-mono text-2xl font-bold text-silicon-amber/30 flex-shrink-0 w-10">
+                    <div className="font-mono text-2xl font-bold text-silicon-amber-strong/30 flex-shrink-0 w-10">
                       {item.step}
                     </div>
                     <div>
@@ -290,7 +290,7 @@ export default function WaymarkPathPage() {
                   <Button
                     type="submit"
                     disabled={status === 'loading'}
-                    className="bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90 font-semibold"
+                    className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90 font-semibold"
                   >
                     {status === 'loading' ? 'Joining...' : 'Get Early Access'}
                   </Button>

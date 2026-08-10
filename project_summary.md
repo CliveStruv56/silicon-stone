@@ -396,6 +396,34 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 10, 2026 — The ink on an accent fill follows the theme
+
+Every solid brand-coloured button and badge on the light theme carried near-black
+text: "Request Early Access" on deep teal sat at **2.5:1**, well under the 4.5:1
+floor, and the amber CTAs at ~4.2:1. One token caused all of it. `--ink-on-accent`
+was pinned to slate ink for *both* themes on the reasoning that it sits on "bright
+accent chips" — true in dark mode, where the accents are phosphor amber and pale
+teal, but the light theme's accents are *deep* colours that need white ink.
+
+**The token now flips with the theme** (`#ffffff` light, `#14181f` dark), which
+fixes all 73 `text-ink-on-accent` call sites at once. Burnt amber `#b5651d`
+needed more than an ink swap — it is the rare fill that reads badly against
+*both* white and black (~4.3:1 either way), so text-bearing amber fills moved to
+a new `--accent-fill` token resolving to the existing deeper amber
+(`--silicon-amber-strong`, 6.4:1 under white). `--silicon-amber` keeps its old
+value and its remaining job: tints, borders and graphic marks. In dark mode both
+tokens are the same phosphor amber, so nothing there changed.
+
+Three related light-mode corrections, all invisible in dark mode: the 185
+`text-silicon-amber` labels (3.7:1 on the stone page) now use
+`text-silicon-amber-strong`; `--silicon-cyan` and `--alert-red` deepened to clear
+AA as text; and the scenario-modeler figures plus the policy-stress-test source
+badges dropped raw Tailwind palette hex (`#f59e0b` at 2.2:1, `text-red-400` at
+2.7:1) for theme tokens. Verified with a scripted contrast pass over 16 public
+pages in both themes: **zero failures**, the only remaining hits being
+false positives where hero text sits on a background *image* the measurer cannot
+see.
+
 ### August 10, 2026 — One article shape for every tier
 
 Two published pieces rendered as two different products. "The Same Money,

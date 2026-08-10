@@ -34,7 +34,7 @@ export function EvidencePackTeaser() {
   return (
     <Card className="bg-surface-elevated border-silicon-amber/30">
       <CardHeader>
-        <div className="flex items-center gap-2 text-silicon-amber">
+        <div className="flex items-center gap-2 text-silicon-amber-strong">
           <Lock className="h-5 w-5" />
           <CardTitle className="text-lg">The full Evidence Pack — £39</CardTitle>
         </div>
@@ -54,7 +54,7 @@ export function EvidencePackTeaser() {
         <p className="rounded-lg border border-silicon-amber/40 bg-silicon-amber/10 p-4 text-sm text-text-primary">
           <span className="font-semibold">The £39 comes back.</span> Buy the Evidence Pack and its
           full value applies against the{' '}
-          <Link href="/products/ai-act-toolkit" className="text-silicon-amber hover:underline">
+          <Link href="/products/ai-act-toolkit" className="text-silicon-amber-strong hover:underline">
             £79 AI Act Compliance Toolkit
           </Link>{' '}
           — making that upgrade £40. One credit per purchaser, valid for 90 days, not redeemable

@@ -207,7 +207,7 @@ export default function AtlanticDriftPage() {
         {/* The moving timeline */}
         <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
           <div className="max-w-3xl">
-            <div className="mb-4 flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-silicon-amber">
+            <div className="mb-4 flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-silicon-amber-strong">
               <Clock className="h-4 w-4" /> The moving timeline
             </div>
             <h2 className="mb-4 text-2xl font-semibold text-text-primary">
@@ -277,13 +277,13 @@ export default function AtlanticDriftPage() {
               </p>
 
               <div className="rounded-lg border border-silicon-amber/30 bg-silicon-amber/5 p-5">
-                <div className="mb-2 flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-silicon-amber">
+                <div className="mb-2 flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-silicon-amber-strong">
                   <ArrowRight className="h-4 w-4" /> The next step
                 </div>
                 <p className="text-sm leading-relaxed text-text-muted">
                   When you want this read against your own systems rather than in general,
                   the{' '}
-                  <Link href="/eu-exposure" className="text-silicon-amber hover:underline">
+                  <Link href="/eu-exposure" className="text-silicon-amber-strong hover:underline">
                     Post-Omnibus Briefing
                   </Link>{' '}
                   is the fixed-price, fixed-scope engagement — what the AI Act now requires of
@@ -328,7 +328,7 @@ export default function AtlanticDriftPage() {
                     <Button
                       type="submit"
                       disabled={status === 'loading'}
-                      className="w-full bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90"
+                      className="w-full bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90"
                     >
                       {status === 'loading' ? 'Sending…' : 'Send me the guide'}
                       {status !== 'loading' && <ArrowRight className="ml-2 h-4 w-4" />}
