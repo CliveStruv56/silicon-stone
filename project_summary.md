@@ -424,6 +424,13 @@ pages in both themes: **zero failures**, the only remaining hits being
 false positives where hero text sits on a background *image* the measurer cannot
 see.
 
+**Disabled buttons stopped free-riding on the fill.** `disabled:opacity-50` over
+a solid accent used to leave dark ink on a pale tint, which read acceptably; with
+white ink the same faded fill dropped to 2.5:1 and the CTA looked broken rather
+than inactive. Disabled `Button`s now take a muted surface and muted text at full
+opacity (4.8:1 light, 4.5:1 dark) — plainly inactive, still readable. Admin
+screens use raw `<button>` elements and are unaffected.
+
 ### August 10, 2026 — One article shape for every tier
 
 Two published pieces rendered as two different products. "The Same Money,

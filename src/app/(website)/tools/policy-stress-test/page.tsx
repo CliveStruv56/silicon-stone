@@ -482,7 +482,7 @@ export default function PolicyStressTestPage() {
                 <Button
                   onClick={handleAnalyze}
                   disabled={!selectedIndustry}
-                  className="w-full bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90 disabled:opacity-50"
+                  className="w-full bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90"
                 >
                 <Scale className="w-4 h-4 mr-2" />
                 Analyze Compliance Friction
