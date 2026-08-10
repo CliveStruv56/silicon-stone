@@ -293,7 +293,7 @@ describe('Article 6(3) exemption duties and log retention', () => {
 
   it('frames the duties as vendor evidence for a pure deployer', () => {
     const result = evaluateRuleLibrary(annexIIINoProfiling)
-    expect(result.vendorQuestions.join(' ')).toMatch(/Article 49\(2\)/)
+    expect(result.vendorQuestions.join(' ')).toMatch(/Article 6\(4\) — Has your vendor documented/)
     expect(result.obligations.join(' ')).not.toMatch(/Register yourself/)
   })
 
@@ -323,6 +323,82 @@ describe('Article 6(3) exemption duties and log retention', () => {
       expect(item).toMatch(/logging capability/)
       expect(item).not.toMatch(/six months/)
     }
+  })
+})
+
+describe('vendor questions and organisation size', () => {
+  it('anchors every vendor question to an Article', () => {
+    const result = evaluateRuleLibrary({
+      ...inScopeBase,
+      sensitive_domains: ['employment'],
+      affected_people: ['none'],
+      decision_impact: 'assistive',
+      vendor_docs: ['none'],
+    })
+    // The DPA question is GDPR, held deliberately outside the AI Act anchors.
+    const aiActQuestions = result.vendorQuestions.filter((item) => !/DPA/.test(item))
+    expect(aiActQuestions.length).toBeGreaterThan(3)
+    for (const question of aiActQuestions) {
+      expect(question).toMatch(/^Articles? \d+/)
+    }
+  })
+
+  it('asks the Article 49 registration question on an Annex III path', () => {
+    const result = evaluateRuleLibrary({
+      ...inScopeBase,
+      sensitive_domains: ['employment'],
+      vendor_docs: ['none'],
+    })
+    expect(result.vendorQuestions.join(' ')).toMatch(/Article 49 — Has this system been registered/)
+  })
+
+  it('asks it only once, even where the exemption rule also fires', () => {
+    const result = evaluateRuleLibrary({
+      ...inScopeBase,
+      sensitive_domains: ['critical-infrastructure'],
+      affected_people: ['none'],
+      decision_impact: 'assistive',
+      vendor_docs: ['none'],
+    })
+    const matches = result.vendorQuestions.filter((item) => /registered in the EU database/.test(item))
+    expect(matches.length).toBe(1)
+  })
+
+  it('drops the registration question once the reference is held', () => {
+    const result = evaluateRuleLibrary({
+      ...inScopeBase,
+      sensitive_domains: ['employment'],
+      vendor_docs: ['registration'],
+    })
+    expect(result.vendorQuestions.join(' ')).not.toMatch(/registration reference/)
+  })
+
+  it('surfaces SME relief across paragraphs 3, 4 and 5', () => {
+    const result = evaluateRuleLibrary({ ...inScopeBase, org_size: 'small' })
+    expect(result.firedRules.map((rule) => rule.id)).toContain('sme-proportionate-relief')
+    expect(result.obligations.join(' ')).toMatch(/paragraphs 3, 4 and 5/)
+  })
+
+  it('caps SMC relief at paragraphs 4 and 5, and says Article 5 fines are not capped', () => {
+    const result = evaluateRuleLibrary({ ...inScopeBase, org_size: 'small-mid-cap' })
+    expect(result.firedRules.map((rule) => rule.id)).toContain('smc-proportionate-relief')
+    const fines = result.obligations.find((item) => /Article 99\(6a\)/.test(item))
+    expect(fines).toMatch(/paragraphs 4 and 5 only/)
+    expect(fines).toMatch(/does not extend to Article 5/)
+    expect(fines).toMatch(/7%/)
+  })
+
+  it('does not confuse the two size reliefs', () => {
+    const smc = fired({ ...inScopeBase, org_size: 'small-mid-cap' })
+    expect(smc).not.toContain('sme-proportionate-relief')
+    const sme = fired({ ...inScopeBase, org_size: 'medium' })
+    expect(sme).not.toContain('smc-proportionate-relief')
+  })
+
+  it('stays silent when organisation size is not given', () => {
+    const ids = fired(inScopeBase)
+    expect(ids).not.toContain('sme-proportionate-relief')
+    expect(ids).not.toContain('smc-proportionate-relief')
   })
 })
 

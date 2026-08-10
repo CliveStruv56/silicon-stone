@@ -354,6 +354,36 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 10, 2026 — Compliance Checker: article-anchored vendor questions, SME/SMC relief
+
+Vendor questions were reasonable requests with nothing behind them. Each now
+opens with its Article, which is the difference between a wish and a procurement
+demand: Art 6(3) classification and intended purpose (with the Art 6(4)
+assessment if an exemption is claimed), Art 9 risk management, Art 13
+transparency documentation, Art 12/26(6) log export, Art 49 EU database
+registration, Art 72 post-market monitoring and change notification. Step 13
+gained matching options for risk-management documentation and the registration
+reference, each labelled with its Article.
+
+**Article 49 is the sharpest lever here** and is rarely asked, so it fires on
+every Annex III path rather than only where an exemption is claimed. Writing the
+tests surfaced two overlaps worth recording: `annex-iii-sensitive-domain` was
+asking an unanchored version of the Art 6(3) classification question that
+`vendor-classification-missing` already asks properly, and `annex-iii-exemption-
+duties` was asking for the registration reference a second time. Both now defer
+to the single anchored owner, and a test asserts the registration question
+appears exactly once.
+
+**Organisation size** is a new optional question feeding two rules. SMEs get
+Art 11(1) simplified Annex IV documentation that notified bodies must accept,
+Art 17(2) proportionate QMS, Art 57 priority sandbox access, and the Art 99(6)
+lower-of cap across paragraphs 3, 4 and 5. Small mid-caps — the category the
+Omnibus brought in, defined by reference to point (2) of the Annex to
+Recommendation (EU) 2025/1099 — get the same first three, but their Art 99(6a)
+cap covers **paragraphs 4 and 5 only**. An SMC's Article 5 exposure is uncapped
+at the higher of €35M or 7%, and the copy says so explicitly rather than letting
+"small mid-caps get relief" imply otherwise.
+
 ### August 10, 2026 — Compliance Checker: Omnibus timeline and penalty ceilings on the result
 
 The checker returned a classification and no dates. A user could read "Likely

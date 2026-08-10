@@ -125,6 +125,36 @@ const sources = {
     publisher: 'European Commission AI Act Service Desk',
     url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-12',
   },
+  article9: {
+    label: 'AI Act Service Desk: Article 9 risk management system',
+    article: 'Article 9',
+    publisher: 'European Commission AI Act Service Desk',
+    url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-9',
+  },
+  article11: {
+    label: 'AI Act Service Desk: Article 11 technical documentation',
+    article: 'Article 11',
+    publisher: 'European Commission AI Act Service Desk',
+    url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-11',
+  },
+  article13: {
+    label: 'AI Act Service Desk: Article 13 transparency and information provision',
+    article: 'Article 13',
+    publisher: 'European Commission AI Act Service Desk',
+    url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-13',
+  },
+  article72: {
+    label: 'AI Act Service Desk: Article 72 post-market monitoring',
+    article: 'Article 72',
+    publisher: 'European Commission AI Act Service Desk',
+    url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-72',
+  },
+  article99: {
+    label: 'AI Act Service Desk: Article 99 penalties',
+    article: 'Article 99',
+    publisher: 'European Commission AI Act Service Desk',
+    url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-99',
+  },
   article19: {
     label: 'AI Act Service Desk: Article 19 automatically generated logs',
     article: 'Article 19',
@@ -596,9 +626,9 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
         ? []
         : ['Annex III use cases default to high-risk under the AI Act. Article 6(3) offers a narrow-task exemption (narrow procedural tasks, improving prior human activity, etc.) — confirm the vendor classification and intended purpose before assuming a lower tier applies.'],
       obligations: ['Treat this as a likely high-risk candidate until the vendor classification and intended-purpose evidence are confirmed.'],
-      vendorQuestions: performsProfiling(answers).value
-        ? []
-        : ['Does the vendor classify this as an Annex III high-risk system, and what Article 6(3) exemption analysis, if any, does it rely on?'],
+      // The Article 6(3) classification question belongs to
+      // vendor-classification-missing, which asks it with its anchor attached.
+      vendorQuestions: [],
       adjacentRisks: [],
       reviewTriggers: ['Use expands into a new Annex III domain or affects a new group of people'],
       reportSections: ['Annex III classification rationale'],
@@ -712,11 +742,11 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
           : [
               'Where your vendor relies on an Article 6(3) narrow-task exemption, obtain its Article 6(4) assessment for your file — the duty is the provider’s, but the evidence is what makes your own position defensible.',
             ],
+        // The Article 49 registration question is asked once, by
+        // vendor-registration-missing, so it is not duplicated here.
         vendorQuestions: provider
           ? []
-          : [
-              'Has your vendor documented its Article 6(3) assessment, and has it registered itself and the system in the EU database under Article 49(2)? If so, what is the registration reference?',
-            ],
+          : ['Article 6(4) — Has your vendor documented its Article 6(3) assessment, and will it produce that documentation on request?'],
         adjacentRisks: [],
         reviewTriggers: ['The vendor changes its Article 6(3) position or the system’s intended purpose'],
         reportSections: ['Annex III classification rationale'],
@@ -926,12 +956,12 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'Vendor classification evidence missing',
     category: 'vendor-evidence',
     legalStatus: 'operational-risk',
-    source: sources.article26,
+    source: sources.article6,
     priority: 500,
     when: (answers) => !has(answers, 'vendor_docs', 'classification'),
     build: () => vendorEvidenceFinding(
       'vendor AI Act classification or intended-purpose statement is missing',
-      'What AI Act classification and intended purpose does the vendor assign to this system?'
+      'Article 6(3) — What AI Act classification and intended purpose do you assign to this system, and if you rely on a narrow-task exemption, can you provide the Article 6(4) assessment?'
     ),
   }),
   rule({
@@ -939,12 +969,39 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'Instructions and oversight guidance missing',
     category: 'vendor-evidence',
     legalStatus: 'operational-risk',
-    source: sources.article26,
+    source: sources.article13,
     priority: 501,
     when: (answers) => !has(answers, 'vendor_docs', 'instructions'),
     build: () => vendorEvidenceFinding(
-      'instructions for use and human oversight guidance are missing',
-      'What instructions for use, limitations, human oversight guidance, and misuse warnings does the vendor provide?'
+      'transparency documentation and instructions for use are missing',
+      'Article 13 — Where is your transparency documentation covering capabilities, performance boundaries, known limitations, and instructions for safe use?'
+    ),
+  }),
+  rule({
+    id: 'vendor-risk-management-missing',
+    title: 'Risk management system documentation missing',
+    category: 'vendor-evidence',
+    legalStatus: 'operational-risk',
+    source: sources.article9,
+    priority: 502,
+    when: (answers) => !has(answers, 'vendor_docs', 'risk-management'),
+    build: () => vendorEvidenceFinding(
+      'risk management system documentation is missing',
+      'Article 9 — Can you provide your risk management system documentation showing a continuous, iterative process across the system’s lifecycle?'
+    ),
+  }),
+  rule({
+    id: 'vendor-registration-missing',
+    title: 'EU database registration evidence missing',
+    category: 'vendor-evidence',
+    legalStatus: 'current-law',
+    source: sources.article49,
+    priority: 503,
+    // The sharpest procurement lever in the set, and the one least often asked.
+    when: (answers) => inAnnexIIIDomain(answers) && !has(answers, 'vendor_docs', 'registration'),
+    build: () => vendorEvidenceFinding(
+      'EU database registration reference is missing',
+      'Article 49 — Has this system been registered in the EU database? If so, what is the registration reference? If not, what is your timeline?'
     ),
   }),
   rule({
@@ -965,12 +1022,12 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'Audit logs or export evidence missing',
     category: 'vendor-evidence',
     legalStatus: 'operational-risk',
-    source: sources.article26,
-    priority: 503,
+    source: sources.article12,
+    priority: 504,
     when: (answers) => !has(answers, 'vendor_docs', 'logs'),
     build: () => vendorEvidenceFinding(
       'logging, audit, or export options are missing',
-      'Can you export logs, decisions, prompts, outputs, user actions, and configuration history for audit or incident review?'
+      'Articles 12 and 26(6) — Does the system automatically record events over its lifetime, and can you export logs, decisions, prompts, outputs, user actions, and configuration history for audit?'
     ),
   }),
   rule({
@@ -978,12 +1035,12 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'Vendor change-control evidence missing',
     category: 'vendor-evidence',
     legalStatus: 'operational-risk',
-    source: sources.article26,
-    priority: 504,
+    source: sources.article72,
+    priority: 505,
     when: (answers) => !has(answers, 'vendor_docs', 'change-policy'),
     build: () => vendorEvidenceFinding(
       'model update or change notification policy is missing',
-      'How will the vendor notify you about model, feature, policy, or performance changes?'
+      'Article 72 — What does your post-market monitoring cover, and how will you notify us about model, feature, policy, or performance changes?'
     ),
   }),
   rule({
@@ -1006,6 +1063,62 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
       adjacentRisks: [],
       reviewTriggers: ['Vendor evidence pack is received or materially updated'],
       reportSections: ['Vendor due diligence questionnaire'],
+    }),
+  }),
+  rule({
+    id: 'sme-proportionate-relief',
+    title: 'SME and start-up proportionate treatment',
+    category: 'governance',
+    legalStatus: 'current-law',
+    source: sources.article11,
+    priority: 650,
+    when: (answers) => hasAny(answers, 'org_size', ['micro', 'small', 'medium']),
+    build: () => ({
+      evidence: ['Organisation size: SME'],
+      explanation:
+        'The AI Act treats SMEs and start-ups proportionately on documentation, quality management, sandbox access, and fine ceilings.',
+      scoreDelta: 0,
+      confidenceImpact: 0,
+      reasons: [],
+      missingFacts: [],
+      obligations: [
+        'As an SME you may supply Annex IV technical documentation in the simplified form set out in the Commission’s form, which notified bodies must accept (Article 11(1)).',
+        'Your quality management system may be implemented proportionately to the size of your organisation, subject to a floor on rigour (Article 17(2)).',
+        'You have priority access to AI regulatory sandboxes (Article 57).',
+        'Fines take the lower of the percentage and the fixed amount, across Article 99 paragraphs 3, 4 and 5 (Article 99(6)).',
+      ],
+      vendorQuestions: [],
+      adjacentRisks: [],
+      reviewTriggers: ['Organisation grows past the SME thresholds'],
+      reportSections: ['Classification rationale and confidence'],
+    }),
+  }),
+  rule({
+    id: 'smc-proportionate-relief',
+    title: 'Small mid-cap proportionate treatment',
+    category: 'governance',
+    legalStatus: 'current-law',
+    source: sources.article99,
+    priority: 651,
+    when: (answers) => has(answers, 'org_size', 'small-mid-cap'),
+    build: () => ({
+      evidence: ['Organisation size: small mid-cap (SMC)'],
+      explanation:
+        'The Digital Omnibus extended several SME reliefs to small mid-caps, a category defined by reference to point (2) of the Annex to Recommendation (EU) 2025/1099. The fine relief is narrower than the SME version.',
+      scoreDelta: 0,
+      confidenceImpact: 0,
+      reasons: [],
+      missingFacts: [],
+      obligations: [
+        'As a small mid-cap you may supply Annex IV technical documentation in simplified form using the Commission’s form, which notified bodies must accept (Article 11(1)).',
+        'Your quality management system may be implemented proportionately to the size of your organisation, subject to a floor on rigour (Article 17(2)).',
+        'You have priority access to AI regulatory sandboxes (Article 57).',
+        'Fines take the lower of the percentage and the fixed amount for Article 99 paragraphs 4 and 5 only (Article 99(6a)). This relief does not extend to Article 5 prohibited-practice fines, which remain at the higher of €35M or 7% of total worldwide annual turnover.',
+      ],
+      vendorQuestions: [],
+      adjacentRisks: [],
+      reviewTriggers: ['Organisation grows past the small mid-cap thresholds'],
+      reportSections: ['Classification rationale and confidence'],
     }),
   }),
   rule({
