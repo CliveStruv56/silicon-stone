@@ -354,6 +354,59 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 10, 2026 — Compliance Checker: session persistence, tiered CTA, rule base v2026-08-10
+
+Closes Stage 0.
+
+**The refresh-wipe is fixed.** Sixteen steps of answers lived in `useState`
+alone, so a refresh — or a phone locking mid-assessment — dropped the user back
+at step 1 with nothing. Answers now autosave (600ms debounce) to Upstash under
+`sas:checker:<uuid>`, keyed by an opaque id in an **httpOnly** cookie so the
+client never handles it. 24-hour TTL, refreshed on every write so an assessment
+spread across a working day does not expire underneath the user.
+
+Validation lives in `checker-session-schema.ts`, split out from the `server-only`
+Redis module for one practical reason worth remembering: `server-only` throws
+inside vitest, so anything that needs unit tests cannot sit in the same file as
+the Upstash calls. That schema module is the entire trust boundary for an
+unauthenticated write endpoint — unknown keys dropped, values capped at 500
+chars, arrays at 24 entries, `showResult` strictly boolean.
+
+Upstash is optional throughout. With no store configured every path returns
+early and the tool behaves exactly as before — verified locally, where the PUT
+returns `{saved: false}` and the form is unaffected. Production has
+`KV_REST_API_*` set, so restore is live there.
+
+**The phantom product is gone.** The result screen advertised a "paid self-serve
+report" that does not exist. It is replaced by a tiered next step: high-risk,
+prohibited, or provider/both leads with the £79 toolkit; everything else leads
+with the £24 checklist pack, with the other as secondary. There is no "AI Act
+Essentials for SMEs" product, so the tiering uses the two that exist. No
+`PRE_LAUNCH` handling is needed because these link to product *pages*, which
+already render the early-access CTA while the flag is set.
+
+Rule base bumped to **v2026-08-10** with the changelog inline in
+`ai-act-rules.ts`. Its sandbox line reads "extended to 2 Aug 2027 (from
+2 Aug 2026)" — not "unchanged", which is what the source spec claimed and is
+wrong.
+
+**Verified end-to-end in a real browser** (Puppeteer against `next dev`, since
+programmatic clicks through the Chrome extension never reach React's delegated
+listeners — worth knowing before debugging that again). Three paths:
+
+| Path | Result |
+|---|---|
+| Third-party HR tool, applicants, ranking, rubber-stamp, profiling confirmed | Likely high-risk, **High** confidence, override fired, no exemption caveat, £79 primary |
+| Internal drafting tool, no Annex III, meaningful oversight | Likely minimal-risk, override absent, profiling question skipped (15 steps not 16), **£24 primary** |
+| Same, selecting the intimate-imagery practice | **Prohibited from 2 December 2026** — future-dated, not a present-tense ban |
+
+Step 10 renders all ten practices with both "Applies from 2 December 2026"
+badges, the Art 5(1a)/(1b) qualifier help text, and the law-enforcement
+sub-heading. One styling gotcha: the outline Button variant sets
+`dark:border-input`, which beats a bare `border-stone-teal` in dark mode and
+leaves the secondary CTA looking borderless — `dark:border-stone-teal` is
+required alongside it.
+
 ### August 10, 2026 — Compliance Checker: article-anchored vendor questions, SME/SMC relief
 
 Vendor questions were reasonable requests with nothing behind them. Each now

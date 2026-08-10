@@ -23,6 +23,9 @@ const configs = {
   deepResearch: { limit: 3, window: '1 h', prefix: 'sas:deep-research' },
   factCheck: { limit: 10, window: '1 h', prefix: 'sas:fact-check' },
   imagePrompts: { limit: 30, window: '1 h', prefix: 'sas:image-prompts' },
+  // Autosave for the compliance checker: one write per answer, so the ceiling
+  // has to clear a fast full run of the form without inviting a write flood.
+  checkerSession: { limit: 120, window: '15 m', prefix: 'sas:checker-session' },
 } satisfies Record<string, RateLimitConfig>
 
 export type DurableRateLimitKey = keyof typeof configs

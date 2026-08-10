@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -11,7 +11,6 @@ import {
   ClipboardCheck,
   FileText,
   Gauge,
-  LockKeyhole,
   RefreshCcw,
   ShieldCheck,
 } from 'lucide-react'
@@ -80,15 +79,107 @@ function optionIsSelected(question: AssessmentQuestion, answers: AssessmentAnswe
   return values(answers[question.id]).includes(value)
 }
 
+interface CtaTarget {
+  label: string
+  href: string
+  blurb: string
+}
+
+const CHECKLIST_PACK: CtaTarget = {
+  label: 'AI Audit Checklist Pack — £24',
+  href: '/products/ai-audit-checklist',
+  blurb: 'Inventory, vendor scorecard, gap analysis, and a board-ready summary. The do-something-today step.',
+}
+
+const COMPLIANCE_TOOLKIT: CtaTarget = {
+  label: 'AI Act Compliance Toolkit — from £79',
+  href: '/products/ai-act-toolkit',
+  blurb: 'Risk classification, checklists by category, template policies, and the systems register.',
+}
+
+/**
+ * Vary the next step by outcome. Pushing the flagship toolkit at someone whose
+ * drafting assistant came back minimal-risk is the fastest way to teach them
+ * the result was not really read — so the £24 pack leads there, and the
+ * toolkit leads only where the work is genuinely toolkit-shaped.
+ */
+function resultCta(classification: string, role: string): { primary: CtaTarget; secondary: CtaTarget } {
+  const heavyweight =
+    role === 'Provider' ||
+    role === 'Both' ||
+    classification === 'Likely high-risk' ||
+    classification === 'Prohibited practice' ||
+    classification === 'Prohibited from 2 December 2026'
+
+  return heavyweight
+    ? { primary: COMPLIANCE_TOOLKIT, secondary: CHECKLIST_PACK }
+    : { primary: CHECKLIST_PACK, secondary: COMPLIANCE_TOOLKIT }
+}
+
+const SESSION_ENDPOINT = '/api/tools/compliance-checker/session'
+const AUTOSAVE_DEBOUNCE_MS = 600
+
 export default function ComplianceCheckerPage() {
   const [answers, setAnswers] = useState<AssessmentAnswers>({})
   const [currentIndex, setCurrentIndex] = useState(0)
   const [showResult, setShowResult] = useState(false)
+  // Until the restore round-trip settles, autosave must stay quiet — otherwise
+  // the empty initial state races the response and overwrites a stored run.
+  const [restored, setRestored] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+
+    fetch(SESSION_ENDPOINT)
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => {
+        if (cancelled || !data?.session) return
+        const { answers: storedAnswers, step, showResult: storedShowResult } = data.session
+        if (storedAnswers && Object.keys(storedAnswers).length > 0) {
+          setAnswers(storedAnswers)
+          setCurrentIndex(step ?? 0)
+          setShowResult(Boolean(storedShowResult))
+        }
+      })
+      .catch(() => {
+        // No store, or offline. The tool works in memory exactly as before.
+      })
+      .finally(() => {
+        if (!cancelled) setRestored(true)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    if (!restored) return
+    if (Object.keys(answers).length === 0) return
+
+    if (saveTimer.current) clearTimeout(saveTimer.current)
+    saveTimer.current = setTimeout(() => {
+      fetch(SESSION_ENDPOINT, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ answers, step: currentIndex, showResult }),
+      }).catch(() => {
+        // Autosave is best-effort; a failed write must never block the form.
+      })
+    }, AUTOSAVE_DEBOUNCE_MS)
+
+    return () => {
+      if (saveTimer.current) clearTimeout(saveTimer.current)
+    }
+  }, [answers, currentIndex, showResult, restored])
 
   const visibleQuestions = useMemo(() => getVisibleQuestions(answers), [answers])
   const currentQuestion = visibleQuestions[currentIndex] ?? visibleQuestions[visibleQuestions.length - 1]
   const result = useMemo(() => evaluateAssessment(answers), [answers])
   const tone = resultTone(result.classification)
+  const cta = resultCta(result.classification, result.role)
   const progress = Math.round(((currentIndex + 1) / visibleQuestions.length) * 100)
   const currentValue = currentQuestion ? answers[currentQuestion.id] : undefined
   const canContinue = !currentQuestion?.required || values(currentValue).length > 0
@@ -131,6 +222,9 @@ export default function ComplianceCheckerPage() {
     setAnswers({})
     setCurrentIndex(0)
     setShowResult(false)
+    fetch(SESSION_ENDPOINT, { method: 'DELETE' }).catch(() => {
+      // Nothing to do — the local reset has already happened.
+    })
   }
 
   return (
@@ -440,28 +534,38 @@ export default function ComplianceCheckerPage() {
                 <Card className="bg-surface-elevated border-silicon-amber/30">
                   <CardHeader>
                     <div className="flex items-center gap-2 text-silicon-amber">
-                      <LockKeyhole className="w-5 h-5" />
-                      <CardTitle className="text-lg">Full report module</CardTitle>
+                      <ClipboardCheck className="w-5 h-5" />
+                      <CardTitle className="text-lg">Your next step</CardTitle>
                     </div>
                     <CardDescription>
-                      The paid self-serve report should expand this assessment into an exportable evidence pack.
+                      Everything above is yours to keep — copy it, download it, or file it as your AI system
+                      record. These take it further.
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <ul className="space-y-2">
-                      {result.reportSections.map((section) => (
-                        <li key={section} className="flex items-start gap-2 text-sm text-text-primary">
-                          <CheckCircle2 className="w-4 h-4 text-stone-teal mt-0.5 flex-shrink-0" />
-                          <span>{section}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <Link href="/products/ai-act-toolkit">
-                      <Button className="w-full bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90">
-                        View compliance toolkit
-                      </Button>
-                    </Link>
-                    <p className="text-xs text-text-muted text-center">
+                    <div>
+                      <Link href={cta.primary.href}>
+                        <Button className="w-full bg-silicon-amber text-ink-on-accent hover:bg-silicon-amber/90">
+                          {cta.primary.label}
+                        </Button>
+                      </Link>
+                      <p className="mt-2 text-xs text-text-muted">{cta.primary.blurb}</p>
+                    </div>
+                    <div>
+                      <Link href={cta.secondary.href}>
+                        {/* dark:border-stone-teal is required — the outline
+                            variant sets dark:border-input, which would win in
+                            dark mode and leave the button looking borderless. */}
+                        <Button
+                          variant="outline"
+                          className="w-full border-stone-teal text-stone-teal dark:border-stone-teal"
+                        >
+                          {cta.secondary.label}
+                        </Button>
+                      </Link>
+                      <p className="mt-2 text-xs text-text-muted">{cta.secondary.blurb}</p>
+                    </div>
+                    <p className="text-xs text-text-muted text-center border-t border-border-subtle pt-4">
                       Need it interpreted for your business?{' '}
                       <Link href="/eu-exposure" className="text-silicon-amber hover:underline">
                         See the Post-Omnibus Briefing

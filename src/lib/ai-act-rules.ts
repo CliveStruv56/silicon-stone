@@ -85,8 +85,26 @@ export interface RuleEvaluation {
   reportSections: string[]
 }
 
-const RULE_VERSION = '2026-06-02'
-const LAST_REVIEWED = '2026-06-02'
+const RULE_VERSION = '2026-08-10'
+const LAST_REVIEWED = '2026-08-10'
+
+/**
+ * Rule-base changelog. Every entry is a legal claim; verify against the
+ * consolidated text before adding one.
+ *
+ * v2026-08-10 — Digital Omnibus on AI (Regulation (EU) 2026/1744, OJ 24.7.2026,
+ *   in force 27.7.2026): Annex III high-risk → 2 Dec 2027; Annex I → 2 Aug 2028;
+ *   new Art 5(1)(ba) and (bb) prohibitions from 2 Dec 2026; SMC category added
+ *   (Arts 11, 17, 57, 99(6a)). Art 50 transparency in force 2 Aug 2026.
+ *   Corrected penalty tiers: Art 50 and GPAI sit at €15M/3% (Arts 99(4)(g), 101)
+ *   — no 1.5% band exists. Added the Art 6(3) profiling override. Retention
+ *   re-cited to Arts 19(1)/26(6), with Art 12 as the logging capability only.
+ *   Art 57(1) sandbox deadline extended to 2 Aug 2027 (from 2 Aug 2026) — this
+ *   is a separate provision from the 2 Dec 2027 Annex III application date, and
+ *   must not be described as unchanged.
+ * v2026-06-02 — initial versioned rule base.
+ */
+export const RULE_BASE_VERSION = RULE_VERSION
 
 const sources = {
   overview: {
