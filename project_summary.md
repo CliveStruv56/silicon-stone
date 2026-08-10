@@ -424,6 +424,27 @@ pages in both themes: **zero failures**, the only remaining hits being
 false positives where hero text sits on a background *image* the measurer cannot
 see.
 
+**The hero scrim was tuned for a column that only exists on desktop.** The
+overlay is a *horizontal* gradient — 0.50 alpha at the left edge, thinning to
+0.18 at 32% to keep the figure in the photograph, then 0.70→0.95 across the
+right, where the copy sits in the `lg:grid` third column. Below `lg` the copy
+runs full-width and crosses that thin band, landing on the one bright light
+streak in the picture: sampling the *rendered backdrop pixels* on a 390px
+viewport put the amber badge at **2.1:1** and the amber headline at **2.0:1**.
+Below `lg` the hero now uses an even vertical scrim instead; the horizontal one
+is `hidden lg:block`, matching the breakpoint where the column layout actually
+starts (it was briefly `md`, which left 768–1023px on the wrong scrim).
+
+The same measurement caught a **pre-existing desktop** failure: the copy column
+starts at 33% and the gradient's thin point sat at 32%, so the badge ran at
+3.2:1 at every desktop width. The thin point moved to 24% and the ramp now
+closes before the text begins, and the badge dropped its translucent amber fill
+— at 11px it is the most contrast-sensitive text in the hero, and a translucent
+fill borrows its lightness from whatever the photo is doing underneath — for an
+opaque dark chip with the amber kept as border and text. Re-measured against
+rendered pixels at 390 / 430 / 768 / 1024 / 1440: **no run under AA**, including
+against the brightest 5% of the backdrop under each one.
+
 **Disabled buttons stopped free-riding on the fill.** `disabled:opacity-50` over
 a solid accent used to leave dark ink on a pale tint, which read acceptably; with
 white ink the same faded fill dropped to 2.5:1 and the CTA looked broken rather

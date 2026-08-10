@@ -35,16 +35,34 @@ const itemVariants = {
 const HERO_IMAGE_ALT =
     'A figure on a clifftop on an Outer Orkney isle, looking out across the North Atlantic — the view from the edge'
 
+/* Desktop scrim: horizontal, because the copy sits in the right-hand column.
+   It thins in the middle to keep the figure in the photo — but the thin point
+   used to sit at 32%, and the copy column starts at 33%, so the badge and the
+   amber headline landed on the one bright patch of the picture (3.2:1 measured).
+   The thin point moves left to 24% and the ramp closes before the text begins. */
 const HERO_OVERLAY_BACKGROUND = `
     linear-gradient(to right,
         rgba(11,17,23,0.50) 0%,
-        rgba(11,17,23,0.18) 32%,
-        rgba(11,17,23,0.70) 60%,
+        rgba(11,17,23,0.20) 24%,
+        rgba(11,17,23,0.62) 40%,
+        rgba(11,17,23,0.80) 62%,
         rgba(11,17,23,0.95) 100%
     ),
     linear-gradient(to top,
         rgba(11,17,23,0.70) 0%,
         rgba(11,17,23,0) 38%
+    )
+`
+
+/* Mobile scrim: below lg the copy spans the full width, so it crosses that 0.18
+   band — and the photo's bright light streak sits right under the headline.
+   Measured on a 390px viewport, the amber ran at 2.0:1 there. An even vertical
+   scrim instead, weighted to the top where the badge and headline sit. */
+const HERO_OVERLAY_MOBILE_BACKGROUND = `
+    linear-gradient(to bottom,
+        rgba(11,17,23,0.72) 0%,
+        rgba(11,17,23,0.66) 50%,
+        rgba(11,17,23,0.86) 100%
     )
 `
 
@@ -87,8 +105,13 @@ export function HeroSection({ settings }: HeroSectionProps) {
 
             {/* Directional gradient overlay — preserves figure on the left, darkens the right for type. */}
             <div
-                className="absolute inset-0 z-[1] pointer-events-none"
+                className="absolute inset-0 z-[1] pointer-events-none hidden lg:block"
                 style={{ background: HERO_OVERLAY_BACKGROUND }}
+            />
+            {/* Even vertical scrim below lg, where the copy runs full-width. */}
+            <div
+                className="absolute inset-0 z-[1] pointer-events-none lg:hidden"
+                style={{ background: HERO_OVERLAY_MOBILE_BACKGROUND }}
             />
 
             {/* Subtle teal grid — quiet brand cohesion */}
@@ -117,7 +140,11 @@ export function HeroSection({ settings }: HeroSectionProps) {
                         <motion.div variants={itemVariants}>
                             <Badge
                                 variant="outline"
-                                className="mb-8 max-w-full whitespace-normal rounded-md border-[#F6AD55]/70 bg-[#F6AD55]/12 px-3 py-1.5 font-mono text-[11px] sm:text-[12.5px] uppercase tracking-[0.06em] sm:tracking-[0.10em] text-[#F6AD55] shadow-[0_8px_30px_rgba(0,0,0,0.35)] backdrop-blur-sm"
+                                /* Dark chip, not an amber tint: at 11px this is the most
+                                   contrast-sensitive text in the hero, and a translucent
+                                   amber fill takes its lightness from whatever the photo
+                                   is doing underneath. */
+                                className="mb-8 max-w-full whitespace-normal rounded-md border-[#F6AD55]/70 bg-[rgba(11,17,23,0.72)] px-3 py-1.5 font-mono text-[11px] sm:text-[12.5px] uppercase tracking-[0.06em] sm:tracking-[0.10em] text-[#F6AD55] shadow-[0_8px_30px_rgba(0,0,0,0.35)] backdrop-blur-sm"
                             >
                                 Forensic Technopolitics
                                 <span className="hidden sm:inline"> · the view from the edge</span>
