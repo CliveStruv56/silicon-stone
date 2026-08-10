@@ -1,0 +1,35 @@
+{
+  "version": "2026-08-10",
+  "lastReviewed": "2026-08-10",
+  "corpusCutOff": "2026-07-27",
+  "normalisation": "v1",
+  "provenance": {
+    "instrument": "Regulation (EU) 2024/1689 (AI Act), as amended by Regulation (EU) 2026/1744 (Digital Omnibus on AI)",
+    "celex": "02024R1689-20260727",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A02024R1689-20260727",
+    "retrieved": "2026-08-10",
+    "note": "Corpus files are the consolidated Article text with EUR-Lex consolidation markers (▼B, ▼M1), markdown link syntax, non-breaking spaces and soft hyphens removed. See src/lib/rulepack/normalise.ts — the citation verifier applies the same normalisation to both sides before matching."
+  },
+  "changelog": "Digital Omnibus on AI (Regulation (EU) 2026/1744, OJ 24.7.2026, in force 27.7.2026): Annex III high-risk → 2 Dec 2027; Annex I → 2 Aug 2028; new Art 5(1)(ba) and (bb) prohibitions from 2 Dec 2026; SMC category added (Arts 11, 17, 57, 99(6a)), defined at Art 3(14b) by reference to point (2) of the Annex to Recommendation (EU) 2025/1099. Art 50 transparency in force 2 Aug 2026. Corrected penalty tiers: Art 50 and GPAI sit at €15M/3% (Arts 99(4)(g), 101) — no 1.5% band exists. Added the Art 6(3) profiling override. Retention re-cited to Arts 19(1)/26(6), with Art 12 as the logging capability only. Art 57(1) sandbox deadline extended to 2 Aug 2027 (from 2 Aug 2026) — a separate provision from the 2 Dec 2027 Annex III application date, and not left unchanged.",
+  "corpus": {
+    "3": "c41cdd2e27346d0bdd449209c9f08004cdca6c96c0acf8a9d9ed8a6b700b002b",
+    "5": "51a49fefa11df2e740913ae8833fce0857365c238dd7791b9e108218a487ffbe",
+    "6": "c816401472cd1d406aa259a7de6d00777704c848f80982d2059a9f9e4bd3236c",
+    "9": "0cb4966d8980391b2ff0fc506353e2b49a1088644aecc95b71ceff8f8f164b21",
+    "11": "93205639f72bda05cab0f20061d5c5d4e1d129d28e99b4d76312eadc75c31da1",
+    "12": "6ede0f56bc42c894796c0f9ccf9603e22398733884ddd3334712fca4639219e9",
+    "13": "af2cfb1cfe843f89e01684e987fed5ab91d1e756e260622dd388efdf902e2a71",
+    "17": "b5f9226d3713cbb9d5b7b7e34a9947184b59bb695a8e047780222ee8f78cfc48",
+    "19": "474593b1b53d17ce9c3530721fb241f161e7c375bd617d76f484348e153bc301",
+    "26": "6d3761cef2af94efdfc067d32168ebb5f54881b671418d1f3b4a71e221afd2eb",
+    "49": "fc07a541be29fe5b0677b7c22daae6dd628e0205e881be29e30576af75e9241b",
+    "50": "11f28a1ff626c026c7273e5bc4a167367953365eac70239ec53bd86ee8c9b84f",
+    "57": "7ace3a0ebf2903bfdbd5109c92cf430e0210f8bd0e94aed104c54dc4c82a2ba7",
+    "72": "1472fcac169374ee93202a4deac453a5e65a9a0aecaabe7b16c9714c2e4281ff",
+    "73": "b2fa52f7c64642c676304254915c814747be7a8f8dc6fc7a42762637ab50b59f",
+    "99": "e731913990eb3a71f1f5527ce0dfb36777813580eb0955dd8d7b616eb2ef1595",
+    "101": "d0eabf47387c8221eaa3d08f68425911d7ae619bde5046c22ddf1762672a6ec2",
+    "111": "b983e07e9fb3f3ebb999a78efdbfcb3e3f8411e6b1028540ecd8c9b484c48f86",
+    "113": "9f08310801e72bb4975974f53098d04a4c2fb0d9b05d3f0259a656eee1dfc519"
+  }
+}

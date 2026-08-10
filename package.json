@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "gen:style": "node scripts/gen-style-rules.mjs",
-    "prebuild": "node scripts/gen-style-rules.mjs",
+    "rulepack:check": "node scripts/rulepack-check.mjs",
+    "rulepack:hash": "node scripts/rulepack-check.mjs --write",
+    "prebuild": "node scripts/gen-style-rules.mjs && node scripts/rulepack-check.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",

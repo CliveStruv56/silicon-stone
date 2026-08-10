@@ -28,6 +28,7 @@ import {
   getVisibleQuestions,
 } from '@/lib/ai-act-assessment'
 import { AI_ACT_TIMELINE, PENALTY_TIERS } from '@/lib/ai-act-timeline'
+import { RULE_PACK } from '@/lib/rulepack'
 import { CopyMarkdownButton } from '@/components/tools/CopyMarkdownButton'
 import { ToolSubscribeCard } from '@/components/tools/ToolSubscribeCard'
 import { complianceCheckerMarkdown } from '@/lib/tools-markdown'
@@ -596,7 +597,12 @@ export default function ComplianceCheckerPage() {
                         className="rounded-lg border border-border-subtle bg-surface-elevated p-4"
                       >
                         <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
-                          <span className="font-semibold text-text-primary">{entry.label}</span>
+                          <span className="font-semibold text-text-primary">
+                            {entry.label}
+                            <span className="ml-2 font-mono text-xs font-normal text-text-muted">
+                              {entry.basis}
+                            </span>
+                          </span>
                           <Badge
                             variant="outline"
                             className={
@@ -674,7 +680,11 @@ export default function ComplianceCheckerPage() {
                 <CardHeader>
                   <CardTitle className="text-lg text-text-primary">Rules fired</CardTitle>
                   <CardDescription>
-                    These versioned rules are the evidence trail behind the result and paid report.
+                    These versioned rules are the evidence trail behind the result. Rule pack{' '}
+                    <span className="font-mono text-text-primary">{RULE_PACK.manifest.version}</span>,
+                    built from the consolidated text at CELEX{' '}
+                    <span className="font-mono">{RULE_PACK.manifest.provenance.celex}</span>, current to{' '}
+                    {RULE_PACK.manifest.corpusCutOff}.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>

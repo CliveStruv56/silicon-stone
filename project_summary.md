@@ -253,6 +253,12 @@ EXA_API_KEY=<key>
 INOREADER_APP_ID=1000008617
 INOREADER_APP_KEY=<key>
 
+# AI Act rule pack (Compliance Checker)
+NEXT_PUBLIC_RULEPACK_VERSION=2026-08-10   # Optional: pins the rule pack. Must be a
+                                          # version present in rulepack/versions/ and
+                                          # registered in src/lib/rulepack/index.ts.
+                                          # Unknown value = build fails, by design.
+
 # Email/Newsletter
 CONVERTKIT_API_KEY=<key>
 CONVERTKIT_FORM_ID=<id>
@@ -353,6 +359,67 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 10, 2026 — Stage 1: the AI Act rule pack, with a real legal corpus
+
+The legal payload behind the checker now lives in `rulepack/versions/2026-08-10/`
+rather than in TypeScript constants: application dates, penalty ceilings, source
+citations, per-rule Article anchors, the ten Article 5(1) points, and 19
+Articles of verbatim statute.
+
+**What is *not* in the pack, and why.** The trigger predicates. Encoding "fires
+when an Annex III domain is present and profiling is performed" as JSON needs a
+condition language plus an interpreter — untyped, invisible to the compiler, and
+deciding legal classifications. The ten-week lag this pack exists to close is a
+lag in dates and wording, not in logic shapes. So `when:` stays TypeScript, and
+the acceptance is narrowed accordingly: changing the pinned version changes
+dates, anchors, citations and copy with no code change.
+
+**Pinning is env-driven** (`NEXT_PUBLIC_RULEPACK_VERSION`), never "latest". A
+rule pack decides what the law is said to be, so it changes when someone decides
+it changes, not when a file lands. An unknown version **throws** rather than
+falling back — silently serving a different vintage of the law than the one
+pinned is the worst available outcome, and a failed build is cheap by comparison.
+
+**The corpus is real.** 19 Articles (3, 5, 6, 9, 11, 12, 13, 17, 19, 26, 49, 50,
+57, 72, 73, 99, 101, 111, 113) pulled from the EUR-Lex consolidated text at CELEX
+02024R1689-20260727 — not written from memory, which would make Stage 3's
+verifier a theatre of checking quotes against my own paraphrase. It confirmed
+every claim shipped in Stage 0, verbatim, and closed the one open item: Art
+3(14b) defines SMC by reference to point (2) of the Annex to Recommendation (EU)
+2025/1099, exactly as claimed. Art 111(2) is the authority for 2 August 2030, and
+Art 113 for the rest — each timeline entry now carries its `basis` on screen, so
+a reader can check a date rather than trust it.
+
+It is deliberately **partial**. `hasCorpus()` is the honest answer to "can a
+quote against this Article be verified at all", and Stage 3 must treat an
+uncovered Article as unverifiable rather than as a pass — hence three verdicts
+(`verified` / `not-found` / `uncovered`), not a boolean.
+
+**Corpus stays server-side.** It is ~90KB of statute that only the citation
+verifier needs; `corpus.ts` is `server-only` and reads from disk, so it never
+reaches a browser. Verified against the built bundle: the corpus text appears in
+no client chunk, and the checker page got *smaller* (21 kB → 20.4 kB).
+
+**Normalisation is the unglamorous load-bearing part.** EUR-Lex is full of
+non-breaking spaces inside "Article 6", curly apostrophes, soft hyphens, and
+line breaks mid-sentence. A verifier that compares raw strings fails on
+essentially every quote, and a 100% failure rate reads as a model problem rather
+than a character-encoding one. `normaliseLegalText` folds all of it — but
+preserves case, so a mis-transcribed quote still fails, and it is exact-substring,
+so a paraphrase still fails.
+
+**`npm run rulepack:check` runs in `prebuild` and exits 1 on drift** (verified by
+tampering with Article 6 and watching the build refuse). The failure it catches
+is someone editing corpus text without bumping the version, silently
+invalidating every citation previously verified against it. Corpus and version
+move together or the build stops. `npm run rulepack:hash` regenerates hashes
+after an intentional change.
+
+One gotcha for future work: `scripts/rulepack-check.mjs` duplicates the
+normaliser rather than importing it, because `prebuild` runs before any
+TypeScript build. The manifest records `normalisation: "v1"` so a divergence
+between the two copies is at least visible.
 
 ### August 10, 2026 — Compliance Checker: session persistence, tiered CTA, rule base v2026-08-10
 

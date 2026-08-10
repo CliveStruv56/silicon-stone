@@ -3,7 +3,8 @@
 // can paste into a doc, Slack, or email. Format favours readability over fidelity.
 
 import type { AssessmentResult, AssessmentAnswers, AssessmentQuestion } from './ai-act-assessment'
-import { AI_ACT_TIMELINE, PENALTY_TIERS } from './ai-act-timeline'
+import { AI_ACT_TIMELINE, LEGAL_CORPUS_CUT_OFF, PENALTY_TIERS } from './ai-act-timeline'
+import { RULE_PACK } from './rulepack'
 import type { Policy, IndustryImpact } from '@/types/policy'
 import type { Scenario, ExposureProfile as ScenarioExposureProfile } from '@/types/scenario'
 import type {
@@ -48,7 +49,7 @@ export function complianceCheckerMarkdown(
 
   return `# AI Act Compliance Checker — ${toolName}
 
-_Generated ${isoDate()} · First-pass triage, not legal advice._
+_Generated ${isoDate()} · Rule pack ${RULE_PACK.manifest.version} · Legal corpus current to ${LEGAL_CORPUS_CUT_OFF} (CELEX ${RULE_PACK.manifest.provenance.celex}) · First-pass triage, not legal advice._
 
 **Classification:** ${result.classification}
 **Likely role:** ${result.role}

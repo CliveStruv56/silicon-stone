@@ -4,6 +4,7 @@ import type {
   SourceReference,
   UserRole,
 } from './ai-act-assessment'
+import { RULE_PACK, type PackProhibitedPractice } from './rulepack'
 
 export type LegalStatus = 'current-law' | 'official-guidance' | 'operational-risk' | 'adjacent-risk'
 
@@ -85,137 +86,35 @@ export interface RuleEvaluation {
   reportSections: string[]
 }
 
-const RULE_VERSION = '2026-08-10'
-const LAST_REVIEWED = '2026-08-10'
-
 /**
- * Rule-base changelog. Every entry is a legal claim; verify against the
- * consolidated text before adding one.
- *
- * v2026-08-10 — Digital Omnibus on AI (Regulation (EU) 2026/1744, OJ 24.7.2026,
- *   in force 27.7.2026): Annex III high-risk → 2 Dec 2027; Annex I → 2 Aug 2028;
- *   new Art 5(1)(ba) and (bb) prohibitions from 2 Dec 2026; SMC category added
- *   (Arts 11, 17, 57, 99(6a)). Art 50 transparency in force 2 Aug 2026.
- *   Corrected penalty tiers: Art 50 and GPAI sit at €15M/3% (Arts 99(4)(g), 101)
- *   — no 1.5% band exists. Added the Art 6(3) profiling override. Retention
- *   re-cited to Arts 19(1)/26(6), with Art 12 as the logging capability only.
- *   Art 57(1) sandbox deadline extended to 2 Aug 2027 (from 2 Aug 2026) — this
- *   is a separate provision from the 2 Dec 2027 Annex III application date, and
- *   must not be described as unchanged.
- * v2026-06-02 — initial versioned rule base.
+ * Version, sources and Article anchors all come from the pinned rule pack —
+ * see src/lib/rulepack. Changing the pinned version changes what the engine
+ * cites, with no edit here. The trigger predicates below stay in TypeScript on
+ * purpose; the reasoning is in the rule pack's module comment.
  */
+const RULE_VERSION = RULE_PACK.manifest.version
+const LAST_REVIEWED = RULE_PACK.manifest.lastReviewed
+
 export const RULE_BASE_VERSION = RULE_VERSION
 
-const sources = {
-  overview: {
-    label: 'European Commission AI Act overview',
-    article: 'AI Act overview',
-    publisher: 'European Commission',
-    url: 'https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai',
-  },
-  article2: {
-    label: 'AI Act Service Desk: Article 2 territorial scope',
-    article: 'Article 2',
-    publisher: 'European Commission AI Act Service Desk',
-    url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-2',
-  },
-  article5: {
-    label: 'AI Act Service Desk: Article 5 prohibited AI practices',
-    article: 'Article 5',
-    publisher: 'European Commission AI Act Service Desk',
-    url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-5',
-  },
-  article6: {
-    label: 'AI Act Service Desk: Article 6 high-risk classification',
-    article: 'Article 6',
-    publisher: 'European Commission AI Act Service Desk',
-    url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-6',
-  },
-  annex3: {
-    label: 'AI Act Service Desk: Annex III high-risk areas',
-    article: 'Annex III',
-    publisher: 'European Commission AI Act Service Desk',
-    url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/annex-3',
-  },
-  article12: {
-    label: 'AI Act Service Desk: Article 12 record-keeping',
-    article: 'Article 12',
-    publisher: 'European Commission AI Act Service Desk',
-    url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-12',
-  },
-  article9: {
-    label: 'AI Act Service Desk: Article 9 risk management system',
-    article: 'Article 9',
-    publisher: 'European Commission AI Act Service Desk',
-    url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-9',
-  },
-  article11: {
-    label: 'AI Act Service Desk: Article 11 technical documentation',
-    article: 'Article 11',
-    publisher: 'European Commission AI Act Service Desk',
-    url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-11',
-  },
-  article13: {
-    label: 'AI Act Service Desk: Article 13 transparency and information provision',
-    article: 'Article 13',
-    publisher: 'European Commission AI Act Service Desk',
-    url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-13',
-  },
-  article72: {
-    label: 'AI Act Service Desk: Article 72 post-market monitoring',
-    article: 'Article 72',
-    publisher: 'European Commission AI Act Service Desk',
-    url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-72',
-  },
-  article99: {
-    label: 'AI Act Service Desk: Article 99 penalties',
-    article: 'Article 99',
-    publisher: 'European Commission AI Act Service Desk',
-    url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-99',
-  },
-  article19: {
-    label: 'AI Act Service Desk: Article 19 automatically generated logs',
-    article: 'Article 19',
-    publisher: 'European Commission AI Act Service Desk',
-    url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-19',
-  },
-  article49: {
-    label: 'AI Act Service Desk: Article 49 registration',
-    article: 'Article 49',
-    publisher: 'European Commission AI Act Service Desk',
-    url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-49',
-  },
-  article26: {
-    label: 'AI Act Service Desk: Article 26 deployer obligations',
-    article: 'Article 26',
-    publisher: 'European Commission AI Act Service Desk',
-    url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-26',
-  },
-  article50: {
-    label: 'AI Act Service Desk: Article 50 transparency obligations',
-    article: 'Article 50',
-    publisher: 'European Commission AI Act Service Desk',
-    url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-50',
-  },
-  article51: {
-    label: 'AI Act Service Desk: Article 51 GPAI systemic risk',
-    article: 'Article 51',
-    publisher: 'European Commission AI Act Service Desk',
-    url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-51',
-  },
-  omnibus: {
-    label: 'Regulation (EU) 2026/1744 (Digital Omnibus on AI), in force 27 July 2026',
-    article: 'Article 5(1)',
-    publisher: 'Official Journal of the European Union',
-    url: 'https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng',
-  },
-  gdpr: {
-    label: 'ICO: Data protection impact assessments',
-    article: 'GDPR DPIA due diligence',
-    publisher: 'Information Commissioner’s Office',
-    url: 'https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/accountability-and-governance/data-protection-impact-assessments-dpias/',
-  },
-} satisfies Record<string, RuleSource>
+/**
+ * The source registry, read from the pinned rule pack. Every citation the tool
+ * shows resolves through here, so correcting a URL or an Article label is a
+ * data edit in rulepack/versions/<version>/sources.json.
+ */
+const sources = RULE_PACK.sources as Record<string, RuleSource>
+
+/**
+ * The anchor a rule cites: its source entry, plus a narrower Article label
+ * where the rule is about a specific paragraph. Falls back to the source's own
+ * label so a rule missing from the pack still renders something truthful
+ * rather than throwing at import time.
+ */
+function anchor(ruleId: string): RuleSource {
+  const mapping = RULE_PACK.ruleAnchors[ruleId]
+  const source = sources[mapping?.source ?? 'overview'] ?? sources.overview
+  return mapping?.article ? { ...source, article: mapping.article } : source
+}
 
 const classificationRank: Record<Classification, number> = {
   'Out of EU scope': 0,
@@ -369,19 +268,13 @@ function selected(answers: AssessmentAnswers, id: string): string {
   return values(answers, id).join(', ')
 }
 
-interface Art5Practice {
-  /** The point within Article 5(1), e.g. 'a', 'ba'. Also the rule-ID suffix. */
-  point: string
-  /** Short phrase used in the fired-rule evidence and explanation copy. */
-  summary: string
-  /**
-   * True for the two points inserted by Regulation (EU) 2026/1744, which apply
-   * from 2 December 2026 rather than 2 February 2025. These produce a
-   * future-dated verdict — telling someone to "stop now" over a prohibition
-   * that does not yet exist would be as wrong as missing it entirely.
-   */
-  futureDated?: boolean
-}
+/**
+ * One point of Article 5(1), as carried by the rule pack. `futureDated` marks
+ * the two points inserted by Regulation (EU) 2026/1744, which apply from
+ * 2 December 2026 rather than 2 February 2025 — telling someone to "stop now"
+ * over a prohibition that does not yet exist would be as wrong as missing it.
+ */
+type Art5Practice = PackProhibitedPractice
 
 /**
  * Article 5(1) as consolidated at CELEX 02024R1689-20260727 — ten points, after
@@ -389,26 +282,16 @@ interface Art5Practice {
  * question presents them, which groups the two law-enforcement-scoped points
  * (d, h) last rather than following the Regulation's lettering.
  */
-const ART5_PRACTICES: Art5Practice[] = [
-  { point: 'a', summary: 'subliminal, purposefully manipulative, or deceptive techniques that materially distort behaviour' },
-  { point: 'b', summary: 'exploitation of vulnerabilities of age, disability, or a specific social or economic situation' },
-  { point: 'ba', summary: 'generating or manipulating non-consensual intimate imagery of an identifiable person', futureDated: true },
-  { point: 'bb', summary: 'generating or manipulating child sexual abuse material', futureDated: true },
-  { point: 'c', summary: 'social scoring leading to detrimental or disproportionate treatment' },
-  { point: 'e', summary: 'untargeted scraping of facial images to build or expand recognition databases' },
-  { point: 'f', summary: 'inferring emotions in the workplace or in educational institutions' },
-  { point: 'g', summary: 'biometric categorisation deducing protected characteristics' },
-  { point: 'd', summary: 'predicting criminal offences based solely on profiling or personality traits' },
-  { point: 'h', summary: '“real-time” remote biometric identification in publicly accessible spaces for law enforcement' },
-]
+const ART5_PRACTICES: Art5Practice[] = RULE_PACK.prohibitedPractices
 
 /**
- * Anchor each practice to its own point. The two Omnibus insertions cite the
- * amending Regulation, since the Service Desk page for Article 5 is not the
- * authority for text that Regulation (EU) 2026/1744 introduced.
+ * Anchor each practice to its own point, using the source the pack assigns it.
+ * The two Omnibus insertions cite the amending Regulation, since the Service
+ * Desk page for Article 5 is not the authority for text that Regulation (EU)
+ * 2026/1744 introduced.
  */
 function art5Source(practice: Art5Practice): RuleSource {
-  const base = practice.futureDated ? sources.omnibus : sources.article5
+  const base = sources[practice.source] ?? sources.article5
   return { ...base, article: `Article 5(1)(${practice.point})` }
 }
 
@@ -428,7 +311,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'No clear EU territorial connection',
     category: 'scope',
     legalStatus: 'current-law',
-    source: sources.article2,
+    source: anchor('scope-no-eu-connection'),
     priority: 10,
     when: (answers) => values(answers, 'eu_scope').length === 1 && has(answers, 'eu_scope', 'none'),
     build: () => ({
@@ -451,7 +334,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'EU territorial scope uncertain',
     category: 'scope',
     legalStatus: 'current-law',
-    source: sources.article2,
+    source: anchor('scope-uncertain'),
     priority: 20,
     when: (answers) => values(answers, 'eu_scope').length === 0 || has(answers, 'eu_scope', 'not-sure'),
     build: () => ({
@@ -474,7 +357,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'Third-party AI tool deployer role',
     category: 'role',
     legalStatus: 'current-law',
-    source: sources.article26,
+    source: anchor('role-third-party-deployer'),
     priority: 30,
     when: (answers) => first(answers, 'origin') === 'third-party',
     build: () => ({
@@ -497,7 +380,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'Integrated third-party AI may create mixed responsibilities',
     category: 'role',
     legalStatus: 'current-law',
-    source: sources.article26,
+    source: anchor('role-integrated-third-party'),
     priority: 31,
     when: (answers) => first(answers, 'origin') === 'integrated-third-party',
     build: () => ({
@@ -520,7 +403,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'Own AI product or feature provider role',
     category: 'role',
     legalStatus: 'current-law',
-    source: sources.overview,
+    source: anchor('role-provider-own-product'),
     priority: 32,
     when: (answers) => first(answers, 'origin') === 'own-product',
     build: () => ({
@@ -543,7 +426,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'Modified, rebranded, or resold AI creates provider-like exposure',
     category: 'role',
     legalStatus: 'current-law',
-    source: sources.overview,
+    source: anchor('role-modified-resold'),
     priority: 33,
     when: (answers) => first(answers, 'origin') === 'modified-or-resold',
     build: () => ({
@@ -566,7 +449,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'User role unclear',
     category: 'role',
     legalStatus: 'current-law',
-    source: sources.overview,
+    source: anchor('role-unclear'),
     priority: 34,
     when: (answers) => first(answers, 'origin') === 'not-sure',
     build: () => ({
@@ -605,7 +488,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'Prohibited-practice position uncertain',
     category: 'prohibited',
     legalStatus: 'current-law',
-    source: sources.article5,
+    source: anchor('prohibited-uncertain'),
     priority: 120,
     when: (answers) => has(answers, 'prohibited_screen', 'not-sure'),
     build: () => ({
@@ -628,7 +511,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'Annex III sensitive-domain trigger',
     category: 'high-risk',
     legalStatus: 'current-law',
-    source: sources.annex3,
+    source: anchor('annex-iii-sensitive-domain'),
     priority: 200,
     when: (answers) => hasAny(answers, 'sensitive_domains', annexIIIDomains),
     build: (answers) => ({
@@ -657,7 +540,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'Primary use suggests Annex III high-risk area',
     category: 'high-risk',
     legalStatus: 'current-law',
-    source: sources.annex3,
+    source: anchor('annex-iii-primary-use'),
     priority: 201,
     when: (answers) => {
       const primaryUse = first(answers, 'primary_use')
@@ -688,7 +571,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'Article 6(3) profiling override — high-risk is not rebuttable',
     category: 'high-risk',
     legalStatus: 'current-law',
-    source: sources.article6,
+    source: anchor('annex-iii-profiling-override'),
     priority: 199,
     when: (answers) => inAnnexIIIDomain(answers) && performsProfiling(answers).value,
     build: (answers) => {
@@ -737,7 +620,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'Claiming the Article 6(3) exemption carries its own duties',
     category: 'high-risk',
     legalStatus: 'current-law',
-    source: sources.article49,
+    source: anchor('annex-iii-exemption-duties'),
     priority: 202,
     // Only where the exemption is actually available — the profiling override
     // forecloses it, and surfacing its consequences there would mislead.
@@ -776,7 +659,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'Automatically generated logs must be retained',
     category: 'governance',
     legalStatus: 'current-law',
-    source: sources.article26,
+    source: anchor('high-risk-log-retention'),
     priority: 203,
     when: (answers) => inAnnexIIIDomain(answers),
     build: (answers) => ({
@@ -809,7 +692,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'Significant decision impact',
     category: 'high-risk',
     legalStatus: 'operational-risk',
-    source: sources.article6,
+    source: anchor('high-impact-decision'),
     priority: 210,
     when: (answers) => hasAny(answers, 'decision_impact', ['ranking', 'eligibility', 'automated-adverse', 'safety-control']),
     build: (answers) => ({
@@ -831,7 +714,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'AI influences a human decision',
     category: 'high-risk',
     legalStatus: 'operational-risk',
-    source: sources.article6,
+    source: anchor('decision-support'),
     priority: 211,
     when: (answers) => has(answers, 'decision_impact', 'recommendation'),
     build: () => ({
@@ -853,7 +736,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'Weak or absent human oversight',
     category: 'high-risk',
     legalStatus: 'operational-risk',
-    source: sources.article26,
+    source: anchor('weak-human-oversight'),
     priority: 220,
     when: (answers) => hasAny(answers, 'human_oversight', ['rubber-stamp', 'none']),
     build: (answers) => ({
@@ -875,7 +758,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'Human oversight uncertain',
     category: 'high-risk',
     legalStatus: 'operational-risk',
-    source: sources.article26,
+    source: anchor('human-oversight-uncertain'),
     priority: 221,
     when: (answers) => has(answers, 'human_oversight', 'not-sure'),
     build: () => ({
@@ -897,7 +780,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'AI interaction transparency trigger',
     category: 'transparency',
     legalStatus: 'current-law',
-    source: sources.article50,
+    source: anchor('article-50-chatbot'),
     priority: 300,
     when: (answers) => has(answers, 'transparency', 'chatbot'),
     build: () => transparencyFinding('people interact directly with an AI chatbot or assistant'),
@@ -907,7 +790,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'Synthetic media transparency trigger',
     category: 'transparency',
     legalStatus: 'current-law',
-    source: sources.article50,
+    source: anchor('article-50-synthetic-media'),
     priority: 301,
     when: (answers) => has(answers, 'transparency', 'synthetic-media'),
     build: () => transparencyFinding('synthetic images, audio, video, or deepfake-style content'),
@@ -917,7 +800,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'Externally published AI-generated text trigger',
     category: 'transparency',
     legalStatus: 'current-law',
-    source: sources.article50,
+    source: anchor('article-50-published-text'),
     priority: 302,
     when: (answers) => has(answers, 'transparency', 'published-text'),
     build: () => transparencyFinding('externally published AI-generated text'),
@@ -927,7 +810,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'Emotion or biometric categorisation transparency trigger',
     category: 'transparency',
     legalStatus: 'current-law',
-    source: sources.article50,
+    source: anchor('article-50-emotion-biometric'),
     priority: 303,
     when: (answers) => has(answers, 'transparency', 'emotion-biometric'),
     build: () => transparencyFinding('emotion recognition or biometric categorisation'),
@@ -937,7 +820,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'Customer-facing chatbot transparency trigger',
     category: 'transparency',
     legalStatus: 'current-law',
-    source: sources.article50,
+    source: anchor('article-50-customer-service'),
     priority: 304,
     // A customer-service / user-facing assistant is the canonical Article 50 case.
     // Fire even if the explicit chatbot transparency box was not ticked, but skip
@@ -951,7 +834,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'GPAI or AI product route',
     category: 'gpai',
     legalStatus: 'current-law',
-    source: sources.article51,
+    source: anchor('gpai-product-route'),
     priority: 400,
     when: (answers) => has(answers, 'primary_use', 'gpai-product'),
     build: () => ({
@@ -974,7 +857,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'Vendor classification evidence missing',
     category: 'vendor-evidence',
     legalStatus: 'operational-risk',
-    source: sources.article6,
+    source: anchor('vendor-classification-missing'),
     priority: 500,
     when: (answers) => !has(answers, 'vendor_docs', 'classification'),
     build: () => vendorEvidenceFinding(
@@ -987,7 +870,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'Instructions and oversight guidance missing',
     category: 'vendor-evidence',
     legalStatus: 'operational-risk',
-    source: sources.article13,
+    source: anchor('vendor-instructions-missing'),
     priority: 501,
     when: (answers) => !has(answers, 'vendor_docs', 'instructions'),
     build: () => vendorEvidenceFinding(
@@ -1000,7 +883,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'Risk management system documentation missing',
     category: 'vendor-evidence',
     legalStatus: 'operational-risk',
-    source: sources.article9,
+    source: anchor('vendor-risk-management-missing'),
     priority: 502,
     when: (answers) => !has(answers, 'vendor_docs', 'risk-management'),
     build: () => vendorEvidenceFinding(
@@ -1013,7 +896,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'EU database registration evidence missing',
     category: 'vendor-evidence',
     legalStatus: 'current-law',
-    source: sources.article49,
+    source: anchor('vendor-registration-missing'),
     priority: 503,
     // The sharpest procurement lever in the set, and the one least often asked.
     when: (answers) => inAnnexIIIDomain(answers) && !has(answers, 'vendor_docs', 'registration'),
@@ -1027,7 +910,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'Data processing terms missing',
     category: 'vendor-evidence',
     legalStatus: 'adjacent-risk',
-    source: sources.gdpr,
+    source: anchor('vendor-dpa-missing'),
     priority: 502,
     when: (answers) => !has(answers, 'vendor_docs', 'dpa'),
     build: () => vendorEvidenceFinding(
@@ -1040,7 +923,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'Audit logs or export evidence missing',
     category: 'vendor-evidence',
     legalStatus: 'operational-risk',
-    source: sources.article12,
+    source: anchor('vendor-logs-missing'),
     priority: 504,
     when: (answers) => !has(answers, 'vendor_docs', 'logs'),
     build: () => vendorEvidenceFinding(
@@ -1053,7 +936,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'Vendor change-control evidence missing',
     category: 'vendor-evidence',
     legalStatus: 'operational-risk',
-    source: sources.article72,
+    source: anchor('vendor-change-policy-missing'),
     priority: 505,
     when: (answers) => !has(answers, 'vendor_docs', 'change-policy'),
     build: () => vendorEvidenceFinding(
@@ -1066,7 +949,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'Vendor evidence pack absent or unknown',
     category: 'vendor-evidence',
     legalStatus: 'operational-risk',
-    source: sources.article26,
+    source: anchor('vendor-docs-none-or-unknown'),
     priority: 505,
     when: (answers) => values(answers, 'vendor_docs').length === 0 || hasAny(answers, 'vendor_docs', ['none', 'not-sure']),
     build: () => ({
@@ -1088,7 +971,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'SME and start-up proportionate treatment',
     category: 'governance',
     legalStatus: 'current-law',
-    source: sources.article11,
+    source: anchor('sme-proportionate-relief'),
     priority: 650,
     when: (answers) => hasAny(answers, 'org_size', ['micro', 'small', 'medium']),
     build: () => ({
@@ -1116,7 +999,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'Small mid-cap proportionate treatment',
     category: 'governance',
     legalStatus: 'current-law',
-    source: sources.article99,
+    source: anchor('smc-proportionate-relief'),
     priority: 651,
     when: (answers) => has(answers, 'org_size', 'small-mid-cap'),
     build: () => ({
@@ -1144,7 +1027,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'Personal data adjacent risk',
     category: 'gdpr-vendor',
     legalStatus: 'adjacent-risk',
-    source: sources.gdpr,
+    source: anchor('gdpr-personal-data'),
     priority: 600,
     when: (answers) => hasAny(answers, 'data_types', ['personal', 'employee', 'health', 'children', 'biometric', 'special-category']),
     build: () => ({
@@ -1166,7 +1049,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'Sensitive data adjacent risk',
     category: 'gdpr-vendor',
     legalStatus: 'adjacent-risk',
-    source: sources.gdpr,
+    source: anchor('gdpr-sensitive-data'),
     priority: 601,
     when: (answers) => hasAny(answers, 'data_types', ['employee', 'health', 'children', 'biometric', 'special-category']),
     build: () => ({
@@ -1188,7 +1071,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'Sector vendor contract risk',
     category: 'gdpr-vendor',
     legalStatus: 'adjacent-risk',
-    source: sources.gdpr,
+    source: anchor('sector-vendor-contract-risk'),
     priority: 602,
     when: (answers) => hasAny(answers, 'sensitive_domains', ['employment', 'healthcare', 'credit', 'insurance', 'biometrics']),
     build: () => ({
@@ -1210,7 +1093,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'AI system record baseline',
     category: 'governance',
     legalStatus: 'operational-risk',
-    source: sources.overview,
+    source: anchor('system-record-obligation'),
     priority: 700,
     when: () => true,
     build: () => ({
@@ -1241,7 +1124,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     title: 'Ongoing reassessment triggers',
     category: 'governance',
     legalStatus: 'operational-risk',
-    source: sources.overview,
+    source: anchor('ongoing-review-triggers'),
     priority: 701,
     when: () => true,
     build: (answers) => {
