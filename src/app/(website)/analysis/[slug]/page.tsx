@@ -139,6 +139,59 @@ function collectBodyImageUrls(body: PortableTextBlock[]): string[] {
     .map((block) => urlFor(block).width(1200).height(675).url())
 }
 
+// Articles published before the write-time strip landed carry the authored
+// markdown file's furniture as real body blocks: a `# Title` duplicating the
+// page's own <h1>, the newsletter "Subject Line:" / "Preview Text:" lines, and an
+// "Article" heading before the prose (house style, see
+// .agent/rules/style/house-style.md). Drop that run from the head of the body so
+// every article opens on its Executive Summary. Head only — a paragraph further
+// down that happens to open "Preview text:" is left untouched.
+const PREAMBLE_META = /^(subject line|preview text)\s*:/
+
+function blockText(block: PortableTextBlock): string {
+  return (block.children || []).map((child) => child.text || '').join('')
+}
+
+function normaliseHeading(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[:\s]+$/, '')
+}
+
+function stripAuthoringPreamble(
+  body: PortableTextBlock[],
+  title: string
+): PortableTextBlock[] {
+  if (!Array.isArray(body)) return body
+  const wantedTitle = normaliseHeading(title || '')
+  let cut = 0
+
+  for (const block of body) {
+    if (block?._type !== 'block') break
+    const style = block.style || 'normal'
+    const text = normaliseHeading(blockText(block))
+
+    // Only drop the leading h1 when it duplicates the title we already render.
+    if (style === 'h1' && wantedTitle && text === wantedTitle) {
+      cut++
+      continue
+    }
+    if ((style === 'h2' || style === 'h3') && text === 'article') {
+      cut++
+      continue
+    }
+    if (style === 'normal' && PREAMBLE_META.test(text)) {
+      cut++
+      continue
+    }
+
+    break
+  }
+
+  return cut > 0 ? body.slice(cut) : body
+}
+
 // Many generated articles end the body with a "Sources" heading + list, which
 // duplicates the structured `citations[]` rendered separately below. When we have
 // citations to show, drop the trailing in-body Sources section (the heading and
@@ -220,10 +273,11 @@ export default async function ArticlePage({ params }: Props) {
   // In-read newsletter capture (P3-2): on by default, but suppressed when the
   // end gate is already the newsletter (avoid a double email ask), and only on
   // pieces long enough to carry a mid-article break.
+  const bodyWithoutPreamble = stripAuthoringPreamble(article.body || [], article.title)
   const bodyForRender: PortableTextBlock[] =
     article.citations && article.citations.length > 0
-      ? stripTrailingSourcesSection(article.body || [])
-      : article.body || []
+      ? stripTrailingSourcesSection(bodyWithoutPreamble)
+      : bodyWithoutPreamble
   const bodySplit =
     article.inReadCapture !== false && resolvedGate.mode !== 'email'
       ? splitBodyForCapture(bodyForRender)
@@ -434,32 +488,6 @@ export default async function ArticlePage({ params }: Props) {
             </p>
           )}
 
-          {/* Methodology Checklist - if pillars are applied */}
-          {article.methodologyPillars && article.methodologyPillars.length > 0 && (
-            <MethodologyChecklist
-              pillars={article.methodologyPillars}
-              variant={article.intelligenceTier === 'audit' ? 'expanded' : 'compact'}
-              className="mb-8"
-            />
-          )}
-
-          {/* What to do next - longer tiers only; keep a Pulse within its scan-time promise */}
-          {article.intelligenceTier !== 'pulse' && article.actionableInsights && article.actionableInsights.length > 0 && (
-            <div className="glass-plate tech-corners rounded-lg p-6 mb-8 border border-tier-briefing/30">
-              <h2 className="font-ui-mono text-tier-briefing text-sm mb-4">What to do next</h2>
-              <ul className="space-y-3">
-                {article.actionableInsights.map((insight: string, index: number) => (
-                  <li key={index} className="flex items-start gap-3">
-                    <span className="text-silicon-amber font-mono text-sm mt-0.5">
-                      {String(index + 1).padStart(2, '0')}
-                    </span>
-                    <span className="text-text-primary">{insight}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
           {/* Reader controls: save-for-later left; text size (every article)
               and the glossary toggle (annotated articles only, off by default)
               right. */}
@@ -493,6 +521,35 @@ export default async function ArticlePage({ params }: Props) {
           </div>
 
           <Separator className="mt-10 mb-8 bg-border-subtle" />
+
+          {/* Methodology Checklist - if pillars are applied. Sits below the piece
+              so the reader reaches the argument before the audit trail; the
+              compact variant is used on every tier for a consistent article
+              shape. */}
+          {article.methodologyPillars && article.methodologyPillars.length > 0 && (
+            <MethodologyChecklist
+              pillars={article.methodologyPillars}
+              variant="compact"
+              className="mb-8"
+            />
+          )}
+
+          {/* What to do next - longer tiers only; keep a Pulse within its scan-time promise */}
+          {article.intelligenceTier !== 'pulse' && article.actionableInsights && article.actionableInsights.length > 0 && (
+            <div className="glass-plate tech-corners rounded-lg p-6 mb-8 border border-tier-briefing/30">
+              <h2 className="font-ui-mono text-tier-briefing text-sm mb-4">What to do next</h2>
+              <ul className="space-y-3">
+                {article.actionableInsights.map((insight: string, index: number) => (
+                  <li key={index} className="flex items-start gap-3">
+                    <span className="text-silicon-amber font-mono text-sm mt-0.5">
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                    <span className="text-text-primary">{insight}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* Sources / Citations */}
           {article.citations && article.citations.length > 0 && (

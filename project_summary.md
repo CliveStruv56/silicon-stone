@@ -2,7 +2,7 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-08-10
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (74 static pages), 181 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (74 static pages), 187 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages with an early-access enquiry fallback until Lemon Squeezy checkout URLs are configured, Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
@@ -395,6 +395,47 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 10, 2026 — One article shape for every tier
+
+Two published pieces rendered as two different products. "The Same Money,
+Counted Three Times" (`audit`) opened on a duplicate `# Title`, the newsletter
+`Subject Line:` / `Preview Text:` lines and an `## Article` heading before a word
+of prose; the Iran briefing opened clean. The article page now renders the same
+shape regardless of tier.
+
+**The furniture was never meant for the reader.** House style requires the
+authored markdown *file* to open `# Title` → `**Subject Line:**` →
+`**Preview Text:**` → `## Article`, and the voice-edit pass injects those rules
+as overriding authority — so the model adds the furniture even when it is
+generating straight into Sanity. The legacy file-sync path stripped it
+(`scripts/sync-content.ts`); the generator path never did. Fixed at both ends:
+`stripAuthoringPreamble()` in `markdown-to-portable-text.ts` runs inside
+`createArticleInSanity()`, the one choke point all three generation paths share
+(`/create`, `/import`, and the local-draft `save` that skips `finalizeDraft`);
+and a block-level twin on the article page repairs everything already published
+without a data migration. Both strip the *head* of the body only — a paragraph
+further down that opens "Preview Text:" is evidence, not furniture, and survives.
+
+**The leading `h1` goes too**, but only when it duplicates the title the page
+already renders. Both articles carried that duplicate; a body legitimately
+opening on a different heading keeps it.
+
+**The methodology panel is compact on every tier.** It was one component with a
+tier-selected branch — `audit` got a wide grid table, everything else the
+checklist. The grid was a deliberate tier signal, and it is retired: consistency
+won. The `expanded` variant remains a supported prop in
+`MethodologyChecklist.tsx` with no caller.
+
+**Analysis after argument.** Methodology Audit and "What to do next" moved below
+the body, so the page now reads image → heading → dek → executive summary →
+article → panels → sources. The reader-controls row stays directly above the
+prose, where the text-size stepper belongs. Render conditions are unchanged —
+a Pulse still hides "What to do next". Widths untouched: `max-w-4xl` container,
+`max-w-[64ch]` measure.
+
+Verified on both articles at 1440px: one `h1`, body opening on Executive Summary,
+compact panel below the prose, 896/756px unchanged. 187 tests green.
 
 ### August 10, 2026 — Stage 3 (free half): email-gated report with a citation verifier
 

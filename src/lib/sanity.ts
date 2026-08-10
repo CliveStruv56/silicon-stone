@@ -3,7 +3,7 @@ import { createClient } from '@sanity/client';
 import crypto from 'crypto';
 import { apiVersion, dataset, projectId } from '../sanity/env';
 import { CATEGORIES_QUERY } from '../sanity/lib/queries';
-import { markdownToPortableText } from './markdown-to-portable-text';
+import { markdownToPortableText, stripAuthoringPreamble } from './markdown-to-portable-text';
 import { CLAUDE_MODEL } from './anthropic';
 
 const token = process.env.SANITY_API_WRITE_TOKEN;
@@ -73,8 +73,12 @@ async function resolveCategoryRefs(slugs: string[]): Promise<{ _type: 'reference
 export async function createArticleInSanity(data: ArticleData) {
     if (!token) throw new Error("Missing SANITY_API_WRITE_TOKEN");
 
-    // Convert Markdown to Blocks
-    const blocks = markdownToPortableText(data.body);
+    // Convert Markdown to Blocks. Every generation path lands here (/create,
+    // /import and the local-draft `save` command, which skips finalizeDraft), so
+    // this is the one place that guarantees the newsletter furniture the voice
+    // pass adds — duplicate `# Title`, `**Subject Line:**`, `**Preview Text:**`,
+    // `## Article` — never becomes visible body copy.
+    const blocks = markdownToPortableText(stripAuthoringPreamble(data.body, data.title));
 
     // Map persona key to valid schema option
     // Schema: 'clara', 'ian', 'sofia', 'citizen'

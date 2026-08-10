@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { markdownToPortableText } from './markdown-to-portable-text'
+import { markdownToPortableText, stripAuthoringPreamble } from './markdown-to-portable-text'
 
 type Block = {
   _type: string
@@ -75,5 +75,63 @@ describe('markdownToPortableText — inline marks', () => {
     const [block] = blocks('**only bold**')
     expect(block.children?.[0].marks).toEqual(['strong'])
     expect(block.children?.[0].text).toBe('only bold')
+  })
+})
+
+describe('stripAuthoringPreamble', () => {
+  const TITLE = 'The Same Money, Counted Three Times'
+
+  it('drops the full house-style preamble and opens on the prose', () => {
+    const markdown = [
+      `# ${TITLE}`,
+      '',
+      '**Subject Line:** The AI financing loop hiding in plain sight.',
+      '',
+      '**Preview Text:** Nvidia reportedly standing behind OpenAI\'s debt.',
+      '',
+      '## Article',
+      '',
+      '**Executive Summary**',
+      '',
+      'Nvidia is reportedly in talks to guarantee $250 billion.',
+    ].join('\n')
+
+    expect(stripAuthoringPreamble(markdown, TITLE)).toBe(
+      ['**Executive Summary**', '', 'Nvidia is reportedly in talks to guarantee $250 billion.'].join('\n')
+    )
+  })
+
+  it('leaves a body that carries no preamble untouched', () => {
+    const markdown = '**Executive Summary**\n\nThe first real paragraph.'
+    expect(stripAuthoringPreamble(markdown, TITLE)).toBe(markdown)
+  })
+
+  it('keeps a leading heading that is not the article title', () => {
+    const markdown = '# A Different Heading\n\nBody copy.'
+    expect(stripAuthoringPreamble(markdown, TITLE)).toBe(markdown)
+  })
+
+  it('only strips at the head — a later "Preview Text:" paragraph survives', () => {
+    const markdown = [
+      `# ${TITLE}`,
+      '',
+      'Opening paragraph.',
+      '',
+      '**Preview Text:** quoted here as evidence, not as furniture.',
+    ].join('\n')
+
+    expect(stripAuthoringPreamble(markdown, TITLE)).toBe(
+      ['Opening paragraph.', '', '**Preview Text:** quoted here as evidence, not as furniture.'].join('\n')
+    )
+  })
+
+  it('strips the preamble without a title and tolerates unbolded labels', () => {
+    const markdown = 'Subject Line: something\nPreview Text: something else\n\n## Article\n\nReal body.'
+    expect(stripAuthoringPreamble(markdown)).toBe('Real body.')
+  })
+
+  it('does not remove an "Article" heading once the prose has started', () => {
+    const markdown = 'Opening paragraph.\n\n## Article\n\nMore.'
+    expect(stripAuthoringPreamble(markdown, TITLE)).toBe(markdown)
   })
 })
