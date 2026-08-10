@@ -6,6 +6,7 @@ export type AssessmentAnswers = Record<string, AssessmentValue>
 
 export type Classification =
   | 'Prohibited practice'
+  | 'Prohibited from 2 December 2026'
   | 'Likely high-risk'
   | 'Likely limited-risk'
   | 'Likely minimal-risk'
@@ -21,6 +22,15 @@ export interface AssessmentOption {
   label: string
   value: string
   description?: string
+  /** Short status chip rendered beside the label, e.g. an application date. */
+  badge?: string
+  /**
+   * Optional sub-heading this option sits under. Consecutive options sharing a
+   * group render beneath one heading; ungrouped options render flat. Used to
+   * break up the ten Article 5(1) practices so the law-enforcement-scoped ones
+   * are visibly scoped rather than reading as general prohibitions.
+   */
+  group?: string
 }
 
 export interface AssessmentQuestion {
@@ -195,13 +205,55 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     id: 'prohibited_screen',
     section: 'Risk Signals',
     text: 'Does the use involve any of these red-flag practices?',
+    help: 'These are the ten practices prohibited by Article 5(1). Two of them — the intimate-imagery and CSAM points inserted by the Digital Omnibus — do not bite until 2 December 2026.',
     type: 'multi',
     options: [
-      { label: 'Social scoring of people across contexts', value: 'social-scoring' },
-      { label: 'Manipulation or exploitation of vulnerable people', value: 'manipulation' },
-      { label: 'Emotion recognition in workplace or education', value: 'workplace-emotion' },
-      { label: 'Real-time remote biometric identification in public spaces', value: 'public-biometric-id' },
-      { label: 'Scraping facial images to build recognition databases', value: 'facial-scraping' },
+      {
+        label: 'Subliminal, purposefully manipulative, or deceptive techniques that materially distort behaviour and cause significant harm',
+        value: 'art5-a',
+      },
+      {
+        label: 'Exploiting vulnerabilities of age, disability, or a specific social or economic situation',
+        value: 'art5-b',
+      },
+      {
+        label: 'Generating or manipulating realistic images, video, or audio of a person’s intimate parts, or of a person in sexually explicit activity, without their explicit consent',
+        value: 'art5-ba',
+        badge: 'Applies from 2 December 2026',
+        description:
+          'Placing on the market is caught only where that output is the intended purpose, or a reasonably foreseeable and reproducible outcome without significant technical modification and without adequate safety measures (Art 5(1a)). Manipulation that does not increase exposure of intimate parts or alter the nature of the activity is not caught (Art 5(1b)).',
+      },
+      {
+        label: 'Generating or manipulating child sexual abuse material within the meaning of Article 2(c) and (e) of Directive 2011/93/EU',
+        value: 'art5-bb',
+        badge: 'Applies from 2 December 2026',
+      },
+      {
+        label: 'Social scoring leading to detrimental treatment in unrelated contexts, or to disproportionate treatment',
+        value: 'art5-c',
+      },
+      {
+        label: 'Untargeted scraping of facial images from the internet or CCTV to build or expand facial recognition databases',
+        value: 'art5-e',
+      },
+      {
+        label: 'Inferring emotions in the workplace or in educational institutions, other than for medical or safety reasons',
+        value: 'art5-f',
+      },
+      {
+        label: 'Biometric categorisation deducing race, political opinions, trade union membership, religious or philosophical beliefs, sex life, or sexual orientation',
+        value: 'art5-g',
+      },
+      {
+        label: 'Predicting the risk of a person committing a criminal offence based solely on profiling or personality traits',
+        value: 'art5-d',
+        group: 'Law enforcement contexts',
+      },
+      {
+        label: '“Real-time” remote biometric identification in publicly accessible spaces for law enforcement purposes',
+        value: 'art5-h',
+        group: 'Law enforcement contexts',
+      },
       { label: 'None of these', value: 'none' },
       { label: 'Not sure', value: 'not-sure' },
     ],
@@ -277,9 +329,14 @@ export function evaluateAssessment(answers: AssessmentAnswers): AssessmentResult
     ? answers.tool_name.trim()
     : 'this AI system'
 
+  // The future-dated prohibition needs its own sentence: lower-casing the tier
+  // label would read "prohibited from 2 december 2026", and more importantly the
+  // generic copy would imply a present-tense ban that does not yet exist.
   const summary = ruleEvaluation.classification === 'Out of EU scope'
     ? `${toolName} appears to be outside EU AI Act territorial scope on this first-pass assessment. Document the reasoning and re-check if EU users, customers, or outputs are added.`
-    : `${toolName} is classified as ${ruleEvaluation.classification.toLowerCase()} on this first-pass assessment. The result should be treated as an AI system record and reviewed when the use case, vendor, data, or level of automation changes.`
+    : ruleEvaluation.classification === 'Prohibited from 2 December 2026'
+      ? `${toolName} is not a prohibited practice today, but the selected use falls under Article 5(1)(ba) or (bb) — inserted by the Digital Omnibus — and is prohibited from 2 December 2026. Treat that date as a hard stop and plan the redesign or withdrawal now.`
+      : `${toolName} is classified as ${ruleEvaluation.classification.toLowerCase()} on this first-pass assessment. The result should be treated as an AI system record and reviewed when the use case, vendor, data, or level of automation changes.`
 
   return {
     classification: ruleEvaluation.classification,

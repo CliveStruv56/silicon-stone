@@ -1,7 +1,7 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-08-07
+> Last Updated: 2026-08-10
 > Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (71 static pages), 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com. Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools (email-gated for lead capture, AI Act triage engine recently overhauled), product/commerce pages with an early-access enquiry fallback until Lemon Squeezy checkout URLs are configured, Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production. **The blocker is a P0: the production Kit API key is a legacy v3 key, so `/api/subscribe` 401s and — because `NEXT_PUBLIC_PRE_LAUNCH` is still `true`, making every product CTA an email capture — the entire funnel currently terminates in a failed POST.** Beyond that: Lemon Squeezy store not yet created, 9 drafts unpublished, and 7 of 12 published articles still lack cover images. Go-live sequence lives in `LAUNCH.md`; defects and debt in §10.
@@ -353,6 +353,43 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 10, 2026 — Compliance Checker: all ten Article 5(1) practices, and a future-dated prohibition tier
+
+Step 10 of the checker listed **five** prohibited practices. Article 5(1) as
+consolidated at CELEX 02024R1689-20260727 has **ten** — the original eight, with
+(a) and (b) conflated into one option here, plus the two points the Digital
+Omnibus intercalated as (ba) and (bb).
+
+`prohibited_screen` now carries all ten, keyed `art5-{point}` so the option value,
+the rule ID (`prohibited-art5-{point}`) and the Article anchor on the fired rule
+all agree. The two law-enforcement-scoped points (d, h) sit under a
+"Law enforcement contexts" sub-heading rather than reading as general
+prohibitions, which is why the list departs from the Regulation's lettering
+order. `AssessmentOption` gained `badge` and `group`, and the multi-select
+renderer — which previously showed labels only — now renders badge and
+description too.
+
+**The tier is the substantive part.** (ba) and (bb) apply from **2 December
+2026**, not today. Firing the existing `prohibitedFinding()` for them would emit
+"Stop or pause the affected use" over a practice that is currently lawful, which
+is wrong in the opposite direction from missing it. So `Classification` gained
+`'Prohibited from 2 December 2026'`, ranked above `Likely high-risk` and below
+`Prohibited practice` — a present-tense prohibition always takes the headline —
+and `futureProhibitedFinding()` plans a dated withdrawal instead of ordering a
+halt. `evaluateAssessment`'s summary special-cases the tier, because the generic
+copy lower-cases the classification and would have read "prohibited from
+2 december 2026".
+
+Those two points cite **Regulation (EU) 2026/1744** (in force 27 July 2026), not
+the Service Desk page for Article 5 — the Service Desk is not the authority for
+text the amending Regulation introduced. `(ba)` also carries the two Omnibus
+qualifiers as help text: the intended-purpose / reasonably-foreseeable-outcome
+test (Art 5(1a)) and the carve-out for manipulation that neither increases
+exposure nor alters the nature of the activity (Art 5(1b)).
+
+Result tone for the new tier is amber, not red. It is a dated hard stop to plan
+against, not an emergency.
 
 ### August 7, 2026 — About hero: transparent observatory render, one variant per theme
 

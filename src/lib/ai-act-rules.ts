@@ -130,6 +130,12 @@ const sources = {
     publisher: 'European Commission AI Act Service Desk',
     url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-51',
   },
+  omnibus: {
+    label: 'Regulation (EU) 2026/1744 (Digital Omnibus on AI), in force 27 July 2026',
+    article: 'Article 5(1)',
+    publisher: 'Official Journal of the European Union',
+    url: 'https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng',
+  },
   gdpr: {
     label: 'ICO: Data protection impact assessments',
     article: 'GDPR DPIA due diligence',
@@ -145,7 +151,10 @@ const classificationRank: Record<Classification, number> = {
   'Likely limited-risk': 3,
   'Uncertain': 4,
   'Likely high-risk': 5,
-  'Prohibited practice': 6,
+  // A future-dated prohibition outranks high-risk but must never displace a
+  // practice that is prohibited *today* — that one is the headline.
+  'Prohibited from 2 December 2026': 6,
+  'Prohibited practice': 7,
 }
 
 const roleRank: Record<UserRole, number> = {
@@ -199,6 +208,49 @@ function hasAny(answers: AssessmentAnswers, id: string, wanted: string[] | Set<s
 
 function selected(answers: AssessmentAnswers, id: string): string {
   return values(answers, id).join(', ')
+}
+
+interface Art5Practice {
+  /** The point within Article 5(1), e.g. 'a', 'ba'. Also the rule-ID suffix. */
+  point: string
+  /** Short phrase used in the fired-rule evidence and explanation copy. */
+  summary: string
+  /**
+   * True for the two points inserted by Regulation (EU) 2026/1744, which apply
+   * from 2 December 2026 rather than 2 February 2025. These produce a
+   * future-dated verdict — telling someone to "stop now" over a prohibition
+   * that does not yet exist would be as wrong as missing it entirely.
+   */
+  futureDated?: boolean
+}
+
+/**
+ * Article 5(1) as consolidated at CELEX 02024R1689-20260727 — ten points, after
+ * the Omnibus inserted the intercalated (ba) and (bb). Listed in the order the
+ * question presents them, which groups the two law-enforcement-scoped points
+ * (d, h) last rather than following the Regulation's lettering.
+ */
+const ART5_PRACTICES: Art5Practice[] = [
+  { point: 'a', summary: 'subliminal, purposefully manipulative, or deceptive techniques that materially distort behaviour' },
+  { point: 'b', summary: 'exploitation of vulnerabilities of age, disability, or a specific social or economic situation' },
+  { point: 'ba', summary: 'generating or manipulating non-consensual intimate imagery of an identifiable person', futureDated: true },
+  { point: 'bb', summary: 'generating or manipulating child sexual abuse material', futureDated: true },
+  { point: 'c', summary: 'social scoring leading to detrimental or disproportionate treatment' },
+  { point: 'e', summary: 'untargeted scraping of facial images to build or expand recognition databases' },
+  { point: 'f', summary: 'inferring emotions in the workplace or in educational institutions' },
+  { point: 'g', summary: 'biometric categorisation deducing protected characteristics' },
+  { point: 'd', summary: 'predicting criminal offences based solely on profiling or personality traits' },
+  { point: 'h', summary: '“real-time” remote biometric identification in publicly accessible spaces for law enforcement' },
+]
+
+/**
+ * Anchor each practice to its own point. The two Omnibus insertions cite the
+ * amending Regulation, since the Service Desk page for Article 5 is not the
+ * authority for text that Regulation (EU) 2026/1744 introduced.
+ */
+function art5Source(practice: Art5Practice): RuleSource {
+  const base = practice.futureDated ? sources.omnibus : sources.article5
+  return { ...base, article: `Article 5(1)(${practice.point})` }
 }
 
 function rule(
@@ -374,63 +426,28 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
       reportSections: ['Role analysis: deployer/provider/both'],
     }),
   }),
-  rule({
-    id: 'prohibited-social-scoring',
-    title: 'Social scoring prohibited-practice red flag',
-    category: 'prohibited',
-    legalStatus: 'current-law',
-    source: sources.article5,
-    priority: 100,
-    when: (answers) => has(answers, 'prohibited_screen', 'social-scoring'),
-    build: () => prohibitedFinding('social scoring of people across contexts'),
-  }),
-  rule({
-    id: 'prohibited-manipulation-vulnerability',
-    title: 'Manipulation or vulnerable-person exploitation red flag',
-    category: 'prohibited',
-    legalStatus: 'current-law',
-    source: sources.article5,
-    priority: 101,
-    when: (answers) => has(answers, 'prohibited_screen', 'manipulation'),
-    build: () => prohibitedFinding('manipulation or exploitation of vulnerable people'),
-  }),
-  rule({
-    id: 'prohibited-workplace-education-emotion',
-    title: 'Workplace or education emotion recognition red flag',
-    category: 'prohibited',
-    legalStatus: 'current-law',
-    source: sources.article5,
-    priority: 102,
-    when: (answers) => has(answers, 'prohibited_screen', 'workplace-emotion'),
-    build: () => prohibitedFinding('emotion recognition in workplace or education'),
-  }),
-  rule({
-    id: 'prohibited-public-biometric-id',
-    title: 'Real-time remote biometric identification red flag',
-    category: 'prohibited',
-    legalStatus: 'current-law',
-    source: sources.article5,
-    priority: 103,
-    when: (answers) => has(answers, 'prohibited_screen', 'public-biometric-id'),
-    build: () => prohibitedFinding('real-time remote biometric identification in public spaces'),
-  }),
-  rule({
-    id: 'prohibited-facial-scraping',
-    title: 'Facial image scraping red flag',
-    category: 'prohibited',
-    legalStatus: 'current-law',
-    source: sources.article5,
-    priority: 104,
-    when: (answers) => has(answers, 'prohibited_screen', 'facial-scraping'),
-    build: () => prohibitedFinding('scraping facial images to build recognition databases'),
-  }),
+  ...ART5_PRACTICES.map((practice, index) =>
+    rule({
+      id: `prohibited-art5-${practice.point}`,
+      title: `Article 5(1)(${practice.point}) prohibited-practice red flag`,
+      category: 'prohibited',
+      legalStatus: 'current-law',
+      source: art5Source(practice),
+      priority: 100 + index,
+      when: (answers) => has(answers, 'prohibited_screen', `art5-${practice.point}`),
+      build: () =>
+        practice.futureDated
+          ? futureProhibitedFinding(practice.summary)
+          : prohibitedFinding(practice.summary),
+    })
+  ),
   rule({
     id: 'prohibited-uncertain',
     title: 'Prohibited-practice position uncertain',
     category: 'prohibited',
     legalStatus: 'current-law',
     source: sources.article5,
-    priority: 105,
+    priority: 120,
     when: (answers) => has(answers, 'prohibited_screen', 'not-sure'),
     build: () => ({
       evidence: ['Prohibited-practice screen selected: not sure'],
@@ -895,6 +912,41 @@ function prohibitedFinding(label: string): Omit<RuleFinding, 'id' | 'title' | 'c
     vendorQuestions: ['Ask the vendor to confirm whether the system is designed, marketed, or technically capable of this prohibited-practice use.'],
     adjacentRisks: [],
     reviewTriggers: ['Any biometric, profiling, worker, education, public-space, or vulnerable-person use is proposed'],
+    reportSections: ['Prohibited-practice screening'],
+  }
+}
+
+/**
+ * Article 5(1)(ba) and (bb) apply from 2 December 2026. Until then the practice
+ * is lawful, so this finding plans a withdrawal against a date rather than
+ * ordering an immediate stop — and it scores below `prohibitedFinding` so a
+ * practice prohibited today always takes the headline.
+ */
+function futureProhibitedFinding(label: string): Omit<RuleFinding, 'id' | 'title' | 'category' | 'version' | 'lastReviewed' | 'legalStatus' | 'source'> {
+  return {
+    evidence: [`Prohibited-practice screen selected: ${label}`],
+    explanation: `The selected use involves ${label}, which becomes a prohibited practice on 2 December 2026 under Article 5(1)(ba)–(bb), inserted by Regulation (EU) 2026/1744. It is not prohibited today.`,
+    classification: 'Prohibited from 2 December 2026',
+    scoreDelta: 50,
+    confidenceImpact: 0,
+    reasons: [
+      'A selected practice is prohibited from 2 December 2026 under the Digital Omnibus amendments. It is not prohibited today, but the use cannot continue past that date.',
+    ],
+    missingFacts: [],
+    obligations: [
+      'Plan the redesign, restriction, or withdrawal of the affected use so it is complete before 2 December 2026.',
+      'Document the intended purpose and the technical safeguards that prevent this output — the prohibition catches outputs that are a reasonably foreseeable and reproducible outcome without adequate safety measures, not only outputs that are the intended purpose (Article 5(1a)).',
+    ],
+    vendorQuestions: [
+      'What technical safeguards prevent this system generating non-consensual intimate imagery or child sexual abuse material, and will the vendor attest to Article 5(1)(ba)–(bb) compliance before 2 December 2026?',
+    ],
+    adjacentRisks: [
+      'Non-consensual intimate imagery and CSAM carry criminal and platform-liability exposure independent of the AI Act; this is a matter for legal counsel now, not on 2 December 2026.',
+    ],
+    reviewTriggers: [
+      'Approach of the 2 December 2026 prohibition date',
+      'Any change to model capability, safety filters, or output restrictions',
+    ],
     reportSections: ['Prohibited-practice screening'],
   }
 }

@@ -28,11 +28,20 @@ describe('territorial scope (Article 2)', () => {
   it('out-of-scope short-circuits content rules — even a prohibited red flag', () => {
     const result = evaluateRuleLibrary({
       eu_scope: ['none'],
-      prohibited_screen: ['social-scoring'],
+      prohibited_screen: ['art5-c'],
     })
     // The prohibited rule still fires (its findings surface as signals)…
-    expect(result.firedRules.map((rule) => rule.id)).toContain('prohibited-social-scoring')
+    expect(result.firedRules.map((rule) => rule.id)).toContain('prohibited-art5-c')
     // …but the headline classification stays out of scope.
+    expect(result.classification).toBe('Out of EU scope')
+  })
+
+  it('out-of-scope also short-circuits a future-dated prohibition', () => {
+    const result = evaluateRuleLibrary({
+      eu_scope: ['none'],
+      prohibited_screen: ['art5-ba'],
+    })
+    expect(result.firedRules.map((rule) => rule.id)).toContain('prohibited-art5-ba')
     expect(result.classification).toBe('Out of EU scope')
   })
 
@@ -50,28 +59,66 @@ describe('territorial scope (Article 2)', () => {
 })
 
 describe('prohibited practices (Article 5)', () => {
-  const flags: Array<[string, string]> = [
-    ['social-scoring', 'prohibited-social-scoring'],
-    ['manipulation', 'prohibited-manipulation-vulnerability'],
-    ['workplace-emotion', 'prohibited-workplace-education-emotion'],
-    ['public-biometric-id', 'prohibited-public-biometric-id'],
-    ['facial-scraping', 'prohibited-facial-scraping'],
-  ]
+  // The eight points that have applied since 2 February 2025.
+  const presentTense = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+  // The two inserted by Regulation (EU) 2026/1744, applying 2 December 2026.
+  const futureDated = ['ba', 'bb']
 
-  it.each(flags)('flag %s classifies as Prohibited practice via %s', (flag, ruleId) => {
-    const result = evaluateRuleLibrary({ ...inScopeBase, prohibited_screen: [flag] })
+  it.each(presentTense)('point (%s) classifies as Prohibited practice today', (point) => {
+    const result = evaluateRuleLibrary({ ...inScopeBase, prohibited_screen: [`art5-${point}`] })
     expect(result.classification).toBe('Prohibited practice')
-    expect(result.firedRules.map((rule) => rule.id)).toContain(ruleId)
+    expect(result.firedRules.map((rule) => rule.id)).toContain(`prohibited-art5-${point}`)
     expect(result.obligations.join(' ')).toMatch(/Stop or pause/i)
+  })
+
+  it.each(futureDated)('point (%s) classifies as prohibited from 2 December 2026, not today', (point) => {
+    const result = evaluateRuleLibrary({ ...inScopeBase, prohibited_screen: [`art5-${point}`] })
+    expect(result.classification).toBe('Prohibited from 2 December 2026')
+    expect(result.firedRules.map((rule) => rule.id)).toContain(`prohibited-art5-${point}`)
+    // Must not order an immediate halt over a prohibition that does not yet exist.
+    expect(result.obligations.join(' ')).not.toMatch(/Stop or pause/i)
+    expect(result.obligations.join(' ')).toMatch(/2 December 2026/)
+  })
+
+  it.each(futureDated)('point (%s) cites the amending Regulation, not the Service Desk', (point) => {
+    const result = evaluateRuleLibrary({ ...inScopeBase, prohibited_screen: [`art5-${point}`] })
+    const fired = result.firedRules.find((rule) => rule.id === `prohibited-art5-${point}`)
+    expect(fired?.source.url).toContain('2026/1744')
+    expect(fired?.source.article).toBe(`Article 5(1)(${point})`)
+  })
+
+  it('every one of the ten Article 5(1) points has a rule', () => {
+    const points = ['a', 'b', 'ba', 'bb', 'c', 'd', 'e', 'f', 'g', 'h']
+    for (const point of points) {
+      const ids = fired({ ...inScopeBase, prohibited_screen: [`art5-${point}`] })
+      expect(ids).toContain(`prohibited-art5-${point}`)
+    }
+  })
+
+  it('a present-tense prohibition outranks a simultaneous future-dated one', () => {
+    const result = evaluateRuleLibrary({
+      ...inScopeBase,
+      prohibited_screen: ['art5-ba', 'art5-c'],
+    })
+    expect(result.classification).toBe('Prohibited practice')
   })
 
   it('prohibited outranks a simultaneous Annex III high-risk trigger', () => {
     const result = evaluateRuleLibrary({
       ...inScopeBase,
-      prohibited_screen: ['social-scoring'],
+      prohibited_screen: ['art5-c'],
       sensitive_domains: ['employment'],
     })
     expect(result.classification).toBe('Prohibited practice')
+  })
+
+  it('a future-dated prohibition still outranks high-risk', () => {
+    const result = evaluateRuleLibrary({
+      ...inScopeBase,
+      prohibited_screen: ['art5-ba'],
+      sensitive_domains: ['employment'],
+    })
+    expect(result.classification).toBe('Prohibited from 2 December 2026')
   })
 })
 

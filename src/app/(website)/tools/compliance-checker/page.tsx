@@ -47,7 +47,9 @@ function resultTone(classification: string) {
     }
   }
 
-  if (classification === 'Likely high-risk' || classification === 'Uncertain') {
+  // Future-dated prohibition reads amber, not red: it is a dated hard stop to
+  // plan against, not a practice to halt today.
+  if (classification === 'Likely high-risk' || classification === 'Uncertain' || classification === 'Prohibited from 2 December 2026') {
     return {
       border: 'border-silicon-amber/40',
       bg: 'bg-silicon-amber/10',
@@ -269,28 +271,46 @@ export default function ComplianceCheckerPage() {
 
                     {currentQuestion.type === 'multi' && (
                       <div className="grid gap-3">
-                        {currentQuestion.options?.map((option) => {
+                        {currentQuestion.options?.map((option, index) => {
                           const selected = optionIsSelected(currentQuestion, answers, option.value)
+                          const previousGroup = currentQuestion.options?.[index - 1]?.group
+                          const showGroupHeading = Boolean(option.group) && option.group !== previousGroup
                           return (
-                            <button
-                              key={option.value}
-                              type="button"
-                              onClick={() => toggleMulti(currentQuestion, option.value)}
-                              className={`text-left rounded-lg border p-4 transition-all ${
-                                selected
-                                  ? 'border-stone-teal bg-stone-teal/10'
-                                  : 'border-border-subtle bg-surface-elevated hover:border-stone-teal/70'
-                              }`}
-                            >
-                              <span className="flex items-start gap-3">
-                                <span className={`mt-1 h-4 w-4 rounded border flex items-center justify-center flex-shrink-0 ${
-                                  selected ? 'border-stone-teal bg-stone-teal' : 'border-text-muted'
-                                }`}>
-                                  {selected && <CheckCircle2 className="w-3 h-3 text-ink-on-accent" />}
+                            <div key={option.value}>
+                              {showGroupHeading && (
+                                <div className="mb-2 mt-2 text-xs font-mono uppercase tracking-wider text-text-muted">
+                                  {option.group}
+                                </div>
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => toggleMulti(currentQuestion, option.value)}
+                                className={`w-full text-left rounded-lg border p-4 transition-all ${
+                                  selected
+                                    ? 'border-stone-teal bg-stone-teal/10'
+                                    : 'border-border-subtle bg-surface-elevated hover:border-stone-teal/70'
+                                }`}
+                              >
+                                <span className="flex items-start gap-3">
+                                  <span className={`mt-1 h-4 w-4 rounded border flex items-center justify-center flex-shrink-0 ${
+                                    selected ? 'border-stone-teal bg-stone-teal' : 'border-text-muted'
+                                  }`}>
+                                    {selected && <CheckCircle2 className="w-3 h-3 text-ink-on-accent" />}
+                                  </span>
+                                  <span className="min-w-0">
+                                    <span className="block font-medium text-text-primary">{option.label}</span>
+                                    {option.badge && (
+                                      <span className="mt-2 inline-block rounded border border-silicon-amber px-2 py-0.5 text-xs font-medium text-silicon-amber">
+                                        {option.badge}
+                                      </span>
+                                    )}
+                                    {option.description && (
+                                      <span className="mt-2 block text-sm text-text-muted">{option.description}</span>
+                                    )}
+                                  </span>
                                 </span>
-                                <span className="font-medium text-text-primary">{option.label}</span>
-                              </span>
-                            </button>
+                              </button>
+                            </div>
                           )
                         })}
                       </div>
