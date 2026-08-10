@@ -354,6 +354,34 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 10, 2026 — Compliance Checker: exemption duties and correctly-cited log retention
+
+Two additions that pair with the profiling override.
+
+**`annex-iii-exemption-duties`** fires on an Annex III domain where profiling is
+*absent* — i.e. exactly where the override does not, so the two never contradict
+each other. Article 6(3) is not a quiet opt-out: relying on it obliges the
+provider to document the assessment before the system is placed on the market or
+put into service (Art 6(4)) and to register itself and the system in the EU
+database anyway (Art 49(2)). Both bind the **provider**, so the rule reads
+`origin` and reframes them as a vendor-evidence question for a pure deployer
+rather than inventing an obligation the user does not carry.
+
+**`high-risk-log-retention`** exists because six months is correct but Article 12
+is the wrong anchor for it. Article 12 is the technical record-keeping
+*capability*; the retention duty is Art 26(6) for deployers ("appropriate to the
+intended purpose… at least six months", subject to overriding Union or national
+law including data protection law) and Art 19(1) for providers. Most users of
+this tool are deployers, so 26(6) is what surfaces by default. Tests assert the
+separation directly: any obligation mentioning Article 12 must say "logging
+capability" and must not say "six months".
+
+Serious-incident deadlines are deliberately still absent. Article 73 has three —
+15 days baseline, 10 where a person has died, 2 for widespread infringement or
+critical-infrastructure disruption — and a partial version would counsel a
+fatally late notification. They belong with the Stage 3 report, which will cover
+incident reporting properly, not as a fragment here.
+
 ### August 10, 2026 — Compliance Checker: the Article 6(3) profiling override
 
 The checker's most consequential defect was not an omission but an active

@@ -119,6 +119,24 @@ const sources = {
     publisher: 'European Commission AI Act Service Desk',
     url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/annex-3',
   },
+  article12: {
+    label: 'AI Act Service Desk: Article 12 record-keeping',
+    article: 'Article 12',
+    publisher: 'European Commission AI Act Service Desk',
+    url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-12',
+  },
+  article19: {
+    label: 'AI Act Service Desk: Article 19 automatically generated logs',
+    article: 'Article 19',
+    publisher: 'European Commission AI Act Service Desk',
+    url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-19',
+  },
+  article49: {
+    label: 'AI Act Service Desk: Article 49 registration',
+    article: 'Article 49',
+    publisher: 'European Commission AI Act Service Desk',
+    url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-49',
+  },
   article26: {
     label: 'AI Act Service Desk: Article 26 deployer obligations',
     article: 'Article 26',
@@ -247,6 +265,17 @@ export function performsProfiling(answers: AssessmentAnswers): ProfilingAssessme
   if (confirmation === 'yes') return { value: true, basis: 'confirmed' }
   if (confirmation === 'no') return { value: false, basis: 'declined' }
   return { value: true, basis: 'assumed' }
+}
+
+/**
+ * Whether the user carries provider-side duties. Articles 6(4) and 49(2) bind
+ * the *provider*, so a pure deployer must see them as a vendor-evidence
+ * question rather than as an obligation on them.
+ */
+function hasProviderDuties(answers: AssessmentAnswers): boolean {
+  return ['own-product', 'modified-or-resold', 'integrated-third-party'].includes(
+    first(answers, 'origin') ?? ''
+  )
 }
 
 /** Whether any Annex III domain is in play, by either route the engine uses. */
@@ -654,6 +683,78 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
         reportSections: ['Annex III classification rationale'],
       }
     },
+  }),
+  rule({
+    id: 'annex-iii-exemption-duties',
+    title: 'Claiming the Article 6(3) exemption carries its own duties',
+    category: 'high-risk',
+    legalStatus: 'current-law',
+    source: sources.article49,
+    priority: 202,
+    // Only where the exemption is actually available — the profiling override
+    // forecloses it, and surfacing its consequences there would mislead.
+    when: (answers) => inAnnexIIIDomain(answers) && !performsProfiling(answers).value,
+    build: (answers) => {
+      const provider = hasProviderDuties(answers)
+      return {
+        evidence: ['Annex III domain present with no profiling of natural persons identified'],
+        explanation:
+          'Article 6(3) is not a quiet opt-out. A provider relying on it must document the assessment before the system is placed on the market or put into service (Article 6(4)) and must still register itself and the system in the EU database (Article 49(2)).',
+        scoreDelta: 0,
+        confidenceImpact: 0,
+        reasons: [],
+        missingFacts: [],
+        obligations: provider
+          ? [
+              'If you rely on an Article 6(3) narrow-task exemption, document that assessment before the system is placed on the market or put into service, and produce it to national competent authorities on request (Article 6(4)).',
+              'Register yourself and the system in the EU database even where the exemption applies (Article 49(2)).',
+            ]
+          : [
+              'Where your vendor relies on an Article 6(3) narrow-task exemption, obtain its Article 6(4) assessment for your file — the duty is the provider’s, but the evidence is what makes your own position defensible.',
+            ],
+        vendorQuestions: provider
+          ? []
+          : [
+              'Has your vendor documented its Article 6(3) assessment, and has it registered itself and the system in the EU database under Article 49(2)? If so, what is the registration reference?',
+            ],
+        adjacentRisks: [],
+        reviewTriggers: ['The vendor changes its Article 6(3) position or the system’s intended purpose'],
+        reportSections: ['Annex III classification rationale'],
+      }
+    },
+  }),
+  rule({
+    id: 'high-risk-log-retention',
+    title: 'Automatically generated logs must be retained',
+    category: 'governance',
+    legalStatus: 'current-law',
+    source: sources.article26,
+    priority: 203,
+    when: (answers) => inAnnexIIIDomain(answers),
+    build: (answers) => ({
+      evidence: ['Annex III domain present'],
+      explanation:
+        'Article 12 requires the technical capability to record events automatically over the system’s lifetime. The retention period is a separate duty: Article 26(6) for deployers, Article 19(1) for providers.',
+      scoreDelta: 0,
+      confidenceImpact: 0,
+      reasons: [],
+      missingFacts: [],
+      obligations: hasProviderDuties(answers)
+        ? [
+            'As provider, keep the automatically generated logs for at least six months, subject to any longer period required by Union or national law (Article 19(1)).',
+            'Ensure the system technically records events over its lifetime — that logging capability is Article 12, and is separate from how long you keep the output.',
+          ]
+        : [
+            'As deployer, keep the automatically generated logs under your control for a period appropriate to the intended purpose and in any event at least six months, unless Union or national law — including data protection law — provides otherwise (Article 26(6)).',
+            'Confirm the system technically records events over its lifetime; that logging capability is the vendor’s Article 12 duty, and is separate from your retention period.',
+          ],
+      vendorQuestions: [],
+      adjacentRisks: [
+        'Log retention interacts with GDPR storage limitation — a six-month floor under the AI Act does not license indefinite retention of personal data.',
+      ],
+      reviewTriggers: ['Log storage, export capability, or retention configuration changes'],
+      reportSections: ['Evidence register'],
+    }),
   }),
   rule({
     id: 'high-impact-decision',

@@ -266,6 +266,66 @@ describe('Article 6(3) profiling override', () => {
   })
 })
 
+describe('Article 6(3) exemption duties and log retention', () => {
+  const annexIIINoProfiling: AssessmentAnswers = {
+    ...inScopeBase,
+    sensitive_domains: ['critical-infrastructure'],
+    affected_people: ['none'],
+    decision_impact: 'assistive',
+  }
+
+  it('surfaces Art 6(4) and Art 49(2) where the exemption is still available', () => {
+    const result = evaluateRuleLibrary(annexIIINoProfiling)
+    expect(result.firedRules.map((rule) => rule.id)).toContain('annex-iii-exemption-duties')
+  })
+
+  it('withholds them where the profiling override has foreclosed the exemption', () => {
+    const ids = fired({
+      ...inScopeBase,
+      primary_use: 'employment',
+      affected_people: ['applicants'],
+      decision_impact: 'ranking',
+      sensitive_domains: ['employment'],
+      profiling_confirm: 'yes',
+    })
+    expect(ids).not.toContain('annex-iii-exemption-duties')
+  })
+
+  it('frames the duties as vendor evidence for a pure deployer', () => {
+    const result = evaluateRuleLibrary(annexIIINoProfiling)
+    expect(result.vendorQuestions.join(' ')).toMatch(/Article 49\(2\)/)
+    expect(result.obligations.join(' ')).not.toMatch(/Register yourself/)
+  })
+
+  it('attributes the duties to the user where they build the product', () => {
+    const result = evaluateRuleLibrary({ ...annexIIINoProfiling, origin: 'own-product' })
+    expect(result.obligations.join(' ')).toMatch(/Register yourself and the system in the EU database/)
+  })
+
+  it('cites Art 26(6) for deployer retention, not Article 12', () => {
+    const result = evaluateRuleLibrary(annexIIINoProfiling)
+    const retention = result.obligations.find((item) => /at least six months/.test(item))
+    expect(retention).toMatch(/Article 26\(6\)/)
+    expect(retention).not.toMatch(/Article 12/)
+  })
+
+  it('cites Art 19(1) for provider retention', () => {
+    const result = evaluateRuleLibrary({ ...annexIIINoProfiling, origin: 'own-product' })
+    const retention = result.obligations.find((item) => /at least six months/.test(item))
+    expect(retention).toMatch(/Article 19\(1\)/)
+  })
+
+  it('describes Article 12 as the logging capability, never the retention period', () => {
+    const result = evaluateRuleLibrary(annexIIINoProfiling)
+    const article12 = result.obligations.filter((item) => /Article 12/.test(item))
+    expect(article12.length).toBeGreaterThan(0)
+    for (const item of article12) {
+      expect(item).toMatch(/logging capability/)
+      expect(item).not.toMatch(/six months/)
+    }
+  })
+})
+
 describe('Article 50 transparency', () => {
   it('a declared chatbot interaction is likely limited-risk', () => {
     const result = evaluateRuleLibrary({
