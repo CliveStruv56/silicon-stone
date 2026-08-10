@@ -435,6 +435,14 @@ Below `lg` the hero now uses an even vertical scrim instead; the horizontal one
 is `hidden lg:block`, matching the breakpoint where the column layout actually
 starts (it was briefly `md`, which left 768–1023px on the wrong scrim).
 
+There are **two** vertical scrims, split at `sm`. One value dark enough for 768px
+is heavier than a phone needs, and `sm` is exactly where the badge gains its
+"· the view from the edge" tail and reaches into a brighter stretch of the
+photograph. Phones take 0.62/0.56/0.80 and keep more of the picture; 640–1023px
+takes 0.72/0.66/0.86. The tightest run at every width is now the teal
+"Book a 25-minute conversation" button at 4.73:1, which is its own solid fill and
+owes nothing to the scrim.
+
 The same measurement caught a **pre-existing desktop** failure: the copy column
 starts at 33% and the gradient's thin point sat at 32%, so the badge ran at
 3.2:1 at every desktop width. The thin point moved to 24% and the ramp now

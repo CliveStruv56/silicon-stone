@@ -54,10 +54,23 @@ const HERO_OVERLAY_BACKGROUND = `
     )
 `
 
-/* Mobile scrim: below lg the copy spans the full width, so it crosses that 0.18
-   band — and the photo's bright light streak sits right under the headline.
-   Measured on a 390px viewport, the amber ran at 2.0:1 there. An even vertical
-   scrim instead, weighted to the top where the badge and headline sit. */
+/* Below lg the copy spans the full width, so it crosses that 0.18 band — and the
+   photo's bright light streak sits right under the headline. Measured on a 390px
+   viewport, the amber ran at 2.0:1 there. Even vertical scrims instead, weighted
+   to the top where the badge and headline sit.
+
+   Two of them, split at sm, because that is where the badge gains its
+   "· the view from the edge" tail and reaches into a brighter stretch of the
+   photograph. Phones get the lighter one — the picture survives better and the
+   short badge stays clear of the bright patch. */
+const HERO_OVERLAY_PHONE_BACKGROUND = `
+    linear-gradient(to bottom,
+        rgba(11,17,23,0.62) 0%,
+        rgba(11,17,23,0.56) 50%,
+        rgba(11,17,23,0.80) 100%
+    )
+`
+
 const HERO_OVERLAY_MOBILE_BACKGROUND = `
     linear-gradient(to bottom,
         rgba(11,17,23,0.72) 0%,
@@ -108,9 +121,13 @@ export function HeroSection({ settings }: HeroSectionProps) {
                 className="absolute inset-0 z-[1] pointer-events-none hidden lg:block"
                 style={{ background: HERO_OVERLAY_BACKGROUND }}
             />
-            {/* Even vertical scrim below lg, where the copy runs full-width. */}
+            {/* Even vertical scrims below lg, where the copy runs full-width. */}
             <div
-                className="absolute inset-0 z-[1] pointer-events-none lg:hidden"
+                className="absolute inset-0 z-[1] pointer-events-none sm:hidden"
+                style={{ background: HERO_OVERLAY_PHONE_BACKGROUND }}
+            />
+            <div
+                className="absolute inset-0 z-[1] pointer-events-none hidden sm:block lg:hidden"
                 style={{ background: HERO_OVERLAY_MOBILE_BACKGROUND }}
             />
 
