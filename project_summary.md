@@ -2,9 +2,13 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-08-10
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (71 static pages), 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (72 static pages), 147 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
-**Current State**: Full-featured intelligence portal live at siliconandstone.com. Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools (email-gated for lead capture, AI Act triage engine recently overhauled), product/commerce pages with an early-access enquiry fallback until Lemon Squeezy checkout URLs are configured, Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production. **The blocker is a P0: the production Kit API key is a legacy v3 key, so `/api/subscribe` 401s and — because `NEXT_PUBLIC_PRE_LAUNCH` is still `true`, making every product CTA an email capture — the entire funnel currently terminates in a failed POST.** Beyond that: Lemon Squeezy store not yet created, 9 drafts unpublished, and 7 of 12 published articles still lack cover images. Go-live sequence lives in `LAUNCH.md`; defects and debt in §10.
+**Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages with an early-access enquiry fallback until Lemon Squeezy checkout URLs are configured, Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
+
+**The AI Act Compliance Checker was rebuilt on 2026-08-10** (Stages 0–2 of the agentic build spec): the rule base is corrected and versioned at `v2026-08-10`, backed by a git-tracked rule pack carrying 19 Articles of verbatim consolidated statute; a conversational intake now proposes answers the user confirms before the unchanged deterministic engine classifies. Stage 3 (email gate + agentic report) is spec'd and partly blocked — see §11.
+
+**The blocker is a P0: the production Kit API key is a legacy v3 key, so `/api/subscribe` 401s and — because `NEXT_PUBLIC_PRE_LAUNCH` is still `true`, making every product CTA an email capture — the entire funnel currently terminates in a failed POST.** Beyond that: Lemon Squeezy store not yet created, 9 drafts unpublished, and 7 of 12 published articles still lack cover images. Go-live sequence lives in `LAUNCH.md`; defects and debt in §10.
 
 ---
 
@@ -333,6 +337,13 @@ SESSION_SECRET=<long random secret, 32+ characters>
 | Tool pages | `src/app/(website)/tools/*/page.tsx` |
 | Email gate overlay | `src/components/tools/EmailGateOverlay.tsx` |
 | Tool data | `src/lib/*-data.ts` |
+| **AI Act triage engine (rules + questions)** | `src/lib/ai-act-rules.ts`, `src/lib/ai-act-assessment.ts` |
+| **AI Act rule pack (dates, penalties, anchors, corpus)** | `rulepack/versions/<version>/`, loaded via `src/lib/rulepack/` |
+| Rule-pack corpus hash check (runs in `prebuild`) | `scripts/rulepack-check.mjs` (`npm run rulepack:check` / `:hash`) |
+| Timeline + penalty ceilings (read from the pack) | `src/lib/ai-act-timeline.ts` |
+| Checker session autosave (Upstash, 24h) | `src/lib/checker-session.ts`, `-schema.ts`, `src/app/api/tools/compliance-checker/session/` |
+| Agentic intake (vocabulary, validator, extraction) | `src/lib/intake/`, `src/app/api/tools/compliance-checker/intake/` |
+| Intake UI (Art 50(1) disclosure + review screen) | `src/components/tools/ComplianceIntake.tsx` |
 | Product pages | `src/app/(website)/products/*/page.tsx` |
 | Legal pages | `src/app/(website)/privacy/`, `src/app/(website)/terms/` |
 | Admin routes | `src/app/(admin)/*/` |
@@ -1718,8 +1729,11 @@ discount codes, booking URL, LinkedIn URL). This table is for defects and debt.
 | 7 of 12 published articles have no cover image | Verified via GROQ 2026-08-05 — `mainImage` is undefined on `welcome-to-silicon-and-stone`, `atlantic-fault-lines-us-tech-policy-eu-autonomy`, `tariff-enforcement-collision`, `semiconductor-testing-bottleneck-ai-accelerators`, `korean-memory-fab-capacity-squeeze-2027`, `greenland-critical-minerals-transatlantic-scramble`, `open-source-sovereignty`. Placeholders render on the live site and in OG cards. The Studio has image-prompt suggestions + a media library to speed this up. | **High** |
 | 9 unpublished drafts, 8 of them without images | Verified 2026-08-05: drafts have grown from 2 (May) to **9** while publishing stalled — GPAI enforcement, EU Chips Act mid-point, China mineral licences, the token-bill piece, Fable 5 shutdown (the only one with an image), open-source exemption, GPT-5.6 two-tier market, plus the two long-standing Iran/Gulf drafts. Several are time-sensitive and decaying. | **High** |
 | `article.gate` configured on zero articles | The PWA Phase 3 `Gate` component (email / commerce / lead) shipped 2026-07-17 but **no article document sets `gate`**, so the whole ladder falls back to `auto` → newsletter. The monetisation surface exists in code and is unused in content. | Medium |
-| Docs use the apex host, but `www` is canonical | `SITE_URL` in `src/lib/site.ts` is `https://www.siliconandstone.com` — canonical host = www was locked during the SEO sprint (commit `b599df1`), and the apex 307s to it. That is correct behaviour; the defect is that `LAUNCH.md` §0 gave the Lemon Squeezy redirect targets and webhook URL on the **apex**, adding a needless redirect hop through a payment callback. Corrected in `LAUNCH.md` on 2026-08-05; prose elsewhere still says "siliconandstone.com" informally, which is harmless. | Low |
-| Inoreader redirect URI still localhost | `http://localhost:3000/api/auth/callback/inoreader` in the Inoreader dev portal. Research-pipeline OAuth therefore cannot complete in production; it works locally. Change to `https://www.siliconandstone.com/api/auth/callback/inoreader`. | Medium |
+| ~~`LAUNCH.md` URLs named `www`~~ — corrected 2026-08-10 | **The canonical host is the bare apex** as of 2026-08-06 (commit `50996d27`) — `SITE_URL` in `src/lib/site.ts` is `https://siliconandstone.com` and `www` 308s to it, reversing the June decision. The Lemon Squeezy redirect targets and webhook URL in `LAUNCH.md` still gave `www`, which would have put a redirect hop inside a payment callback; both now use the apex. Historical `www` mentions in §9 changelog entries are left as written. | Resolved |
+| Inoreader redirect URI still localhost | `http://localhost:3000/api/auth/callback/inoreader` in the Inoreader dev portal. Research-pipeline OAuth therefore cannot complete in production; it works locally. Change to `https://siliconandstone.com/api/auth/callback/inoreader` (apex, not www). | Medium |
+| Rule-pack corpus covers 19 Articles, not all of them | `rulepack/versions/2026-08-10/corpus/` holds Arts 3, 5, 6, 9, 11, 12, 13, 17, 19, 26, 49, 50, 57, 72, 73, 99, 101, 111, 113. `hasCorpus()` answers honestly and `verifyCitation()` returns `uncovered` for anything else. **Stage 3's verifier must treat `uncovered` as unverifiable, never as a pass.** Extending coverage is a data task (re-scrape from the same CELEX id), not a code change. | Medium |
+| No monthly model-spend ceiling | Part G of the build spec calls for a budget ceiling enforced at the gateway rather than discovered on the invoice. What exists is per-IP rate limiting (`checkerIntake`: 10/hour) and the `usage.ts` ledger. Intake is the only metered call on a free, ungated tool, so this matters more once Stage 3's email-gated report adds a frontier-model call. | Medium |
+| Intake normaliser is duplicated in a build script | `scripts/rulepack-check.mjs` re-implements `normaliseLegalText` because `prebuild` runs before any TypeScript build. The manifest records `normalisation: "v1"` so a divergence is visible, but the two copies must be edited together. | Low |
 | Atlantic Drift Briefing PDF unwritten | Lead magnet referenced in the Welcome Pack and required before YouTube launch. Outline at `docs/atlantic-drift-briefing-outline.md`; full PDF still to write. Note the *product* deliverables (toolkit, spreadsheets, checklist) **are** built — `deliverables/dist/`. | Medium |
 | Legacy `methodologyPillars` on 2 articles | Re-verified 2026-08-05, unchanged: published *Atlantic Fault Lines Deepen* (`2oGVswEwQBfyYUvi889ioS`, `policy-stress-testing`) and draft *Iran Conflict Reshapes…* (`drafts.1344add1-…`, `supply-chain-forensics`). `MethodologyChecklist` normalises legacy slugs at render, so the UI is never blank; backfill these 2 in Studio to retire the legacy map. | Medium |
 | Sanity persona docs hold the short version | Re-verified 2026-08-05: all 5 personas carry a one-sentence `painPoints` string vs the fuller treatment in `docs/persona-profiles.md`. The old blocker ("MCP writes blocked by the schema-deploy gap") is **stale** — schema deploy was resolved 2026-05-21, so this is now simply undone, and MCP `patch_documents` can do it. | Low |
@@ -1739,7 +1753,10 @@ discount codes, booking URL, LinkedIn URL). This table is for defects and debt.
   goal names (`Gate Impression`, `Email Capture`, `Product View`, `Advisory Lead`,
   `Push Opt In`) and the three in `LAUNCH.md` §3 exist by exact name.
 - ~~Sanity schema not fully deployed to manifest~~ — resolved 2026-05-21.
-- ~~No unit tests for app logic~~ — 58 specs across 5 files, green.
+- ~~No unit tests for app logic~~ — **147 specs across 8 files**, green. The AI Act
+  engine, rule pack, session schema, and intake validator carry the bulk of them.
+- ~~Compliance Checker rule base stale and Step 10 incomplete~~ — resolved
+  2026-08-10 across Stages 0–2; see §9. Rule base is `v2026-08-10`.
 - ~~No CI gates~~ — `.github/workflows/check.yml` runs `npm run check`, `npm test`,
   four invariant suites, `test:pwa`, and `next build` on every push.
 - ~~Legacy slug renames awaiting sign-off~~ — resolved 2026-06-10, 301s live.
@@ -1775,6 +1792,25 @@ Nothing downstream matters until email capture works.
 | **Inoreader redirect URI** | Update the dev portal to the production callback so research OAuth works outside localhost. |
 | **VAPID keys for Web Push** | `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` — Phase 3 push is code-complete but cannot send until these are set and verified on a real device. |
 | **Confirm Plausible goal names** | Phase 3 + `LAUNCH.md` §3 events must exist by exact name (with spaces) to register. |
+
+### Priority 2b — Compliance Checker Stage 3 (spec'd, partly blocked)
+
+Stages 0–2 shipped 2026-08-10 (§9). Stage 3 is the email gate and the agentic
+report. Build spec: `.playwright-mcp/compliance-checker-agentic-build-spec.md`;
+the reviewed implementation plan is in
+`~/.claude/plans/question-one-your-narrower-distributed-barto.md`.
+
+| Task | Description |
+|------|-------------|
+| **Free preview (components 1–3) behind an email gate** | Buildable now. Role analysis, classification rationale with the mandatory "what we did not ask you", and the dated review schedule. Nothing currently free becomes gated — the gate sits in front of something new. |
+| **Citation verification pass** | Every legal claim carries a `verbatim_quote` + `article_reference`; `verifyCitation()` in `src/lib/rulepack/corpus.ts` already returns `verified` / `not-found` / `uncovered`. Unmatched claims are dropped with an explicit note; 3+ failures withholds the report. Track the failure rate — it is the canary. |
+| **Email capture → Upstash, no mailing platform** | Write behind a no-op `onEmailCaptured(record)` hook with a `TODO: wire to list platform` marker. Separate the report-delivery basis from marketing consent; add the tool to the privacy notice. |
+| **£39 Evidence Pack + the £39→£79 credit** | **Blocked on the Lemon Squeezy store existing**, same blocker as PWA P3-4/P3-5. Build behind a flag; confirm the provider supports single-use codes scoped to a SKU before starting. |
+| **Legal review before Stage 3 ships** | Open item of record: the report template, the disclaimer, and the credit terms (a consumer-facing commercial promise). |
+
+**Two constraints carried forward from Stages 0–2.** The deterministic
+classification is *fixed input* the generation may not contradict, and there are
+no percentage confidence scores anywhere — the tool uses categorical labels.
 
 ### Priority 3 — Premium tier (future)
 
@@ -1827,13 +1863,15 @@ npm run lint             # Run ESLint
 When starting a new Claude Code session:
 
 1. **Read this document first** for full context
-2. **The app builds cleanly** — `npm run build` should produce 71 static pages, 0 errors
+2. **The app builds cleanly** — `npm run build` should produce 72 static pages, 0 errors. `prebuild` now runs two gates: the style codegen and `rulepack-check.mjs`
 3. **24 npm audit findings** (1 critical / 13 high / 9 moderate / 1 low, as of 2026-08-05) — all in the Sanity v4 toolchain subtree (CLI/export code, not reachable from served routes) plus `sharp` and `ws`. Do not run `npm audit fix --force`; npm proposes `next@16`, which the Sanity v4 pin forbids. Anything new on top of this baseline is real.
 4. **APIs**: Anthropic, Exa, Sanity, Pinecone working. **Kit is 401ing in production** (legacy v3 key — see §10 P0). **Inoreader** OAuth cannot complete in production (redirect URI still localhost); it works locally.
 5. **Admin password** is deployment-specific and must not be committed or recorded in docs. `SESSION_SECRET` is required for signed admin sessions and must be 32+ characters.
 6. **Inoreader** is connected as `clive4` (tokens in cookies, may need re-auth)
 7. **Do NOT upgrade Sanity to v5** until Next.js 16 is stable
-8. **Live at siliconandstone.com** — Vercel auto-deploys from main branch; note the apex 307s to `www.siliconandstone.com`
+8. **Live at siliconandstone.com** — Vercel auto-deploys from main. **The bare apex is canonical** (since 2026-08-06); `www` 308s to it. Do not reintroduce `www` URLs
+8b. **Never edit a rule-pack corpus file without bumping the pack version** — `prebuild` fails closed on drift, by design. Intentional change: bump the version, then `npm run rulepack:hash`. Every figure in the pack is a legal claim traceable to CELEX `02024R1689-20260727`
+8c. **The Compliance Checker's model never decides the tier.** Intake proposes answers the user confirms; the deterministic engine classifies. Keep it that way — the result screen promises it in writing
 9. **Lemon Squeezy** — no store yet; `NEXT_PUBLIC_PRE_LAUNCH=true` keeps every product CTA on the early-access capture (verified live 2026-08-05)
 10. **Plausible** — live on production (`script.tagged-events.js` served); confirm the Phase 3 goal names exist by exact name
 11. **`LAUNCH.md` is the single source of truth for launch state** — §10/§11 here deliberately do not duplicate its checklist
@@ -1841,10 +1879,20 @@ When starting a new Claude Code session:
 ### Quick Verification
 
 ```bash
-npm run build            # Should pass with 71 static pages
+npm run build            # Should pass with 72 static pages
+npm test                 # 147 specs across 8 files, all green
+npm run rulepack:check   # 19 corpus files verified against the manifest
 npm audit                # Expect 24 findings (Sanity toolchain subtree + sharp)
 npm run dev              # Start dev server, visit localhost:3000
 ```
+
+**Browser-testing note.** Programmatic `.click()` through the Chrome extension
+does not reach React's delegated handlers on this app — the DOM event fires and
+state never updates, which reads as a broken page. Drive the UI with Puppeteer
+instead (`executablePath` set to the installed Chrome; `waitUntil:
+'domcontentloaded'`, since Sanity's live client keeps a connection open and
+`networkidle0` never settles). Dev-mode hydration also takes several seconds —
+wait before concluding a control is dead.
 
 ---
 

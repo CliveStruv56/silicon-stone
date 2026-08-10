@@ -115,12 +115,13 @@ regenerate with `deliverables/src/assemble-toolkit.mjs` and
 - [ ] **AI Act Compliance Toolkit — Professional — £149.** Same three files plus
       the 30-minute video walkthrough — **not yet recorded**; this is the only
       product asset still missing (file or unlisted link in the delivery note).
-- [ ] Set each product's **receipt / redirect ("Continue") URL**. Use the **`www`
-      host** — `src/lib/site.ts` makes `www` canonical and the apex 307s to it,
-      so an apex URL adds a redirect hop through the payment callback:
-  - Checklist → `https://www.siliconandstone.com/products/success?product=checklist`
-  - Toolkit Standard → `https://www.siliconandstone.com/products/success?product=toolkit-standard`
-  - Toolkit Professional → `https://www.siliconandstone.com/products/success?product=toolkit-pro`
+- [ ] Set each product's **receipt / redirect ("Continue") URL**. Use the **bare
+      apex** — `src/lib/site.ts` makes the apex canonical and `www` 308s to it
+      (reversed from the June decision on 2026-08-06), so a `www` URL adds a
+      redirect hop through the payment callback:
+  - Checklist → `https://siliconandstone.com/products/success?product=checklist`
+  - Toolkit Standard → `https://siliconandstone.com/products/success?product=toolkit-standard`
+  - Toolkit Professional → `https://siliconandstone.com/products/success?product=toolkit-pro`
 - [ ] Copy each **checkout link** into:
   - `NEXT_PUBLIC_LEMONSQUEEZY_CHECKLIST_URL`
   - `NEXT_PUBLIC_LEMONSQUEEZY_TOOLKIT_STANDARD_URL`
@@ -134,7 +135,7 @@ regenerate with `deliverables/src/assemble-toolkit.mjs` and
 ### Lemon Squeezy — webhook
 
 - [ ] Settings → Webhooks → URL
-      `https://www.siliconandstone.com/api/webhooks/lemonsqueezy`, events at least
+      `https://siliconandstone.com/api/webhooks/lemonsqueezy` (apex, not `www`), events at least
       `order_created`, signing secret into `LEMONSQUEEZY_WEBHOOK_SECRET`.
       (The route verifies HMAC signatures and is idempotent; on
       `order_created` it tags the buyer in Kit by variant ID.)

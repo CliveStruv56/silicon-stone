@@ -16,6 +16,30 @@ React 19 bundle. Do NOT run a blind `npm update` / `npm install <pkg>@latest`:
 - The Sanity `apiVersion` is sourced from `NEXT_PUBLIC_SANITY_API_VERSION`
   (default `2026-01-13`); keep all clients/scripts on that single value.
 
+## AI Act rule pack (load-bearing — do not break)
+
+The Compliance Checker's legal payload lives in `rulepack/versions/<version>/`,
+not in TypeScript constants. Two rules:
+
+- **Never edit a corpus file without bumping the pack version.** `prebuild` runs
+  `scripts/rulepack-check.mjs`, which exits 1 on any hash drift — that is
+  deliberate. Corpus text and pack version move together, or every citation
+  previously verified against that text is silently invalidated. Intentional
+  change: bump the version directory, then `npm run rulepack:hash`.
+- **Every figure in the pack is a legal claim.** Dates, penalty ceilings and
+  Article anchors are traceable to the EUR-Lex consolidated text at CELEX
+  `02024R1689-20260727`. Verify against that before changing one; do not take a
+  date from a summary, a blog post, or a build spec.
+
+Two invariants the tool promises on screen and must keep:
+
+- **The model never decides the tier.** Agentic intake proposes answers the user
+  confirms; classification is the deterministic engine's alone.
+- **Confidence is categorical, never a percentage.**
+
+Corpus coverage is partial (19 Articles). `verifyCitation()` returns
+`uncovered` for anything else — treat that as unverifiable, never as a pass.
+
 ## Model routing
 
 You normally choose the tool yourself (Claude Code vs Codex). Two optional
