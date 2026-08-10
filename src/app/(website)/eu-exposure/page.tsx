@@ -115,13 +115,14 @@ export default function EuExposurePage() {
                   The deadline is the easy part. The requirement is permanent.
                 </h1>
                 <p className="text-xl text-text-muted leading-relaxed mb-6">
-                  In May 2026 the EU agreed the Digital Omnibus and rewrote the AI Act’s
-                  timetable. The headline said “delay”. The reality is sharper: some
+                  The Digital Omnibus is law — Regulation (EU) 2026/1744, in force since
+                  27 July 2026 — and it rewrote the AI Act’s timetable. The headline said
+                  “delay”. The reality is sharper: some
                   obligations moved by sixteen months, others did not move at all. The
                   transparency duties have applied since 2 August 2026; watermarking for
                   systems already on the market moves to 2 December 2026; standalone high-risk
                   moves to 2 December 2027 and embedded high-risk to 2 August 2028. If your
-                  compliance calendar was built before May, parts of it are now wrong.
+                  compliance calendar was built before the Omnibus, parts of it are now wrong.
                 </p>
                 <p className="text-text-muted leading-relaxed">
                   The AI Act’s reach is extraterritorial: if your AI touches the EU market or

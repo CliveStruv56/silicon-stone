@@ -378,7 +378,7 @@ export const SCENARIOS: Scenario[] = [
         implication: 'The tool should show staged operational exposure rather than implying one universal enforcement date.',
       },
       {
-        fact: 'The Digital Omnibus (agreed May 2026, adopted June 2026) moves standalone (Annex III) high-risk obligations to 2 December 2027 and product-integrated (Annex I) systems to 2 August 2028.',
+        fact: 'The Digital Omnibus on AI — Regulation (EU) 2026/1744, published in the Official Journal on 24 July 2026 and in force since 27 July 2026 — moves standalone (Annex III) high-risk obligations to 2 December 2027 and product-integrated (Annex I) systems to 2 August 2028.',
         implication: 'The scenario is an evidence-readiness risk, not a penalty-countdown story.',
       },
     ],

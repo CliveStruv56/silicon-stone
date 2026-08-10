@@ -354,6 +354,36 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 10, 2026 — Compliance Checker: Omnibus timeline and penalty ceilings on the result
+
+The checker returned a classification and no dates. A user could read "Likely
+high-risk" and have no idea whether that bit today, next year, or in 2028.
+
+New `src/lib/ai-act-timeline.ts` holds `AI_ACT_TIMELINE` and `PENALTY_TIERS` as
+data rather than prose, so the result screen, the free `.md` export and (from
+Stage 1) the versioned rule pack read the same figures. Eight timeline entries
+from 2 Feb 2025 to 2 Aug 2030, each marked in-force or upcoming; six penalty
+rows, each with its Article.
+
+Two things worth not getting wrong again:
+
+**The sandbox date moved.** Article 57(1) now reads 2 August 2027, but it was
+*changed* by the Omnibus from 2 August 2026 — it was not re-enacted unchanged,
+and it has nothing to do with the 2 December 2027 Annex III date. The build spec
+this work came from asserted the opposite; the timeline entry states the
+extension explicitly so the error cannot be reintroduced from the doc.
+
+**There is no 1.5% band.** Article 50 and GPAI sit at €15M/3% (Arts 99(4)(g) and
+101(1)), not €7.5M/1.5%. Verified: the figure never appeared anywhere in `src/`
+or `docs/`, so this is prevention, not cleanup. Article 99(6a)'s SMC cap covers
+paragraphs 4 and 5 only — an SMC's Article 5 exposure is uncapped, and the table
+says so.
+
+Also corrected three copy sites that still framed the Omnibus as agreed rather
+than enacted — `products/ai-act-toolkit`, `eu-exposure`, and a `scenario-data`
+evidence note all said "agreed May 2026" or "adopted June 2026". It is
+Regulation (EU) 2026/1744, OJ 24 July 2026, in force 27 July 2026.
+
 ### August 10, 2026 — Compliance Checker: exemption duties and correctly-cited log retention
 
 Two additions that pair with the profiling override.

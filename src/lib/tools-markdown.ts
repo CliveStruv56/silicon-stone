@@ -3,6 +3,7 @@
 // can paste into a doc, Slack, or email. Format favours readability over fidelity.
 
 import type { AssessmentResult, AssessmentAnswers, AssessmentQuestion } from './ai-act-assessment'
+import { AI_ACT_TIMELINE, PENALTY_TIERS } from './ai-act-timeline'
 import type { Policy, IndustryImpact } from '@/types/policy'
 import type { Scenario, ExposureProfile as ScenarioExposureProfile } from '@/types/scenario'
 import type {
@@ -72,6 +73,14 @@ ${bullets(result.adjacentRisks, 'No adjacent risks flagged by these answers.')}
 
 ## Ongoing review triggers
 ${bullets(result.reviewTriggers)}
+
+## Timing
+${AI_ACT_TIMELINE.map((entry) => `- **${entry.date}** — ${entry.label}${entry.status === 'in-force' ? ' _(in force)_' : ''}. ${entry.detail}`).join('\n')}
+
+## Penalty ceilings
+| Infringement | Ceiling | Basis |
+| --- | --- | --- |
+${PENALTY_TIERS.map((tier) => `| ${tier.infringement} | ${tier.ceiling} | ${tier.basis} |`).join('\n')}
 
 ## Rules fired
 ${rules || '_No rules fired._'}

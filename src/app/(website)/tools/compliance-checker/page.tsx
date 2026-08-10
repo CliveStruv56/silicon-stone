@@ -28,6 +28,7 @@ import {
   evaluateAssessment,
   getVisibleQuestions,
 } from '@/lib/ai-act-assessment'
+import { AI_ACT_TIMELINE, PENALTY_TIERS } from '@/lib/ai-act-timeline'
 import { CopyMarkdownButton } from '@/components/tools/CopyMarkdownButton'
 import { ToolSubscribeCard } from '@/components/tools/ToolSubscribeCard'
 import { complianceCheckerMarkdown } from '@/lib/tools-markdown'
@@ -474,6 +475,73 @@ export default function ComplianceCheckerPage() {
                   </CardContent>
                 </Card>
               </div>
+
+              <Card className="bg-stone-charcoal border-border-subtle">
+                <CardHeader>
+                  <CardTitle className="text-lg text-text-primary">Timing</CardTitle>
+                  <CardDescription>
+                    The AI Act applies in stages, and the Digital Omnibus moved some of them. There is no
+                    single deadline — check which line your system sits on.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-3">
+                    {AI_ACT_TIMELINE.map((entry) => (
+                      <li
+                        key={entry.date}
+                        className="rounded-lg border border-border-subtle bg-surface-elevated p-4"
+                      >
+                        <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
+                          <span className="font-semibold text-text-primary">{entry.label}</span>
+                          <Badge
+                            variant="outline"
+                            className={
+                              entry.status === 'in-force'
+                                ? 'w-fit border-alert-red text-alert-red'
+                                : 'w-fit border-stone-teal text-stone-teal'
+                            }
+                          >
+                            {entry.status === 'in-force' ? `In force — ${entry.date}` : entry.date}
+                          </Badge>
+                        </div>
+                        <p className="mt-2 text-sm text-text-muted">{entry.detail}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-stone-charcoal border-border-subtle">
+                <CardHeader>
+                  <CardTitle className="text-lg text-text-primary">Penalty ceilings</CardTitle>
+                  <CardDescription>
+                    Ceilings, not expected fines. Each is the higher of the fixed amount and the percentage
+                    of total worldwide annual turnover — except for SMEs and small mid-caps, which take the lower.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="overflow-x-auto">
+                    <table className="w-full min-w-[560px] text-sm">
+                      <thead>
+                        <tr className="border-b border-border-subtle text-left text-xs uppercase tracking-wider text-text-muted">
+                          <th className="pb-2 pr-4 font-medium">Infringement</th>
+                          <th className="pb-2 pr-4 font-medium">Ceiling</th>
+                          <th className="pb-2 font-medium">Basis</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {PENALTY_TIERS.map((tier) => (
+                          <tr key={tier.basis} className="border-b border-border-subtle/50 align-top">
+                            <td className="py-3 pr-4 text-text-primary">{tier.infringement}</td>
+                            <td className="py-3 pr-4 text-text-muted">{tier.ceiling}</td>
+                            <td className="py-3 font-mono text-xs text-stone-teal">{tier.basis}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
 
               <Card className="bg-stone-charcoal border-border-subtle">
                 <CardHeader>
