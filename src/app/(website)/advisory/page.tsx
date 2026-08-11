@@ -340,9 +340,6 @@ export default function ServicesPage() {
                   vendors, the technology exposures that could become operating
                   constraints — read continuously, not once.
                 </p>
-                <p className="mt-5 font-mono text-xs uppercase tracking-wider text-text-muted">
-                  Regulatory copy last reviewed: 30 June 2026
-                </p>
               </div>
 
               <div className="relative">

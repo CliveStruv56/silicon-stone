@@ -378,6 +378,8 @@ Out of scope (deferred):
 - Files changed:
   - `src/components/home/IntelligenceTiers.tsx` (rewritten — 4 tiers → 3)
   - `src/components/home/AdjacentBlock.tsx` (NEW — sister-product cross-link)
+    — **superseded 2026-08-11:** deleted; the cross-link now lives as a fuller
+    card on `/products`. §4b below is historical.
   - `src/components/home/index.ts` (re-export AdjacentBlock)
   - `src/app/(website)/page.tsx` (import + render `<AdjacentBlock />` after `<IntelligenceTiers />`)
   - `src/components/layout/Footer.tsx` (small WaymarkPath cross-link button on the bottom strip)

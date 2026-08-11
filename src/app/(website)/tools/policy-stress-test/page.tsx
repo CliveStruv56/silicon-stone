@@ -322,7 +322,7 @@ export default function PolicyStressTestPage() {
   const pressurePoint = useMemo(() => getPressurePoint(euPolicy, usPolicy), [euPolicy, usPolicy])
   const evidenceChecklist = useMemo(() => getEvidenceChecklist(euImpact, usImpact), [euImpact, usImpact])
 
-  // Combine and prioritize actions
+  // Combine and prioritise actions
   const allActions = useMemo(() => {
     const actions = [
       ...(euImpact?.actions || []).map(a => ({ ...a, source: 'EU' })),
@@ -358,7 +358,7 @@ export default function PolicyStressTestPage() {
             </h1>
             <p className="text-lg text-text-muted max-w-2xl mx-auto">
               Compare US and EU regulatory requirements for your industry.
-              Understand compliance friction and prioritize your response.
+              Understand compliance friction and prioritise your response.
             </p>
           </div>
         </section>
@@ -613,7 +613,7 @@ export default function PolicyStressTestPage() {
                     <CardHeader>
                       <CardTitle className="text-lg text-text-primary flex items-center gap-2">
                         <CheckCircle2 className="w-5 h-5 text-stone-teal" />
-                        Prioritized Action Plan
+                        Prioritised Action Plan
                       </CardTitle>
                       <CardDescription>
                         Combined compliance actions across both jurisdictions

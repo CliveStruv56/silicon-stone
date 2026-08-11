@@ -8,7 +8,6 @@ import {
   CredibilityBlock,
   OrchestrationBattleground,
   IntelligenceTiers,
-  AdjacentBlock,
   ToolsGallery,
   PersonaCompass,
   SubscribeCTA,
@@ -154,10 +153,7 @@ export default async function Home() {
         {/* 10. Advisory band — Engage */}
         <AdvisoryBand />
 
-        {/* 11. Adjacent Block — WaymarkPath as a "Related" companion */}
-        <AdjacentBlock />
-
-        {/* 12. Subscribe CTA */}
+        {/* 11. Subscribe CTA */}
         <div className="bg-stone-charcoal/30 border-t border-border-subtle">
           <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
             <div className="max-w-md mx-auto">

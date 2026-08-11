@@ -6,6 +6,7 @@ import { LadderBox } from '@/components/products/LadderBox'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { StaggerContainer, StaggerItem } from '@/components/ui/StaggerContainer'
 import {
   Shield,
   ClipboardCheck,
@@ -108,12 +109,8 @@ export default function ProductsPage() {
                 Practical Tools for Compliance and Strategy
               </h1>
               <p className="text-xl text-text-muted leading-relaxed">
-                The practical first step is not a countdown. It is an evidence trail:
-                know which systems you use, what role you play, what your vendors can
-                prove, and what should trigger reassessment.
-              </p>
-              <p className="mt-5 font-mono text-xs uppercase tracking-wider text-text-muted">
-                Regulatory copy last reviewed: 30 June 2026
+                Know which systems you use, what role you play, what your vendors
+                can prove, and what should trigger reassessment.
               </p>
             </div>
           </div>
@@ -188,17 +185,58 @@ export default function ProductsPage() {
           </div>
         </section>
 
-        {/* Sister product */}
-        <section className="border-y border-border-subtle bg-stone-charcoal/30">
-          <div className="mx-auto flex max-w-7xl flex-col gap-3 px-6 py-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
-            <p className="text-sm text-text-muted">
-              <span className="font-semibold text-sister-indigo">WaymarkPath</span>
-              {' '}is the separate career-transition companion for professionals navigating the same shifts.
-            </p>
-            <Link href="/waymarkpath" className="inline-flex items-center gap-1.5 text-sm text-sister-indigo hover:underline">
-              See WaymarkPath
-              <ArrowRight className="h-4 w-4" />
-            </Link>
+        {/* Sister product — WaymarkPath is adjacent to the Read → Use → Buy →
+            Engage ladder, not a rung on it, so it sits below the ladder in its
+            own band rather than in the products grid. Points at the internal
+            /waymarkpath page rather than the external app: that page explains
+            the companion and carries the early-access capture, so it is the
+            right first stop. The footer link matches, so
+            NEXT_PUBLIC_WAYMARKPATH_URL is not read anywhere in src. */}
+        <section aria-labelledby="sister-heading" className="border-y border-border-subtle bg-stone-charcoal/30">
+          <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
+            <StaggerContainer>
+              <StaggerItem>
+                <Link href="/waymarkpath" className="group block">
+                  <div className="card-interactive rounded-xl border border-sister-indigo/30 bg-stone-charcoal p-6 md:p-8">
+                    <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                      <div className="min-w-0 flex-1">
+                        <span className="mb-3 block font-mono text-[12px] uppercase tracking-[0.12em] text-sister-indigo">
+                          Related — a separate companion
+                        </span>
+                        <h2 id="sister-heading" className="text-2xl font-bold text-text-primary">
+                          WaymarkPath
+                        </h2>
+                        <p className="mt-2 max-w-2xl text-text-muted leading-relaxed">
+                          The career-transition companion for the individual
+                          professional navigating the same shifts these products
+                          address at company level.
+                        </p>
+
+                        <ul className="mt-5 grid gap-2 sm:grid-cols-3">
+                          {[
+                            'Skills gap analysis, ranked by priority',
+                            'A roadmap with milestones and progress tracking',
+                            'Daily AI check-ins that hold the plan together',
+                          ].map((item) => (
+                            <li key={item} className="flex items-start gap-2 text-sm text-text-muted">
+                              <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-sister-indigo" />
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <div className="flex-shrink-0">
+                        <span className="inline-flex items-center gap-2 rounded-md border border-sister-indigo/40 px-4 py-2 text-sm font-medium text-sister-indigo transition-colors group-hover:bg-sister-indigo/10">
+                          See WaymarkPath
+                          <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              </StaggerItem>
+            </StaggerContainer>
           </div>
         </section>
 

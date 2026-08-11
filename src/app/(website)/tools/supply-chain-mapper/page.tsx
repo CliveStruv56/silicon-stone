@@ -247,7 +247,7 @@ export default function SupplyChainMapperPage() {
               Interactive Tool
             </Badge>
             <h1 className="text-3xl font-bold text-text-primary sm:text-4xl mb-4">
-              Supply Chain Chokepoints
+              Supply Chain Mapper
             </h1>
             <p className="text-lg text-text-muted max-w-2xl">
               Mapping the physical vulnerability of the digital world. Explore {SUPPLY_CHAIN_NODES.length} critical nodes across the global semiconductor supply chain.
@@ -264,13 +264,22 @@ export default function SupplyChainMapperPage() {
                   <ClipboardList className="w-5 h-5 text-stone-teal" />
                   Exposure Diagnostic
                 </CardTitle>
-                <CardDescription>
+                {/* Both descriptions carry the same min-height so the selects
+                    below them share a baseline. The scenario summary opposite
+                    is dynamic (96–114 chars) and can reach three lines at `lg`
+                    but settles at two once max-w-7xl caps the column at `xl`,
+                    so the floor steps down there rather than leaving a
+                    permanent gap. The values are measured line heights (22px
+                    per line), not round numbers — 40px looked right but sat
+                    4px under a real two-line description and reintroduced the
+                    misalignment at 1440. */}
+                <CardDescription className="min-h-[66px] xl:min-h-[44px]">
                   Adjust the operating context to see which chokepoints matter most for this organisation.
                 </CardDescription>
               </CardHeader>
               <CardContent className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 <label className="space-y-1.5">
-                  <span className="text-xs uppercase tracking-wider text-text-muted">Industry context</span>
+                  <span className="block min-h-[44px] text-xs uppercase tracking-wider text-text-muted">Industry context</span>
                   <select
                     value={exposureProfile.industry}
                     onChange={(event) => setExposureProfile(prev => ({
@@ -286,7 +295,7 @@ export default function SupplyChainMapperPage() {
                 </label>
 
                 <label className="space-y-1.5">
-                  <span className="text-xs uppercase tracking-wider text-text-muted">Critical chip class</span>
+                  <span className="block min-h-[44px] text-xs uppercase tracking-wider text-text-muted">Critical chip class</span>
                   <select
                     value={exposureProfile.chipExposure}
                     onChange={(event) => setExposureProfile(prev => ({
@@ -302,7 +311,7 @@ export default function SupplyChainMapperPage() {
                 </label>
 
                 <label className="space-y-1.5">
-                  <span className="text-xs uppercase tracking-wider text-text-muted">Sourcing posture</span>
+                  <span className="block min-h-[44px] text-xs uppercase tracking-wider text-text-muted">Sourcing posture</span>
                   <select
                     value={exposureProfile.sourcingFlexibility}
                     onChange={(event) => setExposureProfile(prev => ({
@@ -318,7 +327,7 @@ export default function SupplyChainMapperPage() {
                 </label>
 
                 <label className="space-y-1.5">
-                  <span className="text-xs uppercase tracking-wider text-text-muted">Supply footprint</span>
+                  <span className="block min-h-[44px] text-xs uppercase tracking-wider text-text-muted">Supply footprint</span>
                   <select
                     value={exposureProfile.geography}
                     onChange={(event) => setExposureProfile(prev => ({
@@ -341,18 +350,29 @@ export default function SupplyChainMapperPage() {
                   <Activity className="w-5 h-5 text-silicon-amber-strong" />
                   Stress Scenario
                 </CardTitle>
-                <CardDescription>{selectedScenario.summary}</CardDescription>
+                <CardDescription className="min-h-[66px] xl:min-h-[44px]">
+                  {selectedScenario.summary}
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                <select
-                  value={selectedScenarioId}
-                  onChange={(event) => setSelectedScenarioId(event.target.value as ScenarioId)}
-                  className="h-10 w-full rounded-md border border-border-subtle bg-slate-deep px-3 text-sm text-text-primary outline-none focus:ring-2 focus:ring-silicon-amber"
-                >
-                  {SUPPLY_CHAIN_SCENARIOS.map(scenario => (
-                    <option key={scenario.id} value={scenario.id}>{scenario.name}</option>
-                  ))}
-                </select>
+                {/* Captioned like the four selects opposite — without the span
+                    this select sat ~18px higher than its neighbours. The
+                    captions carry a two-line min-height (`min-h-[44px]`) so
+                    every select in the row shares a baseline: "Critical chip
+                    class" wraps even at 1440, and all four left captions wrap
+                    at `lg`, while "Scenario" never does. */}
+                <label className="block space-y-1.5">
+                  <span className="block min-h-[44px] text-xs uppercase tracking-wider text-text-muted">Scenario</span>
+                  <select
+                    value={selectedScenarioId}
+                    onChange={(event) => setSelectedScenarioId(event.target.value as ScenarioId)}
+                    className="h-10 w-full rounded-md border border-border-subtle bg-slate-deep px-3 text-sm text-text-primary outline-none focus:ring-2 focus:ring-silicon-amber"
+                  >
+                    {SUPPLY_CHAIN_SCENARIOS.map(scenario => (
+                      <option key={scenario.id} value={scenario.id}>{scenario.name}</option>
+                    ))}
+                  </select>
+                </label>
                 <div className="grid gap-2 sm:grid-cols-3">
                   {selectedScenario.responseMoves.slice(0, 3).map(move => (
                     <div key={move} className="rounded-md border border-border-subtle bg-surface-elevated px-3 py-2 text-xs text-text-muted">

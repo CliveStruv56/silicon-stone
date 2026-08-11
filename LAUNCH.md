@@ -166,11 +166,34 @@ LS supports discount codes natively (Store → Discounts → New discount):
       to the company/founder LinkedIn URL (falls back to
       `https://www.linkedin.com/` until set).
 
+### Regulatory review stamp — reinstate before launch
+
+The "Regulatory copy last reviewed: <date>" line was removed from all five
+pages on 2026-08-11. It was stale (four pages said 30 June, `/eu-exposure` said
+17 July) and a stale review date on a compliance product is worse than none.
+
+- [ ] Re-read the regulatory copy on each page against the pinned corpus
+      (CELEX `02024R1689-20260727`), then restore the stamp with the **real**
+      review date. It is a credibility signal worth having once it is true —
+      and one date, on every page, not five drifting ones. Consider sourcing it
+      from a single constant so it cannot diverge again. Removed from:
+      - `src/app/(website)/products/page.tsx` (hero, under the sub-heading)
+      - `src/app/(website)/products/ai-audit-checklist/page.tsx` (under the first CTA)
+      - `src/app/(website)/products/ai-act-toolkit/page.tsx` (under the guarantee)
+      - `src/app/(website)/advisory/page.tsx`
+      - `src/app/(website)/eu-exposure/page.tsx`
+
 ## 1. Launch day — flip the flags
 
 - [ ] `NEXT_PUBLIC_PRE_LAUNCH=false` → product CTAs become Buy buttons wired to
       LS checkout (a CTA whose checkout URL is still unconfigured stays in
       early-access mode as a safety net).
+      > **Until this flips**, the pre-launch CTAs read "Buy Now" but collect an
+      > email (owner's call, 2026-08-11 — the site is unpromoted and unindexed,
+      > so nobody meets them). That reasoning expires the moment the site is
+      > announced or indexed: launch, or put the wording back, before promoting
+      > anything. The labels live on `<EarlyAccessCTA label=…>` in
+      > `products/ai-audit-checklist/page.tsx` and `products/ai-act-toolkit/page.tsx`.
 - [ ] `NEXT_PUBLIC_FREE_INTRO_END=<launch date + 90 days>` (ISO, e.g.
       `2026-10-19`) — the free-intro copy self-expires after that date; or flip
       `NEXT_PUBLIC_FREE_INTRO_WINDOW=false` manually.

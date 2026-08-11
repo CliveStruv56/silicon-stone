@@ -41,18 +41,24 @@ const textMap: Record<string, string> = {
  * with one card parked on top. Offsets are pre-computed rather than derived at
  * runtime so Tailwind sees complete class strings.
  *
- *   x = R·sin θ, y = −R·cos θ, with R = 320
+ *   x = R·sin θ, y = −R·cos θ, with R = 265
  *
  * Vertical offsets are absolute rather than `50% ± y` because the pentagon is
- * taller above the hub than below it; anchoring to a fixed centre (485px in a
- * 910px box) keeps the slack even top and bottom.
+ * taller above the hub than below it; anchoring to a fixed centre (390px in a
+ * 730px box) keeps the slack even top and bottom.
+ *
+ * R is bounded at both ends: too small and the top card's lower edge collides
+ * with the dial's arrowheads (which reach r≈137px at a 300px hub); too large
+ * and the block towers over the rest of the page. The node width (240px) is
+ * bound to R as well — Clara and Ian sit only 252px apart horizontally, so a
+ * wider card would overlap at the corners.
  */
 const orbit: Record<PersonaSlug, string> = {
-  clara: 'lg:left-1/2 lg:top-[165px]',
-  ian: 'lg:left-[calc(50%+304px)] lg:top-[386px]',
-  sofia: 'lg:left-[calc(50%+188px)] lg:top-[744px]',
-  citizen: 'lg:left-[calc(50%-188px)] lg:top-[744px]',
-  troy: 'lg:left-[calc(50%-304px)] lg:top-[386px]',
+  clara: 'lg:left-1/2 lg:top-[125px]',
+  ian: 'lg:left-[calc(50%+252px)] lg:top-[308px]',
+  sofia: 'lg:left-[calc(50%+156px)] lg:top-[604px]',
+  citizen: 'lg:left-[calc(50%-156px)] lg:top-[604px]',
+  troy: 'lg:left-[calc(50%-252px)] lg:top-[308px]',
   positional: '',
 }
 
@@ -69,23 +75,23 @@ function PersonaNode({ slug }: { slug: PersonaSlug }) {
     <Link
       href={`/intelligence?persona=${slug}`}
       className={cn(
-        'group block h-full lg:absolute lg:h-auto lg:w-[270px] lg:-translate-x-1/2 lg:-translate-y-1/2',
+        'group block h-full lg:absolute lg:h-auto lg:w-[240px] lg:-translate-x-1/2 lg:-translate-y-1/2',
         orbit[slug],
       )}
     >
       <div
         className={cn(
-          'mx-auto flex h-full w-full max-w-[290px] flex-col items-center rounded-3xl border bg-stone-charcoal p-5 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md lg:h-[310px] lg:max-w-none',
+          'mx-auto flex h-full w-full max-w-[290px] flex-col items-center rounded-3xl border bg-stone-charcoal p-4 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md lg:h-[230px] lg:max-w-none',
           borderMap[persona.color] ?? borderMap['text-muted'],
         )}
       >
         <Image
           src={persona.avatar}
           alt=""
-          width={96}
-          height={96}
+          width={80}
+          height={80}
           className={cn(
-            'h-24 w-24 rounded-2xl border-2 object-cover',
+            'h-20 w-20 rounded-full border-2 object-cover',
             ringMap[persona.color] ?? ringMap['text-muted'],
           )}
         />
@@ -97,10 +103,9 @@ function PersonaNode({ slug }: { slug: PersonaSlug }) {
           {persona.role}
         </div>
 
-        <p className="mt-3 text-sm leading-relaxed text-text-muted">
-          {persona.description}.
-        </p>
-
+        {/* No description here by design: the card is a signpost, and the full
+            description is one click away in `PersonaIntro` on /intelligence.
+            Carrying it in both places made the block tower over the page. */}
         <div
           className={cn(
             'mt-auto flex items-center gap-1 pt-4 text-sm',
@@ -270,21 +275,21 @@ export function PersonaCompass() {
         </StaggerItem>
 
         <StaggerItem>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:relative lg:block lg:h-[910px]">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:relative lg:block lg:h-[730px]">
             {BRIEFINGS_PERSONA_ORDER.map((slug: PersonaSlug) => (
               <PersonaNode key={slug} slug={slug} />
             ))}
 
             {/* Hub — desktop only; below lg its words are carried by the header. */}
-            <div className="hidden lg:absolute lg:left-1/2 lg:top-[485px] lg:flex lg:h-[360px] lg:w-[360px] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:items-center lg:justify-center">
+            <div className="hidden lg:absolute lg:left-1/2 lg:top-[390px] lg:flex lg:h-[300px] lg:w-[300px] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:items-center lg:justify-center">
               <CompassDial />
               {/* `relative` keeps the words above the dial — the SVG is
                   positioned and now paints a solid face. */}
-              <div className="relative max-w-[205px] px-2 text-center" aria-hidden="true">
+              <div className="relative max-w-[172px] px-2 text-center" aria-hidden="true">
                 <p
                   className="font-bold text-text-primary"
                   style={{
-                    fontSize: 'clamp(26px, 2.4vw, 34px)',
+                    fontSize: 'clamp(22px, 2vw, 28px)',
                     letterSpacing: '-0.02em',
                     lineHeight: 1.08,
                   }}
@@ -292,7 +297,7 @@ export function PersonaCompass() {
                   Find Your{' '}
                   <span className="text-silicon-amber-strong">Perspective.</span>
                 </p>
-                <p className="mt-3 text-sm leading-relaxed text-text-muted">
+                <p className="mt-2.5 text-[13px] leading-snug text-text-muted">
                   Intelligence tailored to your seat at the table.
                 </p>
               </div>
@@ -301,8 +306,8 @@ export function PersonaCompass() {
         </StaggerItem>
 
         {/* Positional (the WaymarkPath reading lens) deliberately has no strip
-            here — the Adjacent Block near the foot of the page carries that
-            cross-link, and repeating it mid-page read as double-billing. */}
+            here — the sister-product card on /products carries that cross-link,
+            and repeating it mid-page read as double-billing. */}
       </StaggerContainer>
     </section>
   )

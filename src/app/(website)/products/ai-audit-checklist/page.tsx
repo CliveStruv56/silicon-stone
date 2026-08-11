@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { AdvisoryNextStep } from '@/components/products/AdvisoryNextStep'
 import { EarlyAccessCTA } from '@/components/products/EarlyAccessCTA'
-import { GuaranteeNote } from '@/components/products/GuaranteeNote'
 import { isConfiguredCheckout } from '@/lib/checkout'
 import { PRE_LAUNCH } from '@/lib/flags'
 import {
@@ -83,7 +82,7 @@ export default function AIAuditChecklistPage() {
                   <div className="text-3xl font-mono font-bold text-stone-teal">£24</div>
                   <div className="text-sm text-text-muted">
                   2 spreadsheets + 2 PDFs<br />
-                    {buyable ? 'Digital delivery' : 'Early access'}
+                    Digital delivery
                   </div>
                 </div>
                 {buyable ? (
@@ -95,17 +94,13 @@ export default function AIAuditChecklistPage() {
                 ) : (
                   <EarlyAccessCTA
                     tierTag="tier-checklist"
+                    label="Buy Now — £24"
+                    submitLabel="Notify me at this address"
                     buttonClassName="bg-stone-teal text-ink-on-accent hover:bg-stone-teal/90 font-semibold"
                   />
                 )}
                 <p className="text-xs text-text-muted mt-3">
                   Includes a £20 discount code for the full AI Act Compliance Toolkit (valid 90 days).
-                </p>
-                <div className="mt-4">
-                  <GuaranteeNote />
-                </div>
-                <p className="mt-5 font-mono text-xs uppercase tracking-wider text-text-muted">
-                  Regulatory copy last reviewed: 30 June 2026
                 </p>
               </div>
 
@@ -223,17 +218,14 @@ export default function AIAuditChecklistPage() {
                 <div className="flex justify-center">
                   <EarlyAccessCTA
                     tierTag="tier-checklist"
+                    label="Buy Now — £24"
+                    submitLabel="Notify me at this address"
                     buttonClassName="bg-stone-teal text-ink-on-accent hover:bg-stone-teal/90 font-semibold"
                   />
                 </div>
               )}
-              <div className="mt-6 flex justify-center">
-                <GuaranteeNote className="justify-center" />
-              </div>
               <div className="flex items-center justify-center gap-6 mt-6 text-xs text-text-muted">
-                <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> {buyable ? 'Digital delivery' : 'Early access enquiries open'}</span>
                 <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> £20 Toolkit discount included</span>
-                <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> EU VAT handled</span>
               </div>
               <p className="text-sm text-text-muted mt-6">
                 Ready for the full framework?{' '}

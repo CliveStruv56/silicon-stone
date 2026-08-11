@@ -1,10 +1,10 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-08-10
+> Last Updated: 2026-08-11
 > Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (74 static pages), 187 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
-**Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages with an early-access enquiry fallback until Lemon Squeezy checkout URLs are configured, Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
+**Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
 **The AI Act Compliance Checker was rebuilt on 2026-08-10** (Stages 0–3 of the agentic build spec): the rule base is corrected and versioned at `v2026-08-10`, backed by a git-tracked rule pack carrying 19 Articles of verbatim consolidated statute; a conversational intake proposes answers the user confirms before the unchanged deterministic engine classifies; and the result screen now offers an email-gated written report whose every legal quotation is string-matched against that corpus before a reader sees it. The paid half of Stage 3 — the £39 Evidence Pack and the £39→£79 credit — is built dark behind a flag and blocked on the Lemon Squeezy store. A legal review of the report template, disclaimer and credit terms is an open item before it ships. See §11.
 
@@ -395,6 +395,65 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 11, 2026 — Eleven-item site pass: compass, merchandising, ladder
+
+A batch of copy, layout and merchandising fixes across the public site.
+
+**Homepage.** The persona compass was dominating the page at 910px tall. It is
+now 730px: the pentagon radius drops 320 → 265, cards 310 → 230px (and 270 →
+240px wide, which the tightened radius requires — Clara and Ian sit only 252px
+apart), avatars are 80px circles, and the hub dial shrinks 360 → 300px. The
+per-card description is **gone** rather than shortened: the shared
+`personas.ts` strings are untouched, so `/intelligence`, the article CTAs and
+`/saved` read exactly as before, and the full description is one click away in
+`PersonaIntro` — the cards already linked to `/intelligence?persona=<slug>`.
+The geometry comment carries the new numbers; it is the only record of how the
+pentagon is derived.
+
+**WaymarkPath** left the homepage (`AdjacentBlock` deleted) for a fuller card
+on `/products`, replacing the thin one-line band that was already there. Its
+value lines come from WaymarkPath's own feature list; the old block claimed
+"Free to start", which contradicts that page's "Early Access — Coming Soon"
+badge, so the claim is gone.
+
+**`/tools`** cards gained the preview art the homepage gallery already used —
+same WebP renders, same ratio applied to the frame so the row reserves height
+before the image lands.
+
+**The ladder** went from three rungs to five. It had skipped the £79 Toolkit
+despite rung one's whole benefit being £20 off it, and said "Briefing" for the
+£450 Advisory Briefing while an unrelated £2,500 Post-Omnibus Briefing existed
+on `/eu-exposure`. Both are now named in full. The heading changed from "Every
+step pays for the next" to "Every step builds on the last" — with five rungs,
+two are scope progressions carrying no money credit, and the old heading would
+have overclaimed.
+
+**Alignment on the Supply Chain Mapper.** The right-hand select had no caption
+`<span>`, and both card descriptions were free to differ in height. Fixed, and
+a worse pre-existing bug surfaced on the way: "Critical chip class" wraps to
+two lines even at 1440 while its three neighbours do not, so the selects were
+misaligned *inside* the left card too. All five captions now carry a two-line
+`min-h`, verified at 0px spread across 4 widths × 5 scenarios.
+
+**Product CTAs now read "Buy Now"** while `PRE_LAUNCH` is still true — an
+explicit owner decision on 2026-08-11, on the grounds the site is unpromoted
+and unindexed so nobody meets them. Production was checked first: all three
+`NEXT_PUBLIC_LEMONSQUEEZY_*_URL` values are the `example.com` placeholders
+`isConfiguredCheckout()` rejects, so the store is definitively not live. The
+buttons still open an email capture; `EarlyAccessCTA` gained a `submitLabel`
+prop so the button that actually posts an address says "Notify me at this
+address" rather than repeating "Buy Now". **`LAUNCH.md` records that this
+reasoning expires the moment the site is announced or indexed.**
+
+**Also:** "Supply Chain Chokepoints" → "Supply Chain Mapper" in the H1 and
+`<title>` (the route, nav and both grids already said Mapper); prioritize →
+prioritise; the `/products` sub-heading lost its "not a countdown" opener; the
+money-back guarantee left the checklist page; and the "Regulatory copy last
+reviewed" stamp was removed from **all five** pages carrying it — the dates had
+already drifted apart (four said 30 June, `/eu-exposure` said 17 July), and a
+stale review date on a compliance product is worse than none. `LAUNCH.md` lists
+all five locations as a pre-launch task to reinstate with one real, shared date.
 
 ### August 10, 2026 — The ink on an accent fill follows the theme
 

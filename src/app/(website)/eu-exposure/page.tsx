@@ -132,9 +132,6 @@ export default function EuExposurePage() {
                   Sovereignty Package is already reshaping market access for US providers. A
                   project ends; this does not.
                 </p>
-                <p className="mt-5 font-mono text-xs uppercase tracking-wider text-text-muted">
-                  Regulatory copy last reviewed: 17 July 2026
-                </p>
               </div>
 
               <div className="relative">

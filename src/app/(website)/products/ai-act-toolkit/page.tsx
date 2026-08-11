@@ -117,7 +117,8 @@ export default function AIActToolkitPage() {
                   ) : (
                     <EarlyAccessCTA
                       tierTag="tier-toolkit-standard"
-                      label="Request Early Access — Standard"
+                      label="Buy Now — Standard"
+                      submitLabel="Notify me at this address"
                       buttonClassName="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90 font-semibold"
                     />
                   )}
@@ -130,7 +131,8 @@ export default function AIActToolkitPage() {
                   ) : (
                     <EarlyAccessCTA
                       tierTag="tier-toolkit-professional"
-                      label="Request Early Access — Professional"
+                      label="Buy Now — Professional"
+                      submitLabel="Notify me at this address"
                       variant="outline"
                       buttonClassName="border-stone-teal text-stone-teal hover:bg-stone-teal/10"
                     />
@@ -138,14 +140,10 @@ export default function AIActToolkitPage() {
                 </div>
                 <p className="text-xs text-text-muted mt-3">
                   Professional includes a 30-minute video walkthrough.
-                  {!standardBuyable && ' Early access is open while fulfilment is finalised.'}
                 </p>
                 <div className="mt-4">
                   <GuaranteeNote />
                 </div>
-                <p className="mt-5 font-mono text-xs uppercase tracking-wider text-text-muted">
-                  Regulatory copy last reviewed: 30 June 2026
-                </p>
               </div>
 
               <div className="bg-stone-charcoal border border-border-subtle rounded-xl p-8">
@@ -330,7 +328,8 @@ export default function AIActToolkitPage() {
                 ) : (
                   <EarlyAccessCTA
                     tierTag="tier-toolkit-standard"
-                    label="Request Early Access — Standard"
+                    label="Buy Now — Standard"
+                    submitLabel="Notify me at this address"
                     buttonClassName="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90 font-semibold"
                   />
                 )}
@@ -343,7 +342,8 @@ export default function AIActToolkitPage() {
                 ) : (
                   <EarlyAccessCTA
                     tierTag="tier-toolkit-professional"
-                    label="Request Early Access — Professional"
+                    label="Buy Now — Professional"
+                    submitLabel="Notify me at this address"
                     variant="outline"
                     buttonClassName="border-stone-teal text-stone-teal hover:bg-stone-teal/10"
                   />
@@ -367,7 +367,7 @@ export default function AIActToolkitPage() {
                 {' '}version-tracks every model, dataset, wrapper and API, with provenance and licence status.
               </p>
               <div className="flex items-center justify-center gap-6 mt-8 text-xs text-text-muted">
-                <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> {standardBuyable ? 'Digital delivery' : 'Early access enquiries open'}</span>
+                <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> Digital delivery</span>
                 <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> Quarterly updates</span>
                 <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> EU VAT handled</span>
               </div>

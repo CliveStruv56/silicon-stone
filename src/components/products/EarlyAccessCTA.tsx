@@ -9,6 +9,14 @@ interface EarlyAccessCTAProps {
   /** Tier tag applied in Kit alongside `early-access` (e.g. tier-toolkit-standard). */
   tierTag: string
   label?: string
+  /**
+   * Label for the submit button once the email field is showing. Defaults to
+   * `label`, which is right when the CTA reads "Request Early Access". Set it
+   * where `label` is commerce-flavoured ("Buy Now — £24"): that wording belongs
+   * on the button that opens the form, but the button that actually posts an
+   * address should say what it does.
+   */
+  submitLabel?: string
   buttonClassName?: string
   size?: 'default' | 'sm' | 'lg'
   variant?: 'default' | 'outline'
@@ -23,6 +31,7 @@ interface EarlyAccessCTAProps {
 export function EarlyAccessCTA({
   tierTag,
   label = 'Request Early Access',
+  submitLabel,
   buttonClassName = '',
   size = 'lg',
   variant = 'default',
@@ -92,7 +101,7 @@ export function EarlyAccessCTA({
         className="w-full rounded-md border border-border-subtle bg-slate-deep px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-silicon-amber"
       />
       <Button type="submit" size={size} variant={variant} disabled={status === 'loading'} className={buttonClassName}>
-        {status === 'loading' ? 'Sending…' : label}
+        {status === 'loading' ? 'Sending…' : (submitLabel ?? label)}
       </Button>
       {status === 'error' && (
         <p className="text-sm text-alert-red">
