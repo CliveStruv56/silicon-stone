@@ -331,8 +331,15 @@ export function PersonaCompass() {
       className="mx-auto max-w-7xl px-6 py-14 lg:px-8 lg:py-14"
     >
       <StaggerContainer>
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-12">
-          <StaggerItem>
+        {/* Explicit rows so the diagram can sit in the *list's* row rather than
+            beside the column as a whole. Centred on the column it landed 97px
+            high — exactly half the heading block, which is what `self-center`
+            centres on when the heading shares the column. */}
+        {/* The heading/list gap is the grid's row-gap, not a margin on the
+            list: a margin sits *inside* the row, which offset the list from the
+            row box by 24px and left the dial 12px high. */}
+        <div className="grid grid-cols-1 gap-y-6 lg:grid-cols-2 lg:grid-rows-[auto_auto] lg:gap-x-12 lg:gap-y-6">
+          <StaggerItem className="lg:col-start-1 lg:row-start-1">
             <Badge
               variant="outline"
               className="mb-6 border-silicon-amber/60 text-silicon-amber-strong font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
@@ -354,8 +361,10 @@ export function PersonaCompass() {
               Intelligence tailored to your seat at the table. Every briefing is
               tagged for the roles its analysis serves most.
             </p>
+          </StaggerItem>
 
-            <div className="mt-6 flex flex-col gap-2.5">
+          <StaggerItem className="lg:col-start-1 lg:row-start-2">
+            <div className="flex flex-col gap-2.5">
               {BRIEFINGS_PERSONA_ORDER.map((slug: PersonaSlug) => (
                 <PersonaRow
                   key={slug}
@@ -367,10 +376,15 @@ export function PersonaCompass() {
             </div>
           </StaggerItem>
 
-          {/* The diagram. Hidden below `lg`, where a radial layout is
-              unreadable and the list alone carries the section. */}
-          <StaggerItem className="hidden lg:block lg:self-center">
-            <div className="relative mx-auto aspect-square w-full max-w-[600px]">
+          {/* The diagram, sharing the list's row so it centres on the text
+              boxes. The box is absolutely positioned so it contributes no
+              height: the row stays the list's 449px and the dial overhangs it
+              symmetrically instead of stretching the section by 135px. The
+              560px cap keeps that overhang (~56px each side) inside the
+              section's own `py-14`, so nothing spills into the next section.
+              Hidden below `lg`, where a radial layout is unreadable. */}
+          <StaggerItem className="hidden lg:relative lg:col-start-2 lg:row-start-2 lg:block">
+            <div className="absolute left-1/2 top-1/2 aspect-square w-full max-w-[560px] -translate-x-1/2 -translate-y-1/2">
               <div className="absolute left-1/2 top-[51.5%] flex h-[62%] w-[62%] -translate-x-1/2 -translate-y-1/2 items-center justify-center">
                 <CompassDial />
                 {/* `relative` lifts the words above the dial, which is

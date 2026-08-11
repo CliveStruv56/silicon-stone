@@ -442,8 +442,25 @@ faces (measured −2px). The label is now absolutely positioned below the
 avatar, so the div is avatar-sized and the geometry means what it says.
 
 Measured after the fix: top/bottom gaps within 2px at 1440 and 7px at 1024,
-horizontal exact, diagram centre within 1–3px of the list column's centre, and
-arrowhead clearance 17px at 1440 / 9px at 1024.
+horizontal exact, and arrowhead clearance 17px at 1440 / 9px at 1024.
+
+**Then aligned to the rows rather than to the column.** `lg:self-center`
+centres against the whole left column — heading included — which left the dial
+97px high, exactly half the 194px heading block. The heading and the list are
+now separate grid rows (`lg:grid-rows-[auto_auto]`) with the diagram placed in
+the list's row, so it centres on the text boxes. Two details make that work:
+
+- The box is **absolutely positioned**, so it contributes no height. The row
+  stays the list's 449px and the 560px dial overhangs it symmetrically (~20px
+  each side of the visible content) instead of stretching the section by 135px.
+  The 560px cap is what keeps that overhang inside the section's own `py-14` —
+  measured as zero spill into the neighbouring sections.
+- The heading/list gap is the grid's **row-gap, not a margin on the list**. As
+  a margin it sat *inside* the row, offsetting the list from its row box by
+  24px and leaving the dial 12px high.
+
+Final: diagram centre within 2–3px of the list centre at every `lg`+ width,
+section still 756px (835px at 1024, 967px on mobile).
 
 **The writing is back in the centre of the dial**, which had been left empty
 when the heading moved to the list column. At rest it reads "Find Your
