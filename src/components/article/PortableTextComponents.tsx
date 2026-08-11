@@ -4,6 +4,13 @@ import { PortableTextComponents } from 'next-sanity'
 import { urlFor } from '@/sanity/lib/image'
 import { GlossaryPopover } from '@/components/glossary'
 
+// Heading anchor id, stamped onto the block by buildToc (src/lib/article-toc.ts).
+// Undefined wherever the body was rendered without that pass — the heading then
+// renders exactly as it did before, with no id and no tab stop.
+function headingId(value: unknown): string | undefined {
+  return (value as { tocId?: string } | undefined)?.tocId
+}
+
 // All sizes are em-based so the body scales with the container's font-size —
 // which the A−/A/A+ stepper drives via the --article-size CSS var (P2-2).
 export const portableTextComponents: PortableTextComponents = {
@@ -11,14 +18,36 @@ export const portableTextComponents: PortableTextComponents = {
     // Body markdown that starts with `# Heading` would otherwise emit a second
     // <h1>, duplicating the page title. Render it as an <h2> (keeping the larger
     // visual weight) so each article has exactly one <h1>.
-    h1: ({ children }) => (
-      <h2 className="text-[1.65em] font-bold text-text-primary mt-10 mb-4">{children}</h2>
+    // `id`/`tabIndex` come from buildToc stamping `tocId` onto heading blocks.
+    // tabIndex={-1} keeps the heading out of the tab order while letting the
+    // contents list move focus *into* the section it jumps to; scroll-mt clears
+    // the sticky header so the target is not hidden underneath it on arrival.
+    h1: ({ children, value }) => (
+      <h2
+        id={headingId(value)}
+        tabIndex={headingId(value) ? -1 : undefined}
+        className="scroll-mt-24 text-[1.65em] font-bold text-text-primary mt-10 mb-4"
+      >
+        {children}
+      </h2>
     ),
-    h2: ({ children }) => (
-      <h2 className="text-[1.35em] font-bold text-text-primary mt-8 mb-4">{children}</h2>
+    h2: ({ children, value }) => (
+      <h2
+        id={headingId(value)}
+        tabIndex={headingId(value) ? -1 : undefined}
+        className="scroll-mt-24 text-[1.35em] font-bold text-text-primary mt-8 mb-4"
+      >
+        {children}
+      </h2>
     ),
-    h3: ({ children }) => (
-      <h3 className="text-[1.15em] font-semibold text-text-primary mt-6 mb-3">{children}</h3>
+    h3: ({ children, value }) => (
+      <h3
+        id={headingId(value)}
+        tabIndex={headingId(value) ? -1 : undefined}
+        className="scroll-mt-24 text-[1.15em] font-semibold text-text-primary mt-6 mb-3"
+      >
+        {children}
+      </h3>
     ),
     h4: ({ children }) => (
       <h4 className="text-[1.05em] font-semibold text-text-primary mt-4 mb-2">{children}</h4>

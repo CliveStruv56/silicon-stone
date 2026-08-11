@@ -12,10 +12,12 @@ import {
   PulseHeader,
   MethodologyChecklist,
   ReadingProgress,
+  TableOfContents,
   TextSizeStepper,
   Gate,
   InReadCapture,
 } from '@/components/article'
+import { buildToc, MIN_TOC_ENTRIES } from '@/lib/article-toc'
 import { SaveButton, type SavePayload } from '@/components/article/SaveButton'
 import { RelatedArticles } from '@/components/article/RelatedArticles'
 import { GlossaryToggle } from '@/components/glossary'
@@ -274,10 +276,18 @@ export default async function ArticlePage({ params }: Props) {
   // end gate is already the newsletter (avoid a double email ask), and only on
   // pieces long enough to carry a mid-article break.
   const bodyWithoutPreamble = stripAuthoringPreamble(article.body || [], article.title)
-  const bodyForRender: PortableTextBlock[] =
+  const bodyStripped: PortableTextBlock[] =
     article.citations && article.citations.length > 0
       ? stripTrailingSourcesSection(bodyWithoutPreamble)
       : bodyWithoutPreamble
+
+  // Contents for long reads. Runs *after* the preamble/sources strips (so the
+  // list matches what is actually on the page) and *before* the capture split
+  // (so headings in both halves carry their anchor ids).
+  const toc = buildToc(bodyStripped)
+  const bodyForRender = toc.body as PortableTextBlock[]
+  const showToc = toc.entries.length >= MIN_TOC_ENTRIES
+
   const bodySplit =
     article.inReadCapture !== false && resolvedGate.mode !== 'email'
       ? splitBodyForCapture(bodyForRender)
@@ -500,6 +510,12 @@ export default async function ArticlePage({ params }: Props) {
           </div>
 
           <Separator className="mb-10 bg-border-subtle" />
+
+          {showToc && (
+            <div className="max-w-[64ch]">
+              <TableOfContents entries={toc.entries} />
+            </div>
+          )}
 
           {/* Article Body — measure capped at 66ch, 18px/1.6 body scaled by the
               reader-controlled --article-size var (P2-2; children are em-based

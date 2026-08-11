@@ -382,6 +382,7 @@ SESSION_SECRET=<long random secret, 32+ characters>
 | Content sync | `scripts/sync-content.ts` |
 | Pinecone backfill sync | `src/scripts/sync-pinecone.ts` |
 | Briefing PDF renderer | `scripts/render-briefing-pdf.ts` |
+| Article contents (heading ids + entries) | `src/lib/article-toc.ts` (stamps `tocId`), `src/components/article/TableOfContents.tsx` |
 | Persona definitions + avatars | `src/lib/personas.ts`, `public/personas/` |
 | Middleware (auth) | `src/middleware.ts` |
 | Context profiles | `context/core/` |
@@ -397,6 +398,62 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 11, 2026 — "On this page" contents for long articles
+
+Long reads had no way back up and no sense of shape. The sticky header already
+covers *"take me elsewhere"* — it never hides at ≥768px, and below that it
+reveals on an 8px upward scroll with the `BottomTabBar` permanently on screen —
+so a floating back-to-top button would have been a fifth thing in an already
+crowded mobile corner (`SaveButton`, `TextSizeStepper`, `InReadCapture`, tab
+bar) solving a problem that was mostly already solved. A contents list answers
+the question the header does not: *where am I in this piece.*
+
+**Ids are stamped, not recomputed.** `buildToc()` resolves each heading's anchor
+id server-side and writes it onto the block as `tocId`; the renderers read that
+stamp. This is the whole design and it is not incidental — two headings called
+"Background" need the second to take a `-2` suffix, and only something that has
+seen the entire document can know it is looking at the second one. Any
+recompute-in-the-renderer scheme emits two identical ids, and every link to the
+second heading silently lands on the first.
+
+Order matters: the pass runs **after** `stripAuthoringPreamble` /
+`stripTrailingSourcesSection` (so the list matches what is actually rendered)
+and **before** `splitBodyForCapture` (so headings on both sides of the in-read
+capture keep their anchors).
+
+`h1` blocks are collected as top-level entries alongside `h2`, because body
+markdown starting with `# Heading` renders as an `<h2>` to keep one `<h1>` per
+page — collecting only `h2` would have missed them entirely.
+
+**Accessibility, which is mostly not the smooth-scroll part:**
+
+- **`prefers-reduced-motion` is read at click time, not cached at mount.** A
+  value captured once at hydration keeps animating at a reader who changes the
+  setting mid-session until they reload. There is no global
+  `scroll-behavior: smooth` in `globals.css`, so this handler is the only thing
+  that can animate a jump — and therefore the only place the preference can be
+  honoured.
+- **Focus moves to the heading, not just the viewport.** Scrolling alone leaves
+  a keyboard or screen-reader user's focus back in the list, so their next Tab
+  goes to the next contents link rather than into the section they chose — a
+  trap that looks perfect to a mouse user. Headings carry `tabIndex={-1}`.
+- `scroll-mt-24` clears the sticky header so the target is not hidden on arrival.
+- The scrollspy is advisory only: it sets `aria-current="location"` and a colour,
+  and never moves focus or scrolls, so it cannot fight the reader for control.
+- `history.pushState` mirrors a native anchor click, so Back returns the reader
+  to where they were and the URL stays shareable.
+
+Rendered in flow above the body rather than as a sticky rail: the article
+container is `max-w-4xl` with prose at `64ch`, so a rail would need the
+container widened. Collapsed below `lg` and opened after mount, so the server
+HTML and first client render always agree.
+
+Threshold is 3 headings (`MIN_TOC_ENTRIES`) — below that a list is furniture.
+Verified against the built HTML: **11 of 12 published articles** get a contents
+list with every `href` matching a real heading id.
+`eu-ai-act-compliance-chasm-august-2026` gets none, correctly — it does not
+carry enough headings.
 
 ### August 11, 2026 — Notion reconciled to the repo; the Toolkit copy in `docs/` deleted
 
