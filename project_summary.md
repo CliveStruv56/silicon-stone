@@ -453,6 +453,16 @@ opaque dark chip with the amber kept as border and text. Re-measured against
 rendered pixels at 390 / 430 / 768 / 1024 / 1440: **no run under AA**, including
 against the brightest 5% of the backdrop under each one.
 
+**The install prompt waits for the fold now.** Checking the fixed hero work on
+production surfaced something dev never showed: the PWA add-to-home-screen card
+fires on the live site and, being `position: fixed`, lands on the opening view —
+on mobile directly over the hero's CTAs. No anchor point fixes that (the top
+would cover the nav), so it is gated on scrolling past 60% of the first screen
+instead, which also means it only asks after the reader has engaged. A page with
+no fold to clear still shows it immediately — but that check runs on a 1.5s timer,
+because measuring `scrollHeight` during hydration reports nearly every page as
+short and put the card straight back over the hero.
+
 **Disabled buttons stopped free-riding on the fill.** `disabled:opacity-50` over
 a solid accent used to leave dark ink on a pale tint, which read acceptably; with
 white ink the same faded fill dropped to 2.5:1 and the CTA looked broken rather

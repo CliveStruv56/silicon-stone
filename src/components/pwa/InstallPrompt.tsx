@@ -46,11 +46,47 @@ function passesValueThreshold(): boolean {
  * `beforeinstallprompt` is only surfaced from the second session onwards
  * (Chromium), and iOS — which has no install event — gets manual share-sheet
  * instructions under the same threshold. Dismissal sticks for 30 days.
+ *
+ * It is also held back until the reader has scrolled past the first screen. The
+ * card is `position: fixed`, so wherever it is anchored it lands on top of the
+ * opening view — on the home page that means sitting over the hero's CTAs. A
+ * page too short to scroll shows it straight away, since there is no fold to
+ * clear.
  */
 export function InstallPrompt() {
   const standalone = useStandalone();
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [mode, setMode] = useState<"hidden" | "native" | "ios">("hidden");
+  const [pastFold, setPastFold] = useState(false);
+
+  useEffect(() => {
+    if (standalone) return;
+
+    function onScroll() {
+      if (window.scrollY > window.innerHeight * 0.6) {
+        setPastFold(true);
+        window.removeEventListener("scroll", onScroll);
+      }
+    }
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    // A page with no fold to clear still gets the card — but only once layout
+    // has settled. Measuring during hydration reports almost every page as
+    // short, which is what put the card back over the hero.
+    const settle = window.setTimeout(() => {
+      if (document.documentElement.scrollHeight <= window.innerHeight + 100) {
+        setPastFold(true);
+        window.removeEventListener("scroll", onScroll);
+      }
+    }, 1500);
+
+    return () => {
+      window.clearTimeout(settle);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [standalone]);
 
   useEffect(() => {
     if (standalone) return;
@@ -97,7 +133,7 @@ export function InstallPrompt() {
     setMode("hidden");
   }, [deferred]);
 
-  if (mode === "hidden" || standalone) return null;
+  if (mode === "hidden" || standalone || !pastFold) return null;
 
   return (
     <aside
