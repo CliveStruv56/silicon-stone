@@ -387,6 +387,8 @@ SESSION_SECRET=<long random secret, 32+ characters>
 | Context profiles | `context/core/` |
 | Business overview | `business-overview.json` |
 | Strategy docs | `docs/` |
+| **Paid product deliverables (sources)** | `deliverables/src/` — build with `node deliverables/src/assemble-toolkit.mjs` and `build-spreadsheets.mjs` |
+| Built deliverables (gitignored, regenerable) | `deliverables/dist/` — never copy these back into `docs/` (pointer: `docs/ai-act-compliance-toolkit.md`) |
 | Plausible types | `src/types/plausible.d.ts` |
 | Favicon | `src/app/icon.svg` |
 | Codebase knowledge graph | `.understand-anything/knowledge-graph.json` |
@@ -395,6 +397,49 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 11, 2026 — Notion reconciled to the repo; the Toolkit copy in `docs/` deleted
+
+**Documentation pass, no code change.** Notion had last been reconciled on 6
+August, so it predated the Compliance Checker rebuild, the nav pass, the
+canonical-host switch and the Kit P0 confirmation.
+
+Six Journal entries were logged (canonical host → apex; the Checker rebuild;
+the nav pass and `/us-executive-guide` rename; the Atlantic Drift identifier
+decision; "Buy Now" CTAs + the regulatory-stamp removal; the Kit P0
+confirmation). Seven canon pages were updated — **Platform Overview** (public
+pages table, status table, ordered next steps), **AI Act Compliance Checker**,
+**Project Map**, **AI / Agent Instructions**, **Digital Products**, **Persona
+Profiles** (already current) and the **project page's Current State**. Four
+tasks were added: the legal review of the paid report, the 14 Kit tag IDs, the
+Professional video walkthrough, and reinstating the regulatory stamp.
+
+Three corrections worth noting, because each was wrong in a way that would have
+misled a reader:
+
+- Platform Overview listed **Kit integration as "Live"**. It is the P0. Now
+  marked blocked, with the confirmation evidence.
+- **AI / Agent Instructions still mapped Talent & Capability Flow to "Robert"**
+  — a persona retired on 30 June 2026. An agent reading it as canon could have
+  emitted a tag that no longer exists. Corrected, along with the page's whole
+  "everything lives in the vault" premise.
+- Several pages still assumed the **product files were unbuilt**. They have been
+  in `deliverables/dist/` since June; the only missing asset is the Toolkit
+  Professional video walkthrough.
+
+**`docs/AI Act Compliance Toolkit.md` was deleted** (`3edd998b`). It was 106KB
+and **byte-identical** to `deliverables/dist/AI Act Compliance Toolkit.md` — a
+build output, copied into `docs/` with its provenance stripped. It was untracked,
+so nothing entered git history. It is replaced by
+`docs/ai-act-compliance-toolkit.md`, a pointer carrying the source dir, the build
+command, the output path and the CELEX reference.
+
+The reason it had to go rather than be committed: the sources are
+`deliverables/src/*.md`, so the copy would have drifted the moment a section was
+edited — and a stale risk-classification tree inside a compliance product still
+reads as authoritative. Same failure mode the Obsidian vault was retired over on
+6 August. Repo visibility was checked while deciding: it is **private**, so the
+full £79 deliverable text was not exposed.
 
 ### August 11, 2026 — Every offering reachable from the top nav
 
