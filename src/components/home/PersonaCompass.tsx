@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
@@ -36,29 +37,30 @@ const textMap: Record<string, string> = {
 }
 
 /**
- * Desktop compass geometry. The five nodes sit on a true pentagon — 72° apart,
- * starting due north — so they read as orbiting the hub rather than as a grid
- * with one card parked on top. Offsets are pre-computed rather than derived at
- * runtime so Tailwind sees complete class strings.
+ * Marker geometry for the diagram column. The five markers sit on a true
+ * pentagon — 72° apart, starting due north — so the dial's arrows point at
+ * something again now that the persona cards have moved into the list column.
  *
- *   x = R·sin θ, y = −R·cos θ, with R = 265
+ *   x = R·sin θ, y = −R·cos θ, with R = 180 about a centre of (230, 230)
  *
- * Vertical offsets are absolute rather than `50% ± y` because the pentagon is
- * taller above the hub than below it; anchoring to a fixed centre (390px in a
- * 730px box) keeps the slack even top and bottom.
+ * Those pixel values were derived against a 460px box and then divided through
+ * by it, because the column is only 456px wide at exactly `lg` and a fixed
+ * 460px box would overflow by 4px. Percentages let the whole pentagon scale
+ * with the column while the avatars stay a constant 48px.
  *
- * R is bounded at both ends: too small and the top card's lower edge collides
- * with the dial's arrowheads (which reach r≈137px at a 300px hub); too large
- * and the block towers over the rest of the page. The node width (240px) is
- * bound to R as well — Clara and Ian sit only 252px apart horizontally, so a
- * wider card would overlap at the corners.
+ *   clara   0°   (230,  50)   ian  72°  (401, 174)   sofia 144° (336, 376)
+ *   citizen 216° (124, 376)   troy 288° ( 59, 174)
+ *
+ * R is bounded below by the dial's arrowheads, which reach r≈137px when the
+ * 400-unit viewBox is drawn at 65.2% of the box; markers any closer would sit
+ * on the arrow tips rather than at the end of them.
  */
-const orbit: Record<PersonaSlug, string> = {
-  clara: 'lg:left-1/2 lg:top-[125px]',
-  ian: 'lg:left-[calc(50%+252px)] lg:top-[308px]',
-  sofia: 'lg:left-[calc(50%+156px)] lg:top-[604px]',
-  citizen: 'lg:left-[calc(50%-156px)] lg:top-[604px]',
-  troy: 'lg:left-[calc(50%-252px)] lg:top-[308px]',
+const marker: Record<PersonaSlug, string> = {
+  clara: 'left-1/2 top-[10.87%]',
+  ian: 'left-[87.22%] top-[37.91%]',
+  sofia: 'left-[73%] top-[81.65%]',
+  citizen: 'left-[27%] top-[81.65%]',
+  troy: 'left-[12.78%] top-[37.91%]',
   positional: '',
 }
 
@@ -68,55 +70,119 @@ const RAY_ANGLES = [0, 72, 144, 216, 288]
 /** Compass tick marks every 15°, with the cardinals drawn longer. */
 const TICKS = Array.from({ length: 24 }, (_, i) => i * 15)
 
-function PersonaNode({ slug }: { slug: PersonaSlug }) {
+/**
+ * One row in the list column. Horizontal and content-sized rather than a fixed
+ * box: the old card was 240×230px because the pentagon dictated it, which left
+ * dead space no amount of copy could fill. A wide row absorbs the persona's
+ * description comfortably, so the text that used to be hidden at `lg` is back.
+ *
+ * Hovering or focusing a row lights its marker in the diagram — that linkage is
+ * what stops the diagram being five anonymous faces.
+ */
+function PersonaRow({
+  slug,
+  onActivate,
+  onDeactivate,
+}: {
+  slug: PersonaSlug
+  onActivate: () => void
+  onDeactivate: () => void
+}) {
   const persona = PERSONAS[slug]
 
   return (
     <Link
       href={`/intelligence?persona=${slug}`}
+      onMouseEnter={onActivate}
+      onMouseLeave={onDeactivate}
+      onFocus={onActivate}
+      onBlur={onDeactivate}
       className={cn(
-        'group block h-full lg:absolute lg:h-auto lg:w-[240px] lg:-translate-x-1/2 lg:-translate-y-1/2',
-        orbit[slug],
+        // `card-interactive` carries the resting depth, the hover lift and the
+        // reduced-motion opt-out that used to be hand-rolled here.
+        'card-interactive group flex items-center gap-4 rounded-[32px] border bg-stone-charcoal p-3.5',
+        borderMap[persona.color] ?? borderMap['text-muted'],
       )}
     >
-      <div
+      <Image
+        src={persona.avatar}
+        alt=""
+        width={48}
+        height={48}
         className={cn(
-          'mx-auto flex h-full w-full max-w-[290px] flex-col items-center rounded-3xl border bg-stone-charcoal p-4 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md lg:h-[230px] lg:max-w-none',
-          borderMap[persona.color] ?? borderMap['text-muted'],
+          'h-12 w-12 flex-shrink-0 rounded-full border-2 object-cover',
+          ringMap[persona.color] ?? ringMap['text-muted'],
         )}
-      >
-        <Image
-          src={persona.avatar}
-          alt=""
-          width={80}
-          height={80}
-          className={cn(
-            'h-20 w-20 rounded-full border-2 object-cover',
-            ringMap[persona.color] ?? ringMap['text-muted'],
-          )}
-        />
+      />
 
-        <h3 className="mt-4 text-lg font-semibold leading-tight text-text-primary">
-          {persona.name}
-        </h3>
-        <div className="mt-1.5 font-mono text-[11.5px] uppercase leading-tight tracking-[0.08em] text-text-muted">
-          {persona.role}
+      <div className="min-w-0 flex-1">
+        {/* Name and role share a line. Stacked, they made every row three text
+            lines tall, which at `lg` (where all five descriptions wrap) put the
+            section above the height it had before this redesign. `flex-wrap`
+            lets the role drop below on a narrow column rather than truncate. */}
+        <div className="flex flex-wrap items-baseline gap-x-2">
+          <h3 className="text-base font-semibold leading-tight text-text-primary">
+            {persona.name}
+          </h3>
+          <span className="font-mono text-[10.5px] uppercase leading-tight tracking-[0.08em] text-text-muted">
+            {persona.role}
+          </span>
         </div>
-
-        {/* No description here by design: the card is a signpost, and the full
-            description is one click away in `PersonaIntro` on /intelligence.
-            Carrying it in both places made the block tower over the page. */}
-        <div
-          className={cn(
-            'mt-auto flex items-center gap-1 pt-4 text-sm',
-            textMap[persona.color] ?? textMap['text-muted'],
-          )}
-        >
-          <span>Explore</span>
-          <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-        </div>
+        <p className="mt-1 text-sm leading-snug text-text-muted">
+          {persona.description}.
+        </p>
       </div>
+
+      <ArrowRight
+        className={cn(
+          'h-4 w-4 flex-shrink-0 transition-transform group-hover:translate-x-0.5',
+          textMap[persona.color] ?? textMap['text-muted'],
+        )}
+      />
     </Link>
+  )
+}
+
+/**
+ * A persona's node on the dial. Deliberately decorative: the list column
+ * already carries one link per persona, and making these links too would give
+ * every persona two tab stops to the same destination.
+ */
+function PersonaMarker({
+  slug,
+  active,
+  dimmed,
+}: {
+  slug: PersonaSlug
+  active: boolean
+  dimmed: boolean
+}) {
+  const persona = PERSONAS[slug]
+
+  return (
+    <div
+      aria-hidden="true"
+      className={cn(
+        'absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center transition-all duration-300 motion-reduce:transition-none',
+        marker[slug],
+        active && 'scale-110',
+        dimmed && 'opacity-40',
+      )}
+    >
+      <Image
+        src={persona.avatar}
+        alt=""
+        width={48}
+        height={48}
+        className={cn(
+          'h-12 w-12 rounded-full border-2 object-cover',
+          ringMap[persona.color] ?? ringMap['text-muted'],
+        )}
+      />
+      <span className="mt-1 font-mono text-[9.5px] uppercase tracking-[0.1em] text-text-muted">
+        {persona.name.split(' ').pop()}
+      </span>
+    </div>
   )
 }
 
@@ -125,7 +191,7 @@ function PersonaNode({ slug }: { slug: PersonaSlug }) {
  * and five arrows out to the nodes. Decorative — the hub's words are marked
  * aria-hidden and the real heading lives in the section header.
  */
-function CompassDial() {
+function CompassDial({ activeAngle }: { activeAngle: number | null }) {
   const reduceMotion = useReducedMotion()
 
   return (
@@ -225,87 +291,121 @@ function CompassDial() {
           <polygon points="200,18 192,30 208,30" stroke="none" />
         </g>
       ))}
+
+      {/* Needle. The face used to carry the section heading; with the heading
+          moved to the list column it would otherwise sit empty, and a compass
+          without a needle reads as an unfinished plate. It swings to the
+          bearing of whichever row is hovered — the same linkage the markers
+          show, stated a second way — and rests due north, dimmed, when nothing
+          is active. Bearings match RAY_ANGLES, so index × 72° is the persona's
+          angle in BRIEFINGS_PERSONA_ORDER. */}
+      <motion.g
+        style={{ transformOrigin: '200px 200px' }}
+        animate={{ rotate: activeAngle ?? 0, opacity: activeAngle === null ? 0.3 : 0.95 }}
+        transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 90, damping: 14 }}
+      >
+        <line
+          x1="200"
+          y1="200"
+          x2="200"
+          y2="108"
+          stroke="var(--silicon-amber)"
+          strokeWidth="3"
+          strokeLinecap="round"
+        />
+        <polygon points="200,92 193,112 207,112" fill="var(--silicon-amber)" />
+      </motion.g>
+      <circle cx="200" cy="200" r="6" fill="var(--stone-charcoal)" stroke="var(--silicon-amber)" strokeWidth="2.5" />
     </svg>
   )
 }
 
 /**
- * Persona routing rendered as a compass: the five taggable personas orbit a hub
- * that carries the section title, collapsing to a plain card list below `lg`
- * where a radial layout would be unreadable. Sits inside the "Read" run of the
- * page, between the tier ladder and the tools gallery.
+ * Persona routing, split in two: the five taggable personas as a stacked list
+ * on the left, the compass dial and its markers on the right. Sits inside the
+ * "Read" run of the page, between the tier ladder and the tools gallery.
  *
- * The heading lives in the hub on desktop. To keep one real `h2` in the
- * document, the header block above stays in the DOM and goes `sr-only` at `lg`,
- * and the hub's copy is `aria-hidden`.
+ * The earlier version put the persona cards *on* the pentagon, which forced two
+ * compromises this layout does not need: the heading had nowhere to live, so
+ * the real `h2` went `sr-only` at `lg` while the hub painted an `aria-hidden`
+ * copy of the same words; and each card was locked to 240×230px by the
+ * geometry, leaving space that no amount of copy could fill. Here the heading
+ * sits in normal flow and the rows size to their content.
+ *
+ * Below `lg` the diagram is dropped entirely and the list carries the section.
  */
 export function PersonaCompass() {
+  const [active, setActive] = useState<PersonaSlug | null>(null)
+
+  // Bearing of the hovered persona, or null at rest. The order of
+  // BRIEFINGS_PERSONA_ORDER is the order of the pentagon, so the index is the
+  // bearing in units of 72°.
+  const activeIndex = active ? BRIEFINGS_PERSONA_ORDER.indexOf(active) : -1
+  const activeAngle = activeIndex === -1 ? null : activeIndex * 72
+
   return (
     <section
       aria-labelledby="persona-heading"
       className="mx-auto max-w-7xl px-6 py-14 lg:px-8 lg:py-14"
     >
       <StaggerContainer>
-        <StaggerItem>
-          <div className="max-w-3xl mb-8">
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-12">
+          <StaggerItem>
             <Badge
               variant="outline"
               className="mb-6 border-silicon-amber/60 text-silicon-amber-strong font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
             >
               Read · persona routing
             </Badge>
-            <div className="lg:sr-only">
-              <h2
-                id="persona-heading"
-                className="font-bold text-text-primary mb-4"
-                style={{
-                  fontSize: 'clamp(32px, 4vw, 48px)',
-                  letterSpacing: '-0.02em',
-                  lineHeight: 1.1,
-                }}
-              >
-                Find Your Perspective
-              </h2>
-              <p className="text-base text-text-muted leading-relaxed">
-                Intelligence tailored to your seat at the table. Every briefing
-                is tagged for the roles its analysis serves most.
-              </p>
+            <h2
+              id="persona-heading"
+              className="font-bold text-text-primary mb-4"
+              style={{
+                fontSize: 'clamp(32px, 3.4vw, 44px)',
+                letterSpacing: '-0.02em',
+                lineHeight: 1.1,
+              }}
+            >
+              Find Your Perspective
+            </h2>
+            <p className="text-base text-text-muted leading-relaxed">
+              Intelligence tailored to your seat at the table. Every briefing is
+              tagged for the roles its analysis serves most.
+            </p>
+
+            <div className="mt-6 flex flex-col gap-2.5">
+              {BRIEFINGS_PERSONA_ORDER.map((slug: PersonaSlug) => (
+                <PersonaRow
+                  key={slug}
+                  slug={slug}
+                  onActivate={() => setActive(slug)}
+                  onDeactivate={() => setActive(null)}
+                />
+              ))}
             </div>
-          </div>
-        </StaggerItem>
+          </StaggerItem>
 
-        <StaggerItem>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:relative lg:block lg:h-[730px]">
-            {BRIEFINGS_PERSONA_ORDER.map((slug: PersonaSlug) => (
-              <PersonaNode key={slug} slug={slug} />
-            ))}
-
-            {/* Hub — desktop only; below lg its words are carried by the header. */}
-            <div className="hidden lg:absolute lg:left-1/2 lg:top-[390px] lg:flex lg:h-[300px] lg:w-[300px] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:items-center lg:justify-center">
-              <CompassDial />
-              {/* `relative` keeps the words above the dial — the SVG is
-                  positioned and now paints a solid face. */}
-              <div className="relative max-w-[172px] px-2 text-center" aria-hidden="true">
-                <p
-                  className="font-bold text-text-primary"
-                  style={{
-                    fontSize: 'clamp(22px, 2vw, 28px)',
-                    letterSpacing: '-0.02em',
-                    lineHeight: 1.08,
-                  }}
-                >
-                  Find Your{' '}
-                  <span className="text-silicon-amber-strong">Perspective.</span>
-                </p>
-                <p className="mt-2.5 text-[13px] leading-snug text-text-muted">
-                  Intelligence tailored to your seat at the table.
-                </p>
+          {/* The diagram. Hidden below `lg`, where a radial layout is
+              unreadable and the list alone carries the section. */}
+          <StaggerItem className="hidden lg:block lg:self-center">
+            <div className="relative mx-auto aspect-square w-full max-w-[460px]">
+              <div className="absolute left-1/2 top-1/2 h-[65.2%] w-[65.2%] -translate-x-1/2 -translate-y-1/2">
+                <CompassDial activeAngle={activeAngle} />
               </div>
-            </div>
-          </div>
-        </StaggerItem>
 
-        {/* Positional (the WaymarkPath reading lens) deliberately has no strip
+              {BRIEFINGS_PERSONA_ORDER.map((slug: PersonaSlug) => (
+                <PersonaMarker
+                  key={slug}
+                  slug={slug}
+                  active={active === slug}
+                  dimmed={active !== null && active !== slug}
+                />
+              ))}
+            </div>
+          </StaggerItem>
+        </div>
+
+        {/* Positional (the WaymarkPath reading lens) deliberately has no row
             here — the sister-product card on /products carries that cross-link,
             and repeating it mid-page read as double-billing. */}
       </StaggerContainer>

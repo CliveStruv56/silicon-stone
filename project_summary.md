@@ -396,6 +396,47 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 11, 2026 — The persona compass becomes a list beside a dial
+
+The earlier shrink (910px → 730px) fixed the height but not the composition:
+five sparse cards orbiting a hub, looking under-filled because content had been
+removed rather than rearranged. The section is now a two-column split — the
+five personas as a stacked list on the left, the dial and its markers on the
+right (`lg:grid-cols-2`, diagram dropped below `lg`).
+
+Three things fell out of the reframing rather than being added to it:
+
+- **The cards stopped being load-bearing.** Each was pinned to 240×230px by the
+  pentagon (240px because Clara and Ian sat 252px apart). As list rows they
+  size to content, so the dead space went without needing filler.
+- **The heading duplication is gone.** The real `h2` used to be `lg:sr-only`
+  while the hub painted an `aria-hidden` copy of the same words, because the
+  radial layout had nowhere to put a heading. One `h2`, in normal flow.
+- **The added context is copy that already existed** — the intro paragraph was
+  in the markup but `sr-only` at `lg`, and each persona's `description` lives
+  in `personas.ts`. Nothing was invented, and `personas.ts` is still untouched,
+  so `/intelligence`, the article CTAs and `/saved` are unaffected.
+
+The five cards *were* the diagram, so the dial would have pointed its arrows at
+nothing. It now has its own 48px avatar markers on the same pentagon (R=180,
+expressed as percentages so the box scales — the column is only 456px at
+exactly `lg` and a fixed 460px box overflowed by 4px). Markers are decorative,
+not links, so each persona keeps exactly one tab stop. Hovering or focusing a
+row lights its marker and dims the other four.
+
+**The dial's face was left empty** once the heading moved out, which read as an
+unfinished plate — so it gained a needle that swings to the hovered persona's
+bearing and rests due north, dimmed. `BRIEFINGS_PERSONA_ORDER` is the pentagon
+order, so the bearing is just index × 72°.
+
+**Height was the acceptance test, and the first attempt failed it** — 923px
+against the old 842px, because three stacked text lines per row put every
+description onto two lines at `lg`. Folding the role onto the name line and
+tightening the padding brought it to **756px at ≥1280 and 835px at 1024**, so
+the section carries more information in less height at every width. Verified
+across 1536/1440/1280/1024/390: five links, no marker overflow, and correct
+hover linkage on all five rows.
+
 ### August 11, 2026 — Eleven-item site pass: compass, merchandising, ladder
 
 A batch of copy, layout and merchandising fixes across the public site.
