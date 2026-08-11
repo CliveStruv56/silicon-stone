@@ -424,10 +424,26 @@ box; every offset is a percentage because the column is 584px at `xl` but only
 are decorative, not links, so each persona keeps exactly one tab stop. Hovering
 or focusing a row lights its marker and dims the other four.
 
-**Sized up after review** (the first cut was marooned — a 460px diagram in a
-584px column, reading as small and meaningless): the box is now 560px, avatars
-56px (64 at `xl`), and the dial 62% of the box. The section height is unchanged
-because the list column is the taller of the two, so this cost nothing.
+**Sized up twice after review** (the first cut was marooned — a 460px diagram
+in a 584px column, reading as small and meaningless). The box now fills the
+column (584px at `xl`, capped at 600), avatars are 72px (80 at `xl`), and the
+dial is 62% of the box. The section height is unchanged throughout, because the
+list column is the taller of the two — the diagram had that space spare.
+
+**Two centring bugs were found by measuring rather than by eye.** First, a
+pentagon is not vertically symmetric — one point due north, two below the
+horizontal — so it spans 38% above its centre and 30.74% below (cos 144° =
+−0.809), and on a 50% centre it reads as shoved toward the top. `Cy` is now
+51.5%, which balances the true extents. Second, the marker `<div>` wrapped the
+avatar *and* its label, so `-translate-y-1/2` centred that combined block on
+the pentagon point and left every avatar sitting above its true position — at
+`lg` that cost enough radius to put the arrowheads through the bottom two
+faces (measured −2px). The label is now absolutely positioned below the
+avatar, so the div is avatar-sized and the geometry means what it says.
+
+Measured after the fix: top/bottom gaps within 2px at 1440 and 7px at 1024,
+horizontal exact, diagram centre within 1–3px of the list column's centre, and
+arrowhead clearance 17px at 1440 / 9px at 1024.
 
 **The writing is back in the centre of the dial**, which had been left empty
 when the heading moved to the list column. At rest it reads "Find Your

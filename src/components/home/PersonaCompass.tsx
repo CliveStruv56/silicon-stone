@@ -41,21 +41,31 @@ const textMap: Record<string, string> = {
  * pentagon — 72° apart, starting due north — so the dial's arrows point at
  * something now that the persona cards have moved into the list column.
  *
- *   x% = 50 + R·sin θ,  y% = 50 − R·cos θ,  with R = 38% of the box
+ *   x% = 50 + R·sin θ,  y% = Cy − R·cos θ,  with R = 38% and Cy = 51.5%
  *
  * Everything here is a percentage of the box rather than a pixel offset: the
  * column is 584px wide at `xl` but only 456px at exactly `lg`, and the whole
  * pentagon has to scale between the two. The avatars are the one fixed
- * dimension (56px, 64px at `xl`), which is what sets the lower bound on R —
+ * dimension (72px, 80px at `xl`), which is what sets the lower bound on R —
  * at 62% the dial's arrowheads reach r≈0.28×box, so a marker's inner edge has
  * to clear that or the arrows spear the faces instead of pointing at them.
+ *
+ * Cy is 51.5%, not 50%, because a pentagon is not vertically symmetric: one
+ * point sits due north but two sit below the horizontal, so the shape spans
+ * 38% above the centre and only 30.74% below it (cos 144° = −0.809). Centred
+ * on 50% it reads as pushed toward the top of its box. Balancing the real
+ * extents — avatar half-height above, avatar half-height plus the label below
+ * — puts the optical centre near 51.5%; measured, that leaves the top and
+ * bottom gaps within a few px of each other at both `lg` and `xl`. The dial
+ * is offset to match, since the arrows have to radiate from the same point
+ * the markers orbit.
  */
 const marker: Record<PersonaSlug, string> = {
-  clara: 'left-1/2 top-[12%]',
-  ian: 'left-[86.14%] top-[38.26%]',
-  sofia: 'left-[72.34%] top-[80.74%]',
-  citizen: 'left-[27.66%] top-[80.74%]',
-  troy: 'left-[13.86%] top-[38.26%]',
+  clara: 'left-1/2 top-[13.5%]',
+  ian: 'left-[86.14%] top-[39.76%]',
+  sofia: 'left-[72.34%] top-[82.24%]',
+  citizen: 'left-[27.66%] top-[82.24%]',
+  troy: 'left-[13.86%] top-[39.76%]',
   positional: '',
 }
 
@@ -158,7 +168,12 @@ function PersonaMarker({
     <div
       aria-hidden="true"
       className={cn(
-        'absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center transition-all duration-300 motion-reduce:transition-none',
+        // Sized to the avatar alone, so `-translate-y-1/2` lands the *avatar's*
+        // centre on the pentagon point. The label is taken out of flow and hung
+        // below: inside the flex column it added its own height to the block,
+        // which pushed every face above its true point and cost enough radius
+        // to put the arrowheads through the bottom two at `lg`.
+        'absolute -translate-x-1/2 -translate-y-1/2 transition-all duration-300 motion-reduce:transition-none',
         marker[slug],
         active && 'scale-110',
         dimmed && 'opacity-40',
@@ -167,14 +182,14 @@ function PersonaMarker({
       <Image
         src={persona.avatar}
         alt=""
-        width={64}
-        height={64}
+        width={80}
+        height={80}
         className={cn(
-          'h-14 w-14 rounded-full border-2 object-cover xl:h-16 xl:w-16',
+          'block h-[72px] w-[72px] rounded-full border-2 object-cover xl:h-20 xl:w-20',
           ringMap[persona.color] ?? ringMap['text-muted'],
         )}
       />
-      <span className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.1em] text-text-muted xl:text-[11px]">
+      <span className="absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap font-mono text-[11px] uppercase tracking-[0.1em] text-text-muted xl:text-[12px]">
         {persona.name.split(' ').pop()}
       </span>
     </div>
@@ -355,8 +370,8 @@ export function PersonaCompass() {
           {/* The diagram. Hidden below `lg`, where a radial layout is
               unreadable and the list alone carries the section. */}
           <StaggerItem className="hidden lg:block lg:self-center">
-            <div className="relative mx-auto aspect-square w-full max-w-[560px]">
-              <div className="absolute left-1/2 top-1/2 flex h-[62%] w-[62%] -translate-x-1/2 -translate-y-1/2 items-center justify-center">
+            <div className="relative mx-auto aspect-square w-full max-w-[600px]">
+              <div className="absolute left-1/2 top-[51.5%] flex h-[62%] w-[62%] -translate-x-1/2 -translate-y-1/2 items-center justify-center">
                 <CompassDial />
                 {/* `relative` lifts the words above the dial, which is
                     absolutely positioned and paints a solid face. Decorative:
