@@ -216,8 +216,19 @@ pages on 2026-08-11. It was stale (four pages said 30 June, `/eu-exposure` said
 - [ ] Run a tool (e.g. Compliance Checker) to the results screen, subscribe via
       the results block, confirm the subscriber lands in Kit tagged
       `tool-compliance-checker`.
-- [ ] Subscribe once each from `/atlantic-drift` and `/eu-exposure`; confirm
-      the `atlantic-drift` / `eu-exposure` tags.
+- [ ] Subscribe once each from `/us-executive-guide` and `/eu-exposure`;
+      confirm the `atlantic-drift` / `eu-exposure` tags.
+
+      > The guide moved from `/atlantic-drift` to `/us-executive-guide` on
+      > 2026-08-11 (the old path 301s) because "Atlantic Drift" is the
+      > newsletter and the content category, not that page. Its **Kit tag is
+      > still `atlantic-drift`** and its **Plausible goal is still "Atlantic
+      > Drift Signup"** — both are external identifiers with history attached,
+      > so renaming them is an owner action, not a code change: create the new
+      > Kit tag, point `CONVERTKIT_ATLANTIC_DRIFT_TAG_ID` at it (or add a new
+      > var and update `src/lib/kit.ts`), and add the renamed Plausible goal.
+      > Leave them as they are unless the reporting confusion is worth the
+      > migration.
 - [ ] `LAUNCH48` announced with its 48-hour window; verify it applies at
       checkout on Professional.
 

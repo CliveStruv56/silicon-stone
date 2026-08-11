@@ -31,7 +31,7 @@ const STATIC_ROUTES: Array<{
   // sitemap so search/campaign discovery can reach it (F12).
   { path: '/eu-exposure', changeFrequency: 'monthly', priority: 0.6 },
   // US-inbound lead magnet — the guide behind the EU Exposure Briefing (D1).
-  { path: '/atlantic-drift', changeFrequency: 'monthly', priority: 0.6 },
+  { path: '/us-executive-guide', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/products', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/products/ai-act-toolkit', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/products/ai-audit-checklist', changeFrequency: 'monthly', priority: 0.6 },

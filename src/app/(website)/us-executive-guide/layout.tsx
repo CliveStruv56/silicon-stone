@@ -7,7 +7,7 @@ const description =
 export const metadata: Metadata = {
   title: `${title} | Silicon and Stone`,
   description,
-  alternates: { canonical: '/atlantic-drift' },
+  alternates: { canonical: '/us-executive-guide' },
   openGraph: {
     title,
     description,

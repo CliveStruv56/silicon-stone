@@ -16,8 +16,8 @@ const footerNavigation = {
     { name: 'Tools', href: '/tools' },
     { name: 'Products', href: '/products' },
     { name: 'Advisory', href: '/advisory' },
-    // The US-facing landing pages (/atlantic-drift, /eu-exposure) are still
-    // built and routable — they are just not linked from the footer for now.
+    { name: 'Post-Omnibus Briefing', href: '/eu-exposure' },
+    { name: 'US Executive’s Guide', href: '/us-executive-guide' },
     { name: 'Glossary', href: '/glossary' },
     { name: 'Methodology', href: '/methodology' },
     { name: 'About', href: '/about' },

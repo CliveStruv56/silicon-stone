@@ -75,6 +75,11 @@ const nextConfig: NextConfig = {
       { source: '/briefings', destination: '/intelligence', statusCode: 301 },
       { source: '/services', destination: '/advisory', statusCode: 301 },
       { source: '/products/briefings', destination: '/products/sector-reports', statusCode: 301 },
+      // The free guide moved off /atlantic-drift, which collided with the
+      // content category of the same name and with the Atlantic Drift
+      // Briefing newsletter. Its Kit tag and Plausible goal deliberately keep
+      // the old identifiers — see the notes in the page component.
+      { source: '/atlantic-drift', destination: '/us-executive-guide', statusCode: 301 },
     ]
     // 301s for renamed article slugs (see src/lib/slug-redirects.ts).
     return [...routeRedirects, ...articleRedirectRules()]

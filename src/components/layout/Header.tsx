@@ -22,11 +22,12 @@ const primaryNavigation: NavItem[] = [
     href: '/intelligence',
     children: [
       { name: 'All intelligence', href: '/intelligence' },
-      // The page at /atlantic-drift is the free email guide, not the content
-      // category of the same name (/analysis/category/atlantic-drift, which is
-      // what the footer links). Listed under its own title so the two are not
-      // confusable in the menu.
-      { name: 'US Executive’s Guide', href: '/atlantic-drift', note: 'Free' },
+      // The free email guide. It used to live at /atlantic-drift, which
+      // collided with the *content category* of that name
+      // (/analysis/category/atlantic-drift) and with the newsletter the brand
+      // calls the Atlantic Drift Briefing. Renamed to its own title; the old
+      // path 301s (next.config.ts).
+      { name: 'US Executive’s Guide', href: '/us-executive-guide', note: 'Free' },
     ],
   },
   {

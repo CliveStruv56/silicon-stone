@@ -430,6 +430,24 @@ WaymarkPath was deliberately left out of the top nav (footer and the
 `/products` card only): it is a separate companion product, and promoting it
 would reverse the de-emphasis of 2026-08-11.
 
+**Follow-up the same day — footer parity and the Atlantic Drift rename.** The
+footer's Engage column gained the Post-Omnibus Briefing and the guide. The
+name collision was then resolved by renaming **the guide**, not the category:
+"Atlantic Drift" is the newsletter ("Get the Atlantic Drift Briefing"), the
+content category, a Kit tag and a Plausible goal — roughly ten call sites,
+two of them external systems — whereas the guide's own title has always been
+"The US Executive's Guide to European Digital Sovereignty". It now lives at
+`/us-executive-guide`, with a 301 from the old path in `next.config.ts`
+alongside the existing Phase B redirects. Canonical, sitemap, header, footer
+and the PWA tab-bar match list all moved with it.
+
+**Two identifiers deliberately did NOT move**: the Kit tag `atlantic-drift`
+(resolved via `CONVERTKIT_ATLANTIC_DRIFT_TAG_ID`, with subscribers already
+attached) and the Plausible goal "Atlantic Drift Signup" (configured by exact
+name in the dashboard). Renaming either in code would silently stop tagging or
+stop recording the goal. Both are owner actions and are written up in
+`LAUNCH.md` §2; the reasoning is also commented at the call site.
+
 Verified: every nav href returns 200, all six `/advisory#` fragments exist with
 no duplicate ids and scroll into view clear of the sticky header, the Advisory
 menu fits the viewport at 1280, and the mobile menu carries the new children.

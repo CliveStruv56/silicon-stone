@@ -62,6 +62,15 @@ export default function AtlanticDriftPage() {
     try {
       // Same site-wide Kit form; `atlantic-drift` is the source segment tag —
       // never a separate subscription (spec §1.2).
+      //
+      // The tag keeps its old name even though the page moved to
+      // /us-executive-guide. It is an EXTERNAL identifier: it resolves through
+      // CONVERTKIT_ATLANTIC_DRIFT_TAG_ID (src/lib/kit.ts) to a tag that
+      // already exists in Kit with subscribers attached. Renaming it here
+      // would silently stop tagging until a new tag and env var were created.
+      // Same for the Plausible goal below — the goal is configured by exact
+      // name in the Plausible dashboard. Both are owner actions, not code
+      // changes; see LAUNCH.md.
       const result = await submitWithOfflineQueue('/api/subscribe', {
         email,
         tags: ['atlantic-drift'],

@@ -32,7 +32,7 @@ const TABS: Tab[] = [
       "/glossary",
       "/about",
       "/search",
-      "/atlantic-drift",
+      "/us-executive-guide",
       "/eu-exposure",
       "/waymarkpath",
     ],
