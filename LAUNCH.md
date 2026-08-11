@@ -221,14 +221,17 @@ pages on 2026-08-11. It was stale (four pages said 30 June, `/eu-exposure` said
 
       > The guide moved from `/atlantic-drift` to `/us-executive-guide` on
       > 2026-08-11 (the old path 301s) because "Atlantic Drift" is the
-      > newsletter and the content category, not that page. Its **Kit tag is
-      > still `atlantic-drift`** and its **Plausible goal is still "Atlantic
-      > Drift Signup"** — both are external identifiers with history attached,
-      > so renaming them is an owner action, not a code change: create the new
-      > Kit tag, point `CONVERTKIT_ATLANTIC_DRIFT_TAG_ID` at it (or add a new
-      > var and update `src/lib/kit.ts`), and add the renamed Plausible goal.
-      > Leave them as they are unless the reporting confusion is worth the
-      > migration.
+      > newsletter and the content category, not that page.
+      >
+      > **Settled — do not "fix" this.** The Kit tag stays `atlantic-drift` and
+      > the Plausible goal stays "Atlantic Drift Signup" (owner decision,
+      > 2026-08-11). Both are external identifiers with history attached: the
+      > tag resolves through `CONVERTKIT_ATLANTIC_DRIFT_TAG_ID` to a tag that
+      > already has subscribers, and the goal is matched by exact name in the
+      > Plausible dashboard. Renaming either in code — without first creating
+      > the replacement in Kit/Plausible — silently stops tagging signups and
+      > stops recording the goal. The mismatch with the page's URL is
+      > deliberate and costs nothing but a moment's confusion in reporting.
 - [ ] `LAUNCH48` announced with its 48-hour window; verify it applies at
       checkout on Professional.
 

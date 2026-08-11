@@ -445,8 +445,10 @@ and the PWA tab-bar match list all moved with it.
 (resolved via `CONVERTKIT_ATLANTIC_DRIFT_TAG_ID`, with subscribers already
 attached) and the Plausible goal "Atlantic Drift Signup" (configured by exact
 name in the dashboard). Renaming either in code would silently stop tagging or
-stop recording the goal. Both are owner actions and are written up in
-`LAUNCH.md` §2; the reasoning is also commented at the call site.
+stop recording the goal. **The owner confirmed on 2026-08-11 that both stay as
+they are** — this is a closed decision, recorded in `LAUNCH.md` §2 and
+commented at the call site, so the URL/identifier mismatch is deliberate and
+should not be "tidied" by a later session.
 
 Verified: every nav href returns 200, all six `/advisory#` fragments exist with
 no duplicate ids and scroll into view clear of the sticky header, the Advisory
