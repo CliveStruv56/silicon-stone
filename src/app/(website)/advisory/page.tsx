@@ -177,6 +177,13 @@ const assessments: Assessment[] = [
 
 type Tier = {
   name: string
+  /**
+   * Fragment id for the tier's card, so the Advisory menu can link straight to
+   * it. The Drift Retainer deliberately has none: a dedicated `#retainer`
+   * section already exists further down the page and the nav points there, so
+   * adding the same id here would duplicate it.
+   */
+  anchor?: string
   price: string
   priceNote?: string
   /** Italic line rendered directly under the price (credit / guarantee copy). */
@@ -199,6 +206,7 @@ type Tier = {
 const tiers: Tier[] = [
   {
     name: 'Advisory Briefing',
+    anchor: 'briefing',
     price: '£450',
     priceNote: 'one hour',
     priceDetail:
@@ -217,6 +225,7 @@ const tiers: Tier[] = [
   },
   {
     name: 'The Exposure Diagnostic',
+    anchor: 'diagnostic',
     price: 'From £2,500',
     priceNote: 'custom scope',
     positioning:
@@ -255,6 +264,7 @@ const tiers: Tier[] = [
   },
   {
     name: 'Strategic Assessment',
+    anchor: 'assessment',
     price: 'From £8,000',
     priceNote: 'then transitions to retainer',
     positioning:
@@ -674,6 +684,8 @@ export default function ServicesPage() {
               {tiers.map((tier, idx) => (
                 <motion.div
                   key={tier.name}
+                  id={tier.anchor}
+                  className={tier.anchor ? 'scroll-mt-24' : undefined}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}

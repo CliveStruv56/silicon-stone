@@ -396,6 +396,44 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 11, 2026 — Every offering reachable from the top nav
+
+An audit of the nav against every public route found the Tools and Products
+dropdowns already complete (four tools, three `/products/*`). The gaps were
+elsewhere:
+
+- **`/eu-exposure` — the Post-Omnibus Briefing (From £2,500, fixed) was in no
+  menu at all**, not even the footer, reachable only from inline links on five
+  pages. It is now under **Advisory**, not Products: it is a scoped engagement,
+  and everything under Products is a digital download.
+- **Advisory had no dropdown** despite carrying four tiers. It now lists
+  Advisory Briefing (£450), The Exposure Diagnostic, The Drift Retainer,
+  Strategic Assessment, the Post-Omnibus Briefing, Modules and Contact, with
+  prices as inline notes.
+- **Intelligence** gained a dropdown carrying the free email guide at
+  `/atlantic-drift`.
+
+Two traps worth remembering:
+
+- **The Drift Retainer tier card deliberately has no `id`.** A dedicated
+  `#retainer` section already exists further down `/advisory`, and the nav
+  points there; giving the card the same id would duplicate it. `Tier.anchor`
+  is optional for exactly this reason.
+- **"Atlantic Drift" names two different things.** The page at
+  `/atlantic-drift` is the free email guide; `/analysis/category/atlantic-drift`
+  is the content category, and that is what the footer's "Atlantic Drift" link
+  points at. The menu lists the guide under its own title, "US Executive's
+  Guide", so the two are not confusable — but the underlying collision is still
+  there and may be worth renaming one of them.
+
+WaymarkPath was deliberately left out of the top nav (footer and the
+`/products` card only): it is a separate companion product, and promoting it
+would reverse the de-emphasis of 2026-08-11.
+
+Verified: every nav href returns 200, all six `/advisory#` fragments exist with
+no duplicate ids and scroll into view clear of the sticky header, the Advisory
+menu fits the viewport at 1280, and the mobile menu carries the new children.
+
 ### August 11, 2026 — The persona compass becomes a list beside a dial
 
 The earlier shrink (910px → 730px) fixed the height but not the composition:

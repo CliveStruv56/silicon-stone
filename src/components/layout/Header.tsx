@@ -20,6 +20,14 @@ const primaryNavigation: NavItem[] = [
   {
     name: 'Intelligence',
     href: '/intelligence',
+    children: [
+      { name: 'All intelligence', href: '/intelligence' },
+      // The page at /atlantic-drift is the free email guide, not the content
+      // category of the same name (/analysis/category/atlantic-drift, which is
+      // what the footer links). Listed under its own title so the two are not
+      // confusable in the menu.
+      { name: 'US Executive’s Guide', href: '/atlantic-drift', note: 'Free' },
+    ],
   },
   {
     name: 'Tools',
@@ -43,6 +51,19 @@ const primaryNavigation: NavItem[] = [
   {
     name: 'Advisory',
     href: '/advisory',
+    children: [
+      { name: 'Advisory Briefing', href: '/advisory#briefing', note: '£450' },
+      { name: 'The Exposure Diagnostic', href: '/advisory#diagnostic', note: 'From £2,500' },
+      { name: 'The Drift Retainer', href: '/advisory#retainer', note: 'From £2,000/mo' },
+      { name: 'Strategic Assessment', href: '/advisory#assessment' },
+      // A separate page rather than an anchor, and the one paid offering that
+      // was in no menu at all — reachable only from inline links on five pages.
+      // Filed under Advisory, not Products: it is a scoped engagement, and
+      // everything under Products is a digital download.
+      { name: 'Post-Omnibus Briefing', href: '/eu-exposure', note: 'From £2,500' },
+      { name: 'Modules', href: '/advisory#modules' },
+      { name: 'Contact', href: '/advisory#contact' },
+    ],
   },
 ]
 
