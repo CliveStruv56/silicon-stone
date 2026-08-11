@@ -8,7 +8,7 @@
 
 **The AI Act Compliance Checker was rebuilt on 2026-08-10** (Stages 0–3 of the agentic build spec): the rule base is corrected and versioned at `v2026-08-10`, backed by a git-tracked rule pack carrying 19 Articles of verbatim consolidated statute; a conversational intake proposes answers the user confirms before the unchanged deterministic engine classifies; and the result screen now offers an email-gated written report whose every legal quotation is string-matched against that corpus before a reader sees it. The paid half of Stage 3 — the £39 Evidence Pack and the £39→£79 credit — is built dark behind a flag and blocked on the Lemon Squeezy store. A legal review of the report template, disclaimer and credit terms is an open item before it ships. See §11.
 
-**The blocker is a P0: the production Kit API key is a legacy v3 key, so `/api/subscribe` 401s and — because `NEXT_PUBLIC_PRE_LAUNCH` is still `true`, making every product CTA an email capture — the entire funnel currently terminates in a failed POST.** Beyond that: Lemon Squeezy store not yet created, 9 drafts unpublished, and 7 of 12 published articles still lack cover images. Go-live sequence lives in `LAUNCH.md`; defects and debt in §10.
+**The blocker is a P0, re-confirmed against the live API on 2026-08-11: the production Kit API key is a legacy v3 key (22 chars, no `kit_` prefix), so `/api/subscribe` 401s and — because `NEXT_PUBLIC_PRE_LAUNCH` is still `true`, making every product CTA an email capture — the entire funnel currently terminates in a failed POST.** Beyond that: Lemon Squeezy store not yet created, 9 drafts unpublished, and 7 of 12 published articles still lack cover images. Go-live sequence lives in `LAUNCH.md`; defects and debt in §10.
 
 ---
 
@@ -1478,6 +1478,21 @@ Kit tags to map, verification steps.
   `CONVERTKIT_API_KEY` is likely a legacy v3 key; api.kit.com/v4 needs a
   **v4 API key**. Owner: replace it in Vercel env + redeploy (steps in
   LAUNCH.md "Current state"), then re-test subscribe.
+
+  **Confirmed 2026-08-11**, not inferred: the stored key is 22 characters with
+  no `kit_` prefix (legacy v3 shape), `GET api.kit.com/v4/account` with it
+  returns `401 {"errors":["The API key is invalid"]}`, and the old v3 host no
+  longer authenticates at all — `api.convertkit.com/v3` now redirects to the
+  Kit login page, so there is no fallback. A v4 key is the only route.
+
+  **Also found:** production holds only 5 `CONVERTKIT_*` vars
+  (`API_KEY`, `FORM_ID`, `CONTACT_TAG_ID`, `TOOL_LEAD_TAG_ID`,
+  `WAYMARKPATH_TAG_ID`). The other **14 tag-ID vars referenced by
+  `SUBSCRIBE_TAG_IDS` / `BUYER_TAG_IDS` are unset**, including
+  `CONVERTKIT_ATLANTIC_DRIFT_TAG_ID` and `CONVERTKIT_EU_EXPOSURE_TAG_ID`.
+  Missing IDs are skipped gracefully, so once the key is fixed subscribes will
+  succeed — but arrive **untagged**, with no segmentation by source, tier or
+  buyer. Creating those tags is already a pre-launch item in `LAUNCH.md` §0.
 
 ### July 17, 2026 — Advisory repositioning (Drift Retainer reprice + Post-Omnibus Briefing)
 
