@@ -418,16 +418,30 @@ Three things fell out of the reframing rather than being added to it:
   so `/intelligence`, the article CTAs and `/saved` are unaffected.
 
 The five cards *were* the diagram, so the dial would have pointed its arrows at
-nothing. It now has its own 48px avatar markers on the same pentagon (R=180,
-expressed as percentages so the box scales — the column is only 456px at
-exactly `lg` and a fixed 460px box overflowed by 4px). Markers are decorative,
-not links, so each persona keeps exactly one tab stop. Hovering or focusing a
-row lights its marker and dims the other four.
+nothing. It now has its own avatar markers on the same pentagon (R = 38% of the
+box; every offset is a percentage because the column is 584px at `xl` but only
+456px at exactly `lg`, and the pentagon has to scale between the two). Markers
+are decorative, not links, so each persona keeps exactly one tab stop. Hovering
+or focusing a row lights its marker and dims the other four.
 
-**The dial's face was left empty** once the heading moved out, which read as an
-unfinished plate — so it gained a needle that swings to the hovered persona's
-bearing and rests due north, dimmed. `BRIEFINGS_PERSONA_ORDER` is the pentagon
-order, so the bearing is just index × 72°.
+**Sized up after review** (the first cut was marooned — a 460px diagram in a
+584px column, reading as small and meaningless): the box is now 560px, avatars
+56px (64 at `xl`), and the dial 62% of the box. The section height is unchanged
+because the list column is the taller of the two, so this cost nothing.
+
+**The writing is back in the centre of the dial**, which had been left empty
+when the heading moved to the list column. At rest it reads "Find Your
+Perspective."; on hover it names the persona being pointed at and their role.
+A short-lived needle was tried instead and removed — it occupied the same
+radius the text needs, and the marker highlight already carries the linkage.
+Verified that the text stays inside the dial face (corner radius 104 vs face
+117 at 1440) and that markers clear the arrowheads (13px at 1440, 8px at 1024).
+
+**Note for whoever touches this next:** "Find Your Perspective" now appears
+twice on screen at rest — as the `h2` in the list column and again in the
+dial. That is deliberate (owner's request to restore the centre copy) but it
+was not true of the old design, where the `h2` was `sr-only` at `lg` and the
+dial carried the only visible instance.
 
 **Height was the acceptance test, and the first attempt failed it** — 923px
 against the old 842px, because three stacked text lines per row put every

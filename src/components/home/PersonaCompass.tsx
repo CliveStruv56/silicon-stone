@@ -39,28 +39,23 @@ const textMap: Record<string, string> = {
 /**
  * Marker geometry for the diagram column. The five markers sit on a true
  * pentagon — 72° apart, starting due north — so the dial's arrows point at
- * something again now that the persona cards have moved into the list column.
+ * something now that the persona cards have moved into the list column.
  *
- *   x = R·sin θ, y = −R·cos θ, with R = 180 about a centre of (230, 230)
+ *   x% = 50 + R·sin θ,  y% = 50 − R·cos θ,  with R = 38% of the box
  *
- * Those pixel values were derived against a 460px box and then divided through
- * by it, because the column is only 456px wide at exactly `lg` and a fixed
- * 460px box would overflow by 4px. Percentages let the whole pentagon scale
- * with the column while the avatars stay a constant 48px.
- *
- *   clara   0°   (230,  50)   ian  72°  (401, 174)   sofia 144° (336, 376)
- *   citizen 216° (124, 376)   troy 288° ( 59, 174)
- *
- * R is bounded below by the dial's arrowheads, which reach r≈137px when the
- * 400-unit viewBox is drawn at 65.2% of the box; markers any closer would sit
- * on the arrow tips rather than at the end of them.
+ * Everything here is a percentage of the box rather than a pixel offset: the
+ * column is 584px wide at `xl` but only 456px at exactly `lg`, and the whole
+ * pentagon has to scale between the two. The avatars are the one fixed
+ * dimension (56px, 64px at `xl`), which is what sets the lower bound on R —
+ * at 62% the dial's arrowheads reach r≈0.28×box, so a marker's inner edge has
+ * to clear that or the arrows spear the faces instead of pointing at them.
  */
 const marker: Record<PersonaSlug, string> = {
-  clara: 'left-1/2 top-[10.87%]',
-  ian: 'left-[87.22%] top-[37.91%]',
-  sofia: 'left-[73%] top-[81.65%]',
-  citizen: 'left-[27%] top-[81.65%]',
-  troy: 'left-[12.78%] top-[37.91%]',
+  clara: 'left-1/2 top-[12%]',
+  ian: 'left-[86.14%] top-[38.26%]',
+  sofia: 'left-[72.34%] top-[80.74%]',
+  citizen: 'left-[27.66%] top-[80.74%]',
+  troy: 'left-[13.86%] top-[38.26%]',
   positional: '',
 }
 
@@ -172,14 +167,14 @@ function PersonaMarker({
       <Image
         src={persona.avatar}
         alt=""
-        width={48}
-        height={48}
+        width={64}
+        height={64}
         className={cn(
-          'h-12 w-12 rounded-full border-2 object-cover',
+          'h-14 w-14 rounded-full border-2 object-cover xl:h-16 xl:w-16',
           ringMap[persona.color] ?? ringMap['text-muted'],
         )}
       />
-      <span className="mt-1 font-mono text-[9.5px] uppercase tracking-[0.1em] text-text-muted">
+      <span className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.1em] text-text-muted xl:text-[11px]">
         {persona.name.split(' ').pop()}
       </span>
     </div>
@@ -191,7 +186,7 @@ function PersonaMarker({
  * and five arrows out to the nodes. Decorative — the hub's words are marked
  * aria-hidden and the real heading lives in the section header.
  */
-function CompassDial({ activeAngle }: { activeAngle: number | null }) {
+function CompassDial() {
   const reduceMotion = useReducedMotion()
 
   return (
@@ -292,30 +287,6 @@ function CompassDial({ activeAngle }: { activeAngle: number | null }) {
         </g>
       ))}
 
-      {/* Needle. The face used to carry the section heading; with the heading
-          moved to the list column it would otherwise sit empty, and a compass
-          without a needle reads as an unfinished plate. It swings to the
-          bearing of whichever row is hovered — the same linkage the markers
-          show, stated a second way — and rests due north, dimmed, when nothing
-          is active. Bearings match RAY_ANGLES, so index × 72° is the persona's
-          angle in BRIEFINGS_PERSONA_ORDER. */}
-      <motion.g
-        style={{ transformOrigin: '200px 200px' }}
-        animate={{ rotate: activeAngle ?? 0, opacity: activeAngle === null ? 0.3 : 0.95 }}
-        transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 90, damping: 14 }}
-      >
-        <line
-          x1="200"
-          y1="200"
-          x2="200"
-          y2="108"
-          stroke="var(--silicon-amber)"
-          strokeWidth="3"
-          strokeLinecap="round"
-        />
-        <polygon points="200,92 193,112 207,112" fill="var(--silicon-amber)" />
-      </motion.g>
-      <circle cx="200" cy="200" r="6" fill="var(--stone-charcoal)" stroke="var(--silicon-amber)" strokeWidth="2.5" />
     </svg>
   )
 }
@@ -337,11 +308,7 @@ function CompassDial({ activeAngle }: { activeAngle: number | null }) {
 export function PersonaCompass() {
   const [active, setActive] = useState<PersonaSlug | null>(null)
 
-  // Bearing of the hovered persona, or null at rest. The order of
-  // BRIEFINGS_PERSONA_ORDER is the order of the pentagon, so the index is the
-  // bearing in units of 72°.
-  const activeIndex = active ? BRIEFINGS_PERSONA_ORDER.indexOf(active) : -1
-  const activeAngle = activeIndex === -1 ? null : activeIndex * 72
+  const activePersona = active ? PERSONAS[active] : null
 
   return (
     <section
@@ -388,9 +355,47 @@ export function PersonaCompass() {
           {/* The diagram. Hidden below `lg`, where a radial layout is
               unreadable and the list alone carries the section. */}
           <StaggerItem className="hidden lg:block lg:self-center">
-            <div className="relative mx-auto aspect-square w-full max-w-[460px]">
-              <div className="absolute left-1/2 top-1/2 h-[65.2%] w-[65.2%] -translate-x-1/2 -translate-y-1/2">
-                <CompassDial activeAngle={activeAngle} />
+            <div className="relative mx-auto aspect-square w-full max-w-[560px]">
+              <div className="absolute left-1/2 top-1/2 flex h-[62%] w-[62%] -translate-x-1/2 -translate-y-1/2 items-center justify-center">
+                <CompassDial />
+                {/* `relative` lifts the words above the dial, which is
+                    absolutely positioned and paints a solid face. Decorative:
+                    the section's accessible name is the real `h2` in the list
+                    column, so this is `aria-hidden` and never read twice.
+                    At rest it names the section; on hover it names whichever
+                    persona the reader is pointing at, which is what stops the
+                    dial being a decorative plate. */}
+                <div className="relative max-w-[58%] px-2 text-center" aria-hidden="true">
+                  {activePersona ? (
+                    <>
+                      <p
+                        className="font-bold text-text-primary"
+                        style={{
+                          fontSize: 'clamp(17px, 1.5vw, 22px)',
+                          letterSpacing: '-0.02em',
+                          lineHeight: 1.12,
+                        }}
+                      >
+                        {activePersona.name}
+                      </p>
+                      <p className="mt-2 font-mono text-[10px] uppercase leading-snug tracking-[0.08em] text-text-muted">
+                        {activePersona.role}
+                      </p>
+                    </>
+                  ) : (
+                    <p
+                      className="font-bold text-text-primary"
+                      style={{
+                        fontSize: 'clamp(18px, 1.7vw, 25px)',
+                        letterSpacing: '-0.02em',
+                        lineHeight: 1.1,
+                      }}
+                    >
+                      Find Your{' '}
+                      <span className="text-silicon-amber-strong">Perspective.</span>
+                    </p>
+                  )}
+                </div>
               </div>
 
               {BRIEFINGS_PERSONA_ORDER.map((slug: PersonaSlug) => (
