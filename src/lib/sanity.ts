@@ -207,7 +207,22 @@ export async function listSanityArticles(): Promise<SanityArticle[]> {
         _createdAt,
         contentType
     }`;
-    return await writeClient.fetch(query);
+    // perspective: 'raw' — on recent apiVersions the client defaults to the
+    // 'published' perspective, which hides drafts.* entirely. Without this the
+    // library shows only published articles, so every generated draft is
+    // invisible and an article vanishes the moment it is unpublished.
+    const docs = await writeClient.fetch<SanityArticle[]>(query, {}, { perspective: 'raw' });
+
+    // An article with unpublished edits exists twice under 'raw'. Collapse the
+    // twins to one row per article, preferring the published variant so the
+    // badge reflects what the public site is actually serving.
+    const byBaseId = new Map<string, SanityArticle>();
+    for (const doc of docs) {
+        const baseId = doc._id.replace(/^drafts\./, '');
+        const existing = byBaseId.get(baseId);
+        if (!existing || existing._id.startsWith('drafts.')) byBaseId.set(baseId, doc);
+    }
+    return [...byBaseId.values()];
 }
 
 export async function listPublishedArticles(): Promise<SanityArticle[]> {
