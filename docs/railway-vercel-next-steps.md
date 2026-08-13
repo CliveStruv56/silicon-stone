@@ -327,9 +327,15 @@ still run in-process on Vercel.
 | `POST` | `/v1/research/deep` | `x-backend-api-key` | Body `{ topic, instructions, model? }`. Starts a job, returns `{ jobId, status }` immediately. |
 | `GET` | `/v1/research/deep/{jobId}` | `x-backend-api-key` | Returns `{ status, report, error, costDollars }`. |
 
-The backend calls Exa's REST Research API directly (`POST https://api.exa.ai/research/v1`,
-then polls `GET …/{id}?stream=false`, header `x-api-key`). The forensic instructions are
+The backend calls Exa's REST Agent API directly (`POST https://api.exa.ai/agent/runs`,
+then polls `GET …/agent/runs/{id}`, header `x-api-key`). The forensic instructions are
 built on the Next.js side and passed in, so brand/prompt logic stays in one place.
+
+> Exa retired the old Research API (`/research/v1`) in April 2026 — it answers
+> `410 RESEARCH_RETIRED`. Migrated to the Agent API on 2026-08-13. The effort
+> tier is set by `EXA_AGENT_EFFORT` (default `high`; one of
+> `minimal|low|medium|high|xhigh|auto`) and validated at import, so a typo fails
+> the boot rather than every Deep Dive.
 
 ### Required environment variables
 

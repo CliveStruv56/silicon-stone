@@ -67,7 +67,7 @@ draft, run the voice-edit pass, extract SEO/metadata, and save a draft to Sanity
 It reports back the draft ID and the Studio link.
 
 - **Pulse / Signal / Guide / YouTube:** about a minute or two.
-- **Deep Dive:** the research alone takes ~5–7 minutes (Exa Research Pro), so the
+- **Deep Dive:** the research alone takes ~5–7 minutes (Exa Agent API), so the
   whole run is ~10–15 minutes. This is expected.
 
 ### Step 4 — Review and publish in Studio
@@ -164,7 +164,7 @@ self-serve fallback.
   FORMAT / PERSONA / TOPIC.
 - **A draft has `[AUTHOR: …]` notes.** That is by design — the system never
   invents figures or sources. Fill them in Studio before publishing.
-- **Deep Dive feels slow.** Normal — Exa Research Pro runs for minutes. Let it.
+- **Deep Dive feels slow.** Normal — the Exa Agent runs for minutes. Let it.
 - **Website still says "Analysis failed to parse."** Credits are still empty —
   top up the Anthropic account.
 - **Wrong persona/topic in the draft.** It is only a draft; tell Claude Code to

@@ -60,13 +60,17 @@ export function CreateForm({ initialPersonas, initialFormat = "signal" }: Create
             // as a Railway background job when configured; every other format uses the
             // fast recency-biased web search and returns inline.
             const started = await startResearch(topic, format === "deep_dive", brief);
+            if (started.mode === "error") throw new Error(started.error);
             const result = started.mode === "job"
                 ? await pollDeepJob(started.jobId)
                 : started.result;
             setResearchResult(result);
         } catch (error) {
+            // Show the reason, not just "check the logs" — the upstream detail
+            // (rate limit, retired API, missing key) is what makes it fixable.
             console.error("Research failed:", error);
-            alert("Failed to gather intelligence. Please check the logs.");
+            const detail = error instanceof Error ? error.message : String(error);
+            alert(`Failed to gather intelligence.\n\n${detail}`);
         } finally {
             setIsResearching(false);
         }
@@ -245,7 +249,7 @@ export function CreateForm({ initialPersonas, initialFormat = "signal" }: Create
                         </div>
                         {format === "deep_dive" && (
                             <p className="text-xs text-muted-foreground">
-                                Deep Dive runs an agentic, multi-step research pass (Exa Research Pro). Expect a few minutes and a higher per-run cost than other formats.
+                                Deep Dive runs an agentic, multi-step research pass (Exa Agent). Expect a few minutes and a higher per-run cost than other formats.
                             </p>
                         )}
                     </div>

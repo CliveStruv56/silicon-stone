@@ -1,7 +1,7 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-08-11
+> Last Updated: 2026-08-13
 > Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (74 static pages), 187 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
@@ -398,6 +398,57 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 13, 2026 — Deep Dive research migrated off Exa's retired Research API
+
+Deep Dive generation had been failing with *"Failed to gather intelligence."*
+The cause was upstream, not ours: **Exa retired the standalone Research API in
+April 2026**, and `POST https://api.exa.ai/research/v1` now answers `410 Gone`
+with `RESEARCH_RETIRED`. Only Deep Dive broke, because it is the only format
+routed to that endpoint — every other format (and `/research`) goes through
+`searchExa()` → `/search`, which is unaffected and kept working throughout.
+
+**Migrated to the Exa Agent API** (`POST /agent/runs`, poll
+`GET /agent/runs/{id}`), which preserves the existing create-then-poll job
+architecture. Both call sites moved: the Railway worker
+(`backend/main.py::_run_deep_research`) and the in-process dev fallback
+(`src/lib/exa.ts::deepResearchExa`). Field renames: `instructions` → `query`,
+`researchId` → `id`, `output.content` → `output.text`. The `exa-research-pro`
+model name is gone; the cost/quality tier is now `EXA_AGENT_EFFORT` (default
+`high`), validated at import against `minimal|low|medium|high|xhigh|auto` so a
+typo fails the boot instead of every Deep Dive.
+
+**Called via raw `fetch`/`httpx`, not the SDK.** `exa-js` is pinned at 2.2.0 for
+the `/search` path and predates the `agent.runs` namespace (latest is 2.18.0);
+raw calls avoid a dependency bump on a load-bearing build and keep the TypeScript
+and Python request shapes identical.
+
+**Verified against the live API, not just the docs** — which proved necessary
+twice. Exa's reference lists a `max` effort tier that the API rejects, and
+describes `costDollars` as a bare number when it is really
+`{total, agentCompute, search, …}`; both readers now accept either shape. A
+`budget` object is rejected outright on fixed-price tiers ("budget is currently
+supported only for metered efforts"), so the effort tier is the cost control.
+
+**The error reporting that hid this is fixed.** The failure surfaced as a
+generic *"check the logs"* alert because three layers discarded the reason:
+`startResearch` rewrote every error into one string (and, being a thrown Server
+Action error, would have been redacted in production anyway — it now *returns*
+`{mode:"error"}`), the rate-limit rejection was thrown inside that same catch,
+and the form ignored the `error` the poller already carried. Exa's own message
+now travels end to end; the same failure today reads *"Exa returned 410: The Exa
+Research API has been retired…"* in the alert.
+
+**Also fixed:** a job that failed before returning a run id never called
+`_deep_research_mark_finished`, leaking its slot in `research:active-jobs` for
+the full hour TTL — two such leaks would have blocked all Deep Dives against the
+`DEEP_RESEARCH_MAX_ACTIVE_JOBS = 2` ceiling.
+
+Note that both rate limiters (Vercel `deepResearch`, 3/hour; backend per-IP,
+3/hour) increment *before* Exa is called, so the failed attempts consumed quota.
+The backend limiter keys on `_client_ip`, which for Vercel-originated calls is a
+shared egress IP rather than the individual writer — worth revisiting if a
+second writer is ever added.
 
 ### August 11, 2026 — "On this page" contents for long articles
 

@@ -73,11 +73,63 @@ export interface DeepResearchResult {
     costDollars?: number;
 }
 
+const EXA_AGENT_URL = "https://api.exa.ai/agent/runs";
 /**
- * Agentic multi-step research via Exa's native Research API (exa-research-pro).
- * Reserved for Deep Dives: it plans the research, runs multiple searches/reads,
- * and reasons across them. Slower (minutes) and billed per request, so it is
- * format-gated upstream — never call this for short-form.
+ * Cost/quality tier, in place of the retired `exa-research-pro` model name.
+ * Valid values: minimal | low | medium | high | xhigh | auto. The tier is the
+ * cost control — fixed-price tiers reject a `budget` object, so don't add one.
+ */
+const EXA_AGENT_EFFORT = "high";
+const EXA_AGENT_USAGE_MODEL = "exa-agent";
+
+interface ExaAgentRun {
+    id?: string;
+    status?: string;
+    output?: { text?: string };
+    costDollars?: number | { total?: number };
+    error?: string | { message?: string; code?: string };
+}
+
+/**
+ * Total run cost. The live Agent API returns `costDollars` as an object
+ * ({ total, agentCompute, search, … }), though Exa's reference describes a bare
+ * number — accept either so a shape change degrades to "no cost recorded".
+ */
+function agentCost(run: ExaAgentRun): number | undefined {
+    const cost = run.costDollars;
+    return typeof cost === "object" ? cost?.total : cost;
+}
+
+function agentError(run: ExaAgentRun): string | undefined {
+    const error = run.error;
+    if (!error) return undefined;
+    return typeof error === "object" ? (error.message ?? error.code) : error;
+}
+
+async function exaAgentFetch(path: string, init?: RequestInit): Promise<ExaAgentRun> {
+    const res = await fetch(`${EXA_AGENT_URL}${path}`, {
+        ...init,
+        headers: { "x-api-key": API_KEY as string, "Content-Type": "application/json" },
+        cache: "no-store",
+    });
+    if (!res.ok) {
+        throw new Error(`Exa agent request failed: ${res.status} ${(await res.text()).slice(0, 200)}`);
+    }
+    return (await res.json()) as ExaAgentRun;
+}
+
+/**
+ * Agentic multi-step research via Exa's Agent API. Reserved for Deep Dives: it
+ * plans the research, runs multiple searches/reads, and reasons across them.
+ * Slower (minutes) and billed per run, so it is format-gated upstream — never
+ * call this for short-form.
+ *
+ * Called through raw fetch rather than the SDK: exa-js is pinned at 2.2.0 for
+ * the `/search` path above and predates the `agent.runs` namespace. This also
+ * keeps the request shape identical to the Railway backend's httpx version.
+ *
+ * NOTE: this is the local/dev fallback. In production the Railway backend runs
+ * the job, because a minutes-long poll would outlive a serverless invocation.
  */
 export async function deepResearchExa(instructions: string): Promise<DeepResearchResult | null> {
     if (!API_KEY) {
@@ -85,39 +137,45 @@ export async function deepResearchExa(instructions: string): Promise<DeepResearc
         return null;
     }
 
-    const exa = new Exa(API_KEY);
-
     try {
-        const created = await exa.research.create({
-            instructions,
-            model: "exa-research-pro",
+        const created = await exaAgentFetch("", {
+            method: "POST",
+            body: JSON.stringify({ query: instructions, effort: EXA_AGENT_EFFORT }),
         });
 
-        const finished = await exa.research.pollUntilFinished(created.researchId, {
-            pollInterval: 3000,
-            timeoutMs: 10 * 60 * 1000, // 10 minutes — see infra caveat in research.ts
-        });
-
-        if (finished.status !== "completed") {
-            console.error(`Exa research did not complete (status: ${finished.status}).`);
+        if (!created.id) {
+            console.error("Exa did not return an agent run id.");
             return null;
         }
 
-        // Record cost for the analytics dashboard (non-fatal). This is the
-        // in-process fallback path; when the Railway backend runs the job it
-        // records the event itself at completion, so the two never both fire
-        // for one job (research.ts picks one path or the other).
-        void recordUsage({
-            service: "exa",
-            model: "exa-research-pro",
-            operation: "deep-research",
-            costDollars: finished.costDollars?.total ?? 0,
-        }).catch(() => {});
+        const deadline = Date.now() + 10 * 60 * 1000; // 10 min — see infra caveat in research.ts
+        while (Date.now() < deadline) {
+            await new Promise((r) => setTimeout(r, 3000));
+            const run = await exaAgentFetch(`/${created.id}`);
 
-        return {
-            content: finished.output.content,
-            costDollars: finished.costDollars?.total,
-        };
+            if (run.status === "completed") {
+                const costDollars = agentCost(run);
+                // Record cost for the analytics dashboard (non-fatal). This is the
+                // in-process fallback path; when the Railway backend runs the job it
+                // records the event itself at completion, so the two never both fire
+                // for one job (research.ts picks one path or the other).
+                void recordUsage({
+                    service: "exa",
+                    model: EXA_AGENT_USAGE_MODEL,
+                    operation: "deep-research",
+                    costDollars: costDollars ?? 0,
+                }).catch(() => {});
+
+                return { content: run.output?.text ?? "", costDollars };
+            }
+            if (run.status === "failed" || run.status === "cancelled" || run.status === "canceled") {
+                console.error(`Exa agent run did not complete (status: ${run.status}): ${agentError(run) ?? "no reason given"}`);
+                return null;
+            }
+        }
+
+        console.error("Exa agent run timed out.");
+        return null;
     } catch (e) {
         console.error("Exa deep research failed:", e);
         return null;

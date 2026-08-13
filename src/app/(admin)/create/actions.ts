@@ -17,7 +17,8 @@ const MAX_BRIEF_LENGTH = 2000
 
 export type StartResearchResponse =
     | { mode: "result"; result: ResearchResult }
-    | { mode: "job"; jobId: string };
+    | { mode: "job"; jobId: string }
+    | { mode: "error"; error: string };
 
 /**
  * Entry point for the /create form. Deep Dives run on the Railway backend as a
@@ -32,14 +33,16 @@ export async function startResearch(topic: string, deep: boolean, brief: string 
     if (!normalizedTopic) {
         throw new Error("Topic is required.")
     }
-    try {
-        if (deep) {
-            const ip = await getServerActionClientIp()
-            const rateLimit = await checkDurableRateLimit("deepResearch", ip)
-            if (!rateLimit.allowed) {
-                throw new Error(`Too many deep research starts. Try again in ${rateLimit.retryAfter} seconds.`)
-            }
+    // Outside the try: a rate-limit rejection is a specific, actionable message
+    // and must not be rewritten into the generic failure below.
+    if (deep) {
+        const ip = await getServerActionClientIp()
+        const rateLimit = await checkDurableRateLimit("deepResearch", ip)
+        if (!rateLimit.allowed) {
+            return { mode: "error", error: `Too many deep research starts. Try again in ${rateLimit.retryAfter} seconds.` }
         }
+    }
+    try {
         if (deep && isBackendConfigured()) {
             const jobId = await startDeepResearchJob(normalizedTopic, buildDeepInstructions(normalizedTopic, normalizedBrief));
             return { mode: "job", jobId };
@@ -47,8 +50,11 @@ export async function startResearch(topic: string, deep: boolean, brief: string 
         const result = await researchPipeline(normalizedTopic, undefined, { deep, brief: normalizedBrief });
         return { mode: "result", result };
     } catch (error) {
+        // Returned, not thrown: Next.js redacts thrown Server Action errors in
+        // production, which is what reduced an upstream 410 to "check the logs".
         console.error("Error starting research:", error);
-        throw new Error("Failed to gather intelligence.");
+        const detail = error instanceof Error ? error.message : String(error);
+        return { mode: "error", error: `Failed to gather intelligence: ${detail}` };
     }
 }
 

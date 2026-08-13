@@ -104,13 +104,13 @@ export async function performResearch(
     //    short-timeout serverless function (e.g. Vercel), route the deep path through
     //    the Railway backend or a background job rather than blocking the request.
     if (opts.deep) {
-        console.log(`Deep research (Exa Research Pro) for: ${topic}`);
+        console.log(`Deep research (Exa Agent) for: ${topic}`);
         const instructions = buildDeepInstructions(topic, opts.brief);
         try {
             const deep = await deepResearchExa(instructions);
             if (deep?.content) {
                 deepReport = deep.content;
-                searchContext += `\n--- DEEP RESEARCH (EXA RESEARCH PRO) ---\n${deep.content}\n`;
+                searchContext += `\n--- DEEP RESEARCH (EXA AGENT) ---\n${deep.content}\n`;
             } else if (process.env.NODE_ENV === 'production') {
                 throw new Error("Exa deep research returned no content.");
             }
@@ -231,6 +231,6 @@ async function synthesizeContext(
  * so the Deep Dive writer builds on it verbatim.
  */
 export async function synthesizeDeepReport(topic: string, report: string, brief?: string): Promise<ResearchResult> {
-    const searchContext = `\n--- DEEP RESEARCH (EXA RESEARCH PRO) ---\n${report}\n`;
+    const searchContext = `\n--- DEEP RESEARCH (EXA AGENT) ---\n${report}\n`;
     return synthesizeContext(topic, searchContext, report, brief);
 }

@@ -35,12 +35,18 @@ export async function startDeepResearchJob(topic: string, instructions: string):
     const res = await fetch(`${BACKEND_API_URL}/v1/research/deep`, {
         method: "POST",
         headers: headers(),
-        body: JSON.stringify({ topic, instructions, model: "exa-research-pro" }),
+        // No `model`: the backend picks the Exa Agent effort tier. The old
+        // `exa-research-pro` name belonged to the Research API, retired by Exa
+        // in April 2026 (410 RESEARCH_RETIRED).
+        body: JSON.stringify({ topic, instructions }),
         cache: "no-store",
     });
 
     if (!res.ok) {
-        throw new Error(`Backend research start failed: ${res.status}`);
+        // Surface the backend's own detail (rate limit, budget store, Exa key)
+        // rather than a bare status the writer can't act on.
+        const detail = await res.text().catch(() => "");
+        throw new Error(`Backend research start failed: ${res.status}${detail ? ` — ${detail.slice(0, 200)}` : ""}`);
     }
 
     const data = (await res.json()) as { jobId?: string };

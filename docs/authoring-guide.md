@@ -13,7 +13,7 @@ This guide outlines the workflows for researching topics, generating drafts, and
 2.  **Enter a Research Query:**
     *   Type a natural language query in the search bar.
     *   *Example:* "European battery passport implementation timeline and blockers"
-    *   The system runs a live **Exa.ai** web search (Deep Dive uses the agentic Exa Research Pro pass), then Claude synthesises a **Forensic Summary**. It also surfaces semantically similar **prior articles** from the Pinecone index so the draft extends rather than repeats past coverage.
+    *   The system runs a live **Exa.ai** web search (Deep Dive uses the agentic Exa Agent API pass), then Claude synthesises a **Forensic Summary**. It also surfaces semantically similar **prior articles** from the Pinecone index so the draft extends rather than repeats past coverage.
     *   *(Note: `/create` does **not** read your Inoreader subscriptions — that is the `/research` route. In practice you browse Inoreader yourself, pick a story, and type its topic here. See `docs/admin-research-workflow.md`.)*
 
 3.  **Review Intelligence:**
@@ -26,7 +26,7 @@ This guide outlines the workflows for researching topics, generating drafts, and
     |--------|-------------|
     | **Pulse** | 100-140 word, 30-second intelligence scan |
     | **Signal** | 800-1,500 word breaking analysis (default) |
-    | **Deep Dive** | 3,000-6,000 word forensic report (agentic Exa Research Pro) |
+    | **Deep Dive** | 3,000-6,000 word forensic report (agentic Exa Agent API) |
     | **Guide** | 500-2,000 word how-to for a tool or technique |
     | **YouTube Script** | Tiered Intelligence structure (Pulse/Briefing/Audit CTA) |
     | **Research Only** | Gather intelligence without generating a draft |

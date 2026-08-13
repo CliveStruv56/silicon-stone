@@ -36,7 +36,7 @@ export interface DraftPromptInput {
     research?: DraftResearch;
     /** Pre-formatted "prior coverage" lines from the Pinecone article index. */
     priorCoverage?: string;
-    /** Full Exa Research Pro report, for Deep Dives — handed to the writer verbatim. */
+    /** Full Exa Agent research report, for Deep Dives — handed to the writer verbatim. */
     deepReport?: string;
     /**
      * Externally-written article to rework into the S&S voice + format (the

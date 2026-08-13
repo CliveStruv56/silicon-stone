@@ -2,7 +2,7 @@
 
 This document describes what happens in the Silicon & Stone admin area when you press the **research** button. It covers the two admin pages that initiate research, the exact path through Exa and Pinecone, and where each external service is used.
 
-> **Correction to the common assumption:** The research button itself does **not** use Pinecone. The research step is powered by **Exa** (fast web search or Exa Research Pro). **Pinecone** is used *after* research, when you choose to generate a draft, to find semantically similar articles you have already written and inject them into the draft prompt as “prior coverage.” Pinecone is also the storage layer for the standalone `/knowledge` semantic-search workspace.
+> **Correction to the common assumption:** The research button itself does **not** use Pinecone. The research step is powered by **Exa** (fast web search or the Exa Agent API for Deep Dives). **Pinecone** is used *after* research, when you choose to generate a draft, to find semantically similar articles you have already written and inject them into the draft prompt as “prior coverage.” Pinecone is also the storage layer for the standalone `/knowledge` semantic-search workspace.
 
 ---
 
@@ -79,7 +79,7 @@ sequenceDiagram
     alt deep && backend configured
         SA->>RB: startDeepResearchJob(topic, buildDeepInstructions(...))
         RB->>Rail: POST /v1/research/deep
-        Rail->>Exa: Exa Research Pro (research.create + poll)
+        Rail->>Exa: Exa Agent API (POST /agent/runs + poll)
         Exa-->>Rail: completed report
         Rail-->>RB: jobId (pending)
         RB-->>SA: {mode:"job", jobId}
@@ -154,16 +154,29 @@ Parameters (defaults):
 
 Used only for **Deep Dive** format (`format === "deep_dive"`).
 
+> **Migrated 2026-08-13.** Exa retired the standalone Research API
+> (`POST /research/v1`) in April 2026; it now answers `410 RESEARCH_RETIRED`.
+> Deep Dives run on the **Exa Agent API** (`POST /agent/runs`) instead. Called
+> via raw `fetch`/`httpx`, not the SDK: `exa-js` is pinned at 2.2.0 for the
+> `/search` path and predates the `agent.runs` namespace.
+
 ```ts
-await exa.research.create({
-  instructions,              // built by buildDeepInstructions()
-  model: "exa-research-pro"
-});
-await exa.research.pollUntilFinished(researchId, {
-  pollInterval: 3000,
-  timeoutMs: 10 * 60 * 1000  // 10 minutes
-});
+// POST https://api.exa.ai/agent/runs
+{
+  query: instructions,   // built by buildDeepInstructions() — no separate
+                         // `instructions` field on the Agent API
+  effort: "high"         // minimal | low | medium | high | xhigh | auto
+}
+// -> { id, status: "queued" }
+// Poll GET /agent/runs/{id} every 3s, up to 10 minutes.
+// Terminal statuses: completed | failed | cancelled
+// Report text:  output.text          (was output.content)
+// Run cost:     costDollars.total
 ```
+
+Do **not** add a `budget` object on a fixed-price effort tier — the API rejects
+it with "budget is currently supported only for metered efforts". The tier is
+the cost control.
 
 The forensic prompt (`buildDeepInstructions` in `src/lib/research.ts`) instructs Exa to cover:
 - Physical / supply-chain layer
@@ -315,7 +328,7 @@ Input is capped at 24,000 characters to stay well under the ~8,191 token limit.
 
 ## 10. Summary
 
-1. **Research is always Exa.** The button triggers either a fast Exa search (`searchExa`) or, for Deep Dives, Exa Research Pro (`deepResearchExa`), optionally routed through the Railway backend.
+1. **Research is always Exa.** The button triggers either a fast Exa search (`searchExa`) or, for Deep Dives, the Exa Agent API (`deepResearchExa`), optionally routed through the Railway backend.
 2. **Claude synthesizes** the Exa/Inoreader output into a `ResearchResult` (summary, sources, keywords, pain points).
 3. **Pinecone is used only when generating a draft** from the `/create` page. It retrieves up to 5 similar prior articles and feeds them to Claude as prior-coverage context.
 4. **Pinecone is also populated** by the `/api/vectorize` webhook whenever Sanity publishes/updates an article, and it powers the standalone `/knowledge` semantic search workspace.

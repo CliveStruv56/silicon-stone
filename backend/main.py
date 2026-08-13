@@ -279,7 +279,25 @@ def _sanity_image_url(image: dict[str, Any] | None, width: int = 800, height: in
 # NOTE: the async worker still runs in the process that accepted the POST. Redis
 # makes job *state* durable and replica-shared; full crash-resumption of an
 # in-flight run would need a real queue/worker and is out of scope here.
-EXA_RESEARCH_URL = "https://api.exa.ai/research/v1"
+# Exa retired the standalone Research API (/research/v1) in April 2026 — it now
+# answers 410 RESEARCH_RETIRED. The Agent API is its successor and keeps the same
+# create-then-poll shape, so only the URL, payload keys and result keys changed.
+EXA_AGENT_URL = "https://api.exa.ai/agent/runs"
+# Cost/quality tier, in place of the old `exa-research-pro` model name. "high"
+# is the closest analogue for a board-grade brief. The tier is itself the cost
+# control: the fixed-price tiers reject a `budget` object ("budget is currently
+# supported only for metered efforts"), so do not add one back here.
+# Verified against the live API 2026-08-13 — anything outside this set is a 400.
+EXA_AGENT_EFFORTS = frozenset({"minimal", "low", "medium", "high", "xhigh", "auto"})
+EXA_AGENT_EFFORT = os.getenv("EXA_AGENT_EFFORT", "high")
+if EXA_AGENT_EFFORT not in EXA_AGENT_EFFORTS:
+    # Fail loudly at import rather than 400 on every deep dive at runtime.
+    raise RuntimeError(
+        f"EXA_AGENT_EFFORT={EXA_AGENT_EFFORT!r} is not one of {sorted(EXA_AGENT_EFFORTS)}"
+    )
+# Ledger label for Agent spend. Distinct from the retired "exa-research-pro" so
+# the analytics dashboard doesn't blend pre- and post-migration costs.
+EXA_AGENT_USAGE_MODEL = "exa-agent"
 RESEARCH_JOB_TTL_SECONDS = 60 * 60
 REDIS_URL = os.getenv("REDIS_URL", "")
 DEEP_RESEARCH_MAX_TOPIC_CHARS = 300
@@ -415,6 +433,45 @@ def _prune_research_jobs() -> None:
         RESEARCH_JOBS.pop(jid, None)
 
 
+def _agent_cost(data: dict[str, Any]) -> Any:
+    """Total run cost from an Agent run payload.
+
+    The live Agent API returns `costDollars` as an object
+    ({"total", "agentCompute", "search", …}), though Exa's reference describes a
+    bare number. Accept either so a shape change upstream degrades to "no cost
+    recorded" rather than a crashed worker.
+    """
+    cost = data.get("costDollars")
+    if isinstance(cost, dict):
+        return cost.get("total")
+    return cost
+
+
+def _exa_error_message(response: httpx.Response) -> str:
+    """Best-effort short reason from an Exa error response body."""
+    try:
+        body = response.json()
+    except ValueError:
+        return response.text[:200]
+    if isinstance(body, dict):
+        error = body.get("error")
+        if isinstance(error, dict):
+            return str(error.get("message") or error.get("code") or error)[:200]
+        if error:
+            return str(error)[:200]
+        if body.get("detail"):
+            return str(body["detail"])[:200]
+    return response.text[:200]
+
+
+def _agent_error(data: dict[str, Any]) -> str | None:
+    """Human-readable failure reason from an Agent run payload, if any."""
+    error = data.get("error")
+    if isinstance(error, dict):
+        return error.get("message") or error.get("code")
+    return str(error) if error else None
+
+
 async def _run_deep_research(job_id: str, instructions: str, model: str) -> None:
     api_key = os.getenv("EXA_API_KEY", "")
     if not api_key:
@@ -423,17 +480,23 @@ async def _run_deep_research(job_id: str, instructions: str, model: str) -> None
         return
 
     headers = {"x-api-key": api_key, "Content-Type": "application/json"}
+    # The Agent API takes the forensic prompt as `query`; there is no separate
+    # instructions field. `model` is accepted only when the caller pins one —
+    # the retired `exa-research-pro` name is not a valid Agent model, so legacy
+    # callers that still send it fall through to the effort tier instead.
+    payload: dict[str, Any] = {"query": instructions, "effort": EXA_AGENT_EFFORT}
+    if model and not model.startswith("exa-research"):
+        payload["model"] = model
     try:
         async with httpx.AsyncClient(timeout=httpx.Timeout(30.0)) as client:
-            created = await client.post(
-                EXA_RESEARCH_URL,
-                headers=headers,
-                json={"instructions": instructions, "model": model},
-            )
+            created = await client.post(EXA_AGENT_URL, headers=headers, json=payload)
             created.raise_for_status()
-            research_id = created.json().get("researchId")
+            research_id = created.json().get("id")
             if not research_id:
-                await _job_update(job_id, status="failed", error="Exa did not return a researchId")
+                await _job_update(job_id, status="failed", error="Exa did not return an agent run id")
+                # Without this the job keeps its slot in research:active-jobs for
+                # the full TTL and eats the concurrency ceiling.
+                await _deep_research_mark_finished(job_id)
                 return
 
             await _job_update(job_id, status="running", research_id=research_id)
@@ -441,38 +504,36 @@ async def _run_deep_research(job_id: str, instructions: str, model: str) -> None
             deadline = time.time() + 10 * 60  # 10 minutes
             while time.time() < deadline:
                 await asyncio.sleep(3)
-                poll = await client.get(
-                    f"{EXA_RESEARCH_URL}/{research_id}",
-                    headers=headers,
-                    params={"stream": "false"},
-                )
+                poll = await client.get(f"{EXA_AGENT_URL}/{research_id}", headers=headers)
                 poll.raise_for_status()
                 data = poll.json()
                 status = data.get("status")
 
                 if status == "completed":
                     output = data.get("output") or {}
-                    cost = (data.get("costDollars") or {}).get("total")
+                    cost = _agent_cost(data)
                     await _job_update(
                         job_id,
                         status="completed",
-                        report=output.get("content", ""),
+                        report=output.get("text", ""),
                         cost_dollars=cost,
                     )
                     logger.info(
-                        "deep research job %s completed via Exa (research_id=%s, store=%s, cost=%s)",
+                        "deep research job %s completed via Exa Agent (run_id=%s, store=%s, cost=%s)",
                         job_id, research_id, _store_mode(), cost,
                     )
                     # Record spend in the usage ledger. The frontend only polls
                     # when the backend runs the job, so it can't log this itself.
-                    await _record_exa_usage("deep-research", model, cost, job_id)
+                    await _record_exa_usage("deep-research", EXA_AGENT_USAGE_MODEL, cost, job_id)
                     await _deep_research_mark_finished(job_id)
                     return
-                if status in ("failed", "canceled"):
+                # Exa spells it "cancelled"; the older Research API used
+                # "canceled". Accept both so neither spelling hangs the poll.
+                if status in ("failed", "canceled", "cancelled"):
                     await _job_update(
                         job_id,
                         status="failed",
-                        error=data.get("error", f"research {status}"),
+                        error=_agent_error(data) or f"research {status}",
                     )
                     await _deep_research_mark_finished(job_id)
                     return
@@ -480,8 +541,15 @@ async def _run_deep_research(job_id: str, instructions: str, model: str) -> None
             await _job_update(job_id, status="failed", error="Deep research timed out")
             await _deep_research_mark_finished(job_id)
     except httpx.HTTPStatusError as exc:
-        logger.error("Exa research failed: status=%s body=%s", exc.response.status_code, exc.response.text[:500])
-        await _job_update(job_id, status="failed", error=f"Exa returned {exc.response.status_code}")
+        logger.error("Exa agent run failed: status=%s body=%s", exc.response.status_code, exc.response.text[:500])
+        # Carry Exa's own message into the job error, not just the status code.
+        # A bare "Exa returned 410" is what made the Research API's retirement
+        # look like a generic outage from the writer's side.
+        await _job_update(
+            job_id,
+            status="failed",
+            error=f"Exa returned {exc.response.status_code}: {_exa_error_message(exc.response)}",
+        )
         await _deep_research_mark_finished(job_id)
     except httpx.HTTPError as exc:
         logger.error("Exa research request failed: %s", exc)
@@ -832,7 +900,9 @@ async def start_deep_research(payload: DeepResearchRequest, request: Request) ->
     if len(instructions) > DEEP_RESEARCH_MAX_INSTRUCTION_CHARS:
         raise HTTPException(status_code=413, detail="instructions are too large")
 
-    model = payload.model or "exa-research-pro"
+    # Empty by default: the Agent API picks its own model from the effort tier.
+    # Only an explicitly pinned model is forwarded.
+    model = payload.model or ""
     digest = _deep_research_hash(topic, instructions)
     existing_job_id = await _require_deep_research_budget(request, digest)
     if existing_job_id:
