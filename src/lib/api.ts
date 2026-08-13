@@ -104,11 +104,28 @@ export function getAITells(): string {
     return AI_TELLS_RULES;
 }
 
+let contentFocusMissWarned = false;
+
+/**
+ * Optional editorial steer for the draft prompt. Returns "" when the file is
+ * absent — callers MUST treat "" as "omit the section", not "emit an empty
+ * header" (see buildDraftPrompt). The miss is logged once per process: this
+ * silently returned "" for a file that does not exist, so every generated
+ * prompt carried a dangling "Current Content Focus Areas:" heading with
+ * nothing under it and nothing in the logs to say so.
+ */
 export async function getContentFocus(): Promise<string> {
     const fullPath = nodePath.join(ROOT, 'knowledge/company/content-focus.md');
     try {
         return await fs.readFile(fullPath, 'utf-8');
     } catch {
+        if (!contentFocusMissWarned) {
+            contentFocusMissWarned = true;
+            console.warn(
+                `[prompts] No content-focus file at ${fullPath} — the "Current Content Focus Areas" ` +
+                `section will be omitted from draft prompts. Create it to steer topic selection.`,
+            );
+        }
         return "";
     }
 }

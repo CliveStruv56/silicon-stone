@@ -12,7 +12,12 @@ dotenv.config({ path: '.env.local' })
 import { createClient } from '@sanity/client'
 import { Pinecone } from '@pinecone-database/pinecone'
 import OpenAI from 'openai'
-import { extractArticleText, buildArticleMetadata } from '../lib/embeddings'
+import {
+  extractArticleText,
+  buildArticleMetadata,
+  EMBEDDING_MODEL,
+  EMBEDDING_DIMENSIONS,
+} from '../lib/embeddings'
 
 const sanity = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
@@ -27,9 +32,9 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
 async function embed(text: string): Promise<number[]> {
   const res = await openai.embeddings.create({
-    model: 'text-embedding-3-small',
+    model: EMBEDDING_MODEL,
     input: text,
-    dimensions: 1024,
+    dimensions: EMBEDDING_DIMENSIONS,
   })
   return res.data[0].embedding
 }

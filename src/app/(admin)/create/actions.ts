@@ -7,8 +7,7 @@ import { buildDraftPrompt, type DraftFormat } from "@/lib/prompts";
 import { parseDraftPayload, finalizeDraft } from "@/lib/draft-pipeline";
 import { requireAdmin } from "@/lib/auth";
 import { ResearchResult } from "@/types/research";
-import { generateEmbedding } from "@/lib/embeddings";
-import { searchSimilar } from "@/lib/pinecone";
+import { gatherDraftContext } from "@/lib/draft-retrieval";
 import { checkDurableRateLimit } from "@/lib/durable-rate-limit";
 import { getServerActionClientIp } from "@/lib/rate-limit";
 
@@ -135,25 +134,24 @@ export async function createDraftFromResearch(
     try {
         await requireAdmin();
 
-        // Retrieve semantically similar prior articles from Pinecone (RAG) and
-        // format them as a "prior coverage" block the writer can extend/differentiate.
-        let priorCoverageBlock = ''
-        try {
-            const topicVector = await generateEmbedding(topic)
-            const similar = await searchSimilar(topicVector, 5)
-            if (similar.length > 0) {
-                const lines = similar.map(
-                    (r) => `- "${r.metadata.title}": ${r.metadata.excerpt} (/analysis/${r.metadata.slug})`
-                )
-                priorCoverageBlock = `=== PRIOR COVERAGE IN YOUR KNOWLEDGE BASE ===\nYou have already written on related topics. Reference, extend, or differentiate from this prior work rather than repeating it:\n${lines.join('\n')}`
-            }
-        } catch {
-            // Pinecone not configured — skip silently
-        }
+        // Prior coverage (article index) + primary statutory text (regulatory
+        // corpus), retrieved together. Both lanes fail independently and neither
+        // throws — but every outcome is logged, including the no-ops. This used
+        // to be an inline block ending in a bare `catch {}`, so a Pinecone
+        // outage silently produced un-RAGed drafts with nothing in the logs.
+        stage = "retrieving prior coverage and regulatory context";
+        const draftContext = await gatherDraftContext({
+            topic,
+            brief,
+            keywords: researchResult.suggestedContext.keywords,
+            painPoints: researchResult.suggestedContext.pain_points,
+            personaRole: personaSlug.replace(/-/g, " "),
+        });
 
         // Single, data-driven prompt builder for every format — pulls the brand
         // voice DNA, business profile and full Sanity persona, then carries the
-        // research, prior coverage and (for Deep Dives) the full forensic report.
+        // research, statute, prior coverage and (for Deep Dives) the full
+        // forensic report.
         stage = "building the prompt";
         const { systemPrompt, userPrompt } = await buildDraftPrompt({
             topic,
@@ -165,7 +163,8 @@ export async function createDraftFromResearch(
                 painPoints: researchResult.suggestedContext.pain_points,
                 keywords: researchResult.suggestedContext.keywords,
             },
-            priorCoverage: priorCoverageBlock || undefined,
+            priorCoverage: draftContext.priorCoverage,
+            regulatoryCorpus: draftContext.regulatoryCorpus,
             deepReport: researchResult.deepReport,
             brief: brief.trim().slice(0, MAX_BRIEF_LENGTH) || undefined,
         });

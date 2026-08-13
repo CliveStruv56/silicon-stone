@@ -18,7 +18,13 @@ export type EvidenceChunkMetadata = {
   recordType: EvidenceRecordType
   manifestId: string
   title: string
-  brandTags: string
+  /**
+   * A real array, not a comma-joined string. Pinecone metadata supports
+   * string[] and matches membership with $in. This used to store "a,b", which
+   * no single-tag filter could ever match, so any source carrying more than one
+   * brand tag was invisible to /api/knowledge/evidence.
+   */
+  brandTags: string[]
   locator: string
   url: string
   text: string
@@ -100,7 +106,7 @@ export function buildEvidenceChunkRecords(source: EvidenceSource) {
       recordType: source.recordType,
       manifestId: source.manifestId ?? '',
       title: source.title,
-      brandTags: source.brandTags.join(','),
+      brandTags: source.brandTags,
       locator: `chunk:${chunkIndex}`,
       url: source.url ?? '',
       text,

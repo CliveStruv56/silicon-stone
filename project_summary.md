@@ -2,7 +2,7 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-08-13
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (74 static pages), 187 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (74 static pages), 208 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
@@ -398,6 +398,77 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 13, 2026 — Regulatory retrieval corpus: the drafting model can now quote statute
+
+Until now the drafting model at `/create` never saw primary legal text. Every
+statutory statement in a draft was recalled from model weights or paraphrased
+from a journalist's summary, then caught (or not) afterwards by the fact-check
+pass — which checks claims against *fresh Exa web results*, not against the law.
+
+**A new editorial retrieval lane closes that gap.** The consolidated EU AI Act
+(CELEX `02024R1689-20260727` — the post-Digital-Omnibus text) is committed under
+`corpus/regulatory/`, parsed into 585 provisions, chunked into 447 citation-headed
+passages and embedded into a new Pinecone index `silicon-and-stone-regulatory`
+(1024-d dense, **no integrated embed config**). At draft time a deterministic
+keyword gate decides whether the piece is regulation-adjacent at all; if so the
+topic, brief, keywords, pain points and persona are composed into a query, and up
+to six passages — capped at three per Article so one long Article cannot dominate
+— are injected into the prompt above a score floor of 0.30.
+
+Three things make it safe rather than merely useful:
+
+- **The citation header lives inside the embedded text.** There is no code path
+  where a quotation reaches the model separated from its Article, paragraph,
+  consolidation date and source URL.
+- **The prompt forbids quoting from memory** and tells the model that absence
+  from the corpus is not evidence a rule does not exist.
+- **It is walled off from the Compliance Checker.**
+  `npm run test:regulatory-index` fails the build if anything under
+  `src/lib/report/`, `src/lib/rulepack/` or the checker route so much as
+  references this lane. The checker's authority remains the pinned rule pack.
+  The two AI Act copies exist deliberately; `npm run reg:check` (in `prebuild`)
+  fails if their consolidation dates ever diverge.
+
+Verified end to end: probe query "high-risk classification derogation narrow
+procedural task" returns **Article 6(3) top at 0.502**; a real draft prompt on
+credit-scoring obligations pulls Articles 43, 7 and 6 and injects 7,104
+characters of statute; the negative control ("TSMC Dresden fab workforce
+shortages") correctly yields `gate=miss` and no block; and pointing the index env
+var at a nonexistent index logs the failure loudly while the draft still builds.
+
+Also fixed, all pre-existing and all found during this work:
+
+1. **`getContentFocus()` read a file that does not exist** (`knowledge/company/content-focus.md`)
+   and swallowed the miss, so every prompt shipped a dangling "Current Content
+   Focus Areas:" heading with nothing under it. Now the section is omitted and
+   the miss is logged.
+2. **A bare `catch {}` around the prior-coverage RAG block** meant a Pinecone
+   outage silently produced un-RAGed drafts. Both call sites now share
+   `src/lib/draft-retrieval.ts`, which logs every path including the no-ops.
+3. **`/research` passed Exa web results into the `priorCoverage` slot**, which is
+   headed "PRIOR COVERAGE IN YOUR KNOWLEDGE BASE" — telling the model that
+   third-party pages were Silicon & Stone's own back catalogue. The sources were
+   already being passed correctly via `research.sources`; the duplicate is gone.
+4. **`npm run evidence:rebuild` could not run at all** — it crashed on
+   `import 'server-only'` under `tsx`. A shared `scripts/tsconfig.scripts.json`
+   now shims it for every CLI script.
+5. **Evidence `brandTags` were stored comma-joined**, so no filter could match a
+   source carrying more than one brand tag; it is now a real `string[]` matched
+   with `$in`, and the index has been rebuilt.
+6. **The evidence upsert was unbatched** — 500 chunks in one request is ~10 MB
+   against Pinecone's 2 MB ceiling, so it would fail on any large source. Now
+   batched at 100, as the regulatory lane is from the start.
+7. Embedding model/dimension were hardcoded in three scripts instead of imported,
+   and two `.env.local` values (including the Pinecone API key) had trailing
+   whitespace.
+
+**Known, deliberately not fixed:** the `silicon-and-stone` article index was
+created with an integrated `embed` config (`llama-text-embed-v2`) while the app
+writes OpenAI vectors into it. Pinecone fixes embed config at creation, so it
+cannot be repaired in place — and that index also holds an `ideas` namespace with
+235 records written by something outside this repo, which recreation would
+destroy. The new lane is created clean and `npm run reg:verify-index` asserts it.
 
 ### August 13, 2026 — Deep Dive research migrated off Exa's retired Research API
 

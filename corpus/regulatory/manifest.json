@@ -1,0 +1,12 @@
+{
+  "normalisation": "v1",
+  "instruments": {
+    "eu-ai-act": {
+      "version": "2026-07-27",
+      "consolidatedAs": "2026-07-27",
+      "sha256": "524ab5942cc05305cce00da032f7a9f726aaf8bb78954ac536db4f6497bf0a46",
+      "reviewBy": "2026-11-11",
+      "changelog": "Initial ingest of Regulation (EU) 2024/1689 (AI Act), as amended by Regulation (EU) 2026/1744 (Digital Omnibus on AI), consolidated as at 2026-07-27, retrieved 2026-08-13."
+    }
+  }
+}

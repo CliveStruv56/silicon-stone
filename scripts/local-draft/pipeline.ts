@@ -168,23 +168,29 @@ async function cmdDraftPrompt(flags: Flags): Promise<void> {
 
   const { buildDraftPrompt } = await import('../../src/lib/prompts')
 
+  const research = p.research
+
+  // Same retrieval step the website uses, so a local draft and a /create draft
+  // see identical context. Must NOT be re-implemented here — this pair of call
+  // sites had already drifted apart once, and scripts/regulatory-index-checks.ts
+  // now fails the build if either one inlines its own retrieval.
   let priorCoverage: string | undefined
+  let regulatoryCorpus: string | undefined
   try {
-    const { generateEmbedding } = await import('../../src/lib/embeddings')
-    const { searchSimilar } = await import('../../src/lib/pinecone')
-    const vector = await generateEmbedding(p.topic)
-    const similar = await searchSimilar(vector, 5)
-    if (similar.length > 0) {
-      const lines = similar.map(
-        (r) => `- "${r.metadata.title}": ${r.metadata.excerpt} (/analysis/${r.metadata.slug})`,
-      )
-      priorCoverage = `=== PRIOR COVERAGE IN YOUR KNOWLEDGE BASE ===\nYou have already written on related topics. Reference, extend, or differentiate from this prior work rather than repeating it:\n${lines.join('\n')}`
-    }
+    const { gatherDraftContext } = await import('../../src/lib/draft-retrieval')
+    const context = await gatherDraftContext({
+      topic: p.topic,
+      brief: p.brief || undefined,
+      keywords: research?.keywords,
+      painPoints: research?.painPoints,
+      personaRole: p.persona.replace(/-/g, ' '),
+    })
+    priorCoverage = context.priorCoverage
+    regulatoryCorpus = context.regulatoryCorpus
   } catch (e) {
-    warn(`Pinecone RAG skipped: ${errMsg(e)}`)
+    warn(`Draft context retrieval skipped: ${errMsg(e)}`)
   }
 
-  const research = p.research
   const { systemPrompt, userPrompt } = await buildDraftPrompt({
     topic: p.topic,
     personaKey: p.persona,
@@ -198,6 +204,7 @@ async function cmdDraftPrompt(flags: Flags): Promise<void> {
         }
       : undefined,
     priorCoverage,
+    regulatoryCorpus,
     deepReport: research?.deepReport,
     brief: p.brief || undefined,
   })

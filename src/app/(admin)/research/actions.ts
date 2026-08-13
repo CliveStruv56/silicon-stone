@@ -39,11 +39,11 @@ export async function createDraftFromResearch(summary: string, topic: string, so
         const { buildDraftPrompt } = await import("@/lib/prompts");
         const { parseDraftPayload } = await import("@/lib/draft-pipeline");
 
-        // Format sources as context for Claude
-        const sourcesContext = sources.length > 0
-            ? sources.map(s => `- ${s.title}: ${s.snippet}`).join('\n')
-            : "No additional sources.";
-
+        // `sources` goes through research.sources, which buildDraftPrompt renders under
+        // === SOURCES ===. It must NOT also be passed as priorCoverage: that slot is
+        // headed "PRIOR COVERAGE IN YOUR KNOWLEDGE BASE" and tells the model it already
+        // wrote the material, which would invite the draft to self-reference third-party
+        // pages as Silicon & Stone's own back catalogue.
         const { systemPrompt, userPrompt } = await buildDraftPrompt({
             topic,
             personaKey: 'global-citizen',
@@ -54,7 +54,6 @@ export async function createDraftFromResearch(summary: string, topic: string, so
                 painPoints: [],
                 keywords: [],
             },
-            priorCoverage: sourcesContext === "No additional sources." ? undefined : sourcesContext,
         });
         const responseText = await callClaude(systemPrompt, userPrompt);
         const draft = parseDraftPayload(responseText);

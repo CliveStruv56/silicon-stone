@@ -45,7 +45,7 @@ assert.equal(records[0].id, 'public-report-2026:chunk:0')
 assert.equal(records[0].metadata.sourceId, 'public-report-2026')
 assert.equal(records[0].metadata.recordType, 'knowledge_source')
 assert.equal(records[0].metadata.manifestId, 'public-report-2026')
-assert.equal(records[0].metadata.brandTags, 'silicon-and-stone,shared')
+assert.deepEqual(records[0].metadata.brandTags, ['silicon-and-stone', 'shared'])
 assert.equal(records[0].metadata.locator, 'chunk:0')
 assert.equal(records[0].metadata.url, 'https://example.com/report')
 assert.equal(records[0].metadata.contentHash, `sha256:${'b'.repeat(64)}`)
@@ -65,6 +65,11 @@ assert.ok(
 assert.match(evidenceIndex, /EVIDENCE_EMBEDDING_BATCH_SIZE/)
 assert.match(evidenceIndex, /EVIDENCE_SOURCE_MAX_CHUNKS/)
 assert.match(evidenceIndex, /embedInBatches/)
+assert.match(
+  evidenceIndex,
+  /EVIDENCE_UPSERT_BATCH_SIZE/,
+  'upserts must be batched — 500 chunks in one request exceeds Pinecone 2MB limit',
+)
 assert.equal(
   /Promise\.all\(\s*records\.map/.test(evidenceIndex),
   false,
@@ -90,7 +95,9 @@ assert.equal(relatedArticlesComponent.includes('searchSimilar'), false)
 const evidenceSearchRoute = fs.readFileSync('src/app/api/knowledge/evidence/route.ts', 'utf8')
 assert.match(evidenceSearchRoute, /await requireAdmin\(\)/)
 assert.match(evidenceSearchRoute, /searchEvidence\(vector, 8, filter\)/)
-assert.match(evidenceSearchRoute, /brandTags: \{ \$eq: brand \}/)
+// $in, not $eq — brandTags is a string[]; an equality filter could never match
+// a multi-tag source, which is the bug this assertion previously pinned in place.
+assert.match(evidenceSearchRoute, /brandTags: \{ \$in: \[brand\] \}/)
 
 const knowledgePage = fs.readFileSync('src/app/(admin)/knowledge/page.tsx', 'utf8')
 assert.match(knowledgePage, /Deep Evidence Search/)

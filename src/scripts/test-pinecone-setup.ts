@@ -11,6 +11,7 @@ dotenv.config({ path: '.env.local' })
 import { createClient } from '@sanity/client'
 import { Pinecone } from '@pinecone-database/pinecone'
 import OpenAI from 'openai'
+import { EMBEDDING_MODEL, EMBEDDING_DIMENSIONS } from '../lib/embeddings'
 
 const checks: Array<{ name: string; pass: boolean; detail: string }> = []
 
@@ -45,12 +46,12 @@ async function main() {
   try {
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
     const res = await openai.embeddings.create({
-      model: 'text-embedding-3-small',
+      model: EMBEDDING_MODEL,
       input: 'Silicon and Stone connectivity test',
-      dimensions: 1024,
+      dimensions: EMBEDDING_DIMENSIONS,
     })
     const dims = res.data[0].embedding.length
-    record('OpenAI embeddings', dims === 1024, `generated ${dims}-dim vector`)
+    record('OpenAI embeddings', dims === EMBEDDING_DIMENSIONS, `generated ${dims}-dim vector`)
   } catch (err) {
     record('OpenAI embeddings', false, String((err as Error).message))
   }
@@ -65,11 +66,11 @@ async function main() {
     const count = stats.totalRecordCount ?? 0
     record(
       'Pinecone index',
-      dim === 1024,
+      dim === EMBEDDING_DIMENSIONS,
       `dimension=${dim}, vectors=${count}`
     )
-    if (dim !== 1024) {
-      console.log('  \x1b[33m⚠ Index dimension must be 1024 to match our embedding config\x1b[0m')
+    if (dim !== EMBEDDING_DIMENSIONS) {
+      console.log(`  \x1b[33m⚠ Index dimension must be ${EMBEDDING_DIMENSIONS} to match our embedding config\x1b[0m`)
     }
   } catch (err) {
     record('Pinecone index', false, String((err as Error).message))
@@ -97,9 +98,9 @@ async function main() {
     try {
       const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
       const embedRes = await openai.embeddings.create({
-        model: 'text-embedding-3-small',
+        model: EMBEDDING_MODEL,
         input: 'test vector for connectivity check',
-        dimensions: 1024,
+        dimensions: EMBEDDING_DIMENSIONS,
       })
       const vector = embedRes.data[0].embedding
       const testId = '__connectivity_test__'

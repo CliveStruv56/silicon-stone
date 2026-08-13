@@ -22,7 +22,12 @@ export async function GET(req: NextRequest) {
   }
 
   const vector = await generateEmbedding(query)
-  const filter = brand ? { brandTags: { $eq: brand } } : undefined
+  // brandTags is a string[]. It used to be stored comma-joined ("a,b"), which
+  // no filter could match against a single tag — a multi-tag source was simply
+  // invisible to this endpoint. Array storage is the fix; $in is used because it
+  // states membership explicitly (Pinecone's $eq also matches inside an array,
+  // but reading it as equality is misleading).
+  const filter = brand ? { brandTags: { $in: [brand] } } : undefined
   const results = await searchEvidence(vector, 8, filter)
 
   return NextResponse.json(results.map((result) => ({
@@ -32,7 +37,7 @@ export async function GET(req: NextRequest) {
     recordType: result.metadata.recordType,
     manifestId: result.metadata.manifestId,
     title: result.metadata.title,
-    brandTags: result.metadata.brandTags.split(',').filter(Boolean),
+    brandTags: result.metadata.brandTags,
     locator: result.metadata.locator,
     url: result.metadata.url,
     text: result.metadata.text,

@@ -1,0 +1,18 @@
+{
+  "corpusId": "eu-ai-act",
+  "shortName": "EU AI Act",
+  "instrument": "Regulation (EU) 2024/1689 (AI Act), as amended by Regulation (EU) 2026/1744 (Digital Omnibus on AI)",
+  "jurisdiction": "EU",
+  "celex": "02024R1689-20260727",
+  "eli": "http://data.europa.eu/eli/reg/2024/1689/2026-07-27",
+  "version": "2026-07-27",
+  "consolidatedAs": "2026-07-27",
+  "sourceUrl": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:02024R1689-20260727",
+  "citationUrl": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A02024R1689-20260727",
+  "retrieved": "2026-08-13",
+  "parser": "eurlex",
+  "expectedArticles": 119,
+  "coverage": "full",
+  "relatedPolicyId": "eu-ai-act",
+  "note": "119 article divisions, not 113: the Digital Omnibus (Regulation (EU) 2026/1744) inserted Articles 4a, 60a, 75a, 75b, 75c and 75d. EUR-Lex consolidated texts omit the preamble, so this corpus contains no recitals — only the enacting terms (Articles 1-113 including insertions) and Annexes I-XIII. Consolidation markers, footnotes and markdown link syntax are stripped at fetch time; NBSP and soft hyphens are folded by src/lib/rulepack/normalise.ts at hash and match time. Text is reused from EUR-Lex under CC BY 4.0 (Commission Decision 2011/833/EU)."
+}

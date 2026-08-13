@@ -8,6 +8,7 @@ dotenv.config({ path: '.env.local' })
 
 import { Pinecone } from '@pinecone-database/pinecone'
 import OpenAI from 'openai'
+import { EMBEDDING_MODEL, EMBEDDING_DIMENSIONS } from '../lib/embeddings'
 
 async function main() {
   const query = process.argv[2] ?? 'EU AI Act compliance deadlines'
@@ -18,9 +19,9 @@ async function main() {
   const index = pinecone.index(process.env.PINECONE_INDEX_NAME!)
 
   const embedRes = await openai.embeddings.create({
-    model: 'text-embedding-3-small',
+    model: EMBEDDING_MODEL,
     input: query,
-    dimensions: 1024,
+    dimensions: EMBEDDING_DIMENSIONS,
   })
 
   const result = await index.query({

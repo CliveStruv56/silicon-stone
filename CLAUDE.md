@@ -50,6 +50,45 @@ The report generator only supplies Articles the pack covers, so an `uncovered`
 verdict means the model cited outside its evidence, not merely that coverage is
 thin.
 
+## Regulatory retrieval corpus (editorial only — do not blur)
+
+`corpus/regulatory/`, `src/lib/regulatory/` and the Pinecone index named by
+`PINECONE_REGULATORY_INDEX_NAME` give the drafting model at `/create` primary
+statutory text to quote and cite. They are **never** an authority for anything
+the Compliance Checker shows on screen — that remains the pinned rule pack under
+`rulepack/versions/`. Two copies of the AI Act exist on purpose; the separation
+is the safety property.
+
+- `npm run test:regulatory-index` fails if any file under `src/lib/report/`,
+  `src/lib/rulepack/` or `src/app/api/tools/compliance-checker/` so much as
+  references the regulatory lane — and also if the generator stops consuming it,
+  if the prompt stops forbidding quotation from memory, or if a silent
+  `catch {}` reappears anywhere in the retrieval path.
+- `npm run reg:check` runs in `prebuild` and blocks the build on corpus hash
+  drift, on a lapsed `reviewBy` date, **or** if the corpus consolidation date
+  stops matching the rule pack's `corpusCutOff`. The lanes assert consistency
+  with each other; they never share storage.
+- Corpus text is committed so an amendment is a reviewable `git diff` rather
+  than a silent re-embed. To change it: `npm run reg:fetch -- --corpus <id>`,
+  read the diff, then `npm run reg:hash` and write what you checked into the
+  manifest `changelog`.
+- Every chunk carries its citation header *inside* the embedded text, so a
+  quotation can never reach the model separated from its locator.
+- This lane does **not** carry the Compliance Checker's "no unverified
+  quotation" guarantee. Drafts pass human review in Studio before publish; that
+  is the control.
+- The index must have **no integrated `embed` config** — this app writes OpenAI
+  vectors, and Pinecone's integrated text path would embed queries with a
+  different model. `npm run reg:verify-index` asserts this against the live
+  index; `--create` provisions one correctly.
+
+## CLI scripts and `server-only`
+
+Several `src/lib` modules start with `import 'server-only'`, which throws under
+plain `tsx`. Any script reusing them must run with
+`TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json`, which maps that specifier to
+an empty shim. Forgetting it is not subtle — the script dies on import.
+
 ## Model routing
 
 You normally choose the tool yourself (Claude Code vs Codex). Two optional
