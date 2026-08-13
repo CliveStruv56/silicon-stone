@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Terminal, Zap, Search, Users, Database, Home, BrainCircuit, LogOut, FileInput, BarChart3 } from 'lucide-react';
+import { Terminal, Zap, Search, Users, Database, Home, BrainCircuit, LogOut, FileInput, BarChart3, FileText } from 'lucide-react';
 import { logout } from '@/app/(auth)/login/actions';
 
 export const metadata = {
@@ -22,6 +22,7 @@ const NAV_ITEMS: NavItem[] = [
     { href: '/analytics', label: 'Analytics', icon: BarChart3 },
     { href: '/create', label: 'Create', icon: Zap },
     { href: '/import', label: 'Import', icon: FileInput },
+    { href: '/content', label: 'Library', icon: FileText },
     { href: '/research', label: 'Research', icon: Search },
     { href: '/context', label: 'Context', icon: Users },
     { href: '/knowledge', label: 'Knowledge', icon: BrainCircuit },

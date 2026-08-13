@@ -19,9 +19,10 @@ export default async function ImportPage() {
                     Import Article
                 </h1>
                 <p className="text-muted-foreground">
-                    Paste an article written outside the system. It is reworked end-to-end into
-                    the Silicon &amp; Stone voice and saved as a draft — never auto-published.
-                    The original text is kept on the article for reference.
+                    Paste an article written outside the system — by hand or anywhere else. It is
+                    reworked end-to-end into the Silicon &amp; Stone voice and the format you pick,
+                    fact-checked against fresh sources, and saved as a draft for review in Studio.
+                    Never auto-published. The original text is kept on the article for reference.
                 </p>
             </div>
 

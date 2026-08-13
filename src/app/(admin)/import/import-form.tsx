@@ -1,8 +1,8 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useActionState, useEffect, useRef, useState } from 'react';
 import { importArticle } from './actions';
-import { IMPORT_INITIAL_STATE } from './types';
+import { BRIEF_MAX, IMPORT_FORMATS, IMPORT_INITIAL_STATE } from './types';
 import {
     Sparkles,
     FileText,
@@ -10,6 +10,9 @@ import {
     CheckCircle,
     AlertCircle,
     Upload,
+    ShieldCheck,
+    BookOpen,
+    Video,
 } from 'lucide-react';
 
 interface Persona {
@@ -19,26 +22,19 @@ interface Persona {
     slug: { current: string };
 }
 
-const FORMATS = [
-    {
-        id: 'pulse',
-        name: 'Pulse',
-        desc: '30-second intelligence scan (100-140 words)',
-        icon: Sparkles,
-    },
-    {
-        id: 'signal',
-        name: 'Signal',
-        desc: 'Rapid-response analysis (~800 words)',
-        icon: Sparkles,
-    },
-    {
-        id: 'deep_dive',
-        name: 'Deep Dive',
-        desc: 'Comprehensive forensic report (3000+ words)',
-        icon: FileText,
-    },
-];
+const FORMAT_ICONS = {
+    pulse: Sparkles,
+    signal: Sparkles,
+    deep_dive: FileText,
+    guide: BookOpen,
+    youtube: Video,
+} as const;
+
+type FactCheckState =
+    | { status: 'idle' }
+    | { status: 'starting' }
+    | { status: 'started' }
+    | { status: 'error'; message: string };
 
 const cardClass =
     'flex items-start gap-3 p-4 border border-border bg-card rounded-xl cursor-pointer transition-all hover:bg-muted/50 has-[:checked]:ring-2 has-[:checked]:ring-primary has-[:checked]:border-transparent';
@@ -49,6 +45,50 @@ export function ImportForm({ personas }: { personas: Persona[] }) {
         IMPORT_INITIAL_STATE,
     );
     const [fileName, setFileName] = useState('');
+    const [brief, setBrief] = useState('');
+    const [wantsFactCheck, setWantsFactCheck] = useState(true);
+    const [factCheck, setFactCheck] = useState<FactCheckState>({ status: 'idle' });
+
+    // Fire the fact-check once per created draft. Same call the Studio document
+    // action makes — the route owns the rate limit, the re-entrancy guard and
+    // the background execution, so there is nothing to duplicate here.
+    const firedFor = useRef('');
+    useEffect(() => {
+        if (!state.success || !state.articleId || !wantsFactCheck) return;
+        if (firedFor.current === state.articleId) return;
+        firedFor.current = state.articleId;
+
+        setFactCheck({ status: 'starting' });
+        fetch('/api/fact-check', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ documentId: state.articleId }),
+        })
+            .then((res) => {
+                if (res.status === 401) {
+                    setFactCheck({
+                        status: 'error',
+                        message:
+                            'Admin session expired — sign in at /login again, then run the fact-check from Studio.',
+                    });
+                } else if (res.status === 409) {
+                    setFactCheck({ status: 'started' });
+                } else if (!res.ok) {
+                    setFactCheck({
+                        status: 'error',
+                        message: `Fact-check failed to start (${res.status}). Run it from the Studio document menu.`,
+                    });
+                } else {
+                    setFactCheck({ status: 'started' });
+                }
+            })
+            .catch(() => {
+                setFactCheck({
+                    status: 'error',
+                    message: 'Fact-check request failed. Run it from the Studio document menu.',
+                });
+            });
+    }, [state.success, state.articleId, wantsFactCheck]);
 
     return (
         <form action={formAction} className="space-y-8">
@@ -80,24 +120,27 @@ export function ImportForm({ personas }: { personas: Persona[] }) {
             <fieldset className="space-y-3">
                 <legend className="text-sm font-semibold mb-2">2. What format?</legend>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {FORMATS.map((f) => (
-                        <label key={f.id} className={cardClass}>
-                            <input
-                                type="radio"
-                                name="format"
-                                value={f.id}
-                                required
-                                className="mt-1 accent-primary"
-                            />
-                            <div>
-                                <div className="font-bold flex items-center gap-2">
-                                    <f.icon className="w-4 h-4" />
-                                    {f.name}
+                    {IMPORT_FORMATS.map((f) => {
+                        const Icon = FORMAT_ICONS[f.id];
+                        return (
+                            <label key={f.id} className={cardClass}>
+                                <input
+                                    type="radio"
+                                    name="format"
+                                    value={f.id}
+                                    required
+                                    className="mt-1 accent-primary"
+                                />
+                                <div>
+                                    <div className="font-bold flex items-center gap-2">
+                                        <Icon className="w-4 h-4" />
+                                        {f.name}
+                                    </div>
+                                    <div className="text-sm text-muted-foreground">{f.desc}</div>
                                 </div>
-                                <div className="text-sm text-muted-foreground">{f.desc}</div>
-                            </div>
-                        </label>
-                    ))}
+                            </label>
+                        );
+                    })}
                 </div>
             </fieldset>
 
@@ -159,6 +202,52 @@ export function ImportForm({ personas }: { personas: Persona[] }) {
                 </div>
             </fieldset>
 
+            {/* STEP 4 — STEER THE REWORK */}
+            <fieldset className="space-y-3">
+                <legend className="text-sm font-semibold mb-2">
+                    4. Steer the rework <span className="font-normal text-muted-foreground">(optional)</span>
+                </legend>
+                <textarea
+                    id="brief"
+                    name="brief"
+                    rows={5}
+                    value={brief}
+                    onChange={(e) => setBrief(e.target.value.slice(0, BRIEF_MAX))}
+                    placeholder="e.g. Keep every figure and date exactly as written. Lead with the enforcement deadline. Cut the vendor pitch at the end. Assume the reader already knows what the AI Act is."
+                    className="w-full px-4 py-3 bg-card border border-border rounded-lg text-sm leading-relaxed resize-y focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                <div className="flex justify-between gap-4 text-xs text-muted-foreground">
+                    <span>
+                        Guides how the source is reworked — angle, emphasis, what to keep or cut.
+                        Unlike the pasted article, the wording here is treated as your
+                        authoritative instruction.
+                    </span>
+                    <span className={brief.length >= BRIEF_MAX ? 'text-amber-500 font-medium' : ''}>
+                        {brief.length}/{BRIEF_MAX}
+                    </span>
+                </div>
+
+                <label className="flex items-start gap-3 p-4 border border-border bg-card rounded-xl cursor-pointer hover:bg-muted/50 transition-colors">
+                    <input
+                        type="checkbox"
+                        checked={wantsFactCheck}
+                        onChange={(e) => setWantsFactCheck(e.target.checked)}
+                        className="mt-1 accent-primary"
+                    />
+                    <div>
+                        <div className="font-bold flex items-center gap-2">
+                            <ShieldCheck className="w-4 h-4" />
+                            Fact-check the reworked draft
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                            Verifies every checkable claim against fresh web searches and writes the
+                            report into the Fact Check panel in Studio. Runs in the background — it
+                            takes a few minutes and never blocks the draft.
+                        </div>
+                    </div>
+                </label>
+            </fieldset>
+
             {/* SUBMIT */}
             <div className="flex justify-end">
                 <button
@@ -185,6 +274,20 @@ export function ImportForm({ personas }: { personas: Persona[] }) {
                     <div>
                         <div className="font-bold">Draft created</div>
                         <div className="text-sm opacity-90">{state.message}</div>
+                        {factCheck.status === 'starting' && (
+                            <div className="text-sm opacity-90 mt-1 flex items-center gap-2">
+                                <Loader2 className="w-3 h-3 animate-spin" /> Starting fact-check…
+                            </div>
+                        )}
+                        {factCheck.status === 'started' && (
+                            <div className="text-sm opacity-90 mt-1">
+                                Fact-check running — the report appears in the Fact Check panel in
+                                Studio within a few minutes.
+                            </div>
+                        )}
+                        {factCheck.status === 'error' && (
+                            <div className="text-sm text-amber-500 mt-1">{factCheck.message}</div>
+                        )}
                         {state.articleId && (
                             <a
                                 href={`/studio/intent/edit/id=${state.articleId};type=article`}

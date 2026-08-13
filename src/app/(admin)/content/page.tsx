@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { listSanityArticles } from "@/lib/sanity";
+import { UnpublishButton } from "./unpublish-button";
 
 // Force dynamic to always show fresh data
 export const dynamic = 'force-dynamic';
@@ -81,6 +82,9 @@ export default async function ContentPage() {
                                     >
                                         <Pen className="w-3 h-3" /> Edit in Studio
                                     </a>
+                                    {!article._id.startsWith('drafts.') && (
+                                        <UnpublishButton id={article._id} />
+                                    )}
                                 </div>
                             </div>
                         ))

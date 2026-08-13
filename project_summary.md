@@ -175,13 +175,13 @@ All draft-generating formats use Claude at temperature 0.4. Drafts are created d
 |-------|--------|-------------|
 | `/admin` | ✅ | Dashboard with mission status, voice DNA, personas |
 | `/create` | ✅ | Unified research-to-Sanity creation pipeline (Pulse/Signal/Deep Dive/Research/YouTube). `/generate` was merged into it and deleted (`f5d53dd`) |
-| `/import` | ✅ | Import an externally-written article — reworked into S&S voice, saved as draft |
+| `/import` | ✅ | Import an externally-written article — reworked into S&S voice (any of the 5 formats), optional brief, auto fact-check, saved as draft |
 | `/research` | ✅ | Research pipeline (Inoreader + Exa + Claude) |
 | `/analytics` | ✅ | API usage/cost ledger, content counts, Kit audience metrics (`bc5ffaa`) |
 | `/knowledge` | ✅ | Editorial AIOS inbox — sources, evidence index, candidates (see `docs/editorial-aios-*.md`) |
 | `/context` | ✅ | View context profiles |
 | `/context/edit` | ✅ | Edit voice DNA, ICP, business profile |
-| `/content` | ✅ | Content sync management |
+| `/content` | ✅ | Content Library — every article with draft/published state, preview, edit, **unpublish**. Now in the admin nav as "Library" |
 | `/editor` | ✅ | Raw article editor |
 
 ### API Routes
@@ -398,6 +398,46 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 13, 2026 — Article flow made two-way: unpublish, and a fuller external-article intake
+
+Two flexibility gaps in the article workflow, closed.
+
+**Unpublish.** Publish state here is pure Sanity draft/published — no `status`
+field anywhere — and until now there was no publish or unpublish code in the app
+at all. Studio ships a built-in Unpublish, but `relatedArticles` holds **strong**
+references that the vectorize webhook writes back automatically, and Sanity
+refuses to delete a document others strongly reference, so on any well-linked
+article it fails outright. `unpublishArticle`
+(`src/app/(admin)/content/actions.ts`) does it properly in one transaction:
+unset every incoming `relatedArticles` ref, `createIfNotExists` the `drafts.`
+twin (never `createOrReplace` — an in-progress draft holds newer edits and must
+win), delete the published doc. It then drops the Pinecone vector so the piece
+stops surfacing in related-articles and semantic search, and invalidates the same
+Next surfaces the publish webhook does. `publishedAt` is kept, so re-publishing
+from Studio restores the original date. Surfaced as a two-step inline confirm on
+published rows at `/content`, which is now reachable — it was an orphaned page,
+and is in the admin nav as **Library**.
+
+One side effect worth knowing: the referrers' `relatedArticles` entries are
+unset permanently, and only refill when those articles are next re-vectorized
+(i.e. next published or edited). That is inherent to deleting a referenced
+document, not specific to this implementation.
+
+**External article intake.** `/import` already reworked a pasted or uploaded
+article into the S&S voice via the same prompt builder `/create` uses
+(`sourceMaterial` flips it into rework mode). Three additions finish the job:
+an optional **brief** to steer the rework (angle, emphasis, what to keep or
+cut — same trusted-instruction semantics as `/create`); **all five formats**
+instead of three (`guide` and `youtube` were rejected for no reason, though
+`buildDraftPrompt` always supported them, and the list now lives in
+`import/types.ts` shared by form and action so they cannot drift); and an
+opt-out **fact-check** that fires the moment the draft lands, POSTing the same
+`/api/fact-check` call the Studio document action makes, so the route keeps
+ownership of the rate limit, re-entrancy guard and background execution. The
+fact-check runs on the reworked draft, not the source text — that is the prose
+that ships. Imports still never carry `publishedAt`, so nothing can auto-publish;
+the Studio draft plus `voiceEditNotes` plus the Fact Check panel is the review.
 
 ### August 13, 2026 — Regulatory retrieval corpus: the drafting model can now quote statute
 

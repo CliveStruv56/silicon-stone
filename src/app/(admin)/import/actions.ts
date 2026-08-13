@@ -2,10 +2,10 @@
 
 import { extractRawText } from "mammoth";
 import { callClaude } from "@/lib/anthropic";
-import { buildDraftPrompt, type DraftFormat } from "@/lib/prompts";
+import { buildDraftPrompt } from "@/lib/prompts";
 import { parseDraftPayload, finalizeDraft } from "@/lib/draft-pipeline";
 import { requireAdmin } from "@/lib/auth";
-import type { ImportState } from "./types";
+import { BRIEF_MAX, isImportFormat, type ImportState } from "./types";
 
 /**
  * Takes an externally-written article (pasted plain text / markdown), reworks it
@@ -24,6 +24,7 @@ export async function importArticle(
         const format = (formData.get("format") as string) || "";
         const personaSlug = (formData.get("persona") as string) || "";
         const originalTitle = ((formData.get("originalTitle") as string) || "").trim();
+        const brief = ((formData.get("brief") as string) || "").trim().slice(0, BRIEF_MAX);
 
         // Source text comes from an uploaded file (.docx / .md / .markdown / .txt)
         // if one was provided, otherwise from the pasted textarea.
@@ -56,7 +57,7 @@ export async function importArticle(
         if (!personaSlug) {
             return { success: false, message: "Select a target persona.", articleId: "" };
         }
-        if (format !== "pulse" && format !== "signal" && format !== "deep_dive") {
+        if (!isImportFormat(format)) {
             return { success: false, message: "Select a format.", articleId: "" };
         }
         if (text.length < 200) {
@@ -72,11 +73,13 @@ export async function importArticle(
         // the same unified prompt builder /create uses. Passing `sourceMaterial`
         // switches it into rework mode (preserve facts, rewrite prose) and carries
         // the brand voice DNA + persona context + format scaffold automatically.
+        // `brief` is the author's authoritative steer on angle and emphasis.
         const { systemPrompt, userPrompt } = await buildDraftPrompt({
             topic: originalTitle || "Imported article",
             personaKey: personaSlug,
             format,
             sourceMaterial: text,
+            ...(brief ? { brief } : {}),
         });
 
         // Deep dives can exceed the 4096-token default — give them headroom.
@@ -88,7 +91,7 @@ export async function importArticle(
         // Pass-3 (voice edit) → Pass-2 (metadata) → Sanity write — shared with /create.
         const created = await finalizeDraft({
             draft,
-            format: format as DraftFormat,
+            format,
             personaSlug,
             source: "imported",
             sourceMaterial: text,
