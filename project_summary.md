@@ -225,16 +225,73 @@ All 4 tools require email submission before revealing results:
 
 ---
 
-## 5. Digital Products (Commerce)
+## 5. The Offering — Full Catalogue
 
-| Product | Price | Status |
-|---------|-------|--------|
-| EU AI Act Compliance Toolkit | £79 (Standard) / £149 (Professional) | Sales page live; early-access enquiry fallback until Lemon Squeezy URL is configured |
-| AI Audit Checklist | £24 | First paid step; sales page live; early-access enquiry fallback until Lemon Squeezy URL is configured |
-| Sector Briefings (4 planned) | TBD | Coming Soon page with email capture |
+Reviewed against the code on **2026-08-15**. Every figure below is a commercial
+claim rendered on a live page; the "Where it lives" column is the single source
+of truth for that price. `LadderBox.tsx` carries the same warning — change a
+price there and here together, or the ladder starts lying.
 
-**Note**: Lemon Squeezy is the intended checkout. Until its URLs are configured, product
-buttons route to `/services#contact` as honest early-access enquiries rather than dead links.
+### 5.1 Free — Read
+
+| Offering | Price | What it is | Where it lives |
+|---|---|---|---|
+| Intelligence archive | Free | Twice-weekly analysis, Pulse → Signal → Deep Dive → Audit depths, five personas | `/intelligence` |
+| Atlantic Drift / Stone Briefing newsletters | Free | Kit-delivered, two topics; in-read capture on articles | site-wide + `/api/subscribe` |
+| The four interactive tools | Free (email-gated results) | Supply Chain Mapper, **Compliance Checker**, Scenario Modeler, Policy Stress-Test | `/tools/*` |
+| US Executive Guide | Free | US-inbound lead magnet feeding the Post-Omnibus Briefing | `/us-executive-guide` |
+
+### 5.2 Paid — Buy (self-service digital products)
+
+These three are the only `product` documents in Sanity (`product-ai-audit-checklist`,
+`product-ai-act-toolkit`, `product-sector-reports`) and the only SKUs the
+end-of-article gate can sell.
+
+| Product | Price | Summary | Where it lives |
+|---|---|---|---|
+| **AI Audit Checklist Pack** | **£24** | The gateway SKU. Systems inventory sheet, vendor dependency scorecard, quick gap analysis, board-ready risk summary. Ships a **£20 Toolkit discount code** (90 days) — so Checklist + Toolkit is £83 rather than £103. | `/products/ai-audit-checklist` |
+| **AI Act Compliance Toolkit** | **From £79** — Standard £79, Professional £149 | The flagship. Risk-classification decision tree, checklists by risk category, template policies, AI Systems Register + Compliance Tracker, phased action plan. Professional adds a 30-minute video walkthrough. | `/products/ai-act-toolkit` |
+| **Sector Reports** | **£39 each, or 3 for £99** | 15–20pp briefings per industry (Manufacturing, Financial Services, Professional Services, Public Sector): AI landscape, AI Act exposure, geopolitical risk, three scenarios, 90-day checklist. | `/products/sector-reports` |
+| **Compliance Checker Evidence Pack** | **£39** (credits £39 against the £79 Toolkit → £40 upgrade) | Components 4–11 of the Compliance Checker report. **Built dark** behind `NEXT_PUBLIC_EVIDENCE_PACK_ENABLED` (default `false`); checkout and single-use code issuance are unbuilt. | `EvidencePackTeaser.tsx` via `ReportGate` |
+
+**Status — all four:** `NEXT_PUBLIC_PRE_LAUNCH` is still `true`, so every "Buy"
+button is an `EarlyAccessCTA` email capture into Kit (`early-access` + a
+`tier-*` tag), not a checkout. Sector Reports is additionally pre-product: the
+page is a waitlist, and its Sanity `topics` were deliberately cleared on
+2026-08-15 so the `auto` article gate can never select a SKU with nothing to
+sell (restore them when the first report is on sale — see `LAUNCH.md`).
+
+### 5.3 Paid — Engage (advisory)
+
+| Engagement | Price | Summary | Where it lives |
+|---|---|---|---|
+| **Advisory Briefing** | **£450** / one hour | Focused consultation on your tool results and one specific question, plus a written follow-up. Credited **in full** to your first retainer month if you proceed within 30 days. | `/advisory#briefing` |
+| **The Exposure Diagnostic** | **From £2,500** (custom scope) | AI system + vendor-evidence review, dependency mapping, regulatory-friction read, 15–25pp report, 30-day follow-up. Fee credited to the first retainer quarter. Carries a revision-or-50%-refund guarantee. | `/advisory#diagnostic` |
+| **The Post-Omnibus Briefing** | **From £2,500**, fixed | US/UK-inbound. Fixed-scope written briefing (15–25pp) on what the AI Act now requires of you post-Digital Omnibus, delivered in three weeks, plus one interpretation call. | `/eu-exposure` |
+| ↳ *European Procurement Readiness* (add-on) | **From £1,500** | Add-on to the above: your systems mapped against EU buyer governance questionnaires, required-vs-theatre evidence triage, AI indemnification clause review. | `/eu-exposure` |
+| **The Drift Retainer** | **£2,000/mo** — three-month initial term, then rolling. £20,000/year annual. **Founding rate £1,500/mo for the first six months, first five clients** (`FOUNDING_OFFER_ACTIVE`). | The spine of the whole offering. Board-forwardable monthly briefing, a 90-minute working session on one live decision, "The Line" direct access between sessions, quarterly written exposure review on the 3×2 method. Opens with a Baseline Month — walk away after month one paying that month only. | `/advisory#retainer` |
+| **Strategic Assessment** | **From £8,000**, then transitions to retainer | The deep one-off: multi-framework analysis, 40+pp report, board-ready presentation, implementation roadmap. Positioned as the framework-neutral decision document before buying governance software. | `/advisory#assessment` |
+| **Board-level / multi-entity engagement** | **£25,000–£50,000** | Bespoke, for a group, multi-jurisdiction exposure or a board mandate; settles into a Drift Retainer. | `/advisory` (bespoke band) |
+| **Applied modules** | Sovereign Architecture Review **from £6,500**; AI Bill of Materials **from £4,500**; Manufacturing Exposure, Scenario Impact and Regulatory Friction **from £3,500** each | Scoped add-ons folded into a briefing or a retainer. All five priced as of 2026-08-15 — the £3,500 floor sits below the £4,500 module and above the £2,500 Diagnostic. | `/advisory` (assessments) |
+| Free 25-minute intro conversation | Free during the first 90 days (`FREE_INTRO_WINDOW`) | The launch-window front door to the retainer. Distinct from the £450 Briefing, which is a working session. | `/advisory#contact` |
+
+### 5.4 Adjacent, not a rung
+
+**WaymarkPath** — the career-transition companion for the individual
+professional. Presented as "Related — a separate companion" on `/products`,
+`/advisory` and the homepage; **no price is published anywhere on this site**.
+
+### 5.5 The Ladder (credit chain, `LadderBox.tsx`)
+
+£24 Checklist → £20 off the Toolkit · £79+ Toolkit → the evidence base a
+briefing starts from · £450 Advisory Briefing → credited in full to month one ·
+£2,500+ Post-Omnibus Briefing → extends into a Retainer · £2,500+ Exposure
+Diagnostic → credited to the first retainer quarter.
+
+**Checkout note**: Lemon Squeezy is the intended merchant of record for 5.2.
+Until its URLs and variant IDs are configured (`LAUNCH.md` §0), product buttons
+open the early-access capture rather than a checkout, and the Sanity products'
+`checkoutUrl` fields are all null so the article gate links to the product page.
 
 ---
 
@@ -398,6 +455,76 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 15, 2026 — §5 rewritten as the full offering catalogue
+
+Documentation only, no product code touched. §5 was still the three-row
+"Digital Products (Commerce)" table written before the advisory repricing, the
+Read→Use→Buy→Engage restructure and the `/eu-exposure` front door existed: it
+listed Sector Reports as "TBD", knew nothing of the retainer, the briefings or
+the Evidence Pack, and pointed the checkout fallback at `/services#contact`, a
+route that no longer exists. Replaced with a catalogue split by rung (free /
+buy / engage / adjacent), every figure read off the page that renders it, plus
+the credit ladder and the Lemon Squeezy status note.
+
+**Six inconsistencies found in the pass; all six fixed.**
+
+- *Fixed.* `advisory/page.tsx:160` still offered the AI Bill of Materials as an
+  add-on to an "EU Exposure Briefing" — the last surviving instance of the old
+  name. Now "a Post-Omnibus Briefing", matching the page, its metadata, the
+  header, the footer, the ladder and three inline cross-links.
+- *Fixed.* The Exposure Diagnostic and the Post-Omnibus Briefing both open at
+  £2,500 and sat two rows apart in the Advisory dropdown carrying the identical
+  note "From £2,500", reading as one offer listed twice. The Post-Omnibus note
+  is now `From £2,500 · US & UK` — the audience is the real difference, so the
+  menu says so at the point of choice rather than leaving the reader to open
+  both pages. Fixed in the nav only; `LadderBox` already names both in full.
+- *Fixed.* `product-sector-reports` in Sanity carried `badge: "Sector Focus"`
+  while `/products` renders "Coming Soon" for the same SKU. Patched and
+  published to "Coming Soon". Currently unreachable anyway — the doc's `topics`
+  were cleared, so the article gate cannot select it — but it would have been
+  wrong the day they are restored.
+- *Fixed.* Two docs carried prices that exist nowhere in the offering.
+  `welcome-pack-jane-struver.md` had "Paid Intelligence Series PDFs (£12–19)"
+  and a "£7–12/mo premium subscription"; its revenue ladder now names the real
+  SKUs and the real advisory prices, and the premium subscription is marked
+  unpriced and undecided rather than costed. `silicon-stone-website-build-brief-for-claude-code.md`
+  was anchored on "EU Exposure Briefing £3,500 fixed; Drift Retainer from
+  £3,500/mo" — neither shipped. It now opens with a shipped-prices note
+  pointing at this section as the source of truth, keeps its recommendations as
+  the historical record, and marks where the outcome diverged (the £12,000
+  roadmap shipped as the £8,000 Strategic Assessment).
+- *Fixed — two-field split on the advisory contact form.* The single "Area of
+  Interest" control listed Drift Retainer alongside five subject areas, so it
+  answered neither question: the Advisory Briefing (£450), the Exposure
+  Diagnostic (from £2,500) and the Strategic Assessment (from £8,000) had no
+  value at all, though all three tier CTAs land on this form, and those leads
+  reached Kit indistinguishable from a topic enquiry. Now **"What are you
+  interested in?"** (`ENGAGEMENTS` — the ladder in ascending order: Advisory
+  Briefing, Exposure Diagnostic, Drift Retainer, Strategic Assessment,
+  Board-level engagement) plus an optional **"Subject area"** (`SUBJECT_AREAS`
+  — the five topics, click-to-clear). Every tier CTA, the retainer CTA and the
+  bespoke band now preselect their engagement on click, keeping the `href` so
+  the anchor still scrolls without JS. **Wire contract unchanged**: the
+  engagement posts as `interest` on its own — an exact-match string Kit can
+  segment on — and the optional subject rides in as a labelled first line of
+  the message, rather than being blended into the tag or posted as a sixth
+  field the Railway proxy would silently drop. "Drift Retainer" keeps its
+  historic wording (not the page's "The Drift Retainer") so any existing Kit
+  segment still matches. The Post-Omnibus Briefing is deliberately absent —
+  it has its own form on `/eu-exposure` with `interest` preset.
+- *Fixed — all five advisory modules now priced.* Manufacturing Exposure,
+  Scenario Impact and Regulatory Friction were bare while AI Bill of Materials
+  and Sovereign Architecture Review showed £4,500 and £6,500 in the same grid;
+  it read as unfinished rather than bespoke and cut against the fixed-price
+  stance the rest of the site sells on. All three set to **from £3,500** — the
+  floor, below the £4,500 module and above the £2,500 Diagnostic. The root
+  cause was in the render, not the data: price and provenance were an
+  either/or, so a module with a `fromTool` could never show a price however it
+  was set. Both badges now render, price first.
+
+**Verification**: `tsc --noEmit` clean, `eslint` clean on the changed files,
+`vitest` 224/224 green.
 
 ### August 15, 2026 — Commerce rehearsed end-to-end against a store that does not exist yet
 

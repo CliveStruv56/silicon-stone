@@ -94,6 +94,14 @@ const methods = [
   },
 ]
 
+/**
+ * Follow-on modules. All five carry a price: the three older ones (Manufacturing
+ * Exposure, Scenario Impact, Regulatory Friction) were bare while the two newer
+ * ones showed £4,500 and £6,500 in the same grid, which read as unfinished
+ * rather than bespoke and quietly contradicted the fixed-price stance the rest
+ * of the site sells on. £3,500 is the floor: narrower in scope than the £4,500
+ * AI Bill of Materials, above the £2,500 Exposure Diagnostic.
+ */
 type Assessment = {
   title: string
   description: string
@@ -117,6 +125,7 @@ const assessments: Assessment[] = [
     ],
     icon: Globe,
     fromTool: 'Supply Chain Mapper',
+    price: 'From £3,500',
     color: 'stone-teal',
   },
   {
@@ -130,6 +139,7 @@ const assessments: Assessment[] = [
     ],
     icon: TrendingUp,
     fromTool: 'Scenario Modeler',
+    price: 'From £3,500',
     color: 'alert-red',
   },
   {
@@ -143,6 +153,7 @@ const assessments: Assessment[] = [
     ],
     icon: FileText,
     fromTool: 'Policy Stress-Test',
+    price: 'From £3,500',
     color: 'silicon-amber',
   },
   {
@@ -157,7 +168,7 @@ const assessments: Assessment[] = [
     ],
     icon: Layers,
     price: 'From £4,500',
-    priceNote: 'Or added to an EU Exposure Briefing.',
+    priceNote: 'Or added to a Post-Omnibus Briefing.',
     color: 'stone-teal',
   },
   {
@@ -175,8 +186,48 @@ const assessments: Assessment[] = [
   },
 ]
 
+/**
+ * The contact form's two questions.
+ *
+ * These were one field. It listed "Drift Retainer" alongside "Vendor
+ * Dependency" and "Scenario Planning" — one engagement mixed in with five
+ * subject areas — so it could answer neither question properly: three priced
+ * tiers whose CTAs land on this very form (Advisory Briefing £450, Exposure
+ * Diagnostic from £2,500, Strategic Assessment from £8,000) had no value at
+ * all, and those leads reached Kit indistinguishable from a topic enquiry.
+ *
+ * `ENGAGEMENTS` is the ladder, in ascending order, and is what gets segmented
+ * on — so the strings are exact-match tags, not prose. "Drift Retainer" keeps
+ * its historic wording rather than the page's "The Drift Retainer" so any
+ * existing Kit segment still matches, and drops "The" to sit consistently with
+ * `/eu-exposure`, which posts "Post-Omnibus Briefing". That briefing is
+ * deliberately absent here: it has its own form on its own page.
+ */
+const ENGAGEMENTS = [
+  'Advisory Briefing',
+  'Exposure Diagnostic',
+  'Drift Retainer',
+  'Strategic Assessment',
+  'Board-level engagement',
+] as const
+
+/** Optional second question — the subject, independent of the commitment. */
+const SUBJECT_AREAS = [
+  'AI Governance',
+  'Vendor Dependency',
+  'Manufacturing Exposure',
+  'Scenario Planning',
+  'Policy Analysis',
+] as const
+
 type Tier = {
   name: string
+  /**
+   * Which `ENGAGEMENTS` value this tier's CTA preselects on the form. Without
+   * it the visitor has to re-declare, in a second control, the thing they just
+   * clicked a button to ask for.
+   */
+  engagement: (typeof ENGAGEMENTS)[number]
   /**
    * Fragment id for the tier's card, so the Advisory menu can link straight to
    * it. The Drift Retainer deliberately has none: a dedicated `#retainer`
@@ -206,6 +257,7 @@ type Tier = {
 const tiers: Tier[] = [
   {
     name: 'Advisory Briefing',
+    engagement: 'Advisory Briefing',
     anchor: 'briefing',
     price: '£450',
     priceNote: 'one hour',
@@ -225,6 +277,7 @@ const tiers: Tier[] = [
   },
   {
     name: 'The Exposure Diagnostic',
+    engagement: 'Exposure Diagnostic',
     anchor: 'diagnostic',
     price: 'From £2,500',
     priceNote: 'custom scope',
@@ -246,6 +299,7 @@ const tiers: Tier[] = [
   },
   {
     name: 'The Drift Retainer',
+    engagement: 'Drift Retainer',
     price: 'From £2,000/mo',
     priceNote: 'three-month initial term',
     priceDetail:
@@ -264,6 +318,7 @@ const tiers: Tier[] = [
   },
   {
     name: 'Strategic Assessment',
+    engagement: 'Strategic Assessment',
     anchor: 'assessment',
     price: 'From £8,000',
     priceNote: 'then transitions to retainer',
@@ -287,7 +342,8 @@ export default function ServicesPage() {
     name: '',
     email: '',
     company: '',
-    interest: '',
+    engagement: '',
+    subject: '',
     message: '',
   })
   const [formSubmitted, setFormSubmitted] = useState(false)
@@ -301,7 +357,22 @@ export default function ServicesPage() {
     setFormError('')
 
     try {
-      const result = await submitWithOfflineQueue('/api/contact', formData)
+      // The form asks two questions; the wire contract carries one `interest`
+      // field, and `/api/contact` proxies a fixed five-field body to the
+      // Railway backend. So the engagement — the value Kit segments on — takes
+      // `interest` alone and stays an exact-match string, and the optional
+      // subject rides in as a labelled first line of the message rather than
+      // being blended into the tag or posted as a field the backend would
+      // silently drop.
+      const result = await submitWithOfflineQueue('/api/contact', {
+        name: formData.name,
+        email: formData.email,
+        company: formData.company,
+        interest: formData.engagement,
+        message: formData.subject
+          ? `Subject area: ${formData.subject}\n\n${formData.message}`
+          : formData.message,
+      })
       if (result.queued) {
         setFormQueued(true)
         setFormSubmitted(true)
@@ -491,7 +562,11 @@ export default function ServicesPage() {
                     </div>
                   )}
                   <div>
-                    <a href="#contact" className="block">
+                    <a
+                      href="#contact"
+                      className="block"
+                      onClick={() => setFormData((prev) => ({ ...prev, engagement: 'Drift Retainer' }))}
+                    >
                       <Button size="lg" className="w-full bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90">
                         Book a 25-minute conversation
                         <ArrowRight className="ml-2 h-4 w-4" />
@@ -626,17 +701,25 @@ export default function ServicesPage() {
                 >
                   <Card className="card-interactive h-full bg-stone-charcoal border-border-subtle">
                     <CardHeader>
-                      <div className="flex items-start justify-between">
-                        <Icon className={`w-6 h-6 text-${assessment.color}`} />
-                        {assessment.fromTool ? (
-                          <Badge variant="outline" className="text-[12px] text-text-muted border-border-subtle">
-                            From {assessment.fromTool}
-                          </Badge>
-                        ) : assessment.price ? (
-                          <Badge variant="outline" className="text-[12px] font-mono text-text-primary border-border-subtle">
-                            {assessment.price}
-                          </Badge>
-                        ) : null}
+                      {/* Price and provenance are not alternatives. These were
+                          an either/or, so the three modules that grew out of a
+                          tool showed only "From {tool}" and no price at all —
+                          which is why they sat unpriced next to two that were
+                          not. Both render now, price first. */}
+                      <div className="flex items-start justify-between gap-3">
+                        <Icon className={`w-6 h-6 flex-shrink-0 text-${assessment.color}`} />
+                        <div className="flex flex-col items-end gap-1.5">
+                          {assessment.price && (
+                            <Badge variant="outline" className="text-[12px] font-mono text-text-primary border-border-subtle">
+                              {assessment.price}
+                            </Badge>
+                          )}
+                          {assessment.fromTool && (
+                            <Badge variant="outline" className="text-[12px] text-text-muted border-border-subtle">
+                              From {assessment.fromTool}
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                       <CardTitle className="text-lg text-text-primary mt-3">
                         {assessment.title}
@@ -738,7 +821,14 @@ export default function ServicesPage() {
                         <p className="text-xs italic text-text-muted">{tier.guaranteeNote}</p>
                       )}
                       <div className="mt-auto">
-                        <a href="#contact" className="block">
+                        {/* The href still does the scrolling, so this works
+                            without JS; the click only preselects the tier the
+                            visitor just asked for. */}
+                        <a
+                          href="#contact"
+                          className="block"
+                          onClick={() => setFormData((prev) => ({ ...prev, engagement: tier.engagement }))}
+                        >
                           <Button
                             className={`w-full ${tier.highlighted ? 'bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90' : 'bg-surface-elevated text-text-primary hover:bg-surface-elevated/80'}`}
                           >
@@ -778,7 +868,10 @@ export default function ServicesPage() {
                   <div className="font-mono text-lg font-semibold text-text-primary">
                     £25,000–£50,000
                   </div>
-                  <a href="#contact">
+                  <a
+                    href="#contact"
+                    onClick={() => setFormData((prev) => ({ ...prev, engagement: 'Board-level engagement' }))}
+                  >
                     <Button className="bg-surface-elevated text-text-primary hover:bg-surface-elevated/80">
                       Discuss an engagement
                     </Button>
@@ -916,15 +1009,49 @@ export default function ServicesPage() {
 
                   <div>
                     <label className="block text-sm text-text-muted mb-1.5">
-                      Area of Interest
+                      What are you interested in?
                     </label>
                     <div className="grid grid-cols-2 gap-2">
-                      {['Drift Retainer', 'AI Governance', 'Vendor Dependency', 'Manufacturing Exposure', 'Scenario Planning', 'Policy Analysis'].map((option) => (
+                      {ENGAGEMENTS.map((option) => (
                         <button
                           key={option}
                           type="button"
-                          onClick={() => setFormData({ ...formData, interest: option })}
-                          className={`px-3 py-2 text-sm rounded-md border transition-colors ${formData.interest === option
+                          aria-pressed={formData.engagement === option}
+                          onClick={() => setFormData({ ...formData, engagement: option })}
+                          className={`px-3 py-2 text-sm rounded-md border transition-colors ${formData.engagement === option
+                            ? 'border-stone-teal bg-stone-teal/10 text-stone-teal'
+                            : 'border-border-subtle bg-stone-charcoal text-text-muted hover:border-stone-teal/50'
+                            }`}
+                        >
+                          {option}
+                        </button>
+                      ))}
+                    </div>
+                    <p className="mt-2 text-xs text-text-muted">
+                      Not sure yet? Leave it blank and describe the situation below.
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm text-text-muted mb-1.5">
+                      Subject area{' '}
+                      <span className="text-text-muted/60">(optional)</span>
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {SUBJECT_AREAS.map((option) => (
+                        <button
+                          key={option}
+                          type="button"
+                          aria-pressed={formData.subject === option}
+                          // Clicking the selected option clears it — the field
+                          // is optional, so it has to be possible to un-answer.
+                          onClick={() =>
+                            setFormData({
+                              ...formData,
+                              subject: formData.subject === option ? '' : option,
+                            })
+                          }
+                          className={`px-3 py-2 text-sm rounded-md border transition-colors ${formData.subject === option
                             ? 'border-stone-teal bg-stone-teal/10 text-stone-teal'
                             : 'border-border-subtle bg-stone-charcoal text-text-muted hover:border-stone-teal/50'
                             }`}

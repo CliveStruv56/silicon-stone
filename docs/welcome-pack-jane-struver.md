@@ -187,11 +187,11 @@ Built to compound, not to sequence. Each layer activates as the audience justifi
 |---|---|---|
 | 1 | Free PDF lead magnets (email capture via Kit) | Lead capture **live** via tool email gates and homepage; Atlantic Drift PDF outline drafted, full PDF pending. |
 | 1 | Affiliate links in YouTube descriptions | Pending channel launch. |
-| 2 | Paid Intelligence Series PDFs (£12–19) | Sales pages live with early-access enquiry fallback; Lemon Squeezy store creation + product files pending. |
+| 2 | Paid digital products — AI Audit Checklist Pack **£24**, AI Act Compliance Toolkit **£79 / £149**, Sector Reports **£39 each or 3 for £99** | Sales pages live with early-access enquiry fallback; Lemon Squeezy store creation + product files pending. Sector Reports is a waitlist until the first report exists. |
 | 2 | YouTube ad revenue (AdSense) | Pending channel launch + thresholds (1,000 subs + 4,000 watch hours). |
 | 3 | Sponsorships (B2B integrations) | Month 12+, when audience-quality data justifies. |
-| 3 | Premium subscription (£7–12/mo) | Month 12+, when newsletter shows engagement. |
-| 4 | Selective consulting (via VBP Solutions) | Opportunistic, as authority generates demand. |
+| 3 | Premium subscription | Unpriced and undecided — no such product exists. Month 12+, if the newsletter shows the engagement to justify one. The recurring revenue the business actually runs on is the Drift Retainer, below. |
+| 4 | Advisory engagements — Advisory Briefing **£450**, Exposure Diagnostic and Post-Omnibus Briefing **from £2,500**, Strategic Assessment **from £8,000**, board-level **£25,000–£50,000**, and the **Drift Retainer at £2,000/mo** (founding rate £1,500/mo, first five clients) | Live and priced on `/advisory` and `/eu-exposure`. The retainer is the spine of the offering, not an opportunistic add-on. |
 
 #### The flagship lead magnet
 

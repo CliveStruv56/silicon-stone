@@ -22,7 +22,16 @@ Each task names a route/file area, the change, and drop-in copy in house style w
 
 ## Part A — New Advisory & Product Surface
 
-All sit on `/advisory` unless noted. Prices are **recommendations to confirm**, anchored to the ladder (EU Exposure Briefing £3,500 fixed; Drift Retainer from £3,500/mo).
+All sit on `/advisory` unless noted.
+
+> **Shipped — prices confirmed 2026-08-15.** This section is a historical build
+> brief; the prices below were recommendations at the time of writing and have
+> since been set. The two ladder anchors it was drafted against — an "EU
+> Exposure Briefing" at £3,500 fixed and a Drift Retainer from £3,500/mo — were
+> **not** what shipped. The live figures are the **Post-Omnibus Briefing from
+> £2,500 fixed** (`/eu-exposure` — the offer was renamed) and the **Drift
+> Retainer at £2,000/mo**. For current pricing always read `project_summary.md`
+> §5, never this brief.
 
 ### A1 — New module: AI Bill of Materials (P0)
 **Where:** `/advisory` follow-on modules; upsell link from `/products/ai-act-toolkit`.
@@ -33,7 +42,7 @@ All sit on `/advisory` unless noted. Prices are **recommendations to confirm**, 
 > - Provenance and licence status for every component, with the gaps your vendors cannot yet evidence
 > - A mapping to the Cyber Resilience Act's SBOM duty and to AI Act Article 50 transparency
 > - A prioritised remediation list — what to fix before the September 2026 reporting duties bite
-> *From £4,500 — or added to an EU Exposure Briefing.* **[price: confirm]**
+> *From £4,500 — or added to a Post-Omnibus Briefing.* — shipped as written.
 
 ### A2 — New module: Sovereign Architecture Review (P0)
 **Hold neutrality — sell option value, not a named vendor.**
@@ -44,20 +53,21 @@ All sit on `/advisory` unless noted. Prices are **recommendations to confirm**, 
 > - An abstraction-layer assessment — can you satisfy a buyer's sovereignty demand without re-architecting?
 > - A key-custody and admin-access review: EU-resident keys, and where a US administrative override still reaches EU data
 > - A sovereignty roadmap that keeps your options open — it does not pick your vendors for you
-> *From £6,500.* **[price: confirm]**
+> *From £6,500.* — shipped as written.
 
 ### A3 — New add-on: Procurement Exposure (P1)
-**Where:** add-on to the EU Exposure Briefing; short block on `/eu-exposure`.
+**Where:** add-on to the Post-Omnibus Briefing; short block on `/eu-exposure`.
 > **Procurement Exposure**
 > See which missing evidence will actually stall your European deals — and which is just box-ticking.
 > *Deliverables*
 > - Your AI systems mapped against the governance questionnaires European buyers now send
 > - A required-versus-theatre triage: the evidence that genuinely gates procurement, separated from the noise
 > - A review of the AI indemnification clauses appearing in EU enterprise contracts — what you'd be signing
-> *Add-on from £1,500.* **[price: confirm]**
+> *Add-on from £1,500.* — shipped as written.
 
 ### A4 — Price the top tier + enterprise band (P0)
-**Where:** `/advisory` board-ready roadmap (currently unpriced). Recommend: roadmap **from £12,000**; bespoke/enterprise **£25,000–£50,000**. Keep the "settles into a Drift Retainer" line.
+**Where:** `/advisory` board-ready roadmap (unpriced at the time of writing). Recommended: roadmap **from £12,000**; bespoke/enterprise **£25,000–£50,000**. Keep the "settles into a Drift Retainer" line.
+**Shipped:** the enterprise band went live at **£25,000–£50,000** as recommended; the roadmap tier did **not** take the £12,000 figure — it is live as the Strategic Assessment **from £8,000**, transitioning to a Drift Retainer.
 
 ## Part B — Positioning Copy
 
@@ -91,7 +101,7 @@ Specs only — title, route, tier, abstract, sources.
 - Genuinely required vs the noise
 - The moving timeline (operative-vs-adopted)
 - A short self-check (in-scope systems? model provenance? key custody?)
-- CTA: email capture → **Kit**; next step = the fee-credited EU Exposure Briefing
+- CTA: email capture → **Kit**; next step = the fee-credited Post-Omnibus Briefing
 
 ### D2 — EU-Japan capability note + bio touch (P1)
 **Where:** block on `/about` (or `/capabilities`); one line in the Clive Struver bio.

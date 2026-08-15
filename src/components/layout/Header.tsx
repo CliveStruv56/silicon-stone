@@ -61,7 +61,13 @@ const primaryNavigation: NavItem[] = [
       // was in no menu at all — reachable only from inline links on five pages.
       // Filed under Advisory, not Products: it is a scoped engagement, and
       // everything under Products is a digital download.
-      { name: 'Post-Omnibus Briefing', href: '/eu-exposure', note: 'From £2,500' },
+      //
+      // The note carries "US & UK" because this and the Exposure Diagnostic
+      // both open at £2,500 and sat two rows apart reading as the same offer.
+      // The audience is the real difference — the Diagnostic reads your whole
+      // stack, this one reads your European market entry — so the menu says so
+      // rather than leaving the reader to guess from two identical prices.
+      { name: 'Post-Omnibus Briefing', href: '/eu-exposure', note: 'From £2,500 · US & UK' },
       { name: 'Modules', href: '/advisory#modules' },
       { name: 'Contact', href: '/advisory#contact' },
     ],
