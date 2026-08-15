@@ -1,0 +1,19 @@
+{
+  "corpusId": "eu-data-act",
+  "shortName": "EU Data Act",
+  "instrument": "Regulation (EU) 2023/2854 on harmonised rules on fair access to and use of data (Data Act)",
+  "jurisdiction": "EU",
+  "instrumentType": "regulation",
+  "applicationNote": "In application since 12 September 2025. One obligation is still future: Article 3(1) applies only to connected products and related services placed on the market after 12 September 2026 (Article 50).",
+  "celex": "32023R2854",
+  "eli": "http://data.europa.eu/eli/reg/2023/2854/oj",
+  "version": "2023-12-22",
+  "consolidatedAs": "2023-12-22",
+  "sourceUrl": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32023R2854",
+  "citationUrl": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32023R2854",
+  "retrieved": "2026-08-15",
+  "parser": "eurlex",
+  "expectedArticles": 50,
+  "coverage": "full",
+  "note": "50 Articles, no Annexes — verified against the EUR-Lex DOM on 2026-08-15. Like the Chips Act this is the ORIGINAL act, not a consolidated text: no consolidated version of the Data Act exists (CELEX 02023R2854-* returns 'the requested document does not exist'), because it has not been amended. 'consolidatedAs' is therefore the OJ publication date. Application dates read directly from Article 50. Text is reused from EUR-Lex under CC BY 4.0 (Commission Decision 2011/833/EU)."
+}

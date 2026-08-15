@@ -476,14 +476,24 @@ production has been redeployed. The lane degrading to a quiet no-op rather than
 an error is correct behaviour, but it means nothing surfaces the omission; the
 per-generation `[regulatory]` log line is the only canary.
 
-**Two instruments added, taking the corpus to three** (855 chunks, all in
-`silicon-and-stone-regulatory` ns `v2026-08-13`):
+**Five instruments added, taking the corpus to six** (1,422 chunks, all in
+`silicon-and-stone-regulatory` ns `v2026-08-13`), ingested in two waves with a
+precision gate between them:
 
 | Corpus | Text | Articles | Chunks |
 |---|---|---|---|
 | `eu-ai-act` | CELEX `02024R1689-20260727` | 119 + 14 annexes | 447 |
 | `gdpr` | CELEX `02016R0679-20160504` | 99, no annexes | 265 |
-| `eu-chips-act` | CELEX `32023R1781` | 41 + 4 annexes | 143 |
+| `eu-chips-act` | CELEX `32023R1781` (original act) | 41 + 4 annexes | 143 |
+| `eu-data-act` | CELEX `32023R2854` (original act) | 50, no annexes | 174 |
+| `nis2` | CELEX `02022L2555-20221227` — **Directive** | 46 + 3 annexes | 155 |
+| `eu-cyber-resilience-act` | CELEX `02024R2847-20241120` | 71 + 8 annexes | 238 |
+
+Every consolidation was resolved from EUR-Lex at fetch time, and that mattered:
+a secondary source asserted a Data Act consolidation at `02023R2854-20231222`
+which EUR-Lex does not serve — the Data Act has never been amended, so like the
+Chips Act its current text is the original act. `expectedArticles` came from
+counting the live DOM, and `fetch.ts` refuses to write on a mismatch.
 
 GDPR was the gap that mattered most: `gate.ts` already listed `gdpr`,
 `personal data` and `lawful basis` as trigger terms, so a GDPR topic *passed* the
@@ -517,6 +527,15 @@ assigns paragraph locators identically either way.
 - **Per-instrument diversification.** The passage budget is now capped per
   instrument as well as per article, derived from how many instruments cleared
   the score floor — so a single-instrument question still gets the full budget.
+- **A second score floor for topic-only hits.** Naming an instrument's subject
+  matter now trips the gate even with no legal vocabulary present, because
+  "cloud switching charges and interoperability for data processing services" is
+  squarely Data Act Chapter VI and previously gated out with nothing. The trade
+  is that weaker evidence of legal intent must clear a higher relevance bar
+  (0.55 rather than 0.30), calibrated against two measured cases: that Data Act
+  query scores 0.582 and passes; "TSMC Dresden fab workforce shortages and the
+  semiconductor talent pipeline" scored 0.473 and was pulling 11KB of Chips Act
+  into a labour-market story. It is now suppressed, and the log says why.
 
 **Three defects found and fixed while doing it:**
 
@@ -552,11 +571,22 @@ is what catches stale records after a re-chunk — a namespace total cannot. New
 diversify → format), as distinct from `reg:ingest --probe`, which measures raw
 vector similarity.
 
-**Verified:** a GDPR query routes to GDPR alone (top 0.741, six GDPR articles); a
-semiconductor query routes to the Chips Act alone (0.672) and returns no AI Act
-text; a cross-cutting credit-scoring query routes to both and returns AI Act
-Annex III and Article 10 *plus* GDPR Article 22, the actual automated-decision
-provision; and "TSMC Dresden fab workforce shortages" still gates out entirely.
+**Verified by probe against the live index.** Single-instrument questions route
+to exactly one instrument and stay there: GDPR access requests → GDPR Arts 15,
+12, 16 (0.684); NIS2 risk management → NIS2 Arts 21, 32, 20 (0.779) with the
+directive caveat rendered; CRA vulnerability disclosure → CRA Arts 13, 14 and
+Annexes I-II (0.708); AI Act conformity assessment → AI Act Arts 43, 6, 47
+(0.710); Chips Act subsidies → Chips Act Arts 13-15 (0.672) and **no AI Act
+text**. A genuinely cross-cutting credit-scoring query routes to two and returns
+AI Act Annex III and Article 10 *plus* GDPR Article 22 — the actual
+automated-decision provision. "TSMC Dresden fab workforce shortages" and "Nvidia
+quarterly earnings" still gate out entirely.
+
+**Still open:** the corpus holds no recitals (EUR-Lex omits the preamble from
+consolidated texts), which bites hardest for the GDPR, whose 173 recitals are
+routinely cited as interpretive authority. No reranking: retrieval is
+single-stage over-fetch-24 → floor → cap 3/article → 6 passages, which the
+probes above show is sufficient at six instruments. Revisit if precision drops.
 
 ### August 15, 2026 — documentation reconciled to the shipped prices, repo and Notion
 

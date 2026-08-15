@@ -1,0 +1,19 @@
+{
+  "corpusId": "eu-cyber-resilience-act",
+  "shortName": "EU Cyber Resilience Act",
+  "instrument": "Regulation (EU) 2024/2847 on horizontal cybersecurity requirements for products with digital elements (Cyber Resilience Act)",
+  "jurisdiction": "EU",
+  "instrumentType": "regulation",
+  "applicationNote": "Mostly NOT yet in application. Article 71 sets three dates: Chapter IV (Articles 35 to 51) applies from 11 June 2026, Article 14 from 11 September 2026, and the Regulation as a whole from 11 December 2027. Write about the main obligations in the future tense — as at 2026-08-15 only Chapter IV has started to apply.",
+  "celex": "02024R2847-20241120",
+  "eli": "http://data.europa.eu/eli/reg/2024/2847/2024-11-20",
+  "version": "2024-11-20",
+  "consolidatedAs": "2024-11-20",
+  "sourceUrl": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:02024R2847-20241120",
+  "citationUrl": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A02024R2847-20241120",
+  "retrieved": "2026-08-15",
+  "parser": "eurlex",
+  "expectedArticles": 71,
+  "coverage": "full",
+  "note": "71 Articles and 8 Annexes — verified against the EUR-Lex consolidated DOM on 2026-08-15. Application dates read directly from Article 71 and carried in applicationNote, because quoting a not-yet-applicable obligation in the present tense is the specific way this instrument misleads. EUR-Lex consolidated texts omit the preamble, so no recitals are present. Text is reused from EUR-Lex under CC BY 4.0 (Commission Decision 2011/833/EU)."
+}

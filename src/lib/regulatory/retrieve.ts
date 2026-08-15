@@ -22,6 +22,7 @@ import {
   formatRegulatoryBlock,
   diversifyHits,
   REGULATORY_SCORE_FLOOR,
+  REGULATORY_TOPIC_ONLY_SCORE_FLOOR,
 } from './format'
 
 /** Over-fetch, then diversify and cut. */
@@ -123,17 +124,24 @@ export async function retrieveRegulatoryContext(
     return { block: null, notes }
   }
 
+  // A topic that named an instrument's subject matter but used no legal
+  // vocabulary at all has to clear a higher bar — see the constant's note.
+  const floor =
+    gate.matched.length === 0 ? REGULATORY_TOPIC_ONLY_SCORE_FLOOR : REGULATORY_SCORE_FLOOR
+
   const topScore = hits[0].score
-  if (topScore < REGULATORY_SCORE_FLOOR) {
+  if (topScore < floor) {
     notes.push(
-      `[regulatory] gate=hit matched=${JSON.stringify(gate.matched)} ` +
-        `topScore=${topScore.toFixed(3)} below floor ${REGULATORY_SCORE_FLOOR} — no block injected`,
+      `[regulatory] gate=hit matched=${JSON.stringify(gate.matched)} ${routingNote} ` +
+        `topScore=${topScore.toFixed(3)} below floor ${floor}` +
+        `${floor === REGULATORY_TOPIC_ONLY_SCORE_FLOOR ? ' (topic-only gate hit)' : ''}` +
+        ' — no block injected',
     )
     return { block: null, notes }
   }
 
   const selected = diversifyHits(
-    hits.filter((hit) => hit.score >= REGULATORY_SCORE_FLOOR),
+    hits.filter((hit) => hit.score >= floor),
     REGULATORY_MAX_PASSAGES,
   )
   const block = formatRegulatoryBlock(selected)

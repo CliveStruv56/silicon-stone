@@ -100,7 +100,17 @@ export function looksRegulatory(...fields: Array<string | undefined | null>): Ga
     .filter(([, terms]) => terms.some((term) => haystack.includes(term)))
     .map(([corpusId]) => corpusId)
 
-  return { hit: matched.length > 0, matched, corpusIds }
+  // Naming an instrument's subject matter is itself evidence the topic is
+  // regulation-adjacent, even when no general legal word appears. "Cloud
+  // switching charges and interoperability for data processing services" is
+  // squarely Data Act Chapter VI, yet contains not one word from
+  // REGULATORY_TERMS, and gated out entirely before this.
+  //
+  // Safe to be permissive here because the gate is not the last defence: the
+  // 0.30 score floor in retrieve.ts drops everything when the corpus has
+  // nothing relevant, so a false positive costs one embedding call rather than
+  // an irrelevant statutory paragraph in the draft.
+  return { hit: matched.length > 0 || corpusIds.length > 0, matched, corpusIds }
 }
 
 /** Exposed so a guard test can assert every routing key is a real corpus. */

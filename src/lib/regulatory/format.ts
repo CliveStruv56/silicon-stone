@@ -28,6 +28,20 @@ export const MIN_CHUNKS_PER_INSTRUMENT = 2
 export const REGULATORY_SCORE_FLOOR = 0.3
 
 /**
+ * Higher floor for a topic that reached the gate WITHOUT using any legal
+ * vocabulary — matching only an instrument's subject matter ("cloud switching",
+ * "semiconductor"). Weaker evidence of legal intent, so a stronger relevance
+ * requirement before statute is injected.
+ *
+ * Calibrated 2026-08-15 against two measured cases: "cloud switching charges
+ * and interoperability for data processing services" is genuinely Data Act
+ * Chapter VI and scores 0.582; "TSMC Dresden fab workforce shortages and the
+ * semiconductor talent pipeline" is a labour-market story that pulled 11KB of
+ * Chips Act at 0.473. This floor separates them.
+ */
+export const REGULATORY_TOPIC_ONLY_SCORE_FLOOR = 0.55
+
+/**
  * Cap hits per parent article AND per instrument, preserving score order.
  *
  * Article 5 alone is ~13KB across many prohibitions; without the per-article cap

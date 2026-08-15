@@ -1,0 +1,19 @@
+{
+  "corpusId": "nis2",
+  "shortName": "NIS2 Directive",
+  "instrument": "Directive (EU) 2022/2555 on measures for a high common level of cybersecurity across the Union (NIS2)",
+  "jurisdiction": "EU",
+  "instrumentType": "directive",
+  "applicationNote": "A Directive, not a Regulation. Member States were required to transpose it by 17 October 2024 and to apply their national measures from 18 October 2024 (Article 41). Obligations on an organisation arise under the national transposing law of the Member State concerned, which varies, not under this text directly — Article 46 states the Directive is addressed to the Member States.",
+  "celex": "02022L2555-20221227",
+  "eli": "http://data.europa.eu/eli/dir/2022/2555/2022-12-27",
+  "version": "2022-12-27",
+  "consolidatedAs": "2022-12-27",
+  "sourceUrl": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:02022L2555-20221227",
+  "citationUrl": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A02022L2555-20221227",
+  "retrieved": "2026-08-15",
+  "parser": "eurlex",
+  "expectedArticles": 46,
+  "coverage": "full",
+  "note": "46 Articles and 3 Annexes — verified against the EUR-Lex consolidated DOM on 2026-08-15. THE ONLY DIRECTIVE IN THIS CORPUS: it binds Member States and reaches an organisation only through national transposing law, so a draft must never write that NIS2 requires something of a company. format.ts renders that caveat above every passage from this instrument, driven by instrumentType. Transposition and application dates read directly from Article 41. EUR-Lex consolidated texts omit the preamble, so no recitals are present. Text is reused from EUR-Lex under CC BY 4.0 (Commission Decision 2011/833/EU)."
+}

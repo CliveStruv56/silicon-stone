@@ -15,12 +15,33 @@
       "reviewBy": "2026-11-13",
       "changelog": "Initial ingest of Regulation (EU) 2023/1781 (European Chips Act), retrieved 2026-08-15. Checked at review: EUR-Lex listed NO consolidated version as at 2026-08-15 — the Chips Act has not been amended since adoption, so the current text is the original act at CELEX 32023R1781 and 'consolidatedAs' is its OJ publication date (OJ L 229, 18.9.2023). This is the first corpus in the original-act dialect; scripts/regulatory/fetch.ts was extended to read oj-ti-art / oj-sti-art / oj-normal / oj-doc-ti, two-column table points, and inline paragraph numbers. Extraction verified: 41 Articles and 4 Annexes matching the EUR-Lex DOM, Article 1 read against the source, none of the 83 recitals present (the extractor walks only art_ and anx_ ids). A first amendment will create a consolidated version under a new CELEX — that is what npm run reg:drift watches for."
     },
+    "eu-cyber-resilience-act": {
+      "version": "2024-11-20",
+      "consolidatedAs": "2024-11-20",
+      "sha256": "e3fb7513af106676bb142399539b4eb7ca04a5f7c73a89d6a099f4d3fdbff0d7",
+      "reviewBy": "2026-11-13",
+      "changelog": "Initial ingest of Regulation (EU) 2024/2847 (Cyber Resilience Act), consolidated as at 2024-11-20, retrieved 2026-08-15. Checked at review: 02024R2847-20241120 is the current and only consolidated version on EUR-Lex. Extraction verified: 71 Articles and 8 Annexes matching the DOM, Article 13(1) read against the source, no recitals, no consolidation markers. Application dates transcribed from Article 71 into applicationNote — Chapter IV (Arts 35-51) from 11 June 2026, Article 14 from 11 September 2026, the rest from 11 December 2027. Re-check at the next review whether the main body has come into application; until then most of this text describes obligations that do not yet bite."
+    },
+    "eu-data-act": {
+      "version": "2023-12-22",
+      "consolidatedAs": "2023-12-22",
+      "sha256": "69dd93de307b6b13713166ffa15d35bf7856bea6767dfe093ecd8056f8a7c90f",
+      "reviewBy": "2026-11-13",
+      "changelog": "Initial ingest of Regulation (EU) 2023/2854 (Data Act), retrieved 2026-08-15. Checked at review: NO consolidated version exists — CELEX 02023R2854-* returns 'the requested document does not exist', so the current text is the original act at 32023R2854 and 'consolidatedAs' is the OJ publication date. Verified empirically rather than from a summary: a secondary source asserted a 2023-12-22 consolidation that EUR-Lex does not serve. Extraction verified: 50 Articles, no Annexes, matching the DOM; original-act dialect, same as the Chips Act; no recitals, no markers. Application dates transcribed from Article 50 into applicationNote — in force since 12 September 2025, with the Article 3(1) obligation reaching only connected products placed on the market after 12 September 2026, which is still future at retrieval."
+    },
     "gdpr": {
       "version": "2016-05-04",
       "consolidatedAs": "2016-05-04",
       "sha256": "2c220564f66000fa3df7013a3515851ce6003b0d4f76b3e71be0dba18c038e4a",
       "reviewBy": "2026-11-13",
       "changelog": "Initial ingest of Regulation (EU) 2016/679 (GDPR), consolidated as at 2016-05-04, retrieved 2026-08-15. Checked at review: EUR-Lex lists 2016-05-04 as the only consolidated version (the GDPR has not been amended since adoption; that consolidation folds in the 2018 corrigendum). The data-protection Digital Omnibus, COM(2025) 837, would amend this text but was still under Council negotiation and NOT in force at retrieval — re-check its status at the next review. Extraction verified: 99 Articles, 0 Annexes, matching the EUR-Lex DOM; Articles 1, 2, 22 and 99 read against the source; inline corrigendum markers in Articles 43(1) and 65(1) stripped by INLINE_MARKERS in scripts/regulatory/fetch.ts. No recitals — EUR-Lex consolidated texts omit the preamble, which matters more for the GDPR than most instruments."
+    },
+    "nis2": {
+      "version": "2022-12-27",
+      "consolidatedAs": "2022-12-27",
+      "sha256": "8c053fffd63dc696bd76ac89586ea8c9295d41fe7e49b307069fcfee63bf2cff",
+      "reviewBy": "2026-11-13",
+      "changelog": "Initial ingest of Directive (EU) 2022/2555 (NIS2), consolidated as at 2022-12-27, retrieved 2026-08-15. Checked at review: 02022L2555-20221227 is the current and only consolidated version. THE ONLY DIRECTIVE IN THIS CORPUS — instrumentType 'directive' makes format.ts print the transposition caveat above every passage, because the text reads like it binds companies when it does not: Article 21(1) says 'Member States shall ensure that essential and important entities take...', and Article 46 states the Directive is addressed to the Member States. Transposition dates transcribed from Article 41 into applicationNote (adopt by 17 October 2024, apply from 18 October 2024). Extraction verified: 46 Articles and 3 Annexes matching the DOM, Article 21 read against the source, no recitals, no markers. National transposing law is NOT in this corpus and cannot be quoted from it."
     }
   }
 }

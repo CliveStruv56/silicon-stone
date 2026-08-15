@@ -6,7 +6,13 @@ import {
   REGULATORY_CHUNK_MAX_CHARACTERS,
   PINECONE_METADATA_LIMIT_BYTES,
 } from './chunk'
-import { formatRegulatoryBlock, diversifyHits, MAX_CHUNKS_PER_ARTICLE } from './format'
+import {
+  formatRegulatoryBlock,
+  diversifyHits,
+  MAX_CHUNKS_PER_ARTICLE,
+  REGULATORY_SCORE_FLOOR,
+  REGULATORY_TOPIC_ONLY_SCORE_FLOOR,
+} from './format'
 import { looksRegulatory, routableCorpusIds } from './gate'
 import { listCorpusIds, readInstrumentMeta, readSourceText } from './meta'
 import type { RegulatoryHit } from './types'
@@ -228,6 +234,25 @@ describe('multi-instrument retrieval', () => {
 
   it('routes nothing when no instrument is named, so callers search everything', () => {
     expect(looksRegulatory('compliance obligations and penalties').corpusIds).toEqual([])
+  })
+
+  it("fires on an instrument's subject matter even with no legal vocabulary", () => {
+    // Squarely Data Act Chapter VI, yet contains not one word of general legal
+    // vocabulary. Before this the topic gated out and the draft saw no statute.
+    const gate = looksRegulatory('cloud switching charges for data processing services')
+    expect(gate.matched).toEqual([])
+    expect(gate.hit).toBe(true)
+    expect(gate.corpusIds).toEqual(['eu-data-act'])
+  })
+
+  it('holds a topic-only hit to a higher relevance bar', () => {
+    // The trade for the permissive gate above: weaker evidence of legal intent
+    // has to clear a stronger relevance floor, or a labour-market story about
+    // semiconductors collects the Chips Act (measured at 0.473).
+    expect(REGULATORY_TOPIC_ONLY_SCORE_FLOOR).toBeGreaterThan(REGULATORY_SCORE_FLOOR)
+    const gate = looksRegulatory('TSMC Dresden fab workforce shortages and the semiconductor talent pipeline')
+    expect(gate.matched).toEqual([])
+    expect(gate.corpusIds).toEqual(['eu-chips-act'])
   })
 
   it('can route to every corpus that is actually ingested', () => {
