@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { StaggerContainer, StaggerItem } from '@/components/ui/StaggerContainer'
 import { ForensicCard } from '@/components/ui/ForensicCard'
 import { Badge } from '@/components/ui/badge'
+import { AMOUNTS, gbp } from '@/lib/offering'
 import { ArrowRight } from 'lucide-react'
 
 /* Preview frames.
@@ -41,7 +42,7 @@ const tools = [
     preview: '/tools/compliance-checker-preview.webp',
     previewAlt:
       'Isometric illustration: circuit traces run from a server rack out to four graded tiers — red and flagged with a warning symbol, amber, teal, then unlit grey — echoing the EU AI Act risk classes from prohibited down to minimal.',
-    takeFurther: { label: 'AI Act Compliance Toolkit (£79)', href: '/products' },
+    takeFurther: { label: `AI Act Compliance Toolkit (${gbp(AMOUNTS.toolkitStandard)})`, href: '/products' },
   },
   {
     name: 'Scenario Modeler',

@@ -3,6 +3,7 @@ import { getSanityPersona } from "./sanity";
 import { callClaude } from "./anthropic";
 import { logErrorToFile } from "./debug";
 import type { VoiceDNA } from "@/types/context";
+import { AMOUNTS, gbp } from "./offering";
 
 /**
  * The five canonical Silicon & Stone draft formats. `research` is a separate
@@ -326,7 +327,7 @@ Divide the research into 3–4 distinct "Takeaways". For each:
 
 ## 3. The Audit CTA (12:00 - End)
 **The Transition:** a smooth move from the final takeaway into the call to action.
-**The Pitch:** a low-pressure pitch to siliconandstone.com — direct ${persona.role} to a free interactive tool (Compliance Checker, Supply Chain Mapper), and mention the £24 AI Audit Checklist Pack or the £79 AI Act Compliance Toolkit.
+**The Pitch:** a low-pressure pitch to siliconandstone.com — direct ${persona.role} to a free interactive tool (Compliance Checker, Supply Chain Mapper), and mention the ${gbp(AMOUNTS.checklist)} AI Audit Checklist Pack or the ${gbp(AMOUNTS.toolkitStandard)} AI Act Compliance Toolkit.
 
 Tone: Sober, authoritative, clinical. Zero hype.`;
     }

@@ -14,6 +14,7 @@ import {
   ArrowRight,
   CheckCircle,
 } from 'lucide-react'
+import { AMOUNTS, gbp } from '@/lib/offering'
 
 export const metadata: Metadata = {
   title: 'Products | Silicon and Stone',
@@ -36,7 +37,7 @@ const products = [
     title: 'AI Audit Checklist Pack',
     slug: 'ai-audit-checklist',
     description: 'A quick-start pack for auditing your AI exposure, vendor dependencies, and compliance gaps. The essential first step.',
-    price: '£24',
+    price: gbp(AMOUNTS.checklist),
     badge: 'Quick Start',
     badgeColor: 'bg-stone-teal text-ink-on-accent',
     icon: ClipboardCheck,
@@ -47,7 +48,7 @@ const products = [
       'Vendor Dependency Scorecard',
       'Quick Compliance Gap Analysis',
       'Board-Ready Risk Summary template',
-      'Includes £20 discount on full Toolkit',
+      `Includes ${gbp(AMOUNTS.toolkitDiscount)} discount on full Toolkit`,
     ],
     cta: 'View Checklist Pack',
   },
@@ -55,7 +56,7 @@ const products = [
     title: 'AI Act Compliance Toolkit',
     slug: 'ai-act-toolkit',
     description: 'A structured governance toolkit for cataloguing systems, classifying risk, collecting vendor evidence, and planning against phased AI Act implementation.',
-    price: 'From £79',
+    price: `From ${gbp(AMOUNTS.toolkitStandard)}`,
     badge: 'Flagship',
     badgeColor: 'bg-accent-fill text-ink-on-accent',
     icon: Shield,
@@ -75,7 +76,7 @@ const products = [
     title: 'Sector Reports',
     slug: 'sector-reports',
     description: 'Focused 15-20 page briefings on AI impact, regulatory exposure, and geopolitical risk for specific industries.',
-    price: 'From £39',
+    price: `From ${gbp(AMOUNTS.sectorReport)}`,
     badge: 'Coming Soon',
     badgeColor: 'bg-surface-elevated text-text-muted',
     icon: FileText,

@@ -31,6 +31,7 @@ import {
   Layers,
   type LucideIcon,
 } from 'lucide-react'
+import { AMOUNTS, gbp } from '@/lib/offering'
 
 const domains = [
   {
@@ -125,7 +126,7 @@ const assessments: Assessment[] = [
     ],
     icon: Globe,
     fromTool: 'Supply Chain Mapper',
-    price: 'From £3,500',
+    price: `From ${gbp(AMOUNTS.moduleFloor)}`,
     color: 'stone-teal',
   },
   {
@@ -139,7 +140,7 @@ const assessments: Assessment[] = [
     ],
     icon: TrendingUp,
     fromTool: 'Scenario Modeler',
-    price: 'From £3,500',
+    price: `From ${gbp(AMOUNTS.moduleFloor)}`,
     color: 'alert-red',
   },
   {
@@ -153,7 +154,7 @@ const assessments: Assessment[] = [
     ],
     icon: FileText,
     fromTool: 'Policy Stress-Test',
-    price: 'From £3,500',
+    price: `From ${gbp(AMOUNTS.moduleFloor)}`,
     color: 'silicon-amber',
   },
   {
@@ -167,7 +168,7 @@ const assessments: Assessment[] = [
       'A prioritised remediation list — what to fix before the September 2026 reporting duties bite',
     ],
     icon: Layers,
-    price: 'From £4,500',
+    price: `From ${gbp(AMOUNTS.aiBillOfMaterials)}`,
     priceNote: 'Or added to a Post-Omnibus Briefing.',
     color: 'stone-teal',
   },
@@ -181,7 +182,7 @@ const assessments: Assessment[] = [
       'A sovereignty roadmap that keeps your options open — it does not pick your vendors for you',
     ],
     icon: Shield,
-    price: 'From £6,500',
+    price: `From ${gbp(AMOUNTS.sovereignArchitectureReview)}`,
     color: 'sister-indigo',
   },
 ]
@@ -259,10 +260,10 @@ const tiers: Tier[] = [
     name: 'Advisory Briefing',
     engagement: 'Advisory Briefing',
     anchor: 'briefing',
-    price: '£450',
+    price: gbp(AMOUNTS.advisoryBriefing),
     priceNote: 'one hour',
     priceDetail:
-      '£450. Credited in full toward your first month on the Drift Retainer if you proceed within 30 days — so if we work together, the conversation was free.',
+      `${gbp(AMOUNTS.advisoryBriefing)}. Credited in full toward your first month on the Drift Retainer if you proceed within 30 days — so if we work together, the conversation was free.`,
     introDistinction:
       'New here? Start with the free 25-minute conversation (launch offer). The Briefing is the working session: your tool results, your specific question, a written follow-up.',
     description: 'A focused strategic consultation built on your tool results and a specific question. The low-commitment way to test the water.',
@@ -279,10 +280,10 @@ const tiers: Tier[] = [
     name: 'The Exposure Diagnostic',
     engagement: 'Exposure Diagnostic',
     anchor: 'diagnostic',
-    price: 'From £2,500',
+    price: `From ${gbp(AMOUNTS.exposureDiagnostic)}`,
     priceNote: 'custom scope',
     positioning:
-      'If you need template policies and a document pack, a fixed-price compliance shop will do it cheaper — our own £79 toolkit covers the essentials. The Exposure Diagnostic is for the questions documents can’t answer: where your dependency on specific vendors, models and jurisdictions becomes an operating constraint, and what to do about it this quarter.',
+      `If you need template policies and a document pack, a fixed-price compliance shop will do it cheaper — our own ${gbp(AMOUNTS.toolkitStandard)} toolkit covers the essentials. The Exposure Diagnostic is for the questions documents can’t answer: where your dependency on specific vendors, models and jurisdictions becomes an operating constraint, and what to do about it this quarter.`,
     description: 'A focused review of your AI governance, evidence gaps, and technology dependencies — the clearest first picture of where you stand.',
     features: [
       'AI system and vendor-evidence review — what you run, and what your vendors can prove',
@@ -300,7 +301,7 @@ const tiers: Tier[] = [
   {
     name: 'The Drift Retainer',
     engagement: 'Drift Retainer',
-    price: 'From £2,000/mo',
+    price: `From ${gbp(AMOUNTS.driftRetainerMonthly)}/mo`,
     priceNote: 'three-month initial term',
     priceDetail:
       'The Baseline Month guarantee: after month one, walk away paying that month only. You know within thirty days whether the relationship earns its fee.',
@@ -320,7 +321,7 @@ const tiers: Tier[] = [
     name: 'Strategic Assessment',
     engagement: 'Strategic Assessment',
     anchor: 'assessment',
-    price: 'From £8,000',
+    price: `From ${gbp(AMOUNTS.strategicAssessment)}`,
     priceNote: 'then transitions to retainer',
     positioning:
       'Before you commit €1,000–€3,100 a month to governance software, know what you actually need it to do. The Strategic Assessment gives your board a framework-neutral decision document — vendor-agnostic, because we sell no software and take no referral fees.',
@@ -536,7 +537,7 @@ export default function ServicesPage() {
                   </p>
                   <div className="border-t border-border-subtle pt-4">
                     <div className="text-lg font-semibold text-text-primary">
-                      £2,000<span className="text-text-muted">/month</span>
+                      {gbp(AMOUNTS.driftRetainerMonthly)}<span className="text-text-muted">/month</span>
                     </div>
                     <div className="text-sm text-text-muted">
                       Three-month initial term, then rolling monthly · limited to a handful
@@ -548,7 +549,7 @@ export default function ServicesPage() {
                       earns its fee.
                     </p>
                     <p className="mt-3 text-sm italic text-text-muted">
-                      Prefer annual? Twelve months for the price of ten (£20,000/year).
+                      Prefer annual? Twelve months for the price of ten ({gbp(AMOUNTS.driftRetainerAnnual)}/year).
                     </p>
                   </div>
                   {FOUNDING_OFFER_ACTIVE && (
@@ -557,7 +558,7 @@ export default function ServicesPage() {
                         Founding rate — five companies, launch only.
                       </strong>{' '}
                       The first five retainer clients join at{' '}
-                      <strong className="font-semibold">£1,500/month for the first six months</strong>,
+                      <strong className="font-semibold">{gbp(AMOUNTS.driftRetainerFounding)}/month for the first six months</strong>,
                       then the standard rate. Same Baseline Month guarantee.
                     </div>
                   )}
@@ -866,7 +867,7 @@ export default function ServicesPage() {
                 </div>
                 <div className="flex flex-shrink-0 flex-col items-start gap-3 lg:items-end">
                   <div className="font-mono text-lg font-semibold text-text-primary">
-                    £25,000–£50,000
+                    {gbp(AMOUNTS.bespokeFloor)}–{gbp(AMOUNTS.bespokeCeiling)}
                   </div>
                   <a
                     href="#contact"

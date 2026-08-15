@@ -18,6 +18,7 @@ import {
   AlertTriangle,
   Presentation,
 } from 'lucide-react'
+import { AMOUNTS, DERIVED, gbp } from '@/lib/offering'
 
 export const metadata: Metadata = {
   title: 'AI Audit Checklist Pack | Silicon and Stone',
@@ -79,7 +80,7 @@ export default function AIAuditChecklistPage() {
                   gaps — all in an afternoon. The essential first step before detailed compliance work.
                 </p>
                 <div className="flex items-center gap-4 mb-8">
-                  <div className="text-3xl font-mono font-bold text-stone-teal">£24</div>
+                  <div className="text-3xl font-mono font-bold text-stone-teal">{gbp(AMOUNTS.checklist)}</div>
                   <div className="text-sm text-text-muted">
                   2 spreadsheets + 2 PDFs<br />
                     Digital delivery
@@ -88,19 +89,19 @@ export default function AIAuditChecklistPage() {
                 {buyable ? (
                   <Button size="lg" className="bg-stone-teal text-ink-on-accent hover:bg-stone-teal/90 font-semibold" asChild>
                     <a href={checkoutUrl} target="_blank" rel="noopener noreferrer" className="plausible-event-name=Buy+Checklist+Pack">
-                      Buy Checklist Pack — £24
+                      Buy Checklist Pack — {gbp(AMOUNTS.checklist)}
                     </a>
                   </Button>
                 ) : (
                   <EarlyAccessCTA
                     tierTag="tier-checklist"
-                    label="Buy Now — £24"
+                    label={`Buy Now — ${gbp(AMOUNTS.checklist)}`}
                     submitLabel="Notify me at this address"
                     buttonClassName="bg-stone-teal text-ink-on-accent hover:bg-stone-teal/90 font-semibold"
                   />
                 )}
                 <p className="text-xs text-text-muted mt-3">
-                  Includes a £20 discount code for the full AI Act Compliance Toolkit (valid 90 days).
+                  Includes a {gbp(AMOUNTS.toolkitDiscount)} discount code for the full AI Act Compliance Toolkit (valid 90 days).
                 </p>
               </div>
 
@@ -112,15 +113,15 @@ export default function AIAuditChecklistPage() {
                   <div className="flex items-start gap-3">
                     <div className="w-8 h-8 rounded-full bg-stone-teal/20 text-stone-teal flex items-center justify-center text-sm font-mono flex-shrink-0">1</div>
                     <div>
-                      <div className="text-text-primary font-medium">Start here — £24</div>
+                      <div className="text-text-primary font-medium">Start here — {gbp(AMOUNTS.checklist)}</div>
                       <p className="text-sm text-text-muted">Audit your AI systems and discover your gaps</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="w-8 h-8 rounded-full bg-silicon-amber/20 text-silicon-amber-strong flex items-center justify-center text-sm font-mono flex-shrink-0">2</div>
                     <div>
-                      <div className="text-text-primary font-medium">Upgrade to full Toolkit — £59</div>
-                      <p className="text-sm text-text-muted">Use your £20 discount to get the complete compliance framework</p>
+                      <div className="text-text-primary font-medium">Upgrade to full Toolkit — {gbp(DERIVED.toolkitAfterDiscount)}</div>
+                      <p className="text-sm text-text-muted">Use your {gbp(AMOUNTS.toolkitDiscount)} discount to get the complete compliance framework</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -132,7 +133,7 @@ export default function AIAuditChecklistPage() {
                   </div>
                 </div>
                 <div className="mt-6 pt-4 border-t border-border-subtle text-sm text-text-muted">
-                  Total investment for audit + toolkit: <span className="font-mono text-silicon-amber-strong">£83</span> (vs £103 separately)
+                  Total investment for audit + toolkit: <span className="font-mono text-silicon-amber-strong">{gbp(DERIVED.bundleTotal)}</span> (vs {gbp(DERIVED.bundleSeparately)} separately)
                 </div>
               </div>
             </div>
@@ -205,27 +206,27 @@ export default function AIAuditChecklistPage() {
                 Know Where You Stand
               </h2>
               <p className="text-text-muted mb-8">
-                At £24, this is less than the cost of a business book — and it gives you
+                At {gbp(AMOUNTS.checklist)}, this is less than the cost of a business book — and it gives you
                 a structured picture of your AI exposure in a single afternoon.
               </p>
               {buyable ? (
                 <Button size="lg" className="bg-stone-teal text-ink-on-accent hover:bg-stone-teal/90 font-semibold" asChild>
                   <a href={checkoutUrl} target="_blank" rel="noopener noreferrer">
-                    Buy Checklist Pack — £24
+                    Buy Checklist Pack — {gbp(AMOUNTS.checklist)}
                   </a>
                 </Button>
               ) : (
                 <div className="flex justify-center">
                   <EarlyAccessCTA
                     tierTag="tier-checklist"
-                    label="Buy Now — £24"
+                    label={`Buy Now — ${gbp(AMOUNTS.checklist)}`}
                     submitLabel="Notify me at this address"
                     buttonClassName="bg-stone-teal text-ink-on-accent hover:bg-stone-teal/90 font-semibold"
                   />
                 </div>
               )}
               <div className="flex items-center justify-center gap-6 mt-6 text-xs text-text-muted">
-                <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> £20 Toolkit discount included</span>
+                <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> {gbp(AMOUNTS.toolkitDiscount)} Toolkit discount included</span>
               </div>
               <p className="text-sm text-text-muted mt-6">
                 Ready for the full framework?{' '}

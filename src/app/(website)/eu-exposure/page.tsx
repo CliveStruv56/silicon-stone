@@ -21,6 +21,7 @@ import {
   Clock,
   Scale,
 } from 'lucide-react'
+import { AMOUNTS, gbp } from '@/lib/offering'
 
 const briefingIncludes = [
   'AI Act scope classification — which of your systems are in scope, at which risk tier',
@@ -236,7 +237,7 @@ export default function EuExposurePage() {
                   </div>
                   <div className="border-t border-border-subtle pt-4">
                     <div className="text-lg font-semibold text-text-primary">
-                      From £2,500<span className="text-text-muted">, fixed</span>
+                      From {gbp(AMOUNTS.postOmnibusBriefing)}<span className="text-text-muted">, fixed</span>
                     </div>
                     <div className="text-sm text-text-muted">
                       Scope agreed in a 25-minute conversation before any commitment. Can
@@ -368,7 +369,7 @@ export default function EuExposurePage() {
                 ))}
               </ul>
               <p className="mt-5 text-sm font-semibold text-text-primary">
-                Add-on from £1,500.
+                Add-on from {gbp(AMOUNTS.procurementAddOn)}.
               </p>
             </CardContent>
           </Card>

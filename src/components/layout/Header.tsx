@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/layout/ThemeToggle'
-import { priceOf } from '@/lib/offering'
+import { AMOUNTS, gbp, priceOf } from '@/lib/offering'
 
 type NavChild = { name: string; href: string; note?: string }
 
@@ -72,7 +72,7 @@ const primaryNavigation: NavItem[] = [
       // stack, this one reads your European market entry — so the menu says so
       // rather than leaving the reader to guess from two identical prices.
       { name: 'Post-Omnibus Briefing', href: '/eu-exposure', note: `${priceOf('post-omnibus-briefing')} · US & UK` },
-      { name: 'Modules', href: '/advisory#modules', note: 'From £3,500' },
+      { name: 'Modules', href: '/advisory#modules', note: `From ${gbp(AMOUNTS.moduleFloor)}` },
       { name: 'All prices', href: '/pricing' },
       { name: 'Contact', href: '/advisory#contact' },
     ],

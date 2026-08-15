@@ -5,6 +5,7 @@ import { ArrowRight } from 'lucide-react'
 import { StaggerContainer, StaggerItem } from '@/components/ui/StaggerContainer'
 import { ForensicCard } from '@/components/ui/ForensicCard'
 import { Badge } from '@/components/ui/badge'
+import { AMOUNTS, gbp } from '@/lib/offering'
 
 type Product = {
   price: string
@@ -16,19 +17,19 @@ type Product = {
 
 const products: Product[] = [
   {
-    price: '£24',
+    price: gbp(AMOUNTS.checklist),
     title: 'AI Audit Checklist Pack',
     body: 'A quick-start audit of your AI exposure, vendor dependencies and compliance gaps. The essential first step.',
   },
   {
-    price: 'From £79',
+    price: `From ${gbp(AMOUNTS.toolkitStandard)}`,
     label: 'Flagship',
     title: 'AI Act Compliance Toolkit',
     body: 'A structured governance toolkit: catalogue systems, classify risk, collect vendor evidence, plan against phased implementation.',
     flagship: true,
   },
   {
-    price: 'From £39',
+    price: `From ${gbp(AMOUNTS.sectorReport)}`,
     label: 'Coming soon',
     title: 'Sector Reports',
     body: 'Focused 15–20pp briefings on AI, regulatory and geopolitical risk for specific industries.',

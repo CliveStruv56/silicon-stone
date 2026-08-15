@@ -5,6 +5,7 @@ import { ArrowRight } from 'lucide-react'
 import { StaggerContainer, StaggerItem } from '@/components/ui/StaggerContainer'
 import { ForensicCard } from '@/components/ui/ForensicCard'
 import { Badge } from '@/components/ui/badge'
+import { AMOUNTS, gbp } from '@/lib/offering'
 
 type Tier = {
   label: string
@@ -28,7 +29,7 @@ const tiers: Tier[] = [
   {
     label: 'Most popular · Ongoing',
     title: 'The Drift Retainer',
-    body: 'When the board asks what has actually changed, a standing independent read on how the drift affects your supply chains, procurement, and people — delivered monthly, so the leadership team is never blindsided. From £2,000/mo.',
+    body: `When the board asks what has actually changed, a standing independent read on how the drift affects your supply chains, procurement, and people — delivered monthly, so the leadership team is never blindsided. From ${gbp(AMOUNTS.driftRetainerMonthly)}/mo.`,
     href: '/advisory#retainer',
     popular: true,
   },

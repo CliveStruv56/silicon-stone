@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Lock } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { EVIDENCE_PACK_ENABLED } from '@/lib/flags'
+import { AMOUNTS, DERIVED, gbp } from '@/lib/offering'
 
 /**
  * The paid Evidence Pack — components 4–11 of the report.
@@ -36,7 +37,7 @@ export function EvidencePackTeaser() {
       <CardHeader>
         <div className="flex items-center gap-2 text-silicon-amber-strong">
           <Lock className="h-5 w-5" />
-          <CardTitle className="text-lg">The full Evidence Pack — £39</CardTitle>
+          <CardTitle className="text-lg">The full Evidence Pack — {gbp(AMOUNTS.evidencePack)}</CardTitle>
         </div>
         <CardDescription>
           Eight further components: the operational artefacts that go in a compliance file, bespoke
@@ -52,13 +53,13 @@ export function EvidencePackTeaser() {
           ))}
         </ul>
         <p className="rounded-lg border border-silicon-amber/40 bg-silicon-amber/10 p-4 text-sm text-text-primary">
-          <span className="font-semibold">The £39 comes back.</span> Buy the Evidence Pack and its
+          <span className="font-semibold">The {gbp(AMOUNTS.evidencePack)} comes back.</span> Buy the Evidence Pack and its
           full value applies against the{' '}
           <Link href="/products/ai-act-toolkit" className="text-silicon-amber-strong hover:underline">
-            £79 AI Act Compliance Toolkit
+            {gbp(AMOUNTS.toolkitStandard)} AI Act Compliance Toolkit
           </Link>{' '}
-          — making that upgrade £40. One credit per purchaser, valid for 90 days, not redeemable
-          for cash or against the £24 checklist pack.
+          — making that upgrade {gbp(DERIVED.toolkitAfterEvidencePack)}. One credit per purchaser, valid for 90
+          days, not redeemable for cash or against the {gbp(AMOUNTS.checklist)} checklist pack.
         </p>
       </CardContent>
     </Card>

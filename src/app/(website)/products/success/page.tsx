@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Header, Footer } from '@/components/layout'
 import { Button } from '@/components/ui/button'
 import { CheckCircle, Mail, ArrowRight } from 'lucide-react'
+import { AMOUNTS, DERIVED, gbp } from '@/lib/offering'
 
 export const metadata: Metadata = {
   title: 'Order Confirmed | Silicon and Stone',
@@ -68,17 +69,18 @@ export default async function PurchaseSuccessPage({
                 Your next step
               </div>
               <h2 className="mb-3 text-2xl font-semibold text-text-primary">
-                Your £20 Toolkit credit is in your delivery email
+                Your {gbp(AMOUNTS.toolkitDiscount)} Toolkit credit is in your delivery email
               </h2>
               <p className="mb-6 text-text-muted">
-                Alongside your download links you&rsquo;ll find a £20 discount code for the
-                full AI Act Compliance Toolkit (valid 90 days). Use it at checkout and the
-                complete compliance framework is £59 instead of £79.
+                Alongside your download links you&rsquo;ll find a {gbp(AMOUNTS.toolkitDiscount)} discount
+                code for the full AI Act Compliance Toolkit (valid 90 days). Use it at
+                checkout and the complete compliance framework is{' '}
+                {gbp(DERIVED.toolkitAfterDiscount)} instead of {gbp(AMOUNTS.toolkitStandard)}.
               </p>
               <div className="mb-6 rounded-lg border border-border-subtle bg-slate-deep p-4 text-sm text-text-muted">
                 Total investment for audit + toolkit:{' '}
-                <span className="font-mono text-silicon-amber-strong">£83</span> (vs £103
-                separately)
+                <span className="font-mono text-silicon-amber-strong">{gbp(DERIVED.bundleTotal)}</span>{' '}
+                (vs {gbp(DERIVED.bundleSeparately)} separately)
               </div>
               <Link href="/products/ai-act-toolkit">
                 <Button className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90 font-semibold">
@@ -97,14 +99,14 @@ export default async function PurchaseSuccessPage({
                 Your next step
               </div>
               <h2 className="mb-3 text-2xl font-semibold text-text-primary">
-                Want it applied to your situation? Book an Advisory Briefing — £450
+                Want it applied to your situation? Book an Advisory Briefing — {gbp(AMOUNTS.advisoryBriefing)}
               </h2>
               <p className="mb-4 text-text-muted">
                 A one-hour working session: your tool results, your specific question, a
                 written follow-up.
               </p>
               <p className="mb-6 text-sm italic text-text-muted">
-                £450. Credited in full toward your first month on the Drift Retainer if
+                {gbp(AMOUNTS.advisoryBriefing)}. Credited in full toward your first month on the Drift Retainer if
                 you proceed within 30 days — so if we work together, the conversation was
                 free.
               </p>

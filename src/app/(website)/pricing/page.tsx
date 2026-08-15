@@ -8,29 +8,36 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { FOUNDING_OFFER_ACTIVE, FREE_INTRO_WINDOW, PRE_LAUNCH } from '@/lib/flags'
 import {
+  AMOUNTS,
   ENGAGEMENTS,
   FREE_OFFERINGS,
   MODULES,
+  gbp,
   PRODUCTS,
   type Offering,
 } from '@/lib/offering'
 
+const DESCRIPTION =
+  `Everything Silicon and Stone offers and what it costs — free intelligence and tools, ` +
+  `digital products from ${gbp(AMOUNTS.checklist)}, and advisory engagements from ` +
+  `${gbp(AMOUNTS.advisoryBriefing)} to a standing retainer.`
+
 export const metadata: Metadata = {
   title: 'Pricing | Silicon and Stone',
   description:
-    'Everything Silicon and Stone offers and what it costs — free intelligence and tools, digital products from £24, and advisory engagements from £450 to a standing retainer.',
+    DESCRIPTION,
   alternates: { canonical: '/pricing' },
   openGraph: {
     title: 'Pricing',
     description:
-      'Everything Silicon and Stone offers and what it costs — free intelligence and tools, digital products from £24, and advisory engagements from £450 to a standing retainer.',
+      DESCRIPTION,
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Pricing',
     description:
-      'Everything Silicon and Stone offers and what it costs — free intelligence and tools, digital products from £24, and advisory engagements from £450 to a standing retainer.',
+      DESCRIPTION,
   },
 }
 
@@ -218,7 +225,7 @@ export default function PricingPage() {
                 Founding rate — five companies, launch only.
               </strong>{' '}
               The first five Drift Retainer clients join at{' '}
-              <strong className="font-semibold">£1,500 a month for the first six months</strong>,
+              <strong className="font-semibold">{gbp(AMOUNTS.driftRetainerFounding)} a month for the first six months</strong>,
               then the standard rate. Same Baseline Month guarantee.
             </div>
           )}
@@ -227,7 +234,7 @@ export default function PricingPage() {
             <p className="mt-4 text-sm italic text-text-muted">
               New here? The 25-minute intro conversation is free during our
               launch window — the first ninety days. It is a conversation, not
-              the £450 Briefing, which is a working session on your specific
+              the {gbp(AMOUNTS.advisoryBriefing)} Briefing, which is a working session on your specific
               question.
             </p>
           )}

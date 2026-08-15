@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
+import { AMOUNTS, gbp } from '@/lib/offering'
 
 /**
  * "Take it further" band for product pages — the explicit route from a one-off
@@ -21,14 +22,14 @@ export function AdvisoryNextStep() {
           <p className="mb-8 text-text-muted">
             The buyers who get the most from these products are usually the ones
             already carrying real exposure. If that&apos;s you, the warmest next step is
-            a £450 Advisory Briefing — a one-hour read on your specific situation,
+            a {gbp(AMOUNTS.advisoryBriefing)} Advisory Briefing — a one-hour read on your specific situation,
             credited in full toward a Drift Retainer if you go on to one within 30
             days.
           </p>
           <div className="flex flex-col justify-center gap-4 sm:flex-row">
             <Link href="/advisory#contact">
               <span className="inline-flex items-center gap-1.5 rounded-md bg-accent-fill px-5 py-2.5 text-sm font-semibold text-ink-on-accent transition-colors hover:bg-accent-fill/90">
-                Book an Advisory Briefing — £450
+                Book an Advisory Briefing — {gbp(AMOUNTS.advisoryBriefing)}
                 <ArrowRight className="h-4 w-4" />
               </span>
             </Link>

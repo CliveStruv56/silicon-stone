@@ -34,6 +34,7 @@ import { ReportGate } from '@/components/tools/ReportGate'
 import { CopyMarkdownButton } from '@/components/tools/CopyMarkdownButton'
 import { ToolSubscribeCard } from '@/components/tools/ToolSubscribeCard'
 import { complianceCheckerMarkdown } from '@/lib/tools-markdown'
+import { AMOUNTS, gbp } from '@/lib/offering'
 
 function values(value: AssessmentValue | undefined): string[] {
   if (!value) return []
@@ -89,13 +90,13 @@ interface CtaTarget {
 }
 
 const CHECKLIST_PACK: CtaTarget = {
-  label: 'AI Audit Checklist Pack — £24',
+  label: `AI Audit Checklist Pack — ${gbp(AMOUNTS.checklist)}`,
   href: '/products/ai-audit-checklist',
   blurb: 'Inventory, vendor scorecard, gap analysis, and a board-ready summary. The do-something-today step.',
 }
 
 const COMPLIANCE_TOOLKIT: CtaTarget = {
-  label: 'AI Act Compliance Toolkit — from £79',
+  label: `AI Act Compliance Toolkit — from ${gbp(AMOUNTS.toolkitStandard)}`,
   href: '/products/ai-act-toolkit',
   blurb: 'Risk classification, checklists by category, template policies, and the systems register.',
 }
@@ -103,7 +104,7 @@ const COMPLIANCE_TOOLKIT: CtaTarget = {
 /**
  * Vary the next step by outcome. Pushing the flagship toolkit at someone whose
  * drafting assistant came back minimal-risk is the fastest way to teach them
- * the result was not really read — so the £24 pack leads there, and the
+ * the result was not really read — so the cheaper pack leads there, and the
  * toolkit leads only where the work is genuinely toolkit-shaped.
  */
 function resultCta(classification: string, role: string): { primary: CtaTarget; secondary: CtaTarget } {

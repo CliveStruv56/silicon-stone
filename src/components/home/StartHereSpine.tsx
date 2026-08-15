@@ -5,6 +5,7 @@ import { ArrowRight } from 'lucide-react'
 import { StaggerContainer, StaggerItem } from '@/components/ui/StaggerContainer'
 import { ForensicCard } from '@/components/ui/ForensicCard'
 import { Badge } from '@/components/ui/badge'
+import { AMOUNTS, gbp } from '@/lib/offering'
 
 type Rung = {
   marker: string
@@ -35,7 +36,7 @@ const rungs: Rung[] = [
     tone: 'free',
   },
   {
-    marker: 'From £24',
+    marker: `From ${gbp(AMOUNTS.checklist)}`,
     title: 'Buy',
     body: 'Practical Tools for Compliance and Strategy',
     cta: 'See Products',
@@ -43,7 +44,7 @@ const rungs: Rung[] = [
     tone: 'paid',
   },
   {
-    marker: 'From £2,000/mo',
+    marker: `From ${gbp(AMOUNTS.driftRetainerMonthly)}/mo`,
     title: 'Retain',
     body: 'A standing read on the drift, so your leadership team is never blindsided. Diagnostics and assessments scope into an ongoing relationship.',
     cta: 'Explore Advisory',

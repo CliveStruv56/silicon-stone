@@ -18,6 +18,7 @@ import {
   Briefcase,
   Building2,
 } from 'lucide-react'
+import { AMOUNTS, gbp } from '@/lib/offering'
 
 const briefings = [
   {
@@ -94,8 +95,8 @@ export default function BriefingsProductPage() {
                 exposure assessment, and geopolitical risk — tailored to specific industries.
               </p>
               <div className="flex items-center gap-4">
-                <div className="text-2xl font-mono font-bold text-text-muted">£39 each</div>
-                <div className="text-sm text-text-muted">or 3 for £99</div>
+                <div className="text-2xl font-mono font-bold text-text-muted">{gbp(AMOUNTS.sectorReport)} each</div>
+                <div className="text-sm text-text-muted">or 3 for {gbp(AMOUNTS.sectorReportTrio)}</div>
               </div>
             </div>
           </div>

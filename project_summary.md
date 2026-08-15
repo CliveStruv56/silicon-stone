@@ -289,6 +289,12 @@ briefing starts from · £450 Advisory Briefing → credited in full to month on
 £2,500+ Post-Omnibus Briefing → extends into a Retainer · £2,500+ Exposure
 Diagnostic → credited to the first retainer quarter.
 
+**Source of truth**: every figure above is rendered from `src/lib/offering.ts`
+(`AMOUNTS` for the raw numbers, `DERIVED` for the sums of them), enforced by
+`src/lib/offering.test.ts`, which fails the build on any hard-coded `£` in
+`src/`. The one copy it cannot reach is the three Sanity `product` documents'
+`priceLabel`, edited in Studio, which drives the end-of-article gate.
+
 **Checkout note**: Lemon Squeezy is the intended merchant of record for 5.2.
 Until its URLs and variant IDs are configured (`LAUNCH.md` §0), product buttons
 open the early-access capture rather than a checkout, and the Sanity products'
@@ -457,6 +463,42 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 15, 2026 — every price now comes from the catalogue, and a test keeps it that way
+
+The prose pages were the last holdouts: `/products` and its three subpages,
+`/advisory`, `/eu-exposure`, `/products/success`, the four homepage bands,
+`LadderBox`, `AdvisoryNextStep`, `EvidencePackTeaser` and the Compliance
+Checker's CTA labels all held their own price literals. They now interpolate
+`gbp(AMOUNTS.x)` from `src/lib/offering.ts`, prose included.
+
+**`AMOUNTS` is now the only place a price is typed**, and `DERIVED` computes
+the figures that are arithmetic on other figures — `toolkitAfterDiscount` (£59),
+`bundleTotal` (£83), `bundleSeparately` (£103), `toolkitAfterEvidencePack`
+(£40). Those four were hand-written on the Checklist and success pages, so
+moving the Toolkit price would have left the "£83 vs £103 separately" claim
+quietly wrong in two places.
+
+**`src/lib/offering.test.ts` enforces it** rather than leaving it to a comment:
+it asserts the arithmetic, asserts that every id the header nav passes to
+`priceOf()` still resolves, and walks `src/` failing on any `£` outside a
+four-file allowlist (the catalogue, its own test, the Sanity schema's example
+string, and the gate fixtures, which must pin their own values). Writing it
+immediately caught a surface nobody had listed: **`src/lib/prompts.ts` was
+telling the article-drafting model to "mention the £24 AI Audit Checklist Pack
+or the £79 AI Act Compliance Toolkit"** — a price claim that would have been
+written into published articles, where no amount of fixing the website reaches
+it. Now interpolated like everything else.
+
+Verified page by page: the rendered price sets on `/`, `/products`, all three
+product pages, `/advisory`, `/eu-exposure` and `/pricing` are unchanged from
+before the refactor, and the Ladder box renders character-for-character
+identically (its emphasis moved into the `LADDER` data rather than being
+inferred from string positions). 232 tests green, `next build` passes.
+
+The single remaining manual copy is Sanity: the three `product` documents'
+`priceLabel`, authored in Studio, which drives the end-of-article gate. Change
+a product price in code and change it there too.
+
 ### August 15, 2026 — `/pricing` shipped, and one source of truth behind it
 
 New public route `src/app/(website)/pricing/page.tsx` — every price on one
@@ -471,13 +513,8 @@ the founding-rate and free-intro blocks appear only while their flags are on.
 The page is rendered from **`src/lib/offering.ts`**, a new typed catalogue that
 is the point of the exercise — the audit that started this session found the
 same figures restated across nine surfaces and drifted apart on six of them, so
-`/pricing` had to not become the tenth copy. The header nav now reads its price
-notes from `priceOf()` rather than holding its own literals. The prose pages
-(`/products`, `/advisory`, `/eu-exposure` and the three product subpages) still
-carry their own copies because their prices are woven into sentences; the
-module header lists every one of those surfaces so a figure change has a
-checklist rather than a memory test. `project_summary.md` §5 remains the
-written record.
+`/pricing` had to not become the tenth copy. **Every surface now reads from it**
+(see the following entry). `project_summary.md` §5 remains the written record.
 
 Also published a printable rate card as a Claude artifact — *The Commitment
 Ladder*, the same catalogue set as a one-sheet ledger for print. It follows the

@@ -22,6 +22,7 @@ import {
   FileCheck2,
   CalendarClock,
 } from 'lucide-react'
+import { AMOUNTS, gbp } from '@/lib/offering'
 
 export const metadata: Metadata = {
   title: 'AI Act Compliance Toolkit | Silicon and Stone',
@@ -101,7 +102,7 @@ export default function AIActToolkitPage() {
                   and set review triggers.
                 </p>
                 <div className="flex items-center gap-4 mb-8">
-                  <div className="text-3xl font-mono font-bold text-silicon-amber-strong">£79</div>
+                  <div className="text-3xl font-mono font-bold text-silicon-amber-strong">{gbp(AMOUNTS.toolkitStandard)}</div>
                   <div className="text-sm text-text-muted">
                     Standard Package<br />
                     PDF + Spreadsheets
@@ -111,7 +112,7 @@ export default function AIActToolkitPage() {
                   {standardBuyable ? (
                     <Button size="lg" className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90 font-semibold" asChild>
                       <a href={checkoutUrls.standard} target="_blank" rel="noopener noreferrer" className="plausible-event-name=Buy+Toolkit+Standard">
-                        Buy Standard — £79
+                        Buy Standard — {gbp(AMOUNTS.toolkitStandard)}
                       </a>
                     </Button>
                   ) : (
@@ -125,7 +126,7 @@ export default function AIActToolkitPage() {
                   {professionalBuyable ? (
                     <Button size="lg" variant="outline" className="border-stone-teal text-stone-teal hover:bg-stone-teal/10" asChild>
                       <a href={checkoutUrls.professional} target="_blank" rel="noopener noreferrer" className="plausible-event-name=Buy+Toolkit+Professional">
-                        Buy Professional — £149
+                        Buy Professional — {gbp(AMOUNTS.toolkitProfessional)}
                       </a>
                     </Button>
                   ) : (
@@ -254,7 +255,7 @@ export default function AIActToolkitPage() {
                     AI Systems Register spreadsheet; Compliance Tracker with dashboard;
                     quarterly update emails
                   </td>
-                  <td className="whitespace-nowrap px-4 py-4 align-top font-mono font-bold text-silicon-amber-strong">£79</td>
+                  <td className="whitespace-nowrap px-4 py-4 align-top font-mono font-bold text-silicon-amber-strong">{gbp(AMOUNTS.toolkitStandard)}</td>
                 </tr>
                 <tr>
                   <td className="whitespace-nowrap px-4 py-4 align-top font-semibold text-text-primary">Professional</td>
@@ -266,14 +267,14 @@ export default function AIActToolkitPage() {
                     recorded by the author — how to apply each section to your specific
                     situation
                   </td>
-                  <td className="whitespace-nowrap px-4 py-4 align-top font-mono font-bold text-silicon-amber-strong">£149</td>
+                  <td className="whitespace-nowrap px-4 py-4 align-top font-mono font-bold text-silicon-amber-strong">{gbp(AMOUNTS.toolkitProfessional)}</td>
                 </tr>
               </tbody>
             </table>
           </div>
           <p className="mt-4 max-w-3xl text-sm italic text-text-muted">
             Professional: thirty minutes of video, applying each section to a business
-            like yours. £149 — still less than an hour of any consultant&rsquo;s time.
+            like yours. {gbp(AMOUNTS.toolkitProfessional)} — still less than an hour of any consultant&rsquo;s time.
           </p>
         </section>
 
@@ -322,7 +323,7 @@ export default function AIActToolkitPage() {
                 {standardBuyable ? (
                   <Button size="lg" className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90 font-semibold" asChild>
                     <a href={checkoutUrls.standard} target="_blank" rel="noopener noreferrer">
-                      Buy Standard — £79
+                      Buy Standard — {gbp(AMOUNTS.toolkitStandard)}
                     </a>
                   </Button>
                 ) : (
@@ -336,7 +337,7 @@ export default function AIActToolkitPage() {
                 {professionalBuyable ? (
                   <Button size="lg" variant="outline" className="border-stone-teal text-stone-teal hover:bg-stone-teal/10" asChild>
                     <a href={checkoutUrls.professional} target="_blank" rel="noopener noreferrer">
-                      Buy Professional — £149
+                      Buy Professional — {gbp(AMOUNTS.toolkitProfessional)}
                     </a>
                   </Button>
                 ) : (
@@ -355,9 +356,9 @@ export default function AIActToolkitPage() {
               <p className="text-sm text-text-muted">
                 Not sure yet?{' '}
                 <Link href="/products/ai-audit-checklist" className="text-stone-teal hover:underline">
-                  Start with the Audit Checklist Pack (£24)
+                  Start with the Audit Checklist Pack ({gbp(AMOUNTS.checklist)})
                 </Link>
-                {' '}and get a £20 discount on this toolkit.
+                {' '}and get a {gbp(AMOUNTS.toolkitDiscount)} discount on this toolkit.
               </p>
               <p className="mt-3 text-sm text-text-muted">
                 Need the systems register built and evidenced for you?{' '}

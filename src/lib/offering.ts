@@ -3,27 +3,86 @@
  *
  * This exists because they were in nine. A 2026-08-15 audit found the same
  * figures restated across `/products`, `/advisory`, `/eu-exposure`, the three
- * product subpages, the header nav, three homepage bands, `LadderBox` and the
- * Sanity `product` documents — and found six places where they had drifted
- * apart. This module is what `/pricing` renders and what the header nav reads
- * its price notes from.
+ * product subpages, the header nav, three homepage bands and `LadderBox` — and
+ * found six places where they had drifted apart. Every one of those surfaces
+ * now reads from here. `AMOUNTS` is the only place a number is typed.
  *
- * It is NOT yet the source every surface reads. The prose pages weave prices
- * into sentences ("still less than an hour of any consultant's time"), so they
- * still hold their own copies. When you change a figure here, change it in:
+ * Two rules keep it that way:
  *
- *   /products               `products/page.tsx` (grid) + `home/ProductsBand.tsx`
- *   the three product pages `products/{ai-audit-checklist,ai-act-toolkit,sector-reports}/page.tsx`
- *   /advisory               `advisory/page.tsx` (`assessments`, `tiers`, the
- *                           retainer card, the bespoke band)
- *   /eu-exposure            `eu-exposure/page.tsx`
- *   the ladder              `products/LadderBox.tsx`
- *   the homepage spine      `home/StartHereSpine.tsx`, `home/AdvisoryBand.tsx`
- *   Sanity                  the three `product` documents' `priceLabel`
+ *  1. **Never write a price as a literal in a component.** Interpolate
+ *     `gbp(AMOUNTS.x)` or one of the `DERIVED` figures, even inside prose. A
+ *     sentence like "£83 for both rather than £103" is arithmetic on two other
+ *     prices, and hand-written arithmetic is exactly what goes stale first.
+ *  2. **The one copy that cannot import this** is Sanity: the three `product`
+ *     documents carry their own `priceLabel`, edited in Studio, and drive the
+ *     end-of-article gate. Change a product price here and change it there too
+ *     — that is the single remaining manual step.
+ *
+ * Rule 1 is enforced, not trusted: `offering.test.ts` walks `src/` and fails on
+ * any `£` outside a short allowlist. It caught `prompts.ts` quoting product
+ * prices at the article-drafting model on the day it was written.
  *
  * Every figure below is a commercial claim. `project_summary.md` §5 is the
  * written record of what is on sale and why.
  */
+
+/**
+ * The raw figures, in pounds. Everything displayed anywhere is derived from
+ * these — nothing else in the codebase should contain a price as a number or
+ * a hard-coded "£" string.
+ */
+export const AMOUNTS = {
+  /** Products. */
+  checklist: 24,
+  toolkitStandard: 79,
+  toolkitProfessional: 149,
+  sectorReport: 39,
+  sectorReportTrio: 99,
+  evidencePack: 39,
+  /** The credit the Checklist Pack ships against the Toolkit. */
+  toolkitDiscount: 20,
+
+  /** Advisory. */
+  advisoryBriefing: 450,
+  exposureDiagnostic: 2500,
+  postOmnibusBriefing: 2500,
+  procurementAddOn: 1500,
+  driftRetainerMonthly: 2000,
+  /** Twelve months for the price of ten. */
+  driftRetainerAnnual: 20000,
+  /** Founding rate, first five clients, first six months. */
+  driftRetainerFounding: 1500,
+  strategicAssessment: 8000,
+  bespokeFloor: 25000,
+  bespokeCeiling: 50000,
+
+  /** Follow-on modules. */
+  moduleFloor: 3500,
+  aiBillOfMaterials: 4500,
+  sovereignArchitectureReview: 6500,
+} as const
+
+/** Format an amount as sterling: 24 → "£24", 25000 → "£25,000". */
+export function gbp(amount: number): string {
+  return `£${amount.toLocaleString('en-GB')}`
+}
+
+/**
+ * Figures that are arithmetic on the ones above. These used to be typed out by
+ * hand on the product pages, which is why the Checklist page could have gone on
+ * claiming an £83 bundle after either half of it moved.
+ */
+export const DERIVED = {
+  /** Toolkit price after applying the Checklist Pack's credit. */
+  toolkitAfterDiscount: AMOUNTS.toolkitStandard - AMOUNTS.toolkitDiscount,
+  /** Checklist + discounted Toolkit — what the ladder actually costs. */
+  bundleTotal:
+    AMOUNTS.checklist + (AMOUNTS.toolkitStandard - AMOUNTS.toolkitDiscount),
+  /** The same two bought cold. */
+  bundleSeparately: AMOUNTS.checklist + AMOUNTS.toolkitStandard,
+  /** Toolkit price after the Evidence Pack's credit. */
+  toolkitAfterEvidencePack: AMOUNTS.toolkitStandard - AMOUNTS.evidencePack,
+} as const
 
 export interface Offering {
   /** Stable key — used for nav lookups and React keys, never displayed. */
@@ -86,19 +145,19 @@ export const PRODUCTS: Offering[] = [
   {
     id: 'ai-audit-checklist',
     name: 'AI Audit Checklist Pack',
-    price: '£24',
+    price: gbp(AMOUNTS.checklist),
     summary:
       'The first paid step. Systems inventory, vendor dependency scorecard, quick gap analysis and a board-ready risk summary.',
     href: '/products/ai-audit-checklist',
     terms: [
-      'Includes a £20 discount code for the Compliance Toolkit, valid 90 days — £83 for both rather than £103.',
+      `Includes a ${gbp(AMOUNTS.toolkitDiscount)} discount code for the Compliance Toolkit, valid 90 days — ${gbp(DERIVED.bundleTotal)} for both rather than ${gbp(DERIVED.bundleSeparately)}.`,
     ],
   },
   {
     id: 'ai-act-toolkit',
     name: 'AI Act Compliance Toolkit',
-    price: '£79',
-    priceNote: 'Standard · £149 Professional',
+    price: gbp(AMOUNTS.toolkitStandard),
+    priceNote: `Standard · ${gbp(AMOUNTS.toolkitProfessional)} Professional`,
     summary:
       'The governance toolkit: risk-classification decision tree, checklists by risk category, template policies, a Systems Register and a Compliance Tracker, against the phased AI Act timetable.',
     href: '/products/ai-act-toolkit',
@@ -110,8 +169,8 @@ export const PRODUCTS: Offering[] = [
   {
     id: 'sector-reports',
     name: 'Sector Reports',
-    price: '£39',
-    priceNote: 'each · or three for £99',
+    price: gbp(AMOUNTS.sectorReport),
+    priceNote: `each · or three for ${gbp(AMOUNTS.sectorReportTrio)}`,
     summary:
       '15–20 page briefings per industry: AI landscape, regulatory exposure, geopolitical risk, three scenarios and a 90-day checklist.',
     href: '/products/sector-reports',
@@ -120,11 +179,13 @@ export const PRODUCTS: Offering[] = [
   {
     id: 'evidence-pack',
     name: 'Compliance Checker Evidence Pack',
-    price: '£39',
+    price: gbp(AMOUNTS.evidencePack),
     summary:
       'The full written evidence pack behind your Compliance Checker result — every claim string-matched against the pinned statute before you see it.',
     href: '/tools/compliance-checker',
-    terms: ['The £39 credits against the £79 Toolkit, making that upgrade £40.'],
+    terms: [
+      `The ${gbp(AMOUNTS.evidencePack)} credits against the ${gbp(AMOUNTS.toolkitStandard)} Toolkit, making that upgrade ${gbp(DERIVED.toolkitAfterEvidencePack)}.`,
+    ],
     status: 'Not yet on sale',
   },
 ]
@@ -134,7 +195,7 @@ export const ENGAGEMENTS: Offering[] = [
   {
     id: 'advisory-briefing',
     name: 'Advisory Briefing',
-    price: '£450',
+    price: gbp(AMOUNTS.advisoryBriefing),
     priceNote: 'one hour',
     summary:
       'A focused consultation on your tool results and one specific question, with a written follow-up. The low-commitment way to test the water.',
@@ -146,7 +207,7 @@ export const ENGAGEMENTS: Offering[] = [
   {
     id: 'exposure-diagnostic',
     name: 'The Exposure Diagnostic',
-    price: 'From £2,500',
+    price: `From ${gbp(AMOUNTS.exposureDiagnostic)}`,
     priceNote: 'custom scope',
     summary:
       'Where your dependency on specific vendors, models and jurisdictions becomes an operating constraint — with a 15–25 page report and a 30-day follow-up call.',
@@ -159,14 +220,14 @@ export const ENGAGEMENTS: Offering[] = [
   {
     id: 'post-omnibus-briefing',
     name: 'The Post-Omnibus Briefing',
-    price: 'From £2,500',
+    price: `From ${gbp(AMOUNTS.postOmnibusBriefing)}`,
     priceNote: 'fixed price, fixed scope',
     summary:
       'For US and UK companies selling into Europe: what the AI Act now actually requires of you after the Digital Omnibus, in plain English, delivered within three weeks.',
     href: '/eu-exposure',
     terms: [
       'Written briefing of 15–25 pages, an executive summary and one interpretation call.',
-      'European Procurement Readiness add-on from £1,500.',
+      `European Procurement Readiness add-on from ${gbp(AMOUNTS.procurementAddOn)}.`,
       'Extends into a Drift Retainer where the exposure is ongoing.',
     ],
   },
@@ -175,21 +236,21 @@ export const ENGAGEMENTS: Offering[] = [
     name: 'The Drift Retainer',
     // "From", not a flat rate: the tier card on /advisory reads "From
     // £2,000/mo" and the header note is built from this string.
-    price: 'From £2,000',
+    price: `From ${gbp(AMOUNTS.driftRetainerMonthly)}`,
     priceNote: 'per month · three-month initial term',
     summary:
       'The standing relationship. A board-forwardable monthly briefing, a working session on one live decision, direct access between sessions, and a quarterly written exposure review.',
     href: '/advisory#retainer',
     terms: [
       'The Baseline Month guarantee: after month one, walk away paying that month only.',
-      'Twelve months for the price of ten — £20,000 a year.',
+      `Twelve months for the price of ten — ${gbp(AMOUNTS.driftRetainerAnnual)} a year.`,
       'Limited to a handful of client companies at any time.',
     ],
   },
   {
     id: 'strategic-assessment',
     name: 'Strategic Assessment',
-    price: 'From £8,000',
+    price: `From ${gbp(AMOUNTS.strategicAssessment)}`,
     priceNote: 'then transitions to retainer',
     summary:
       'The deep one-off for a high-stakes decision: multi-framework analysis, a 40-page report, a board-ready presentation and an implementation roadmap.',
@@ -201,7 +262,7 @@ export const ENGAGEMENTS: Offering[] = [
   {
     id: 'board-level',
     name: 'Board-level and multi-entity engagements',
-    price: '£25,000–£50,000',
+    price: `${gbp(AMOUNTS.bespokeFloor)}–${gbp(AMOUNTS.bespokeCeiling)}`,
     priceNote: 'bespoke',
     summary:
       'For a group, multi-jurisdiction exposure or a board-level mandate — scoped to the question, then settling into a Drift Retainer for ongoing oversight.',
@@ -218,7 +279,7 @@ export const MODULES: Offering[] = [
   {
     id: 'sovereign-architecture-review',
     name: 'Sovereign Architecture Review',
-    price: 'From £6,500',
+    price: `From ${gbp(AMOUNTS.sovereignArchitectureReview)}`,
     summary:
       'Where inference, weights and keys sit, who can reach them, and whether you can satisfy a buyer’s sovereignty demand without re-architecting.',
     href: '/advisory#modules',
@@ -226,7 +287,7 @@ export const MODULES: Offering[] = [
   {
     id: 'ai-bill-of-materials',
     name: 'AI Bill of Materials',
-    price: 'From £4,500',
+    price: `From ${gbp(AMOUNTS.aiBillOfMaterials)}`,
     summary:
       'Every model, dataset, fine-tune, wrapper, API and library, version-tracked, with provenance and licence status — before a regulator or a buyer asks.',
     href: '/advisory#modules',
@@ -235,7 +296,7 @@ export const MODULES: Offering[] = [
   {
     id: 'manufacturing-exposure',
     name: 'Manufacturing Exposure Module',
-    price: 'From £3,500',
+    price: `From ${gbp(AMOUNTS.moduleFloor)}`,
     summary:
       'Semiconductor, cloud, supplier and operational dependencies mapped where they matter, with chokepoints and procurement questions.',
     href: '/advisory#modules',
@@ -243,7 +304,7 @@ export const MODULES: Offering[] = [
   {
     id: 'scenario-impact',
     name: 'Scenario Impact Analysis',
-    price: 'From £3,500',
+    price: `From ${gbp(AMOUNTS.moduleFloor)}`,
     summary:
       'Custom geopolitical scenario modelling for your industry and geography, with value-at-stake quantified by business unit.',
     href: '/advisory#modules',
@@ -251,7 +312,7 @@ export const MODULES: Offering[] = [
   {
     id: 'regulatory-friction',
     name: 'Regulatory Friction Assessment',
-    price: 'From £3,500',
+    price: `From ${gbp(AMOUNTS.moduleFloor)}`,
     summary:
       'US versus EU compliance gap analysis, friction-scored for your operations, with a priority matrix and a transatlantic roadmap.',
     href: '/advisory#modules',
@@ -262,12 +323,21 @@ export const MODULES: Offering[] = [
  * The credit chain. Kept in step with `LadderBox`, which renders the same
  * five rungs on `/products` and `/advisory`.
  */
-export const LADDER: Array<{ from: string; to: string }> = [
-  { from: '£24 Checklist Pack', to: '£20 off the AI Act Compliance Toolkit.' },
-  { from: '£79+ Compliance Toolkit', to: 'the evidence base a briefing starts from.' },
-  { from: '£450 Advisory Briefing', to: 'credited in full to your first retainer month.' },
-  { from: '£2,500+ Post-Omnibus Briefing', to: 'extends into a Drift Retainer where the exposure is ongoing.' },
-  { from: '£2,500+ Exposure Diagnostic', to: 'credited to your first retainer quarter.' },
+export const LADDER: Array<{
+  from: string
+  /**
+   * The part of the outcome that moves money, emphasised when rendered. Absent
+   * on the rungs that are scope progressions rather than credits — those must
+   * not be bolded as if they discounted something.
+   */
+  emphasis?: string
+  to: string
+}> = [
+  { from: `${gbp(AMOUNTS.checklist)} Checklist Pack`, emphasis: `${gbp(AMOUNTS.toolkitDiscount)} off`, to: 'the AI Act Compliance Toolkit.' },
+  { from: `${gbp(AMOUNTS.toolkitStandard)}+ Compliance Toolkit`, to: 'the evidence base a briefing starts from.' },
+  { from: `${gbp(AMOUNTS.advisoryBriefing)} Advisory Briefing`, emphasis: 'credited in full', to: 'to your first retainer month.' },
+  { from: `${gbp(AMOUNTS.postOmnibusBriefing)}+ Post-Omnibus Briefing`, to: 'extends into a Drift Retainer where the exposure is ongoing.' },
+  { from: `${gbp(AMOUNTS.exposureDiagnostic)}+ Exposure Diagnostic`, emphasis: 'credited', to: 'to your first retainer quarter.' },
 ]
 
 /** Look up a display price by offering id, for surfaces that show only that. */
