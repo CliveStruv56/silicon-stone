@@ -82,6 +82,27 @@ is the safety property.
   different model. `npm run reg:verify-index` asserts this against the live
   index; `--create` provisions one correctly.
 
+## Pricing (load-bearing — do not break)
+
+Every price the site shows comes from `src/lib/offering.ts`. `AMOUNTS` is the
+only place a figure is typed; `DERIVED` computes the ones that are arithmetic
+on others (the "£83 for both rather than £103" line is a sum of two prices, not
+a third price). Components interpolate `gbp(AMOUNTS.x)` — **never** write a `£`
+literal in a page or component, prose included.
+
+Two checks enforce this, and both are meant to be annoying:
+
+- `src/lib/offering.test.ts` walks `src/` and fails on any `£` outside a
+  four-file allowlist. Add to the allowlist only with a reason.
+- `npm run test:sanity-prices` fails CI when a published Sanity `product`
+  document's `priceLabel` / `name` / `productPath` disagrees with
+  `SANITY_PRODUCTS`. Those three documents are the one copy code cannot import,
+  and the end-of-article gate renders them, so changing a product price means
+  changing `AMOUNTS` **and** the document in Studio.
+
+A price is a commercial claim. `project_summary.md` §5 is the written record of
+what is on sale, at what, and why.
+
 ## CLI scripts and `server-only`
 
 Several `src/lib` modules start with `import 'server-only'`, which throws under

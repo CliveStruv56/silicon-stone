@@ -290,10 +290,11 @@ briefing starts from · £450 Advisory Briefing → credited in full to month on
 Diagnostic → credited to the first retainer quarter.
 
 **Source of truth**: every figure above is rendered from `src/lib/offering.ts`
-(`AMOUNTS` for the raw numbers, `DERIVED` for the sums of them), enforced by
-`src/lib/offering.test.ts`, which fails the build on any hard-coded `£` in
-`src/`. The one copy it cannot reach is the three Sanity `product` documents'
-`priceLabel`, edited in Studio, which drives the end-of-article gate.
+(`AMOUNTS` for the raw numbers, `DERIVED` for the sums of them). Two checks
+keep it that way: `src/lib/offering.test.ts` fails on any hard-coded `£` in
+`src/`, and `npm run test:sanity-prices` (CI) fails when a published Sanity
+`product` document disagrees with `SANITY_PRODUCTS`. There is no longer an
+unguarded copy of a price anywhere.
 
 **Checkout note**: Lemon Squeezy is the intended merchant of record for 5.2.
 Until its URLs and variant IDs are configured (`LAUNCH.md` §0), product buttons
@@ -462,6 +463,37 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 15, 2026 — CI now fails when Sanity and the code disagree on a price
+
+`scripts/sanity-price-checks.ts` (`npm run test:sanity-prices`, wired into
+`.github/workflows/check.yml`) closes the last gap. The three Sanity `product`
+documents hold the one price the code cannot import, and it is that string the
+end-of-article upsell gate renders — so drift there is invisible on every page
+of the site and visible only to a reader who has just finished an article and is
+as persuaded as they will ever be. `SANITY_PRODUCTS` in the catalogue now
+declares what those documents must say (`priceLabel`, `name`, `productPath`),
+derived from `AMOUNTS`; the script fetches and compares.
+
+Four failure modes, deliberately distinguished:
+
+- **Published mismatch → fail**, with a two-column diff naming the document and
+  field and telling you which side to change.
+- **Draft mismatch → warn only.** The site serves published documents, and
+  failing CI over a half-edited document open in Studio would train everyone to
+  ignore the check. Drafts are only inspected when `SANITY_API_READ_TOKEN` is
+  set; without one the script says so rather than implying it looked.
+- **A product document missing, or one in Sanity the catalogue has never heard
+  of → fail.** The gate can select an unknown SKU and sell it at a price no page
+  on the site shows.
+- **Sanity unreachable → fail, but say so plainly.** A check that silently
+  passes when it could not run is worse than no check; the message states it is
+  *not* a price mismatch so nobody hunts a price that was never wrong.
+
+Not in `prebuild`, deliberately: it needs the network, and a Sanity blip must
+not be able to fail a Vercel deploy. Verified both ways — passes against live
+Sanity, and fails with the right message when `AMOUNTS.sectorReport` is
+temporarily moved to 44.
 
 ### August 15, 2026 — every price now comes from the catalogue, and a test keeps it that way
 

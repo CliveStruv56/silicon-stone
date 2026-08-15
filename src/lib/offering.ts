@@ -15,12 +15,19 @@
  *     prices, and hand-written arithmetic is exactly what goes stale first.
  *  2. **The one copy that cannot import this** is Sanity: the three `product`
  *     documents carry their own `priceLabel`, edited in Studio, and drive the
- *     end-of-article gate. Change a product price here and change it there too
- *     — that is the single remaining manual step.
+ *     end-of-article gate. Change a product price here and change it there too.
+ *     `SANITY_PRODUCTS` below declares what those documents must say.
  *
- * Rule 1 is enforced, not trusted: `offering.test.ts` walks `src/` and fails on
- * any `£` outside a short allowlist. It caught `prompts.ts` quoting product
- * prices at the article-drafting model on the day it was written.
+ * Neither rule is trusted; both are enforced.
+ *
+ *   `offering.test.ts`            walks `src/` and fails on any `£` outside a
+ *                                 short allowlist. It caught `prompts.ts`
+ *                                 quoting product prices at the
+ *                                 article-drafting model on the day it was
+ *                                 written.
+ *   `npm run test:sanity-prices`  fetches the three documents and fails CI when
+ *                                 a published one disagrees with
+ *                                 `SANITY_PRODUCTS`.
  *
  * Every figure below is a commercial claim. `project_summary.md` §5 is the
  * written record of what is on sale and why.
@@ -338,6 +345,46 @@ export const LADDER: Array<{
   { from: `${gbp(AMOUNTS.advisoryBriefing)} Advisory Briefing`, emphasis: 'credited in full', to: 'to your first retainer month.' },
   { from: `${gbp(AMOUNTS.postOmnibusBriefing)}+ Post-Omnibus Briefing`, to: 'extends into a Drift Retainer where the exposure is ongoing.' },
   { from: `${gbp(AMOUNTS.exposureDiagnostic)}+ Exposure Diagnostic`, emphasis: 'credited', to: 'to your first retainer quarter.' },
+]
+
+/**
+ * What the three Sanity `product` documents must say.
+ *
+ * These documents are authored in Studio and drive the end-of-article upsell
+ * gate, so they are the one copy of a price that cannot import this module.
+ * Instead the expectation is declared here — derived from `AMOUNTS`, so it
+ * cannot drift from the rest of the site — and `npm run test:sanity-prices`
+ * fails CI when a published document disagrees.
+ *
+ * The `From ` prefixes are not decoration: the gate renders this string
+ * verbatim as its CTA ("Get it — From £39"), and the toolkit and sector
+ * reports both have tiers above their headline figure.
+ */
+export const SANITY_PRODUCTS: Array<{
+  /** Sanity document `_id` (published, no `drafts.` prefix). */
+  documentId: string
+  name: string
+  priceLabel: string
+  productPath: string
+}> = [
+  {
+    documentId: 'product-ai-audit-checklist',
+    name: 'AI Audit Checklist Pack',
+    priceLabel: gbp(AMOUNTS.checklist),
+    productPath: '/products/ai-audit-checklist',
+  },
+  {
+    documentId: 'product-ai-act-toolkit',
+    name: 'AI Act Compliance Toolkit',
+    priceLabel: `From ${gbp(AMOUNTS.toolkitStandard)}`,
+    productPath: '/products/ai-act-toolkit',
+  },
+  {
+    documentId: 'product-sector-reports',
+    name: 'Sector Reports',
+    priceLabel: `From ${gbp(AMOUNTS.sectorReport)}`,
+    productPath: '/products/sector-reports',
+  },
 ]
 
 /** Look up a display price by offering id, for surfaces that show only that. */

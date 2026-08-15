@@ -36,6 +36,7 @@
     "evidence:rebuild:dry": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/rebuild-evidence-index.ts --dry-run",
     "test:evidence-index": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/evidence-index-checks.ts",
     "test:pwa": "tsx scripts/pwa-checks.ts",
+    "test:sanity-prices": "tsx scripts/sanity-price-checks.ts",
     "render-briefing": "tsx scripts/render-briefing-pdf.ts",
     "draft:local": "TSX_TSCONFIG_PATH=scripts/local-draft/tsconfig.json tsx scripts/local-draft/pipeline.ts",
     "graph": "bash scripts/view-graph.sh"

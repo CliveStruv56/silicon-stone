@@ -153,6 +153,11 @@ one extra click between a reader and a payment.
     **Restore `semiconductors`, `us-technopolitics` and `atlantic-drift` when
     the first sector report is actually on sale** — until then those articles
     correctly fall back to the newsletter gate.
+- [ ] **Do not retype a `priceLabel` in Studio.** `npm run test:sanity-prices`
+      fails CI when a published product document's `priceLabel`, `name` or
+      `productPath` disagrees with `SANITY_PRODUCTS` in `src/lib/offering.ts`.
+      A price change is two edits, in this order: `AMOUNTS` in the catalogue
+      (which moves every page at once), then the matching Studio document.
 - [ ] `lemonVariantId` is only read for Model-B on-site unlock. All three
       products are `deliveryModel: download`, so leave it blank.
 - [ ] An article only gets a commerce gate if its `categories` intersect a

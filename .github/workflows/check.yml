@@ -21,6 +21,16 @@ jobs:
       - run: npm run test:style-rules
       - run: npm run test:knowledge-inbox
       - run: npm run test:evidence-index
+      # The three Sanity `product` documents hold the one price the code cannot
+      # import, and the end-of-article gate renders it. Deliberately not in
+      # `prebuild`: it needs the network, and a Sanity blip must not be able to
+      # fail a Vercel deploy. SANITY_API_READ_TOKEN is optional — with it the
+      # run also warns about drafts that would break on publish.
+      - run: npm run test:sanity-prices
+        env:
+          NEXT_PUBLIC_SANITY_PROJECT_ID: 3q59mpd7
+          NEXT_PUBLIC_SANITY_DATASET: production
+          SANITY_API_READ_TOKEN: ${{ secrets.SANITY_API_READ_TOKEN }}
       # Catch server/client-boundary breakage that lint+typecheck miss —
       # otherwise it surfaces only as a failed Vercel deploy.
       - run: npm run build
