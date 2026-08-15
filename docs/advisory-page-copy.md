@@ -1,6 +1,15 @@
 # Advisory Page — Finished Copy
 
-*Drop-in copy for the `/advisory` rebuild. UK English, house voice. Prices are placeholders calibrated to UK mid-market fractional rates (£3,500–5,000/mo retainers; diagnostics £2,500+; assessment £8,000+) — set your own final numbers.*
+*Drop-in copy for the `/advisory` rebuild. UK English, house voice.*
+
+> **The prices below are the placeholders this copy was drafted against, and
+> several are not what shipped.** Live figures (2026-08-15): Advisory Briefing
+> **£450**, Exposure Diagnostic **from £2,500**, Drift Retainer **£2,000/mo**
+> (not £3,500–5,000), Strategic Assessment **from £8,000**, follow-on modules
+> **from £3,500**. Do not paste a price out of this file — take it from
+> `src/lib/offering.ts`, which every page and `/pricing` render from. The
+> engagement formerly called the *Focused Diagnostic* here shipped as **The
+> Exposure Diagnostic**.
 
 ---
 

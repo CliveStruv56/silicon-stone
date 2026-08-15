@@ -80,7 +80,7 @@ Three discipline rules, taped to your monitor:
 > Listen for: the actual objection. "Didn't know who to call" is a gift. "Not urgent" is the wall you need to understand.
 
 **13.** Roughly what would a problem like this have to cost the business before someone said "right, we need to spend real money to fix it"?
-> Listen for: their internal trigger threshold. Tells you whether your £2,500–£3,500 numbers are trivial or terrifying to them.
+> Listen for: their internal trigger threshold. Tells you whether your £2,000–£2,500 numbers are trivial or terrifying to them.
 
 ## Section D — The alternatives (locate yourself honestly)
 *Goal: map yourself against do-nothing, the law firm, and the free PDF.*
@@ -101,7 +101,7 @@ Three discipline rules, taped to your monitor:
 > Listen for: specific engagement ("would it cover X?") vs. polite warmth ("sounds great!"). Warmth is a no in disguise.
 
 **18.** If that existed and worked the way I described, what would feel like fair money for it — monthly, or for a one-off diagnostic to start?
-> Listen for: their number first, before you say yours. Then say your real numbers (£2,500 diagnostic / £3,500-a-month retainer) and **watch their face for the half-second before they speak.** That flinch, or its absence, is the single most valuable data point in the whole call.
+> Listen for: their number first, before you say yours. Then say your real numbers (£2,500 diagnostic / £2,000-a-month retainer — direct-channel rates as at 2026-08-15; check `/pricing` before the call) and **watch their face for the half-second before they speak.** That flinch, or its absence, is the single most valuable data point in the whole call.
 
 **19.** Is this a "interesting, keep me posted" or a "actually, can you send me something I could act on" — and be brutal, you won't hurt my feelings?
 > Listen for: the real temperature. Force the binary. "Keep me posted" = no. "Send me a proposal / when can you start" = the only yes that counts.

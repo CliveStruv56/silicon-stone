@@ -4,6 +4,13 @@
 
 **Target outcome:** A stable £10k/mo via 2–3 retainers, fed by the existing free-intelligence/tools/products funnel.
 
+> **Implemented — prices differ from this spec.** Shipped 2026-08-15: Drift
+> Retainer **£2,000/mo** (spec said £3,500–5,000), Strategic Assessment **from
+> £8,000** (spec said £8–12k), and the *Focused Diagnostic* shipped as **The
+> Exposure Diagnostic, from £2,500**. Products are unchanged at £24 / £79 /
+> £149 / £39. Current figures live in `src/lib/offering.ts` and at `/pricing`;
+> this spec is kept as the record of what was proposed.
+
 **House Style reminders for all copy:** UK English, smart quotes, em-dash cap, calibrated and restrained ("never glib, never breathless"). Banned words: game-changer, unlock, empower, seamless, leverage (as verb), actionable insights, literally. Note: the live `/products` page currently contains "unlocking" — fix in passing.
 
 ---

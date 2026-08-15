@@ -2,7 +2,7 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-08-15
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (74 static pages), 208 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (78 static pages), 232 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
@@ -17,7 +17,7 @@
 This is the **Silicon & Stone intelligence portal** — a Next.js 15 + Sanity CMS platform for "Forensic Technopolitics" analysis. It combines a public website, admin research/authoring tools, digital product sales pages, and an embedded CMS Studio.
 
 **Key facts:**
-- Build passes cleanly (`npm run build` — 74 static pages, 0 errors)
+- Build passes cleanly (`npm run build` — 78 static pages, 0 errors)
 - `npm audit` baseline (2026-08-05): **24 findings — 1 critical, 13 high, 9 moderate, 1 low.** The old "13 moderate / uuid only" baseline was stale; the tree drifted while the repo was quiet. Next.js was bumped 15.5.18 → **15.5.21** (closes two HIGH Server Actions advisories: DoS + SSRF) and the `postcss` override was refreshed to `^8.5.23` (resolves 8.5.25, clearing both PostCSS path-traversal advisories). Everything remaining traces through `sanity@4` — `@sanity/cli` → `@sanity/runtime-cli` (adm-zip), `@sanity/export` (tar, critical), `@sanity/template-validator` (undici), `preferred-pm` (js-yaml) — i.e. Studio CLI/export tooling that is not reachable from any served route, plus `sharp` (libvips CVEs; needs ≥0.35 but Next 15.5 declares `^0.34.3`) and `ws` via `openai`/`exa-js`. **Do not run `npm audit fix --force`** — npm proposes `next@16`, which the Sanity v4 pin forbids. These clear together at the Next 16 / Sanity v5 upgrade.
 - All API integrations verified working: Anthropic, Exa.ai, Inoreader, Sanity, ConvertKit
 - Admin login: configured via `ADMIN_PASSWORD` in the deployment environment. Do not store the live password in project docs.
@@ -463,6 +463,53 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 15, 2026 — documentation reconciled to the shipped prices, repo and Notion
+
+**Repo.** Every doc that quoted a price was checked against the catalogue. Four
+carried figures that never shipped and now say so, keeping their originals as
+the historical record rather than rewriting them: `docs/advisory-page-copy.md`
+(drafted against a £3,500–5,000/mo retainer, and its "Focused Diagnostic"
+shipped as the Exposure Diagnostic), `docs/site-revision-spec.md` (same
+anchors, plus an £8–12k assessment that shipped at £8,000),
+`docs/monetisation_strategy.md` (a pre-build strategy doc whose every figure is
+superseded — flagged "do not price from it"), and
+`docs/silicon-stone-website-build-brief-for-claude-code.md` (done in the
+earlier pass). `docs/lemonsqueezy-setup.md` was already correct and now points
+at the catalogue. The summary header's stale counts were corrected: **78 static
+pages, 232 tests**, not 74/208.
+
+One genuinely ambiguous case, left as a decision rather than an edit:
+`docs/Legal firm plan/` quotes **£3,500–£7,500** partner-delivered diagnostics,
+set when the direct retainer was £3,500/mo. That may be a deliberate
+partner-margin spread rather than drift, so the brief now carries a note asking
+for confirmation, and only the call script's explicit "your real numbers
+(£2,500 diagnostic / £3,500-a-month retainer)" line was corrected to £2,000 —
+it claimed to state the direct figures, and no longer did.
+
+**Notion.** Real drift found and fixed in the Command Center:
+
+- **Advisory & BD** pipeline's `Offer` options were stale — "Focused Diagnostic",
+  "Drift Retainer £3.5k/mo" and "EU Exposure £3.5k". Rewritten to the shipped
+  ladder (no rows existed, so nothing was reassigned), with a
+  "Follow-on module £3.5k+" option added.
+- **Digital Products — Catalogue** still described the advisory tier as
+  "Focused Diagnostic → Drift Retainer £3,500–5,000/mo" and a "£750 assessment"
+  that never existed. Corrected, and topped with a warning that prices now live
+  in code and this page is a mirror.
+- **Platform Overview** gained a `/pricing` row in its public-pages table,
+  "Sector Briefings" → "Sector Reports", the Evidence Pack in its price table,
+  the advisory ladder, 74 → 78 pages, and a 15 Aug reconciliation bullet.
+  Re-marked Verified.
+- **New page: "Offering Catalogue — Every Price"** in the Documentation
+  database — the full four-rung catalogue, the credit chain, how the figures
+  are kept honest, and the open commercial questions. It states plainly that
+  the repo is the source and it is the mirror.
+- **Journal** decision entry logged, and **two tasks** raised for the decisions
+  this work surfaced but could not make: the two engagements both opening at
+  £2,500, and the legal-firm channel spread.
+
+The Notion **Products** database needed no price changes — it already matched.
 
 ### August 15, 2026 — CI now fails when Sanity and the code disagree on a price
 

@@ -32,6 +32,11 @@ layer — but the **checkout** lives in LS):
 | AI Audit Checklist Pack | £24 | Download (Model A) | off |
 | AI Act Compliance Toolkit | from £79 | Download (Model A) | off |
 | Sector Reports | from £39 | Download (Model A) | off |
+
+> These prices are mirrored from `src/lib/offering.ts` (`AMOUNTS`). If you
+> change one in Lemon Squeezy, change it there first and let every page
+> follow — `npm run test:sanity-prices` will also fail until the matching
+> Sanity `product` document agrees.
 | Intelligence Series | tbd | On-site unlock (Model B) | **on** |
 
 For the **Intelligence Series** product, enable **License keys** on the variant

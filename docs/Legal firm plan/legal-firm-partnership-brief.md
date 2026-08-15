@@ -77,6 +77,13 @@ Silicon & Stone offers the factual, technical, operational, and industry-context
 
 **Likely price range:** £3,500 to £7,500, depending on client size and complexity.
 
+> **Partner-channel rates, deliberately above the direct ones.** The site sells
+> the Exposure Diagnostic from £2,500 and the Drift Retainer at £2,000/mo
+> (`/pricing`). The figures in this brief are for work delivered alongside a law
+> firm — wider scope, and a margin for the partner. Confirm they are still the
+> intended spread before quoting: they were set when the direct retainer was
+> £3,500/mo, and that has since come down to £2,000.
+
 **Output:** A practical evidence pack that helps the client and legal firm understand:
 
 - What AI systems are in use.
