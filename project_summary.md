@@ -474,25 +474,46 @@ nothing to sell. Those three fall back to the newsletter gate instead.
 `LAUNCH.md` records that the three topics must be **restored when the first
 sector report actually goes on sale**.
 
-The four articles left with nothing to sell then got an explicit **`lead`**
-gate — `atlantic-fault-lines-us-tech-policy-eu-autonomy`,
+The four articles left with nothing to sell —
+`atlantic-fault-lines-us-tech-policy-eu-autonomy`,
 `helium-scarcity-semiconductor-production`,
 `the-same-money-counted-three-times-ais-circular-financing` and
-`korean-memory-fab-capacity-squeeze-2027` now close on "Need this applied to
+`korean-memory-fab-capacity-squeeze-2027` — now close on "Need this applied to
 your own exposure? / Book a call" into `/advisory#contact` rather than a second
-newsletter ask. These are the **first four articles on the site to set `gate`
-explicitly**; everything else still runs on `auto`.
+newsletter ask.
 
 The end state across the 15 published articles is **11 commerce gates, all
 pointing at the buyable £79 Toolkit, and 4 advisory lead gates. Nothing is left
 on the newsletter fallback, and no gate advertises a product that cannot be
 bought.**
 
-**This is not self-maintaining.** `auto` resolves to commerce-or-email and never
-to lead, so a future article tagged only with topics no product claims will
-default back to the newsletter until an editor sets the mode by hand. Recorded
-in §11 as a decision rather than fixed, because making `lead` automatic is a
-policy choice about what the site asks readers for.
+**Then made self-maintaining — `category.defaultGateMode`.** The four explicit
+gates were a manual patch over a structural gap: `auto` resolved to
+commerce-or-email and never to lead, so any *future* article tagged only with
+topics no product claims would silently default back to the newsletter until an
+editor noticed. Rather than hard-code that policy, it now lives on the category:
+
+- New `defaultGateMode` field on the `category` schema — **Newsletter / Lead /
+  None**, and unset means "no opinion". `commerce` is deliberately not offered:
+  with no product match it could only fall back to the `isDefault` product, and
+  `resolveUpsellProduct` refuses that blanket upsell on purpose.
+- `resolveCategoryGateFallback()` takes the **first category that states a
+  preference**, in the order the editor arranged them on the article — so the
+  primary category wins and re-ordering in Studio is the control. Categories
+  that leave it unset are skipped rather than counted as a vote for the
+  newsletter, so one opinionated category can carry an article tagged with
+  several vague ones.
+- Precedence, tested: an explicit `article.gate` beats everything; a real
+  product match beats the category default (an advisory-shaped category must
+  never cost a sale on a piece that has something to sell); the category default
+  only ever replaces `auto`'s newsletter fallback.
+- Set to **lead** on the five categories no product claims: `semiconductors`,
+  `us-technopolitics`, `atlantic-drift`, `edge-economy`, `asian-innovation`.
+- The four per-article overrides were then **removed**, and the split held at
+  11 commerce / 4 lead with `gate` set on zero articles. The mechanism is
+  carrying it, not the manual patch — which is the actual proof it works.
+- `src/lib/gate.test.ts` is new: 16 specs covering the fallback resolution and
+  every precedence rule above.
 
 **And §10 was wrong about the ladder.** It recorded the gate as "shipped but
 unused" because no article sets `gate` explicitly. That is true and irrelevant:
@@ -2522,7 +2543,7 @@ discount codes, booking URL, LinkedIn URL). This table is for defects and debt.
 | **Kit API key invalid — nothing on the site can capture a lead** | Production `/api/subscribe` returns Kit **401 "The API key is invalid"**; the stored `CONVERTKIT_API_KEY` is a legacy v3 key and `api.kit.com/v4` needs a v4 key. Because `NEXT_PUBLIC_PRE_LAUNCH` is `true`, *every* product CTA is an early-access email capture — so the entire funnel currently terminates in a failed POST. Verified still pre-launch on 2026-08-05: `/products/ai-act-toolkit` serves 8× "Request Early Access" and zero checkout links. Code side is done; this is one Vercel env var. Fix + verification steps in `LAUNCH.md` "Current state". | **P0** |
 | 7 of 12 published articles have no cover image | Verified via GROQ 2026-08-05 — `mainImage` is undefined on `welcome-to-silicon-and-stone`, `atlantic-fault-lines-us-tech-policy-eu-autonomy`, `tariff-enforcement-collision`, `semiconductor-testing-bottleneck-ai-accelerators`, `korean-memory-fab-capacity-squeeze-2027`, `greenland-critical-minerals-transatlantic-scramble`, `open-source-sovereignty`. Placeholders render on the live site and in OG cards. The Studio has image-prompt suggestions + a media library to speed this up. | **High** |
 | 9 unpublished drafts, 8 of them without images | Verified 2026-08-05: drafts have grown from 2 (May) to **9** while publishing stalled — GPAI enforcement, EU Chips Act mid-point, China mineral licences, the token-bill piece, Fable 5 shutdown (the only one with an image), open-source exemption, GPT-5.6 two-tier market, plus the two long-standing Iran/Gulf drafts. Several are time-sensitive and decaying. | **High** |
-| ~~`article.gate` configured on zero articles~~ — the claim was wrong, corrected 2026-08-15 | The count was right; the conclusion was not. `auto` resolves to **commerce** whenever an article's categories intersect a product's `topics` (`resolveGate`, `src/lib/gate.ts:151`), and only falls back to the newsletter when nothing matches — so the ladder was live all along. Verified on `/analysis/welcome-to-silicon-and-stone`. Four articles now also set `gate` explicitly (`mode: lead`). Current split across the 15 published: **11 commerce, 4 lead, 0 newsletter**. | Resolved |
+| ~~`article.gate` configured on zero articles~~ — the claim was wrong, corrected 2026-08-15 | The count was right; the conclusion was not. `auto` resolves to **commerce** whenever an article's categories intersect a product's `topics`, and (since 2026-08-15) to whatever `category.defaultGateMode` asks for when nothing matches — so the ladder was live all along. `gate` is still set on zero articles **by design**: the routing is driven by product `topics` and category defaults, not per-article config. Split across the 15 published: **11 commerce, 4 lead, 0 newsletter**. See `src/lib/gate.ts` and its test file for the precedence rules. | Resolved |
 | ~~4 published articles have no `categories`~~ — fixed 2026-08-15 | `eu-ai-act-compliance-chasm-august-2026`, `tariff-enforcement-collision`, `greenland-critical-minerals-transatlantic-scramble` and `open-source-sovereignty` had no categories at all, so the `auto` gate had nothing to match and fell back to the newsletter — including the AI Act explainer, the piece most likely to sell the £79 toolkit. All four tagged and published; each now renders a Toolkit commerce gate. Note the 2026-08-05 "zero articles with empty categories" check tested `count(categories) == 0` and missed the field being **absent** — use `!defined(categories)` too. | Resolved |
 | ~~3 published articles upsell "Sector Reports", which cannot be bought~~ — fixed 2026-08-15 | `korean-memory-fab-capacity-squeeze-2027`, `helium-scarcity-semiconductor-production` and `the-same-money-counted-three-times-ais-circular-financing` matched only `product-sector-reports`' topics, so their gate read "Go deeper: Sector Reports / Get it — From £39" with the CTA landing on the Coming Soon waitlist. Fixed by **clearing `topics` on `product-sector-reports`** (owner decision) — `auto` can no longer select a product that has nothing to sell, and those three fall back to the newsletter gate. **Restore the three topics when the first sector report goes on sale**; noted in `LAUNCH.md`. | Resolved |
 | Sanity `product.checkoutUrl` blank on all three products | The commerce gate opens `checkoutUrl` when set and otherwise links to `productPath`. Setting the three `NEXT_PUBLIC_LEMONSQUEEZY_*_URL` env vars lights up the **product pages only** — the in-article gate keeps sending readers to the product page until the same links are pasted into the Sanity product docs. `LAUNCH.md` had no Sanity step at all; one was added 2026-08-15. | Medium (blocked on LS) |
@@ -2582,7 +2603,7 @@ Nothing downstream matters until email capture works.
 |------|-------------|
 | **Cover images for 7 published articles** | Live-site quality issue; see §10. Studio has image-prompt suggestions + media library. |
 | **Publish or kill the 9 drafts** | Several are time-sensitive (GPAI enforcement, Chips Act mid-point) and decay with every week. |
-| **Decide whether `lead` should ever be automatic** | `auto` resolves to commerce-or-email and **never** to lead, by design — so the four `lead` gates set on 2026-08-15 are a manual, per-article editorial act. Any future article tagged only `semiconductors` / `us-technopolitics` / `atlantic-drift` / `edge-economy` will silently default to the newsletter until someone notices and sets the mode. Options if that drift is unacceptable: make `auto`'s no-product branch resolve to `lead` for a named set of categories, or add a `defaultGateMode` to the `category` schema. Neither is built; the current behaviour is a safe default, not a bug. |
+| ~~**Decide whether `lead` should ever be automatic**~~ — shipped 2026-08-15 | `category.defaultGateMode` now routes it. A new article inherits the right gate from its categories with no per-article config; the only thing an editor must still get right is **tagging the piece**, since an article with no categories falls through to the newsletter. See §9. |
 | ~~**Wire `article.gate` explicitly where `auto` guesses wrong**~~ | Done for the four articles `auto` could not serve — see the 2026-08-15 §9 entry. Remaining case is `commerce` overrides where the topic match picks the wrong product; none observed yet, since only the Toolkit currently claims any topics. |
 | **Atlantic Drift Briefing PDF** | Outline exists; required before YouTube launch. |
 

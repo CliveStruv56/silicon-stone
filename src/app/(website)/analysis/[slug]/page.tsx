@@ -26,7 +26,13 @@ import { sanityFetch } from '@/sanity/lib/live'
 import { ARTICLE_QUERY, ARTICLE_SLUGS_QUERY, UPSELL_PRODUCTS_QUERY } from '@/sanity/lib/queries'
 import { urlFor } from '@/sanity/lib/image'
 import { getPersonaLabel, getDynamicCTA } from '@/lib/personas'
-import { resolveGate, resolveUpsellProduct, findDefaultProduct, type GateProduct } from '@/lib/gate'
+import {
+  resolveGate,
+  resolveUpsellProduct,
+  findDefaultProduct,
+  resolveCategoryGateFallback,
+  type GateProduct,
+} from '@/lib/gate'
 import { formatDate } from '@/lib/format'
 import { absoluteUrl } from '@/lib/site'
 import {
@@ -44,6 +50,8 @@ type Category = {
   _id: string
   title: string
   slug: string
+  /** `category.defaultGateMode` — the `auto` gate's fallback when no product maps. */
+  defaultGateMode?: string | null
 }
 
 export async function generateStaticParams() {
@@ -269,6 +277,7 @@ export default async function ArticlePage({ params }: Props) {
     gate: article.gate,
     upsellProduct,
     defaultProduct: findDefaultProduct(productList),
+    categoryFallback: resolveCategoryGateFallback(article.categories as Category[] | null),
     emailFallback: { headline: emailCta.headline, body: emailCta.subheadline },
   })
 

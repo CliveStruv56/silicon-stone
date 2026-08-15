@@ -6,11 +6,19 @@
  *  - email    → newsletter capture
  *  - commerce → product upsell (opens Lemon Squeezy checkout when configured)
  *  - lead     → book-a-call
- * Plus `auto` (commerce if a product maps to the article's topics, else email)
- * and `none`.
+ * Plus `auto` (commerce if a product maps to the article's topics, else the
+ * article's category default, else email) and `none`.
  */
 
 export type GateMode = 'auto' | 'email' | 'commerce' | 'lead' | 'none'
+
+/**
+ * What a category says an `auto` article should close on when no product maps
+ * to it (`category.defaultGateMode`). Deliberately excludes `commerce`: with no
+ * product match, a commerce gate could only fall back to the `isDefault`
+ * product, and `resolveUpsellProduct` refuses that blanket upsell on purpose.
+ */
+export type CategoryGateFallback = 'email' | 'lead' | 'none'
 
 export interface GateProduct {
   name: string
@@ -90,20 +98,44 @@ export function findDefaultProduct(products: GateProduct[]): GateProduct | null 
 }
 
 /**
+ * The gate an article's categories ask for when `auto` finds no product.
+ *
+ * Resolution is "first category that states a preference", in the order the
+ * editor arranged them on the article — so the primary category wins and
+ * re-ordering in Studio is the control. Categories that leave the field unset
+ * are skipped rather than treated as a vote for the newsletter, which lets a
+ * single opinionated category carry an article tagged with several vague ones.
+ */
+export function resolveCategoryGateFallback(
+  categories: Array<{ defaultGateMode?: string | null } | null | undefined> | null | undefined,
+): CategoryGateFallback | null {
+  for (const category of categories || []) {
+    const mode = category?.defaultGateMode
+    if (mode === 'email' || mode === 'lead' || mode === 'none') return mode
+  }
+  return null
+}
+
+/**
  * Turn the Sanity gate config + resolved product into the exact mode + copy to
  * render. `emailFallback` supplies the persona-aware newsletter copy so an
  * `auto`/`email` gate reuses the same headline/subheadline as the standing CTA.
  *
  * `defaultProduct` backs an explicit `commerce` gate whose article has no topic
- * match; `auto` never uses it (falls back to the newsletter instead).
+ * match; `auto` never uses it (falls back to the category default instead).
+ *
+ * `categoryFallback` is `category.defaultGateMode` resolved across the
+ * article's categories. It only ever replaces `auto`'s newsletter fallback —
+ * an explicit gate on the article and a real product match both outrank it.
  */
 export function resolveGate(params: {
   gate: GateConfig | null | undefined
   upsellProduct: GateProduct | null
   defaultProduct?: GateProduct | null
+  categoryFallback?: CategoryGateFallback | null
   emailFallback: { headline: string; body: string }
 }): ResolvedGate {
-  const { gate, upsellProduct, defaultProduct, emailFallback } = params
+  const { gate, upsellProduct, defaultProduct, categoryFallback, emailFallback } = params
   const mode: GateMode = gate?.mode || 'auto'
 
   if (mode === 'none') return { mode: 'none' }
@@ -147,6 +179,12 @@ export function resolveGate(params: {
     return product ? commerceGate(product) : emailGate()
   }
 
-  // auto: commerce only when a product maps to the topic, else the newsletter.
-  return upsellProduct ? commerceGate(upsellProduct) : emailGate()
+  // auto: commerce when a product maps to the topic. Otherwise the article's
+  // categories decide (`category.defaultGateMode`) — an advisory-shaped topic
+  // can ask for the book-a-call gate rather than a second email ask — and the
+  // newsletter remains the fallback when no category states a preference.
+  if (upsellProduct) return commerceGate(upsellProduct)
+  if (categoryFallback === 'none') return { mode: 'none' }
+  if (categoryFallback === 'lead') return leadGate()
+  return emailGate()
 }

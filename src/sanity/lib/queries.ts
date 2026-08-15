@@ -49,6 +49,8 @@ export const FEATURED_ARTICLES_QUERY = defineQuery(`
   }
 `)
 
+// Single article. `categories[].defaultGateMode` feeds the `auto` gate's
+// no-product fallback — see `resolveCategoryGateFallback` in src/lib/gate.ts.
 export const ARTICLE_QUERY = defineQuery(`
   *[_type == "article" && slug.current == $slug][0] {
     _id,
@@ -85,7 +87,8 @@ export const ARTICLE_QUERY = defineQuery(`
     categories[]->{
       _id,
       title,
-      "slug": slug.current
+      "slug": slug.current,
+      defaultGateMode
     },
     personas,
     author->{
