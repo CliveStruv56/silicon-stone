@@ -1,0 +1,1519 @@
+Article 1
+
+Subject matter and general objectives
+
+1.
+
+This Regulation establishes a framework for strengthening the semiconductor ecosystem at Union level, in particular through the following measures:
+
+(a) the establishment of the Chips for Europe Initiative (the ‘Initiative’);
+
+(b) setting the criteria to recognise and to support integrated production facilities and open EU foundries that are first-of-a-kind facilities and that foster the security of supply and the resilience of the Union’s semiconductor ecosystem;
+
+(c) setting up a coordination mechanism between the Member States and the Commission for mapping and monitoring the Union’s semiconductor sector as well as crisis prevention and response to semiconductor shortages and, where relevant, consulting stakeholders from the semiconductor sector.
+
+2.
+
+The first general objective of this Regulation is to ensure the conditions necessary for the competitiveness and innovation capacity of the Union and to ensure the adjustment of the industry to structural changes.
+
+3.
+
+The second general objective, separate from and complementary to the first general objective set out in paragraph 2, is to improve the functioning of the internal market by laying down a uniform Union legal framework for increasing the Union’s resilience and security of supply in the field of semiconductor technologies.
+
+
+Article 2
+
+Definitions
+
+For the purposes of this Regulation, the following definitions apply:
+
+(1) ‘semiconductor’ means one of the following: (a) a material, including novel materials, either elemental or compound, whose electrical conductivity can be modified; or (b) a component consisting of a series of layers of semiconducting, insulating and conducting materials defined according to a predetermined pattern, and intended to perform well-defined electronic or photonic functions or both; (a) a material, including novel materials, either elemental or compound, whose electrical conductivity can be modified; or (b) a component consisting of a series of layers of semiconducting, insulating and conducting materials defined according to a predetermined pattern, and intended to perform well-defined electronic or photonic functions or both;
+
+(a) a material, including novel materials, either elemental or compound, whose electrical conductivity can be modified; or
+
+(b) a component consisting of a series of layers of semiconducting, insulating and conducting materials defined according to a predetermined pattern, and intended to perform well-defined electronic or photonic functions or both;
+
+(2) ‘chip’ means an electronic device comprising various functional elements on a single piece of semiconductor material, typically taking the form of memory, logic, processor, optoelectronics and analogue devices;
+
+(3) ‘quantum chip’ means a device that processes information at the level of individual quantum systems, with a varying level of component integration on-chip depending on the quantum platform used, including platforms for quantum computing, communication, sensing or metrology;
+
+(4) ‘technology node’ means a specific semiconductor manufacturing process and its design rules;
+
+(5) ‘semiconductor supply chain’ means the system of activities, organisations, actors, technology, information, resources and services involved in the production of semiconductors, including raw and processed materials, such as gases, manufacturing equipment, design, including related software development, fabrication, assembly, testing and packaging;
+
+(6) ‘semiconductor value chain’ means the set of activities in relation to a semiconductor product from its conception to its end use, including raw and processed materials, such as gases, manufacturing equipment, research, development and innovation, design, including related software development, fabrication, testing, assembly and packaging to embedding and integration in end products, as well as end-of-life processes, such as reuse, disassembly and recycling;
+
+(7) ‘pilot line’ means an experimental project or action addressing higher technology readiness levels from levels 3 to 8 to further develop an enabling infrastructure necessary to test, demonstrate, validate and calibrate a product or system with the model assumptions;
+
+(8) ‘coordinator’ means a legal entity established in the Union which is a member of a European chips infrastructure consortium and which has been appointed by all the members of the consortium to be the principal point of contact for the Commission;
+
+(9) ‘small and medium-sized enterprises’ or ‘SMEs’ means small or medium-sized enterprises as defined in Article 2 of the Annex to Commission Recommendation 2003/361/EC (29);
+
+(10) ‘small mid-cap’ means small mid-cap as defined in Article 2, point (20), of Regulation (EU) 2021/695;
+
+(11) ‘first-of-a-kind facility’ means a new or substantially upgraded semiconductor manufacturing facility, or a facility for the production of equipment or key components for such equipment predominantly used in semiconductor manufacturing, which provides innovation with regard to the manufacturing process or final product that is not yet substantively present or committed to be built within the Union, including innovation that concerns improvements in computing power or in the level of security, safety or reliability, energy and environmental performance, the technology node or substrate materials, or in the implementation of production processes that lead to efficiency gains, or improves recyclability, or reduces production inputs;
+
+(12) ‘next-generation chips’ means chips that go beyond the state of the art in offering significant improvements in functional performance, computing power or energy efficiency as well as other significant energy and environmental gains;
+
+(13) ‘next-generation semiconductor technologies’ means semiconductor technologies that go beyond the state of the art in offering significant improvements in functional performance, computing power or energy efficiency as well as other significant energy and environmental gains;
+
+(14) ‘cutting-edge semiconductor technologies’ means state-of-the-art innovation in chips and semiconductor technologies when the projects are carried out;
+
+(15) ‘semiconductor manufacturing’ means any of the stages of production and processing of semiconductor wafers, including substrate materials, front-end and back-end, necessary to deliver a finished semiconductor product;
+
+(16) ‘front-end’ means the entire processing of a semiconductor wafer;
+
+(17) ‘back-end’ means the packaging, assembly and test of the semiconductor product;
+
+(18) ‘users of semiconductors’ means undertakings that produce products in which semiconductors are incorporated;
+
+(19) ‘key market actors’ means undertakings in the Union’s semiconductor supply chain, the reliable functioning of which is essential for the supply of semiconductors;
+
+(20) ‘critical sector’ means any sector referred to in Annex IV;
+
+(21) ‘crisis-relevant product’ means semiconductors, intermediate products and raw and processed materials which are either deployed directly by critical sectors or used in order to produce devices used by critical sectors required to produce semiconductors or intermediate products, that are affected by a semiconductor crisis and relevant to ensure crucial functions of a critical sector;
+
+(22) ‘production capability’ means the ability of a facility to produce certain types of products;
+
+(23) ‘production capacity’ means the maximum potential output of a facility;
+
+(24) ‘trade secret’ means a trade secret as defined in Article 2, point (1), of Directive (EU) 2016/943.
+
+
+Article 3
+
+Establishment of the Initiative
+
+1.
+
+The Initiative is established for the duration of the Multiannual Financial Framework 2021–2027, established by Council Regulation (EU, Euratom) 2020/2093 (30).
+
+2.
+
+The Initiative shall be supported by funding from Horizon Europe and the Digital Europe Programme, and in particular Specific Objective 6 of the Digital Europe Programme, for a maximum indicative amount of EUR 1,725 billion and EUR 1,575 billion, respectively. That funding shall be implemented in accordance with Regulations (EU) 2021/694 and (EU) 2021/695.
+
+
+Article 4
+
+Objectives of the Initiative
+
+1.
+
+The general objective of the Initiative is to achieve large-scale technological capacity building and support related research and innovation activities throughout the Union’s semiconductor value chain to enable development and deployment of cutting-edge semiconductor technologies, next-generation semiconductor technologies and cutting-edge quantum technologies and the innovation of established technologies that will reinforce advanced design, systems integration and chip production capabilities in the Union, thereby increasing the competitiveness of the Union. It shall also contribute to the achievement of the green and digital transitions, in particular by reducing the climate impact of electronic systems, improving the sustainability of next-generation chips and strengthening the circular economy processes, contribute to quality jobs within the semiconductor ecosystem and address security-by-design principles, which provide protection against cybersecurity threats.
+
+2.
+
+The Initiative shall have the following five operational objectives:
+
+(a) operational objective 1: building up advanced design capacities for integrated semiconductor technologies;
+
+(b) operational objective 2: enhancing existing and developing new advanced pilot lines across the Union to enable development and deployment of cutting-edge semiconductor technologies and next-generation semiconductor technologies;
+
+(c) operational objective 3: building advanced technology and engineering capacities for accelerating the innovative development of cutting-edge quantum chips and associated semiconductor technologies;
+
+(d) operational objective 4: establishing a network of competence centres across the Union by enhancing existing or creating new facilities;
+
+(e) operational objective 5: undertaking activities, to be described collectively as ‘Chips Fund’ activities, to facilitate access to debt financing and equity, including by providing clear guidance, in particular for start-ups, scale-ups, SMEs and small mid-caps in the semiconductor value chain, through a blending facility under the InvestEU Fund and via the European Innovation Council.
+
+3.
+
+The Initiative’s operational objectives may include capacity building activities and related research and innovation activities. All capacity building activities shall be financed through the Digital Europe Programme and the related research and innovation activities shall be funded through Horizon Europe.
+
+
+Article 5
+
+Content of the Initiative
+
+The Initiative shall:
+
+(a) under its operational objective 1: (i) build up and maintain a virtual design platform, available across the Union, integrating existing and new design facilities with extended libraries and electronic design automation (EDA) tools; (ii) extend the design capabilities by fostering innovative developments, such as open-source processor architectures and other innovative architectures, chiplets, programmable chips, new types of memory, processors, accelerators or low power chips, that are built in accordance with security-by-design principles; (iii) enlarge the semiconductor ecosystem by integrating the vertical market sectors, such as health, mobility, energy, telecommunications, security, defence and space, contributing to the green, digital and innovation agendas of the Union; (i) build up and maintain a virtual design platform, available across the Union, integrating existing and new design facilities with extended libraries and electronic design automation (EDA) tools; (ii) extend the design capabilities by fostering innovative developments, such as open-source processor architectures and other innovative architectures, chiplets, programmable chips, new types of memory, processors, accelerators or low power chips, that are built in accordance with security-by-design principles; (iii) enlarge the semiconductor ecosystem by integrating the vertical market sectors, such as health, mobility, energy, telecommunications, security, defence and space, contributing to the green, digital and innovation agendas of the Union;
+
+(i) build up and maintain a virtual design platform, available across the Union, integrating existing and new design facilities with extended libraries and electronic design automation (EDA) tools;
+
+(ii) extend the design capabilities by fostering innovative developments, such as open-source processor architectures and other innovative architectures, chiplets, programmable chips, new types of memory, processors, accelerators or low power chips, that are built in accordance with security-by-design principles;
+
+(iii) enlarge the semiconductor ecosystem by integrating the vertical market sectors, such as health, mobility, energy, telecommunications, security, defence and space, contributing to the green, digital and innovation agendas of the Union;
+
+(b) under its operational objective 2: (i) strengthen capabilities in next-generation chip production technologies and manufacturing equipment, by integrating research and innovation activities and preparing the development of future technology nodes, such as leading-edge nodes, fully depleted silicon on insulator technologies, new semiconductors materials or heterogeneous systems integration and advanced module assembly and packaging for high, medium or low volumes; (ii) support innovation at a large scale through access to new or existing pilot lines for experimentation, test, process control, final device reliability and validation of new design concepts integrating key functionalities; (iii) provide support to integrated production facilities and open EU foundries through preferential access to the new pilot lines, as well as ensure access on fair terms to new pilot lines for a wide range of users of the Union’s semiconductor ecosystem; (i) strengthen capabilities in next-generation chip production technologies and manufacturing equipment, by integrating research and innovation activities and preparing the development of future technology nodes, such as leading-edge nodes, fully depleted silicon on insulator technologies, new semiconductors materials or heterogeneous systems integration and advanced module assembly and packaging for high, medium or low volumes; (ii) support innovation at a large scale through access to new or existing pilot lines for experimentation, test, process control, final device reliability and validation of new design concepts integrating key functionalities; (iii) provide support to integrated production facilities and open EU foundries through preferential access to the new pilot lines, as well as ensure access on fair terms to new pilot lines for a wide range of users of the Union’s semiconductor ecosystem;
+
+(i) strengthen capabilities in next-generation chip production technologies and manufacturing equipment, by integrating research and innovation activities and preparing the development of future technology nodes, such as leading-edge nodes, fully depleted silicon on insulator technologies, new semiconductors materials or heterogeneous systems integration and advanced module assembly and packaging for high, medium or low volumes;
+
+(ii) support innovation at a large scale through access to new or existing pilot lines for experimentation, test, process control, final device reliability and validation of new design concepts integrating key functionalities;
+
+(iii) provide support to integrated production facilities and open EU foundries through preferential access to the new pilot lines, as well as ensure access on fair terms to new pilot lines for a wide range of users of the Union’s semiconductor ecosystem;
+
+(c) under its operational objective 3: (i) develop innovative design libraries for quantum chips; (ii) support the development of new or existing pilot lines, clean rooms and foundries for prototyping and producing quantum chips for the integration of quantum circuits and control electronics; (iii) develop facilities for testing and validating advanced quantum chips produced by the pilot lines, with a view to closing the innovation feedback loop between designers, producers and users of quantum components; (i) develop innovative design libraries for quantum chips; (ii) support the development of new or existing pilot lines, clean rooms and foundries for prototyping and producing quantum chips for the integration of quantum circuits and control electronics; (iii) develop facilities for testing and validating advanced quantum chips produced by the pilot lines, with a view to closing the innovation feedback loop between designers, producers and users of quantum components;
+
+(i) develop innovative design libraries for quantum chips;
+
+(ii) support the development of new or existing pilot lines, clean rooms and foundries for prototyping and producing quantum chips for the integration of quantum circuits and control electronics;
+
+(iii) develop facilities for testing and validating advanced quantum chips produced by the pilot lines, with a view to closing the innovation feedback loop between designers, producers and users of quantum components;
+
+(d) under its operational objective 4: (i) strengthen capacities and offer a wide range of expertise to the stakeholders, including end-user start-ups and SMEs, facilitating access to and the effective use of the capacities and facilities referred to in this Article; (ii) address the knowledge and skills shortage and mismatch by attracting, mobilising and retaining new talent on research, design and production and supporting the emergence of a suitably skilled workforce in science, technology, engineering and mathematics (STEM) subjects up to the postdoctoral level for strengthening the semiconductor ecosystem, including by offering suitable training opportunities for students, for example dual study programmes and student orientation, in addition to reskilling and upskilling of workers; (i) strengthen capacities and offer a wide range of expertise to the stakeholders, including end-user start-ups and SMEs, facilitating access to and the effective use of the capacities and facilities referred to in this Article; (ii) address the knowledge and skills shortage and mismatch by attracting, mobilising and retaining new talent on research, design and production and supporting the emergence of a suitably skilled workforce in science, technology, engineering and mathematics (STEM) subjects up to the postdoctoral level for strengthening the semiconductor ecosystem, including by offering suitable training opportunities for students, for example dual study programmes and student orientation, in addition to reskilling and upskilling of workers;
+
+(i) strengthen capacities and offer a wide range of expertise to the stakeholders, including end-user start-ups and SMEs, facilitating access to and the effective use of the capacities and facilities referred to in this Article;
+
+(ii) address the knowledge and skills shortage and mismatch by attracting, mobilising and retaining new talent on research, design and production and supporting the emergence of a suitably skilled workforce in science, technology, engineering and mathematics (STEM) subjects up to the postdoctoral level for strengthening the semiconductor ecosystem, including by offering suitable training opportunities for students, for example dual study programmes and student orientation, in addition to reskilling and upskilling of workers;
+
+(e) under its operational objective 5: (i) improve the leverage effect of the Union budget spending and achieving a higher multiplier effect in terms of attracting private-sector financing; (ii) provide support to companies facing difficulties in accessing finance, and address the need to underpin the economic resilience throughout the Union and the Member States; (iii) accelerate and improve accessibility to investment in the field of chip design, semiconductor manufacturing and integration technologies, and leverage funding from both the public and the private sectors, while increasing the security of supply and the resilience of the semiconductor ecosystem for the whole semiconductor value chain. (i) improve the leverage effect of the Union budget spending and achieving a higher multiplier effect in terms of attracting private-sector financing; (ii) provide support to companies facing difficulties in accessing finance, and address the need to underpin the economic resilience throughout the Union and the Member States; (iii) accelerate and improve accessibility to investment in the field of chip design, semiconductor manufacturing and integration technologies, and leverage funding from both the public and the private sectors, while increasing the security of supply and the resilience of the semiconductor ecosystem for the whole semiconductor value chain.
+
+(i) improve the leverage effect of the Union budget spending and achieving a higher multiplier effect in terms of attracting private-sector financing;
+
+(ii) provide support to companies facing difficulties in accessing finance, and address the need to underpin the economic resilience throughout the Union and the Member States;
+
+(iii) accelerate and improve accessibility to investment in the field of chip design, semiconductor manufacturing and integration technologies, and leverage funding from both the public and the private sectors, while increasing the security of supply and the resilience of the semiconductor ecosystem for the whole semiconductor value chain.
+
+
+Article 6
+
+Synergies with Union programmes
+
+The Initiative shall be implemented in synergy with Union programmes in accordance with Annex III. The Commission shall ensure that the achievement of the objectives is not hampered when leveraging the complementary character of the Initiative with Union programmes.
+
+
+Article 7
+
+European chips infrastructure consortiums
+
+1.
+
+For the purpose of implementing actions funded under the Initiative, a legal entity may be established in the form of a European chips infrastructure consortium (ECIC) in accordance with this Article. More than one ECIC may be established.
+
+2.
+
+An ECIC shall:
+
+(a) have legal personality from the date of entry into force of the Commission implementing act referred to in paragraph 5;
+
+(b) have, in each Member State concerned, the most extensive legal capacity accorded to legal entities under the national law of that Member State and, in particular, the capacity to acquire, own and dispose of movable property, immovable property and IP, conclude contracts and be a party to legal proceedings;
+
+(c) have a single statutory seat, which shall be located on the territory of a Member State;
+
+(d) be established by at least three members (founding members), namely Member States, or public or private legal entities from at least three Member States, or a combination thereof, with a view to achieving broad representation across the Union;
+
+(e) ensure that, following the adoption of the implementing act referred to in paragraph 5 establishing the ECIC, other Member States may join it as members at any time, that other public or private legal entities may join it as members at any time on fair and reasonable terms specified in the statutes of the ECIC and that Member States that do not provide a financial or a non-financial contribution may join it as observers without voting rights, by notifying the ECIC;
+
+(f) appoint a coordinator.
+
+3.
+
+The coordinator of a potential ECIC shall, on behalf of all of the founding members, submit an application to the Commission in writing. That application shall contain the following:
+
+(a) a request to the Commission to establish an ECIC, including a list of founding members that are forming the consortium;
+
+(b) a description of the principal tasks, activities and necessary resources needed to complete the actions set out in the application;
+
+(c) the draft statutes of the ECIC, which shall include at least the following elements: (i) the duration of and procedure for winding-up in accordance with Article 10; (ii) the liability regime in accordance with Article 8; (iii) the statutory seat and name of the ECIC; (iv) the scope of the ECIC’s tasks and activities; (v) the membership, including the conditions of and procedure for changes in membership; (vi) the budget, including the arrangements for financial and in-kind contributions from its members; (vii) ownership of the results; (viii) governance, including the decision-making process and specific roles; (ix) if applicable, voting rights; (i) the duration of and procedure for winding-up in accordance with Article 10; (ii) the liability regime in accordance with Article 8; (iii) the statutory seat and name of the ECIC; (iv) the scope of the ECIC’s tasks and activities; (v) the membership, including the conditions of and procedure for changes in membership; (vi) the budget, including the arrangements for financial and in-kind contributions from its members; (vii) ownership of the results; (viii) governance, including the decision-making process and specific roles; (ix) if applicable, voting rights;
+
+(i) the duration of and procedure for winding-up in accordance with Article 10;
+
+(ii) the liability regime in accordance with Article 8;
+
+(iii) the statutory seat and name of the ECIC;
+
+(iv) the scope of the ECIC’s tasks and activities;
+
+(v) the membership, including the conditions of and procedure for changes in membership;
+
+(vi) the budget, including the arrangements for financial and in-kind contributions from its members;
+
+(vii) ownership of the results;
+
+(viii) governance, including the decision-making process and specific roles;
+
+(ix) if applicable, voting rights;
+
+(d) a declaration by the host Member State on whether it recognises the ECIC as an international body within the meaning of Article 143(1), point (g), and Article 151(1), point (b), of Directive 2006/112/EC, and as an international organisation within the meaning of Article 11(1), point (b), of Directive (EU) 2020/262, from its date of establishment, subject to limits and conditions of the exemptions provided for in those provisions, which shall be laid down in an agreement between the members of the ECIC;
+
+(e) a description detailing how the actions taken by the ECIC are to contribute to the relevant objectives set out in Article 4, including an overview of the expected impact of potential public funding;
+
+(f) a statement to the effect that the ECIC is to carry out its activities in accordance with sound budgetary principles for the exercise of its financial responsibility.
+
+4.
+
+The Commission shall assess the applications on the basis of all of the following criteria:
+
+(a) the appropriate competences, know-how and capabilities of the proposed founding members of the ECIC on semiconductors;
+
+(b) the appropriate management capacity, staff and resources necessary to carry out its statutory purpose;
+
+(c) the operational and legal means to apply the administrative, contractual and financial management rules laid down at Union level;
+
+(d) the appropriate financial viability corresponding to the level of Union funds it will be called upon to manage and demonstrated, where appropriate, through accounting documents and bank statements;
+
+(e) the contributions of the members of the ECIC that would be made available to the ECIC, and related arrangements;
+
+(f) the openness of the ECIC to new members;
+
+(g) the ability of the ECIC to ensure coverage of the needs of the Union’s semiconductor value chain, including start-ups and SMEs;
+
+(h) the contribution to the relevant objectives set out in Article 4 of the action proposed to be implemented, in particular its contribution to ensuring the long-term competitiveness of the Union’s semiconductor sector.
+
+5.
+
+The Commission shall adopt an implementing act on the basis of the criteria set out in paragraph 4 either recognising an applicant as an ECIC or rejecting the application. The Commission shall notify the founding members accordingly. Those implementing acts shall be adopted in accordance with the examination procedure referred to in Article 38(2).
+
+6.
+
+The implementing act establishing the ECIC shall be published in the Official Journal of the European Union.
+
+7.
+
+Amendments to the statutes of the ECIC shall comply with and contribute to the objectives of this Regulation. The ECIC shall notify such amendments to the Commission within 10 days of adoption. The notifications shall contain the following:
+
+(a) the text of the amendments proposed or, where appropriate, adopted, including the date on which they enter into force; and
+
+(b) the amended consolidated version of the statutes of the ECIC.
+
+The Commission may object to such amendments within 60 days of receipt of such notification, giving reasons why the amendments do not meet the requirements of this Regulation.
+
+The amendments shall take effect after expiry of the period referred to in the second subparagraph, after the Commission has waived its right to object or after the Commission has revoked its objection.
+
+8.
+
+An ECIC shall produce an annual activity report, containing a technical description of its activities and a financial statement. The annual activity report shall include an assessment of the environmental and social impact of the actions funded and shall be transmitted to the Commission and made publicly available. The Commission may provide recommendations regarding the matters covered in the annual activity report. The Commission shall send the ECICs’ annual activity reports to the European Parliament and to the European Semiconductor Board without undue delay.
+
+9.
+
+Where a Member State considers that the ECIC has refused to accept a new member to the consortium without providing sufficient reasons for such a refusal on the basis of the fair and reasonable terms specified in its statutes, that Member State may bring the matter to the attention of the Public Authorities Board of the Chips Joint Undertaking. The Public Authorities Board of the Chips Joint Undertaking shall, if necessary, recommend that the ECIC take remedial action, such as an amendment to its statutes, in accordance with Article 137, point (f), of Regulation (EU) 2021/2085.
+
+
+Article 8
+
+Liability of the ECIC
+
+1.
+
+An ECIC shall be liable for its debts.
+
+2.
+
+The financial liability of the members for the debts of the ECIC shall be limited to their respective contributions provided to the ECIC. The members may specify in the statutes of the ECIC that they will assume a fixed liability above their respective contributions or unlimited liability.
+
+3.
+
+The Union shall not be liable for an ECIC’s debts.
+
+
+Article 9
+
+Applicable law and jurisdiction of the ECIC
+
+1.
+
+The setting-up and internal functioning of an ECIC shall be governed by:
+
+(a) Union law, in particular this Regulation;
+
+(b) national law of the Member State where the ECIC has its statutory seat in the case of matters not, or only partly, regulated by Union law;
+
+(c) the statutes of the ECIC and their implementing rules.
+
+2.
+
+Without prejudice to the cases in which the Court of Justice of the European Union (Court of Justice) has jurisdiction under the Treaties, the national law of the Member State where the ECIC has its statutory seat shall determine the competent jurisdiction for the resolution of disputes among the members in relation to the ECIC, between the members and the ECIC, and between an ECIC and third parties.
+
+
+Article 10
+
+Winding-up of the ECIC
+
+1.
+
+The statutes of an ECIC shall determine the procedure to be followed for the winding-up of that ECIC following a decision of its members.
+
+2.
+
+The insolvency rules of the Member State where the ECIC has its statutory seat shall apply in the event that the ECIC is unable to pay its debts.
+
+
+Article 11
+
+European network of competence centres in semiconductors
+
+1.
+
+For the purposes of the Initiative’s operational objective 4, a European network of competence centres in semiconductors, system integration and design (the ‘network’) shall be established. The network shall be composed of the competence centres selected by the Chips Joint Undertaking in accordance with paragraph 3.
+
+2.
+
+Competence centres shall perform all or some of the following activities to the benefit of and in close cooperation with the Union industry, in particular SMEs and mid-caps, as well as research and technology organisations, universities, and the public sector and other relevant stakeholders across the semiconductor value chain:
+
+(a) providing access to design services and design tools under the Initiative’s operational objective 1, as well as to the pilot lines supported under the Initiative’s operational objective 2;
+
+(b) raising awareness and providing the necessary know-how, expertise and skills to the stakeholders for helping them accelerate the development of new semiconductor technologies, semiconductor manufacturing, equipment, design options and system concepts as well as the integration of new semiconductor technologies, by using effectively the infrastructure and other available resources of the network;
+
+(c) raising awareness and providing or ensuring access to expertise, know-how and services, including system design readiness, new and existing pilot lines and supporting actions necessary to build skills and competences supported by the Initiative;
+
+(d) facilitating the transfer of expertise and know-how between Member States and regions encouraging exchanges of skills, knowledge and good practices and encouraging joint programmes;
+
+(e) developing and managing specific training actions on semiconductor technologies and their applications to support the development of the talent pool, by skilling and reskilling, and to increase the number of students as well as the quality of education in relevant fields of studies up to PhD level at schools and universities located in the Union by facilitating connections between students and semiconductor companies across the Union, while paying particular attention to women’s participation.
+
+3.
+
+Member States shall designate candidate competence centres in accordance with their national procedures, administrative and institutional structures through an open and competitive process.
+
+The work programme of the Chips Joint Undertaking shall set the procedure for establishing competence centres, including the selection criteria as well as further details on the implementation of the tasks and functions referred to in this Article.
+
+The Chips Joint Undertaking shall select the competence centres forming the network.
+
+Member States and the Commission shall maximise synergies with existing competence centres established under other Union initiatives such as the European Digital Innovation Hubs.
+
+4.
+
+The competence centres shall have substantial overall autonomy to lay down their organisation, composition and working methods. The organisation, composition and working methods of the competence centres shall comply with and contribute to the objectives of this Regulation and the Initiative.
+
+
+Article 12
+
+Implementation
+
+1.
+
+The Initiative’s operational objectives 1 to 4 shall be entrusted to the Chips Joint Undertaking and implemented by actions set out in the work programme of the Chips Joint Undertaking.
+
+2.
+
+In order to reflect technological change and market developments, the Commission is empowered to adopt delegated acts in accordance with Article 37 to amend Annex I with regard to the actions set out therein in a manner consistent with the objectives of the Initiative set out in Article 4.
+
+3.
+
+In order to ensure effective implementation and evaluation of the Initiative, the Commission is empowered to adopt delegated acts in accordance with Article 37 to amend Annex II with regard to the measurable indicators to monitor the implementation and to report on the progress of the Initiative towards the achievement of its objectives as set out in Article 4.
+
+4.
+
+In order to ensure effective implementation, monitoring and evaluation of the Initiative, the annual activity report of the Chips Joint Undertaking shall include information on matters related to the Initiative’s operational objectives 1 to 4, on the basis of the measurable indicators set out in Annex II.
+
+5.
+
+The Commission shall inform the European Semiconductor Board on progress in the implementation of the Initiative’s operational objective 5 on a regular basis.
+
+
+Article 13
+
+Integrated production facilities
+
+1.
+
+Integrated production facilities shall be first-of-a-kind facilities for semiconductor manufacturing, and, where relevant, including design, or for the production of equipment or key components for such equipment predominantly used in semiconductor manufacturing in the Union, which may integrate other steps of the supply chain, and that contribute to the security of supply and the resilience of the Union’s semiconductor ecosystem and in addition they may, where relevant, contribute to the security of the global semiconductor supply chains.
+
+2.
+
+At the time of submitting an application in accordance with Article 15(1), an integrated production facility shall be required to qualify as a first-of-a-kind facility.
+
+3.
+
+An integrated production facility shall meet the following requirements:
+
+(a) its establishment has a clear positive impact with spill-over effects beyond the undertaking or Member State concerned, on the Union’s semiconductor value chain in the medium to long term, with a view to ensuring security of supply and resilience of the semiconductor ecosystem, including the growth of start-ups and SMEs, and contributing to the Union’s green and digital transitions;
+
+(b) it provides an assurance that it is not subject to the extraterritorial application of public service obligations of third countries in a way that may undermine the undertaking’s ability to comply with the obligations set out in Article 26(1) and commits to informing the Commission when such obligation arises;
+
+(c) it invests in the Union in continued innovation with a view to achieving concrete advances in semiconductor technology or preparing next-generation technologies;
+
+(d) it supports the Union’s talent pipeline by developing and deploying educational and skills training and by increasing the pool of qualified and skilled workforce.
+
+4.
+
+For the purpose of investing in continued innovation in accordance with paragraph 3, point (c), of this Article integrated production facilities shall have preferential access to the pilot lines established in accordance with Article 5, point (b). Any such preferential access shall neither exclude nor prevent effective access on fair terms to the pilot lines by other interested undertakings, in particular start-ups and SMEs.
+
+
+Article 14
+
+Open EU foundries
+
+1.
+
+Open EU foundries shall be first-of-a-kind facilities for semiconductor manufacturing in the Union that offer production capacity to unrelated undertakings and thereby contribute to the security of supply for the internal market and the resilience of the Union’s semiconductor ecosystem and in addition they may, where relevant, contribute to the security of the global semiconductor supply chain.
+
+2.
+
+At the time of submitting an application in accordance with Article 15(1), an open EU foundry shall be required to qualify as a first-of-a-kind facility.
+
+3.
+
+An open EU foundry shall meet the following requirements:
+
+(a) its establishment has a clear positive impact, with spill-over effects beyond the undertaking or the Member State concerned, on the Union’s semiconductor value chain in the medium to long term, with a view to ensuring security of supply and resilience of the semiconductor ecosystem, including the growth of start-ups and SMEs, and contributing to the Union’s green and digital transitions, taking into account, in particular, the extent to which it offers front-end or back-end production capacity, or both, to undertakings which are not related to the facility, if there is sufficient demand;
+
+(b) it provides an assurance that it is not subject to the extraterritorial application of public service obligations of third countries in a way that may undermine the undertaking’s ability to comply with the obligations set out in Article 26(1) and commits to informing the Commission when such obligation arises;
+
+(c) it invests in the Union in continued innovation with a view to achieving concrete advances in semiconductor technology or preparing next-generation technologies;
+
+(d) it supports the Union’s talent pipeline by developing and deploying educational and skills training and by increasing the pool of qualified and skilled workforce.
+
+4.
+
+Where an open EU foundry offers production capacity to undertakings not related to the operator of the facility, it shall establish and maintain adequate and effective functional separation of the design and manufacturing processes in order to ensure the protection of information obtained at each stage.
+
+5.
+
+For the purpose of investing in the continued innovation in accordance with paragraph 3, point (c), of this Article, open EU foundries shall have preferential access to the pilot lines established in accordance with Article 5, point (b). Any such preferential access shall neither exclude nor prevent effective access on fair terms to the pilot lines by other interested undertakings, in particular start-ups and SMEs.
+
+
+Article 15
+
+Application for status as integrated production facility or open EU foundry
+
+1.
+
+Any undertaking or any consortium of undertakings may submit an application to the Commission to grant a project the status of integrated production facility or open EU foundry.
+
+2.
+
+The Commission shall, taking into account the views of the European Semiconductor Board, assess the application through a fair and transparent process on the basis of the following elements:
+
+(a) compliance with the criteria set out in Article 13(2) or Article 14(2), respectively, and a commitment to comply with Article 13(3) or Article 14(3), respectively;
+
+(b) a business plan evaluating the financial and technical viability of the project, taking into account its entire lifetime, including information on any planned public support;
+
+(c) proven experience of the applicant in installing and operating similar facilities;
+
+(d) provision of an appropriate supporting document proving the readiness of the Member State or Member States where the applicant intends to establish its facility to support the establishment of such a facility;
+
+(e) the existence of appropriate policies, including technical protection and implementing measures, aiming to ensure the protection of undisclosed information and IP rights, in particular with a view to preventing the unauthorised disclosure of trade secrets or the leakage of sensitive emerging technologies.
+
+The Commission shall provide guidance on the information required and its relevant format.
+
+3.
+
+The Commission shall process applications, adopt its decisions and notify the applicants within six months of receipt of a complete application. Where the Commission considers that the information provided in the application is incomplete, it shall provide the applicant with the opportunity to submit the additional information required to complete the application without undue delay. The Commission’s decision shall determine the duration of the status on the basis of the predicted lifetime of the project.
+
+4.
+
+The Commission shall monitor the progress achieved in the establishment and operation of integrated production facilities and open EU foundries and shall inform the European Semiconductor Board on a regular basis.
+
+5.
+
+The operator of the facility may request the Commission to review the duration of the status or to modify its implementation plans with regard to compliance with the requirements under Article 13(3) or Article 14(3), respectively, where it considers such a review to be duly justified on account of unforeseen external circumstances. On the basis of such a review, the Commission may revise the duration of the status granted in accordance with paragraph 3 of this Article or accept the modification of the implementation plans.
+
+6.
+
+Where the Commission finds that a facility no longer fulfils the requirements set out in Article 13(3) or Article 14(3), it shall give the operator of the integrated production facility or open EU foundry the opportunity to comment and to propose appropriate measures.
+
+7.
+
+The Commission may repeal a decision recognising the status of an integrated production facility or open EU foundry if the recognition was based on an application containing incorrect information or where, despite completing the procedure in paragraph 5 of this Article, the integrated production facility or open EU foundry does not fulfil the requirements set out in Article 13(3) or Article 14(3), respectively. Before taking such a decision, the Commission shall consult the European Semiconductor Board after providing it with the reasons for the proposed repeal. Any decision withdrawing the status of an integrated production facility or open EU foundry shall be properly reasoned and subject to a right of appeal by the operator.
+
+8.
+
+Facilities whose status as integrated production facility or open EU foundry have been repealed pursuant to paragraph 7 of this Article shall lose all rights linked to the recognition of this status arising from this Regulation. However, such facilities shall remain subject to the obligation set out in Article 26(1) for a period equivalent to that which was initially foreseen when the status was granted in accordance with paragraph 3 of this Article, or, where the status was reviewed, the applicable duration in accordance with paragraph 5 of this Article.
+
+
+Article 16
+
+Public interest and public support
+
+1.
+
+Integrated production facilities and open EU foundries shall be considered to contribute to the security of supply of semiconductors and the resilience of the Union’s semiconductor ecosystem and therefore to be in the public interest.
+
+2.
+
+In order to reach security of supply and the resilience of the Union’s semiconductor ecosystem, Member States may, without prejudice to Articles 107 and 108 TFEU, apply support measures and provide for administrative support to integrated production facilities and open EU foundries in accordance with Article 18.
+
+
+Article 17
+
+Design centres of excellence
+
+1.
+
+The Commission may award a label of ‘design centre of excellence’ to design centres established in the Union that significantly enhance the Union’s capabilities in innovative chip design through their service offerings or through the development, promotion and strengthening of design skills and capabilities.
+
+2.
+
+The Commission shall adopt delegated acts in accordance with Article 37, supplementing this Regulation by establishing the procedure for applications and the requirements and conditions for the granting, monitoring and withdrawal of the label referred to in paragraph 1 of this Article.
+
+3.
+
+Design centres of excellence shall be considered to be in the public interest, thereby contributing to the resilience of the Union’s semiconductor ecosystem. Member States may, without prejudice to Articles 107 and 108 TFEU, apply support measures for design centres of excellence, in particular if such design centres of excellence are SMEs.
+
+
+Article 18
+
+Fast-tracking of permit-granting procedures
+
+1.
+
+Member States shall ensure that administrative applications related to the planning, construction and operation of integrated production facilities and open EU foundries are processed in an efficient, transparent and timely manner. To that end, all national authorities concerned shall ensure that the most rapid treatment legally possible is given to these applications in a manner that fully respects national law and procedure.
+
+2.
+
+Where such a status exists in national law, integrated production facilities and open EU foundries shall be allocated the status of the highest national significance possible and be treated as such in permit-granting processes. This paragraph shall apply only where such status of the highest national significance exists in national law and does not create an obligation for Member States to introduce such status.
+
+3.
+
+The security of supply of semiconductors and the resilience of the semiconductor ecosystem may be considered to be an imperative reason of overriding public interest within the meaning of Article 6(4) and Article 16(1), point (c), of Directive 92/43/EEC and of overriding public interest within the meaning of Article 4(7) of Directive 2000/60/EC. Therefore, the planning, construction and operation of integrated production facilities and open EU foundries may be considered to be of overriding public interest, provided that the remaining other conditions set out in those provisions are fulfilled. This paragraph shall be without prejudice to the applicability or implementation of other Union environmental law.
+
+4.
+
+For each integrated production facility and open EU foundry, each Member State concerned may designate an authority responsible for facilitating and coordinating administrative applications related to planning, construction and operation.
+
+Each designated authority may appoint a coordinator who shall serve as the single point of contact for the integrated production facility or open EU foundry.
+
+If the establishment of an integrated production facility or an open EU foundry requires decisions to be taken in two or more Member States, the relevant designated authorities may take all necessary steps for efficient and effective cooperation and coordination among themselves.
+
+
+Article 19
+
+Strategic mapping of the Union’s semiconductor sector
+
+1.
+
+The Commission shall carry out a strategic mapping of the Union’s semiconductor sector in cooperation with the European Semiconductor Board. The strategic mapping shall provide an analysis of the Union’s strengths and weaknesses in the global semiconductor sector and identify factors such as:
+
+(a) key products and critical infrastructures in the internal market that are depending on the supply of semiconductors;
+
+(b) main user industries in the Union and their current and expected needs and dependencies, including an analysis of the possible risks to security of supply also linked to insufficient investment;
+
+(c) key segments of the Union’s semiconductor supply chain, including design, software for design, materials, manufacturing equipment, semiconductor manufacturing and outsourced back-end;
+
+(d) the technological characteristics, the dependencies on third-country technology and providers, and bottlenecks of the Union’s semiconductor sector including access to inputs;
+
+(e) current and expected needs for skills and effective access to qualified workforce in the semiconductor sector;
+
+(f) where appropriate, the potential impact of crisis measures referred to in Articles 25, 26, and 27 on the semiconductor sector.
+
+2.
+
+The Commission shall inform the European Semiconductor Board of the aggregate results of the strategic mapping on a regular basis.
+
+3.
+
+The Commission shall, on the basis of the outcome of the strategic mapping carried out pursuant to paragraph 1 and after consulting the European Semiconductor Board, develop a list of early warning indicators. The Commission, after consulting the European Semiconductor Board, shall review the list of early warning indicators on a regular basis, at least every two years.
+
+4.
+
+The Commission shall, after consulting the European Semiconductor Board, develop a framework and methodology for a strategic mapping of the semiconductor sector. The Commission shall update the framework and the methodology where necessary.
+
+5.
+
+The strategic mapping shall be based, inter alia, on publicly and commercially available data and relevant non-confidential information from undertakings, the result of similar analysis performed, including in the context of Union law on raw materials and renewable energy, as well as the evaluations carried out pursuant to Article 40(1). Where this is not enough to develop the strategic mapping pursuant to paragraph 1 of this Article, the Commission may issue voluntary information requests to actors on the semiconductor value chain in the Union, after consulting the European Semiconductor Board. The Commission shall use the standardised and secure means for the collection and processing of information, referred to in Article 32(4), for the purposes of such information requests.
+
+6.
+
+Any information obtained pursuant to this Article shall be treated in compliance with the confidentiality obligations set out in Article 32.
+
+7.
+
+The Commission shall, after consulting the European Semiconductor Board, adopt guidance for the provision of information pursuant to paragraph 5. The Commission shall update that guidance when necessary.
+
+
+Article 20
+
+Monitoring and anticipation
+
+1.
+
+The Commission, in consultation with the European Semiconductor Board, shall carry out regular monitoring of the semiconductor value chain with a view to identifying factors that may disrupt, compromise or negatively affect the supply of semiconductors or trade in semiconductors. For the purposes of this Regulation, the monitoring shall consist of the following activities:
+
+(a) monitoring of early warning indicators identified pursuant to Article 19;
+
+(b) monitoring by Member States of the integrity of activities carried out by the key market actors identified pursuant to Article 21 and reporting by Member States on major events that may hinder the regular operations of such activities;
+
+(c) identifying best practices for preventive risk mitigation and increased transparency in the semiconductor sector.
+
+The Commission, after consulting the European Semiconductor Board, shall define the frequency of the monitoring on the basis of the needs of the semiconductor sector.
+
+The Commission shall coordinate the activities related to the monitoring of the semiconductor sector, on the basis of information collected pursuant to Article 19 or from other sources, such as international partners.
+
+2.
+
+The Commission shall pay particular attention to SMEs to minimise administrative burden resulting from the information collection.
+
+3.
+
+The Commission shall invite key market actors, a representative set of users of semiconductors from the critical sectors, representative organisations of the semiconductor value chain and other relevant stakeholders to provide information, on a voluntary basis, for the purpose of carrying out monitoring activities in accordance with paragraph 1, first subparagraph, point (a).
+
+4.
+
+For the purposes of paragraph 1, first subparagraph, point (b), Member States may request information, on a voluntary basis, from key market actors where necessary and proportionate.
+
+5.
+
+For the purposes of paragraph 3 national competent authorities shall establish and maintain a list of contacts of all relevant undertakings operating along the semiconductor supply chain established in their territory. That list shall be transmitted to the Commission. The Commission shall provide for a standardised format for the list of contacts with a view to ensuring interoperability.
+
+6.
+
+Any acquired information pursuant to this Article shall be handled in accordance with Article 32.
+
+7.
+
+On the basis of the information collected through the activities under paragraph 1, the Commission shall provide a report of the aggregated findings to the European Semiconductor Board in the form of regular updates. The European Semiconductor Board shall meet to assess the results of the monitoring. The Commission shall invite representative organisations of the semiconductor sector to such meetings. Where relevant, the Commission may invite key market actors, users of semiconductors from the critical sectors, authorities or representative organisations of partner third countries, and experts from academia and civil society to such meetings.
+
+
+Article 21
+
+Key market actors
+
+Member States shall, in cooperation with the Commission in accordance with Article 19, identify key market actors along the semiconductor supply chains established in their territory, taking into account the following elements:
+
+(a) the number of other Union undertakings relying on the service or good provided by a market actor;
+
+(b) the Union or global market share of the key market actor in the market for such services or goods;
+
+(c) the importance of a market actor in maintaining a sufficient level of supply of a service or good in the Union, taking into account the availability of alternative means for the provision of that service or good;
+
+(d) the impact a disruption of supply of the service or good provided by the market actor may have on the Union’s semiconductor supply chain and dependent markets.
+
+
+Article 22
+
+Alerts and preventive action
+
+1.
+
+Where a national competent authority becomes aware of a risk of serious disruption in the supply of semiconductors or has concrete and reliable information of any other relevant risk factor or event materialising, it shall alert the Commission without undue delay.
+
+2.
+
+Where the Commission becomes aware of a risk of serious disruption in the supply of semiconductors or has concrete and reliable information of any other relevant risk factor or event materialising, including on the basis of early warning indicators, upon an alert pursuant to paragraph 1 or from international partners, it shall, without undue delay, carry out the following preventive actions:
+
+(a) convening an extraordinary meeting of the European Semiconductor Board to coordinate the following actions: (i) discussing the severity of the disruptions to the supply of semiconductors; (ii) discussing whether initiating the procedure referred to in Article 23 may be necessary and proportionate; (iii) discussing whether it is appropriate, necessary and proportionate for Member States to jointly purchase semiconductors, intermediate products or raw materials as a preventive measure (joint procurement); (iv) entering into dialogue with stakeholders of the semiconductor value chain with a view to identifying, preparing and possibly coordinating preventive measures; (i) discussing the severity of the disruptions to the supply of semiconductors; (ii) discussing whether initiating the procedure referred to in Article 23 may be necessary and proportionate; (iii) discussing whether it is appropriate, necessary and proportionate for Member States to jointly purchase semiconductors, intermediate products or raw materials as a preventive measure (joint procurement); (iv) entering into dialogue with stakeholders of the semiconductor value chain with a view to identifying, preparing and possibly coordinating preventive measures;
+
+(i) discussing the severity of the disruptions to the supply of semiconductors;
+
+(ii) discussing whether initiating the procedure referred to in Article 23 may be necessary and proportionate;
+
+(iii) discussing whether it is appropriate, necessary and proportionate for Member States to jointly purchase semiconductors, intermediate products or raw materials as a preventive measure (joint procurement);
+
+(iv) entering into dialogue with stakeholders of the semiconductor value chain with a view to identifying, preparing and possibly coordinating preventive measures;
+
+(b) on behalf of the Union, entering into consultations or cooperation with relevant third countries with a view to seeking cooperative solutions to address supply-chain disruptions, in compliance with international obligations, which may involve, where appropriate, carrying out coordination in relevant international fora;
+
+(c) asking national competent authorities to assess the state of preparedness of the key market actors.
+
+3.
+
+Any joint procurement carried out following the discussions referred to in paragraph 2, point (a)(iii), shall be carried out by Member States in accordance with the rules set out in Articles 38 and 39 of Directive 2014/24/EU of the European Parliament and of the Council (31) and in Articles 56 and 57 of Directive 2014/25/EU of the European Parliament and of the Council (32).
+
+
+Article 23
+
+Activation of the crisis stage
+
+1.
+
+A semiconductor crisis shall be considered to occur where:
+
+(a) there are serious disruptions in the semiconductor supply chain or serious obstacles to trade in semiconductors within the Union causing significant shortages of semiconductors, intermediate products or raw or processed materials; and
+
+(b) such significant shortages prevent the supply, repair or maintenance of essential products used by critical sectors to the extent that it would have serious detrimental effect on the functioning of the critical sectors due to their impact on society, economy and security of the Union.
+
+2.
+
+Where the Commission becomes aware of a potential semiconductor crisis pursuant to Article 22(2), it shall assess whether the conditions of paragraph 1 of this Article are met. That assessment shall take into account the potential positive and negative impacts and consequences of the crisis stage on the Union’s semiconductor industry and critical sectors. Where that assessment provides concrete and reliable evidence, the Commission may, after consulting the European Semiconductor Board, propose to the Council to activate the crisis stage.
+
+3.
+
+The Council, acting by qualified majority, may activate the crisis stage by means of a Council implementing act. The duration of the crisis stage shall be specified in the implementing act and it shall not exceed 12 months.
+
+The Commission shall report on a regular basis and in any event at least every three months to the European Semiconductor Board and to the European Parliament on the state of the crisis.
+
+4.
+
+Before the expiry of the duration for which the crisis stage was activated, the Commission shall assess whether it is appropriate to prolong the crisis stage. Where such assessment provides concrete and reliable evidence that the conditions for the activation of the crisis are still met, and after consulting the European Semiconductor Board, the Commission may propose to the Council to prolong the crisis stage.
+
+The Council, acting by qualified majority, may prolong the crisis stage by means of a Council implementing act. The duration of the prolongation shall be limited and specified in the Council implementing act.
+
+The Commission may propose prolonging the crisis stage once or more frequently where duly justified.
+
+5.
+
+During the crisis stage, the Commission shall, after consulting the European Semiconductor Board, assess the appropriateness of an early termination of the crisis stage. If the assessment indicates so, the Commission may propose to the Council to terminate the crisis stage.
+
+The Council may terminate the crisis stage by means of a Council implementing act.
+
+6.
+
+During the crisis stage, the Commission shall, upon request from a Member State or on its own initiative, convene extraordinary meetings of the European Semiconductor Board where necessary.
+
+Member States shall work closely with the Commission, inform in a timely manner about and coordinate any national measures taken with regard to the semiconductor supply chain within the European Semiconductor Board.
+
+7.
+
+Upon expiry of the period for which the crisis stage is activated or in the event of its early termination pursuant to paragraph 5 of this Article, the measures taken in accordance with Articles 25, 26 and 27 shall cease to apply immediately.
+
+8.
+
+The Commission shall update the mapping and the monitoring of the semiconductor value chains pursuant to Articles 19 and 20 taking into account the experience from the crisis no later than six months after the expiry of the duration of the crisis stage.
+
+
+Article 24
+
+Emergency toolbox
+
+1.
+
+Where the crisis stage is activated pursuant to Article 23 and where necessary in order to address the semiconductor crisis in the Union, the Commission may take the measure provided for in Article 25, 26 or 27, under the conditions laid down therein.
+
+2.
+
+The Commission shall, after consulting the European Semiconductor Board, restrict the application of the measures provided for in Articles 26 and 27 to the critical sectors the operation of which is disturbed or under threat of disturbance on account of the semiconductor crisis. The use of the measures referred to in paragraph 1 of this Article shall be proportionate and restricted to what is necessary for addressing serious disruptions affecting critical sectors in the Union and must be in the best interest of the Union. The use of those measures shall avoid placing disproportionate administrative burden in particular on SMEs.
+
+3.
+
+Where the crisis stage is activated pursuant to Article 23 and where appropriate in order to address the semiconductor crisis in the Union, the European Semiconductor Board may:
+
+(a) assess and advise on appropriate and effective emergency measures;
+
+(b) assess the expected impact of the possible imposition of protective measures on the Union’s semiconductor sector, considering whether the market situation corresponds to a significant shortage of an essential product pursuant to Regulation (EU) 2015/479 and provide an opinion to the Commission.
+
+4.
+
+The Commission shall regularly inform the European Parliament and the Council of any measures taken in accordance with paragraph 1 and explain the reasons for its decision.
+
+5.
+
+The Commission may, after consulting the European Semiconductor Board, issue guidance on the implementation and the use of the emergency measures.
+
+
+Article 25
+
+Information gathering
+
+1.
+
+Where the crisis stage is activated pursuant to Article 23, the Commission may request undertakings operating along the semiconductor supply chain to provide information about their production capabilities, production capacities and current primary disruptions. The requested information shall be limited to what is necessary to assess the nature of the semiconductor crisis or to identify and assess potential mitigation or emergency measures at Union or national level. The information requests shall not entail the supply of information the disclosure of which would be contrary to the Member States’ national security interests.
+
+2.
+
+Before launching a request for information, the Commission may carry out a voluntary consultation of a representative number of relevant undertakings with a view to identifying the appropriate and proportionate content of such a request. The Commission shall develop the request for information in cooperation with the European Semiconductor Board.
+
+3.
+
+The Commission shall use the secure means and handle any acquired information in accordance with Article 32 to launch the request for information. For this purpose, national competent authorities shall transmit to the Commission the list of contacts established under Article 20(5).
+
+The Commission shall without delay forward a copy of the request for information to the national competent authority of the Member State in whose territory the production site of the addressed undertaking is situated. If the national competent authority so requires, the Commission shall transmit the information acquired from the relevant undertaking in accordance with Union law.
+
+4.
+
+The request for information shall state its legal basis, be limited to the minimum necessary and be proportionate in terms of the granularity and volume of the data and frequency of access to the data requested, have regard for the legitimate aims of the undertaking and the cost and effort required to make the data available, and set out the time limit within which the information is to be provided. It shall also state the penalties provided for in Article 33.
+
+5.
+
+The owners of the undertakings or their representatives and, in the case of legal persons or associations having no legal personality, the persons authorised to represent them by law or by their constitution shall supply the information requested on behalf of the undertaking or the association of undertakings concerned.
+
+6.
+
+If an undertaking supplies incorrect, incomplete or misleading information in response to a request made pursuant to this Article, or does not supply the information within the prescribed time limit, it shall be subject to fines set in accordance with Article 33, except where the undertaking has sufficient reasons for not supplying the requested information.
+
+7.
+
+If an undertaking established in the Union is subject to a request for information from a third country, related to its semiconductor activities, it shall inform the Commission, in due time, in such a manner as to enable the Commission to request similar information from the undertaking. The Commission shall inform the European Semiconductor Board of the existence of such request from a third country.
+
+
+Article 26
+
+Priority-rated orders
+
+1.
+
+Where the crisis stage is activated pursuant to Article 23, the Commission may require integrated production facilities and open EU foundries to accept and prioritise an order of crisis-relevant products (priority-rated order). Such an obligation shall take precedence over any performance obligation under private or public law.
+
+2.
+
+Where applicable, the obligation under paragraph 1 can be imposed to other semiconductor undertakings which have accepted such possibility in the context of receiving public support.
+
+3.
+
+When a semiconductor undertaking established in the Union is subject to a third-country priority-rated order measure, it shall inform the Commission. If that obligation has a significant impact on the operation of certain critical sectors, the Commission may require that undertaking, where necessary and proportionate, to accept and prioritise orders of crisis relevant products in accordance with paragraphs 5, 6 and 7.
+
+4.
+
+Priority-rated orders shall be restricted to beneficiaries who are users of semiconductors from critical sectors or undertakings supplying critical sectors whose activities are disrupted or at risk of disruption and who, having implemented appropriate risk mitigation measures, were unable to avoid and to mitigate the impact of the shortage. The Commission may request a beneficiary to submit appropriate evidence thereof.
+
+5.
+
+The obligations under paragraphs 1, 2 and 3 of this Article shall be enacted as a last resort measure by the Commission via decision. The Commission shall take that decision after consulting the European Semiconductor Board and in accordance with all applicable Union legal obligations, having regard to the circumstances of the case, including the principles of necessity and proportionality. The decision shall, in particular, have regard for the legitimate aims of the undertaking concerned and the cost, effort and technical adjustments required for any change in production sequence. In its decision, the Commission shall state the legal basis of the priority-rated order, fix the time-limit within which the order is to be performed, and, where applicable, specify the product and quantity, and, where applicable, state the penalties provided for in Article 33 for non-compliance with such an obligation. The priority-rated order shall be placed at fair and reasonable price.
+
+6.
+
+Before issuing priority-rated orders in accordance with paragraph 1, the Commission shall give the envisaged recipient of a priority-rated order the opportunity to be heard on the feasibility and details of the order. The Commission shall not issue the priority-rated order when:
+
+(a) the undertaking is unable to perform the priority-rated order on account of insufficient production capability or production capacity, or on technical grounds, even under preferential treatment of the order;
+
+(b) acceptance of the order would place an unreasonable economic burden and entail particular hardship for the undertaking, including substantial risks relating to business continuity.
+
+7.
+
+Where an undertaking is required to accept and prioritise a priority-rated order, it shall not be liable for any breach of contractual obligations that is required to comply with the priority-rated orders. The liability shall be excluded only to the extent the violation of contractual obligations was necessary for compliance with the mandated prioritisation.
+
+8.
+
+The Commission shall adopt an implementing act laying down the practical and operational arrangements for the functioning of priority-rated orders. That implementing act shall be adopted in accordance with the examination procedure referred to in Article 38(2).
+
+
+Article 27
+
+Common purchasing
+
+1.
+
+Where the crisis stage is activated pursuant to Article 23, the Commission may, upon the request of two or more Member States, act as a central purchasing body on behalf of all Member States willing to participate (participating Member State) for their public procurement of crisis-relevant products for critical sectors (common purchasing). Participation in the common purchasing shall be without prejudice to other procurement procedures. The request for common purchasing shall set out reasons on which it is based and shall be used exclusively to address supply-chain disruptions of semiconductors leading to the crisis.
+
+2.
+
+The Commission shall assess the utility, necessity and proportionality of the request, taking into account the views of the European Semiconductor Board. Where the Commission intends not to follow the request, it shall inform the Member States concerned and the European Semiconductor Board and give reasons for its refusal.
+
+3.
+
+The Commission shall draw up a proposal for an agreement to be signed by the participating Member States. Such an agreement shall organise in detail the common purchasing referred to in paragraph 1, including reasons for the use of the common purchasing mechanism and liabilities to be assumed, and establish the mandate for the Commission to act on behalf of the participating Member States.
+
+4.
+
+Procurement under this Regulation shall be carried out by the Commission in accordance with the rules set out in Regulation (EU, Euratom) 2018/1046 of the European Parliament and of the Council (33) (the Financial Regulation) for its own procurement. The Commission may have the ability and responsibility, on behalf of all participating Member States, to enter into contracts with economic operators, including individual producers of crisis-relevant products, concerning the purchase of such products or concerning the financing of the production or the development of such products in exchange for a priority right to the result.
+
+5.
+
+Where the procurement of crisis-relevant products includes financing from the Union budget, specific conditions may be set out in specific agreements with economic operators.
+
+6.
+
+The Commission shall carry out the procurement procedures and conclude the contracts with economic operators on behalf of the participating Member States. The Commission shall invite the participating Member States to appoint representatives to take part in the preparation of the procurement procedures. The deployment, use or resale of the purchased products shall remain the responsibility of the participating Member States, in accordance with the agreement referred to in paragraph 3.
+
+7.
+
+The deployment of common purchasing pursuant to this Article shall be without prejudice to other instruments provided for in the Financial Regulation.
+
+
+Article 28
+
+Establishment and tasks of the European Semiconductor Board
+
+1.
+
+The European Semiconductor Board is established.
+
+2.
+
+The European Semiconductor Board shall provide the Commission with advice, assistance and recommendations pursuant to this Regulation and, in particular, by:
+
+(a) providing advice on the Initiative to the Public Authorities Board of the Chips Joint Undertaking;
+
+(b) providing advice to the Commission in the assessment of the applications for integrated production facilities and open EU foundries;
+
+(c) exchanging views with the Commission on the best ways to ensure, in accordance with Union and national law, effective protection and enforcement of IP rights, confidential information and trade secrets, with due involvement of stakeholders, in relation to the semiconductor sector;
+
+(d) discussing and preparing the identification of specific sectors and technologies with potential high social or environmental impact, or security significance, and therefore in need of certification as green, trusted and secure products;
+
+(e) addressing issues relating to strategic mapping, monitoring, alerting and preventive action and crisis response;
+
+(f) advising on the crisis stage tools under Articles 24 to 27;
+
+(g) providing advice and recommendations regarding the consistent implementation of this Regulation, facilitating cooperation among Member States and exchange of information on issues relating to this Regulation.
+
+3.
+
+The European Semiconductor Board shall advise the Commission on matters concerning international cooperation related to semiconductors. To that end, it may consider stakeholders’ views, including those of the Industrial Alliance on Processors and Semiconductor Technologies. The European Semiconductor Board shall periodically discuss the following, and shall inform the Commission of the outcome of such discussions:
+
+(a) how to enhance cooperation along the global semiconductor value chain between the Union and third countries, taking into account existing international cooperation agreements with third countries;
+
+(b) which third countries could be prioritised for enhanced international cooperation related to semiconductors, considering: (i) complementarities and interdependencies along the semiconductor supply chain; (ii) the effect on semiconductor supply of trade policies, tariffs, export restrictions, trade barriers, as well as the effect of business closures, offshoring or acquisitions of Union key market actors by entities established in third countries on the basis of publicly available information; (iii) the potential contribution to security of supply, taking into account their production capacity of semiconductors, intermediate products and raw materials required to produce semiconductors or intermediate products; (iv) existing cooperation agreements between that third country and the Union. (i) complementarities and interdependencies along the semiconductor supply chain; (ii) the effect on semiconductor supply of trade policies, tariffs, export restrictions, trade barriers, as well as the effect of business closures, offshoring or acquisitions of Union key market actors by entities established in third countries on the basis of publicly available information; (iii) the potential contribution to security of supply, taking into account their production capacity of semiconductors, intermediate products and raw materials required to produce semiconductors or intermediate products; (iv) existing cooperation agreements between that third country and the Union.
+
+(i) complementarities and interdependencies along the semiconductor supply chain;
+
+(ii) the effect on semiconductor supply of trade policies, tariffs, export restrictions, trade barriers, as well as the effect of business closures, offshoring or acquisitions of Union key market actors by entities established in third countries on the basis of publicly available information;
+
+(iii) the potential contribution to security of supply, taking into account their production capacity of semiconductors, intermediate products and raw materials required to produce semiconductors or intermediate products;
+
+(iv) existing cooperation agreements between that third country and the Union.
+
+This paragraph shall be without prejudice to the prerogatives of the European Parliament and of the Council pursuant to the Treaties.
+
+4.
+
+The European Semiconductor Board shall ensure coordination, cooperation and information exchange, where appropriate, with the relevant crisis response and crisis preparedness structures established under Union law.
+
+
+Article 29
+
+Structure of the European Semiconductor Board
+
+1.
+
+The European Semiconductor Board shall be composed of representatives from all the Member States. A representative of the Commission shall be the Chair of the European Semiconductor Board.
+
+2.
+
+Each Member State shall appoint a high-level representative to the European Semiconductor Board. Where relevant as regards the function and expertise, a Member State may have more than one representative in relation to different tasks of the European Semiconductor Board. Each member of the European Semiconductor Board shall have an alternate. Only Member States shall have voting rights. Each Member State shall have only one vote regardless of the number of representatives that they have.
+
+3.
+
+At its first meeting, on a proposal by and in agreement with the Chair, the European Semiconductor Board shall adopt its rules of procedure.
+
+4.
+
+The Chair may establish standing or temporary sub-groups for the purpose of examining specific questions.
+
+Where appropriate, the Chair shall invite representative organisations of the semiconductor value chain, the Industrial Alliance on Processors and Semiconductor Technologies, trade unions and users of semiconductors at Union level to provide input to such sub-groups in the capacity of observers.
+
+A sub-group including Union research and technology organisations shall be established for the purpose of examining specific aspects on strategic technology directions and reporting on this to the European Semiconductor Board.
+
+
+Article 30
+
+Operation of the European Semiconductor Board
+
+1.
+
+The European Semiconductor Board shall hold ordinary meetings at least once a year. It may hold extraordinary meetings at the request of the Commission or a Member State and as referred to in Articles 20 and 23.
+
+2.
+
+The European Semiconductor Board shall hold separate meetings for its tasks referred to in Article 28(2), point (a), and for its tasks referred to in Article 28(2), points (b), (d), (e) and (f).
+
+3.
+
+The Chair shall convene the meetings and prepare the agenda, after consulting the members of the European Semiconductor Board, in accordance with the tasks of the European Semiconductor Board pursuant to this Regulation and with its rules of procedure.
+
+The Commission shall provide administrative and analytical support for the activities of the European Semiconductor Board pursuant to Article 28.
+
+4.
+
+Where appropriate, the Chair shall involve representative organisations of the semiconductor sector and shall invite experts with specific expertise in the subject matter, including from stakeholder organisations, and appoint observers to take part in the meetings, including upon suggestion from members. The Chair may facilitate exchanges between the European Semiconductor Board and other Union bodies, offices, agencies and expert and advisory groups. To that end, the Chair shall invite a representative from the European Parliament as a permanent observer to the European Semiconductor Board, in particular to meetings concerning Chapter IV on monitoring and crisis response. The Chair shall ensure the participation of relevant other Union institutions and bodies as observers to the European Semiconductor Board with respect to meetings concerning Chapter IV on monitoring and crisis response.
+
+Observers and experts shall not have voting rights and shall not participate in the formulation of opinions, recommendations or advice of the European Semiconductor Board and its sub-groups. Where appropriate, the European Semiconductor Board may invite those observers and experts to contribute with information and insights.
+
+5.
+
+The European Semiconductor Board shall take the necessary measures to ensure the safe handling and processing of confidential information, in accordance with Article 32.
+
+
+Article 31
+
+Designation of national competent authorities and single points of contact
+
+1.
+
+Each Member State shall designate one or more national competent authorities for the purpose of ensuring the application and implementation of this Regulation at national level.
+
+2.
+
+Where a Member State designates more than one national competent authority, it shall clearly set out the respective responsibilities of the authorities concerned and shall ensure that they cooperate effectively and efficiently to fulfil their tasks under this Regulation, including with regard to the designation and activities of the national single point of contact referred to in paragraph 3.
+
+3.
+
+Each Member State shall designate one national single point of contact to exercise a liaison function to ensure cross-border cooperation with national competent authorities of other Member States, with the Commission and with the European Semiconductor Board (single point of contact). Where a Member State designates only one competent authority, that competent authority shall also be the single point of contact.
+
+4.
+
+Each Member State shall notify the Commission of the designation of the national competent authority or more than one national competent authority, and the national single point of contact, including their precise tasks and responsibilities under this Regulation, their contact information and any subsequent changes thereto.
+
+5.
+
+Member States shall ensure that national competent authorities, including the single point of contact designated, exercise their powers impartially, transparently and in a timely manner and that they are provided with the powers and the adequate technical, financial and human resources to fulfil their tasks under this Regulation.
+
+6.
+
+Member States shall ensure that national competent authorities, whenever appropriate and in accordance with Union and national law, consult and cooperate with other relevant national authorities, as well as with relevant interested parties.
+
+The Commission shall facilitate the exchange of experience between national competent authorities.
+
+
+Article 32
+
+Treatment of confidential information
+
+1.
+
+Information acquired in the course of implementing this Regulation shall be used only for the purposes of this Regulation and shall be protected by the relevant Union and national law.
+
+2.
+
+Information acquired pursuant to Articles 15, 20 and 25 and Article 26(3) shall be subject to professional secrecy and shall enjoy the protection afforded by the rules applicable to the Union institutions and the relevant national law, including the triggering of the provisions applicable to the violation of those rules.
+
+3.
+
+The Commission and the national authorities, their officials, servants and other persons working under the supervision of those authorities shall ensure the confidentiality of information and data obtained in carrying out their tasks and activities in such a manner as to protect in particular IP rights and sensitive business information or trade secrets. This obligation shall apply to all representatives of Member States, observers, experts and other participants attending meetings of the European Semiconductor Board pursuant to Article 28 and the members of the Semiconductor Committee pursuant to Article 38(1).
+
+4.
+
+The Commission shall provide for standardised and secure means for the collection, processing and storage of the information acquired pursuant to this Regulation.
+
+5.
+
+The Commission and Member States may exchange, where necessary, information acquired pursuant to Articles 20 and 25 solely in an aggregated form preventing disclosure of any conclusions on the specific situation of a company in a Member State with competent authorities of third countries with which they have agreed on bilateral or multilateral confidentiality arrangements to provide an adequate level of confidentiality. Before the Commission or Member States engage in any exchange of information, they shall notify the European Semiconductor Board of the information to be shared and the relevant confidentiality arrangement.
+
+When exchanging information with the competent authorities of third countries, the Commission shall designate and use a single point of contact in the Union to facilitate the transfer of such information or data in a confidential manner pursuant to relevant Commission procedures.
+
+6.
+
+The Commission may adopt implementing acts, as necessary on the basis of the experience acquired in information gathering, to specify the practical arrangements for the treatment of confidential information in the context of exchange of information pursuant to this Regulation. Those implementing acts shall be adopted in accordance with the examination procedure referred to in Article 38(2).
+
+
+Article 33
+
+Penalties
+
+1.
+
+The Commission may, where it deems it to be necessary and proportionate, adopt a decision to:
+
+(a) impose fines, where an undertaking, intentionally or through gross negligence, supplies incorrect, incomplete or misleading information in response to a request made pursuant to Article 25, or does not supply the information within the prescribed time limit;
+
+(b) impose fines, where an undertaking, intentionally or through gross negligence, does not comply with the obligation to inform the Commission of a third-country obligation pursuant to Article 25(7) and Article 26(3);
+
+(c) impose periodic penalty payments, where an undertaking, intentionally or through gross negligence, does not comply with an obligation to prioritise the production of crisis-relevant products pursuant to Article 26.
+
+2.
+
+Before taking a decision pursuant to paragraph 1 of this Article, the Commission shall provide an opportunity for undertakings to be heard in accordance with Article 36. It shall take into account any duly reasoned justification presented by such undertakings for the purpose of determining whether fines or periodic penalty payments are deemed necessary and proportionate.
+
+3.
+
+Fines imposed in the cases referred to in paragraph 1, point (a), shall not exceed EUR 300 000.
+
+Fines imposed in the cases referred to in paragraph 1, point (b), shall not exceed EUR 150 000.
+
+Where the undertaking concerned is an SME, the fines imposed shall not exceed EUR 50 000.
+
+4.
+
+Periodic penalty payments imposed in the case referred to in paragraph 1, point (c), shall not exceed 1,5 % of the current daily turnover for each working day of non-compliance with the obligation pursuant to Article 26 calculated from the date established in the decision in which the priority-rated order was issued.
+
+Where the undertaking concerned is an SME, the periodic penalty payments imposed shall not exceed 0,5 % of the current daily turnover.
+
+5.
+
+In fixing the amount of the fine or periodic penalty payment, the Commission shall take into consideration the nature, gravity and duration of the infringement, including in cases of non-compliance with the obligation to accept and prioritise a priority-rated order set out in Article 26, and whether the undertaking has partially complied with the priority-rated order, taking due account of the principles of proportionality and appropriateness.
+
+6.
+
+Where the undertaking has fulfilled the requirements which the periodic penalty payment was intended to enforce, the Commission may fix the definitive amount of the periodic penalty payment at a figure lower than that which would arise under the original decision.
+
+7.
+
+The Court of Justice shall have unlimited jurisdiction to review decisions whereby the Commission has fixed a fine or a periodic penalty payment. It may cancel, reduce or increase the fine or periodic penalty payment imposed.
+
+
+Article 34
+
+Limitation period for the imposition of penalties
+
+1.
+
+The powers conferred on the Commission by Article 33 shall be subject to the following limitation periods:
+
+(a) two years in the case of infringements of provisions concerning requests of information pursuant to Article 25;
+
+(b) two years in the case of infringements of provisions concerning information obligation pursuant to Article 25(7) and Article 26(3);
+
+(c) three years in the case infringements of provisions concerning the obligation to prioritise the production of crisis-relevant products pursuant to Article 26.
+
+2.
+
+The limitation periods referred to in paragraph 1 shall begin to run on the day on which the infringement is committed. Where there are continuous or repeated infringements, the limitation periods shall begin to run on the day on which the last infringement was committed.
+
+3.
+
+Any action taken by the Commission or the competent authorities of the Member States for the purpose of ensuring compliance with this Regulation shall interrupt the limitation period.
+
+4.
+
+The interruption of the limitation period shall apply for all the parties which are held responsible for the participation in the infringement.
+
+5.
+
+Each interruption shall start the time running afresh. However, the limitation period shall expire at the latest on the day on which a period equal to twice the limitation period has elapsed without the Commission having imposed a fine or a periodic penalty payment. That period shall be extended by the time during which the limitation period is suspended because the decision of the Commission is the subject of proceedings pending before the Court of Justice.
+
+
+Article 35
+
+Limitation period for the enforcement of penalties
+
+1.
+
+The power of the Commission to enforce decisions taken pursuant to Article 33 shall be subject to a limitation period of three years.
+
+2.
+
+Time shall begin to run on the day on which the decision becomes final.
+
+3.
+
+The limitation period for the enforcement of fines and periodic penalty payments shall be interrupted:
+
+(a) by notification of a decision varying the original amount of the fine or periodic penalty payment or refusing an application for variation;
+
+(b) by any action of the Commission or of a Member State, acting at the request of the Commission, designed to enforce payment of the fine or periodic penalty payment.
+
+4.
+
+Each interruption shall start time running afresh.
+
+5.
+
+The limitation period for the enforcement of fines and periodic penalty payments shall be suspended for as long as:
+
+(a) time to pay is allowed;
+
+(b) enforcement of payment is suspended pursuant to a decision of the Court of Justice.
+
+
+Article 36
+
+Right to be heard for the imposition of penalties
+
+1.
+
+Before adopting a decision pursuant to Article 33, the Commission shall give the undertaking concerned the opportunity of being heard on:
+
+(a) preliminary findings of the Commission, including any matter to which the Commission has taken objections;
+
+(b) measures that the Commission may intend to take in view of the preliminary findings referred to in point (a).
+
+2.
+
+Undertakings concerned may submit their observations on the Commission’s preliminary findings pursuant to paragraph 1, point (a), within a time limit which shall be fixed by the Commission in its preliminary findings and which may not be less than 14 days.
+
+3.
+
+The Commission shall base its decisions only on objections on which undertakings concerned have been able to comment.
+
+4.
+
+The rights of defence of the undertaking concerned shall be fully respected in any proceedings. The undertaking concerned shall be entitled to have access to the Commission’s file under the terms of a negotiated disclosure, subject to the legitimate interest of undertakings in the protection of their business secrets. The right of access to the file shall not extend to confidential information and internal documents of the Commission or the authorities of the Member States. In particular, the right of access shall not extend to correspondence between the Commission and the authorities of the Member States. Nothing in this paragraph shall prevent the Commission from disclosing and using information necessary to prove an infringement.
+
+
+Article 37
+
+Exercise of the delegation
+
+1.
+
+The power to adopt delegated acts is conferred on the Commission subject to the conditions laid down in this Article.
+
+2.
+
+The power to adopt delegated acts referred to in Article 12(2) and (3) and Article 17(2) shall be conferred on the Commission for an indeterminate period of time from 19 September 2023.
+
+3.
+
+The delegation of power referred to in Article 12(2) and (3) and Article 17(2) may be revoked at any time by the European Parliament or by the Council. A decision to revoke shall put an end to the delegation of the power specified in that decision. It shall take effect the day following the publication of the decision in the Official Journal of the European Union or at a later date specified therein. It shall not affect the validity of any delegated acts already in force.
+
+4.
+
+Before adopting a delegated act, the Commission shall consult experts designated by each Member State in accordance with the principles laid down in the Interinstitutional Agreement of 13 April 2016 on Better Law-Making.
+
+5.
+
+As soon as it adopts a delegated act, the Commission shall notify it simultaneously to the European Parliament and to the Council.
+
+6.
+
+A delegated act adopted pursuant to Article 12(2) or (3), or Article 17(2) shall enter into force only if no objection has been expressed either by the European Parliament or by the Council within a period of two months of the notification of that act to the European Parliament and the Council or if, before the expiry of that period, the European Parliament and the Council have both informed the Commission that they will not object. That period shall be extended by two months at the initiative of the European Parliament or of the Council.
+
+
+Article 38
+
+Committee procedure
+
+1.
+
+The Commission shall be assisted by a committee (the ‘Semiconductor Committee’). That committee shall be a committee within the meaning of Regulation (EU) No 182/2011.
+
+2.
+
+Where reference is made to this paragraph, Article 5 of Regulation (EU) No 182/2011 shall apply.
+
+3.
+
+Where reference is made to this paragraph, Article 8 of Regulation (EU) No 182/2011, in conjunction with Article 5 thereof, shall apply.
+
+
+Article 39
+
+Amendments to Regulation (EU) 2021/694
+
+Regulation (EU) 2021/694 is amended as follows:
+
+(1) Article 3(2) is amended as follows: (a) the introductory wording is replaced by the following: ‘2. The Programme shall have six interrelated specific objectives:’ ; (b) the following point is added: ‘(f) Specific Objective 6 – Semiconductors.’; (a) the introductory wording is replaced by the following: ‘2. The Programme shall have six interrelated specific objectives:’ ; (b) the following point is added: ‘(f) Specific Objective 6 – Semiconductors.’; ‘(f) Specific Objective 6 – Semiconductors.’;
+
+(a) the introductory wording is replaced by the following: ‘2. The Programme shall have six interrelated specific objectives:’ ;
+
+(b) the following point is added: ‘(f) Specific Objective 6 – Semiconductors.’; ‘(f) Specific Objective 6 – Semiconductors.’;
+
+‘(f) Specific Objective 6 – Semiconductors.’;
+
+(2) the following Article is inserted: ‘Article 8a Specific Objective 6 – Semiconductors The financial contribution from the Union under Specific Objective 6 – Semiconductors shall pursue the objectives laid down in Article 4(2), points (a) to (d), of Regulation (EU) 2023/1781 of the European Parliament and of the Council (*1). (*1) Regulation (EU) 2023/1781 of the European Parliament and of the Council of 13 September 2023 establishing a framework of measures for strengthening Europe’s semiconductor ecosystem and amending Regulation (EU) 2021/694 (Chips Act) OJ L 229, 18.9.2023, p. 1 ’;"
+
+(3) in Article 9, paragraphs 1 and 2 are replaced by the following: ‘1. The financial envelope for the implementation of the Programme for the period from 1 January 2021 to 31 December 2027 shall be EUR 8 168 000 000 in current prices. 2. The indicative distribution of the amount referred to in paragraph 1 shall be: (a) EUR 2 019 914 000 for Specific Objective 1 – High Performance Computing; (b) EUR 1 663 956 000 for Specific Objective 2 – Artificial Intelligence; (c) EUR 1 399 566 000 for Specific Objective 3 – Cybersecurity and Trust; (d) EUR 507 347 000 for Specific Objective 4 – Advanced Digital Skills; (e) EUR 1 002 217 000 for Specific Objective 5 – Deployment and Best Use of Digital Capacities and Interoperability; (f) EUR 1 575 000 000 for Specific Objective 6 – Semiconductors.’ ; (a) EUR 2 019 914 000 for Specific Objective 1 – High Performance Computing; (b) EUR 1 663 956 000 for Specific Objective 2 – Artificial Intelligence; (c) EUR 1 399 566 000 for Specific Objective 3 – Cybersecurity and Trust; (d) EUR 507 347 000 for Specific Objective 4 – Advanced Digital Skills; (e) EUR 1 002 217 000 for Specific Objective 5 – Deployment and Best Use of Digital Capacities and Interoperability; (f) EUR 1 575 000 000 for Specific Objective 6 – Semiconductors.’
+
+(a) EUR 2 019 914 000 for Specific Objective 1 – High Performance Computing;
+
+(b) EUR 1 663 956 000 for Specific Objective 2 – Artificial Intelligence;
+
+(c) EUR 1 399 566 000 for Specific Objective 3 – Cybersecurity and Trust;
+
+(d) EUR 507 347 000 for Specific Objective 4 – Advanced Digital Skills;
+
+(e) EUR 1 002 217 000 for Specific Objective 5 – Deployment and Best Use of Digital Capacities and Interoperability;
+
+(f) EUR 1 575 000 000 for Specific Objective 6 – Semiconductors.’
+
+(4) in Article 11, paragraph 2 is replaced by the following: ‘2. Cooperation with third countries and organisations as referred to in paragraph 1 of this Article with respect to Specific Objectives 1, 2, 3 and 6 shall be subject to Article 12.’ ;
+
+(5) in Article 12, paragraph 6 is replaced by the following: ‘6. If duly justified for security reasons, the work programme may also provide that legal entities established in associated countries and legal entities that are established in the Union but are controlled from third countries may be eligible to participate in all or some actions under Specific Objectives 1, 2 and 6 only if they comply with the requirements to be fulfilled by those legal entities to guarantee the protection of the essential security interests of the Union and the Member States and to ensure the protection of classified documents information. Those requirements shall be set out in the work programme.’ ;
+
+(6) in Article 13, the following paragraph is added: ‘3. The synergies of Specific Objective 6 with other Union Programmes are described in Article 6 of and Annex III to Regulation (EU) 2023/1781.’ ;
+
+(7) Article 14 is amended as follows: (a) paragraph 1 is replaced by the following ‘1. The Programme shall be implemented under direct management, in accordance with the Financial Regulation, or under indirect management by entrusting certain implementation tasks to the bodies referred to in Article 62(1), first subparagraph, point (c), of the Financial Regulation, in accordance with Articles 4 to 8a of this Regulation. Bodies entrusted with the implementation of the Programme may depart from the rules on participation and dissemination laid down in this Regulation only where such departure is provided for in the legal act that establishes those bodies or entrusts budget implementation tasks to them or, for the bodies referred to in Article 62(1), first subparagraph, point (c)(ii), (c)(iii) or (c)(v), of the Financial Regulation, where such departure is provided for in the contribution agreement and the specific operating needs of such bodies or the nature of the action so require.’ ; (b) the following paragraph is added: ‘4. Where the conditions set in Article 27 of Regulation (EU) 2023/1781 are fulfilled, that Article shall apply.’ ; (a) paragraph 1 is replaced by the following ‘1. The Programme shall be implemented under direct management, in accordance with the Financial Regulation, or under indirect management by entrusting certain implementation tasks to the bodies referred to in Article 62(1), first subparagraph, point (c), of the Financial Regulation, in accordance with Articles 4 to 8a of this Regulation. Bodies entrusted with the implementation of the Programme may depart from the rules on participation and dissemination laid down in this Regulation only where such departure is provided for in the legal act that establishes those bodies or entrusts budget implementation tasks to them or, for the bodies referred to in Article 62(1), first subparagraph, point (c)(ii), (c)(iii) or (c)(v), of the Financial Regulation, where such departure is provided for in the contribution agreement and the specific operating needs of such bodies or the nature of the action so require.’ ; (b) the following paragraph is added: ‘4. Where the conditions set in Article 27 of Regulation (EU) 2023/1781 are fulfilled, that Article shall apply.’ ;
+
+(a) paragraph 1 is replaced by the following ‘1. The Programme shall be implemented under direct management, in accordance with the Financial Regulation, or under indirect management by entrusting certain implementation tasks to the bodies referred to in Article 62(1), first subparagraph, point (c), of the Financial Regulation, in accordance with Articles 4 to 8a of this Regulation. Bodies entrusted with the implementation of the Programme may depart from the rules on participation and dissemination laid down in this Regulation only where such departure is provided for in the legal act that establishes those bodies or entrusts budget implementation tasks to them or, for the bodies referred to in Article 62(1), first subparagraph, point (c)(ii), (c)(iii) or (c)(v), of the Financial Regulation, where such departure is provided for in the contribution agreement and the specific operating needs of such bodies or the nature of the action so require.’ ;
+
+(b) the following paragraph is added: ‘4. Where the conditions set in Article 27 of Regulation (EU) 2023/1781 are fulfilled, that Article shall apply.’ ;
+
+(8) in Article 17, paragraph 1 is replaced by the following: ‘1. Only actions contributing to the achievement of the objectives laid down in Articles 3 to 8a shall be eligible for funding.’ ;
+
+(9) in Annex I, the following point is added: ‘Specific Objective 6 – Semiconductors Actions under Specific Objective 6 are provided in Annex I to Regulation (EU) 2023/1781.’;
+
+(10) in Annex II, the following point is added: ‘Specific Objective 6 – Semiconductors Measurable indicators to monitor the implementation and to report on the progress of Specific Objective 6 are provided in Annex II to Regulation (EU) 2023/1781.’;
+
+(11) in Annex III, the following point is added: ‘Specific Objective 6 – Semiconductors Synergies with Union Programmes for Specific Objective 6 are provided in Annex III to Regulation (EU) 2023/1781.’.
+
+
+Article 40
+
+Evaluation and review
+
+1.
+
+By 20 September 2026 and every four years thereafter, the Commission shall submit a report on the evaluation and review of this Regulation to the European Parliament and to the Council. The reports shall be made public.
+
+2.
+
+For the purposes of the evaluation and review of this Regulation, the European Semiconductor Board, the Member States and national competent authorities shall provide the Commission with information on its request.
+
+3.
+
+In carrying out the evaluation and review the Commission shall take into account the positions and findings of the European Semiconductor Board, of the European Parliament, of the Council, and of other relevant bodies or sources.
+
+
+Article 41
+
+Entry into force
+
+This Regulation shall enter into force on the third day following that of its publication in the Official Journal of the European Union.
+
+
+ANNEX I
+
+ACTIONS
+
+Technical description of the Initiative: scope of actions
+
+The initial and, where appropriate, subsequent actions supported by the Initiative shall be implemented in accordance with the following technical description:
+
+Part I
+
+Design capacities for integrated semiconductor technologies
+
+The Initiative shall build up large-scale innovative design capacities for integrated semiconductor technologies through a virtual design platform available across the Union. The virtual design platform will consist of new innovative design facilities with extended libraries and tools, integrating a large number of existing and new technologies (including emerging technologies such as integrated photonics, quantum and AI/neuromorphic). In combination with existing EDA tools, it will allow the design of innovative components and new system concepts and demonstrate key functionalities such as new approaches to high performance, low energy, security, new 3D and heterogeneous system architectures, etc.
+
+Working closely with the user industries from a variety of economic sectors, the virtual design platform will connect the communities of design houses, IP and tool suppliers with research and technology organisations (RTOs) to provide virtual prototype solutions on the basis of co-development of technology. Risks and development costs will be shared and new web-based methods of accessing design tools, with flexible cost models, especially for prototyping, and common interface standards will be promoted.
+
+The virtual design platform shall be continuously upgraded with new design capabilities as it continuously integrates more and more technologies and designs for low-power processors (including open-source, such as RISC-V). Furthermore, the virtual design platform may enable the design of other technologies, such as programmable chips based on field programmable gate arrays, new 3D and heterogeneous system architectures, etc. It will offer its services via the cloud, maximising access and openness to the whole community by networking existing and new design centres across the Member States.
+
+Part II
+
+Pilot lines for preparing for innovative production, testing and validation
+
+The Initiative shall support pilot lines for production, testing and validation bridging the gap from the lab to the fab of advanced semiconductor technologies, such as architectures and materials for power electronics fostering sustainable and renewable energy, energy storage, smart manufacturing in accordance with the highest environmental standards, automation and electro mobility, lower energy consumption, cyber security, functional safety, higher levels of computing performance or integrating breakthrough technologies such as neuromorphic and embedded AI chips, integrated photonics, graphene and other 2D-material-based technologies, integrating electronics and microfluidics in heterogeneous systems, technological solutions for increased sustainability and circularity of electronic components and systems. Focus areas include the following:
+
+(a) Pilot lines to experiment, test, and validate, including through process design kits, the performance of IP blocks, virtual prototypes, new designs and novel integrated heterogeneous systems in an open and accessible way. The virtual design platform will allow design exploration of new IP blocks and new system concepts to be tested and validated on the pilot lines through early process design kits, providing immediate feedback to refine and improve the models before transfer to manufacturing. From the start, the Initiative will expand several existing pilot lines, in synergy with the design infrastructure, to enable access for design and (virtual) prototyping projects.
+
+(b) New pilot lines on semiconductor technologies such as fully depleted silicon on insulator down to 10-7 nm, advanced gate-all-around and leading-edge nodes (e.g. below 2 nm), complemented by pilot lines for 3D heterogeneous systems integration and advanced packaging. The pilot lines will be integrating the latest research and innovation activities and their results. The pilot lines will include a dedicated design infrastructure consisting for example of design models simulating the fabrication process for the design tools used to design circuits and systems-on-chip. This design infrastructure and a user-friendly virtualisation of the pilot lines will be established that will make them directly accessible throughout the Union via the virtual design platform. Such a link will enable the design community to test and validate technology options before these become commercially available. It will ensure that new chip and system design fully exploit the potential of new technologies and deliver cutting edge innovation. Together, these pilot lines will advance the Union’s IP, skills and innovation in semiconductor manufacturing technology and will reinforce and expand the Union’s position in new manufacturing equipment and materials for advanced semiconductor technology modules, such as e.g. lithography and wafer technologies. Close concertation and collaboration with industry shall be organised to guide this capacity expansion and the critical inclusion from the start of selected qualified pilot lines involving for example advanced packaging, 3D heterogeneous integration technology and important additional functionalities such as silicon photonics, power electronics, sensing technologies, silicon graphene and quantum technologies. This powerful extended Union-wide pilot line infrastructure, intimately connected with the design enablement infrastructure, is fundamental for expanding the Union’s knowledge, capacity and capabilities to close the innovation gap from publicly funded research to commercially funded manufacturing, and to increase both demand and manufacturing in the Union by the end of the decade.
+
+Part III
+
+Advanced technology and engineering capacities for quantum chips
+
+The Initiative shall address the specific needs of the future generation of information-processing components exploiting non-classical principles, in particular chips exploiting quantum effects (i.e. quantum chips) on the basis of research activities. Focus areas include the following:
+
+(a) Innovative design libraries for quantum chips building on the design and fabrication processes of the well-established processes of the classical semiconductor industry for semiconductor- and photonics-based qubit platforms; complemented by the development of innovative and advanced design libraries and fabrication processes for the alternative qubit platforms that are not compatible with semiconductors.
+
+(b) Pilot lines for the integration of quantum circuits and control electronics for building quantum chips building on and capitalising on ongoing research; and, for providing access to dedicated clean rooms and foundries for prototyping and production, reducing the entry-barrier for the development and production of small volumes of quantum components and accelerating the innovation cycles.
+
+(c) Facilities for testing and validating advanced quantum components, including those produced by the pilot lines, closing the innovation feedback loop between designers, producers and users of quantum components.
+
+Part IV
+
+A network of competence centres and skills development
+
+The Initiative shall support the following:
+
+(a) The creation of a network of competence centres in each Member State to promote the use of these technologies, acting as interfaces to the virtual design platform and pilot lines, facilitating their effective use, and providing expertise and skills to the stakeholders, including end-user SMEs. Competence centres will provide innovative services to industry, with particular attention to SMEs, academia and public authorities delivering tailored solutions to a wide variety of users that will foster wider uptake of design and advanced technology in the Union. They will also assist in growing a highly skilled work force in the Union.
+
+(b) On skills, specific training actions will be organised around design tools and semiconductor technologies at a local, regional or Union-wide level. Scholarships for graduate studies will be supported. These actions will complement industrial commitments under the Pact for Skills, increasing the number of internships and apprenticeships, in collaboration with academia. Attention will also be paid to reskilling and upskilling programs for workers transferring from other sectors.
+
+Part V
+
+Chips Fund activities for access to capital by start-ups, scale-ups, SMEs and other companies in the semiconductor value chain
+
+The Initiative shall support the creation of a thriving semiconductor and quantum innovation ecosystem by supporting wide access to venture capital for start-ups, scale-ups and SMEs to grow their business and expand their market presence in a sustainable manner.
+
+
+ANNEX II
+
+MEASURABLE INDICATORS TO MONITOR THE IMPLEMENTATION AND TO REPORT ON THE PROGRESS OF THE INITIATIVE TOWARDS THE ACHIEVEMENT OF ITS OBJECTIVES
+
+1.
+
+The number of legal entities involved (subdivided by size, type and country of establishment) in the actions supported by the Initiative.
+
+In relation to the Initiative’s operational objective 1:
+
+2.
+
+The number of design tools developed or integrated under the Initiative.
+
+In relation to the Initiative’s operational objective 2:
+
+3.
+
+The total amount co-invested by the private sector in design capacities and pilot lines under the Initiative.
+
+In relation to the Initiative’s operational objective 3:
+
+4.
+
+The number of users of semiconductors or user communities seeking, and the number of users of semiconductors or user communities obtaining, access to design capacities and pilot lines under the Initiative.
+
+In relation to the Initiative’s operational objective 4:
+
+5.
+
+The number of businesses, which have used the services of national competence centres supported by the Initiative.
+
+6.
+
+The number of persons who have successfully concluded training programmes supported by the Initiative to acquire advanced skills and training on semiconductor technologies and quantum technologies.
+
+7.
+
+The number of active competence centres in the Union in the context of the Initiative.
+
+In relation to the Initiative’s operational objective 5:
+
+8.
+
+The number of start-ups, scale-ups and SMEs that have received venture capital from the Chips Fund activities and the total amount of capital investments made.
+
+9.
+
+The amount of investment by companies operating in the Union, including by segment of the value chain in which they operate.
+
+
+ANNEX III
+
+SYNERGIES WITH UNION PROGRAMMES
+
+1.
+
+Synergies of the Initiative with the Specific Objectives 1 to 5 of the Digital Europe Programme shall ensure that:
+
+(a) the targeted thematic focus of the Initiative on semiconductor and quantum technologies is complementary;
+
+(b) Specific Objectives 1 to 5 of the Digital Europe Programme support digital capacity building in the advanced digital technologies, including High Performance Computing, AI and cybersecurity, and advanced digital skills;
+
+(c) the Initiative will invest in capacity building to reinforce advanced design, production and systems integration capabilities in cutting-edge semiconductor technologies, next-generation semiconductor technologies and cutting-edge quantum technologies for innovative business development, strengthening the Union’s semiconductor supply and value chains, serving key industrial sectors and creating new markets.
+
+2.
+
+Synergies with Horizon Europe shall ensure that:
+
+(a) although thematic areas addressed by the Initiative and several areas of Horizon Europe converge, the type of actions to be supported, their expected outputs and their intervention logic are different and complementary;
+
+(b) Horizon Europe provides extensive support for research, technological development, demonstration, piloting, proof-of-concept, testing and prototyping, including pre-commercial deployment of innovative digital technologies, in particular through: (i) a dedicated budget in the pillar ‘Global Challenges and European Industrial Competitiveness’ for the cluster ‘Digital, Industry and Space’ to develop enabling technologies (AI and robotics, Next Generation internet, High Performance Computing and Big Data, key digital technologies (incl. microelectronics), combining digital with other technologies); (ii) support to research infrastructures under the pillar ‘Excellent Science’; (iii) the integration of digital across all the Global Challenges (health, security, energy and mobility, climate, etc.); and (iv) support for scale-up breakthrough innovations under the pillar ‘Innovative Europe’ (many of which will combine digital and other technologies). (i) a dedicated budget in the pillar ‘Global Challenges and European Industrial Competitiveness’ for the cluster ‘Digital, Industry and Space’ to develop enabling technologies (AI and robotics, Next Generation internet, High Performance Computing and Big Data, key digital technologies (incl. microelectronics), combining digital with other technologies); (ii) support to research infrastructures under the pillar ‘Excellent Science’; (iii) the integration of digital across all the Global Challenges (health, security, energy and mobility, climate, etc.); and (iv) support for scale-up breakthrough innovations under the pillar ‘Innovative Europe’ (many of which will combine digital and other technologies).
+
+(i) a dedicated budget in the pillar ‘Global Challenges and European Industrial Competitiveness’ for the cluster ‘Digital, Industry and Space’ to develop enabling technologies (AI and robotics, Next Generation internet, High Performance Computing and Big Data, key digital technologies (incl. microelectronics), combining digital with other technologies);
+
+(ii) support to research infrastructures under the pillar ‘Excellent Science’;
+
+(iii) the integration of digital across all the Global Challenges (health, security, energy and mobility, climate, etc.); and
+
+(iv) support for scale-up breakthrough innovations under the pillar ‘Innovative Europe’ (many of which will combine digital and other technologies).
+
+(c) the Initiative is exclusively focusing on building large-scale capacities in semiconductor and quantum technologies across the Union. It will invest in: (i) fostering innovation by supporting two closely interlinked technological capacities that enable designing novel system concepts and their testing and validation in pilot lines; (ii) providing targeted support to build training capacity and enhance applied advanced digital competences and skills to support development and deployment of semiconductors by technology development and end-user industries; and (iii) a network of national competence centres, which facilitate access and provide expertise and innovation services to end-user communities and industries, to develop new products and applications and to address market failures. (i) fostering innovation by supporting two closely interlinked technological capacities that enable designing novel system concepts and their testing and validation in pilot lines; (ii) providing targeted support to build training capacity and enhance applied advanced digital competences and skills to support development and deployment of semiconductors by technology development and end-user industries; and (iii) a network of national competence centres, which facilitate access and provide expertise and innovation services to end-user communities and industries, to develop new products and applications and to address market failures.
+
+(i) fostering innovation by supporting two closely interlinked technological capacities that enable designing novel system concepts and their testing and validation in pilot lines;
+
+(ii) providing targeted support to build training capacity and enhance applied advanced digital competences and skills to support development and deployment of semiconductors by technology development and end-user industries; and
+
+(iii) a network of national competence centres, which facilitate access and provide expertise and innovation services to end-user communities and industries, to develop new products and applications and to address market failures.
+
+(d) the technology capacities of the Initiative will be made available to the research and innovation community, including for actions supported through Horizon Europe;
+
+(e) as the development of novel digital technologies in the area of semiconductors matures through Horizon Europe, those technologies where possible progressively will be taken up and deployed by the Initiative;
+
+(f) the Horizon Europe programmes of Regulation (EU) 2021/695 for the development of skills and competencies curricula, including those delivered at the co-location centres of the European Institute of Innovation & Technology’s Knowledge and Innovation Communities, are complemented by capacity building in advanced applied digital skills and competences in semiconductor and quantum technologies supported by the Initiative;
+
+(g) strong coordination mechanisms for programming and implementation are put in place, aligning all procedures for both Horizon Europe and the Initiative to the extent possible. Their governance structures will involve all Commission services concerned.
+
+3.
+
+Synergies with Union programmes under shared management, including the European Regional Development Fund, the European Social Fund Plus, the European Agricultural Fund for Rural Development and the European Maritime, Fisheries and Aquaculture Fund, shall ensure the development and strengthening of regional and local innovation ecosystems, industrial transformation, as well as the digital transformation of society and of public administrations. This includes support for the digital transformation of industry and the take-up of results, as well as the rolling out of novel technologies and innovative solutions. The Initiative will complement and support the transnational networking and mapping of capacities it will support and make them accessible to SMEs and end-user industries in all Union regions.
+
+4.
+
+Synergies with the Connecting Europe Facility shall ensure that:
+
+(a) the Initiative focuses on large-scale digital capacity and infrastructure building in the areas of semiconductors aiming at the wide uptake and deployment across the Union of critical existing or tested innovative digital solutions within a Union framework in areas of public interest or market failure. The Initiative is mainly to be implemented through coordinated and strategic investments with Member States, in building digital capacities in semiconductor technologies to be shared across the Union and in Union-wide actions. This is particularly relevant in electrification and autonomous driving, and is intended to benefit and facilitate the development of more competitive end-use industries, particularly in the mobility and transport sectors;
+
+(b) the capacities and infrastructures of the Initiative are to be made available to testing of innovative new technologies and solutions that can be taken up in the mobility and transport industries. The Connecting Europe Facility is to support the roll-out and deployment of innovative new technologies and solutions in the field of mobility and transport as well as in other domains;
+
+(c) coordination mechanisms are to be established, in particular through appropriate governance structures.
+
+5.
+
+Synergies with InvestEU Programme shall ensure that:
+
+(a) support through market-based financing, including pursuing policy objectives under the Initiative is provided by Regulation (EU) 2021/523; such market-based financing might be combined with the grant support;
+
+(b) a blending facility under the InvestEU Fund is supported by financing provided by Horizon Europe or the Digital Europe Programme in the form of financial instruments within blending operations.
+
+6.
+
+Synergies with Erasmus+ shall ensure that:
+
+(a) the Initiative supports the development and acquisition of the advanced digital skills needed for the development and deployment of cutting-edge semiconductor technologies in cooperation with relevant industries;
+
+(b) the advanced skills part of Erasmus+ complements the interventions of the Initiative, addressing the acquisition of skills in all domains and at all levels through mobility experiences.
+
+7.
+
+Synergies with other Union programmes and initiatives on competencies and skills shall be ensured.
+
+
+ANNEX IV
+
+CRITICAL SECTORS
+
+1. Energy
+
+2. Transport
+
+3. Banking
+
+4. Financial market infrastructure
+
+5. Health
+
+6. Drinking water
+
+7. Waste water
+
+8. Digital infrastructure
+
+9. Public administration
+
+10. Space
+
+11. Production, processing and distribution of food
+
+12. Defence
+
+13. Security

@@ -21,6 +21,9 @@ dotenv.config({ path: path.join(process.cwd(), '.env.local') })
 
 import { Pinecone } from '@pinecone-database/pinecone'
 import { EMBEDDING_DIMENSIONS } from '../../src/lib/embeddings'
+import { listCorpusIds, readInstrumentMeta, readSourceText } from '../../src/lib/regulatory/meta'
+import { parseStatute } from '../../src/lib/regulatory/parse'
+import { buildRegulatoryChunkRecords } from '../../src/lib/regulatory/chunk'
 
 async function main(): Promise<void> {
   const indexName = process.env.PINECONE_REGULATORY_INDEX_NAME
@@ -80,6 +83,46 @@ async function main(): Promise<void> {
   console.log(`  records: ${stats.totalRecordCount ?? 0}`)
   for (const [ns, info] of Object.entries(stats.namespaces ?? {})) {
     console.log(`    namespace ${ns}: ${info.recordCount}`)
+  }
+
+  // Per-corpus counts, compared against what the committed text would produce.
+  // A namespace total cannot reveal orphans: re-ingesting an instrument whose
+  // chunking changed overwrites the ids that still exist and silently strands
+  // the ones that no longer do, leaving stale text retrievable forever.
+  const namespace = process.env.PINECONE_REGULATORY_NAMESPACE
+  const target = namespace
+    ? pc.index(indexName).namespace(namespace)
+    : pc.index(indexName)
+
+  console.log(`\n  per corpus (namespace ${namespace ?? '__default__'}):`)
+  for (const corpusId of listCorpusIds()) {
+    const instrumentMeta = readInstrumentMeta(corpusId)
+    const expected = buildRegulatoryChunkRecords(
+      parseStatute(readSourceText(instrumentMeta), instrumentMeta),
+      instrumentMeta,
+    ).length
+
+    let live = 0
+    let token: string | undefined
+    do {
+      const page = await target.listPaginated({
+        prefix: `${corpusId}:`,
+        paginationToken: token,
+        limit: 100,
+      })
+      live += page.vectors?.length ?? 0
+      token = page.pagination?.next
+    } while (token)
+
+    const verdict = live === expected ? 'ok' : `MISMATCH (${live - expected > 0 ? '+' : ''}${live - expected})`
+    console.log(`    ${corpusId.padEnd(24)} live ${String(live).padStart(4)}  committed ${String(expected).padStart(4)}  ${verdict}`)
+    if (live !== expected) {
+      problems.push(
+        `${corpusId}: ${live} records live but the committed text produces ${expected}. ` +
+          `Stale records stay retrievable — re-run npm run reg:ingest -- --corpus ${corpusId}, ` +
+          `and if the count still differs the delete-by-filter in replaceInstrument is not working.`,
+      )
+    }
   }
 
   if (problems.length > 0) {

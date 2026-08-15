@@ -1,0 +1,18 @@
+{
+  "corpusId": "gdpr",
+  "shortName": "GDPR",
+  "instrument": "Regulation (EU) 2016/679 (General Data Protection Regulation)",
+  "jurisdiction": "EU",
+  "instrumentType": "regulation",
+  "celex": "02016R0679-20160504",
+  "eli": "http://data.europa.eu/eli/reg/2016/679/2016-05-04",
+  "version": "2016-05-04",
+  "consolidatedAs": "2016-05-04",
+  "sourceUrl": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:02016R0679-20160504",
+  "citationUrl": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A02016R0679-20160504",
+  "retrieved": "2026-08-15",
+  "parser": "eurlex",
+  "expectedArticles": 99,
+  "coverage": "full",
+  "note": "99 Articles, no Annexes — verified against the EUR-Lex consolidated DOM on 2026-08-15. The only consolidation is 2016-05-04, which folds in the 2018 corrigendum; the GDPR has not been amended since. The data-protection Digital Omnibus (COM(2025) 837) would amend this text but was still a Council proposal at retrieval and is NOT reflected here. EUR-Lex consolidated texts omit the preamble, so this corpus contains no recitals — a significant limitation for the GDPR specifically, whose 173 recitals are routinely cited as interpretive authority. Consolidation markers, footnotes and markdown link syntax are stripped at fetch time; NBSP and soft hyphens are folded by src/lib/rulepack/normalise.ts at hash and match time. Text is reused from EUR-Lex under CC BY 4.0 (Commission Decision 2011/833/EU)."
+}

@@ -33,15 +33,77 @@ const REGULATORY_TERMS = [
   'regulator', 'commission', 'ec ruling', 'bis ', 'ai office',
 ]
 
+/**
+ * Terms that identify WHICH instrument a topic is about, keyed by corpus id.
+ *
+ * Why this exists: statutory prose is highly self-similar. "The provider shall
+ * ensure that..." reads almost identically in the AI Act, the Cyber Resilience
+ * Act and the Data Act, so cosine similarity alone is a poor instrument
+ * discriminator — an AI Act query can surface CRA passages at a comparable
+ * score, and the model then quotes the wrong instrument with a citation that
+ * looks verified. Selection fixes what diversification cannot.
+ *
+ * Biased toward recall on purpose. Routing narrows a search; matching too many
+ * instruments merely returns today's behaviour, whereas missing the right one
+ * hides the very text the draft needed. Zero matches means "search everything",
+ * never "search nothing".
+ *
+ * Keys MUST be corpus directory names under corpus/regulatory/ —
+ * scripts/regulatory-index-checks.ts asserts that against listCorpusIds().
+ */
+const INSTRUMENT_TERMS: Record<string, string[]> = {
+  'eu-ai-act': [
+    'ai act', 'artificial intelligence act', 'high-risk ai', 'ai office',
+    'gpai', 'general-purpose ai', 'general purpose ai', 'ai system',
+    'conformity assessment', 'digital omnibus',
+  ],
+  gdpr: [
+    'gdpr', 'general data protection', 'data protection', 'personal data',
+    'data subject', 'lawful basis', 'supervisory authority', 'data controller',
+    'data processor', 'dpia', 'privacy notice', 'international transfer',
+  ],
+  'eu-chips-act': [
+    'chips act', 'semiconductor', 'foundry', 'wafer', 'fabrication plant',
+    'chip shortage', 'lithography', 'design capacit', 'first-of-a-kind facilit',
+  ],
+  'eu-data-act': [
+    'data act', 'cloud switching', 'switching between data processing',
+    'connected product', 'data holder', 'data sharing obligation',
+    'business-to-government data', 'interoperability of data spaces',
+  ],
+  nis2: [
+    'nis2', 'nis 2', 'network and information systems', 'essential entit',
+    'important entit', 'incident reporting', 'cybersecurity risk management',
+  ],
+  'eu-cyber-resilience-act': [
+    'cyber resilience', 'products with digital elements', 'vulnerability disclosure',
+    'security update', 'ce marking', 'software bill of materials', 'sbom',
+  ],
+}
+
 export interface GateResult {
   hit: boolean
   matched: string[]
+  /**
+   * Corpus ids the topic names or implies. Empty means "no instrument
+   * identified" — callers should search every instrument, not none.
+   */
+  corpusIds: string[]
 }
 
 export function looksRegulatory(...fields: Array<string | undefined | null>): GateResult {
   const haystack = fields.filter(Boolean).join(' \n ').toLowerCase()
-  if (!haystack.trim()) return { hit: false, matched: [] }
+  if (!haystack.trim()) return { hit: false, matched: [], corpusIds: [] }
 
   const matched = REGULATORY_TERMS.filter((term) => haystack.includes(term))
-  return { hit: matched.length > 0, matched }
+  const corpusIds = Object.entries(INSTRUMENT_TERMS)
+    .filter(([, terms]) => terms.some((term) => haystack.includes(term)))
+    .map(([corpusId]) => corpusId)
+
+  return { hit: matched.length > 0, matched, corpusIds }
+}
+
+/** Exposed so a guard test can assert every routing key is a real corpus. */
+export function routableCorpusIds(): string[] {
+  return Object.keys(INSTRUMENT_TERMS)
 }

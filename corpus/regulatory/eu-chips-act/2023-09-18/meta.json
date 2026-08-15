@@ -1,0 +1,18 @@
+{
+  "corpusId": "eu-chips-act",
+  "shortName": "EU Chips Act",
+  "instrument": "Regulation (EU) 2023/1781 establishing a framework of measures for strengthening Europe's semiconductor ecosystem (Chips Act)",
+  "jurisdiction": "EU",
+  "instrumentType": "regulation",
+  "celex": "32023R1781",
+  "eli": "http://data.europa.eu/eli/reg/2023/1781/oj",
+  "version": "2023-09-18",
+  "consolidatedAs": "2023-09-18",
+  "sourceUrl": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32023R1781",
+  "citationUrl": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32023R1781",
+  "retrieved": "2026-08-15",
+  "parser": "eurlex",
+  "expectedArticles": 41,
+  "coverage": "full",
+  "note": "41 Articles and 4 Annexes — verified against the EUR-Lex DOM on 2026-08-15. UNLIKE the other corpora this is the ORIGINAL act, not a consolidated text: EUR-Lex listed no consolidated version as at 2026-08-15 because the Chips Act has not been amended since adoption. 'consolidatedAs' is therefore the OJ publication date (OJ L 229, 18.9.2023) and the CELEX carries the 3-prefix of an original act rather than the 0-prefix of a consolidation. A first amendment will create a consolidated version at a new CELEX, which is what npm run reg:drift watches for. The source HTML contains 83 recitals under rct_ ids; the extractor walks only art_ and anx_ ids, so no recital reaches the corpus. Text is reused from EUR-Lex under CC BY 4.0 (Commission Decision 2011/833/EU)."
+}

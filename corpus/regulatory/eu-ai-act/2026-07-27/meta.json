@@ -3,6 +3,7 @@
   "shortName": "EU AI Act",
   "instrument": "Regulation (EU) 2024/1689 (AI Act), as amended by Regulation (EU) 2026/1744 (Digital Omnibus on AI)",
   "jurisdiction": "EU",
+  "instrumentType": "regulation",
   "celex": "02024R1689-20260727",
   "eli": "http://data.europa.eu/eli/reg/2024/1689/2026-07-27",
   "version": "2026-07-27",

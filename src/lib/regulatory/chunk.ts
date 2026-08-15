@@ -28,6 +28,13 @@ export const REGULATORY_CHUNK_MAX_CHARACTERS = 3000
 export const REGULATORY_CHUNK_MIN_CHARACTERS = 400
 export const REGULATORY_SENTENCE_OVERLAP_CHARS = 240
 
+/**
+ * Longest chapeau worth repeating onto every continuation of a split provision.
+ * Above this it is content in its own right, and copying it into each part both
+ * duplicates text in the index and starves the points of room.
+ */
+export const CHAPEAU_REPEAT_MAX_CHARACTERS = 1_000
+
 /** Pinecone's per-record metadata ceiling. Chunk sizes are set well inside it. */
 export const PINECONE_METADATA_LIMIT_BYTES = 40_000
 
@@ -88,37 +95,60 @@ function splitOversize(text: string): string[] {
   // No point structure to split on — fall back to sentence-boundary slicing.
   if (points.length === 0) return splitOnSentences(text)
 
+  // Repeating the chapeau only pays when it is short enough to read as context
+  // rather than content. Chips Act Annex I opens with 2.2KB of narrative before
+  // its first point; repeating that onto every continuation stored the same
+  // text sixteen times and left the points themselves fighting for room. When
+  // the chapeau is long it becomes its own leading chunk instead.
+  const repeated = chapeau.length <= CHAPEAU_REPEAT_MAX_CHARACTERS ? chapeau : ''
+  const lead = repeated || !chapeau ? [] : splitOnSentences(chapeau)
+
   const parts: string[] = []
   let current: string[] = []
   const currentLength = (): number =>
-    (chapeau ? chapeau.length + 2 : 0) + current.join('\n\n').length
+    (repeated ? repeated.length + 2 : 0) + current.join('\n\n').length
 
   for (const point of points) {
     if (current.length > 0 && currentLength() + point.length + 2 > REGULATORY_CHUNK_MAX_CHARACTERS) {
-      parts.push([chapeau, ...current].filter(Boolean).join('\n\n'))
+      parts.push([repeated, ...current].filter(Boolean).join('\n\n'))
       const carry = trailingSentence(current[current.length - 1])
       current = carry ? [`(…continued) ${carry}`] : []
     }
     current.push(point)
   }
-  if (current.length > 0) parts.push([chapeau, ...current].filter(Boolean).join('\n\n'))
+  if (current.length > 0) parts.push([repeated, ...current].filter(Boolean).join('\n\n'))
 
-  // A single point can still exceed the cap on its own.
-  return parts.flatMap((part) =>
-    part.length > REGULATORY_CHUNK_MAX_CHARACTERS ? splitOnSentences(part) : part,
-  )
+  // A single point can still exceed the cap on its own. Split the POINT, not the
+  // whole part: running the splitter over "chapeau + point" makes its first
+  // slice the chapeau alone, so every oversize point emits a byte-identical
+  // chunk and the index fills with duplicates.
+  return [
+    ...lead,
+    ...parts.flatMap((part) => {
+      if (part.length <= REGULATORY_CHUNK_MAX_CHARACTERS) return part
+
+      const prefixed = Boolean(repeated) && part.startsWith(repeated)
+      const body = prefixed ? part.slice(repeated.length).trimStart() : part
+      const room = REGULATORY_CHUNK_MAX_CHARACTERS - (prefixed ? repeated.length + 2 : 0)
+      if (room < REGULATORY_CHUNK_MIN_CHARACTERS) return splitOnSentences(part)
+
+      return splitOnSentences(body, room).map((piece) =>
+        prefixed ? `${repeated}\n\n${piece}` : piece,
+      )
+    }),
+  ]
 }
 
 /** Last-resort split for prose with no point structure. Never mid-sentence unless forced. */
-function splitOnSentences(text: string): string[] {
+function splitOnSentences(text: string, limit = REGULATORY_CHUNK_MAX_CHARACTERS): string[] {
   const parts: string[] = []
   let rest = text
-  while (rest.length > REGULATORY_CHUNK_MAX_CHARACTERS) {
-    const window = rest.slice(0, REGULATORY_CHUNK_MAX_CHARACTERS)
+  while (rest.length > limit) {
+    const window = rest.slice(0, limit)
     let cut = Math.max(window.lastIndexOf('. '), window.lastIndexOf('; '))
     // Only accept the boundary if it is not pathologically early.
-    if (cut < REGULATORY_CHUNK_MAX_CHARACTERS * 0.6) cut = window.lastIndexOf(' ')
-    if (cut <= 0) cut = REGULATORY_CHUNK_MAX_CHARACTERS
+    if (cut < limit * 0.6) cut = window.lastIndexOf(' ')
+    if (cut <= 0) cut = limit
     else cut += 1
     parts.push(rest.slice(0, cut).trim())
     rest = rest.slice(cut).trim()
@@ -208,6 +238,8 @@ export function buildRegulatoryChunkRecords(
         instrument: meta.instrument,
         shortName: meta.shortName,
         jurisdiction: meta.jurisdiction,
+        instrumentType: meta.instrumentType,
+        applicationNote: meta.applicationNote ?? '',
         celex: meta.celex,
         eli: meta.eli,
         unit: provision.unit,

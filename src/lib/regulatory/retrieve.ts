@@ -20,7 +20,7 @@ import { searchRegulatory } from './index-client'
 import { looksRegulatory } from './gate'
 import {
   formatRegulatoryBlock,
-  diversifyByArticle,
+  diversifyHits,
   REGULATORY_SCORE_FLOOR,
 } from './format'
 
@@ -97,11 +97,29 @@ export async function retrieveRegulatoryContext(
 
   const query = composeRegulatoryQuery(input)
   const vector = await generateEmbedding(query)
-  const filter = input.corpusId ? { corpusId: { $eq: input.corpusId } } : undefined
-  const hits = await searchRegulatory(vector, REGULATORY_QUERY_TOP_K, filter)
+
+  // Route to the instruments the topic actually names. An explicit corpusId from
+  // the caller always wins; otherwise the gate's routing narrows the search, and
+  // an empty routing result searches everything rather than nothing.
+  const routed = input.corpusId ? [input.corpusId] : gate.corpusIds
+  const filter = routed.length ? { corpusId: { $in: routed } } : undefined
+
+  let hits = await searchRegulatory(vector, REGULATORY_QUERY_TOP_K, filter)
+  let routingNote = routed.length ? `routed=${JSON.stringify(routed)}` : 'routed=all'
+
+  // A routing decision must never be able to starve the draft. If the instruments
+  // we picked hold nothing for this query, fall back to the whole corpus and say
+  // so — a wrong guess should cost relevance, not the entire block.
+  if (hits.length === 0 && filter) {
+    hits = await searchRegulatory(vector, REGULATORY_QUERY_TOP_K)
+    routingNote = `routed=${JSON.stringify(routed)} returned 0, fell back to all instruments`
+  }
 
   if (hits.length === 0) {
-    notes.push(`[regulatory] gate=hit matched=${JSON.stringify(gate.matched)} but 0 hits — is the corpus ingested?`)
+    notes.push(
+      `[regulatory] gate=hit matched=${JSON.stringify(gate.matched)} ${routingNote} ` +
+        'but 0 hits — is the corpus ingested?',
+    )
     return { block: null, notes }
   }
 
@@ -114,7 +132,7 @@ export async function retrieveRegulatoryContext(
     return { block: null, notes }
   }
 
-  const selected = diversifyByArticle(
+  const selected = diversifyHits(
     hits.filter((hit) => hit.score >= REGULATORY_SCORE_FLOOR),
     REGULATORY_MAX_PASSAGES,
   )
@@ -122,7 +140,8 @@ export async function retrieveRegulatoryContext(
 
   notes.push(
     `[regulatory] gate=hit matched=${JSON.stringify(gate.matched.slice(0, 6))} ` +
-      `chunks=${selected.length} topScore=${topScore.toFixed(3)} ` +
+      `${routingNote} chunks=${selected.length} topScore=${topScore.toFixed(3)} ` +
+      `instruments=${JSON.stringify([...new Set(selected.map((hit) => hit.metadata.corpusId))])} ` +
       `cited=${JSON.stringify(selected.map((hit) => hit.metadata.citation))}`,
   )
 

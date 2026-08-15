@@ -16,6 +16,18 @@ export type ProvisionUnit = 'article' | 'annex'
 /** How much of the instrument the corpus actually holds. */
 export type CorpusCoverage = 'full' | 'partial'
 
+/**
+ * Whether the instrument binds businesses directly.
+ *
+ * Load-bearing, not decorative. A Regulation applies directly; a Directive binds
+ * Member States and reaches a company only through national transposing law. A
+ * draft saying "NIS2 Article 21 requires you to..." is a category error, and a
+ * confidently-cited one, because the quotation itself will be accurate. The
+ * renderer states the distinction above every passage so the model cannot
+ * collapse it.
+ */
+export type InstrumentType = 'regulation' | 'directive'
+
 /** Per-instrument provenance, committed alongside the text it describes. */
 export interface InstrumentMeta {
   corpusId: string
@@ -24,6 +36,14 @@ export interface InstrumentMeta {
   /** Full formal title including amending acts. */
   instrument: string
   jurisdiction: string
+  /** Regulation (directly applicable) or Directive (transposed nationally). */
+  instrumentType: InstrumentType
+  /**
+   * Short caveat rendered above every passage, for an instrument whose
+   * obligations are not yet in application (e.g. "Main obligations apply from
+   * 11 December 2027"). Omit when the text is fully in force today.
+   */
+  applicationNote?: string
   /** CELEX id for EU instruments; "" for US law. */
   celex: string
   /** ELI permalink for EU instruments; "" otherwise. */
@@ -72,6 +92,9 @@ export type RegulatoryChunkMetadata = {
   instrument: string
   shortName: string
   jurisdiction: string
+  instrumentType: InstrumentType
+  /** Empty string when the instrument is fully in application. */
+  applicationNote: string
   celex: string
   eli: string
   unit: ProvisionUnit

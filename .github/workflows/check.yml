@@ -21,6 +21,11 @@ jobs:
       - run: npm run test:style-rules
       - run: npm run test:knowledge-inbox
       - run: npm run test:evidence-index
+      # The separation guard: the Compliance Checker's legal authority is the
+      # pinned rule pack, never the editorial retrieval corpus. It also asserts
+      # the chunker invariants for EVERY ingested instrument. Shipped 2026-08-13
+      # but only ever run by hand until now — a guard nobody runs is a comment.
+      - run: npm run test:regulatory-index
       # The three Sanity `product` documents hold the one price the code cannot
       # import, and the end-of-article gate renders it. Deliberately not in
       # `prebuild`: it needs the network, and a Sanity blip must not be able to

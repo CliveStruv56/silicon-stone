@@ -6,15 +6,21 @@ import {
   REGULATORY_CHUNK_MAX_CHARACTERS,
   PINECONE_METADATA_LIMIT_BYTES,
 } from './chunk'
-import { formatRegulatoryBlock, diversifyByArticle, MAX_CHUNKS_PER_ARTICLE } from './format'
-import { looksRegulatory } from './gate'
-import { readInstrumentMeta, readSourceText } from './meta'
+import { formatRegulatoryBlock, diversifyHits, MAX_CHUNKS_PER_ARTICLE } from './format'
+import { looksRegulatory, routableCorpusIds } from './gate'
+import { listCorpusIds, readInstrumentMeta, readSourceText } from './meta'
 import type { RegulatoryHit } from './types'
 
 const meta = readInstrumentMeta('eu-ai-act')
 const source = readSourceText(meta)
 const provisions = parseStatute(source, meta)
 const chunks = buildRegulatoryChunkRecords(provisions, meta)
+
+const gdprMeta = readInstrumentMeta('gdpr')
+const gdprChunks = buildRegulatoryChunkRecords(
+  parseStatute(readSourceText(gdprMeta), gdprMeta),
+  gdprMeta,
+)
 
 describe('parseStatute', () => {
   it('finds exactly the expected number of articles', () => {
@@ -170,7 +176,121 @@ describe('formatRegulatoryBlock', () => {
       .filter((c) => c.metadata.parentId === chunks[0].metadata.parentId)
       .map((c, i) => ({ id: c.id, score: 0.9 - i * 0.01, metadata: c.metadata }))
     if (sameArticle.length > MAX_CHUNKS_PER_ARTICLE) {
-      expect(diversifyByArticle(sameArticle, 10).length).toBe(MAX_CHUNKS_PER_ARTICLE)
+      expect(diversifyHits(sameArticle, 10).length).toBe(MAX_CHUNKS_PER_ARTICLE)
     }
+  })
+})
+
+describe('GDPR corpus', () => {
+  it('parses all 99 articles and no annexes', () => {
+    const articles = new Set(
+      gdprChunks.filter((c) => c.metadata.unit === 'article').map((c) => c.metadata.articleNumber),
+    )
+    expect(articles.size).toBe(gdprMeta.expectedArticles)
+    expect(gdprChunks.some((c) => c.metadata.unit === 'annex')).toBe(false)
+  })
+
+  it('cites Article 22 under its own short name, not the AI Act', () => {
+    const art22 = gdprChunks.filter((c) => c.metadata.parentId === 'gdpr:art:22')
+    expect(art22.length).toBeGreaterThan(0)
+    expect(art22[0].metadata.citation).toMatch(/^GDPR, Article 22/)
+    expect(art22.some((c) => c.metadata.text.includes('solely on automated processing'))).toBe(true)
+  })
+
+  it('carries no leftover corrigendum markers', () => {
+    // Articles 43(1) and 65(1) contain inline ►C1 ... ◄ markers upstream. A
+    // quotation is only verbatim if the editorial apparatus is gone.
+    for (const chunk of gdprChunks) {
+      expect(chunk.metadata.text).not.toMatch(/[►◄▼]/)
+    }
+    const art43 = gdprChunks.find((c) => c.metadata.text.includes('accreditation of certification'))
+    expect(art43!.metadata.text).toContain('In the case of accreditation')
+  })
+})
+
+describe('multi-instrument retrieval', () => {
+  const hit = (index: number, score: number, from = chunks): RegulatoryHit => ({
+    id: from[index].id,
+    score,
+    metadata: from[index].metadata,
+  })
+
+  it('routes a GDPR topic to GDPR and an AI Act topic to the AI Act', () => {
+    expect(looksRegulatory('lawful basis for processing personal data').corpusIds).toContain('gdpr')
+    expect(looksRegulatory('EU AI Act high-risk classification').corpusIds).toContain('eu-ai-act')
+  })
+
+  it('routes a semiconductor topic to the Chips Act, not the AI Act', () => {
+    const routed = looksRegulatory('European semiconductor foundry subsidies').corpusIds
+    expect(routed).toContain('eu-chips-act')
+    expect(routed).not.toContain('eu-ai-act')
+  })
+
+  it('routes nothing when no instrument is named, so callers search everything', () => {
+    expect(looksRegulatory('compliance obligations and penalties').corpusIds).toEqual([])
+  })
+
+  it('can route to every corpus that is actually ingested', () => {
+    // Asserted in this direction on purpose. It catches a typo'd routing key
+    // (a corpus on disk that nothing can route to) AND an ingested corpus
+    // nobody wrote routing terms for — both leave text in the index that no
+    // query can reach. Routing keys for corpora not yet ingested are harmless:
+    // retrieve.ts falls back to searching everything when a filter returns
+    // nothing.
+    const routable = new Set(routableCorpusIds())
+    for (const corpusId of listCorpusIds()) {
+      expect(routable.has(corpusId)).toBe(true)
+    }
+  })
+
+  it('stops one instrument from taking every slot', () => {
+    // Six AI Act hits outscoring two GDPR hits: without a per-instrument cap the
+    // GDPR passages never appear, however relevant the question.
+    const aiHits = chunks.slice(0, 8).map((c, i) => ({
+      id: c.id,
+      score: 0.9 - i * 0.01,
+      metadata: c.metadata,
+    }))
+    const gdprHits = gdprChunks.slice(0, 4).map((c, i) => ({
+      id: c.id,
+      score: 0.5 - i * 0.01,
+      metadata: c.metadata,
+    }))
+
+    const selected = diversifyHits([...aiHits, ...gdprHits], 6)
+    const instruments = new Set(selected.map((s) => s.metadata.corpusId))
+    expect(instruments.has('gdpr')).toBe(true)
+    expect(instruments.has('eu-ai-act')).toBe(true)
+  })
+
+  it('gives a single-instrument result the whole budget', () => {
+    // One chunk from each of eight distinct articles, so the per-article cap
+    // cannot be what limits the result — only the per-instrument cap could,
+    // and with a single instrument it must not apply.
+    const seen = new Set<string>()
+    const only = chunks
+      .filter((c) => !seen.has(c.metadata.parentId) && seen.add(c.metadata.parentId))
+      .slice(0, 8)
+      .map((c, i) => ({ id: c.id, score: 0.9 - i * 0.01, metadata: c.metadata }))
+
+    expect(only.length).toBe(8)
+    expect(diversifyHits(only, 6).length).toBe(6)
+  })
+
+  it('warns the model when an instrument is a Directive', () => {
+    const directive = {
+      ...hit(0, 0.8),
+      metadata: { ...chunks[0].metadata, instrumentType: 'directive' as const },
+    }
+    expect(formatRegulatoryBlock([directive])).toContain('INSTRUMENT TYPE: Directive')
+    expect(formatRegulatoryBlock([hit(0, 0.8)])).not.toContain('INSTRUMENT TYPE: Directive')
+  })
+
+  it('surfaces a deferred application date when one is set', () => {
+    const deferred = {
+      ...hit(0, 0.8),
+      metadata: { ...chunks[0].metadata, applicationNote: 'Applies from 11 December 2027.' },
+    }
+    expect(formatRegulatoryBlock([deferred])).toContain('APPLICATION: Applies from 11 December 2027.')
   })
 })

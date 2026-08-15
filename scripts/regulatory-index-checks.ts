@@ -21,7 +21,7 @@ import {
   PINECONE_METADATA_LIMIT_BYTES,
 } from '../src/lib/regulatory/chunk'
 import { readInstrumentMeta, readSourceText, readManifest, listCorpusIds } from '../src/lib/regulatory/meta'
-import { looksRegulatory } from '../src/lib/regulatory/gate'
+import { looksRegulatory, routableCorpusIds } from '../src/lib/regulatory/gate'
 
 const read = (file: string): string => fs.readFileSync(file, 'utf8')
 
@@ -46,10 +46,27 @@ function walkTs(dir: string): string[] {
 
 // ── Chunker invariants ──────────────────────────────────────────────────────
 
-const meta = readInstrumentMeta('eu-ai-act')
-const chunks = buildRegulatoryChunkRecords(parseStatute(readSourceText(meta), meta), meta)
+// Every ingested instrument, not just the AI Act. These invariants are what
+// make a quotation safe to publish, so a corpus added later must inherit them
+// rather than rely on whoever added it having read this file.
+const chunksByCorpus = listCorpusIds().map((corpusId) => {
+  const instrumentMeta = readInstrumentMeta(corpusId)
+  return {
+    corpusId,
+    records: buildRegulatoryChunkRecords(
+      parseStatute(readSourceText(instrumentMeta), instrumentMeta),
+      instrumentMeta,
+    ),
+  }
+})
 
-assert.ok(chunks.length > 0, 'the AI Act must produce chunks')
+assert.ok(chunksByCorpus.length > 0, 'at least one corpus must be present')
+
+for (const { corpusId, records } of chunksByCorpus) {
+  assert.ok(records.length > 0, `${corpusId} must produce chunks`)
+}
+
+const chunks = chunksByCorpus.flatMap((entry) => entry.records)
 
 for (const chunk of chunks) {
   const body = chunk.metadata.text.split('\n---\n').slice(1).join('\n---\n')
@@ -75,6 +92,26 @@ for (const chunk of chunks) {
 
 assert.equal(new Set(chunks.map((c) => c.id)).size, chunks.length, 'record ids must be unique')
 
+// Unique ids are not enough — two records can carry identical TEXT under
+// different locators. Chips Act Annex I produced sixteen byte-identical chunks
+// because an oversize point was split together with its chapeau, so every part
+// regenerated the same chapeau-only slice. Duplicates waste the per-article
+// retrieval budget on text the model has already been shown.
+for (const { corpusId, records } of chunksByCorpus) {
+  const byHash = new Map<string, string[]>()
+  for (const record of records) {
+    const seen = byHash.get(record.metadata.contentHash) ?? []
+    byHash.set(record.metadata.contentHash, [...seen, record.metadata.locator])
+  }
+  for (const [, locators] of byHash) {
+    assert.equal(
+      locators.length,
+      1,
+      `${corpusId}: identical text under ${locators.length} locators (${locators.slice(0, 4).join(', ')})`,
+    )
+  }
+}
+
 // Merged sibling blocks must not collapse onto the article chapeau's locator.
 for (const chunk of chunks.filter((c) => c.metadata.paragraph.includes('-'))) {
   assert.match(chunk.metadata.locator, /:para:/, `${chunk.id}: merged block lost its paragraph range`)
@@ -88,10 +125,39 @@ assert.equal(
   'recitals must not be in the corpus',
 )
 
-// ── Gate ────────────────────────────────────────────────────────────────────
+// EUR-Lex editorial apparatus must never survive into a quotable passage. The
+// consolidation markers (▼B, ▼M1) and corrigendum brackets (►C1 ... ◄) are
+// EUR-Lex's own annotations, not legal text; GDPR Articles 43(1) and 65(1)
+// carry them inline, mid-sentence.
+for (const chunk of chunks) {
+  assert.doesNotMatch(
+    chunk.metadata.text,
+    /[►◄▼]/,
+    `${chunk.id}: a consolidation marker survived into quotable text`,
+  )
+}
+
+// Every chunk must declare whether its instrument binds companies directly.
+for (const chunk of chunks) {
+  assert.ok(
+    chunk.metadata.instrumentType === 'regulation' || chunk.metadata.instrumentType === 'directive',
+    `${chunk.id}: instrumentType must be set — a Directive quoted as directly binding is wrong`,
+  )
+}
+
+// ── Gate and routing ────────────────────────────────────────────────────────
 
 assert.equal(looksRegulatory('EU AI Act high-risk obligations').hit, true)
 assert.equal(looksRegulatory('TSMC Dresden fab workforce shortages').hit, false)
+
+// An ingested corpus no query can route to is text nobody can reach.
+const routable = new Set(routableCorpusIds())
+for (const corpusId of listCorpusIds()) {
+  assert.ok(
+    routable.has(corpusId),
+    `${corpusId} is ingested but has no routing terms in gate.ts — no query can select it`,
+  )
+}
 
 // ── SEPARATION: the Compliance Checker must never reach this lane ────────────
 

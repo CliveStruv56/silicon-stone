@@ -464,6 +464,100 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 15, 2026 — the regulatory lane goes live, and learns a second and third instrument
+
+**It was never running in production.** `PINECONE_REGULATORY_INDEX_NAME` and
+`PINECONE_REGULATORY_NAMESPACE` were set in `.env.local` on 13 August but never
+added to Vercel, and `retrieveRegulatoryContext()` early-exits when the index
+name is unset. Every draft written on the live site between 13 and 15 August
+therefore had **no statutory retrieval at all** — silently, with only a log note.
+Both variables are now set for Production, Preview and Development, and
+production has been redeployed. The lane degrading to a quiet no-op rather than
+an error is correct behaviour, but it means nothing surfaces the omission; the
+per-generation `[regulatory]` log line is the only canary.
+
+**Two instruments added, taking the corpus to three** (855 chunks, all in
+`silicon-and-stone-regulatory` ns `v2026-08-13`):
+
+| Corpus | Text | Articles | Chunks |
+|---|---|---|---|
+| `eu-ai-act` | CELEX `02024R1689-20260727` | 119 + 14 annexes | 447 |
+| `gdpr` | CELEX `02016R0679-20160504` | 99, no annexes | 265 |
+| `eu-chips-act` | CELEX `32023R1781` | 41 + 4 annexes | 143 |
+
+GDPR was the gap that mattered most: `gate.ts` already listed `gdpr`,
+`personal data` and `lawful basis` as trigger terms, so a GDPR topic *passed* the
+gate and was served AI Act passages or nothing. The tool advertised coverage the
+corpus did not have.
+
+**The Chips Act is the first corpus in EUR-Lex's original-act dialect.** It has
+never been amended, so no consolidated version exists — its current text is the
+original act, which EUR-Lex serves with a completely different CSS vocabulary
+(`oj-ti-art` / `oj-normal` / `oj-doc-ti`, lettered points in two-column tables,
+paragraph numbers inline in the prose). `scripts/regulatory/fetch.ts` now reads
+both dialects and normalises the OJ one into the same block shape, so parse.ts
+assigns paragraph locators identically either way.
+
+**Multi-instrument retrieval needed real changes, not just more data:**
+
+- **Instrument routing.** Statutory prose is highly self-similar — "the provider
+  shall ensure that…" reads almost identically across three of these
+  instruments — so cosine similarity is a poor discriminator and the model would
+  quote the wrong instrument with a citation that looks verified. `looksRegulatory()`
+  now also returns *which* instruments a topic names, and `retrieveRegulatoryContext()`
+  passes that as a `corpusId` filter. Zero matches searches everything, and a
+  filter returning nothing falls back to the whole corpus and logs that it did:
+  a routing guess can cost relevance, never the block.
+- **Directive vs Regulation.** NIS2 and other Directives bind Member States, not
+  companies. `instrumentType` is now a required field, and the block header
+  states the distinction above every passage, because the quotation itself will
+  be accurate even when the obligation it appears to create is addressed to a
+  Member State. `applicationNote` does the same for obligations that apply from
+  a future date.
+- **Per-instrument diversification.** The passage budget is now capped per
+  instrument as well as per article, derived from how many instruments cleared
+  the score floor — so a single-instrument question still gets the full budget.
+
+**Three defects found and fixed while doing it:**
+
+1. **Corrigendum markers reached quotable text.** GDPR Articles 43(1) and 65(1)
+   carry inline `►C1 … ◄` brackets mid-sentence. The existing cleaner only
+   dropped markers that EUR-Lex emits as their own element, which the AI Act
+   happens to use exclusively — so this surfaced only with a second corpus. A
+   corpus whose whole promise is character-for-character quotation cannot hand
+   the model a sentence with `►C1` inside it.
+2. **Sixteen byte-identical chunks in Chips Act Annex I.** An oversize point was
+   split together with its chapeau, so every part regenerated the same
+   chapeau-only first slice. Compounding it, a 2.2KB chapeau was being repeated
+   onto all sixteen parts. Splitting now applies to the point and repeats the
+   chapeau only when it is short enough to be context rather than content
+   (`CHAPEAU_REPEAT_MAX_CHARACTERS`). Chips Act: 172 → 143 chunks, −24% stored
+   text. The AI Act and GDPR are byte-identical after the change, so it is
+   surgical rather than a re-chunking.
+3. **AI Act Annex XIV separated each classification code from its meaning.**
+   `AIP 0102` and its description were emitted as separate blocks. Re-extracted;
+   the normalised hash is unchanged at `524ab594`, confirming no legal text
+   moved — block boundaries only.
+
+**Guards, because each of the above was invisible until something looked:**
+`test:regulatory-index` now runs the chunker invariants over **every** ingested
+corpus rather than the AI Act alone (855 chunks, 3 instruments), and adds three
+new assertions — no consolidation marker survives into quotable text, no two
+records carry identical text under different locators, and every ingested corpus
+is reachable by routing. It also **now runs in CI**; it shipped on 13 August but
+was only ever run by hand, and a guard nobody runs is a comment.
+`reg:verify-index` now reports live-vs-committed record counts per corpus, which
+is what catches stale records after a re-chunk — a namespace total cannot. New
+`npm run reg:probe` exercises the full routed path (gate → routing → floor →
+diversify → format), as distinct from `reg:ingest --probe`, which measures raw
+vector similarity.
+
+**Verified:** a GDPR query routes to GDPR alone (top 0.741, six GDPR articles); a
+semiconductor query routes to the Chips Act alone (0.672) and returns no AI Act
+text; a cross-cutting credit-scoring query routes to both and returns AI Act
+Annex III and Article 10 *plus* GDPR Article 22, the actual automated-decision
+provision; and "TSMC Dresden fab workforce shortages" still gates out entirely.
+
 ### August 15, 2026 — documentation reconciled to the shipped prices, repo and Notion
 
 **Repo.** Every doc that quoted a price was checked against the catalogue. Four
