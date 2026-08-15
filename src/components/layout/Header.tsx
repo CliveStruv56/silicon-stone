@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/layout/ThemeToggle'
+import { priceOf } from '@/lib/offering'
 
 type NavChild = { name: string; href: string; note?: string }
 
@@ -44,19 +45,22 @@ const primaryNavigation: NavItem[] = [
     name: 'Products',
     href: '/products',
     children: [
-      { name: 'AI Audit Checklist Pack', href: '/products/ai-audit-checklist' },
-      { name: 'AI Act Compliance Toolkit', href: '/products/ai-act-toolkit' },
+      { name: 'AI Audit Checklist Pack', href: '/products/ai-audit-checklist', note: priceOf('ai-audit-checklist') },
+      { name: 'AI Act Compliance Toolkit', href: '/products/ai-act-toolkit', note: `From ${priceOf('ai-act-toolkit')}` },
       { name: 'Sector Reports', href: '/products/sector-reports', note: 'Coming soon' },
+      { name: 'All prices', href: '/pricing' },
     ],
   },
   {
     name: 'Advisory',
     href: '/advisory',
     children: [
-      { name: 'Advisory Briefing', href: '/advisory#briefing', note: '£450' },
-      { name: 'The Exposure Diagnostic', href: '/advisory#diagnostic', note: 'From £2,500' },
-      { name: 'The Drift Retainer', href: '/advisory#retainer', note: 'From £2,000/mo' },
-      { name: 'Strategic Assessment', href: '/advisory#assessment' },
+      // Price notes come from src/lib/offering.ts so the menu cannot drift from
+      // /pricing — this nav carried a stale duplicate set until 2026-08-15.
+      { name: 'Advisory Briefing', href: '/advisory#briefing', note: priceOf('advisory-briefing') },
+      { name: 'The Exposure Diagnostic', href: '/advisory#diagnostic', note: priceOf('exposure-diagnostic') },
+      { name: 'The Drift Retainer', href: '/advisory#retainer', note: `${priceOf('drift-retainer')}/mo` },
+      { name: 'Strategic Assessment', href: '/advisory#assessment', note: priceOf('strategic-assessment') },
       // A separate page rather than an anchor, and the one paid offering that
       // was in no menu at all — reachable only from inline links on five pages.
       // Filed under Advisory, not Products: it is a scoped engagement, and
@@ -67,8 +71,9 @@ const primaryNavigation: NavItem[] = [
       // The audience is the real difference — the Diagnostic reads your whole
       // stack, this one reads your European market entry — so the menu says so
       // rather than leaving the reader to guess from two identical prices.
-      { name: 'Post-Omnibus Briefing', href: '/eu-exposure', note: 'From £2,500 · US & UK' },
-      { name: 'Modules', href: '/advisory#modules' },
+      { name: 'Post-Omnibus Briefing', href: '/eu-exposure', note: `${priceOf('post-omnibus-briefing')} · US & UK` },
+      { name: 'Modules', href: '/advisory#modules', note: 'From £3,500' },
+      { name: 'All prices', href: '/pricing' },
       { name: 'Contact', href: '/advisory#contact' },
     ],
   },

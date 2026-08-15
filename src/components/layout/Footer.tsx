@@ -16,6 +16,7 @@ const footerNavigation = {
     { name: 'Tools', href: '/tools' },
     { name: 'Products', href: '/products' },
     { name: 'Advisory', href: '/advisory' },
+    { name: 'Pricing', href: '/pricing' },
     { name: 'Post-Omnibus Briefing', href: '/eu-exposure' },
     { name: 'US Executive’s Guide', href: '/us-executive-guide' },
     { name: 'Glossary', href: '/glossary' },

@@ -161,13 +161,14 @@ All draft-generating formats use Claude at temperature 0.4. Drafts are created d
 | `/products/ai-act-toolkit` | ✅ | Sales page: £79/£149 pricing tiers |
 | `/products/ai-audit-checklist` | ✅ | Sales page: £24 gateway product |
 | `/products/sector-reports` | ✅ | (renamed from `/products/briefings`, 301) Coming Soon with email capture |
+| `/pricing` | ✅ | Every price on one page, rendered from `src/lib/offering.ts`; respects the launch flags |
 | `/waymarkpath` | ✅ | WaymarkPath companion-product page (career transition app) |
 | `/privacy` | ✅ | Privacy policy (GDPR, data collection, third-party services) |
 | `/terms` | ✅ | Terms of service (Scottish governing law) |
 
 **301 redirects** (`next.config.ts`, explicit `statusCode: 301`): `/analysis`→`/intelligence`, `/briefings`→`/intelligence`, `/services`→`/advisory`, `/products/briefings`→`/products/sector-reports`.
 
-**Navigation** (post-Phase A/B): primary Intelligence (single link) · Tools · Products (dropdown: Toolkit, Checklist, Sector Reports) · Advisory, separator, secondary Methodology · About, Search icon, Subscribe button (→ `/#subscribe`)
+**Navigation** (post-Phase A/B): primary Intelligence (single link) · Tools · Products (dropdown: Checklist, Toolkit, Sector Reports, All prices) · Advisory (dropdown: the four tiers, Post-Omnibus Briefing, Modules, All prices, Contact), separator, secondary Methodology · About, Search icon, Subscribe button (→ `/#subscribe`). Dropdown price notes are read from `src/lib/offering.ts`, not held as literals.
 
 ### Admin Routes (`(admin)` group) — protected by `ADMIN_PASSWORD` + signed `SESSION_SECRET` cookie
 
@@ -455,6 +456,36 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 15, 2026 — `/pricing` shipped, and one source of truth behind it
+
+New public route `src/app/(website)/pricing/page.tsx` — every price on one
+page, grouped by rung (free / buy / engage / modules), with the credit ladder
+and a "small print" band covering VAT, what "from" means, the no-referral-fees
+position and the not-legal-advice line. Static, in the sitemap at priority 0.7,
+linked from the footer and from an "All prices" item in both the Products and
+Advisory menus. It respects the launch flags: the pre-launch band says
+checkout is not open rather than letting a reader find out at the button, and
+the founding-rate and free-intro blocks appear only while their flags are on.
+
+The page is rendered from **`src/lib/offering.ts`**, a new typed catalogue that
+is the point of the exercise — the audit that started this session found the
+same figures restated across nine surfaces and drifted apart on six of them, so
+`/pricing` had to not become the tenth copy. The header nav now reads its price
+notes from `priceOf()` rather than holding its own literals. The prose pages
+(`/products`, `/advisory`, `/eu-exposure` and the three product subpages) still
+carry their own copies because their prices are woven into sentences; the
+module header lists every one of those surfaces so a figure change has a
+checklist rather than a memory test. `project_summary.md` §5 remains the
+written record.
+
+Also published a printable rate card as a Claude artifact — *The Commitment
+Ladder*, the same catalogue set as a one-sheet ledger for print. It follows the
+house print convention (IBM Plex, as `scripts/render-briefing-pdf.ts` does,
+deliberately not the site's Unbounded/Outfit), inlined as data URIs because the
+artifact CSP blocks font CDNs, and forces the light palette under `@media
+print` whatever theme the screen was set to. Verified by rendering it through
+headless Chrome at A4.
 
 ### August 15, 2026 — §5 rewritten as the full offering catalogue
 
