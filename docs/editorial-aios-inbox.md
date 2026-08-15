@@ -40,8 +40,11 @@ Set a second Pinecone index name in `.env.local`:
 PINECONE_EVIDENCE_INDEX_NAME=your-separate-evidence-index
 ```
 
-The evidence index is separate from `PINECONE_INDEX_NAME`, which remains the
-published-article semantic-search index used by `/knowledge`.
+The evidence index is separate from `PINECONE_INDEX_NAME`
+(`silicon-and-stone-articles`), which remains the published-article
+semantic-search index used by `/knowledge`, and from
+`PINECONE_REGULATORY_INDEX_NAME`, which holds statutory text for drafting. One
+index per lane; none of them share storage.
 
 Preview a rebuild:
 

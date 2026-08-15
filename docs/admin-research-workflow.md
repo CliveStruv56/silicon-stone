@@ -202,12 +202,19 @@ If the backend is **not** configured, the deep path runs in-process via `deepRes
 
 ## 5. Pinecone usage detail
 
-Pinecone is configured in `src/lib/pinecone.ts`. There are two indexes:
+Pinecone is configured in `src/lib/pinecone.ts`. There are three indexes, one
+per lane, deliberately not shared:
 
-| Env var | Purpose |
-|---------|---------|
-| `PINECONE_INDEX_NAME` | Article-level semantic search (used for prior-coverage RAG) |
-| `PINECONE_EVIDENCE_INDEX_NAME` | Chunk-level evidence search (used in `/knowledge`) |
+| Env var | Index | Purpose |
+|---------|-------|---------|
+| `PINECONE_INDEX_NAME` | `silicon-and-stone-articles` | Article-level semantic search (used for prior-coverage RAG and related articles) |
+| `PINECONE_EVIDENCE_INDEX_NAME` | `silicon-and-stone-evidence` | Chunk-level evidence search (used in `/knowledge`) |
+| `PINECONE_REGULATORY_INDEX_NAME` | `silicon-and-stone-regulatory` | Primary statutory text for drafting at `/create`; six instruments in namespace `PINECONE_REGULATORY_NAMESPACE`. Editorial only — never a Compliance Checker authority |
+
+All three must be plain dense 1024-d cosine indexes with **no integrated `embed`
+config**, because the app supplies its own OpenAI vectors. The retired
+`silicon-and-stone` index violated this and still holds an unrelated `ideas`
+namespace written by a tool outside this repo; do not reuse it.
 
 ### Prior-coverage RAG during draft generation
 
@@ -318,6 +325,8 @@ Input is capped at 24,000 characters to stay well under the ~8,191 token limit.
 | `PINECONE_API_KEY` | `src/lib/pinecone.ts` | Pinecone client |
 | `PINECONE_INDEX_NAME` | `src/lib/pinecone.ts` | Article semantic-search index |
 | `PINECONE_EVIDENCE_INDEX_NAME` | `src/lib/pinecone.ts` | Evidence chunk index |
+| `PINECONE_REGULATORY_INDEX_NAME` | `src/lib/pinecone.ts` | Statutory corpus index — the lane no-ops silently if unset |
+| `PINECONE_REGULATORY_NAMESPACE` | `src/lib/pinecone.ts` | Corpus version namespace (currently `v2026-08-13`) |
 | `BACKEND_API_URL` | `src/lib/research-backend.ts` | Railway backend base URL (optional) |
 | `BACKEND_API_KEY` | `src/lib/research-backend.ts` | Shared secret with backend (optional) |
 | `ANTHROPIC_API_KEY` | `src/lib/anthropic.ts` | Claude synthesis / draft writing |

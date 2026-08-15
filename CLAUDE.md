@@ -80,7 +80,52 @@ is the safety property.
 - The index must have **no integrated `embed` config** — this app writes OpenAI
   vectors, and Pinecone's integrated text path would embed queries with a
   different model. `npm run reg:verify-index` asserts this against the live
-  index; `--create` provisions one correctly.
+  index; `--create` provisions one correctly. It also reports live-vs-committed
+  record counts per corpus, which is what catches records stranded by a
+  re-chunk; a namespace total cannot.
+
+Six instruments share one namespace (`eu-ai-act`, `gdpr`, `eu-chips-act`,
+`eu-data-act`, `nis2`, `eu-cyber-resilience-act`). Three consequences:
+
+- **Routing is not optional.** Statutory prose is self-similar enough that
+  similarity alone hands the model the right words from the wrong instrument.
+  `looksRegulatory()` reports which instruments a topic names and retrieval
+  filters on it. Adding a corpus means adding its terms to `INSTRUMENT_TERMS` in
+  `gate.ts` — the guard fails if an ingested corpus has no routing terms,
+  because text nothing can route to is text nobody can reach.
+- **`instrumentType` is required and load-bearing.** A Directive (NIS2) binds
+  Member States, not companies; the block header says so above every passage,
+  because the quotation will be accurate even when the obligation it appears to
+  create is addressed to a Member State. `applicationNote` does the same job for
+  obligations that apply from a future date (the CRA's main body: 11 Dec 2027).
+- **Two dialects.** EUR-Lex serves consolidated texts and original acts with
+  different CSS vocabularies. An instrument that has never been amended has no
+  consolidated version at all (Chips Act, Data Act), so `fetch.ts` reads both.
+  Resolve the current CELEX from EUR-Lex at fetch time — never from a summary;
+  one asserted a Data Act consolidation that does not exist.
+
+Use `npm run reg:probe -- "<topic>"` to exercise the full routed path before
+trusting a change. `reg:ingest --probe` only measures raw vector similarity.
+
+## Article vectors (the other Pinecone lane)
+
+`PINECONE_INDEX_NAME` names the index behind semantic search, related articles
+and the prior-coverage RAG at `/create`. It holds one OpenAI vector per
+published Sanity article in the default namespace, written by
+`/api/vectorize` on publish.
+
+- **It must also have no integrated `embed` config.** The original index
+  (`silicon-and-stone`) was created with one, and because both models are
+  1024-dimensional nothing ever errored — a text-path query just returned
+  confident nonsense (measured 0.09 and unrelated, against 0.54 done properly).
+  Migrated to `silicon-and-stone-articles` on 2026-08-15.
+  `npm run articles:verify-index` asserts the shape; `--create` provisions one.
+- **The index is rebuildable from Sanity.** Every embedded field and every
+  metadata value derives from the document, so `npm run articles:sync` restores
+  it end to end and reconciles orphans. There is nothing to back up.
+- Do not rename `getPineconeIndex()` or `searchSimilar` — `evidence-index-checks`
+  (CI-blocking) and `regulatory-index-checks` grep for those literals, and a
+  rename makes one assertion vacuously pass rather than fail.
 
 ## Pricing (load-bearing — do not break)
 

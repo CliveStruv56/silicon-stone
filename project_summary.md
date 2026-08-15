@@ -582,6 +582,28 @@ AI Act Annex III and Article 10 *plus* GDPR Article 22 — the actual
 automated-decision provision. "TSMC Dresden fab workforce shortages" and "Nvidia
 quarterly earnings" still gate out entirely.
 
+**The article index was moved off the shared index at last.**
+`silicon-and-stone` was created with an integrated `llama-text-embed-v2` config
+while the app writes OpenAI vectors into it; both are 1024-d, so nothing ever
+errored and a text-path query just returned confident nonsense. It could not be
+repaired in place (Pinecone fixes embed config at creation) and could not be
+recreated, because it also holds an `ideas` namespace — 242 records and growing,
+written by a tool outside this repo. It stayed broken because nobody knew
+whether that tool also read the article namespace.
+
+It does not: the ideas skill queries and upserts only within namespace `ideas`.
+So the 15 article vectors were rebuilt from Sanity into a clean
+`silicon-and-stone-articles` (dense, 1024-d, cosine, **no** embed config) and
+`PINECONE_INDEX_NAME` repointed locally and on all three Vercel environments.
+Nothing needed exporting — every embedded field and metadata value derives from
+the Sanity document, so `npm run articles:sync` rebuilds the index end to end.
+New `npm run articles:verify-index` asserts the shape the way the regulatory
+lane already did, and reports any foreign namespace rather than assuming it is
+safe to delete. The old `__default__` namespace is **left in place** pending an
+explicit go-ahead; deleting it is irreversible and costs nothing to defer.
+Pinecone Starter now holds 5 of 5 indexes, with `quickstart-skills` as the only
+disposable headroom.
+
 **Still open:** the corpus holds no recitals (EUR-Lex omits the preamble from
 consolidated texts), which bites hardest for the GDPR, whose 173 recitals are
 routinely cited as interpretive authority. No reranking: retrieval is
