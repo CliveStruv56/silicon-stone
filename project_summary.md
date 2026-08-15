@@ -1,7 +1,7 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-08-13
+> Last Updated: 2026-08-15
 > Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (74 static pages), 208 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
@@ -398,6 +398,58 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 15, 2026 — Commerce rehearsed end-to-end against a store that does not exist yet
+
+No product code changed. The whole paid path was run locally with
+`NEXT_PUBLIC_PRE_LAUNCH=false` and stub Lemon Squeezy checkout URLs, to find out
+what launch day will actually do before the store exists. Two real gaps and one
+wrong entry in this document came out of it.
+
+**What works, verified rather than assumed.** With the flag off and the three
+`NEXT_PUBLIC_LEMONSQUEEZY_*_URL` vars set, `/products/ai-act-toolkit` swaps all
+its early-access captures for live "Buy Standard — £79" / "Buy Professional —
+£149" anchors, and `/products/ai-audit-checklist` for "Buy Checklist Pack —
+£24"; zero "Request Early Access" remains on either. `/products/success`
+renders the right next-rung block for each of the three SKUs
+(`checklist` → £20 toolkit credit and the £83-vs-£103 line;
+`toolkit-standard` / `toolkit-pro` → the £450 Advisory Briefing) and a neutral
+confirmation with no param. `isConfiguredCheckout()` only rejects
+`example.com`, so any real link passes.
+
+**The webhook was exercised with signed payloads**, which needs no store: a
+valid HMAC returns 200 and maps each of the three `LEMONSQUEEZY_VARIANT_ID_*`
+values to the right `buyer-*` Kit tag; an unknown variant logs
+`order_created without mappable buyer tag` and is dropped; a bad signature and a
+missing signature both 401. So the `order_created` → Kit path is sound and only
+waits on the store's real variant IDs. Note that idempotency was **not**
+exercised — a replayed payload returned 200 rather than `duplicate: true`,
+because Upstash is unset locally and `claimWebhookDelivery()` deliberately
+fails open. That is the documented behaviour, not a defect, but it means the
+de-dupe path is untested until it runs against a configured Redis.
+
+**Gap 1 — the in-article gate has its own source of truth, and `LAUNCH.md` never
+mentioned it.** The commerce gate opens `product.checkoutUrl` from the Sanity
+`product` doc; the env vars do not reach it. All three product docs have it
+blank, so after launch every in-article CTA would still land on the product
+page instead of checkout. `LAUNCH.md` gained a "Sanity — the in-article commerce
+gate" section and a launch-day check that looks at where the gate CTA actually
+points.
+
+**Gap 2 — four published articles have no `categories`,** so `auto` has nothing
+to match and they fall back to the newsletter: `tariff-enforcement-collision`,
+`greenland-critical-minerals-transatlantic-scramble`, `open-source-sovereignty`,
+and — worst of the four — `eu-ai-act-compliance-chasm-august-2026`, the site's
+AI Act explainer and the single piece most likely to sell the £79 toolkit. The
+2026-08-05 note claiming zero articles had empty categories tested
+`count(categories) == 0`, which does not catch an **absent** field.
+
+**And §10 was wrong about the ladder.** It recorded the gate as "shipped but
+unused" because no article sets `gate` explicitly. That is true and irrelevant:
+`auto` resolves to commerce on any topic match, so **11 of 15 published articles
+already render a product upsell** — confirmed live on
+`/analysis/welcome-to-silicon-and-stone` ("Go deeper: AI Act Compliance Toolkit
+/ Get it — From £79"). Row corrected.
 
 ### August 13, 2026 — Article flow made two-way: unpublish, and a fuller external-article intake
 
@@ -2420,7 +2472,9 @@ discount codes, booking URL, LinkedIn URL). This table is for defects and debt.
 | **Kit API key invalid — nothing on the site can capture a lead** | Production `/api/subscribe` returns Kit **401 "The API key is invalid"**; the stored `CONVERTKIT_API_KEY` is a legacy v3 key and `api.kit.com/v4` needs a v4 key. Because `NEXT_PUBLIC_PRE_LAUNCH` is `true`, *every* product CTA is an early-access email capture — so the entire funnel currently terminates in a failed POST. Verified still pre-launch on 2026-08-05: `/products/ai-act-toolkit` serves 8× "Request Early Access" and zero checkout links. Code side is done; this is one Vercel env var. Fix + verification steps in `LAUNCH.md` "Current state". | **P0** |
 | 7 of 12 published articles have no cover image | Verified via GROQ 2026-08-05 — `mainImage` is undefined on `welcome-to-silicon-and-stone`, `atlantic-fault-lines-us-tech-policy-eu-autonomy`, `tariff-enforcement-collision`, `semiconductor-testing-bottleneck-ai-accelerators`, `korean-memory-fab-capacity-squeeze-2027`, `greenland-critical-minerals-transatlantic-scramble`, `open-source-sovereignty`. Placeholders render on the live site and in OG cards. The Studio has image-prompt suggestions + a media library to speed this up. | **High** |
 | 9 unpublished drafts, 8 of them without images | Verified 2026-08-05: drafts have grown from 2 (May) to **9** while publishing stalled — GPAI enforcement, EU Chips Act mid-point, China mineral licences, the token-bill piece, Fable 5 shutdown (the only one with an image), open-source exemption, GPT-5.6 two-tier market, plus the two long-standing Iran/Gulf drafts. Several are time-sensitive and decaying. | **High** |
-| `article.gate` configured on zero articles | The PWA Phase 3 `Gate` component (email / commerce / lead) shipped 2026-07-17 but **no article document sets `gate`**, so the whole ladder falls back to `auto` → newsletter. The monetisation surface exists in code and is unused in content. | Medium |
+| ~~`article.gate` configured on zero articles~~ — the claim was wrong, corrected 2026-08-15 | No article sets `gate`, which is still true, but the conclusion drawn from it was not: `auto` resolves to **commerce** whenever an article's categories intersect a product's `topics` (`resolveGate`, `src/lib/gate.ts:151`), and only falls back to the newsletter when nothing matches. Verified live — `/analysis/welcome-to-silicon-and-stone` renders "Go deeper: AI Act Compliance Toolkit / Get it — From £79". **11 of 15 published articles already carry a commerce gate**; the ladder is live, not unused. | Resolved |
+| 4 published articles have no `categories`, so they get no commerce gate | Verified by GROQ 2026-08-15: `eu-ai-act-compliance-chasm-august-2026`, `tariff-enforcement-collision`, `greenland-critical-minerals-transatlantic-scramble`, `open-source-sovereignty`. The `auto` gate has nothing to match, so each falls back to the newsletter — including the AI Act explainer, the piece most likely to sell the £79 toolkit. This also contradicts the 2026-08-05 "zero articles with empty categories" note, which was checked as `count(categories) == 0` and missed the field being **absent**. Tagging them is a Studio edit. | **High** |
+| Sanity `product.checkoutUrl` blank on all three products | The commerce gate opens `checkoutUrl` when set and otherwise links to `productPath`. Setting the three `NEXT_PUBLIC_LEMONSQUEEZY_*_URL` env vars lights up the **product pages only** — the in-article gate keeps sending readers to the product page until the same links are pasted into the Sanity product docs. `LAUNCH.md` had no Sanity step at all; one was added 2026-08-15. | Medium (blocked on LS) |
 | ~~`LAUNCH.md` URLs named `www`~~ — corrected 2026-08-10 | **The canonical host is the bare apex** as of 2026-08-06 (commit `50996d27`) — `SITE_URL` in `src/lib/site.ts` is `https://siliconandstone.com` and `www` 308s to it, reversing the June decision. The Lemon Squeezy redirect targets and webhook URL in `LAUNCH.md` still gave `www`, which would have put a redirect hop inside a payment callback; both now use the apex. Historical `www` mentions in §9 changelog entries are left as written. | Resolved |
 | Inoreader redirect URI still localhost | `http://localhost:3000/api/auth/callback/inoreader` in the Inoreader dev portal. Research-pipeline OAuth therefore cannot complete in production; it works locally. Change to `https://siliconandstone.com/api/auth/callback/inoreader` (apex, not www). | Medium |
 | Rule-pack corpus covers 19 Articles, not all of them | `rulepack/versions/2026-08-10/corpus/` holds Arts 3, 5, 6, 9, 11, 12, 13, 17, 19, 26, 49, 50, 57, 72, 73, 99, 101, 111, 113. `hasCorpus()` answers honestly and `verifyCitation()` returns `uncovered` for anything else. **Stage 3's verifier must treat `uncovered` as unverifiable, never as a pass.** Extending coverage is a data task (re-scrape from the same CELEX id), not a code change. | Medium |
@@ -2477,7 +2531,8 @@ Nothing downstream matters until email capture works.
 |------|-------------|
 | **Cover images for 7 published articles** | Live-site quality issue; see §10. Studio has image-prompt suggestions + media library. |
 | **Publish or kill the 9 drafts** | Several are time-sensitive (GPAI enforcement, Chips Act mid-point) and decay with every week. |
-| **Wire `article.gate` on published articles** | The Phase 3 ladder is shipped but unused — pick commerce gates for the toolkit-adjacent pieces and lead gates for the advisory-adjacent ones. |
+| **Categorise the 4 uncategorised published articles** | Not cosmetic: with no `categories` the `auto` gate cannot match a product and falls back to the newsletter, so `eu-ai-act-compliance-chasm-august-2026` — the AI Act explainer — currently sells nothing. Tag it `ai-act` at minimum. See §10. |
+| **Wire `article.gate` explicitly where `auto` guesses wrong** | The ladder is live (11 of 15 published articles get a commerce gate via topic match), so this is now tuning, not activation: set an explicit `lead` gate on the advisory-adjacent pieces, and `commerce` where the topic match picks the wrong product. |
 | **Atlantic Drift Briefing PDF** | Outline exists; required before YouTube launch. |
 
 ### Priority 2 — Config not covered by LAUNCH.md

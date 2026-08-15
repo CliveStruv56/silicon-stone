@@ -132,6 +132,32 @@ regenerate with `deliverables/src/assemble-toolkit.mjs` and
   - `LEMONSQUEEZY_VARIANT_ID_TOOLKIT_PRO`
 - [ ] Set `LEMONSQUEEZY_STORE_ID`, `LEMONSQUEEZY_API_KEY`.
 
+### Sanity — the in-article commerce gate
+
+The env vars above only light up the three **product pages**. The end-of-article
+gate is a *second* surface with its own source of truth: the `product` documents
+in Sanity. It already renders a commerce upsell on most published articles (the
+`auto` mode matches an article's categories against a product's `topics`), but
+with `checkoutUrl` blank it links to the product page rather than to checkout —
+one extra click between a reader and a payment.
+
+- [ ] In Studio → Products, paste the same three checkout links into
+      **Lemon Squeezy checkout URL** on the matching document:
+  - `product-ai-audit-checklist` ← the checklist link
+  - `product-ai-act-toolkit` ← the **Standard** link (the gate advertises
+    "From £79", so Standard is the right target)
+  - `product-sector-reports` — leave blank until the reports exist
+- [ ] `lemonVariantId` is only read for Model-B on-site unlock. All three
+      products are `deliveryModel: download`, so leave it blank.
+- [ ] An article only gets a commerce gate if its `categories` intersect a
+      product's `topics`. Four published articles have **no categories at all**
+      and therefore fall back to the newsletter gate — including
+      `eu-ai-act-compliance-chasm-august-2026`, the most toolkit-aligned piece
+      on the site. Tag them (`ai-act` at minimum) or the flagship article sells
+      nothing. The other three: `tariff-enforcement-collision`,
+      `greenland-critical-minerals-transatlantic-scramble`,
+      `open-source-sovereignty`.
+
 ### Lemon Squeezy — webhook
 
 - [ ] Settings → Webhooks → URL
@@ -213,6 +239,12 @@ pages on 2026-08-11. It was stale (four pages said 30 June, `/eu-exposure` said
       `/products/success?product=toolkit-standard|toolkit-pro` showing the
       Advisory Briefing offer + Kit tags `buyer-toolkit-standard` /
       `buyer-toolkit-pro`.
+- [ ] Open a published article tagged `ai-act` (e.g.
+      `/analysis/welcome-to-silicon-and-stone`), scroll to the end-of-article
+      gate, and confirm it reads "Go deeper: AI Act Compliance Toolkit / Get it
+      — From £79" **and that the CTA now opens LS checkout**, not the product
+      page. If it still goes to `/products/ai-act-toolkit`, the Sanity
+      `checkoutUrl` above was not filled in.
 - [ ] Run a tool (e.g. Compliance Checker) to the results screen, subscribe via
       the results block, confirm the subscriber lands in Kit tagged
       `tool-compliance-checker`.
