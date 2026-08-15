@@ -515,6 +515,23 @@ editor noticed. Rather than hard-code that policy, it now lives on the category:
 - `src/lib/gate.test.ts` is new: 16 specs covering the fallback resolution and
   every precedence rule above.
 
+**And the tagging itself is now gated at publish.** The whole chain still rests
+on an article having categories at all — an untagged piece has no product to
+match and no category to ask, so it falls through to the newsletter, which is
+exactly the state the four articles were in. `article.categories` is now
+`rule.required().min(1)` at **error** level, so Studio disables the Publish
+button until the piece is tagged, and the field description says why (it drives
+the gate, not just navigation). One draft was failing the new rule — the
+long-standing Iran semiconductor piece — and was tagged; **zero documents now
+fail it**.
+
+Two honest limits on that gate. It is **Studio-side validation only**: the API
+write path is unaffected, so `/create` can still produce an untagged draft when
+the model returns no `categorySlugs` (`src/lib/sanity.ts:129` only sets the
+field when they resolve). The rule catches it at publish, which is the right
+place — but it is a stop, not a prevention. And it cannot judge whether the tags
+are *right*, only that some exist.
+
 **And §10 was wrong about the ladder.** It recorded the gate as "shipped but
 unused" because no article sets `gate` explicitly. That is true and irrelevant:
 `auto` resolves to commerce on any topic match, so **11 of 15 published articles
@@ -2603,7 +2620,7 @@ Nothing downstream matters until email capture works.
 |------|-------------|
 | **Cover images for 7 published articles** | Live-site quality issue; see §10. Studio has image-prompt suggestions + media library. |
 | **Publish or kill the 9 drafts** | Several are time-sensitive (GPAI enforcement, Chips Act mid-point) and decay with every week. |
-| ~~**Decide whether `lead` should ever be automatic**~~ — shipped 2026-08-15 | `category.defaultGateMode` now routes it. A new article inherits the right gate from its categories with no per-article config; the only thing an editor must still get right is **tagging the piece**, since an article with no categories falls through to the newsletter. See §9. |
+| ~~**Decide whether `lead` should ever be automatic**~~ — shipped 2026-08-15 | `category.defaultGateMode` now routes it, and `article.categories` is required at error level so Studio blocks Publish on an untagged piece. A new article inherits the right gate from its categories with no per-article config. Residual: Studio validation does not apply to API writes, so `/create` can still leave a draft untagged — it is caught at publish, not at creation. See §9. |
 | ~~**Wire `article.gate` explicitly where `auto` guesses wrong**~~ | Done for the four articles `auto` could not serve — see the 2026-08-15 §9 entry. Remaining case is `commerce` overrides where the topic match picks the wrong product; none observed yet, since only the Toolkit currently claims any topics. |
 | **Atlantic Drift Briefing PDF** | Outline exists; required before YouTube launch. |
 

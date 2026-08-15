@@ -81,8 +81,15 @@ export const article = defineType({
       group: 'content',
       name: 'categories',
       title: 'Categories',
+      description:
+        'At least one is required. Categories are not just navigation — they decide what the end-of-article gate offers: a product upsell when one claims the topic, otherwise whatever the category asks for (see "Default end-of-article gate" on the Category). An untagged article silently falls back to a newsletter ask.',
       type: 'array',
       of: [defineArrayMember({ type: 'reference', to: [{ type: 'category' }] })],
+      // Error level, so Studio disables Publish until the piece is tagged.
+      // Four published articles were found untagged on 2026-08-15, each closing
+      // on a second email ask instead of the product or advisory gate.
+      validation: (rule) =>
+        rule.required().min(1).error('Tag the article — this drives the end-of-article gate, not just navigation.'),
     }),
     defineField({
       group: 'content',

@@ -1,0 +1,3080 @@
+[
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "name",
+        "type": "slug"
+      }
+    ],
+    "name": "media.tag",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "options": {
+          "source": "title",
+          "maxLength": 64
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "to": [
+          {
+            "type": "author"
+          }
+        ],
+        "name": "author",
+        "type": "reference"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "fields": [
+          {
+            "validation": [
+              {
+                "rules": [
+                  {
+                    "flag": "presence",
+                    "constraint": "required"
+                  }
+                ],
+                "level": "error"
+              }
+            ],
+            "name": "alt",
+            "type": "string",
+            "title": "Alternative Text"
+          }
+        ],
+        "name": "mainImage",
+        "type": "image"
+      },
+      {
+        "description": "AI-suggested prompts describing what the main image should depict. Click \"Suggest two prompts\" to generate two options from the current article, then copy one into your image agent (which applies the house style).",
+        "fields": [
+          {
+            "of": [
+              {
+                "rows": 3,
+                "type": "text"
+              }
+            ],
+            "name": "prompts",
+            "type": "array"
+          },
+          {
+            "readOnly": true,
+            "name": "generatedAt",
+            "type": "datetime"
+          },
+          {
+            "readOnly": true,
+            "name": "model",
+            "type": "string"
+          }
+        ],
+        "name": "imagePrompts",
+        "type": "object",
+        "title": "Image generation prompts"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 1
+              }
+            ],
+            "level": "error",
+            "message": "Tag the article — this drives the end-of-article gate, not just navigation."
+          }
+        ],
+        "description": "At least one is required. Categories are not just navigation — they decide what the end-of-article gate offers: a product upsell when one claims the topic, otherwise whatever the category asks for (see \"Default end-of-article gate\" on the Category). An untagged article silently falls back to a newsletter ask.",
+        "of": [
+          {
+            "to": [
+              {
+                "type": "category"
+              }
+            ],
+            "type": "reference",
+            "title": "Reference to category"
+          }
+        ],
+        "name": "categories",
+        "type": "array"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Compliance Clara (Legal/Compliance)",
+              "value": "clara"
+            },
+            {
+              "title": "Industrial Ian (Operations/Supply Chain)",
+              "value": "ian"
+            },
+            {
+              "title": "Sovereign Sofia (Policy/Analysis)",
+              "value": "sofia"
+            },
+            {
+              "title": "Global Citizen (General Public)",
+              "value": "citizen"
+            },
+            {
+              "title": "Transatlantic Troy (Founder/CEO, US–EU Market Entry)",
+              "value": "troy"
+            }
+          ]
+        },
+        "description": "Which decision-makers is this most relevant for?",
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "personas",
+        "type": "array",
+        "title": "Target Personas"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Signal (Breaking Analysis)",
+              "value": "signal"
+            },
+            {
+              "title": "Deep Dive (Long-form)",
+              "value": "deepdive"
+            },
+            {
+              "title": "Tool Guide",
+              "value": "guide"
+            },
+            {
+              "title": "YouTube Script",
+              "value": "youtube"
+            }
+          ],
+          "layout": "radio"
+        },
+        "initialValue": "signal",
+        "name": "contentType",
+        "type": "string"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Pulse (30s scan)",
+              "value": "pulse"
+            },
+            {
+              "title": "Briefing (5min read)",
+              "value": "briefing"
+            },
+            {
+              "title": "Audit (deep analysis)",
+              "value": "audit"
+            }
+          ],
+          "layout": "radio"
+        },
+        "description": "Reading speed tier for tiered content experience",
+        "name": "intelligenceTier",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "min",
+                "constraint": 1
+              },
+              {
+                "flag": "max",
+                "constraint": 10
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Significance rating 1-10 for urgency display",
+        "name": "impactScore",
+        "type": "number"
+      },
+      {
+        "rows": 2,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "max",
+                "constraint": 160
+              }
+            ],
+            "level": "warning",
+            "message": "Keep Stone Truth under 160 characters"
+          }
+        ],
+        "description": "One-sentence \"bottom line\" summary (max 160 chars)",
+        "name": "stoneTruth",
+        "type": "text"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Supply Chain × Scenario Modelling",
+              "value": "supply-chain-scenario-modelling"
+            },
+            {
+              "title": "Supply Chain × Long-Memory Filter",
+              "value": "supply-chain-long-memory-filter"
+            },
+            {
+              "title": "Policy × Scenario Modelling",
+              "value": "policy-scenario-modelling"
+            },
+            {
+              "title": "Policy × Long-Memory Filter",
+              "value": "policy-long-memory-filter"
+            },
+            {
+              "title": "Talent × Scenario Modelling",
+              "value": "talent-scenario-modelling"
+            },
+            {
+              "title": "Talent × Long-Memory Filter",
+              "value": "talent-long-memory-filter"
+            }
+          ]
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "supply-chain-scenario-modelling",
+                  "supply-chain-long-memory-filter",
+                  "policy-scenario-modelling",
+                  "policy-long-memory-filter",
+                  "talent-scenario-modelling",
+                  "talent-long-memory-filter"
+                ]
+              },
+              {
+                "flag": "max",
+                "constraint": 6
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Cells of the 3×2 Forensic Technopolitics matrix that this piece visibly applies. Pulses usually use 1 cell; Briefings 2–4 cells; Audits are eligible for all 6 but should only claim cells the body actually uses.",
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "methodologyPillars",
+        "type": "array",
+        "title": "Methodology Audit (3×2 matrix cells)"
+      },
+      {
+        "description": "Key takeaways for decision-makers (3-5 bullets)",
+        "of": [
+          {
+            "type": "text"
+          }
+        ],
+        "name": "actionableInsights",
+        "type": "array",
+        "title": "What to do next"
+      },
+      {
+        "options": {
+          "collapsible": true,
+          "collapsed": true
+        },
+        "description": "The conversion surface shown after the article body (P3-1). The body is never blocked — this only appends below it. Auto = commerce upsell if a product maps to this topic, otherwise the newsletter. Choose a specific mode to override.",
+        "fields": [
+          {
+            "options": {
+              "list": [
+                {
+                  "title": "Auto (product upsell if mapped, else newsletter)",
+                  "value": "auto"
+                },
+                {
+                  "title": "Newsletter / email capture",
+                  "value": "email"
+                },
+                {
+                  "title": "Commerce (product upsell / unlock)",
+                  "value": "commerce"
+                },
+                {
+                  "title": "Lead (book a call)",
+                  "value": "lead"
+                },
+                {
+                  "title": "None",
+                  "value": "none"
+                }
+              ],
+              "layout": "radio"
+            },
+            "initialValue": "auto",
+            "name": "mode",
+            "type": "string"
+          },
+          {
+            "description": "Overrides the automatic topic → product mapping. Leave blank to auto-resolve from categories.",
+            "to": [
+              {
+                "type": "product"
+              }
+            ],
+            "hidden": "conditional",
+            "name": "product",
+            "type": "reference",
+            "title": "Product (commerce mode)"
+          },
+          {
+            "description": "Where the \"book a call\" CTA points. Defaults to /advisory#contact.",
+            "hidden": "conditional",
+            "name": "href",
+            "type": "string",
+            "title": "Link target (lead mode)"
+          },
+          {
+            "description": "Optional. Overrides the default headline for the chosen mode.",
+            "name": "headline",
+            "type": "string",
+            "title": "Headline override"
+          },
+          {
+            "rows": 2,
+            "description": "Optional. Overrides the default supporting copy for the chosen mode.",
+            "name": "body",
+            "type": "text",
+            "title": "Body override"
+          },
+          {
+            "name": "ctaLabel",
+            "type": "string",
+            "title": "CTA label override"
+          }
+        ],
+        "name": "gate",
+        "type": "object",
+        "title": "End-of-article gate"
+      },
+      {
+        "initialValue": true,
+        "description": "Show the Atlantic Drift email capture partway through the article, after the reader has scrolled past the value (P3-2). Never an entry wall; suppressed per-device once dismissed or subscribed. On by default.",
+        "name": "inReadCapture",
+        "type": "boolean",
+        "title": "In-read newsletter capture"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "max",
+                "constraint": 3
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Precomputed semantic neighbours. Updated by the vectorize webhook so public article renders do not call embedding/search providers.",
+        "of": [
+          {
+            "to": [
+              {
+                "type": "article"
+              }
+            ],
+            "type": "reference",
+            "title": "Reference to article"
+          }
+        ],
+        "name": "relatedArticles",
+        "type": "array"
+      },
+      {
+        "name": "publishedAt",
+        "type": "datetime"
+      },
+      {
+        "description": "Set this only when you materially revise a piece after publishing. Shows a visible \"Updated\" date and feeds dateModified in structured data. Leave blank for the original publication and for minor/SEO-only tweaks.",
+        "name": "updatedAt",
+        "type": "datetime"
+      },
+      {
+        "rows": 3,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "max",
+                "constraint": 200
+              }
+            ],
+            "level": "warning",
+            "message": "Keep excerpts under 200 characters"
+          }
+        ],
+        "description": "Short summary for cards and SEO (max 200 characters)",
+        "name": "excerpt",
+        "type": "text"
+      },
+      {
+        "of": [
+          {
+            "marks": {
+              "annotations": [
+                {
+                  "fields": [
+                    {
+                      "options": {
+                        "disableNew": true
+                      },
+                      "validation": [
+                        {
+                          "rules": [
+                            {
+                              "flag": "presence",
+                              "constraint": "required"
+                            }
+                          ],
+                          "level": "error"
+                        }
+                      ],
+                      "to": [
+                        {
+                          "type": "glossaryTerm"
+                        }
+                      ],
+                      "name": "term",
+                      "type": "reference"
+                    }
+                  ],
+                  "name": "glossaryTerm",
+                  "type": "object",
+                  "title": "Glossary term"
+                },
+                {
+                  "fields": [
+                    {
+                      "validation": [
+                        {
+                          "rules": [
+                            {
+                              "flag": "uri",
+                              "constraint": {
+                                "options": {
+                                  "scheme": [
+                                    "/^http$/",
+                                    "/^https$/",
+                                    "/^mailto$/"
+                                  ],
+                                  "allowRelative": false,
+                                  "relativeOnly": false,
+                                  "allowCredentials": false
+                                }
+                              }
+                            }
+                          ],
+                          "level": "error"
+                        }
+                      ],
+                      "name": "href",
+                      "type": "url",
+                      "title": "URL"
+                    },
+                    {
+                      "initialValue": false,
+                      "name": "openInNewTab",
+                      "type": "boolean",
+                      "title": "Open in new tab"
+                    }
+                  ],
+                  "name": "link",
+                  "type": "object"
+                }
+              ],
+              "decorators": [
+                {
+                  "value": "strong",
+                  "title": "Strong"
+                },
+                {
+                  "value": "em",
+                  "title": "Emphasis"
+                },
+                {
+                  "value": "code",
+                  "title": "Code"
+                }
+              ]
+            },
+            "lists": [
+              {
+                "value": "bullet",
+                "title": "Bulleted list"
+              },
+              {
+                "value": "number",
+                "title": "Numbered list"
+              }
+            ],
+            "styles": [
+              {
+                "value": "normal",
+                "title": "Normal"
+              },
+              {
+                "value": "h1",
+                "title": "Heading 1"
+              },
+              {
+                "value": "h2",
+                "title": "Heading 2"
+              },
+              {
+                "value": "h3",
+                "title": "Heading 3"
+              },
+              {
+                "value": "h4",
+                "title": "Heading 4"
+              },
+              {
+                "value": "h5",
+                "title": "Heading 5"
+              },
+              {
+                "value": "h6",
+                "title": "Heading 6"
+              },
+              {
+                "value": "blockquote",
+                "title": "Quote"
+              }
+            ],
+            "of": [],
+            "type": "block"
+          },
+          {
+            "options": {
+              "hotspot": true
+            },
+            "fields": [
+              {
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "name": "alt",
+                "type": "string",
+                "title": "Alternative Text"
+              },
+              {
+                "name": "caption",
+                "type": "string"
+              }
+            ],
+            "type": "image"
+          }
+        ],
+        "name": "body",
+        "type": "array"
+      },
+      {
+        "description": "Primary sources cited in this piece. Renders as the \"Sources\" list and feeds Article structured data (schema.org citation). Prefer primary sources — official filings, regulators, named reporting.",
+        "of": [
+          {
+            "fields": [
+              {
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "name": "title",
+                "type": "string"
+              },
+              {
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      },
+                      {
+                        "flag": "uri",
+                        "constraint": {
+                          "options": {
+                            "scheme": [
+                              "/^http$/",
+                              "/^https$/"
+                            ],
+                            "allowRelative": false,
+                            "relativeOnly": false,
+                            "allowCredentials": false
+                          }
+                        }
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "name": "url",
+                "type": "url",
+                "title": "URL"
+              },
+              {
+                "description": "e.g. European Commission, Reuters, FT",
+                "name": "publisher",
+                "type": "string"
+              }
+            ],
+            "type": "object",
+            "name": "citation"
+          }
+        ],
+        "name": "citations",
+        "type": "array",
+        "title": "Sources / Citations"
+      },
+      {
+        "fields": [
+          {
+            "description": "Override the default title for search engines",
+            "name": "metaTitle",
+            "type": "string"
+          },
+          {
+            "rows": 3,
+            "validation": [
+              {
+                "rules": [
+                  {
+                    "flag": "max",
+                    "constraint": 160
+                  }
+                ],
+                "level": "warning",
+                "message": "Keep meta descriptions under 160 characters"
+              }
+            ],
+            "name": "metaDescription",
+            "type": "text"
+          }
+        ],
+        "name": "seo",
+        "type": "object",
+        "title": "SEO"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "AI-Generated",
+              "value": "generated"
+            },
+            {
+              "title": "Imported & Reworked",
+              "value": "imported"
+            },
+            {
+              "title": "Manual",
+              "value": "manual"
+            }
+          ]
+        },
+        "description": "How this article entered the system.",
+        "name": "source",
+        "type": "string"
+      },
+      {
+        "rows": 12,
+        "description": "Original text an imported article was reworked from. Reference only — never published.",
+        "name": "sourceMaterial",
+        "type": "text",
+        "title": "Original Source Material"
+      },
+      {
+        "rows": 12,
+        "description": "Auto-generated by the Pass-3 voice edit: AI tells removed, house-style corrections, and the list of [AUTHOR: …] specifics still needed. Resolve every [AUTHOR: …] placeholder in the body before publishing. Editorial reference — never published.",
+        "readOnly": true,
+        "name": "voiceEditNotes",
+        "type": "text"
+      },
+      {
+        "options": {
+          "collapsible": true,
+          "collapsed": false
+        },
+        "description": "Machine-generated verification report from the \"Run fact-check\" document action. Each claim is checked against fresh web searches of primary sources. Advisory only — never blocks publishing. Edit a Suggested Revision if needed, then use \"Insert into article\" on the claim to apply it to the body.",
+        "fields": [
+          {
+            "options": {
+              "list": [
+                {
+                  "title": "Running",
+                  "value": "running"
+                },
+                {
+                  "title": "Completed",
+                  "value": "completed"
+                },
+                {
+                  "title": "Failed",
+                  "value": "failed"
+                }
+              ]
+            },
+            "readOnly": true,
+            "name": "status",
+            "type": "string"
+          },
+          {
+            "readOnly": true,
+            "name": "requestedAt",
+            "type": "datetime"
+          },
+          {
+            "readOnly": true,
+            "name": "completedAt",
+            "type": "datetime"
+          },
+          {
+            "description": "Claude model that produced this report.",
+            "readOnly": true,
+            "name": "model",
+            "type": "string"
+          },
+          {
+            "rows": 2,
+            "readOnly": true,
+            "name": "error",
+            "type": "text"
+          },
+          {
+            "options": {
+              "list": [
+                {
+                  "title": "Clean",
+                  "value": "clean"
+                },
+                {
+                  "title": "Minor issues",
+                  "value": "minor-issues"
+                },
+                {
+                  "title": "Major issues",
+                  "value": "major-issues"
+                },
+                {
+                  "title": "Mostly unverifiable",
+                  "value": "unverifiable"
+                }
+              ]
+            },
+            "readOnly": true,
+            "name": "overallVerdict",
+            "type": "string"
+          },
+          {
+            "rows": 4,
+            "readOnly": true,
+            "name": "summary",
+            "type": "text"
+          },
+          {
+            "fields": [
+              {
+                "name": "total",
+                "type": "number"
+              },
+              {
+                "name": "accurate",
+                "type": "number"
+              },
+              {
+                "name": "inaccurate",
+                "type": "number"
+              },
+              {
+                "name": "outdated",
+                "type": "number"
+              },
+              {
+                "name": "needsContext",
+                "type": "number"
+              },
+              {
+                "name": "unverifiable",
+                "type": "number"
+              }
+            ],
+            "readOnly": true,
+            "name": "counts",
+            "type": "object",
+            "title": "Verdict Counts"
+          },
+          {
+            "of": [
+              {
+                "fields": [
+                  {
+                    "rows": 2,
+                    "readOnly": true,
+                    "name": "claim",
+                    "type": "text"
+                  },
+                  {
+                    "description": "Verbatim fragment from the body — search for it to find the claim.",
+                    "readOnly": true,
+                    "name": "locationHint",
+                    "type": "string"
+                  },
+                  {
+                    "rows": 3,
+                    "description": "The exact passage from the article this claim came from — used by \"Insert into article\" to find and replace it.",
+                    "readOnly": true,
+                    "name": "originalText",
+                    "type": "text"
+                  },
+                  {
+                    "options": {
+                      "list": [
+                        {
+                          "title": "Accurate",
+                          "value": "accurate"
+                        },
+                        {
+                          "title": "Inaccurate",
+                          "value": "inaccurate"
+                        },
+                        {
+                          "title": "Outdated",
+                          "value": "outdated"
+                        },
+                        {
+                          "title": "Needs context",
+                          "value": "needs-context"
+                        },
+                        {
+                          "title": "Unverifiable",
+                          "value": "unverifiable"
+                        }
+                      ]
+                    },
+                    "readOnly": true,
+                    "name": "verdict",
+                    "type": "string"
+                  },
+                  {
+                    "options": {
+                      "list": [
+                        "high",
+                        "medium",
+                        "low"
+                      ]
+                    },
+                    "readOnly": true,
+                    "name": "confidence",
+                    "type": "string"
+                  },
+                  {
+                    "rows": 3,
+                    "readOnly": true,
+                    "name": "evidence",
+                    "type": "text"
+                  },
+                  {
+                    "of": [
+                      {
+                        "validation": [
+                          {
+                            "rules": [
+                              {
+                                "flag": "uri",
+                                "constraint": {
+                                  "options": {
+                                    "scheme": [
+                                      "/^http$/",
+                                      "/^https$/"
+                                    ],
+                                    "allowRelative": false,
+                                    "relativeOnly": false,
+                                    "allowCredentials": false
+                                  }
+                                }
+                              }
+                            ],
+                            "level": "error"
+                          }
+                        ],
+                        "type": "url"
+                      }
+                    ],
+                    "readOnly": true,
+                    "name": "sourceUrls",
+                    "type": "array",
+                    "title": "Source URLs"
+                  },
+                  {
+                    "rows": 3,
+                    "description": "Proposed corrected wording. Edit it here if needed, then click \"Insert into article\" below to replace the original passage in the body.",
+                    "name": "suggestedRevision",
+                    "type": "text"
+                  },
+                  {
+                    "description": "Set automatically when the revision is inserted into the body.",
+                    "readOnly": true,
+                    "name": "applied",
+                    "type": "boolean"
+                  }
+                ],
+                "type": "object",
+                "name": "claimCheck"
+              }
+            ],
+            "name": "claims",
+            "type": "array"
+          }
+        ],
+        "name": "factCheck",
+        "type": "object"
+      }
+    ],
+    "name": "article",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "options": {
+          "source": "name",
+          "maxLength": 64
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "name": "image",
+        "type": "image"
+      },
+      {
+        "description": "e.g. \"Founder & Editor\" — shown in the byline and as jobTitle in Person schema.",
+        "name": "role",
+        "type": "string"
+      },
+      {
+        "rows": 4,
+        "description": "Short biography for the author page and Person structured data (E-E-A-T).",
+        "name": "bio",
+        "type": "text"
+      },
+      {
+        "description": "Public profile URLs that identify this author — LinkedIn, X/Twitter, Substack, personal site, ORCID. Feeds the Person schema \"sameAs\" for entity disambiguation.",
+        "of": [
+          {
+            "validation": [
+              {
+                "rules": [
+                  {
+                    "flag": "uri",
+                    "constraint": {
+                      "options": {
+                        "scheme": [
+                          "/^http$/",
+                          "/^https$/"
+                        ],
+                        "allowRelative": false,
+                        "relativeOnly": false,
+                        "allowCredentials": false
+                      }
+                    }
+                  }
+                ],
+                "level": "error"
+              }
+            ],
+            "type": "url"
+          }
+        ],
+        "name": "sameAs",
+        "type": "array",
+        "title": "Profile links (sameAs)"
+      }
+    ],
+    "name": "author",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "options": {
+          "source": "title",
+          "maxLength": 96
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "rows": 3,
+        "name": "description",
+        "type": "text"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Newsletter / email capture (default)",
+              "value": "email"
+            },
+            {
+              "title": "Lead — book a call",
+              "value": "lead"
+            },
+            {
+              "title": "None — no gate at all",
+              "value": "none"
+            }
+          ],
+          "layout": "radio"
+        },
+        "description": "What an article in this category should close on when its own gate is \"Auto\" and no product maps to its topics. Without this the fallback is the newsletter, which is a second email ask on a piece that has nothing to sell. Only consulted for the Auto fallback: an explicit gate on the article always wins, and so does a real product match.",
+        "name": "defaultGateMode",
+        "type": "string",
+        "title": "Default end-of-article gate"
+      }
+    ],
+    "name": "category",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "options": {
+          "source": "name",
+          "maxLength": 96
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Toolkit",
+              "value": "toolkit"
+            },
+            {
+              "title": "Checklist",
+              "value": "checklist"
+            },
+            {
+              "title": "Sector Report",
+              "value": "report"
+            },
+            {
+              "title": "Intelligence Series",
+              "value": "series"
+            },
+            {
+              "title": "Advisory",
+              "value": "advisory"
+            }
+          ],
+          "layout": "radio"
+        },
+        "initialValue": "toolkit",
+        "name": "kind",
+        "type": "string"
+      },
+      {
+        "description": "Display string, e.g. \"£24\", \"From £79\".",
+        "name": "priceLabel",
+        "type": "string",
+        "title": "Price label"
+      },
+      {
+        "rows": 3,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "max",
+                "constraint": 240
+              }
+            ],
+            "level": "warning",
+            "message": "Keep the blurb tight — under 240 characters."
+          }
+        ],
+        "description": "One or two lines pitched at a reader who just finished an article. Used in the upsell / commerce gate.",
+        "name": "blurb",
+        "type": "text"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "regex",
+                "constraint": {
+                  "pattern": "/^\\/[\\w\\-/]*$/",
+                  "name": "path",
+                  "invert": false
+                }
+              }
+            ],
+            "level": "error",
+            "message": "Must be a root-relative path like /products/ai-act-toolkit"
+          }
+        ],
+        "description": "Internal link to the product page, e.g. /products/ai-act-toolkit. Used as the \"learn more\" / fallback CTA target.",
+        "name": "productPath",
+        "type": "string",
+        "title": "Product page path"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "uri",
+                "constraint": {
+                  "options": {
+                    "scheme": [
+                      "/^http$/",
+                      "/^https$/"
+                    ],
+                    "allowRelative": false,
+                    "relativeOnly": false,
+                    "allowCredentials": false
+                  }
+                }
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Optional. When set, the gate CTA opens this checkout directly. Leave blank to link to the product page instead.",
+        "name": "checkoutUrl",
+        "type": "url",
+        "title": "Lemon Squeezy checkout URL"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Download delivery (Model A)",
+              "value": "download"
+            },
+            {
+              "title": "On-site unlock (Model B)",
+              "value": "unlock"
+            }
+          ],
+          "layout": "radio"
+        },
+        "initialValue": "download",
+        "description": "Download = buy → emailed/downloadable artefact (Model A). Unlock = on-site preview then licence-key unlock (Model B).",
+        "name": "deliveryModel",
+        "type": "string",
+        "title": "Delivery model"
+      },
+      {
+        "description": "Numeric LS variant ID. Required for on-site unlock (Model B) licence-key validation; optional otherwise.",
+        "name": "lemonVariantId",
+        "type": "string",
+        "title": "Lemon Squeezy variant ID"
+      },
+      {
+        "description": "Categories this product is relevant to. Drives the automatic article → product upsell mapping.",
+        "of": [
+          {
+            "to": [
+              {
+                "type": "category"
+              }
+            ],
+            "type": "reference",
+            "title": "Reference to category"
+          }
+        ],
+        "name": "topics",
+        "type": "array"
+      },
+      {
+        "description": "Optional short label, e.g. \"Quick Start\", \"Flagship\".",
+        "name": "badge",
+        "type": "string"
+      },
+      {
+        "initialValue": false,
+        "description": "Use this product as the fallback upsell when an article has no topic match. Set on exactly one product.",
+        "name": "isDefault",
+        "type": "boolean",
+        "title": "Default upsell"
+      }
+    ],
+    "name": "product",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "e.g. Industrial Ian",
+        "name": "name",
+        "type": "string",
+        "title": "Persona Name"
+      },
+      {
+        "description": "e.g. Operations Director",
+        "name": "role",
+        "type": "string"
+      },
+      {
+        "options": {
+          "source": "name",
+          "maxLength": 96
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "rows": 3,
+        "description": "What keeps them up at night?",
+        "name": "painPoints",
+        "type": "text"
+      },
+      {
+        "description": "What kind of content do they want?",
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "contentNeeds",
+        "type": "array"
+      },
+      {
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "organizationTypes",
+        "type": "array"
+      },
+      {
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "keyConcerns",
+        "type": "array"
+      }
+    ],
+    "name": "persona",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "options": {
+          "hotspot": true
+        },
+        "description": "The large background image shown on the homepage.",
+        "name": "heroImage",
+        "type": "image",
+        "title": "Homepage Hero Image"
+      },
+      {
+        "description": "Optional override for the main headline.",
+        "name": "heroTitle",
+        "type": "string"
+      },
+      {
+        "rows": 3,
+        "description": "Optional override for the subheadline description.",
+        "name": "heroDescription",
+        "type": "text"
+      },
+      {
+        "options": {
+          "collapsible": true,
+          "collapsed": true
+        },
+        "description": "Structural-analysis briefing on the homepage. Leave fields blank to fall back to the locked redesign copy in COPY.md.",
+        "fields": [
+          {
+            "initialValue": true,
+            "name": "enabled",
+            "type": "boolean",
+            "title": "Render this section"
+          },
+          {
+            "name": "eyebrow",
+            "type": "string",
+            "title": "Eyebrow badge"
+          },
+          {
+            "name": "h2",
+            "type": "string",
+            "title": "Section heading"
+          },
+          {
+            "name": "subhead",
+            "type": "string",
+            "title": "Subhead (silicon-amber)"
+          },
+          {
+            "rows": 5,
+            "name": "intro",
+            "type": "text",
+            "title": "Intro paragraph"
+          },
+          {
+            "fields": [
+              {
+                "name": "tag",
+                "type": "string"
+              },
+              {
+                "name": "title",
+                "type": "string"
+              },
+              {
+                "name": "descriptor",
+                "type": "string"
+              },
+              {
+                "name": "voice",
+                "type": "string",
+                "title": "Voice quote (one sentence in smart quotes)"
+              },
+              {
+                "description": "Each bullet is a short rich-text paragraph. Use Strong on the consequence clause for Stance 01.",
+                "of": [
+                  {
+                    "marks": {
+                      "annotations": [],
+                      "decorators": [
+                        {
+                          "value": "strong",
+                          "title": "Strong"
+                        },
+                        {
+                          "value": "em",
+                          "title": "Emphasis"
+                        }
+                      ]
+                    },
+                    "styles": [
+                      {
+                        "value": "normal",
+                        "title": "Normal"
+                      }
+                    ],
+                    "of": [],
+                    "type": "block"
+                  }
+                ],
+                "name": "bullets",
+                "type": "array",
+                "title": "Bullets (5 expected)"
+              }
+            ],
+            "name": "stance01",
+            "type": "object",
+            "title": "Stance 01 — left column (Model-Dependent)"
+          },
+          {
+            "fields": [
+              {
+                "name": "tag",
+                "type": "string"
+              },
+              {
+                "name": "title",
+                "type": "string"
+              },
+              {
+                "name": "descriptor",
+                "type": "string"
+              },
+              {
+                "name": "voice",
+                "type": "string",
+                "title": "Voice quote (one sentence in smart quotes)"
+              },
+              {
+                "description": "Each bullet is a short rich-text paragraph. Use Emphasis on the consequence clause for Stance 02.",
+                "of": [
+                  {
+                    "marks": {
+                      "annotations": [],
+                      "decorators": [
+                        {
+                          "value": "strong",
+                          "title": "Strong"
+                        },
+                        {
+                          "value": "em",
+                          "title": "Emphasis"
+                        }
+                      ]
+                    },
+                    "styles": [
+                      {
+                        "value": "normal",
+                        "title": "Normal"
+                      }
+                    ],
+                    "of": [],
+                    "type": "block"
+                  }
+                ],
+                "name": "bullets",
+                "type": "array",
+                "title": "Bullets (5 expected)"
+              }
+            ],
+            "name": "stance02",
+            "type": "object",
+            "title": "Stance 02 — right column (Orchestration-Side)"
+          },
+          {
+            "fields": [
+              {
+                "initialValue": "Stone Truth",
+                "name": "label",
+                "type": "string"
+              },
+              {
+                "description": "Use Emphasis on the quotable second sentence.",
+                "of": [
+                  {
+                    "marks": {
+                      "annotations": [],
+                      "decorators": [
+                        {
+                          "value": "strong",
+                          "title": "Strong"
+                        },
+                        {
+                          "value": "em",
+                          "title": "Emphasis"
+                        }
+                      ]
+                    },
+                    "styles": [
+                      {
+                        "value": "normal",
+                        "title": "Normal"
+                      }
+                    ],
+                    "of": [],
+                    "type": "block"
+                  }
+                ],
+                "name": "body",
+                "type": "array",
+                "title": "Body (rich text)"
+              }
+            ],
+            "name": "stoneTruth",
+            "type": "object",
+            "title": "Stone Truth callout"
+          }
+        ],
+        "name": "orchestrationBattleground",
+        "type": "object",
+        "title": "Orchestration Battleground (Homepage §2)"
+      }
+    ],
+    "name": "siteSettings",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "options": {
+          "source": "title",
+          "maxLength": 96
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "description": "3–5 alternate titles following title-formulas.json patterns",
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "titleOptions",
+        "type": "array",
+        "title": "Title Candidates"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "The Stone Briefing (Tuesday, analysis)",
+              "value": "stone-briefing"
+            },
+            {
+              "title": "The Silicon Move (Friday, applied)",
+              "value": "silicon-move"
+            },
+            {
+              "title": "Stone Truth Short (60s)",
+              "value": "shorts"
+            }
+          ],
+          "layout": "radio"
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "stone-briefing",
+                  "silicon-move",
+                  "shorts"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "pillar",
+        "type": "string",
+        "title": "Content Pillar"
+      },
+      {
+        "description": "Links a Friday Silicon Move to its Tuesday Stone Briefing and vice versa",
+        "to": [
+          {
+            "type": "youtubeScript"
+          }
+        ],
+        "name": "pairedScript",
+        "type": "reference"
+      },
+      {
+        "description": "Articles this script draws its analysis from",
+        "of": [
+          {
+            "to": [
+              {
+                "type": "article"
+              }
+            ],
+            "type": "reference",
+            "title": "Reference to article"
+          }
+        ],
+        "name": "sourceArticles",
+        "type": "array"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Compliance Clara (Legal/Compliance)",
+              "value": "clara"
+            },
+            {
+              "title": "Industrial Ian (Operations/Supply Chain)",
+              "value": "ian"
+            },
+            {
+              "title": "Sovereign Sofia (Policy/Analysis)",
+              "value": "sofia"
+            },
+            {
+              "title": "Global Citizen (General Public)",
+              "value": "citizen"
+            },
+            {
+              "title": "Transatlantic Troy (Founder/CEO, US–EU Market Entry)",
+              "value": "troy"
+            }
+          ]
+        },
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "personas",
+        "type": "array",
+        "title": "Target Personas"
+      },
+      {
+        "rows": 2,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Provocative opening line. No intro, no logo, no fluff.",
+        "name": "hook",
+        "type": "text",
+        "title": "Hook (0–5s)"
+      },
+      {
+        "rows": 3,
+        "description": "Why this matters to the viewer's career or organisation",
+        "name": "stakes",
+        "type": "text",
+        "title": "Stakes (5–15s)"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Supply Chain × Scenario Modelling",
+              "value": "supply-chain-scenario-modelling"
+            },
+            {
+              "title": "Supply Chain × Long-Memory Filter",
+              "value": "supply-chain-long-memory-filter"
+            },
+            {
+              "title": "Policy × Scenario Modelling",
+              "value": "policy-scenario-modelling"
+            },
+            {
+              "title": "Policy × Long-Memory Filter",
+              "value": "policy-long-memory-filter"
+            },
+            {
+              "title": "Talent × Scenario Modelling",
+              "value": "talent-scenario-modelling"
+            },
+            {
+              "title": "Talent × Long-Memory Filter",
+              "value": "talent-long-memory-filter"
+            }
+          ]
+        },
+        "description": "Which cells of the Forensic Technopolitics 3 × 2 matrix are applied (3 forensic domains × 2 analytical methods). Match the article-level methodologyPillars vocabulary.",
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "methodologyChecklist",
+        "type": "array",
+        "title": "Methodology Checklist (15–30s)"
+      },
+      {
+        "description": "The substantive body of the video",
+        "of": [
+          {
+            "marks": {
+              "annotations": [
+                {
+                  "fields": [
+                    {
+                      "validation": [
+                        {
+                          "rules": [
+                            {
+                              "flag": "uri",
+                              "constraint": {
+                                "options": {
+                                  "scheme": [
+                                    "/^http$/",
+                                    "/^https$/",
+                                    "/^mailto$/"
+                                  ],
+                                  "allowRelative": false,
+                                  "relativeOnly": false,
+                                  "allowCredentials": false
+                                }
+                              }
+                            }
+                          ],
+                          "level": "error"
+                        }
+                      ],
+                      "name": "href",
+                      "type": "url",
+                      "title": "URL"
+                    }
+                  ],
+                  "name": "link",
+                  "type": "object"
+                }
+              ],
+              "decorators": [
+                {
+                  "value": "strong",
+                  "title": "Strong"
+                },
+                {
+                  "value": "em",
+                  "title": "Emphasis"
+                },
+                {
+                  "value": "code",
+                  "title": "Code"
+                }
+              ]
+            },
+            "lists": [
+              {
+                "value": "bullet",
+                "title": "Bulleted list"
+              },
+              {
+                "value": "number",
+                "title": "Numbered list"
+              }
+            ],
+            "styles": [
+              {
+                "value": "normal",
+                "title": "Normal"
+              },
+              {
+                "value": "h1",
+                "title": "Heading 1"
+              },
+              {
+                "value": "h2",
+                "title": "Heading 2"
+              },
+              {
+                "value": "h3",
+                "title": "Heading 3"
+              },
+              {
+                "value": "h4",
+                "title": "Heading 4"
+              },
+              {
+                "value": "h5",
+                "title": "Heading 5"
+              },
+              {
+                "value": "h6",
+                "title": "Heading 6"
+              },
+              {
+                "value": "blockquote",
+                "title": "Quote"
+              }
+            ],
+            "of": [],
+            "type": "block"
+          }
+        ],
+        "name": "scriptBody",
+        "type": "array",
+        "title": "Core Analysis Script"
+      },
+      {
+        "rows": 3,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "max",
+                "constraint": 280
+              }
+            ],
+            "level": "warning",
+            "message": "Keep Stone Truth under 280 characters"
+          }
+        ],
+        "description": "The bottom-line verdict. Clear, quotable, one sentence max.",
+        "name": "stoneTruth",
+        "type": "text",
+        "title": "Stone Truth (final ~60s)"
+      },
+      {
+        "description": "One CTA per video. Never more.",
+        "fields": [
+          {
+            "options": {
+              "list": [
+                {
+                  "title": "Free Lead Magnet",
+                  "value": "lead-magnet"
+                },
+                {
+                  "title": "Paid PDF (Intelligence Series)",
+                  "value": "paid-pdf"
+                },
+                {
+                  "title": "Career Product",
+                  "value": "career-product"
+                },
+                {
+                  "title": "Membership",
+                  "value": "membership"
+                },
+                {
+                  "title": "Related Video",
+                  "value": "related-video"
+                }
+              ]
+            },
+            "name": "kind",
+            "type": "string"
+          },
+          {
+            "description": "Product funnel id, video id, or URL",
+            "name": "target",
+            "type": "string"
+          },
+          {
+            "rows": 2,
+            "name": "copy",
+            "type": "text",
+            "title": "On-Camera Copy"
+          }
+        ],
+        "name": "cta",
+        "type": "object",
+        "title": "Call to Action"
+      },
+      {
+        "description": "Which digital product this video drives toward (id from product-funnels.json)",
+        "name": "productFunnel",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "min",
+                "constraint": 1
+              },
+              {
+                "flag": "max",
+                "constraint": 60
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "targetDurationMinutes",
+        "type": "number",
+        "title": "Target Duration (minutes)"
+      },
+      {
+        "rows": 2,
+        "description": "Max 3 words of on-thumbnail text. Stone palette + Silicon cyan.",
+        "name": "thumbnailBrief",
+        "type": "text"
+      },
+      {
+        "of": [
+          {
+            "type": "text"
+          }
+        ],
+        "name": "bRollNotes",
+        "type": "array",
+        "title": "B-Roll Notes"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Idea",
+              "value": "idea"
+            },
+            {
+              "title": "Scripted",
+              "value": "scripted"
+            },
+            {
+              "title": "Filmed",
+              "value": "filmed"
+            },
+            {
+              "title": "Edited",
+              "value": "edited"
+            },
+            {
+              "title": "Published",
+              "value": "published"
+            }
+          ],
+          "layout": "radio"
+        },
+        "initialValue": "idea",
+        "name": "productionStatus",
+        "type": "string"
+      },
+      {
+        "description": "Target publish date (Tuesday or Friday per cadence)",
+        "name": "scheduledFor",
+        "type": "datetime"
+      },
+      {
+        "name": "publishedAt",
+        "type": "datetime"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "uri",
+                "constraint": {
+                  "options": {
+                    "scheme": [
+                      "/^http$/",
+                      "/^https$/"
+                    ],
+                    "allowRelative": false,
+                    "relativeOnly": false,
+                    "allowCredentials": false
+                  }
+                }
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "youtubeUrl",
+        "type": "url",
+        "title": "YouTube URL"
+      },
+      {
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "tags",
+        "type": "array"
+      },
+      {
+        "fields": [
+          {
+            "name": "metaTitle",
+            "type": "string"
+          },
+          {
+            "rows": 3,
+            "validation": [
+              {
+                "rules": [
+                  {
+                    "flag": "max",
+                    "constraint": 160
+                  }
+                ],
+                "level": "warning",
+                "message": "Keep meta descriptions under 160 characters"
+              }
+            ],
+            "name": "metaDescription",
+            "type": "text"
+          }
+        ],
+        "name": "seo",
+        "type": "object",
+        "title": "SEO"
+      }
+    ],
+    "name": "youtubeScript",
+    "type": "document",
+    "title": "YouTube Script"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Name of this library folder, e.g. \"Semiconductor B-roll\".",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "options": {
+          "source": "title",
+          "maxLength": 96
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "rows": 3,
+        "name": "description",
+        "type": "text"
+      }
+    ],
+    "name": "assetCollection",
+    "type": "document",
+    "title": "Image Collection"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "fields": [
+          {
+            "name": "alt",
+            "type": "string",
+            "title": "Alternative Text"
+          }
+        ],
+        "name": "image",
+        "type": "image"
+      },
+      {
+        "description": "Which library folder this image belongs to.",
+        "to": [
+          {
+            "type": "assetCollection"
+          }
+        ],
+        "name": "collection",
+        "type": "reference"
+      },
+      {
+        "options": {
+          "layout": "tags"
+        },
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "tags",
+        "type": "array"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "AI-Generated",
+              "value": "ai-generated"
+            },
+            {
+              "title": "Stock / Licensed",
+              "value": "stock"
+            },
+            {
+              "title": "Screenshot",
+              "value": "screenshot"
+            },
+            {
+              "title": "Original / Owned",
+              "value": "original"
+            },
+            {
+              "title": "Other",
+              "value": "other"
+            }
+          ]
+        },
+        "description": "Where this image came from.",
+        "name": "source",
+        "type": "string"
+      },
+      {
+        "name": "credit",
+        "type": "string",
+        "title": "Credit / Attribution"
+      },
+      {
+        "rows": 3,
+        "name": "notes",
+        "type": "text"
+      },
+      {
+        "name": "addedAt",
+        "type": "datetime"
+      }
+    ],
+    "name": "libraryImage",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "regex",
+                "constraint": {
+                  "pattern": "/^[a-z0-9]+(?:-[a-z0-9]+)*$/",
+                  "name": "lower-case kebab-case",
+                  "invert": false
+                }
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Stable lower-case kebab-case ID for this source.",
+        "name": "sourceId",
+        "type": "string",
+        "title": "Source ID"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "URL",
+              "value": "url"
+            },
+            {
+              "title": "PDF",
+              "value": "pdf"
+            },
+            {
+              "title": "Image",
+              "value": "image"
+            },
+            {
+              "title": "Note",
+              "value": "note"
+            },
+            {
+              "title": "Published Article",
+              "value": "published_article"
+            }
+          ],
+          "layout": "radio"
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "url",
+                  "pdf",
+                  "image",
+                  "note",
+                  "published_article"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "sourceType",
+        "type": "string"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Silicon & Stone",
+              "value": "silicon-and-stone"
+            },
+            {
+              "title": "Waymark Path",
+              "value": "waymark-path"
+            },
+            {
+              "title": "Shared",
+              "value": "shared"
+            }
+          ]
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "silicon-and-stone",
+                  "waymark-path",
+                  "shared"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 1
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "brandTags",
+        "type": "array"
+      },
+      {
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "topicTags",
+        "type": "array"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "uri",
+                "constraint": {
+                  "options": {
+                    "scheme": [
+                      "/^http$/",
+                      "/^https$/"
+                    ],
+                    "allowRelative": false,
+                    "relativeOnly": false,
+                    "allowCredentials": false
+                  }
+                }
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "originalUrl",
+        "type": "url",
+        "title": "Original URL"
+      },
+      {
+        "description": "Durable Sanity copy for PDF, image, or note uploads.",
+        "name": "asset",
+        "type": "file",
+        "title": "Uploaded Original"
+      },
+      {
+        "rows": 16,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Raw extracted text for local processing and later evidence indexing.",
+        "name": "extractedText",
+        "type": "text"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "regex",
+                "constraint": {
+                  "pattern": "/^sha256:[a-f0-9]{64}$/",
+                  "name": "sha256:<64 lower-case hex characters>",
+                  "invert": false
+                }
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "SHA-256 hash of the captured source content.",
+        "name": "contentHash",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "capturedAt",
+        "type": "datetime"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Pending local review",
+              "value": "pending"
+            },
+            {
+              "title": "Processed (reviewed)",
+              "value": "processed"
+            },
+            {
+              "title": "Error",
+              "value": "error"
+            }
+          ],
+          "layout": "radio"
+        },
+        "initialValue": "pending",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "pending",
+                  "processed",
+                  "error"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "description": "Legacy field from the retired local-vault filing pass. No longer written.",
+        "name": "manifestId",
+        "type": "string",
+        "title": "Manifest ID (legacy)"
+      }
+    ],
+    "name": "knowledgeSource",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "regex",
+                "constraint": {
+                  "pattern": "/^[a-z0-9]+(?:-[a-z0-9]+)*$/",
+                  "name": "lower-case kebab-case",
+                  "invert": false
+                }
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Stable lower-case kebab-case ID for reviewed local filing.",
+        "name": "candidateId",
+        "type": "string",
+        "title": "Candidate ID"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "rows": 16,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Portal-generated answer awaiting reviewed local filing.",
+        "name": "answer",
+        "type": "text",
+        "title": "Proposed Synthesis"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 1
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Source manifests that must be checked during local filing.",
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "sourceIds",
+        "type": "array",
+        "title": "Source IDs"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Silicon & Stone",
+              "value": "silicon-and-stone"
+            },
+            {
+              "title": "Waymark Path",
+              "value": "waymark-path"
+            },
+            {
+              "title": "Shared",
+              "value": "shared"
+            }
+          ]
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "silicon-and-stone",
+                  "waymark-path",
+                  "shared"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 1
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "brandTags",
+        "type": "array"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "createdAt",
+        "type": "datetime"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Pending local review",
+              "value": "pending"
+            },
+            {
+              "title": "Filed (reviewed)",
+              "value": "filed"
+            },
+            {
+              "title": "Rejected",
+              "value": "rejected"
+            }
+          ],
+          "layout": "radio"
+        },
+        "initialValue": "pending",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "pending",
+                  "filed",
+                  "rejected"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "status",
+        "type": "string"
+      }
+    ],
+    "name": "knowledgeCandidate",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "name",
+        "type": "string",
+        "title": "Canonical name"
+      },
+      {
+        "options": {
+          "source": "name",
+          "maxLength": 96
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "description": "For example, GPAI. Leave blank for ordinary terms.",
+        "name": "acronym",
+        "type": "string",
+        "title": "Acronym or initialism"
+      },
+      {
+        "description": "Use when it differs from the canonical display name.",
+        "name": "fullName",
+        "type": "string",
+        "title": "Expanded or official name"
+      },
+      {
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "aliases",
+        "type": "array",
+        "title": "Aliases and alternative spellings"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "value": "acronym",
+              "title": "Acronym"
+            },
+            {
+              "value": "organisation",
+              "title": "Organisation"
+            },
+            {
+              "value": "law-policy",
+              "title": "Law or policy"
+            },
+            {
+              "value": "programme",
+              "title": "Programme"
+            },
+            {
+              "value": "company-product-model",
+              "title": "Company, product or model"
+            },
+            {
+              "value": "technique",
+              "title": "Technique"
+            },
+            {
+              "value": "technical-term",
+              "title": "Technical term"
+            },
+            {
+              "value": "role-title",
+              "title": "Role or title"
+            }
+          ]
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "acronym",
+                  "organisation",
+                  "law-policy",
+                  "programme",
+                  "company-product-model",
+                  "technique",
+                  "technical-term",
+                  "role-title"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "kind",
+        "type": "string",
+        "title": "Type"
+      },
+      {
+        "rows": 3,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "max",
+                "constraint": 240
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "One plain-language sentence. Maximum 240 characters.",
+        "name": "definition",
+        "type": "text",
+        "title": "Short definition"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "uri",
+                "constraint": {
+                  "options": {
+                    "scheme": [
+                      "/^http$/",
+                      "/^https$/"
+                    ],
+                    "allowRelative": false,
+                    "relativeOnly": false,
+                    "allowCredentials": false
+                  }
+                }
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "sourceUrl",
+        "type": "url",
+        "title": "Official or primary source"
+      },
+      {
+        "name": "reviewedAt",
+        "type": "date",
+        "title": "Last reviewed"
+      },
+      {
+        "of": [
+          {
+            "options": {
+              "disableNew": true
+            },
+            "to": [
+              {
+                "type": "glossaryTerm"
+              }
+            ],
+            "type": "reference",
+            "title": "Reference to glossary term"
+          }
+        ],
+        "name": "relatedTerms",
+        "type": "array",
+        "title": "Related terms"
+      }
+    ],
+    "name": "glossaryTerm",
+    "type": "document"
+  }
+]
