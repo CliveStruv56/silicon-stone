@@ -604,6 +604,32 @@ explicit go-ahead; deleting it is irreversible and costs nothing to defer.
 Pinecone Starter now holds 5 of 5 indexes, with `quickstart-skills` as the only
 disposable headroom.
 
+**A drift watcher now asks whether the law has moved** — `npm run reg:drift`,
+weekly in `.github/workflows/regulatory-drift.yml`, opening an issue labelled
+`regulatory-drift` when anything is stale. The design turns on one thing that
+makes the obvious approach useless: every `sourceUrl` is pinned to a specific
+consolidation, so when an instrument is amended the pinned URL keeps returning
+the **old** text forever and hashes identically. A content-diff watcher would
+report "no drift" indefinitely while the law changed. So the primary check is
+version discovery — read the base act's EUR-Lex page, collect the consolidated
+CELEX ids it lists for *that act*, compare the newest against `consolidatedAs` —
+and the hash comparison is demoted to a tamper check on the pinned text. It also
+flags the AI Act differently, because a new consolidation there means bumping
+the rule pack version and re-verifying every pinned citation, not a re-fetch.
+
+`reviewBy` stays as the fail-closed backstop: `prebuild` fails 90 days after each
+instrument's last review. Automation breaks silently; the build gate cannot. The
+watcher's job is to make that review a two-minute "nothing changed, restamp"
+instead of a research task — which is what makes six instruments sustainable
+rather than a chore every fortnight.
+
+First run: all six current, and the tamper check confirms every committed text
+still hashes to its manifest value. It also corrected the record on the Data
+Act — EUR-Lex *does* list a consolidation dated 2023-12-22 (the initial version,
+same day as OJ publication) but will not serve that CELEX as HTML, so the corpus
+holds the original act. The `meta.json` note previously said no consolidation
+existed at all; it now says what is actually true.
+
 **Still open:** the corpus holds no recitals (EUR-Lex omits the preamble from
 consolidated texts), which bites hardest for the GDPR, whose 173 recitals are
 routinely cited as interpretive authority. No reranking: retrieval is

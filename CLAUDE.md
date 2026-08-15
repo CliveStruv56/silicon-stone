@@ -107,6 +107,28 @@ Six instruments share one namespace (`eu-ai-act`, `gdpr`, `eu-chips-act`,
 Use `npm run reg:probe -- "<topic>"` to exercise the full routed path before
 trusting a change. `reg:ingest --probe` only measures raw vector similarity.
 
+### Keeping it current
+
+`npm run reg:drift` asks EUR-Lex whether the law has moved. The non-obvious part
+is why it does not simply diff the text: every `sourceUrl` is pinned to one
+consolidation, so when an instrument is amended the pinned URL keeps returning
+the **old** text forever and hashes identically. A content-diff watcher would
+report "no drift" indefinitely while the law changed. The real check is *"does a
+newer consolidation exist than the one I pinned"*, read off the base act's
+EUR-Lex page; the hash comparison is only a tamper check on the pinned text.
+
+It runs weekly in `.github/workflows/regulatory-drift.yml` and opens (or
+comments on) an issue labelled `regulatory-drift`. The fail-closed backstop
+remains `reviewBy` in `reg:check`, which fails the **build** 90 days after each
+instrument's last review — automation can break silently, `prebuild` cannot. The
+watcher exists to make that review a two-minute "nothing changed, restamp"
+rather than a research task, which is what makes six instruments sustainable.
+
+A new **AI Act** consolidation is not a simple re-fetch: `reg:check` asserts its
+`consolidatedAs` equals the rule pack's `corpusCutOff`, so the pack version must
+move with it and every pinned citation be re-verified. `reg:drift` says so in
+its output rather than implying all six are equal work.
+
 ## Article vectors (the other Pinecone lane)
 
 `PINECONE_INDEX_NAME` names the index behind semantic search, related articles

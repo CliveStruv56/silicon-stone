@@ -1,0 +1,95 @@
+name: regulatory-drift
+
+# Ask EUR-Lex weekly whether any instrument in the corpus has been amended.
+#
+# This is the mechanism that makes six instruments sustainable. reg:check
+# already fails the BUILD 90 days after each instrument's last review, which is
+# the fail-closed backstop — but on its own it makes every review a research
+# task ("has anything changed since August?"). This answers that question in
+# advance, so the review is usually a two-minute "nothing changed, restamp".
+#
+# Deliberately not in the main check workflow or in prebuild: it needs the
+# network, and a EUR-Lex blip must never be able to fail a deploy.
+
+on:
+  schedule:
+    # Mondays, 07:00 UTC.
+    - cron: '0 7 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+
+      - id: drift
+        run: |
+          set +e
+          npm run reg:drift 2>&1 | tee drift.log
+          echo "status=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+
+      - name: Open an issue when an instrument is stale
+        if: steps.drift.outputs.status != '0'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs')
+            const log = fs.readFileSync('drift.log', 'utf8')
+            const title = 'Regulatory corpus: an instrument needs re-fetching'
+
+            // Reuse the open issue rather than filing a new one every Monday.
+            const open = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'regulatory-drift',
+            })
+
+            const body = [
+              '`npm run reg:drift` reports that the law has moved, or that a pinned',
+              'text no longer hashes to the manifest.',
+              '',
+              '```',
+              log.trim(),
+              '```',
+              '',
+              'To act on it: update the instrument\'s `meta.json` (celex, version,',
+              '`consolidatedAs`, `sourceUrl`, `citationUrl`) and rename its version',
+              'directory, then `npm run reg:fetch -- --corpus <id>`, **read the diff**,',
+              '`npm run reg:hash` with a real changelog, and `npm run reg:ingest -- --corpus <id>`.',
+              '',
+              'The AI Act is not a simple re-fetch: `reg:check` asserts its consolidation',
+              'date equals the rule pack\'s `corpusCutOff`, so the pack version must move',
+              'with it and every pinned citation must be re-verified.',
+            ].join('\n')
+
+            if (open.data.length > 0) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: open.data[0].number,
+                body,
+              })
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+                labels: ['regulatory-drift'],
+              })
+            }
+
+      - name: Fail the run so the schedule surfaces it
+        if: steps.drift.outputs.status != '0'
+        run: exit 1
