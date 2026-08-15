@@ -444,6 +444,32 @@ AI Act explainer and the single piece most likely to sell the £79 toolkit. The
 2026-08-05 note claiming zero articles had empty categories tested
 `count(categories) == 0`, which does not catch an **absent** field.
 
+**Both gaps closed, and a third found on the way out.** The four articles were
+tagged in Studio and published (`ai-act` + `european-sovereignty` on the AI Act
+explainer; `us-technopolitics` / `atlantic-drift` / `european-sovereignty` on the
+tariffs piece; `atlantic-drift` + `european-sovereignty` on Greenland;
+`digital-sovereignty` + `european-sovereignty` on the open-source piece). All
+four now resolve to a Toolkit commerce gate — verified by rendering them locally
+against the live dataset.
+
+Doing that exposed the third problem: **`resolveUpsellProduct` takes the *first*
+matching product, and `UPSELL_PRODUCTS_QUERY` had no `order()`**, so which
+product an article sold was down to whatever order the dataset happened to
+return. The query now orders `isDefault desc, name asc`, which makes the
+flagship Toolkit win any article matching two products. That is deterministic,
+but it does **not** fix the underlying merchandising problem below.
+
+**Open — three published articles upsell a product that cannot be bought.**
+`korean-memory-fab-capacity-squeeze-2027`,
+`helium-scarcity-semiconductor-production` and
+`the-same-money-counted-three-times-ais-circular-financing` carry only topics
+owned by `product-sector-reports` — `semiconductors`, `us-technopolitics`,
+`atlantic-drift` — so ordering cannot rescue them: the Toolkit's topics
+(`ai-act`, `digital-sovereignty`, `european-sovereignty`) do not match at all. Their gate reads "Go deeper: Sector Reports /
+Get it — From £39" and the CTA lands on a **Coming Soon waitlist**. This is
+live on production today and predates this session. Needs an owner decision, not
+a code change: see §11.
+
 **And §10 was wrong about the ladder.** It recorded the gate as "shipped but
 unused" because no article sets `gate` explicitly. That is true and irrelevant:
 `auto` resolves to commerce on any topic match, so **11 of 15 published articles
@@ -2473,7 +2499,8 @@ discount codes, booking URL, LinkedIn URL). This table is for defects and debt.
 | 7 of 12 published articles have no cover image | Verified via GROQ 2026-08-05 — `mainImage` is undefined on `welcome-to-silicon-and-stone`, `atlantic-fault-lines-us-tech-policy-eu-autonomy`, `tariff-enforcement-collision`, `semiconductor-testing-bottleneck-ai-accelerators`, `korean-memory-fab-capacity-squeeze-2027`, `greenland-critical-minerals-transatlantic-scramble`, `open-source-sovereignty`. Placeholders render on the live site and in OG cards. The Studio has image-prompt suggestions + a media library to speed this up. | **High** |
 | 9 unpublished drafts, 8 of them without images | Verified 2026-08-05: drafts have grown from 2 (May) to **9** while publishing stalled — GPAI enforcement, EU Chips Act mid-point, China mineral licences, the token-bill piece, Fable 5 shutdown (the only one with an image), open-source exemption, GPT-5.6 two-tier market, plus the two long-standing Iran/Gulf drafts. Several are time-sensitive and decaying. | **High** |
 | ~~`article.gate` configured on zero articles~~ — the claim was wrong, corrected 2026-08-15 | No article sets `gate`, which is still true, but the conclusion drawn from it was not: `auto` resolves to **commerce** whenever an article's categories intersect a product's `topics` (`resolveGate`, `src/lib/gate.ts:151`), and only falls back to the newsletter when nothing matches. Verified live — `/analysis/welcome-to-silicon-and-stone` renders "Go deeper: AI Act Compliance Toolkit / Get it — From £79". **11 of 15 published articles already carry a commerce gate**; the ladder is live, not unused. | Resolved |
-| 4 published articles have no `categories`, so they get no commerce gate | Verified by GROQ 2026-08-15: `eu-ai-act-compliance-chasm-august-2026`, `tariff-enforcement-collision`, `greenland-critical-minerals-transatlantic-scramble`, `open-source-sovereignty`. The `auto` gate has nothing to match, so each falls back to the newsletter — including the AI Act explainer, the piece most likely to sell the £79 toolkit. This also contradicts the 2026-08-05 "zero articles with empty categories" note, which was checked as `count(categories) == 0` and missed the field being **absent**. Tagging them is a Studio edit. | **High** |
+| ~~4 published articles have no `categories`~~ — fixed 2026-08-15 | `eu-ai-act-compliance-chasm-august-2026`, `tariff-enforcement-collision`, `greenland-critical-minerals-transatlantic-scramble` and `open-source-sovereignty` had no categories at all, so the `auto` gate had nothing to match and fell back to the newsletter — including the AI Act explainer, the piece most likely to sell the £79 toolkit. All four tagged and published; each now renders a Toolkit commerce gate. Note the 2026-08-05 "zero articles with empty categories" check tested `count(categories) == 0` and missed the field being **absent** — use `!defined(categories)` too. | Resolved |
+| 3 published articles upsell "Sector Reports", which cannot be bought | `korean-memory-fab-capacity-squeeze-2027`, `helium-scarcity-semiconductor-production`, `the-same-money-counted-three-times-ais-circular-financing` match only `product-sector-reports`' topics, so their end-of-article gate reads "Go deeper: Sector Reports / Get it — From £39" and the CTA lands on the **Coming Soon waitlist**. Live today; predates 2026-08-15. Deterministic ordering does not help — the Toolkit's topics do not match these articles at all. Owner decision, see §11. | **High** |
 | Sanity `product.checkoutUrl` blank on all three products | The commerce gate opens `checkoutUrl` when set and otherwise links to `productPath`. Setting the three `NEXT_PUBLIC_LEMONSQUEEZY_*_URL` env vars lights up the **product pages only** — the in-article gate keeps sending readers to the product page until the same links are pasted into the Sanity product docs. `LAUNCH.md` had no Sanity step at all; one was added 2026-08-15. | Medium (blocked on LS) |
 | ~~`LAUNCH.md` URLs named `www`~~ — corrected 2026-08-10 | **The canonical host is the bare apex** as of 2026-08-06 (commit `50996d27`) — `SITE_URL` in `src/lib/site.ts` is `https://siliconandstone.com` and `www` 308s to it, reversing the June decision. The Lemon Squeezy redirect targets and webhook URL in `LAUNCH.md` still gave `www`, which would have put a redirect hop inside a payment callback; both now use the apex. Historical `www` mentions in §9 changelog entries are left as written. | Resolved |
 | Inoreader redirect URI still localhost | `http://localhost:3000/api/auth/callback/inoreader` in the Inoreader dev portal. Research-pipeline OAuth therefore cannot complete in production; it works locally. Change to `https://siliconandstone.com/api/auth/callback/inoreader` (apex, not www). | Medium |
@@ -2531,7 +2558,7 @@ Nothing downstream matters until email capture works.
 |------|-------------|
 | **Cover images for 7 published articles** | Live-site quality issue; see §10. Studio has image-prompt suggestions + media library. |
 | **Publish or kill the 9 drafts** | Several are time-sensitive (GPAI enforcement, Chips Act mid-point) and decay with every week. |
-| **Categorise the 4 uncategorised published articles** | Not cosmetic: with no `categories` the `auto` gate cannot match a product and falls back to the newsletter, so `eu-ai-act-compliance-chasm-august-2026` — the AI Act explainer — currently sells nothing. Tag it `ai-act` at minimum. See §10. |
+| **Decide what the "Sector Reports" gate should do** | Three published articles advertise "Get it — From £39" for a product that is Coming Soon; the CTA lands on a waitlist. Three ways out, all cheap: (a) accept it as a deliberate waitlist capture and soften the CTA copy so it stops promising a purchase; (b) clear `topics` on `product-sector-reports` in Studio, so `auto` never selects it and those articles fall back to the newsletter; (c) add `semiconductors` / `us-technopolitics` to the Toolkit's `topics` so it wins them instead — the weakest, since an AI Act toolkit is a stretch against a memory-fab piece. See §10. |
 | **Wire `article.gate` explicitly where `auto` guesses wrong** | The ladder is live (11 of 15 published articles get a commerce gate via topic match), so this is now tuning, not activation: set an explicit `lead` gate on the advisory-adjacent pieces, and `commerce` where the topic match picks the wrong product. |
 | **Atlantic Drift Briefing PDF** | Outline exists; required before YouTube launch. |
 

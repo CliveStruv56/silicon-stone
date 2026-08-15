@@ -139,8 +139,15 @@ export const ARTICLE_QUERY = defineQuery(`
 
 // Products for the contextual upsell mapping (P3-3). Small set; resolved
 // against an article's categories on the server. `topics` are category slugs.
+//
+// The ordering is load-bearing, not cosmetic. `resolveUpsellProduct` takes the
+// FIRST product whose topics intersect the article's categories, so an article
+// tagged with topics belonging to two products would otherwise be sold whichever
+// one the dataset happened to return first. Flagship (`isDefault`) wins, then
+// alphabetical — so a match never falls to "Sector Reports", which has no
+// product to sell yet.
 export const UPSELL_PRODUCTS_QUERY = defineQuery(`
-  *[_type == "product"] {
+  *[_type == "product"] | order(isDefault desc, name asc) {
     name,
     "slug": slug.current,
     kind,
