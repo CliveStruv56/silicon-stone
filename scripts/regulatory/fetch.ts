@@ -31,6 +31,7 @@ import * as path from 'node:path'
 import { CORPUS_ROOT, readInstrumentMeta, listCorpusIds } from '../../src/lib/regulatory/meta'
 
 import { extract } from './extract'
+import { fetchInstrumentHtml } from './source-fetch'
 
 async function main() {
   const argv = process.argv.slice(2)
@@ -47,14 +48,12 @@ async function main() {
   const meta = readInstrumentMeta(corpusId)
   const localHtml = arg('--html')
 
+  // Text comes from Cellar, keyed on meta.celex — never from meta.sourceUrl,
+  // which records the human-readable EUR-Lex page and is now behind a bot
+  // challenge. See source-fetch.ts for why `!r.ok` was not a sufficient guard.
   const html = localHtml
     ? fs.readFileSync(localHtml, 'utf8')
-    : await fetch(meta.sourceUrl, {
-        headers: { 'user-agent': 'silicon-and-stone-regulatory-corpus/1.0' },
-      }).then((r) => {
-        if (!r.ok) throw new Error(`${meta.sourceUrl} → HTTP ${r.status}`)
-        return r.text()
-      })
+    : await fetchInstrumentHtml(meta)
 
   const { text, articles, annexes } = extract(html)
 

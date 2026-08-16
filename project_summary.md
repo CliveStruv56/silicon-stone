@@ -464,6 +464,53 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 16, 2026 — the drift watcher repaired, and Pinecone's role made legible
+
+**Finding 1 is fixed.** Both upstream reads now go through a new
+`scripts/regulatory/source-fetch.ts`, which pulls from the EU Publications
+Office ("Cellar") machine endpoint at `publications.europa.eu/resource/celex/`
+rather than the WAF-protected `eur-lex.europa.eu` web rendering. It refuses
+anything that is not unambiguously a document: status must equal `200` (not
+merely be `ok`), the `x-amzn-waf-action` header is detected and named, and a
+body under 2 KB is rejected. The URL is derived from `meta.celex` rather than
+read from `meta.sourceUrl`, so the text fetched and the identifier claimed for
+it cannot disagree.
+
+`drift.ts` also now treats "no consolidation found" as `error`, never
+`current`, for any instrument pinned to a consolidated CELEX — such an
+instrument must at minimum discover its own version, so finding none proves the
+lookup broke. Only the two original-act instruments (Chips Act, Data Act) may
+legitimately return none.
+
+**The remedy was cleaner than expected: Cellar serves the same XHTML dialect,
+so `extract.ts` needed no changes at all.** Verified by re-fetching all six
+instruments and comparing to the committed corpus — every one reproduced
+`source.txt` **byte for byte** (char delta 0) and hashed identically to the
+manifest. `reg:fetch -- --corpus gdpr` was then run end to end and left the
+working tree clean. `reg:drift` now reports all six `ok`, with the AI Act
+resolving `latest 2026-07-27, pinned 2026-07-27`.
+
+One trap preserved deliberately: the Cellar notice lists consolidations of
+*other* acts (the GDPR notice cites `01995L0046-20180525`), so the existing
+instrument-pinned `consolidationPattern()` regex was kept exactly as it was.
+
+**Regression guards** added to `scripts/regulatory-index-checks.ts` (CI-blocking):
+both scripts must import from `source-fetch`; neither may contain a
+`!response.ok`-shaped status test; `source-fetch` must reference the challenge
+header, the `status !== 200` equality and the size floor. The bad-pattern regex
+was checked against both `if (!r.ok)` and `if (response.status !== 200)` to
+confirm it matches the former and not the latter rather than passing vacuously.
+
+**`docs/editorial-assurance.md` §6 rewritten** after feedback that Pinecone's
+role was not clear. It now explains what a vector index is and why similarity
+search is needed at all (statutes never use the reader's words), then states the
+three things Pinecone is *not*: not the research step (that is Exa, and research
+would be unaffected if Pinecone were switched off), not a source of truth (every
+index is rebuildable from the CMS and the committed corpus), and never an
+authority for anything the Compliance Checker renders. A lifecycle table gives
+each of the four stores its written-when and read-when, which is what makes the
+draft-exclusion and manual-ingest properties legible.
+
 ### August 16, 2026 — the assurance process written down, and a safeguard found broken
 
 Two documents now describe how information reaches an article and what stops an

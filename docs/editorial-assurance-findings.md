@@ -15,7 +15,7 @@ system, not inferred from reading it.
 
 | # | Finding | Severity |
 |---|---|---|
-| 1 | The EUR-Lex drift watcher fails open — and the corpus can no longer be re-fetched | **Critical** |
+| 1 | The EUR-Lex drift watcher fails open — and the corpus can no longer be re-fetched | ~~Critical~~ **Fixed 16 Aug 2026** |
 | 2 | Nothing prevents publishing a draft with unresolved `[AUTHOR: …]` placeholders | **High** |
 | 3 | Nothing prevents publishing despite a "major issues" fact-check verdict | **High** |
 | 4 | Quotations in articles are never mechanically verified | **High** |
@@ -34,7 +34,7 @@ system, not inferred from reading it.
 
 ## 1 · The EUR-Lex drift watcher fails open, and the corpus cannot be re-fetched
 
-**Severity: Critical · Verified live**
+**Severity: Critical · Verified live · FIXED 16 August 2026 — see the resolution at the end of this finding**
 
 `npm run reg:drift` reports `CHANGED` for all six instruments while
 `npm run reg:check` passes. Six simultaneous upstream corrections is not
@@ -104,6 +104,53 @@ than a local run.
 4. Until fixed, either disable the weekly workflow or set it to report rather than
    fail, so it does not train the reader to ignore it. A watcher that cries wolf
    every Monday is worse than none.
+
+### Resolution — 16 August 2026
+
+Fixed. The remedy turned out to be cleaner than expected, because the EU
+Publications Office ("Cellar") machine-access endpoint is not behind the
+challenge **and serves the same XHTML dialect** the extractor already parses.
+
+New module `scripts/regulatory/source-fetch.ts` is now the only way either
+script reads upstream. It:
+
+- derives the URL from `meta.celex` rather than reading `meta.sourceUrl`, so the
+  text fetched and the identifier claimed for it cannot disagree;
+- rejects any status other than `200` — an equality test, not `response.ok`,
+  since the entire failure was a 2xx carrying no document;
+- names the bot challenge explicitly by checking for the `x-amzn-waf-action`
+  header, so the error never sends the reader hunting the extractor;
+- rejects a 200 whose body is below `MIN_USABLE_BYTES` (2 KB, three orders of
+  magnitude below the smallest real instrument).
+
+`drift.ts` additionally treats "no consolidation found" as an `error` rather
+than `current` whenever the instrument is pinned to a consolidated CELEX — such
+an instrument must at minimum discover its own version, so finding none proves
+the lookup failed. Only the two original-act instruments (Chips Act, Data Act)
+may legitimately return none.
+
+**Verification.** All six instruments were re-fetched from Cellar and compared
+against the committed corpus: every one reproduced `source.txt` **byte for byte**
+(char delta 0) and hashed identically to the manifest, so the extractor needed no
+changes at all. `npm run reg:fetch -- --corpus gdpr` was then run end to end and
+left the working tree clean. `npm run reg:drift` now reports all six `ok`,
+including the AI Act correctly resolving `latest 2026-07-27, pinned 2026-07-27`.
+
+**Regression guards** added to `scripts/regulatory-index-checks.ts` (CI-blocking):
+both scripts must import from `source-fetch`; neither may contain a
+`!response.ok`-shaped status test; and `source-fetch` must reference the
+challenge header, the `status !== 200` equality, and the size floor. The bad
+regex was checked against `if (!r.ok)` and `if (response.status !== 200)` to
+confirm it matches the former and not the latter, rather than passing vacuously.
+
+Note the notice lists consolidations of *other* acts too — the GDPR notice cites
+`01995L0046-20180525`, the old Data Protection Directive — so the pre-existing
+instrument-pinned regex was kept exactly as it was. A generic pattern would
+report another act's amendment as drift in this one.
+
+**Not done, and deliberately:** the weekly workflow was left enabled rather than
+disabled, since it now reports correctly. It has still never run; the first
+Monday firing remains unobserved.
 
 ---
 
@@ -476,8 +523,8 @@ Worth recording, so the fixes above are read in proportion.
 
 ## Suggested order of work
 
-1. **Finding 1** — the drift watcher and the fetch path. Time-boxed by the
-   11 November 2026 review deadline, and currently generating a false alarm.
+1. ~~**Finding 1** — the drift watcher and the fetch path.~~ **Done, 16 Aug 2026.**
+   The 11 November review deadline now has a working refresh path behind it.
 2. **Findings 2 and 3** — the publish-action wrapper. One file, closes the two
    largest editorial gaps at once.
 3. **Finding 5** — pass sources through in code. Small, and removes a whole class

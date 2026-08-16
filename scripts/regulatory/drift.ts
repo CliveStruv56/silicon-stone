@@ -4,26 +4,37 @@
  *   npm run reg:drift
  *   npm run reg:drift -- --corpus gdpr
  *
- * THE POINT, because the obvious design does not work. Every `sourceUrl` here is
+ * THE POINT, because the obvious design does not work. Every instrument here is
  * pinned to one consolidation (CELEX 02016R0679-20160504). When the EU amends
- * that instrument, the pinned URL keeps returning the OLD text forever, hashing
+ * that instrument, the pinned CELEX keeps returning the OLD text forever, hashing
  * identically. A content-diff watcher would therefore report "no drift"
  * indefinitely while the law changed. The check that matters is not "did my text
  * change" but "does a newer consolidation exist than the one I pinned".
  *
  * Two checks per instrument:
  *
- *   1. VERSION DISCOVERY (the real one). Read the base act's EUR-Lex page and
- *      collect every consolidated CELEX it links. Newer than `consolidatedAs`
- *      means the corpus is stale. None at all is correct and expected for an
- *      instrument that has never been amended (the Chips Act, the Data Act) —
- *      but if one later appears for those, that IS the amendment.
- *   2. TAMPER CHECK (secondary). Re-extract the pinned URL and compare the
+ *   1. VERSION DISCOVERY (the real one). Read the base act's metadata notice
+ *      and collect every consolidated CELEX it lists for THIS act. Newer than
+ *      `consolidatedAs` means the corpus is stale. None at all is correct and
+ *      expected for an instrument that has never been amended (the Chips Act,
+ *      the Data Act) — but if one later appears for those, that IS the
+ *      amendment. For an instrument already pinned to a consolidation, finding
+ *      none is impossible and is reported as an error, never as "current":
+ *      that combination means the lookup failed, and a version check that
+ *      cannot see its own pinned version has told you nothing.
+ *   2. TAMPER CHECK (secondary). Re-extract the pinned text and compare the
  *      normalised hash to the manifest. This should ALWAYS match; a mismatch
  *      means the extractor or the pinned text changed, not that the law did.
  *
+ * Both reads go through source-fetch.ts, which refuses anything that is not
+ * unambiguously a document. That module exists because this script previously
+ * fetched eur-lex.europa.eu directly and guarded with `if (!response.ok)` —
+ * and the bot challenge that host now serves answers 202 with an empty body,
+ * which is "ok". Every instrument reported CHANGED, and version discovery
+ * silently found nothing to discover.
+ *
  * Exits non-zero on anything but "current", so a scheduler can act on it.
- * Deliberately NOT run in prebuild: it needs the network, and a EUR-Lex blip
+ * Deliberately NOT run in prebuild: it needs the network, and an upstream blip
  * must not be able to fail a deploy. The fail-closed guard is `reviewBy` in
  * reg:check; this exists to make that review a two-minute job.
  */
@@ -41,6 +52,7 @@ import {
 } from '../../src/lib/regulatory/meta'
 import { normaliseLegalText } from '../../src/lib/rulepack/normalise'
 import { extract } from './extract'
+import { fetchBaseActNotice, fetchInstrumentHtml, isConsolidatedCelex } from './source-fetch'
 import type { InstrumentMeta } from '../../src/lib/regulatory/types'
 
 /**
@@ -68,14 +80,6 @@ function isoFromCelexDate(yyyymmdd: string): string {
   return `${yyyymmdd.slice(0, 4)}-${yyyymmdd.slice(4, 6)}-${yyyymmdd.slice(6, 8)}`
 }
 
-async function getText(url: string): Promise<string> {
-  const response = await fetch(url, {
-    headers: { 'user-agent': 'silicon-and-stone-regulatory-corpus/1.0' },
-  })
-  if (!response.ok) throw new Error(`${response.status} ${response.statusText} for ${url}`)
-  return response.text()
-}
-
 interface Finding {
   corpusId: string
   status: 'current' | 'newer' | 'changed' | 'error'
@@ -86,13 +90,26 @@ async function checkInstrument(meta: InstrumentMeta, recordedHash: string): Prom
   const base = baseCelex(meta.celex)
 
   // 1. Version discovery.
-  const basePage = await getText(
-    `https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:${base}`,
-  )
-  const dates = [...basePage.matchAll(consolidationPattern(base))]
+  const notice = await fetchBaseActNotice(base)
+  const dates = [...notice.matchAll(consolidationPattern(base))]
     .map((match) => isoFromCelexDate(match[1]))
     .filter((date, index, all) => all.indexOf(date) === index)
     .sort()
+
+  // An instrument pinned to a consolidation MUST find at least its own in the
+  // notice. Zero means the lookup failed — a markup change, a truncated
+  // response, a wrong identifier — and reporting "current" off the back of a
+  // page nothing was read from is exactly how this check failed open before.
+  if (dates.length === 0 && isConsolidatedCelex(meta.celex)) {
+    return {
+      corpusId: meta.corpusId,
+      status: 'error',
+      detail:
+        `version discovery found no consolidation of ${base} at all, but this corpus ` +
+        `is pinned to the consolidated text ${meta.celex}, which must be listed. ` +
+        `The lookup is broken — treat this as "unknown", never as "current".`,
+    }
+  }
 
   const latest = dates[dates.length - 1]
   if (latest && latest > meta.consolidatedAs) {
@@ -108,7 +125,7 @@ async function checkInstrument(meta: InstrumentMeta, recordedHash: string): Prom
   }
 
   // 2. Tamper check against the pinned text.
-  const extracted = extract(await getText(meta.sourceUrl))
+  const extracted = extract(await fetchInstrumentHtml(meta))
   const liveHash = hashSource(normaliseLegalText(extracted.text))
 
   if (liveHash !== recordedHash) {

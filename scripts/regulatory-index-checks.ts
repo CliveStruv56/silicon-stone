@@ -260,6 +260,53 @@ for (const file of [
   )
 }
 
+// ── Upstream fetches must not treat a non-document as content ───────────────
+
+// `if (!response.ok)` is TRUE for 202, and the bot challenge upstream now
+// serves answers 202 with an empty body. Both fetch paths accepted it as
+// content: reg:drift hashed the empty string and reported every instrument
+// CHANGED, while version discovery found nothing on an empty page and so could
+// never report `newer`. The status check has to be an equality on 200.
+for (const file of ['scripts/regulatory/fetch.ts', 'scripts/regulatory/drift.ts']) {
+  const source = code(file)
+  assert.match(
+    source,
+    /from '\.\/source-fetch'/,
+    `${file}: upstream reads must go through source-fetch.ts, which refuses a non-document`,
+  )
+  assert.doesNotMatch(
+    source,
+    /!\s*(r|res|response)\s*\.\s*ok\b/,
+    `${file}: \`!response.ok\` accepts 202, which is how a bot challenge was read as an ` +
+      `empty instrument — assert status === 200 in source-fetch.ts instead`,
+  )
+}
+
+const sourceFetch = code('scripts/regulatory/source-fetch.ts')
+assert.match(
+  sourceFetch,
+  /x-amzn-waf-action/,
+  'source-fetch must detect the bot-challenge header explicitly — it is the one failure that looks like success',
+)
+assert.match(
+  sourceFetch,
+  /status\s*!==\s*200/,
+  'source-fetch must accept only 200, not any 2xx',
+)
+assert.match(
+  sourceFetch,
+  /MIN_USABLE_BYTES/,
+  'source-fetch must reject a 200 whose body is too small to be an instrument',
+)
+
+// The fetch URL is derived from the CELEX so the text and the identifier
+// claimed for it cannot disagree.
+assert.doesNotMatch(
+  code('scripts/regulatory/fetch.ts'),
+  /fetch\(\s*meta\.sourceUrl/,
+  'fetch.ts must derive its URL from meta.celex, not read meta.sourceUrl',
+)
+
 // ── The local pipeline stays in sync by construction ────────────────────────
 
 const localPipeline = code('scripts/local-draft/pipeline.ts')

@@ -177,20 +177,80 @@ trusting the ones already attached.
 
 ---
 
-## 06 · Stage 3 — Retrieval
+## 06 · Stage 3 — Retrieval, and what Pinecone actually does
 
-Four vector stores exist. They never share storage, and the separation is the
-safety property.
+### What a vector index is, and what it is for here
 
-| Index | Contents | Used for |
-|---|---|---|
-| `silicon-and-stone-articles` | One vector per published article | Prior-coverage context, related articles, semantic search |
-| `silicon-and-stone-evidence` | Chunked captured sources | Claim-level evidence search in `/knowledge` |
-| `silicon-and-stone-regulatory` | Six EU statutes, 1,422 chunks | Primary statutory text for the drafting model to quote |
-| Rule pack (not a vector store) | 19 AI Act Articles, on disk | The Compliance Checker's legal authority — see §10 |
+Pinecone is a vector database. Text put into it is first converted by an
+embedding model into a list of 1,024 numbers — a "vector" — that encodes what
+the passage is *about* rather than which words it contains. Searching works the
+same way: the query is converted to a vector, and the database returns the
+stored passages whose vectors sit closest to it, each with a similarity score
+between 0 and 1.
+
+The practical consequence is that a search for "cloud switching charges" can
+return the Data Act provision that governs it without the phrase "cloud
+switching charges" appearing in the statute, and a draft about export controls
+can surface a previous article on lithography without either sharing a keyword.
+That is the whole reason it is used: keyword search cannot find a relevant
+statutory provision that happens to be written in different words, and statutes
+are always written in different words.
+
+### What Pinecone is not
+
+Three clarifications, because each is a common and consequential misreading.
+
+**Pinecone is not the research step.** No article's facts come from Pinecone.
+Live research is Exa (§4). Pinecone is consulted *after* research, at the moment
+a draft is generated, and it supplies two things only: statutory text to quote
+accurately, and a reminder of what this publication has already written. If
+Pinecone were switched off entirely, research would be unaffected.
+
+**Pinecone is not a source of truth.** It is a search layer over material whose
+authoritative copy lives elsewhere — the statutes are committed to the
+repository as text files, the articles live in the CMS, the captured sources
+live in the CMS. Every index is rebuildable from those originals, and there is
+nothing in Pinecone to back up. If an index were destroyed, one command would
+restore it.
+
+**Pinecone is not an authority for anything the Compliance Checker shows.** The
+Checker's legal payload is a set of files on disk, matched by exact string
+comparison — not a vector search. This separation is enforced by a build check
+(§10). Nothing retrieved by similarity is ever used to verify a legal quotation.
+
+### The four stores, and when each is written and read
+
+They never share storage, and the separation is the safety property.
+
+| Store | What goes in | Written when | Read when | Supplies |
+|---|---|---|---|---|
+| **Article index** | One vector per published article | An article is published or updated in the CMS | A draft is generated; a published article is viewed; admin search | Prior coverage; the related-articles list under an article |
+| **Regulatory index** | Six EU statutes, chunked to 1,422 passages | Manually, by an operator running an ingest command | A draft is generated on a regulatory topic | Verbatim statutory passages for the model to quote and cite |
+| **Evidence index** | Captured source documents, chunked | A source is captured through the knowledge inbox | An operator searches for evidence | Source passages to check a claim against |
+| **Rule pack** *(not Pinecone — files on disk)* | 19 AI Act Articles, verbatim | Manually, with a version bump | A Compliance Checker report is generated | The text every generated quotation is string-matched against |
+
+Two points follow from that table and are worth drawing out.
+
+**Only published work enters the article index.** The publish webhook explicitly
+skips drafts, so an unreviewed draft can never be retrieved as "prior coverage"
+for a later article. Unpublishing an article deletes its vector. The material
+that informs future writing is therefore always material a human approved.
+
+**The regulatory index is never written automatically.** Statutory text enters
+it only when an operator runs the ingest command against corpus files that are
+committed to the repository and hash-verified on every build. There is no path
+by which a web page, a search result, or a model output becomes statutory text
+in this system.
+
+### The safeguards that apply to retrieval
 
 All vector indexes are 1,024-dimensional, cosine, dense, and hold vectors this
-application generated with OpenAI `text-embedding-3-small`.
+application generated with OpenAI `text-embedding-3-small`. What comes back is
+filtered before it reaches the model: the regulatory lane applies routing and
+score floors (below); retrieval failures degrade the draft rather than
+publishing anything unchecked; and nothing retrieved is ever published without
+passing through the same drafting constraints (§7) and human review (§8) as any
+other input.
 
 **Why that last point is a safeguard.** Pinecone can be configured to embed text
 itself. If an index carries that configuration while the application writes its
@@ -486,14 +546,31 @@ newer consolidation exist than the one I pinned"*, read from the base act's
 EUR-Lex page. The hash comparison is only a secondary tamper check on the pinned
 text.
 
-**As at 16 August 2026 the drift watcher is not working.** EUR-Lex has been
-placed behind a bot challenge that answers automated clients with an empty
-response. Both of the watcher's checks consume that empty response without
-recognising it as a failure. The scheduled job has not yet run. This is recorded
-here rather than omitted, because a safeguard that is believed to be working and
-is not is worse than one known to be absent. The 90-day review gate is unaffected
-and remains the binding control; the next review falls due on 11 November 2026.
-Remediation is tracked in the internal findings memo.
+**A failure found and fixed on 16 August 2026.** The watcher was reporting all
+six instruments as changed while the build gate passed. The cause was not an
+amendment: EUR-Lex's web rendering has been placed behind a bot challenge that
+answers automated clients with `HTTP 202` and an empty body, and the fetch
+guarded with `if (!response.ok)` — which is true for 202. The empty body was
+accepted as content. The tamper check then hashed the empty string, and, more
+seriously, version discovery found no consolidation dates on an empty page and
+so could never have reported a newer version. The check that mattered failed
+open.
+
+Three changes were made. Both fetch paths now read from the EU Publications
+Office machine-access endpoint, which is not behind the challenge; a shared
+module rejects anything that is not unambiguously a document — a non-200 status,
+a challenge header, or a body too small to be an instrument; and version
+discovery now treats "no consolidation found" as an error rather than as
+"current" for any instrument pinned to a consolidation, since such an instrument
+must at minimum find its own. The change was verified by re-fetching all six
+instruments from the new endpoint and confirming each reproduces the committed
+corpus **byte for byte**, hashing identically to the manifest. Checks were added
+so the status test cannot regress to accepting a 2xx that carries no document.
+
+This is recorded rather than quietly corrected, because a safeguard believed to
+be working and silently not is worse than one known to be absent — and because
+the failure mode is instructive: the guard was not missing, it was subtly wrong
+in a way that produced confident output.
 
 ---
 
@@ -513,7 +590,7 @@ Every check in the system, what it asserts, and what it stops.
 | `test:knowledge-inbox` | Source ID validation and admin authentication on capture routes | **CI** |
 | `test:style-rules` | Style rules actually reach the production prompt rather than compiling to an empty string | **CI** |
 | `reg:verify-index` / `articles:verify-index` | Live index shape; no embedded-text configuration; per-instrument record counts match the committed corpus | Manual |
-| `reg:drift` | A newer consolidation exists upstream | Weekly job — **currently not functioning**, see §11 |
+| `reg:drift` | A newer consolidation exists upstream than the one pinned; the pinned text is untampered | Weekly job — **repaired 16 August 2026**, see §11 |
 | `reg:probe` | The full routed retrieval path returns the right instrument, above the floor, with the right caveats | Manual |
 
 ### Results of the verification run, 16 August 2026
@@ -527,7 +604,7 @@ Every check in the system, what it asserts, and what it stops.
 | `reg:verify-index` | Pass — 1,422 live records, per-instrument counts match committed corpus exactly |
 | `articles:verify-index` | Pass — correct shape, no embedded-text configuration |
 | `reg:probe` | Pass — see below |
-| `reg:drift` | **Fail** — see §11 |
+| `reg:drift` | **Failed, then fixed** — all six current after repair; see §11 |
 
 The routed retrieval probe was run against three topics and behaved as designed:
 
