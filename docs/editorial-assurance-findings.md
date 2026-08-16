@@ -19,7 +19,7 @@ system, not inferred from reading it.
 | 2 | Nothing prevents publishing a draft with unresolved `[AUTHOR: …]` placeholders | ~~High~~ **Fixed 16 Aug 2026** |
 | 3 | Nothing prevents publishing despite a "major issues" fact-check verdict | ~~High~~ **Fixed 16 Aug 2026** |
 | 4 | Quotations in articles are never mechanically verified | **High** |
-| 5 | Source URLs and titles are re-emitted by the model, not passed through | **High** |
+| 5 | Source URLs and titles are re-emitted by the model, not passed through | ~~High~~ **Fixed 16 Aug 2026** |
 | 6 | Publication dates are discarded before drafting | **Medium-High** |
 | 7 | The fact-check never runs automatically, and Deep Dives are least protected | **Medium-High** |
 | 8 | Prior-coverage retrieval has no score floor | **Medium** |
@@ -326,6 +326,70 @@ objects already in scope in `performResearch`. If the model's selection among
 sources is wanted, have it return *indices* into the result array rather than
 reproduced strings. This is a small change with no downside.
 
+### Resolution — 16 August 2026
+
+Fixed by the index route, so the model keeps its editorial judgement about which
+sources matter without ever handling a URL.
+
+New module `src/lib/research-sources.ts` holds the plumbing as pure functions —
+separate from `research.ts` because that module reaches `server-only` code
+(`exa.ts`, `inoreader.ts`) and could not otherwise be unit tested. It provides:
+
+- `registerSources()` — appends results to a numbered catalogue and renders them
+  as `[S1] … [S2] …` for the prompt, **deduplicating by URL**, so a story reached
+  through both Inoreader and Exa is one entry rather than two the model must
+  choose between;
+- `selectSources()` — rebuilds the list from the catalogue using the numbers the
+  model returned, dropping anything out of range, duplicated or non-numeric;
+- `extractReportSources()` — for Deep Dives, whose research arrives as prose with
+  inline links and has no structured objects to pass through.
+
+The synthesis prompt now asks for `sourceIndexes` and says explicitly: *"Give the
+number and nothing else — do not retype a title, a URL or a snippet anywhere in
+your output."*
+
+Decisions worth recording:
+
+- **An unusable selection falls back to the whole catalogue, not to nothing.** A
+  malformed response should cost the model's ordering, not every source the
+  research found. As a side effect the source list now also survives a synthesis
+  parse failure, which it previously did not — the old fallback returned
+  `sources: []`.
+- **Deep Dive URLs are extracted in code rather than re-typed.** The report is
+  itself model-written, so its links cannot be better than the agent made them —
+  but extracting means the string reaching the writer is copied verbatim rather
+  than passed through a *second* generation step. The source is titled with its
+  host; inventing a nicer title is the exact behaviour being removed.
+- **The mock dev search was converted from a text blob to structured results**, so
+  the offline path exercises the same catalogue code as production instead of a
+  parallel one.
+- **A `[research] sources gathered=N selected=M` line is logged**, in the idiom of
+  the retrieval lanes' notes. Without it a permanent fallback would look
+  identical to a working selection.
+
+**Verification.** 25 unit tests in `src/lib/research-sources.test.ts`, including
+that selection returns the catalogue's URL rather than any supplied string, that
+numeric strings are accepted (models emit them routinely), and that every
+malformed-selection shape falls back rather than emptying the list. Three of them
+read `research.ts` and assert the prompt still asks for indexes and that
+`sources` is built by `selectSources` — if the prompt ever asks for a `sources`
+array again, all this plumbing is bypassed in silence.
+
+Two live runs against real Exa and Claude:
+
+- *"EU AI Act general-purpose AI obligations enforcement"* → 8 sources, every URL
+  a full real link with Exa's own page title, 0 malformed.
+- *"TSMC Dresden fab capacity and European semiconductor supply chain"* →
+  `gathered=8 selected=6`, all six matching the ground-truth search.
+
+The second run is the one that matters: it confirms the model genuinely selects
+rather than the code always falling back, so the editorial judgement survives
+while the strings do not pass through it.
+
+Worth noting that `scripts/local-draft/pipeline.ts` had **always** built its
+sources programmatically from the Exa objects. The two paths disagreed, and the
+local one was right.
+
 ---
 
 ## 6 · Publication dates are discarded before drafting
@@ -589,10 +653,9 @@ Worth recording, so the fixes above are read in proportion.
    The 11 November review deadline now has a working refresh path behind it.
 2. ~~**Findings 2 and 3** — the publish-action wrapper.~~ **Done, 16 Aug 2026.**
    The two largest editorial obligations are now mechanical.
-3. **Finding 5** — pass sources through in code. Small, and removes a whole class
-   of citation error.
-4. **Findings 6 and 12** — richer, dated source context. Two small changes to one
-   function that materially improve what the model has to work with.
+3. ~~**Finding 5** — pass sources through in code.~~ **Done, 16 Aug 2026.**
+4. **Findings 6 and 12** — richer, dated source context. Now a small change to
+   `exaToSources` and one prompt line, since the catalogue plumbing exists.
 5. **Finding 4** — the quotation audit. The most valuable of the larger pieces of
    work.
 6. Everything else as capacity allows.

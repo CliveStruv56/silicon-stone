@@ -464,6 +464,51 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 16, 2026 — the model stops handling source URLs
+
+**Finding 5 fixed.** `synthesizeContext` used to ask Claude for a `sources`
+array of titles and URLs, so every citation the writer received had been through
+a generation step and could be silently mutated — a plausible link that 404s, or
+one resolving somewhere that does not support the claim.
+
+Results are now numbered before the model sees them (`[S1] … [S2] …`) and the
+model returns only `sourceIndexes`; the list is rebuilt in code from the Exa
+objects. New `src/lib/research-sources.ts` holds the plumbing as pure functions,
+kept out of `research.ts` because that module reaches `server-only` code
+(`exa.ts`, `inoreader.ts`) and could not otherwise be unit tested.
+`registerSources()` also **dedupes by URL**, so a story reached through both
+Inoreader and Exa is one entry rather than two.
+
+Decisions worth remembering:
+
+- **An unusable selection falls back to the whole catalogue, never to nothing** —
+  a malformed response should cost the model's ordering, not the sources. Side
+  effect: the source list now survives a synthesis parse failure, which it did
+  not before (the old fallback returned `sources: []`).
+- **Deep Dives extract URLs from the report in code** rather than re-typing them
+  in a second pass, and title each source with its host. The report is itself
+  model-written, so its links cannot be better than the agent made them — but
+  extraction avoids a *second* generation step over the same strings.
+- The dev mock search was converted from a text blob to structured results, so
+  the offline path exercises the same catalogue code as production.
+- A `[research] sources gathered=N selected=M` line is logged, in the idiom of
+  the retrieval lanes' notes — a permanent fallback would otherwise look
+  identical to a working selection.
+
+**Verified live**, twice, against real Exa + Claude: an AI Act enforcement topic
+returned 8 sources, every URL a real full link carrying Exa's own page title, 0
+malformed; a TSMC Dresden topic logged `gathered=8 selected=6` with all six
+matching the ground-truth search. The second is the one that matters — it shows
+the model genuinely selects rather than the code always falling back, so
+editorial judgement survives while the strings no longer pass through it.
+
+25 new tests (suite now 290), three of which read `research.ts` and assert the
+prompt still asks for indexes — if it ever asks for a `sources` array again the
+whole mechanism is bypassed silently.
+
+Incidental: `scripts/local-draft/pipeline.ts` had **always** built its sources
+programmatically. The two paths disagreed and the local one was right.
+
 ### August 16, 2026 — the publish button now enforces what the authoring guide only asked for
 
 **Findings 2 and 3 fixed together.** Two editorial obligations were

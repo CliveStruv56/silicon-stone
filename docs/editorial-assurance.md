@@ -168,12 +168,23 @@ single JSON object: a two-to-three sentence forensic summary, a source list, and
 suggested keywords and reader pain points. The result is what the author sees on
 screen before deciding whether to draft.
 
-**One limitation should be understood.** The source list that reaches the draft
-is re-emitted by the model rather than passed through programmatically from the
-Exa response. Titles and URLs therefore travel through a generation step. This
-is a known weakness, recorded in the internal findings memo, and it is the
-reason the fact-check pass re-derives citations from fresh searches rather than
-trusting the ones already attached.
+**Sources are not re-typed by the model.** Each gathered result is numbered
+before the synthesis step sees it, and the model returns only the numbers of the
+results its summary rests on. The source list handed to the writer is then
+rebuilt in code from the objects the search actually returned. A model cannot
+alter a URL it is never asked to reproduce, which removes an entire class of
+citation error — the plausible link that 404s, or that resolves somewhere not
+supporting the claim.
+
+The selection is still the model's editorial judgement, and that is the point of
+asking: it decides which sources carry the summary. If it returns nothing
+usable, the full gathered list is passed through rather than an empty one — a
+malformed response costs the ordering, never the sources.
+
+A Deep Dive has no structured results to pass through, because its research
+arrives as prose with inline links. There the URLs are extracted from the report
+in code rather than re-typed by a second pass, and the source is titled with its
+host — inventing a better title is exactly what this design exists to prevent.
 
 ---
 
@@ -679,10 +690,12 @@ recorded in the run notes and logged, and a CI check forbids silent failure
 handlers in the retrieval path — but the resulting draft is thinner without
 saying so on its face.
 
-**Source metadata is lossy.** Publication dates from the web search are not
-carried into the drafting context, and source titles and URLs pass through a
-generation step rather than being preserved programmatically. Both are recorded
-in the findings memo.
+**Publication dates are not carried into the drafting context.** The search
+returns them, and the fact-check uses them, but the drafting prompt does not
+receive them — so the model cannot weigh a 2019 source against a 2026 one while
+house style asks for exact dates. Recorded in the findings memo. (Source titles
+and URLs were on this list until 16 August 2026; they are now passed through in
+code — see §5.)
 
 ---
 

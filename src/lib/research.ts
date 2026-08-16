@@ -1,11 +1,19 @@
 import { callClaude } from "./anthropic";
-import { ResearchResult } from "@/types/research";
+import { ResearchResult, ResearchSource } from "@/types/research";
 import { searchItems } from "./inoreader";
 import { logErrorToFile } from "@/lib/debug";
 import { searchExa, deepResearchExa } from "@/lib/exa";
+import {
+    exaToSources,
+    extractReportSources,
+    registerSources,
+    selectSources,
+    SNIPPET_CHARS,
+    type SourceCandidate,
+} from "@/lib/research-sources";
 
-// Mock search function if no API key or Exa fails
-async function searchWeb(query: string): Promise<string> {
+// Mock search results, used only outside production when Exa is unavailable.
+async function searchWeb(query: string): Promise<ResearchSource[]> {
     if (process.env.NODE_ENV === 'production') {
         throw new Error(`Live web search unavailable for query: ${query}`);
     }
@@ -13,35 +21,25 @@ async function searchWeb(query: string): Promise<string> {
     console.log(`Searching web (MOCK) for: ${query}`);
     await new Promise(r => setTimeout(r, 1000));
 
-    // Return a mock search blob for Claude to summarize
-    return `
-    [Result 1] Title: EU AI Act Implementation Updates (Autumn 2025)
-    Snippet: The European AI Office has released new guidance on General Purpose AI models. Harmonized standards are expected to be delayed until Q4 2025, creating uncertainty for "High Risk" providers...
-    URL: europa.eu/ai-act-updates
-
-    [Result 2] Title: Semiconductor Supply Chain: The Dresden Expansion
-    Snippet: TSMC's Dresden fab is proceeding on schedule, but workforce shortages in Saxony threaten to delay full operational capacity until 2028.
-    URL: techcrunch.com/chips-dresden
-    
-    [Result 3] Title: The Atlantic Drift: Divergence in US-EU Digital Policy
-    Snippet: Analysis of the widening gap between US executive orders on AI safety and the binding constraints of the EU AI Act. The "Vulnerability Gap" is growing.
-    URL: politodigital.eu/atlantic-drift
-    `;
-}
-
-interface ExaResult {
-    title: string | null;
-    url: string;
-    text?: string;
-}
-
-// Helper to format Exa results for from object to text
-function formatExaResults(results: ExaResult[]): string {
-    return results.map((r, i) => `
-    [Web Result ${i + 1}] Title: ${r.title}
-    URL: ${r.url}
-    Snippet: ${r.text ? r.text.substring(0, 300) : "No content available."}
-    `).join('\n');
+    // Structured rather than a text blob, so the mock exercises the same
+    // catalogue path as a real search instead of a parallel one.
+    return [
+        {
+            title: "EU AI Act Implementation Updates (Autumn 2025)",
+            url: "https://europa.eu/ai-act-updates",
+            snippet: "The European AI Office has released new guidance on General Purpose AI models. Harmonized standards are expected to be delayed until Q4 2025, creating uncertainty for \"High Risk\" providers...",
+        },
+        {
+            title: "Semiconductor Supply Chain: The Dresden Expansion",
+            url: "https://techcrunch.com/chips-dresden",
+            snippet: "TSMC's Dresden fab is proceeding on schedule, but workforce shortages in Saxony threaten to delay full operational capacity until 2028.",
+        },
+        {
+            title: "The Atlantic Drift: Divergence in US-EU Digital Policy",
+            url: "https://politodigital.eu/atlantic-drift",
+            snippet: "Analysis of the widening gap between US executive orders on AI safety and the binding constraints of the EU AI Act. The \"Vulnerability Gap\" is growing.",
+        },
+    ];
 }
 
 /**
@@ -71,6 +69,9 @@ export async function performResearch(
 ): Promise<ResearchResult> {
     let searchContext = "";
     let deepReport: string | undefined;
+    // Every source the model may cite, numbered. Built here and never round
+    // tripped through a generation step.
+    const catalogue: SourceCandidate[] = [];
 
     // 1. Inoreader Search (Priority)
     if (inoreaderToken) {
@@ -78,16 +79,17 @@ export async function performResearch(
         try {
             const items = await searchItems(inoreaderToken, topic);
             if (items.length > 0) {
-                // Convert Inoreader items to context string
-                const inoreaderContext = items.map((item, i) => `
-                [Inoreader Source ${i + 1}] Title: ${item.title}
-                Source: ${item.origin?.title || 'Feed'}
-                Date: ${new Date(item.published * 1000).toISOString()}
-                Snippet: ${(item.summary?.content || '').replace(/<[^>]*>/g, '').substring(0, 300)}...
-                URL: ${item.canonical?.[0]?.href || ''}
-                `).join('\n');
-
-                searchContext += `\n--- INOREADER RESULTS ---\n${inoreaderContext}\n`;
+                const rendered = registerSources(
+                    catalogue,
+                    items.map((item) => ({
+                        title: item.title ?? '',
+                        url: item.canonical?.[0]?.href || '',
+                        snippet: (item.summary?.content || '')
+                            .replace(/<[^>]*>/g, '')
+                            .substring(0, SNIPPET_CHARS),
+                    })),
+                );
+                searchContext += `\n--- INOREADER RESULTS ---\n${rendered}\n`;
             } else {
                 searchContext += `\n--- INOREADER RESULTS ---\nNo results found in your subscriptions.\n`;
             }
@@ -110,7 +112,11 @@ export async function performResearch(
             const deep = await deepResearchExa(instructions);
             if (deep?.content) {
                 deepReport = deep.content;
+                const cited = registerSources(catalogue, extractReportSources(deep.content));
                 searchContext += `\n--- DEEP RESEARCH (EXA AGENT) ---\n${deep.content}\n`;
+                if (cited) {
+                    searchContext += `\n--- SOURCES CITED IN THAT REPORT ---\n${cited}\n`;
+                }
             } else if (process.env.NODE_ENV === 'production') {
                 throw new Error("Exa deep research returned no content.");
             }
@@ -124,8 +130,8 @@ export async function performResearch(
         if (!deepReport) {
             const exaResults = await searchExa(topic, { recencyDays: 90, numResults: 8 });
             searchContext += exaResults && exaResults.length > 0
-                ? `\n--- WEB RESULTS (EXA.AI) ---\n${formatExaResults(exaResults)}`
-                : `\n--- WEB RESULTS (MOCK FALLBACK) ---\n${await searchWeb(topic)}`;
+                ? `\n--- WEB RESULTS (EXA.AI) ---\n${registerSources(catalogue, exaToSources(exaResults))}`
+                : `\n--- WEB RESULTS (MOCK FALLBACK) ---\n${registerSources(catalogue, await searchWeb(topic))}`;
         }
     } else {
         // Standard: recency-first, news-biased; broaden to evergreen if too thin.
@@ -138,24 +144,24 @@ export async function performResearch(
                 exaResults = [...(exaResults ?? []), ...((broad ?? []).filter(r => !seen.has(r.url)))];
             }
             if (exaResults && exaResults.length > 0) {
-                searchContext += `\n--- WEB RESULTS (EXA.AI) ---\n${formatExaResults(exaResults)}`;
+                searchContext += `\n--- WEB RESULTS (EXA.AI) ---\n${registerSources(catalogue, exaToSources(exaResults))}`;
             } else if (process.env.NODE_ENV === 'production') {
                 throw new Error("Exa returned no results or is not configured.");
             } else {
                 console.log("Exa returned no results or failed, falling back to mock.");
-                searchContext += `\n--- WEB RESULTS (MOCK FALLBACK) ---\n${await searchWeb(topic)}`;
+                searchContext += `\n--- WEB RESULTS (MOCK FALLBACK) ---\n${registerSources(catalogue, await searchWeb(topic))}`;
             }
         } catch (e) {
             console.error("Exa search error in main flow", e);
             if (process.env.NODE_ENV === 'production') {
                 throw new Error("Live web search failed.");
             }
-            searchContext += `\n--- WEB RESULTS (MOCK FALLBACK) ---\n${await searchWeb(topic)}`;
+            searchContext += `\n--- WEB RESULTS (MOCK FALLBACK) ---\n${registerSources(catalogue, await searchWeb(topic))}`;
         }
     }
 
     // 3. Synthesize gathered context into the ResearchResult shape.
-    return synthesizeContext(topic, searchContext, deepReport, opts.brief);
+    return synthesizeContext(topic, searchContext, catalogue, deepReport, opts.brief);
 }
 
 /**
@@ -165,6 +171,7 @@ export async function performResearch(
 async function synthesizeContext(
     topic: string,
     searchContext: string,
+    catalogue: SourceCandidate[],
     deepReport?: string,
     brief?: string
 ): Promise<ResearchResult> {
@@ -177,12 +184,19 @@ async function synthesizeContext(
     Output JSON ONLY with this structure:
     {
        "summary": "A 2-3 sentence forensic summary of the situation.",
-       "sources": [{"title": "...", "url": "...", "snippet": "..."}],
+       "sourceIndexes": [1, 4, 5],
        "suggestedContext": {
           "keywords": ["New Term 1", "New Term 2"],
           "pain_points": ["New specific anxiety for the ICP"]
        }
-    }`;
+    }
+
+    sourceIndexes: the [S…] numbers of the results your summary actually rests
+    on, most important first. Give the number and nothing else — do not retype a
+    title, a URL or a snippet anywhere in your output. The writer's source list
+    is rebuilt from these numbers against the results below, so a number you
+    leave out is a source the piece will not carry, and a number that is not in
+    the list below is discarded.`;
 
     const userPrompt = `Analyze these search results for the topic: "${topic}".${briefBlock}
 
@@ -205,20 +219,36 @@ async function synthesizeContext(
         }
 
         const cleaned = rawJson.substring(firstOpen, lastClose + 1);
-        const parsed = JSON.parse(cleaned) as ResearchResult;
-        return { ...parsed, deepReport };
+        const parsed = JSON.parse(cleaned) as {
+            summary?: string;
+            sourceIndexes?: unknown;
+            suggestedContext?: { keywords?: string[]; pain_points?: string[] };
+        };
+
+        return {
+            summary: typeof parsed.summary === 'string' ? parsed.summary : '',
+            // Rebuilt from the search results, never from the model's output.
+            sources: selectSources(catalogue, parsed.sourceIndexes),
+            suggestedContext: {
+                keywords: parsed.suggestedContext?.keywords ?? [],
+                pain_points: parsed.suggestedContext?.pain_points ?? [],
+            },
+            deepReport,
+        };
     } catch (e) {
         console.error("Failed to parse research JSON", e);
 
         const logs = `ERROR: ${e instanceof Error ? e.message : 'Unknown error'}\n\nRAW OUTPUT:\n${rawJson}`;
         logErrorToFile(logs);
 
-        // Fallback. If a deep report exists, still hand it to the writer.
+        // Fallback. If a deep report exists, still hand it to the writer — and
+        // the sources survive a parse failure now, because they never depended
+        // on the response being readable.
         return {
             summary: deepReport
                 ? "Synthesis parse failed, but the full forensic research report is available to the writer."
                 : "Analysis failed to parse. I have logged the raw output to debug_error.log.",
-            sources: [],
+            sources: catalogue.map(({ title, url, snippet }) => ({ title, url, snippet })),
             suggestedContext: { keywords: [], pain_points: [] },
             deepReport,
         };
@@ -231,6 +261,12 @@ async function synthesizeContext(
  * so the Deep Dive writer builds on it verbatim.
  */
 export async function synthesizeDeepReport(topic: string, report: string, brief?: string): Promise<ResearchResult> {
-    const searchContext = `\n--- DEEP RESEARCH (EXA AGENT) ---\n${report}\n`;
-    return synthesizeContext(topic, searchContext, report, brief);
+    const catalogue: SourceCandidate[] = [];
+    const cited = registerSources(catalogue, extractReportSources(report));
+
+    const searchContext =
+        `\n--- DEEP RESEARCH (EXA AGENT) ---\n${report}\n` +
+        (cited ? `\n--- SOURCES CITED IN THAT REPORT ---\n${cited}\n` : '');
+
+    return synthesizeContext(topic, searchContext, catalogue, report, brief);
 }
