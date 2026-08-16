@@ -630,6 +630,27 @@ same day as OJ publication) but will not serve that CELEX as HTML, so the corpus
 holds the original act. The `meta.json` note previously said no consolidation
 existed at all; it now says what is actually true.
 
+**Proven on production, not just locally.** A real draft was generated at
+`/create` on siliconandstone.com against the topic "What GDPR Article 22 and the
+EU AI Act together require of automated credit scoring", chosen to force
+cross-instrument routing. The result (`drafts.8da5aa5e…`, left unpublished for
+review) cites **AI Act Article 27(1)** and walks its sub-points (a)–(f),
+separates **27(3)** notification from **27(4)** DPIA cross-referencing,
+identifies credit scoring as **Annex III point 5(b)**, and handles Article 6(3)
+and GDPR Article 22 correctly. Each of those was checked back against the
+committed corpus rather than taken on trust.
+
+The before/after is the clearest evidence the lane is doing its job. The draft
+written on 13 August — after the code shipped but while the Vercel variables
+were still missing — contains
+`[AUTHOR: cite the specific Article — believed to be Article 6(3) — and confirm
+the precise conditions for this carve-out.]`: the model guessing at an Article
+number and asking a human to check it. The 16 August draft cites Article
+27(1)(a)–(f) with the sub-point structure intact, and its only `[AUTHOR:]`
+placeholder is for an internal link, not a legal citation. The run also logged
+`[prior-coverage] 5 articles`, confirming the migrated article index working in
+production.
+
 **Still open:** the corpus holds no recitals (EUR-Lex omits the preamble from
 consolidated texts), which bites hardest for the GDPR, whose 173 recitals are
 routinely cited as interpretive authority. No reranking: retrieval is

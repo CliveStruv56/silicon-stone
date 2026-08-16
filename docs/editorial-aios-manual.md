@@ -62,10 +62,15 @@ treat any surviving `AIOS_VAULT_PATH` wiring as dead configuration.
 
 Pinecone is used for retrieval.
 
-There are two separate uses:
+There are three separate uses, one index each — they never share storage:
 
-- the existing article-level semantic search index
-- the separate evidence index for chunk-level source retrieval
+- `PINECONE_INDEX_NAME` (`silicon-and-stone-articles`) — article-level semantic
+  search, related articles, and prior-coverage RAG
+- `PINECONE_EVIDENCE_INDEX_NAME` (`silicon-and-stone-evidence`) — chunk-level
+  source retrieval
+- `PINECONE_REGULATORY_INDEX_NAME` (`silicon-and-stone-regulatory`) — primary
+  statutory text quoted at `/create`. Editorial only: it is never an authority
+  for anything the Compliance Checker renders
 
 Pinecone is not the final knowledge store. It is a search layer.
 
