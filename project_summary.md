@@ -464,6 +464,50 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 16, 2026 — the publish button now enforces what the authoring guide only asked for
+
+**Findings 2 and 3 fixed together.** Two editorial obligations were
+documentation-only: resolve every `[AUTHOR: …]` placeholder before publishing,
+and read the fact-check. Nothing enforced either — the only thing between a
+half-finished draft and the live site was the editor remembering.
+
+`src/lib/publish-preflight.ts` holds the checks as a pure function (no Studio,
+no `server-only`), so they are unit-testable and cannot drift from what the
+dialog claims. `src/sanity/actions/publishPreflight.tsx` **wraps** Studio's own
+publish action — not replaces it — so publishing keeps its built-in validation,
+disabled states and keyboard shortcut. Wired in `sanity.config.ts` by mapping
+over the existing action list rather than appending a second publish button.
+
+- **Blocker:** any unresolved `[AUTHOR: …]` in Body, Excerpt, Stone Truth or
+  Actionable Insights. No way past it.
+- **Warnings (confirm and continue):** no completed fact-check (distinguishing
+  absent / running / failed), an `overallVerdict` of `major-issues`, and an empty
+  `citations` list on a `signal`, `deepdive` or `guide`.
+
+Four decisions worth remembering: **`voiceEditNotes` is deliberately not
+scanned** (it is the field that *lists* the placeholders — scanning it would
+block every voice-passed article forever, and there is a test for that);
+detection is on the opening `[AUTHOR:` token rather than a balanced pair, since
+an unclosed placeholder is still unresolved; block text is joined across spans
+before matching, because a placeholder carrying a mark is stored as several
+sibling spans; and `minor-issues` is deliberately **not** warned on, since
+warning on routine editorial judgement puts the dialog in front of every publish
+and teaches the author to click through it.
+
+**Verified live**, not just unit-tested. 20 new tests (suite now 265), plus a
+Puppeteer run against the local Studio on a disposable draft: with a placeholder
+the dialog read *"Not ready to publish"* and offered **no "Publish anyway"**;
+with it removed, *"Publish this article?"* with both warnings and a "Publish
+anyway" button. Cancel closed both. The live run also confirmed the cross-span
+join works on real Studio data. Scratch draft discarded, dataset confirmed
+clean. Two of the tests read `sanity.config.ts` and assert the wrapper is
+actually mounted — a guard that exists but never mounts still passes its own
+unit tests.
+
+Not verified live, deliberately: the clean pass-through, since exercising it
+means actually publishing, which would fire the vectorise webhook against the
+production dataset. Unit-tested instead.
+
 ### August 16, 2026 — the drift watcher repaired, and Pinecone's role made legible
 
 **Finding 1 is fixed.** Both upstream reads now go through a new

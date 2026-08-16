@@ -16,8 +16,8 @@ system, not inferred from reading it.
 | # | Finding | Severity |
 |---|---|---|
 | 1 | The EUR-Lex drift watcher fails open — and the corpus can no longer be re-fetched | ~~Critical~~ **Fixed 16 Aug 2026** |
-| 2 | Nothing prevents publishing a draft with unresolved `[AUTHOR: …]` placeholders | **High** |
-| 3 | Nothing prevents publishing despite a "major issues" fact-check verdict | **High** |
+| 2 | Nothing prevents publishing a draft with unresolved `[AUTHOR: …]` placeholders | ~~High~~ **Fixed 16 Aug 2026** |
+| 3 | Nothing prevents publishing despite a "major issues" fact-check verdict | ~~High~~ **Fixed 16 Aug 2026** |
 | 4 | Quotations in articles are never mechanically verified | **High** |
 | 5 | Source URLs and titles are re-emitted by the model, not passed through | **High** |
 | 6 | Publication dates are discarded before drafting | **Medium-High** |
@@ -181,6 +181,8 @@ locations. This is the single highest-value change in this memo: it costs one
 small file and converts the most consequential editorial obligation into a
 mechanical one.
 
+**Fixed 16 August 2026** — see the joint resolution under finding 3.
+
 ---
 
 ## 3 · Nothing prevents publishing despite a "major issues" fact-check verdict
@@ -206,6 +208,66 @@ warn — with confirmation, not a hard block — when:
 A confirmation dialogue rather than a block is right here: there are legitimate
 cases (an opinion-led Pulse with no external claims), and a control the author
 routinely has to fight becomes a control they route around.
+
+### Resolution — 16 August 2026 (findings 2 and 3 together)
+
+Fixed by one publish guard, as proposed.
+
+`src/lib/publish-preflight.ts` holds the checks as a pure function with no
+Studio or server dependency, so they are unit-testable and cannot drift from
+what the dialog claims. `src/sanity/actions/publishPreflight.tsx` wraps
+Studio's own publish action — deliberately wrapping rather than replacing, so
+publishing keeps its built-in disabled states, its "already published"
+handling and its keyboard shortcut. Wired in `sanity.config.ts` by mapping over
+the existing action list rather than appending a second publish button.
+
+**Blocker (cannot be clicked past):** any unresolved `[AUTHOR: …]` placeholder
+in the Body, Excerpt, Stone Truth or Actionable Insights.
+
+**Warnings (confirm and continue):** no completed fact-check — distinguishing
+absent, running and failed; an `overallVerdict` of `major-issues`; and an empty
+`citations` list on a `signal`, `deepdive` or `guide`.
+
+Four decisions worth recording:
+
+- **`voiceEditNotes` is deliberately not scanned.** It is the field that *lists*
+  the outstanding placeholders, so including it would block every article that
+  had ever been through the voice pass — permanently. `sourceMaterial` is
+  excluded for the same reason. There is a regression test for this.
+- **Detection is on the opening token `[AUTHOR:`, not a balanced pair.** An
+  unclosed placeholder is still unresolved, and requiring the closing bracket
+  would let the worst-formed case through. It also matches the instruction the
+  authoring guide gives a human.
+- **Block text is joined before matching.** A placeholder that picks up a mark
+  part way through is stored as several sibling spans; matching span by span
+  would miss it. This is not hypothetical — the live test used exactly that
+  shape and the guard reassembled it correctly.
+- **`minor-issues` is not warned on.** Outdated and needs-context claims are
+  routine editorial judgement, and warning on them would put the dialog in front
+  of nearly every publish, which is how a control gets ignored.
+
+**Verification.** 20 unit tests in `src/lib/publish-preflight.test.ts`, plus a
+live run against the Studio driven with Puppeteer on a disposable draft:
+
+- with a placeholder → dialog headed *"Not ready to publish"*, the placeholder
+  listed with its field, **no "Publish anyway" button offered**, only "Back to
+  the draft";
+- with the placeholder removed → dialog headed *"Publish this article?"* listing
+  the two warnings, with "Publish anyway" and "Cancel" both present;
+- cancel closed the dialog in both cases; nothing was published.
+
+The scratch draft was discarded afterwards and the dataset confirmed clean.
+
+Two of the tests read `sanity.config.ts` and assert the wrapper is actually
+mounted, and mounted by wrapping the publish action rather than appended
+alongside it — a guard that exists but is never mounted still passes its own
+unit tests.
+
+**Not verified live, deliberately:** the clean pass-through, where no issues
+means the original publish handler is called with no dialog. Exercising it
+requires actually publishing, which on the production dataset would fire the
+vectorise webhook and briefly put a scratch article on the live site. It is
+covered by unit test instead.
 
 ---
 
@@ -525,8 +587,8 @@ Worth recording, so the fixes above are read in proportion.
 
 1. ~~**Finding 1** — the drift watcher and the fetch path.~~ **Done, 16 Aug 2026.**
    The 11 November review deadline now has a working refresh path behind it.
-2. **Findings 2 and 3** — the publish-action wrapper. One file, closes the two
-   largest editorial gaps at once.
+2. ~~**Findings 2 and 3** — the publish-action wrapper.~~ **Done, 16 Aug 2026.**
+   The two largest editorial obligations are now mechanical.
 3. **Finding 5** — pass sources through in code. Small, and removes a whole class
    of citation error.
 4. **Findings 6 and 12** — richer, dated source context. Two small changes to one

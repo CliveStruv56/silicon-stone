@@ -419,6 +419,29 @@ The reviewer is required to:
 A second editorial reviewer holds a stated veto over anything off-brand,
 including a Methodology Audit that over-claims.
 
+### The publish guard
+
+Points 1 and 5 above were documentation-only obligations until 16 August 2026 —
+stated in the authoring guide, and enforced by nothing but the editor's memory.
+They are now checked at the moment of publication.
+
+**Publishing is blocked outright** if any `[AUTHOR: …]` placeholder remains in
+the body, excerpt, Stone Truth or actionable insights. The dialog lists each one
+and offers no way past it. A placeholder is never correct in published prose: it
+is the system's own marker for a sentence still owing a fact, and shipping one
+tells every reader the piece was machine-drafted and left unfinished.
+
+**Publishing asks for confirmation** — and can be continued — when no fact-check
+has completed, when the fact-check verdict is "major issues", or when a Signal,
+Deep Dive or Guide has an empty sources list. These are judgements an editor is
+entitled to make: an opinion-led piece may legitimately have no external claims.
+A control the author routinely has to fight is one they learn to route around, so
+these confirm rather than block.
+
+The guard wraps Sanity's own publish action rather than replacing it, so
+publishing keeps its built-in validation, disabled states and keyboard shortcut.
+On a finished draft it is invisible.
+
 **Drafts are excluded from the retrieval index.** The publish webhook explicitly
 skips any document whose identifier marks it as a draft. An unreviewed draft can
 therefore never become "prior coverage" that informs a later article. Only
@@ -468,9 +491,12 @@ unverifiable — shown as a coloured badge in Studio. Applying a suggested revis
 patches the draft only; nothing this pass produces is published by itself.
 
 **Stated plainly: the fact-check is advisory and operator-triggered.** It does
-not run automatically, and no code path prevents publishing an article whose
-verdict is "major issues". It is a tool that makes editorial diligence faster and
-more systematic; it is not a gate.
+not run automatically, and it does not decide anything by itself — an editor
+reads the report and applies the revisions. Since 16 August 2026 publishing
+without a completed fact-check, or with a "major issues" verdict, requires an
+explicit confirmation (§8), so the report can no longer be shipped past
+unnoticed. But the confirmation can be given: this is a prompt to look, not a
+gate that holds the piece.
 
 ---
 
@@ -589,6 +615,7 @@ Every check in the system, what it asserts, and what it stops.
 | `test:evidence-index` | Evidence chunking, delete-before-upsert, index isolation | **CI** |
 | `test:knowledge-inbox` | Source ID validation and admin authentication on capture routes | **CI** |
 | `test:style-rules` | Style rules actually reach the production prompt rather than compiling to an empty string | **CI** |
+| Publish guard | No `[AUTHOR: …]` placeholder reaches a reader; a missing or adverse fact-check and an empty sources list are confirmed rather than passed silently | **Publication** |
 | `reg:verify-index` / `articles:verify-index` | Live index shape; no embedded-text configuration; per-instrument record counts match the committed corpus | Manual |
 | `reg:drift` | A newer consolidation exists upstream than the one pinned; the pinned text is untampered | Weekly job — **repaired 16 August 2026**, see §11 |
 | `reg:probe` | The full routed retrieval path returns the right instrument, above the floor, with the right caveats | Manual |
@@ -636,8 +663,9 @@ Articles. Anything outside them returns "uncovered", which is treated as
 unverifiable rather than as a pass.
 
 **The fact-check is advisory, bounded, and not automatic.** It does not run
-unless an operator triggers it, it checks at most eighteen claims, and no
-mechanism prevents publishing despite an adverse verdict.
+unless an operator triggers it, and it checks at most eighteen claims. Publishing
+despite an adverse verdict now requires an explicit confirmation rather than
+passing silently, but the confirmation can still be given.
 
 **Quotations in articles are not mechanically verified.** The exact-substring
 verification described in §10 protects the Compliance Checker's output. In the
