@@ -18,7 +18,7 @@ system, not inferred from reading it.
 | 1 | The EUR-Lex drift watcher fails open — and the corpus can no longer be re-fetched | ~~Critical~~ **Fixed 16 Aug 2026** |
 | 2 | Nothing prevents publishing a draft with unresolved `[AUTHOR: …]` placeholders | ~~High~~ **Fixed 16 Aug 2026** |
 | 3 | Nothing prevents publishing despite a "major issues" fact-check verdict | ~~High~~ **Fixed 16 Aug 2026** |
-| 4 | Quotations in articles are never mechanically verified | **High** |
+| 4 | Quotations in articles are never mechanically verified | ~~High~~ **Fixed 16 Aug 2026** |
 | 5 | Source URLs and titles are re-emitted by the model, not passed through | ~~High~~ **Fixed 16 Aug 2026** |
 | 6 | Publication dates are discarded before drafting | ~~Medium-High~~ **Fixed 16 Aug 2026** |
 | 7 | The fact-check never runs automatically, and Deep Dives are least protected | **Medium-High** |
@@ -302,6 +302,96 @@ retrieves only six passages, so a legitimate quotation may come from an Article
 that was not retrieved. The audit should therefore report *unmatched* and
 *not-retrieved* distinctly, and must be advisory — but it converts "trust the
 prompt" into "check the output", which is the whole point.
+
+### Resolution — 16 August 2026
+
+Fixed. The design question turned out to be *what to match against*, and the
+answer was better than the one proposed above.
+
+**Not the corpus on disk.** `src/lib/regulatory/meta.ts` says it plainly: the
+Next app never touches the corpus files, which is why they are not traced into
+the serverless bundle. Reading them at runtime works locally and fails on
+Vercel — the same trap that made the house-style rules a generated module.
+
+**Not a fresh Pinecone query either**, which would reintroduce a retrieval step
+and a chunk-boundary failure mode of its own.
+
+**The retrieved block, because the retrieved block IS the contract.** The prompt
+promises: *"Place quotation marks ONLY around words you have copied
+character-for-character from the passages below… If the provision you need is
+not below, explain the rule in your own words WITHOUT quotation marks."* A
+quotation absent from that block therefore violates the instruction by
+definition — it was invented, or recalled from memory, or lifted from a
+provision the retrieval did not return, and all three are the failure the
+sentence exists to prevent. Auditing against it is free, exact, needs no
+infrastructure, and tests the actual promise rather than an approximation of it.
+
+`src/lib/quotation-audit.ts` is pure — no `server-only`, no disk, no network —
+so it is fully unit-testable, and it reuses `corpusContainsQuote()` from
+`src/lib/rulepack/normalise.ts`: exact substring after Unicode normalisation,
+case preserved, the same matcher that protects the Compliance Checker.
+
+Three statuses, mirroring the Checker's vocabulary:
+
+- **verified** — present character-for-character in the supplied text;
+- **unmatched** — presented as statute and not in it;
+- **uncovered** — presented as statute but no statutory text was retrieved for
+  this draft, so there is nothing to check against. Unchecked is never a pass.
+
+Decisions worth recording:
+
+- **Only quotations presented as statute are audited.** The trigger is an
+  Article/Annex citation or a named instrument in the same paragraph, reusing
+  `INSTRUMENT_TERMS` from `gate.ts` (now exported). Deliberately narrower than
+  `looksRegulatory()`, whose generic vocabulary — "compliance", "obligation" —
+  would make every quote in a regulatory piece a statutory claim. Articles quote
+  ministers and reporting constantly; flagging those would drown the real
+  findings.
+- **Elisions are split and matched segment by segment.** A writer who writes
+  *"the provider shall … ensure robustness"* elided words on purpose, and
+  demanding the whole span match would report honest editing as fabrication.
+- **A 40-character floor.** Below that a quoted span is a term of art or an
+  emphasis quote — `"high-risk"` — not a quotation of a provision.
+- **Blockquotes are audited too**, since a long statutory quotation is often set
+  that way with no quotation marks at all.
+- **It runs after the voice edit**, because that pass rewrites the body; auditing
+  the pre-edit text would check quotations the reader never sees. A test asserts
+  the ordering.
+
+Surfaced in two places: a read-only **Quotation Audit** field on the article, and
+a **warning in the publish guard** when the audit found unmatched quotations —
+connecting this to findings 2 and 3. A warning rather than a block, because exact
+matching cannot always distinguish an elided or bracketed quotation from an
+invented one; the known false-positive sources are documented on the type.
+
+**Verified against a real retrieved block**, not just a fixture. A NIS2 topic
+retrieved six passages; a body was built with one sentence lifted verbatim from
+them, one plausible fabrication, a minister's quote and a one-word term:
+
+```
+2 statutory quotations checked, 1 verified, 1 NOT FOUND in the supplied statutory text.
+
+[UNMATCHED]
+  "must notify the Commission directly within four hours of detecting any anomaly,
+   regardless of severity"
+```
+
+The fabrication is the instructive part: it invents a four-hour notification duty
+to the Commission where NIS2's actual duty is 24 hours to the CSIRT. It reads
+entirely plausible, it sits beside a correct Article number, and no human reading
+quickly would catch it. That is the class of error this closes.
+
+The minister's quote and the one-word `"significant"` were correctly not audited.
+
+26 unit tests, plus three that read `draft-pipeline.ts` and `create/actions.ts`
+to assert the audit is actually called, called with the block the model was
+given, and called after the voice edit.
+
+**Known limits**, all deliberate: `/import` and `/research` retrieve no statutory
+text, so quotations there return `uncovered` rather than verified — honest, and a
+useful prompt to check by hand. The local-draft `save` command skips
+`finalizeDraft` and so is not audited. And a quotation of a recital will always
+be unmatched, because the corpus carries none.
 
 ---
 
@@ -714,6 +804,8 @@ Worth recording, so the fixes above are read in proportion.
    The two largest editorial obligations are now mechanical.
 3. ~~**Finding 5** — pass sources through in code.~~ **Done, 16 Aug 2026.**
 4. ~~**Findings 6 and 12** — richer, dated source context.~~ **Done, 16 Aug 2026.**
-5. **Finding 4** — the quotation audit. The most valuable of the larger pieces of
-   work, and now the highest-severity item outstanding.
-6. Everything else as capacity allows — findings 7, 8, 9, 10, 11, 13 and 14.
+5. ~~**Finding 4** — the quotation audit.~~ **Done, 16 Aug 2026.**
+6. Everything else as capacity allows. The highest-value remaining are **7**
+   (run the fact-check automatically on Deep Dives and Signals) and **8** (a
+   score floor on prior-coverage retrieval); **9** and **10** harden the rule
+   pack's own guarantees; **11** puts the index-shape checks in CI.

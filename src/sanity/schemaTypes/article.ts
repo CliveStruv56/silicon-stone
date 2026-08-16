@@ -459,6 +459,22 @@ export const article = defineType({
     }),
     defineField({
       group: 'factCheck',
+      name: 'quotationAudit',
+      title: 'Quotation Audit',
+      description:
+        'Every statutory quotation in the body, string-matched against the verbatim ' +
+        'legal text the drafting model was given. UNMATCHED means the quotation is not ' +
+        'in that text — it was invented, recalled from memory, or taken from a provision ' +
+        'the retrieval did not return; check it against the primary source before ' +
+        'publishing. UNCOVERED means no statutory text was retrieved for this draft, so ' +
+        'the quotation could not be checked at all. Advisory: exact matching cannot ' +
+        'always tell an elided or bracketed quotation from a fabricated one.',
+      type: 'text',
+      rows: 10,
+      readOnly: true,
+    }),
+    defineField({
+      group: 'factCheck',
       name: 'factCheck',
       title: 'Fact Check',
       description:

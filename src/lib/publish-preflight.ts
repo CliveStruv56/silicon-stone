@@ -46,6 +46,8 @@ export type PreflightDocument = {
   actionableInsights?: unknown
   citations?: unknown
   factCheck?: { status?: string; overallVerdict?: string }
+  /** Rendered report from the quotation audit; see src/lib/quotation-audit.ts. */
+  quotationAudit?: string
 }
 
 /**
@@ -166,6 +168,27 @@ export function preflightArticle(doc: PreflightDocument): PreflightIssue[] {
       detail:
         'At least one claim was contradicted by the evidence. Open the Fact Check ' +
         'panel, apply the suggested revisions, and re-run before publishing.',
+    })
+  }
+
+  // A quotation the model could not have copied is the one error the drafting
+  // prompt calls a retraction rather than a correction, so it is surfaced at
+  // the moment of publication rather than left in a panel. Still a warning:
+  // exact matching cannot always tell an elided quotation from an invented one.
+  const unmatchedQuotations = (doc.quotationAudit?.match(/\[UNMATCHED\]/g) ?? []).length
+  if (unmatchedQuotations > 0) {
+    issues.push({
+      id: 'unmatched-quotations',
+      severity: 'warning',
+      title:
+        unmatchedQuotations === 1
+          ? '1 statutory quotation is not in the source text'
+          : `${unmatchedQuotations} statutory quotations are not in the source text`,
+      detail:
+        'These were string-matched against the verbatim legal text the drafting ' +
+        'model was given, and were not found in it. Open the Quotation Audit ' +
+        'panel and check each against the primary source. An invented Article ' +
+        'number is a correction; an invented quotation is a retraction.',
     })
   }
 

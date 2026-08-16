@@ -374,10 +374,42 @@ is the sharpest accuracy constraint in the system, and is reproduced in full:
 >   not this task.
 
 A continuous integration check asserts that the sentence forbidding quotation
-from memory is still present in the prompt. The check confirms the instruction
-exists; it cannot confirm the model obeyed it. That gap is closed by human
-review, and — for the Compliance Checker only — by mechanical verification
-(§10).
+from memory is still present in the prompt. But an instruction that is present is
+not an instruction that was followed, so since 16 August 2026 the output is
+checked as well as the prompt.
+
+### The quotation audit
+
+Every draft is audited before it is saved. Each quotation the piece presents as
+statute — one sitting beside an Article or Annex citation, or in a paragraph
+naming an instrument — is string-matched against the verbatim legal text the
+model was given for that draft. The match is exact after Unicode normalisation,
+with case preserved; it is the same matcher that protects the Compliance
+Checker's output.
+
+**The text it matches against is the point.** The prompt's promise is not "quote
+the law correctly" in the abstract; it is "quote only from the passages below".
+The audit therefore checks against exactly those passages. A quotation absent
+from them violates the instruction by definition — invented, recalled from
+memory, or taken from a provision the retrieval never returned.
+
+Three outcomes, and unchecked is never a pass:
+
+| | |
+|---|---|
+| **Verified** | Present character-for-character in the supplied text. |
+| **Unmatched** | Presented as statute and not in it. Checked against the primary source before publishing. |
+| **Uncovered** | Presented as statute, but no statutory text was retrieved for this draft, so there was nothing to check against. |
+
+Results are written to a read-only Quotation Audit field on the article, and an
+unmatched quotation raises a warning at the moment of publication (§8).
+
+Three things it deliberately does not do. It does not audit quotations that are
+not presented as statute — a piece quotes ministers and reporting constantly, and
+flagging those would bury the real findings. It does not fail a quotation that
+elides text with an ellipsis, which is honest editing rather than fabrication. And
+it does not block: exact matching cannot always separate a legitimately bracketed
+or elided quotation from an invented one, so it reports and a person decides.
 
 ### The no-invention rule
 
@@ -456,8 +488,9 @@ is the system's own marker for a sentence still owing a fact, and shipping one
 tells every reader the piece was machine-drafted and left unfinished.
 
 **Publishing asks for confirmation** — and can be continued — when no fact-check
-has completed, when the fact-check verdict is "major issues", or when a Signal,
-Deep Dive or Guide has an empty sources list. These are judgements an editor is
+has completed, when the fact-check verdict is "major issues", when the quotation
+audit found a statutory quotation absent from the source text (§7), or when a
+Signal, Deep Dive or Guide has an empty sources list. These are judgements an editor is
 entitled to make: an opinion-led piece may legitimately have no external claims.
 A control the author routinely has to fight is one they learn to route around, so
 these confirm rather than block.
@@ -639,7 +672,8 @@ Every check in the system, what it asserts, and what it stops.
 | `test:evidence-index` | Evidence chunking, delete-before-upsert, index isolation | **CI** |
 | `test:knowledge-inbox` | Source ID validation and admin authentication on capture routes | **CI** |
 | `test:style-rules` | Style rules actually reach the production prompt rather than compiling to an empty string | **CI** |
-| Publish guard | No `[AUTHOR: …]` placeholder reaches a reader; a missing or adverse fact-check and an empty sources list are confirmed rather than passed silently | **Publication** |
+| Quotation audit | Every statutory quotation in a draft is present character-for-character in the legal text the model was given | **Draft** |
+| Publish guard | No `[AUTHOR: …]` placeholder reaches a reader; a missing or adverse fact-check, an unmatched quotation and an empty sources list are confirmed rather than passed silently | **Publication** |
 | `reg:verify-index` / `articles:verify-index` | Live index shape; no embedded-text configuration; per-instrument record counts match the committed corpus | Manual |
 | `reg:drift` | A newer consolidation exists upstream than the one pinned; the pinned text is untampered | Weekly job — **repaired 16 August 2026**, see §11 |
 | `reg:probe` | The full routed retrieval path returns the right instrument, above the floor, with the right caveats | Manual |
@@ -691,11 +725,13 @@ unless an operator triggers it, and it checks at most eighteen claims. Publishin
 despite an adverse verdict now requires an explicit confirmation rather than
 passing silently, but the confirmation can still be given.
 
-**Quotations in articles are not mechanically verified.** The exact-substring
-verification described in §10 protects the Compliance Checker's output. In the
-editorial lane, the corresponding control is a prompt instruction plus human
-review. This is the largest single gap between the two lanes, and it is the
-principal recommendation in the internal findings memo.
+**The quotation audit checks against what was retrieved, not the whole statute
+book.** It proves a quotation came from the passages the model was given. A
+quotation from a provision the retrieval never returned is reported as unmatched
+even where it is accurate, and a quotation of a recital always will be, because
+the corpus carries none. It is a strong check on fabrication, not a guarantee of
+completeness — and unlike the Compliance Checker's, it warns rather than
+withholds.
 
 **Prior-coverage retrieval has no relevance threshold.** The statutory lane
 drops weak matches below a measured score floor; the lane that surfaces this

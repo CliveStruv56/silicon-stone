@@ -38,6 +38,7 @@ export interface ArticleData {
     source?: 'generated' | 'imported' | 'manual';
     sourceMaterial?: string;         // original text for imported articles
     voiceEditNotes?: string;         // Pass-3 voice-edit summary + [AUTHOR: …] list
+    quotationAudit?: string;         // statutory quotations checked against the retrieved text
     imagePrompts?: string[];         // two "what to depict" prompts for the main image
 }
 
@@ -139,6 +140,7 @@ export async function createArticleInSanity(data: ArticleData) {
     if (data.source) doc.source = data.source;
     if (data.sourceMaterial) doc.sourceMaterial = data.sourceMaterial;
     if (data.voiceEditNotes) doc.voiceEditNotes = data.voiceEditNotes;
+    if (data.quotationAudit) doc.quotationAudit = data.quotationAudit;
     if (data.imagePrompts && data.imagePrompts.length > 0) {
         doc.imagePrompts = {
             prompts: data.imagePrompts,

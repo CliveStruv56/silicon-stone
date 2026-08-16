@@ -164,6 +164,29 @@ describe('preflightArticle', () => {
     }
   })
 
+  it('warns when the quotation audit found a quotation not in the source text', () => {
+    const issues = preflightArticle(
+      cleanArticle({
+        quotationAudit: '2 statutory quotations checked, 1 verified, 1 NOT FOUND\n\n[UNMATCHED] (eu-ai-act)\n  "…"',
+      }),
+    )
+    expect(issues.map((i) => i.id)).toContain('unmatched-quotations')
+    expect(issues[0].severity).toBe('warning')
+    expect(issues[0].title).toContain('1 statutory quotation')
+  })
+
+  it('counts multiple unmatched quotations', () => {
+    const issues = preflightArticle(
+      cleanArticle({ quotationAudit: '[UNMATCHED] a\n[UNMATCHED] b\n[UNCOVERED] c' }),
+    )
+    expect(issues[0].title).toContain('2 statutory quotations')
+  })
+
+  it('does not warn on a clean audit, or on uncovered alone', () => {
+    expect(preflightArticle(cleanArticle({ quotationAudit: '3 checked, 3 verified.' }))).toEqual([])
+    expect(preflightArticle(cleanArticle({ quotationAudit: '[UNCOVERED] x' }))).toEqual([])
+  })
+
   it('warns on an empty sources list for formats that make external claims', () => {
     for (const contentType of CITATION_EXPECTED_TYPES) {
       const issues = preflightArticle(cleanArticle({ contentType, citations: [] }))

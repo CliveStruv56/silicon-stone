@@ -3,6 +3,7 @@ import { extractArticleMetadata, runVoiceEditPass, type DraftFormat } from './pr
 import { buildImagePrompts } from './image-prompts';
 import { createArticleInSanity, listSanityCategories } from './sanity';
 import { slugify } from './utils';
+import { auditQuotations, formatQuotationAudit } from './quotation-audit';
 
 /**
  * Shared draft-finalisation pipeline used by both /create and /import.
@@ -120,6 +121,13 @@ export interface FinalizeDraftInput {
     source: 'generated' | 'imported';
     /** Verbatim original, kept on imported articles. */
     sourceMaterial?: string;
+    /**
+     * The verbatim statutory block this draft was written against, if any.
+     * Passed in so the quotation audit can check what the model actually
+     * quoted against what it was actually given — the retrieved block is the
+     * contract the prompt makes about quotation.
+     */
+    regulatoryCorpus?: string;
     /** Log label, e.g. "/create" or "/import". */
     logPrefix?: string;
 }
@@ -136,6 +144,7 @@ export async function finalizeDraft({
     personaSlug,
     source,
     sourceMaterial,
+    regulatoryCorpus,
     logPrefix = 'draft',
 }: FinalizeDraftInput) {
     // Pass 3 — humanising voice edit (Deep Dives audit-only, others rewritten).
@@ -179,6 +188,24 @@ export async function finalizeDraft({
         console.error(`[${logPrefix}] Image-prompt generation failed:`, err);
     }
 
+    // Quotation audit. Deterministic, no model call, and runs AFTER the voice
+    // edit because that pass rewrites the body — auditing the pre-edit text
+    // would check quotations the reader will never see. Never throws: an audit
+    // failure must not cost the author their draft.
+    let quotationAudit: string | undefined;
+    try {
+        const audit = auditQuotations(draft.content, regulatoryCorpus);
+        if (audit.checked > 0) {
+            quotationAudit = formatQuotationAudit(audit);
+            console.info(
+                `[${logPrefix}] quotation audit — checked=${audit.checked} verified=${audit.verified} ` +
+                `unmatched=${audit.unmatched} uncovered=${audit.uncovered}`,
+            );
+        }
+    } catch (err) {
+        console.error(`[${logPrefix}] Quotation audit failed:`, err);
+    }
+
     return createArticleInSanity({
         title: draft.title,
         slug: slugify(draft.title),
@@ -194,6 +221,7 @@ export async function finalizeDraft({
         intelligenceTier: format === 'pulse' ? 'pulse' : metadata?.intelligenceTier,
         methodologyPillars: metadata?.methodologyPillars,
         voiceEditNotes,
+        ...(quotationAudit ? { quotationAudit } : {}),
         source,
         ...(imagePrompts?.length ? { imagePrompts } : {}),
         ...(sourceMaterial ? { sourceMaterial } : {}),

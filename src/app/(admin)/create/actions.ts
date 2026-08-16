@@ -185,6 +185,9 @@ export async function createDraftFromResearch(
             format,
             personaSlug,
             source: "generated",
+            // The same block the prompt quoted from, so the quotation audit
+            // checks what the model wrote against what it was actually given.
+            regulatoryCorpus: draftContext.regulatoryCorpus,
             logPrefix: "/create",
         });
 

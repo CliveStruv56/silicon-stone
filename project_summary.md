@@ -464,6 +464,70 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 16, 2026 — the prompt's quotation promise is now checked, not just asserted
+
+**Finding 4 fixed — the largest gap between the two lanes.** The drafting prompt
+promises *"Place quotation marks ONLY around words you have copied
+character-for-character from the passages below… An invented Article number is a
+correction; an invented quotation is a retraction."* CI asserted that sentence
+was still **in** the prompt; nothing checked whether the model obeyed it.
+
+**The design decision was what to match against.** Not the corpus on disk —
+`meta.ts` says the Next app never reads it, so it is not traced into the
+serverless bundle and would work locally then fail on Vercel (the same trap that
+made the house-style rules a generated module). Not a fresh Pinecone query
+either, which reintroduces retrieval and a chunk-boundary failure mode. **The
+retrieved block, because the retrieved block IS the contract** — the promise is
+"quote only from the passages below", so a quotation absent from them violates it
+by definition. Free, exact, no infrastructure.
+
+`src/lib/quotation-audit.ts` is pure (no `server-only`, no disk, no network) and
+reuses `corpusContainsQuote()` from `rulepack/normalise.ts` — the same
+exact-substring matcher that protects the Compliance Checker. Three statuses
+mirroring its vocabulary: `verified`, `unmatched`, `uncovered` (nothing retrieved
+to check against; unchecked is never a pass).
+
+Decisions worth remembering:
+
+- **Only quotations presented as statute are audited** — trigger is an
+  Article/Annex citation or a named instrument in the same paragraph, reusing
+  `INSTRUMENT_TERMS` from `gate.ts` (now exported). Deliberately narrower than
+  `looksRegulatory()`, whose generic vocabulary would make every quote in a
+  regulatory piece a statutory claim. Pieces quote ministers constantly.
+- **Elisions are split and matched segment by segment** — "the provider shall …
+  ensure robustness" is honest editing, not fabrication.
+- 40-character floor (below that it is a term of art); blockquotes audited too;
+  runs **after** the voice edit because that pass rewrites the body.
+
+Surfaced as a read-only **Quotation Audit** field and as a publish-guard warning,
+connecting it to findings 2/3. A warning not a block: exact matching cannot always
+tell a bracketed quotation from an invented one.
+
+**Verified against a real retrieved block.** A NIS2 topic retrieved six passages;
+a test body mixed one sentence lifted verbatim, one plausible fabrication, a
+minister's quote and a one-word term. Result: `checked=2 verified=1 unmatched=1`,
+with the fabrication caught —
+
+> `[UNMATCHED] "must notify the Commission directly within four hours of detecting
+> any anomaly, regardless of severity"`
+
+That invents a four-hour Commission duty where NIS2's real duty is 24 hours to
+the CSIRT. It reads plausibly, sits beside a correct Article number, and no
+quick human read would catch it. The minister's quote and the one-word term were
+correctly not audited.
+
+26 unit tests plus three that read `draft-pipeline.ts` and `create/actions.ts` to
+assert the audit is called, called with the block the model was given, and called
+after the voice edit. Suite now 331.
+
+**Known limits, all deliberate:** `/import` and `/research` retrieve no statutory
+text, so quotations there return `uncovered`; the local-draft `save` command
+skips `finalizeDraft` and is not audited; a quotation of a recital will always be
+unmatched, because the corpus carries none.
+
+**Schema note:** the new `quotationAudit` field needs `npx sanity schema deploy`
+before it is writable via MCP (a Vercel deploy does not refresh that manifest).
+
 ### August 16, 2026 — sources reach the writer dated, and four times as substantial
 
 **Findings 6 and 12 fixed together**, both one change to `exaToSources` now the

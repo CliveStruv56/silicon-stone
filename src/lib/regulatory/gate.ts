@@ -51,7 +51,7 @@ const REGULATORY_TERMS = [
  * Keys MUST be corpus directory names under corpus/regulatory/ —
  * scripts/regulatory-index-checks.ts asserts that against listCorpusIds().
  */
-const INSTRUMENT_TERMS: Record<string, string[]> = {
+export const INSTRUMENT_TERMS: Record<string, string[]> = {
   'eu-ai-act': [
     'ai act', 'artificial intelligence act', 'high-risk ai', 'ai office',
     'gpai', 'general-purpose ai', 'general purpose ai', 'ai system',
