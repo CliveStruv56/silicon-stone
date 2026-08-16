@@ -23,8 +23,8 @@ system, not inferred from reading it.
 | 6 | Publication dates are discarded before drafting | ~~Medium-High~~ **Fixed 16 Aug 2026** |
 | 7 | The fact-check never runs automatically, and Deep Dives are least protected | ~~Medium-High~~ **Fixed 16 Aug 2026** |
 | 8 | Prior-coverage retrieval has no score floor | ~~Medium~~ **Fixed 16 Aug 2026** |
-| 9 | Only the rule pack's corpus text is hashed, not its rules or penalties | **Medium** |
-| 10 | The two normalisers are duplicated by hand with no equality test | **Medium** |
+| 9 | Only the rule pack's corpus text is hashed, not its rules or penalties | ~~Medium~~ **Fixed 16 Aug 2026** |
+| 10 | The two normalisers are duplicated by hand with no equality test | ~~Medium~~ **Fixed 16 Aug 2026** |
 | 11 | Index shape verification never runs in CI | **Medium** |
 | 12 | Only 300 characters of each source reach the model; highlights are discarded | ~~Medium~~ **Fixed 16 Aug 2026** |
 | 13 | No source-quality controls on web search | **Medium** |
@@ -727,6 +727,47 @@ JSON files to the digest map under a separate key so the failure message can
 distinguish "the statute text moved" from "a rule changed". Cheap, and it closes
 the gap between the stated principle and what is enforced.
 
+### Resolution — 16 August 2026
+
+Fixed. The manifest now carries a second map, `files`, beside `corpus`:
+
+```json
+"files": {
+  "penalties.json": "6aed52fc…",
+  "rules.json":     "1bd00fd5…",
+  "sources.json":   "e1a825d3…",
+  "timeline.json":  "b88ecca7…"
+}
+```
+
+Kept separate from `corpus` deliberately, so the failure message says which kind
+of drift happened: statute text moving invalidates every citation ever verified
+against it, while a changed rule invalidates a classification. Both stop the
+build; they are not the same incident.
+
+**Files are discovered, not listed.** Every `.json` beside the manifest is
+hashed, so a new pack file is covered the day it appears rather than the day
+someone remembers to add it to the script. A pack with data files but no `files`
+map fails rather than passing — a pack predating this check has unverified
+figures, and silence would be the wrong answer.
+
+**Hashed by content, not by bytes.** The JSON is parsed, its object keys sorted
+recursively, and re-stringified. Array order is preserved, because here it
+carries meaning — the penalty tiers are ordered. So a prettier run does not fail
+a build, and an edited figure does. The legal claim is the value, never the
+whitespace around it.
+
+**Verified by breaking it deliberately.** Three cases, in order:
+
+| Change | Result |
+|---|---|
+| Nothing touched | `19 corpus files and 4 pack files verified`, exit 0 |
+| `penalties.json` reformatted to 4-space indent | still passes, exit 0 |
+| `"€35M or 7%…"` edited to `9%` | `penalties.json: content changed`, **exit 1** |
+
+The middle case is the one worth having: a check that fires on whitespace is a
+check people learn to bypass.
+
 ---
 
 ## 10 · The two normalisers are duplicated by hand with no equality test
@@ -749,6 +790,42 @@ identical output across the normalisation cases already in `rulepack.test.ts`
 (the smart-quote, dash, non-breaking-space and case-preservation cases). The
 script's copy can be exported from the `.mjs` for the test to import without
 disturbing its no-imports property.
+
+### Resolution — 16 August 2026
+
+Fixed. The normaliser moved out of `rulepack-check.mjs` into a side-effect-free
+`scripts/rulepack-normalise.mjs` — necessary because the check script does its
+work at import time and would otherwise call `process.exit()` inside the test
+run. It stays plain `.mjs`, so the "no imports from src/ before the TypeScript
+build" property is untouched.
+
+`src/lib/rulepack/normalise.test.ts` imports both and asserts they agree:
+
+- **24 typographic cases**, one per fold the normaliser performs — each
+  whitespace variant, the soft and non-breaking hyphens, all ten quote forms, the
+  dashes, the ellipsis — plus the traps around them: empty input, whitespace
+  only, combining accents, and one string containing all of it at once;
+- **every corpus file in every live pack** — 19 files today. Synthetic cases only
+  prove the folds someone thought to write down; the corpus is the text the
+  hashes are actually computed over;
+- that both declare the same `NORMALISATION_VERSION`, and that each pack's
+  manifest records that same string — otherwise the manifest is a lie about
+  which normalisation its stored hashes mean.
+
+**Verified by breaking it deliberately.** Deleting the em-dash fold from the
+build-time copy failed three cases (`en dash`, `em dash`, `everything at once`).
+Worth noting what that exercise showed: the 19 corpus-file comparisons did *not*
+fail, because the corpus happens to contain no en or em dashes. The synthetic
+battery caught a divergence the real data would have missed, which is the
+argument for having both rather than either.
+
+Extraction was proved behaviour-preserving before anything else changed: the
+manifest's 19 corpus hashes are byte-identical before and after.
+
+One honest note on the new module: its character classes hold literal glyphs,
+matching the TypeScript. Several — soft hyphen, zero-width space, the BOM — are
+invisible in a diff, so each class carries its code points in the comment beside
+it. The comment is a courtesy; the equality test is the guarantee.
 
 ---
 
@@ -897,8 +974,8 @@ Worth recording, so the fixes above are read in proportion.
 4. ~~**Findings 6 and 12** — richer, dated source context.~~ **Done, 16 Aug 2026.**
 5. ~~**Finding 4** — the quotation audit.~~ **Done, 16 Aug 2026.**
 6. ~~**Findings 7 and 8**~~ **Done, 16 Aug 2026.**
-7. Remaining: **9** and **10** harden the rule pack's own guarantees (hash the
-   whole pack, not just the corpus text; test that the two normalisers agree);
-   **11** puts the index-shape checks on a schedule; **13** and **14** are
-   source-quality and Inoreader wiring. None is load-bearing on a published
-   fact today, which is why they sit below the line.
+7. ~~**Findings 9 and 10**~~ **Done, 16 Aug 2026.**
+8. Remaining: **11** puts the index-shape checks on a schedule; **13** adds
+   source-quality controls to web search; **14** is the Inoreader wiring and its
+   silent token expiry. None is load-bearing on a published fact today, which is
+   why they sit below the line.

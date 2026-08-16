@@ -464,6 +464,51 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 16, 2026 — the whole rule pack is hashed, and the two normalisers are held together
+
+**Finding 9.** `rulepack-check.mjs` hashed only `corpus/*.txt`. `rules.json`,
+`penalties.json`, `timeline.json` and `sources.json` were unhashed — so
+"€35M or 7% of total worldwide annual turnover", every implementation date and
+every Article anchor could be edited with **no build failure and no version
+bump**, on data CLAUDE.md explicitly calls a legal claim.
+
+The manifest now carries a second map, `files`, beside `corpus`. Separate on
+purpose: statute text moving invalidates every citation ever verified against
+it, a changed rule invalidates a classification — both stop the build, but the
+message says which. Files are **discovered**, not listed, so a new pack file is
+covered the day it appears; a pack with data files but no `files` map fails
+rather than passing silently.
+
+**Hashed by content, not bytes** — parse, sort object keys recursively,
+re-stringify; array order preserved because the penalty tiers are ordered. So a
+prettier run does not fail the build and an edited figure does. Verified by
+breaking it: untouched → pass; reformatted to 4-space indent → still pass;
+`7%` → `9%` → **`penalties.json: content changed`, exit 1**. The middle case is
+the one worth having — a check that fires on whitespace is one people learn to
+bypass.
+
+**Finding 10.** The normaliser existed twice — `src/lib/rulepack/normalise.ts`
+and inline in the build script — with nothing asserting they agree. Drift would
+mean the build gate and the runtime verifier computing different hashes for the
+same text, so a citation verifies at build and fails at runtime with the symptom
+nowhere near the cause.
+
+Extracted to a side-effect-free `scripts/rulepack-normalise.mjs` (the check
+script does its work at import time and would otherwise `process.exit()` inside
+the test run); still plain `.mjs`, so the no-imports-from-src property holds.
+`src/lib/rulepack/normalise.test.ts` now asserts equality across **24 typographic
+cases** (one per fold, plus empty/whitespace/combining-accent traps), **every
+corpus file in every pack** (19), and that both declare the same
+`NORMALISATION_VERSION` which each manifest also records.
+
+Verified by breaking it: deleting the em-dash fold from the build copy failed 3
+cases. Worth knowing — **the 19 corpus comparisons did not fail**, because the
+corpus contains no en/em dashes. The synthetic battery caught what the real data
+would have missed, which is the argument for having both.
+
+Extraction proved behaviour-preserving first: the 19 corpus hashes are
+byte-identical before and after. Suite now 395.
+
 ### August 16, 2026 — the fact-check starts itself, and prior coverage gets a measured floor
 
 **Finding 7.** A Signal or Deep Dive now starts its fact-check automatically the

@@ -31,5 +31,11 @@
     "101": "d0eabf47387c8221eaa3d08f68425911d7ae619bde5046c22ddf1762672a6ec2",
     "111": "b983e07e9fb3f3ebb999a78efdbfcb3e3f8411e6b1028540ecd8c9b484c48f86",
     "113": "9f08310801e72bb4975974f53098d04a4c2fb0d9b05d3f0259a656eee1dfc519"
+  },
+  "files": {
+    "penalties.json": "6aed52fc92b728412c219ee6ac43c6decb669df659c8300b4734e01541694daf",
+    "rules.json": "1bd00fd547b633e77caa3a043fb8ef3cc8d938a07b5be4179b9fdd778e90154e",
+    "sources.json": "e1a825d382fe31dc1620c464850f9d11f70e4a9c571483efc5ff8c6470bb408b",
+    "timeline.json": "b88ecca79c238abb659883c002f059ec2c531cff3eec6a1ab5a9aafd2724eb18"
   }
 }

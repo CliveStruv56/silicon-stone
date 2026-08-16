@@ -617,6 +617,17 @@ The pack also requires the report to state **what was not asked** — the sectio
 most likely to be quietly dropped, because it is the one that makes the report
 look less complete than it reads. A report missing it is rejected.
 
+**The pack cannot change without its version changing.** The build hashes both
+halves of it: the verbatim Article text, and the data files carrying the penalty
+ceilings, implementation dates and Article anchors. Editing a figure without
+bumping the version stops the build. The data files are hashed by content rather
+than by bytes — reformatting is not a change, an edited figure is — and the two
+implementations of the text normaliser, one in the build script and one in the
+runtime verifier, are held together by a test that compares them across every
+corpus file and every typographic fold. If they drifted, a citation could verify
+at build time and fail at runtime with the symptom appearing nowhere near the
+cause.
+
 **The two lanes are kept apart by a build check.** The editorial regulatory
 corpus is never an authority for anything the Compliance Checker displays. A CI
 check fails the build if any file under the Compliance Checker's directories so
@@ -683,7 +694,7 @@ Every check in the system, what it asserts, and what it stops.
 
 | Check | Asserts | Blocks |
 |---|---|---|
-| `rulepack-check` | Every pinned Article's text still hashes to the manifest value | **Build** |
+| `rulepack-check` | Every pinned Article's text, and every figure, date and Article anchor in the pack's data files, still hashes to the manifest | **Build** |
 | `reg:check` | Corpus text unchanged; review not lapsed; changelog written; AI Act vintage matches the rule pack | **Build** |
 | `gen:style` | House style and AI-tells rules exist and are non-empty before being compiled into the prompt | **Build** |
 | `test:regulatory-index` | Lane separation; citation header inside every embedded chunk; no recitals; no chunk spans two Articles; the prompt still forbids quoting from memory; no silent failure handlers in the retrieval path | **CI** |
