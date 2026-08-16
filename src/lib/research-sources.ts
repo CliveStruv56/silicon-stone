@@ -18,7 +18,16 @@ import type { ResearchSource } from '@/types/research'
 /** A gathered source, numbered so the model can refer to it without retyping it. */
 export type SourceCandidate = ResearchSource & { index: number }
 
-export const SNIPPET_CHARS = 300
+/**
+ * Per-source evidence budget. Eight sources at this size is ~10KB, small beside
+ * a 30KB deep report and far more useful than the 300 characters this used to
+ * be — on a news page the first 300 characters are the standfirst and byline,
+ * not the substance. Matches the fact-check's own budget for the same reason.
+ */
+export const SOURCE_SNIPPET_CHARS = 1_200
+
+/** Prose kept either side of a URL found in an agentic report. */
+export const REPORT_CONTEXT_CHARS = 300
 
 /** Most sources one synthesis may cite. Well above any real search. */
 export const MAX_SELECTED_SOURCES = 24
@@ -28,14 +37,48 @@ export type ExaResultLike = {
   title?: string | null
   url: string
   text?: string
+  highlights?: string[]
+  publishedDate?: string
 }
 
+/**
+ * Highlights first, then body text.
+ *
+ * The search is asked for highlights — the sentences it judged most relevant to
+ * the query — and they were being requested and then thrown away, while the
+ * model got the opening 300 characters of the page instead. Leading with them
+ * puts the passage that actually matched the query in front of the writer.
+ */
 export function exaToSources(results: ExaResultLike[]): ResearchSource[] {
-  return results.map((r) => ({
-    title: r.title ?? '',
-    url: r.url,
-    snippet: r.text ? r.text.substring(0, SNIPPET_CHARS) : '',
-  }))
+  return results.map((r) => {
+    const snippet = [...(r.highlights ?? []), r.text ?? '']
+      .map((part) => part.trim())
+      .filter(Boolean)
+      .join('\n')
+      .slice(0, SOURCE_SNIPPET_CHARS)
+
+    return {
+      title: r.title ?? '',
+      url: r.url,
+      snippet,
+      ...(r.publishedDate ? { publishedDate: r.publishedDate } : {}),
+    }
+  })
+}
+
+/**
+ * Presentation only — the stored value stays exactly as the search reported it.
+ *
+ * Exa returns midnight timestamps (`2026-07-02T00:00:00.000Z`), and a wall of
+ * those is noise in a prompt. Trimming a zero time component off a full ISO
+ * string is safe; anything in another shape is passed through untouched rather
+ * than parsed, because guessing at a date format is how a wrong date gets
+ * printed with confidence.
+ */
+export function formatSourceDate(value?: string): string {
+  if (!value?.trim()) return 'date unknown'
+  const iso = /^(\d{4}-\d{2}-\d{2})T[0-9:.]+Z?$/.exec(value.trim())
+  return iso ? iso[1] : value.trim()
 }
 
 /**
@@ -61,6 +104,7 @@ export function registerSources(
       title: source.title?.trim() ?? '',
       url,
       snippet: source.snippet?.trim() ?? '',
+      ...(source.publishedDate ? { publishedDate: source.publishedDate } : {}),
       index: catalogue.length + 1,
     }
     if (!existing) catalogue.push(entry)
@@ -68,6 +112,7 @@ export function registerSources(
     blocks.push(
       `[S${entry.index}] ${entry.title || '(untitled)'}\n` +
         `URL: ${entry.url}\n` +
+        `Published: ${formatSourceDate(entry.publishedDate)}\n` +
         `Snippet: ${entry.snippet || 'No content available.'}`,
     )
   }
@@ -108,12 +153,14 @@ export function extractReportSources(report: string): ResearchSource[] {
     const at = match.index ?? 0
     const context =
       report
-        .slice(Math.max(0, at - SNIPPET_CHARS), at)
+        .slice(Math.max(0, at - REPORT_CONTEXT_CHARS), at)
         .split(/\n{2,}/)
         .pop()
         ?.trim() ?? ''
 
-    sources.push({ title: host, url, snippet: context.slice(-SNIPPET_CHARS) })
+    // No publishedDate: an inline link in prose carries no date, and deriving
+    // one from the surrounding sentence would be a guess dressed as metadata.
+    sources.push({ title: host, url, snippet: context.slice(-REPORT_CONTEXT_CHARS) })
   }
 
   return sources
@@ -146,10 +193,16 @@ export function selectSources(
   // Logged like the retrieval lanes' notes: a fallback that never surfaced
   // would look identical to a working selection, and the difference is whether
   // the model is editing the source list or the code is shipping all of it.
+  const dated = chosen.filter((c) => c.publishedDate).length
   console.info(
-    `[research] sources gathered=${catalogue.length} selected=${picked.length}` +
+    `[research] sources gathered=${catalogue.length} selected=${picked.length} dated=${dated}` +
       (picked.length === 0 && catalogue.length > 0 ? ' (fell back to all)' : ''),
   )
 
-  return chosen.map(({ title, url, snippet }) => ({ title, url, snippet }))
+  return chosen.map(({ title, url, snippet, publishedDate }) => ({
+    title,
+    url,
+    snippet,
+    ...(publishedDate ? { publishedDate } : {}),
+  }))
 }

@@ -8,7 +8,7 @@ import {
     extractReportSources,
     registerSources,
     selectSources,
-    SNIPPET_CHARS,
+    SOURCE_SNIPPET_CHARS,
     type SourceCandidate,
 } from "@/lib/research-sources";
 
@@ -86,7 +86,11 @@ export async function performResearch(
                         url: item.canonical?.[0]?.href || '',
                         snippet: (item.summary?.content || '')
                             .replace(/<[^>]*>/g, '')
-                            .substring(0, SNIPPET_CHARS),
+                            .substring(0, SOURCE_SNIPPET_CHARS),
+                        // Inoreader publishes a unix timestamp in seconds.
+                        ...(item.published
+                            ? { publishedDate: new Date(item.published * 1000).toISOString().slice(0, 10) }
+                            : {}),
                     })),
                 );
                 searchContext += `\n--- INOREADER RESULTS ---\n${rendered}\n`;

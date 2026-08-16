@@ -4,6 +4,7 @@ import { callClaude } from "./anthropic";
 import { logErrorToFile } from "./debug";
 import type { VoiceDNA } from "@/types/context";
 import { AMOUNTS, gbp } from "./offering";
+import { formatSourceDate } from "./research-sources";
 
 /**
  * The five canonical Silicon & Stone draft formats. `research` is a separate
@@ -24,7 +25,11 @@ function fenceUntrusted(text: string): string {
 
 export interface DraftResearch {
     summary: string;
-    sources: { title: string; url: string; snippet: string }[];
+    /**
+     * `publishedDate` is optional because an agentic report's inline links carry
+     * no date — it renders as "date unknown" rather than being inferred.
+     */
+    sources: { title: string; url: string; snippet: string; publishedDate?: string }[];
     painPoints: string[];
     keywords: string[];
 }
@@ -129,7 +134,17 @@ The full piece in markdown, following the structure in the task`;
 ${fenceUntrusted(research.summary)}
 
 === SOURCES ===
-${research.sources.map((s) => `- ${fenceUntrusted(s.title)}: ${fenceUntrusted(s.snippet)} (${s.url})`).join('\n')}
+Each source carries the date the publisher gave it, or "date unknown". Weigh
+recency: a source predating the most recent development in the research may
+describe a position that has since moved. When a claim turns on timing, say when
+it was reported. Never present an older source's position as the current one,
+and never infer a date for a source marked "date unknown".
+${research.sources
+        .map(
+            (s) =>
+                `- [${formatSourceDate(s.publishedDate)}] ${fenceUntrusted(s.title)}: ${fenceUntrusted(s.snippet)} (${s.url})`,
+        )
+        .join('\n')}
 
 === PAIN POINTS & KEYWORDS ===
 ${[...research.painPoints, ...research.keywords].join(', ')}

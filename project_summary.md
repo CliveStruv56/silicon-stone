@@ -464,6 +464,48 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 16, 2026 — sources reach the writer dated, and four times as substantial
+
+**Findings 6 and 12 fixed together**, both one change to `exaToSources` now the
+catalogue from finding 5 exists.
+
+**Dates.** `ResearchSource` gains an optional `publishedDate`, carried through
+the catalogue and selection into the drafting prompt, which renders each source
+as `- [2026-08-14] Title: snippet (url)`. New `formatSourceDate()` trims a
+zero-time ISO timestamp to the date **for display only** — the stored value stays
+as the search reported it, and any other shape passes through unparsed, because
+guessing at a date format is how a wrong date gets printed with confidence.
+Inoreader's unix timestamp is converted at the mapping point. The prompt now
+tells the writer to weigh recency, to say when a claim turns on timing, never to
+present an older source's position as current, and never to infer a date for a
+source marked `date unknown` (which is what agentic-report links get, since an
+inline link carries no date).
+
+**Highlights.** The snippet is built highlights-first then body text, to
+`SOURCE_SNIPPET_CHARS = 1200` — the fact-check's own budget. Exa's highlights
+were being requested and thrown away while the model got the opening 300
+characters of the page.
+
+**Verified live** on "EU Cyber Resilience Act obligations for manufacturers":
+`gathered=8 selected=8 dated=8`, mean snippet 1,200 chars against 300, and the
+block now leads with the substance —
+
+> `- [2026-08-14] Organisations must prepare for mandatory 24-hour reporting
+> under EU Cyber Resilience Act: ## From 11 September, digital product
+> manufacturers must notify authorities of any actively exploited
+> vulnerabilities … or face fines of up to €15 million or 2.5% of turnover.`
+
+The 11 September date and the €15m ceiling are exactly the specifics house style
+demands; under the old cap the model received the standfirst and byline.
+
+`scripts/local-draft/pipeline.ts` now imports `exaToSources` instead of mapping
+results itself — otherwise a local draft would have been written from
+300-character undated snippets while the site's used 1,200-character dated ones.
+A test asserts it does not re-implement the mapping. 12 further tests (suite now
+302), two of which read `prompts.ts` to assert the date reaches the writer **and**
+that the recency instruction is still there: a date rendered without an
+instruction is decoration.
+
 ### August 16, 2026 — the model stops handling source URLs
 
 **Finding 5 fixed.** `synthesizeContext` used to ask Claude for a `sources`

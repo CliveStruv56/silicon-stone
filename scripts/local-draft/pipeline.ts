@@ -33,11 +33,16 @@ interface ExaLite {
   title?: string | null
   url: string
   text?: string
+  highlights?: string[]
+  publishedDate?: string
 }
 
 interface ResearchData {
   summary?: string
-  sources?: { title: string; url: string; snippet: string }[]
+  // publishedDate must survive the round trip through the JSON the research
+  // subcommand prints, or the local draft prompt loses the dates the website's
+  // has and the two paths write from different evidence.
+  sources?: { title: string; url: string; snippet: string; publishedDate?: string }[]
   painPoints?: string[]
   keywords?: string[]
   deepReport?: string
@@ -152,11 +157,12 @@ async function cmdResearch(flags: Flags): Promise<void> {
     }
   }
 
-  const sources = raw.map((r) => ({
-    title: r.title ?? '',
-    url: r.url,
-    snippet: typeof r.text === 'string' ? r.text.slice(0, 300) : '',
-  }))
+  // Shared with the website path rather than re-mapped here: this pair of call
+  // sites had already drifted once, and the snippet budget, the
+  // highlights-before-text order and the publication date all have to match or
+  // the local draft is written from thinner evidence than the site's.
+  const { exaToSources } = await import('../../src/lib/research-sources')
+  const sources = exaToSources(raw)
 
   process.stdout.write(`${JSON.stringify({ topic, deep, sources, deepReport }, null, 2)}\n`)
 }

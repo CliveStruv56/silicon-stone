@@ -20,13 +20,13 @@ system, not inferred from reading it.
 | 3 | Nothing prevents publishing despite a "major issues" fact-check verdict | ~~High~~ **Fixed 16 Aug 2026** |
 | 4 | Quotations in articles are never mechanically verified | **High** |
 | 5 | Source URLs and titles are re-emitted by the model, not passed through | ~~High~~ **Fixed 16 Aug 2026** |
-| 6 | Publication dates are discarded before drafting | **Medium-High** |
+| 6 | Publication dates are discarded before drafting | ~~Medium-High~~ **Fixed 16 Aug 2026** |
 | 7 | The fact-check never runs automatically, and Deep Dives are least protected | **Medium-High** |
 | 8 | Prior-coverage retrieval has no score floor | **Medium** |
 | 9 | Only the rule pack's corpus text is hashed, not its rules or penalties | **Medium** |
 | 10 | The two normalisers are duplicated by hand with no equality test | **Medium** |
 | 11 | Index shape verification never runs in CI | **Medium** |
-| 12 | Only 300 characters of each source reach the model; highlights are discarded | **Medium** |
+| 12 | Only 300 characters of each source reach the model; highlights are discarded | ~~Medium~~ **Fixed 16 Aug 2026** |
 | 13 | No source-quality controls on web search | **Medium** |
 | 14 | Inoreader is disconnected from the main authoring path and cannot refresh its token | **Low-Medium** |
 
@@ -412,6 +412,63 @@ and add one line to the drafting instruction telling the model to weigh recency
 and to state the date of any source it relies on for a time-sensitive claim. Two
 lines of code.
 
+### Resolution — 16 August 2026 (findings 6 and 12 together)
+
+Both were one change to `exaToSources`, as expected once the catalogue from
+finding 5 existed.
+
+**Dates (6).** `ResearchSource` gains an optional `publishedDate`, captured from
+the search and carried through the catalogue, the selection and into the
+drafting prompt, which now renders every source as
+`- [2026-08-14] Title: snippet (url)`. A new `formatSourceDate()` trims a
+zero-time ISO timestamp (`2026-07-02T00:00:00.000Z`) to the date for display —
+presentation only, the stored value stays exactly as the search reported it, and
+any other shape is passed through untouched rather than parsed, because guessing
+at a date format is how a wrong date gets printed with confidence. Inoreader's
+unix timestamp is converted at the point of mapping.
+
+The prompt says what to do with them:
+
+> Weigh recency: a source predating the most recent development in the research
+> may describe a position that has since moved. When a claim turns on timing, say
+> when it was reported. Never present an older source's position as the current
+> one, and never infer a date for a source marked "date unknown".
+
+Agentic report links carry no date and render as `date unknown`; deriving one
+from the surrounding sentence would be a guess dressed as metadata.
+
+**Highlights (12).** The snippet is now built highlights-first, then body text,
+to `SOURCE_SNIPPET_CHARS = 1200` — matching the fact-check's own budget for the
+same reason. Eight sources at that size is ~10 KB, small beside a 30 KB deep
+report.
+
+**Verified live** on *"EU Cyber Resilience Act obligations for manufacturers"*:
+`gathered=8 selected=8 dated=8`, mean snippet 1,200 characters against the
+previous 300, and the rendered block leads with the highlight rather than the
+page furniture:
+
+> `- [2026-08-14] Organisations must prepare for mandatory 24-hour reporting under
+> EU Cyber Resilience Act: ## From 11 September, digital product manufacturers
+> must notify authorities of any actively exploited vulnerabilities or severe
+> incidents impacting their products or face fines of up to €15 million or 2.5%
+> of turnover.`
+
+That is the whole argument for finding 12 in one line. The 11 September date and
+the €15 million ceiling are exactly the specifics house style demands; under the
+old 300-character cap the model received the standfirst and byline instead.
+
+**`scripts/local-draft/pipeline.ts` now imports `exaToSources`** rather than
+mapping Exa results itself. The two call sites had already drifted once, and
+after this change a local draft would otherwise have been written from 300-character
+undated snippets while the site's used 1,200-character dated ones. A test asserts
+the local path does not re-implement the mapping.
+
+12 further tests (suite now 302), including that highlights lead but do not
+replace the body text, that `publishedDate` is omitted rather than invented, and
+two that read `prompts.ts` to assert the date reaches the writer *and* that the
+recency instruction is still there — a date rendered without an instruction is
+decoration.
+
 ---
 
 ## 7 · The fact-check never runs automatically, and Deep Dives are least protected
@@ -561,6 +618,8 @@ path does not.
 `formatExaResults`: highlights first, then text, to a larger budget. Eight results
 at 1,200 characters is roughly 10 KB, which is small beside a 30 KB deep report.
 
+**Fixed 16 August 2026** — see the joint resolution under finding 6.
+
 ---
 
 ## 13 · No source-quality controls on web search
@@ -654,8 +713,7 @@ Worth recording, so the fixes above are read in proportion.
 2. ~~**Findings 2 and 3** — the publish-action wrapper.~~ **Done, 16 Aug 2026.**
    The two largest editorial obligations are now mechanical.
 3. ~~**Finding 5** — pass sources through in code.~~ **Done, 16 Aug 2026.**
-4. **Findings 6 and 12** — richer, dated source context. Now a small change to
-   `exaToSources` and one prompt line, since the catalogue plumbing exists.
+4. ~~**Findings 6 and 12** — richer, dated source context.~~ **Done, 16 Aug 2026.**
 5. **Finding 4** — the quotation audit. The most valuable of the larger pieces of
-   work.
-6. Everything else as capacity allows.
+   work, and now the highest-severity item outstanding.
+6. Everything else as capacity allows — findings 7, 8, 9, 10, 11, 13 and 14.

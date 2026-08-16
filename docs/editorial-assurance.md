@@ -112,6 +112,19 @@ de-duplication in the ingestion path.
 `livecrawl: "fallback"` matters for accuracy: where Exa's index copy of a page
 is stale, it fetches the live page rather than serving the cached one.
 
+**What reaches the writer from each result.** The three sentences the search
+judged most relevant to the query, then the body text, to a cap of 1,200
+characters — the same budget the fact-check uses. Leading with the matched
+passage rather than the opening of the page matters more than it sounds: on a
+news article the first few hundred characters are the standfirst and byline, not
+the substance.
+
+Each source also carries the publication date the publisher gave it, rendered
+beside it in the drafting prompt, with an instruction to weigh recency, to say
+when a claim turns on timing, and never to present an older source's position as
+the current one. Where a source has no date it is marked "date unknown" and the
+model is told not to infer one.
+
 ### The Exa Agent — Deep Dive research
 
 Deep Dives use a different mechanism: an agentic, multi-step research run
@@ -684,18 +697,22 @@ editorial lane, the corresponding control is a prompt instruction plus human
 review. This is the largest single gap between the two lanes, and it is the
 principal recommendation in the internal findings memo.
 
+**Prior-coverage retrieval has no relevance threshold.** The statutory lane
+drops weak matches below a measured score floor; the lane that surfaces this
+publication's own back catalogue does not, so a draft always receives up to five
+"related" articles whether or not any are related. Recorded in the findings memo.
+
 **Retrieval degrades quietly by design.** If a vector store is unreachable, the
 draft is generated without that context rather than failing. Every such event is
 recorded in the run notes and logged, and a CI check forbids silent failure
 handlers in the retrieval path — but the resulting draft is thinner without
 saying so on its face.
 
-**Publication dates are not carried into the drafting context.** The search
-returns them, and the fact-check uses them, but the drafting prompt does not
-receive them — so the model cannot weigh a 2019 source against a 2026 one while
-house style asks for exact dates. Recorded in the findings memo. (Source titles
-and URLs were on this list until 16 August 2026; they are now passed through in
-code — see §5.)
+**Source titles, URLs and dates were all lossy until 16 August 2026.** Titles and
+URLs are now passed through in code (§5), and each source carries its
+publication date with an instruction to weigh recency (§4). What remains is that
+the corpus of *published articles* used for prior coverage has no relevance
+threshold — see the next point.
 
 ---
 
