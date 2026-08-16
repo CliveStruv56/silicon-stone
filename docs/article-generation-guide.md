@@ -74,9 +74,16 @@ It reports back the draft ID and the Studio link.
 Open siliconandstone.com/studio → **Article**. Find your new draft.
 - Read it. Resolve any **`[AUTHOR: …]`** placeholders — these are specifics the
   system refused to invent (a figure, a primary-source link). Fill them in or
-  delete the sentence.
+  delete the sentence. **Publishing is blocked until none remain.**
+- Read the **Quotation Audit** panel if the piece quotes statute: `UNMATCHED`
+  means the quotation is not in the legal text the model was given, and needs
+  checking against the primary source.
+- Check the **Fact Check** panel. A Signal or Deep Dive generated from `/create`
+  starts one automatically; a locally drafted piece does not, so run it by hand
+  from the **Run fact-check** action.
 - Check the Stone Truth line, categories, persona and intelligence tier.
-- When happy, **Publish** in Studio.
+- When happy, **Publish** in Studio. The guard will ask you to confirm anything
+  still outstanding.
 
 ### Worked examples (copy, change the topic)
 

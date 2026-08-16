@@ -58,14 +58,14 @@ memory.
 Six production paths exist. They are not equally assured, and the differences
 are deliberate.
 
-| Type | Length | Research pass | Voice pass | Fact-check claim cap |
-|---|---|---|---|---|
-| **Pulse** | 100–140 words | Exa web search | Full rewrite | 8 |
-| **Signal** | 800–1,500 words | Exa web search | Full rewrite | 12 |
-| **Deep Dive** | 3,000–6,000 words | Exa Agent, multi-step | **Audit only** | 18 |
-| **Guide** | 500–2,000 words | Exa web search | Full rewrite | 12 |
-| **YouTube Script** | Variable | Exa web search | Full rewrite | 12 |
-| **Import** (`/import`) | As supplied | None — the source is supplied | Full rewrite | 12 |
+| Type | Length | Research pass | Voice pass | Fact-check | Claim cap |
+|---|---|---|---|---|---|
+| **Pulse** | 100–140 words | Exa web search | Full rewrite | On request | 8 |
+| **Signal** | 800–1,500 words | Exa web search | Full rewrite | **Automatic** | 12 |
+| **Deep Dive** | 3,000–6,000 words | Exa Agent, multi-step | **Audit only** | **Automatic** | 18 |
+| **Guide** | 500–2,000 words | Exa web search | Full rewrite | On request | 12 |
+| **YouTube Script** | Variable | Exa web search | Full rewrite | On request | 12 |
+| **Import** (`/import`) | As supplied | None — the source is supplied | Full rewrite | On request | 12 |
 
 Two asymmetries are worth stating openly.
 
@@ -270,8 +270,8 @@ in this system.
 
 All vector indexes are 1,024-dimensional, cosine, dense, and hold vectors this
 application generated with OpenAI `text-embedding-3-small`. What comes back is
-filtered before it reaches the model: the regulatory lane applies routing and
-score floors (below); retrieval failures degrade the draft rather than
+filtered before it reaches the model: both lanes apply score floors and the
+regulatory lane routes by instrument as well (below); retrieval failures degrade the draft rather than
 publishing anything unchecked; and nothing retrieved is ever published without
 passing through the same drafting constraints (§7) and human review (§8) as any
 other input.

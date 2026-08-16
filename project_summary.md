@@ -464,6 +464,36 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 16, 2026 — the documentation caught up with the day's five commits
+
+Eight documents described a pipeline that had changed underneath them. The sweep
+brought them back in line and, where two documents covered the same ground, gave
+one of them the authority and pointed the other at it rather than restating a
+number that would drift.
+
+- **`docs/editorial-assurance.md`** — the article-type table now carries a
+  **Fact-check** column (Automatic for Signal and Deep Dive, on request for the
+  rest), because "which formats check themselves" had become a property of the
+  system that the table silently omitted.
+- **`docs/admin-research-workflow.md`** — the prior-coverage floor, the fact that
+  the source list is now rebuilt in code rather than generated, what each source
+  carries into the draft (highlights to 1,200 chars, publication date), and a
+  corrected file pointer: the retrieval snippet lives in `draft-retrieval.ts`,
+  not in the `create` action that calls it.
+- **`docs/authoring-guide.md`, `docs/article-generation-guide.md`, `README.md`**
+  — the editor-facing account of publishing: the guard *blocks* on an unresolved
+  `[AUTHOR: …]` placeholder and *asks* on a missing or adverse fact-check, an
+  unmatched quotation, or an empty sources list.
+- **`.agent/skills/ss-draft-local/SKILL.md`** — states what the local path does
+  **not** get. `save` skips `finalizeDraft`, so no quotation audit and no
+  automatic fact-check run there; the skill now says so and tells the operator to
+  run the check by hand.
+- **`docs/editorial-aios-manual.md`** — one paragraph noting that retrieved
+  results are filtered before a model sees them, deferring to
+  `editorial-assurance.md` §6 for the thresholds instead of copying them.
+
+The published artifact of `editorial-assurance.md` was redeployed to the same URL.
+
 ### August 16, 2026 — the whole rule pack is hashed, and the two normalisers are held together
 
 **Finding 9.** `rulepack-check.mjs` hashed only `corpus/*.txt`. `rules.json`,

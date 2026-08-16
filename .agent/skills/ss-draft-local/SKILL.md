@@ -49,7 +49,14 @@ npm run draft:local -- research --topic "<topic>" --deep    # deep_dive (Exa Res
 ```
 
 Save the JSON it prints to `.local-draft/raw-research.json`. It contains
-`{ topic, deep, sources: [{title,url,snippet}], deepReport }`.
+`{ topic, deep, sources: [{title,url,snippet,publishedDate?}], deepReport }`.
+
+The `sources` are built by the same `exaToSources()` the website uses, so the
+snippets lead with the search's own highlights and run to 1,200 characters, and
+each carries its publication date where the search reported one. **Pass
+`publishedDate` through** — the draft prompt renders it beside each source and
+instructs on recency, and dropping it here means the local draft is written from
+undated evidence while the site's is not.
 
 ## Step 2 — Synthesise (YOU are the model)
 
@@ -65,7 +72,7 @@ For a deep dive, mine `deepReport` (it carries inline sources) as well as the
   "brief": "<brief or omit>",
   "research": {
     "summary": "2–3 sentence forensic summary of the situation.",
-    "sources": [ /* pass through (or refine from deepReport): {title,url,snippet} */ ],
+    "sources": [ /* pass through, keeping publishedDate: {title,url,snippet,publishedDate?} */ ],
     "painPoints": ["specific ICP anxiety", "..."],
     "keywords": ["term", "..."],
     "deepReport": "<verbatim deepReport if present, else omit>"
@@ -162,6 +169,20 @@ npm run draft:local -- save --in .local-draft/save.json
 The CLI converts the markdown body to Portable Text and writes a **draft**
 `article` document (it does not publish). Report the Studio link it prints so the
 user can review and publish.
+
+### What this path does NOT get
+
+`save` writes to Sanity directly and skips `finalizeDraft`, so two checks the
+website's `/create` runs do not happen here:
+
+- **no quotation audit** — nothing string-matches statutory quotations in the
+  body against the text they should have come from;
+- **no automatic fact-check** — `/create` starts one for Signals and Deep Dives;
+  this path does not.
+
+Tell the user so, and suggest running **Run fact-check** from the Studio document
+action once the draft lands. The publish guard still applies: an unresolved
+`[AUTHOR: …]` placeholder blocks publishing wherever the draft came from.
 
 ## Notes / caveats
 

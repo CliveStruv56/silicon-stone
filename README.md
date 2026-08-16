@@ -43,7 +43,11 @@ The main end-to-end content workflow is `/create`:
    draft prompt (Pass 1) plus a voice-edit pass (Pass 3) that strips AI tells, enforces
    the style guide, and flags `[AUTHOR: …]` specifics in a **Voice Edit Notes** field.
    Deep Dives get an audit-only pass (notes, no full rewrite).
-5. Review and publish in `/studio` — resolve every `[AUTHOR: …]` placeholder first.
+5. Review and publish in `/studio`. Publishing is **blocked** until every
+   `[AUTHOR: …]` placeholder is resolved, and asks for confirmation on a missing
+   or adverse fact-check, an unmatched statutory quotation, or an empty Sources
+   list. Signals and Deep Dives start their fact-check automatically on save.
+   See `docs/editorial-assurance.md` for what each check promises.
 
 `/generate` has been **removed** and merged into `/create`; every draft is now
 research-backed. For intel without a draft, use **Research Only**. The house-style

@@ -74,6 +74,12 @@ There are three separate uses, one index each — they never share storage:
 
 Pinecone is not the final knowledge store. It is a search layer.
 
+What comes back is filtered before it reaches a drafting model — the article lane
+applies a relevance floor, the regulatory lane routes by instrument and applies
+its own — so a search returning results is not the same as a draft receiving
+them. `docs/editorial-assurance.md` §6 is the authority on that; do not restate
+the thresholds here or the two will drift.
+
 ## The `/knowledge` Page
 
 The `/knowledge` page is the main operational screen for the new system.

@@ -21,15 +21,31 @@ React 19 bundle. Do NOT run a blind `npm update` / `npm install <pkg>@latest`:
 The Compliance Checker's legal payload lives in `rulepack/versions/<version>/`,
 not in TypeScript constants. Two rules:
 
-- **Never edit a corpus file without bumping the pack version.** `prebuild` runs
+- **Never edit ANY pack file without bumping the pack version.** `prebuild` runs
   `scripts/rulepack-check.mjs`, which exits 1 on any hash drift — that is
-  deliberate. Corpus text and pack version move together, or every citation
-  previously verified against that text is silently invalidated. Intentional
-  change: bump the version directory, then `npm run rulepack:hash`.
+  deliberate. Pack content and pack version move together, or every citation
+  previously verified against it is silently invalidated. Intentional change:
+  bump the version directory, then `npm run rulepack:hash`.
 - **Every figure in the pack is a legal claim.** Dates, penalty ceilings and
   Article anchors are traceable to the EUR-Lex consolidated text at CELEX
   `02024R1689-20260727`. Verify against that before changing one; do not take a
   date from a summary, a blog post, or a build spec.
+- **Both halves of the pack are hashed** (since 2026-08-16). `manifest.corpus`
+  covers `corpus/*.txt` — verbatim statute, folded through the legal-text
+  normaliser. `manifest.files` covers every other `.json` in the version
+  directory: `rules`, `penalties`, `timeline`, `sources`. Those were unhashed
+  until then, so a penalty ceiling could change with no build failure. The two
+  maps are separate so the error says which kind of drift happened. Data files
+  are hashed by *content* — parsed, object keys sorted, re-stringified — so
+  reformatting is not a change and an edited figure is. Files are discovered,
+  not listed: a new pack file is covered the day it appears.
+- **The normaliser exists twice and a test holds it together.**
+  `src/lib/rulepack/normalise.ts` is the runtime copy;
+  `scripts/rulepack-normalise.mjs` is the build-time mirror, plain `.mjs`
+  because `prebuild` runs before any TypeScript. `src/lib/rulepack/normalise.test.ts`
+  asserts they agree across every typographic fold and every corpus file. If
+  they drift, the build gate and the citation verifier compute different hashes
+  for the same text, and the symptom appears nowhere near the cause.
 
 Three invariants the tool promises on screen and must keep:
 
@@ -72,11 +88,28 @@ is the safety property.
   than a silent re-embed. To change it: `npm run reg:fetch -- --corpus <id>`,
   read the diff, then `npm run reg:hash` and write what you checked into the
   manifest `changelog`.
+- **Statutory text is fetched from the EU Publications Office ("Cellar"), not
+  from `eur-lex.europa.eu`.** Since 2026-08-16 the human web rendering sits
+  behind an AWS WAF bot challenge that answers automated clients with `HTTP 202`
+  and an empty body — and `response.ok` is TRUE for 202, which is how both fetch
+  paths once read a challenge page as an empty instrument. All upstream reads go
+  through `scripts/regulatory/source-fetch.ts`, which requires status `200`,
+  detects the `x-amzn-waf-action` header by name, and rejects a body too small
+  to be an instrument. The URL is derived from `meta.celex`, never from
+  `meta.sourceUrl`, so the text and the identifier claimed for it cannot
+  disagree. Cellar serves the same XHTML dialect, so `extract.ts` is unchanged.
 - Every chunk carries its citation header *inside* the embedded text, so a
   quotation can never reach the model separated from its locator.
-- This lane does **not** carry the Compliance Checker's "no unverified
-  quotation" guarantee. Drafts pass human review in Studio before publish; that
-  is the control.
+- **Quotations in drafts are audited** (since 2026-08-16). `src/lib/quotation-audit.ts`
+  string-matches every quotation the draft presents as statute against the
+  retrieved block the model was actually given, reusing `corpusContainsQuote()`.
+  The retrieved block is the right target because it is what the prompt's
+  promise refers to — "quote only from the passages below" — so a quotation
+  absent from it violates the instruction by definition. Results land on the
+  article's `quotationAudit` field and raise a publish-guard warning. This is
+  still weaker than the Compliance Checker's guarantee: it warns rather than
+  withholds, and it cannot verify a quotation from a provision retrieval never
+  returned. Human review in Studio remains the final control.
 - The index must have **no integrated `embed` config** — this app writes OpenAI
   vectors, and Pinecone's integrated text path would embed queries with a
   different model. `npm run reg:verify-index` asserts this against the live
@@ -109,13 +142,21 @@ trusting a change. `reg:ingest --probe` only measures raw vector similarity.
 
 ### Keeping it current
 
-`npm run reg:drift` asks EUR-Lex whether the law has moved. The non-obvious part
-is why it does not simply diff the text: every `sourceUrl` is pinned to one
-consolidation, so when an instrument is amended the pinned URL keeps returning
-the **old** text forever and hashes identically. A content-diff watcher would
-report "no drift" indefinitely while the law changed. The real check is *"does a
-newer consolidation exist than the one I pinned"*, read off the base act's
-EUR-Lex page; the hash comparison is only a tamper check on the pinned text.
+`npm run reg:drift` asks upstream whether the law has moved. The non-obvious part
+is why it does not simply diff the text: every instrument is pinned to one
+consolidation, so when it is amended the pinned CELEX keeps returning the **old**
+text forever and hashes identically. A content-diff watcher would report "no
+drift" indefinitely while the law changed. The real check is *"does a newer
+consolidation exist than the one I pinned"*, read off the base act's metadata
+notice; the hash comparison is only a tamper check on the pinned text.
+
+Two things it now does that it did not before 2026-08-16, both fixing a
+fail-**open**: it reads through `source-fetch.ts` (see above), and it treats "no
+consolidation found" as an `error` rather than `current` for any instrument
+pinned to a consolidated CELEX — such an instrument must at minimum discover its
+own version, so finding none proves the lookup broke rather than that nothing
+changed. Only the original-act instruments (Chips Act, Data Act) may legitimately
+return none.
 
 It runs weekly in `.github/workflows/regulatory-drift.yml` and opens (or
 comments on) an issue labelled `regulatory-drift`. The fail-closed backstop
@@ -148,6 +189,42 @@ published Sanity article in the default namespace, written by
 - Do not rename `getPineconeIndex()` or `searchSimilar` — `evidence-index-checks`
   (CI-blocking) and `regulatory-index-checks` grep for those literals, and a
   rename makes one assertion vacuously pass rather than fail.
+- **`PRIOR_COVERAGE_SCORE_FLOOR = 0.37`** (`src/lib/draft-retrieval.ts`), applied
+  per result and shared with the related-articles write-back in
+  `/api/vectorize`. Calibrated 2026-08-16 against the live index: on-topic
+  queries scored 0.421 / 0.533 / 0.687 on their best match, off-topic queries
+  topped out at 0.318. The floor is the midpoint. **Re-measure it as the back
+  catalogue grows** — it was calibrated against 15 articles, and a larger index
+  produces stronger matches across the board.
+- **Prior coverage embeds the topic alone**, while the regulatory lane composes
+  topic + brief + keywords + pain points. Do not "fix" that asymmetry: the
+  keywords come from the research pass and carry its news vocabulary, which is
+  the mirror image of why `retrieve.ts` excludes the research summary.
+
+## Draft-time editorial guards
+
+Three checks run on generated drafts. All are advisory by design — they inform a
+human, none blocks generation.
+
+- **Quotation audit** — see the regulatory-corpus section above. Writes
+  `quotationAudit` on the article.
+- **Auto fact-check** — a Signal or Deep Dive POSTs to `/api/fact-check` from
+  the browser once the draft is saved (`src/lib/auto-fact-check.ts` decides
+  which formats). Client-triggered on purpose: `/create` has `maxDuration = 300`
+  and has already spent most of it on five sequential model calls, so running a
+  90–180s check in the same invocation risks the function dying and leaving
+  `factCheck.status` stuck on `running`. The route already owns auth, the
+  10/hour limit, the re-entrancy guard and its own background run — do not
+  reimplement any of that at the call site.
+- **Publish guard** — `src/sanity/actions/publishPreflight.tsx` wraps Studio's
+  own publish action (wraps, never replaces, so the built-in validation and
+  disabled states survive). It **blocks** on an unresolved `[AUTHOR: …]`
+  placeholder and **warns** on a missing or adverse fact-check, an unmatched
+  quotation, or an empty sources list. `src/lib/publish-preflight.ts` holds the
+  checks as a pure function so they are testable and cannot drift from what the
+  dialog claims. It deliberately does **not** scan `voiceEditNotes` — that field
+  lists the outstanding placeholders, so scanning it would block every
+  voice-passed article forever. There is a test for that.
 
 ## Pricing (load-bearing — do not break)
 

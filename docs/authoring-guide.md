@@ -145,11 +145,17 @@ npm run sync-content:force # Overwrite ALL articles (use with caution)
 
 4.  **Resolve the Voice Edit Notes (before publishing):**
     *   Open the read-only **Voice Edit Notes** field. It lists the AI tells removed, the house-style corrections, and — most importantly — every **`[AUTHOR: …]`** placeholder the voice edit left in the body.
-    *   Search the body for `[AUTHOR:` and replace each placeholder with the real specific (a figure, a name, a date, a first-hand take). **Do not publish with any `[AUTHOR: …]` placeholder still in place.**
+    *   Search the body for `[AUTHOR:` and replace each placeholder with the real specific (a figure, a name, a date, a first-hand take). **Publishing is blocked while any placeholder remains** — the guard lists each one and offers no way past it (see step 6).
     *   For a **Deep Dive** (audit-only), the notes describe what to fix; apply the rewrite yourself. You can also run the terminal **`/voice-edit`** skill on the draft for a full hands-on pass.
 
-5.  **Publish:**
+5.  **Read the two machine reports (both read-only, both advisory):**
+    *   **Quotation Audit** — every quotation the piece presents as statute, string-matched against the verbatim legal text the drafting model was given. `UNMATCHED` means it is not in that text: invented, recalled from memory, or taken from a provision retrieval did not return. Check it against the primary source. `UNCOVERED` means no statutory text was retrieved for this draft, so it could not be checked at all. Exact matching cannot always tell an elided or bracketed quotation from a fabricated one, so read before you act.
+    *   **Fact Check** — for a **Signal** or **Deep Dive** this starts automatically when the draft is saved, so the report is usually waiting by the time you open the piece. For other formats, use the **Run fact-check** action. Apply a suggested revision with **Insert into article**; it patches the draft only.
+
+6.  **Publish:**
     *   Click the green **Publish** button to make the article live on the site.
+    *   **The publish guard runs first.** It *blocks* on an unresolved `[AUTHOR: …]` placeholder. It *asks for confirmation* — which you can give — when no fact-check has completed, when the verdict is "major issues", when the quotation audit found an unmatched quotation, or when a Signal, Deep Dive or Guide has an empty Sources list. On a finished draft you will not see it at all.
+    *   Sanity's own validation still applies underneath: an article needs a title, a slug and **at least one category** before Publish is even enabled.
     *   The site uses ISR — published changes appear after revalidation.
 
 ## 5. Content Types Reference

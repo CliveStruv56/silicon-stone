@@ -220,13 +220,16 @@ namespace written by a tool outside this repo; do not reuse it.
 
 This is the moment Pinecone enters the research→draft workflow.
 
-In `src/app/(admin)/create/actions.ts` → `createDraftFromResearch`:
+`createDraftFromResearch` (`src/app/(admin)/create/actions.ts`) calls
+`gatherDraftContext`, which owns both retrieval lanes in `src/lib/draft-retrieval.ts`.
+The prior-coverage half reduces to:
 
 ```ts
-const topicVector = await generateEmbedding(topic)
-const similar = await searchSimilar(topicVector, 5)
-if (similar.length > 0) {
-  const lines = similar.map(
+const vector = await generateEmbedding(topic)
+const similar = await searchSimilar(vector, PRIOR_COVERAGE_TOP_K)   // 5
+const related = similar.filter((r) => r.score >= PRIOR_COVERAGE_SCORE_FLOOR)  // 0.37
+if (related.length > 0) {
+  const lines = related.map(
     (r) => `- "${r.metadata.title}": ${r.metadata.excerpt} (/analysis/${r.metadata.slug})`
   )
   priorCoverageBlock = `=== PRIOR COVERAGE IN YOUR KNOWLEDGE BASE ===\n...\n${lines.join('\n')}`
@@ -235,7 +238,13 @@ if (similar.length > 0) {
 
 The `priorCoverageBlock` is passed to `buildDraftPrompt` and tells Claude: *“You have already written on related topics. Reference, extend, or differentiate from this prior work rather than repeating it.”*
 
-If Pinecone is not configured, this step fails silently and the draft is generated without prior-coverage context.
+**The score floor (added 2026-08-16).** `PRIOR_COVERAGE_SCORE_FLOOR = 0.37`, applied per result rather than to the top score alone. Calibrated against the live index: three on-topic queries scored 0.421, 0.533 and 0.687 on their best match; four off-topic queries — two of them sharing the publication's professional register — topped out at 0.318. The floor is the midpoint of that band.
+
+Without it every draft received five “related” articles whether or not any were related, and it is the 0.33–0.35 tail that produces *“as we have covered before”* about a piece that covered nothing of the sort. The same constant governs the reader-facing related-articles write-back in `/api/vectorize`. Re-measure it as the back catalogue grows.
+
+**Prior coverage embeds `topic` alone**, deliberately, while the regulatory lane composes topic + brief + keywords + pain points. The keywords come from the research pass and carry its news vocabulary — the mirror image of why `retrieve.ts` excludes the research summary from *its* query.
+
+Retrieval never throws: if Pinecone is unconfigured or unreachable the draft is generated without prior-coverage context. It is not silent, though — every outcome, including the no-ops, is pushed to `DraftContext.notes` and logged (`[prior-coverage] …`), because a lane that never fires is otherwise indistinguishable from one that is broken.
 
 ### How articles get into Pinecone
 
@@ -259,6 +268,8 @@ Used by `src/app/api/knowledge/evidence/route.ts` for the “Deep Evidence Searc
 
 `GET /api/search/semantic?q=...` embeds the query and calls `searchSimilar(vector, 10)` against the article index. This powers the “Published Article Search” in `/knowledge`.
 
+It deliberately applies **no** score floor, unlike the two lanes above: it is admin-only, returns the score with each result, and a human is reading it. A search interface that hides weak results is a worse search interface. The floor exists to stop a *model* being handed a weak match as context.
+
 ---
 
 ## 6. Research result shape
@@ -268,7 +279,12 @@ Both paths return `ResearchResult` (defined in `src/types/research.ts`):
 ```ts
 {
   summary: string
-  sources: Array<{ title: string; url: string; snippet: string }>
+  sources: Array<{
+    title: string
+    url: string
+    snippet: string
+    publishedDate?: string   // as the search reported it; absent for report links
+  }>
   suggestedContext: {
     keywords: string[]
     pain_points: string[]
@@ -276,6 +292,21 @@ Both paths return `ResearchResult` (defined in `src/types/research.ts`):
   deepReport?: string   // only for Deep Dives
 }
 ```
+
+### The sources are built in code, not by the model (changed 2026-08-16)
+
+`synthesizeContext` used to ask Claude for the `sources` array itself, so every title and URL the writer received had passed through a generation step and could be silently mutated — a plausible link that 404s, or one resolving somewhere that does not support the claim.
+
+Now each gathered result is numbered before the model sees it and the model returns only `sourceIndexes`; `selectSources()` rebuilds the list from the objects the search actually returned. The model keeps the judgement worth asking it for — which sources carry the summary — and loses the one it should never have had. An unusable selection falls back to the whole catalogue rather than an empty one, so a malformed response costs the ordering, never the sources.
+
+Deep Dives have no structured results to pass through, because their research arrives as prose with inline links. `extractReportSources()` pulls the URLs out in code and titles each source with its host, rather than sending them through a *second* generation pass.
+
+The plumbing lives in `src/lib/research-sources.ts`, kept out of `research.ts` because that module reaches `server-only` code and could not otherwise be unit tested. A `[research] sources gathered=N selected=M dated=D` line is logged on every run — without it a permanent fallback would look identical to a working selection.
+
+### What each source carries into the draft (changed 2026-08-16)
+
+- **The highlights first, then body text, to 1,200 characters.** Exa's highlights — the sentences it judged most relevant to the query — were being requested and then discarded while the model received the opening 300 characters of the page, which on a news article is the standfirst and byline.
+- **The publication date**, rendered beside each source in the drafting prompt as `[2026-08-14]` or `date unknown`, with an instruction to weigh recency, to say when a claim turns on timing, and never to infer a date for an undated source. `formatSourceDate()` trims a zero-time ISO timestamp for display only; the stored value is exactly what the search reported.
 
 The JSON is produced by Claude in `synthesizeContext` (`src/lib/research.ts`) with a strict system prompt.
 
@@ -303,6 +334,12 @@ Input is capped at 24,000 characters to stay well under the ~8,191 token limit.
 | Create page UI | `src/app/(admin)/create/create-form.tsx` | `CreateForm` |
 | Create page actions | `src/app/(admin)/create/actions.ts` | `startResearch`, `pollResearchJob`, `createDraftFromResearch` |
 | Research orchestration | `src/lib/research.ts` | `performResearch`, `buildDeepInstructions`, `synthesizeContext`, `synthesizeDeepReport` |
+| Source catalogue (pure) | `src/lib/research-sources.ts` | `exaToSources`, `registerSources`, `selectSources`, `extractReportSources`, `formatSourceDate` |
+| Draft retrieval (both lanes) | `src/lib/draft-retrieval.ts` | `gatherDraftContext`, `PRIOR_COVERAGE_SCORE_FLOOR` |
+| Quotation audit (pure) | `src/lib/quotation-audit.ts` | `auditQuotations`, `formatQuotationAudit` |
+| Auto fact-check policy | `src/lib/auto-fact-check.ts` | `shouldAutoFactCheck` |
+| Publish guard (pure checks) | `src/lib/publish-preflight.ts` | `preflightArticle`, `hasBlocker` |
+| Publish guard (Studio action) | `src/sanity/actions/publishPreflight.tsx` | `withPublishPreflight` |
 | Exa client | `src/lib/exa.ts` | `searchExa`, `deepResearchExa` |
 | Railway backend client | `src/lib/research-backend.ts` | `isBackendConfigured`, `startDeepResearchJob`, `getDeepResearchJob` |
 | Embeddings | `src/lib/embeddings.ts` | `generateEmbedding`, `extractArticleText`, `buildArticleMetadata` |
@@ -338,6 +375,7 @@ Input is capped at 24,000 characters to stay well under the ~8,191 token limit.
 ## 10. Summary
 
 1. **Research is always Exa.** The button triggers either a fast Exa search (`searchExa`) or, for Deep Dives, the Exa Agent API (`deepResearchExa`), optionally routed through the Railway backend.
-2. **Claude synthesizes** the Exa/Inoreader output into a `ResearchResult` (summary, sources, keywords, pain points).
-3. **Pinecone is used only when generating a draft** from the `/create` page. It retrieves up to 5 similar prior articles and feeds them to Claude as prior-coverage context.
+2. **Claude synthesizes** the Exa/Inoreader output into a `ResearchResult` — but only the summary, keywords and pain points are its words. The source list is rebuilt in code from the search results, by number.
+3. **Pinecone is used only when generating a draft** from the `/create` page. It retrieves up to 5 similar prior articles, keeps those scoring ≥ 0.37, and feeds them to Claude as prior-coverage context.
 4. **Pinecone is also populated** by the `/api/vectorize` webhook whenever Sanity publishes/updates an article, and it powers the standalone `/knowledge` semantic search workspace.
+5. **Three checks run on the finished draft** — the quotation audit at save time, an automatic fact-check for Signals and Deep Dives, and the publish guard in Studio. See `docs/editorial-assurance.md` for what each one promises and what it does not.
