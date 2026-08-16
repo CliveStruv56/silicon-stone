@@ -698,7 +698,7 @@ Every check in the system, what it asserts, and what it stops.
 | `reg:check` | Corpus text unchanged; review not lapsed; changelog written; AI Act vintage matches the rule pack | **Build** |
 | `gen:style` | House style and AI-tells rules exist and are non-empty before being compiled into the prompt | **Build** |
 | `test:regulatory-index` | Lane separation; citation header inside every embedded chunk; no recitals; no chunk spans two Articles; the prompt still forbids quoting from memory; no silent failure handlers in the retrieval path | **CI** |
-| `test` (245 cases) | Rules engine, withhold threshold, normalisation, routing, score floors, report schema | **CI** |
+| `test` (395 cases) | Rules engine, withhold threshold, normalisation, routing, score floors, report schema | **CI** |
 | `test:security` | Path traversal, session signing, fail-closed backend behaviour | **CI** |
 | `test:evidence-index` | Evidence chunking, delete-before-upsert, index isolation | **CI** |
 | `test:knowledge-inbox` | Source ID validation and admin authentication on capture routes | **CI** |
@@ -733,6 +733,26 @@ The routed retrieval probe was run against three topics and behaved as designed:
   topic-only floor, **no statutory text injected**. This is the calibration case
   from August 2026 behaving correctly: a labour-market story does not get handed
   Chips Act text to quote.
+
+**Re-run after the documentation sweep, later the same day.** The full CI set
+passed: `check`, `test`, `test:security`, `test:style-rules`,
+`test:knowledge-inbox`, `test:evidence-index`, `test:regulatory-index`,
+`test:pwa`, `test:sanity-prices`, and `build`. Two figures moved because the
+day's commits landed between the two runs, and both are worth recording rather
+than overwriting above:
+
+- `test` now reports **395 tests in 18 files**, up from 245 in 12. The new cases
+  are the normaliser equality proof, the quotation audit, the publish-guard
+  checks and the source-catalogue plumbing.
+- `rulepack-check` now reports **19 corpus files and 4 pack files**. The four
+  data files were unhashed during the earlier run; this is the first recorded
+  pass where the gate covers the figures as well as the statute.
+
+`test:sanity-prices` needs `NEXT_PUBLIC_SANITY_PROJECT_ID` and
+`NEXT_PUBLIC_SANITY_DATASET`, which CI supplies and a bare local shell does not —
+it fails closed with an explicit message rather than skipping. Run with the
+project environment loaded it passed: three published products checked against
+the code catalogue.
 
 ---
 

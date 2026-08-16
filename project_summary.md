@@ -2,7 +2,7 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-08-16
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (78 static pages), 245 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (78 static pages), 395 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
@@ -511,7 +511,19 @@ rather than its exit status:
   (AI Act); the other five fall on 2026-11-13. Those five dates are the next
   hard build deadline.
 
-Tests were not re-run — the sweep touched Markdown only, nothing under `src/`.
+**The full CI set was then re-run** and passed: `check`, `test`, `test:security`,
+`test:style-rules`, `test:knowledge-inbox`, `test:evidence-index`,
+`test:regulatory-index`, `test:pwa` and `test:sanity-prices`. Vitest reports
+**395 tests in 18 files**, up from the 245 recorded earlier today — the day's
+commits added the normaliser equality proof, the quotation audit, the
+publish-guard checks and the source-catalogue plumbing. The status header at the
+top of this document was carrying the stale 245 and now reads 395.
+
+`test:sanity-prices` is the one check a bare local shell cannot run: it needs
+`NEXT_PUBLIC_SANITY_PROJECT_ID` and `NEXT_PUBLIC_SANITY_DATASET`, which CI
+supplies from secrets. It fails closed with an explicit message rather than
+skipping — run with `.env.local` loaded it passed, three published products
+checked against the code catalogue.
 
 ### August 16, 2026 — the whole rule pack is hashed, and the two normalisers are held together
 
