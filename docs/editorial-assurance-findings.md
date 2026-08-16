@@ -1,0 +1,489 @@
+# Editorial Assurance — Internal Findings
+
+**Weak points in the research and verification pipeline, ranked by risk to factual accuracy.**
+
+Assessed 16 August 2026 against `main` at `745063bf`. Internal — not published, and
+deliberately not linked from `editorial-assurance.md`.
+
+Each finding records what is wrong, the evidence, why it matters, and a
+recommended fix. Findings marked **verified** were reproduced by running the
+system, not inferred from reading it.
+
+---
+
+## Summary
+
+| # | Finding | Severity |
+|---|---|---|
+| 1 | The EUR-Lex drift watcher fails open — and the corpus can no longer be re-fetched | **Critical** |
+| 2 | Nothing prevents publishing a draft with unresolved `[AUTHOR: …]` placeholders | **High** |
+| 3 | Nothing prevents publishing despite a "major issues" fact-check verdict | **High** |
+| 4 | Quotations in articles are never mechanically verified | **High** |
+| 5 | Source URLs and titles are re-emitted by the model, not passed through | **High** |
+| 6 | Publication dates are discarded before drafting | **Medium-High** |
+| 7 | The fact-check never runs automatically, and Deep Dives are least protected | **Medium-High** |
+| 8 | Prior-coverage retrieval has no score floor | **Medium** |
+| 9 | Only the rule pack's corpus text is hashed, not its rules or penalties | **Medium** |
+| 10 | The two normalisers are duplicated by hand with no equality test | **Medium** |
+| 11 | Index shape verification never runs in CI | **Medium** |
+| 12 | Only 300 characters of each source reach the model; highlights are discarded | **Medium** |
+| 13 | No source-quality controls on web search | **Medium** |
+| 14 | Inoreader is disconnected from the main authoring path and cannot refresh its token | **Low-Medium** |
+
+---
+
+## 1 · The EUR-Lex drift watcher fails open, and the corpus cannot be re-fetched
+
+**Severity: Critical · Verified live**
+
+`npm run reg:drift` reports `CHANGED` for all six instruments while
+`npm run reg:check` passes. Six simultaneous upstream corrections is not
+plausible, and it is not what happened.
+
+**Root cause.** EUR-Lex now sits behind an AWS WAF bot challenge. Automated
+clients receive `HTTP 202 Accepted` with `Content-Length: 0` and the header
+`x-amzn-waf-action: challenge`. Reproduced directly:
+
+```
+$ curl -s -D - -o /dev/null "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:02016R0679-20160504"
+HTTP/1.1 202 Accepted
+Content-Length: 0
+x-amzn-waf-action: challenge
+```
+
+It affects both the pinned text URL and the base act page, and does not depend on
+the user agent — a browser user agent gets the same response.
+
+`getText()` in `scripts/regulatory/drift.ts:71` guards with `if (!response.ok)`.
+**`response.ok` is true for 202**, so the empty body is accepted as valid content.
+The consequences run in both directions:
+
+- **The tamper check produces a false positive.** `extract('')` yields zero
+  articles and empty text, which hashes to `e3b0c442…` — the SHA-256 of the empty
+  string. That never matches the manifest, so every instrument reports `CHANGED`
+  with a message that actively misdirects: *"This is not an amendment — suspect
+  the extractor, or an upstream correction."*
+- **The check that actually matters fails silently.** Version discovery
+  (`drift.ts:92`) regex-scans the base page for consolidation dates. An empty page
+  yields `dates = []`, so `latest` is undefined and no `newer` status can ever be
+  raised. Had the tamper check happened to pass, the watcher would report
+  `current` while having read nothing at all. This is the fail-open case, and it
+  is the more dangerous of the two.
+
+**Second-order consequence — the documented remedy does not work either.**
+`scripts/regulatory/fetch.ts:55` uses the same `!r.ok` guard, so `npm run reg:fetch`
+also consumes the empty body. It does fail safe: the article-count guard at
+`fetch.ts:61` refuses to write when it parses zero articles against an expected
+99. But that means **the corpus cannot currently be refreshed by the documented
+procedure**, and the next `reviewBy` deadline — 11 November 2026 for the AI Act —
+will fail the build with no working path to clear it.
+
+**Also worth knowing:** the scheduled workflow has never run. `gh run list
+--workflow=regulatory-drift.yml` returns an empty list; it was added in the most
+recent regulatory commit (`b4e47e41`) and the Monday cron has not yet fired. When
+it does, it will open an issue reporting six false `CHANGED` findings — and,
+running from a GitHub datacentre IP, is if anything more likely to be challenged
+than a local run.
+
+**Recommended fix, in order:**
+
+1. Treat a 202, an `x-amzn-waf-action` header, or an empty body as a hard error in
+   both `drift.ts` and `fetch.ts`. `if (!response.ok)` should become an explicit
+   allow-list of 200 plus a non-empty body assertion. A fetcher that cannot
+   distinguish "I was blocked" from "the document is empty" cannot be a safeguard.
+2. Add a floor assertion to version discovery: if the base page yields zero
+   consolidation dates *for an instrument that has a consolidated CELEX*, that is
+   an `error`, not `current`. Only the two original-act instruments (Chips Act,
+   Data Act) may legitimately return none.
+3. Re-establish a working fetch path before 11 November 2026. Options, cheapest
+   first: the EUR-Lex Cellar SPARQL/REST API (`publications.europa.eu`), which is
+   intended for machine access and is not behind the same challenge; a WAF-aware
+   client that solves the challenge; or a documented manual fallback — save the
+   page from a browser and pass it via the existing `--html` flag, which
+   `fetch.ts` already supports.
+4. Until fixed, either disable the weekly workflow or set it to report rather than
+   fail, so it does not train the reader to ignore it. A watcher that cries wolf
+   every Monday is worse than none.
+
+---
+
+## 2 · Nothing prevents publishing a draft with unresolved `[AUTHOR: …]` placeholders
+
+**Severity: High**
+
+The system is carefully designed never to invent a fact it does not have; where
+only the author can supply a specific, it inserts a visible `[AUTHOR: …]`
+placeholder. That design is sound. But the obligation to resolve them is
+documentation only.
+
+`docs/authoring-guide.md` §4 states: *"Do not publish with any `[AUTHOR: …]`
+placeholder still in place."* The Sanity schema description for `voiceEditNotes`
+repeats it. Neither is enforced. `sanity.config.ts:27` adds only the fact-check
+document action to the default action list; the publish action is untouched.
+
+The failure mode is a published article containing a literal `[AUTHOR: confirm
+the figure]` in the body — visible to every reader, and worse than a missing
+sentence because it advertises that the piece was machine-drafted and not
+finished. There is already one instance of this pattern in committed source
+(`src/app/(website)/page.tsx:29`, in a comment rather than published prose, but it
+shows the placeholder convention escapes into the repository).
+
+**Recommended fix.** Add a Sanity publish action wrapper for the `article` type
+that scans the body for `[AUTHOR:` and blocks with a clear message listing the
+locations. This is the single highest-value change in this memo: it costs one
+small file and converts the most consequential editorial obligation into a
+mechanical one.
+
+---
+
+## 3 · Nothing prevents publishing despite a "major issues" fact-check verdict
+
+**Severity: High**
+
+The fact-check is explicitly advisory. `src/sanity/actions/factCheckAction.tsx`
+carries the comment *"Advisory only — nothing here blocks publishing."* An article
+whose `factCheck.overallVerdict` is `major-issues` — meaning at least one claim
+was found to be contradicted by the evidence — can be published with one click and
+no friction.
+
+Nor does anything require that a fact-check has been run at all, or that an
+article carries any `citations[]` entries. A published article with an empty
+sources list is not detectable by any check in the system.
+
+**Recommended fix.** Extend the same publish-action wrapper from finding 2 to
+warn — with confirmation, not a hard block — when:
+- `factCheck.status` is absent or not `completed`;
+- `factCheck.overallVerdict` is `major-issues`;
+- `citations` is empty on a `signal`, `deepdive` or `guide`.
+
+A confirmation dialogue rather than a block is right here: there are legitimate
+cases (an opinion-led Pulse with no external claims), and a control the author
+routinely has to fight becomes a control they route around.
+
+---
+
+## 4 · Quotations in articles are never mechanically verified
+
+**Severity: High**
+
+This is the largest asymmetry between the two lanes, and the most defensible
+thing to fix.
+
+The Compliance Checker string-matches every generated quotation against the
+pinned corpus (`verifyCitation` → `corpusContainsQuote` in
+`src/lib/rulepack/normalise.ts`), deletes any claim whose quote does not match,
+and withholds the whole report at three failures. The editorial lane, which
+routinely quotes the same statutes in published articles, relies on a prompt
+instruction — *"Place quotation marks ONLY around words you have copied
+character-for-character"* — and on human review.
+
+CI asserts the instruction is present in the prompt
+(`scripts/regulatory-index-checks.ts`). It cannot assert the model complied. So
+the strongest sentence in the system is, in the editorial lane, unenforced.
+
+**Recommended fix.** Build a quotation audit for article drafts, reusing what
+already exists. For each quoted span in a draft body that sits near an Article
+citation, normalise it and test it against the retrieved regulatory chunk text
+(which is already stored in full in the chunk metadata, and is already carried
+into the run). Surface unmatched quotes in a Studio field alongside the Voice
+Edit Notes.
+
+Note the one design constraint: unlike the Compliance Checker, the editorial lane
+retrieves only six passages, so a legitimate quotation may come from an Article
+that was not retrieved. The audit should therefore report *unmatched* and
+*not-retrieved* distinctly, and must be advisory — but it converts "trust the
+prompt" into "check the output", which is the whole point.
+
+---
+
+## 5 · Source URLs and titles are re-emitted by the model, not passed through
+
+**Severity: High**
+
+`synthesizeContext` in `src/lib/research.ts` asks Claude to return a JSON object
+containing a `sources` array. The Exa result objects are not preserved
+programmatically — the model copies titles and URLs into its output, and that
+output is what reaches the drafting prompt and the on-screen source index.
+
+Every citation therefore passes through a generation step that can silently
+mutate a URL, merge two sources, or attach the wrong title to the right link. The
+failure is quiet: a plausible-looking URL that 404s, or worse, one that resolves
+to something that does not support the claim.
+
+**Recommended fix.** Keep the model's job to summarising, and carry the sources
+through in code. Have `synthesizeContext` return only `summary` and
+`suggestedContext`, and construct `sources[]` directly from the Exa response
+objects already in scope in `performResearch`. If the model's selection among
+sources is wanted, have it return *indices* into the result array rather than
+reproduced strings. This is a small change with no downside.
+
+---
+
+## 6 · Publication dates are discarded before drafting
+
+**Severity: Medium-High**
+
+`formatExaResults` in `src/lib/research.ts` renders each result as title, URL and
+300 characters of text. `publishedDate` is available on the Exa result — the
+fact-check path captures it (`src/lib/fact-check.ts:208`) — but the research path
+drops it.
+
+The drafting model therefore cannot distinguish a 2019 article from one published
+last week, while house style requires exact dates and explicit status labelling
+(current law, proposal, guidance). The recency window helps on the first pass, but
+the broaden pass removes it entirely, so genuinely old material can enter without
+any date signal attached.
+
+**Recommended fix.** Add `Published: <date or unknown>` to each formatted result,
+and add one line to the drafting instruction telling the model to weigh recency
+and to state the date of any source it relies on for a time-sensitive claim. Two
+lines of code.
+
+---
+
+## 7 · The fact-check never runs automatically, and Deep Dives are least protected
+
+**Severity: Medium-High**
+
+Three facts compound:
+
+- The fact-check is triggered by hand from Studio. Nothing runs it on draft
+  creation, so an article is only checked if the author remembers.
+- Deep Dives — the longest, most heavily cited, most commercially significant
+  format — are the only format the voice pass does not rewrite. It produces an
+  audit and the author applies the changes.
+- The Deep Dive's research comes from a single agentic run whose output is
+  incorporated wholesale; the claim cap of 18 covers a fraction of a
+  6,000-word piece.
+
+The format with the most claims has the lightest automated scrutiny.
+
+**Recommended fix.** Trigger `runFactCheck` automatically after `finalizeDraft`
+for `deep_dive` and `signal`, using the same `after()` background pattern the API
+route already uses. The report is advisory and lands on the draft, so this costs
+an operator nothing and means every substantial draft arrives already checked.
+Consider raising the audit cap above 18 for Deep Dives, or checking in two passes.
+
+---
+
+## 8 · Prior-coverage retrieval has no score floor
+
+**Severity: Medium**
+
+The regulatory lane applies score floors of 0.30 and 0.55, with the stated
+reasoning that *"a weak match is worse than no match: the model uses whatever it
+is given"* (`src/lib/regulatory/format.ts`). That reasoning is correct, and it is
+not applied to the prior-coverage lane.
+
+`gatherPriorCoverage` in `src/lib/draft-retrieval.ts` calls
+`searchSimilar(vector, 5)` with no filter and no threshold, and hands the results
+to the model under a heading asserting *"You have already written on related
+topics."* On an index of 15 articles, every draft receives five "related" articles
+regardless of whether any are related. The model is then invited to reference and
+differentiate from work that may have nothing to do with the topic.
+
+The same gap exists in two reader-facing places: the related-articles write-back
+in `/api/vectorize` (`topK: 4`, top 3 kept, no threshold) and
+`/api/search/semantic` (`topK: 10`, no threshold).
+
+**Recommended fix.** Apply a floor to `gatherPriorCoverage` and to the
+related-articles write-back. The regulatory floors were calibrated by measurement
+rather than guessed; do the same here — run the existing corpus of published
+articles against a handful of on-topic and off-topic queries and pick the
+separating value. Also consider composing the prior-coverage query the way the
+regulatory lane does: it currently embeds `topic` alone while the regulatory lane
+embeds topic, brief, keywords, pain points and persona.
+
+---
+
+## 9 · Only the rule pack's corpus text is hashed, not its rules or penalties
+
+**Severity: Medium**
+
+`scripts/rulepack-check.mjs` hashes `rulepack/versions/*/corpus/*.txt` and nothing
+else. `rules.json`, `penalties.json`, `timeline.json` and `sources.json` are not
+hashed, and the manifest's `corpus` map covers only the 19 text files.
+
+CLAUDE.md states the governing principle: *"Every figure in the pack is a legal
+claim. Dates, penalty ceilings and Article anchors are traceable to the EUR-Lex
+consolidated text."* But a penalty ceiling, an implementation date or an Article
+anchor can be edited today with no build failure and no version bump — the exact
+class of silent change the corpus hashing exists to prevent.
+
+**Recommended fix.** Extend the manifest to hash all pack files, not just the
+corpus. `rulepack-check.mjs` already walks the version directory; add the four
+JSON files to the digest map under a separate key so the failure message can
+distinguish "the statute text moved" from "a rule changed". Cheap, and it closes
+the gap between the stated principle and what is enforced.
+
+---
+
+## 10 · The two normalisers are duplicated by hand with no equality test
+
+**Severity: Medium**
+
+`normaliseLegalText` exists twice: in `src/lib/rulepack/normalise.ts` and,
+re-implemented inline, in `scripts/rulepack-check.mjs`. The duplication is
+deliberate and documented — the script runs before any TypeScript build, so it
+cannot import from `src/` — and the manifest records `normalisation: "v1"` so a
+divergence is at least visible in principle.
+
+Nothing asserts the two implementations agree. If they drift, the build check and
+the runtime verifier would compute different hashes for the same text: either the
+build passes on text the verifier will reject, or it fails on text the verifier
+accepts. Both are hard to diagnose because the symptom appears far from the cause.
+
+**Recommended fix.** Add a test that imports both implementations and asserts
+identical output across the normalisation cases already in `rulepack.test.ts`
+(the smart-quote, dash, non-breaking-space and case-preservation cases). The
+script's copy can be exported from the `.mjs` for the test to import without
+disturbing its no-imports property.
+
+---
+
+## 11 · Index shape verification never runs in CI
+
+**Severity: Medium**
+
+`reg:verify-index` and `articles:verify-index` are the only checks that would
+detect an index carrying an embedded-text configuration — the failure that
+produced measured similarity of 0.09 against 0.54 and prompted the August 2026
+migration. Neither runs in `check.yml`; both are manual.
+
+They also perform the per-instrument live-versus-committed record count, which is
+the only thing that detects records stranded by a re-chunk. A namespace total
+cannot: re-ingesting an instrument overwrites the IDs that still exist and
+silently leaves the ones that no longer do, so stale text stays retrievable
+indefinitely.
+
+The exclusion is understandable — both need live Pinecone credentials and the
+network, and the project deliberately keeps network-dependent checks out of the
+build. But the same reasoning produced the weekly drift workflow, and the same
+solution applies.
+
+**Recommended fix.** Add both to a scheduled workflow alongside
+`regulatory-drift.yml` — weekly is ample — with the Pinecone key as a repository
+secret, opening or commenting on an issue on failure. Keep them out of `prebuild`
+for the stated reason.
+
+---
+
+## 12 · Only 300 characters of each source reach the model, and highlights are discarded
+
+**Severity: Medium**
+
+`searchExa` requests `text: true` and `highlights: { numSentences: 3,
+highlightsPerUrl: 1 }`. `formatExaResults` then renders
+`r.text.substring(0, 300)` and never touches `r.highlights`.
+
+So the drafting model sees, per source, the first 300 characters of the page —
+which on a news article is typically the standfirst and byline, not the
+substance — while the three most query-relevant sentences that Exa already
+selected and returned are thrown away. The evidence base is both thinner and less
+relevant than the search was capable of producing. The fact-check path does this
+correctly (highlights first, then text, up to 1,500 characters); the research
+path does not.
+
+**Recommended fix.** Mirror the fact-check's `snippet` construction in
+`formatExaResults`: highlights first, then text, to a larger budget. Eight results
+at 1,200 characters is roughly 10 KB, which is small beside a 30 KB deep report.
+
+---
+
+## 13 · No source-quality controls on web search
+
+**Severity: Medium**
+
+`searchExa` accepts an `includeDomains` option — commented *"Hard-restrict to
+these domains. Off by default to preserve recall"* — and no caller passes it.
+There is no `excludeDomains` anywhere. There is no relevance threshold, no
+re-ranking, and no source-quality weighting: Exa's ranking is used as returned.
+
+For a publication whose house style requires primary sources and whose fact-check
+prompt explicitly rules out *"blogs, vendor content, or aggregators"*, the
+research step applies no such standard at the point where sources are actually
+selected. A vendor blog post that ranks well is treated exactly like a Commission
+communication.
+
+**Recommended fix.** Two low-cost options, either or both:
+- Maintain a deny-list of known aggregators, content farms and vendor blogs and
+  pass it as `excludeDomains`. Recall is preserved; noise is not.
+- Annotate each formatted result with its domain, and add a line to the drafting
+  instruction to prefer primary sources and to state when a claim rests only on
+  secondary reporting.
+
+The second is nearly free and does not risk excluding a source that turns out to
+matter.
+
+---
+
+## 14 · Inoreader is disconnected from the main authoring path and cannot refresh its token
+
+**Severity: Low-Medium**
+
+Two separate issues with the curated feed.
+
+**It is not wired to `/create`.** The Inoreader token is read only in
+`src/app/(admin)/research/actions.ts`; `/create` calls the research pipeline with
+no token. The curated `S&S Approved` label — the one input in the whole system
+that has already passed a human editorial filter — informs only the secondary
+research console, not the main drafting path. The workaround is the author
+reading Inoreader themselves and typing a topic, which works but discards the
+curation.
+
+**The OAuth token cannot refresh.** `exchangeCodeForToken` handles the
+authorisation-code grant only. The refresh token is stored in a cookie with a
+one-year lifetime and never used; there is no `grant_type: refresh_token` path
+anywhere. When the access token expires (30 days by default), `searchItems`
+returns `[]` — errors are swallowed and return an empty array — so the failure is
+silent. Research continues with Exa alone and nothing reports that the curated
+feed dropped out.
+
+**Recommended fix.** Implement the refresh grant and call it on a 401 from
+`searchItems`; surface a connection-expired state in `InoreaderStatus` rather than
+degrading quietly. Separately, decide deliberately whether `/create` should read
+the curated feed — if the answer is no, say so in `authoring-guide.md`, because
+the current split looks like an oversight rather than a decision.
+
+---
+
+## What is working well
+
+Worth recording, so the fixes above are read in proportion.
+
+- **The lane separation is real and enforced.** A CI check greps the Compliance
+  Checker's directories for any reference to the editorial retrieval lane and
+  fails the build on a match. Two copies of the AI Act exist on purpose, and
+  nothing can quietly merge them.
+- **The withhold logic is genuinely fail-closed.** An uncovered Article counts as
+  a failure rather than a pass; an unreadable file degrades to uncovered; three
+  failures withhold the whole report. The tests assert both sides of the
+  threshold.
+- **The routing and score floors work as documented.** Verified live: the AI Act
+  query routed correctly at 0.830, NIS2 rendered its Directive caveat, and the
+  semiconductor labour-market query was correctly refused at 0.473 against the
+  0.55 floor.
+- **The corpus is committed, hashed and count-checked.** The extractor refuses to
+  write when the article count does not match, which is what stops a parser
+  regression producing an index that looks healthy and cites nothing.
+- **The "no silent failure" guard is unusual and valuable.** A CI check forbids
+  empty `catch {}` blocks in the retrieval path, on the reasoning that an
+  unqueried index is indistinguishable from a broken one. That is the correct
+  instinct, and finding 1 is precisely a case of it not being applied to a fetch
+  path.
+
+---
+
+## Suggested order of work
+
+1. **Finding 1** — the drift watcher and the fetch path. Time-boxed by the
+   11 November 2026 review deadline, and currently generating a false alarm.
+2. **Findings 2 and 3** — the publish-action wrapper. One file, closes the two
+   largest editorial gaps at once.
+3. **Finding 5** — pass sources through in code. Small, and removes a whole class
+   of citation error.
+4. **Findings 6 and 12** — richer, dated source context. Two small changes to one
+   function that materially improve what the model has to work with.
+5. **Finding 4** — the quotation audit. The most valuable of the larger pieces of
+   work.
+6. Everything else as capacity allows.

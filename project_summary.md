@@ -1,8 +1,8 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-08-15
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (78 static pages), 232 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
+> Last Updated: 2026-08-16
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (78 static pages), 245 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
@@ -463,6 +463,60 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 16, 2026 — the assurance process written down, and a safeguard found broken
+
+Two documents now describe how information reaches an article and what stops an
+unverified claim getting through: `docs/editorial-assurance.md` (the process and
+its safeguards, written for someone deciding whether to trust the work) and
+`docs/editorial-assurance-findings.md` (internal — fourteen weak points ranked by
+risk, with fixes). Neither restates `admin-research-workflow.md`; that remains
+the technical sequence, while these answer "how do you know this is true".
+
+**Every claim in the process document was verified by running the checks, not by
+reading the code.** Seven of the eight passed: `reg:check`, `rulepack-check`
+(19 corpus files), `test:regulatory-index` (1,422 chunks / 6 instruments), the
+full Vitest suite (245 tests, up from 232), and both live index verifications
+(1,422 regulatory records with per-instrument counts matching the committed
+corpus exactly; article index correctly shaped). `reg:probe` reproduced the
+August calibration: the AI Act query routed at 0.830, NIS2 rendered its Directive
+caveat, and the TSMC Dresden labour-market query was correctly refused at 0.473
+against the 0.55 topic-only floor.
+
+**`reg:drift` failed, and the reason is a real defect rather than an amendment.**
+It reported `CHANGED` for all six instruments while `reg:check` passed. EUR-Lex
+now sits behind an AWS WAF bot challenge that answers automated clients with
+`HTTP 202` and an empty body (`x-amzn-waf-action: challenge`), reproduced with
+curl and independent of user agent. `getText()` guards with `if (!response.ok)`
+— and **202 is ok** — so the empty body is accepted as content. Two
+consequences, the second worse than the first:
+
+- the tamper check hashes the empty string and reports every instrument as
+  `CHANGED`, with a message that misdirects ("suspect the extractor");
+- version discovery finds zero consolidation dates on an empty page, so it can
+  **never** raise `newer`. The check that actually matters fails open.
+
+`fetch.ts` shares the same `!r.ok` guard, so `reg:fetch` also consumes the empty
+body — it fails safe on the article-count assertion, but that means **the corpus
+cannot currently be re-fetched by the documented procedure**, and the AI Act's
+`reviewBy` of 11 November 2026 will fail the build with no working path to clear
+it. The weekly workflow has never run (`gh run list` returns empty; it was added
+in `b4e47e41`), so this had not yet surfaced. Fix is finding 1 in the memo:
+treat 202 / empty body as a hard error, assert version discovery found dates for
+instruments that have a consolidated CELEX, and re-establish a fetch path —
+probably the Cellar API at `publications.europa.eu`, which is built for machine
+access.
+
+**The other findings worth acting on**, in order: nothing blocks publishing a
+draft that still contains `[AUTHOR: …]` placeholders or one whose fact-check
+verdict is `major-issues` (both documentation-only obligations — one Sanity
+publish action closes both); source URLs and titles are re-emitted by the model
+in `synthesizeContext` rather than passed through from the Exa response;
+publication dates are dropped before drafting; the fact-check never runs
+automatically and Deep Dives get the lightest automated scrutiny of any format;
+and prior-coverage retrieval has no score floor while the regulatory lane has two.
+
+No source code changed — this is a documentation and verification pass.
 
 ### August 15, 2026 — the regulatory lane goes live, and learns a second and third instrument
 
