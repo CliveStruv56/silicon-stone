@@ -494,6 +494,25 @@ number that would drift.
 
 The published artifact of `editorial-assurance.md` was redeployed to the same URL.
 
+**Build verified after the sweep** (`npm run build`, 16 August 2026, local). It
+completed to the route table — **78 routes**, no errors; shared first-load JS
+105 kB, with `/studio` the usual outlier at 1.74 MB. The three `prebuild` gates
+were then run on their own, because piping the build to `tail` reads its output
+rather than its exit status:
+
+- `gen-style-rules` — regenerated `style-rules.generated.ts` and re-synced the
+  house-style and AI-tells references; byte-identical to what is committed, so
+  the tree was still clean afterwards.
+- `rulepack-check` — **19 corpus files and 4 pack files** verified at pack
+  `2026-08-10`. The four data files are the half that was unhashed until this
+  morning; this is the first recorded run where the gate covers them.
+- `reg:check` — all six instruments verified, corpus vintage matching the rule
+  pack's `corpusCutOff` of 2026-07-27. Earliest `reviewBy` is **2026-11-11**
+  (AI Act); the other five fall on 2026-11-13. Those five dates are the next
+  hard build deadline.
+
+Tests were not re-run — the sweep touched Markdown only, nothing under `src/`.
+
 ### August 16, 2026 — the whole rule pack is hashed, and the two normalisers are held together
 
 **Finding 9.** `rulepack-check.mjs` hashed only `corpus/*.txt`. `rules.json`,
