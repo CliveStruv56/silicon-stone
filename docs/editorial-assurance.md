@@ -315,9 +315,20 @@ terms and filters retrieval to the instruments actually named. If a routed
 search returns nothing, it falls back to the whole corpus — a routing mistake
 should cost relevance, never the entire block.
 
-**Weak matches are dropped rather than passed on.** Retrieval fetches
-twenty-four candidates, diversifies them (at most three chunks from any one
-Article, with a minimum allocation per instrument), and applies a score floor.
+**Both lanes drop weak matches rather than passing them on.** The prior-coverage
+lane applies a floor of 0.37, calibrated on 16 August 2026 against the live index:
+three on-topic queries scored 0.421, 0.533 and 0.687 on their best match, while
+four off-topic queries — two of them deliberately sharing the publication's
+professional register — topped out at 0.318. The floor is the midpoint. It is
+applied to every result, not just the best one, because an on-topic query
+typically returns two or three genuine neighbours and then a weak tail, and it is
+the tail that produces "as we have covered before" about a piece that covered
+nothing of the sort. The same floor governs the "Related Intelligence" list
+readers see under an article.
+
+For statutory text the same reasoning applies with its own numbers. Retrieval
+fetches twenty-four candidates, diversifies them (at most three chunks from any
+one Article, with a minimum allocation per instrument), and applies a score floor.
 The floor is 0.30 normally and 0.55 when the topic only implied a regulation
 rather than naming one. Both were calibrated against measured cases on 15 August
 2026: a genuine Data Act cloud-switching query scores 0.582, while a
@@ -547,13 +558,22 @@ The report rolls up to a single verdict — clean, minor issues, major issues, o
 unverifiable — shown as a coloured badge in Studio. Applying a suggested revision
 patches the draft only; nothing this pass produces is published by itself.
 
-**Stated plainly: the fact-check is advisory and operator-triggered.** It does
-not run automatically, and it does not decide anything by itself — an editor
-reads the report and applies the revisions. Since 16 August 2026 publishing
-without a completed fact-check, or with a "major issues" verdict, requires an
-explicit confirmation (§8), so the report can no longer be shipped past
-unnoticed. But the confirmation can be given: this is a prompt to look, not a
-gate that holds the piece.
+**Since 16 August 2026 it starts by itself on the formats that need it.** A
+Signal or a Deep Dive begins its fact-check the moment the draft is saved, so
+the report is usually waiting by the time the editor opens the piece. Those two
+are chosen because they carry the highest claim density, and because the Deep
+Dive is the only format the voice pass audits rather than rewrites — the piece
+with the most facts previously had the least automatic scrutiny. A Pulse or a
+Guide is not checked automatically: at 100–140 words on a single verified shift,
+the report would nearly always be empty, and a report nobody reads is worse than
+none.
+
+**Stated plainly: the fact-check is still advisory.** It does not decide
+anything by itself — an editor reads the report and applies the revisions.
+Publishing without a completed check, or with a "major issues" verdict, requires
+an explicit confirmation (§8), so it can no longer be shipped past unnoticed. But
+the confirmation can be given: this is a prompt to look, not a gate that holds
+the piece.
 
 ---
 
@@ -733,10 +753,10 @@ the corpus carries none. It is a strong check on fabrication, not a guarantee of
 completeness — and unlike the Compliance Checker's, it warns rather than
 withholds.
 
-**Prior-coverage retrieval has no relevance threshold.** The statutory lane
-drops weak matches below a measured score floor; the lane that surfaces this
-publication's own back catalogue does not, so a draft always receives up to five
-"related" articles whether or not any are related. Recorded in the findings memo.
+**Score floors are calibrated against a 15-article index.** The prior-coverage
+floor separates the cases measured in August 2026 cleanly, but a back catalogue
+three times the size will produce stronger matches across the board, and the
+floor should be re-measured rather than assumed to hold.
 
 **Retrieval degrades quietly by design.** If a vector store is unreachable, the
 draft is generated without that context rather than failing. Every such event is

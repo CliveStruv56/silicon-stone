@@ -464,6 +464,60 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 16, 2026 — the fact-check starts itself, and prior coverage gets a measured floor
+
+**Finding 7.** A Signal or Deep Dive now starts its fact-check automatically the
+moment the draft is saved. Those two because they carry the highest claim
+density, and because the Deep Dive is the only format the voice pass audits
+rather than rewrites — the piece with the most facts had the least automatic
+scrutiny. Pulse/Guide/YouTube excluded: at 100–140 words the report would nearly
+always be empty, and a report nobody reads is worse than none.
+
+**Not** `after()` inside the generation, as first sketched: `/create` has
+`maxDuration = 300` and already spends most of it on five sequential model calls,
+so appending a 90–180s check risks the function dying mid-run and leaving
+`factCheck.status` stuck on `running`. Instead `createDraftFromResearch` returns
+the draft id and the form POSTs to `/api/fact-check` before navigating — that
+route already owns auth, the 10/hour limit, the re-entrancy guard and its own
+300s background run. Awaited, because it returns 202 as soon as it claims the
+run and navigating sooner would cancel it. A failure to start is a `console.warn`
+only: the draft is already saved, and an unstarted advisory check must never look
+like a lost draft.
+
+`src/lib/auto-fact-check.ts` holds the format set — **not** `actions.ts`, which
+carries `"use server"` and may only export async functions. It imports
+`DraftFormat` as a type only, so nothing from `prompts.ts` reaches the browser.
+Tests cover both.
+
+**Finding 8 — calibrated, not guessed.** `PRIOR_COVERAGE_SCORE_FLOOR = 0.37`.
+Measured against the live index: on-topic queries scored **0.421 / 0.533 / 0.687**
+on their best match; off-topic queries topped out at **0.318** — and two of those
+were chosen to share the publication's professional register ("warehouse lease in
+Rotterdam", "onboarding junior engineers"), not to be absurd (sourdough reached
+0.147). The floor is the midpoint, 0.05 clear either side. The measurements are
+recorded in the code, not just the value.
+
+Applied **per result**, not to the top score: an on-topic query returns two or
+three genuine neighbours then a 0.33–0.35 tail, and it is the tail that produces
+"as we have covered before" about a piece that covered nothing of the sort.
+`/api/vectorize`'s related-articles write-back imports the same constant — an
+unrelated piece under "Related Intelligence" is worse than an empty section, and
+`RelatedArticles` already renders nothing when empty.
+
+Verified through the real path, and the behaviour is graded: 0.687 → 5 of 5 kept;
+0.421 → **3 of 5 kept**; both off-topic topics → no block at all. Before, all four
+received five "you have already written on related topics" articles.
+
+**Deliberately unchanged, now documented in code:** prior coverage embeds the
+topic alone while the regulatory lane composes topic + brief + keywords + pain
+points. That asymmetry is correct for the mirror-image reason `retrieve.ts` gives
+for excluding the research summary — the keywords carry the research pass's news
+vocabulary, which here would pull toward this week's reporting rather than what
+the piece is about. Also unchanged: `/api/search/semantic` keeps no threshold; it
+is admin-only, returns scores, and a human is reading it.
+
+Suite now 349.
+
 ### August 16, 2026 — the prompt's quotation promise is now checked, not just asserted
 
 **Finding 4 fixed — the largest gap between the two lanes.** The drafting prompt

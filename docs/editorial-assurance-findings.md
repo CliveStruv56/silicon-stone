@@ -21,8 +21,8 @@ system, not inferred from reading it.
 | 4 | Quotations in articles are never mechanically verified | ~~High~~ **Fixed 16 Aug 2026** |
 | 5 | Source URLs and titles are re-emitted by the model, not passed through | ~~High~~ **Fixed 16 Aug 2026** |
 | 6 | Publication dates are discarded before drafting | ~~Medium-High~~ **Fixed 16 Aug 2026** |
-| 7 | The fact-check never runs automatically, and Deep Dives are least protected | **Medium-High** |
-| 8 | Prior-coverage retrieval has no score floor | **Medium** |
+| 7 | The fact-check never runs automatically, and Deep Dives are least protected | ~~Medium-High~~ **Fixed 16 Aug 2026** |
+| 8 | Prior-coverage retrieval has no score floor | ~~Medium~~ **Fixed 16 Aug 2026** |
 | 9 | Only the rule pack's corpus text is hashed, not its rules or penalties | **Medium** |
 | 10 | The two normalisers are duplicated by hand with no equality test | **Medium** |
 | 11 | Index shape verification never runs in CI | **Medium** |
@@ -584,6 +584,44 @@ route already uses. The report is advisory and lands on the draft, so this costs
 an operator nothing and means every substantial draft arrives already checked.
 Consider raising the audit cap above 18 for Deep Dives, or checking in two passes.
 
+### Resolution — 16 August 2026
+
+Fixed, though not by the mechanism proposed above.
+
+**Not `after()` inside the generation.** The `/create` page has
+`maxDuration = 300`, and generation already spends most of it on five sequential
+model calls. Appending a 90–180s fact-check to the same invocation risks the
+function being killed mid-run, which leaves `factCheck.status` stuck on
+`running` until the route's 10-minute staleness guard clears it.
+
+**Instead the client starts it against the existing route.**
+`createDraftFromResearch` now returns the created draft's id, and the form POSTs
+to `/api/fact-check` before navigating to Studio. That route already owns the
+auth check, the 10/hour rate limit, the re-entrancy guard and its own background
+run with its own 300s budget — reusing it means none of that is reimplemented
+or allowed to drift. The POST is awaited, because it returns `202` as soon as it
+has claimed the run and navigating away sooner would cancel the request.
+
+`src/lib/auto-fact-check.ts` holds which formats qualify. **Signal and Deep Dive
+only** — a Pulse is 100–140 words on one verified shift and a Guide explains a
+tool, so checking them would spend Exa and model budget producing reports that
+are nearly always empty, and a report nobody reads is worse than none.
+
+The constant lives in its own module rather than in `actions.ts` because that
+file carries `"use server"`, which may only export async functions; exporting a
+`Set` from it is a rule violation waiting to bite. It imports `DraftFormat` as a
+type only, so nothing from `prompts.ts` reaches the browser bundle. There is a
+test for both.
+
+**A failure to start is deliberately silent** — a `console.warn`, no alert. The
+draft is already saved by that point, and an unstarted advisory check must never
+be presented to the author as a lost draft.
+
+**Not done, deliberately:** the Deep Dive claim cap stays at 18. Raising it
+increases Exa fan-out and pushes the 90–180s runtime toward the route's 300s
+ceiling, and choosing a new number without measuring that runtime would be a
+guess. It remains worth doing with measurement behind it.
+
 ---
 
 ## 8 · Prior-coverage retrieval has no score floor
@@ -613,6 +651,59 @@ articles against a handful of on-topic and off-topic queries and pick the
 separating value. Also consider composing the prior-coverage query the way the
 regulatory lane does: it currently embeds `topic` alone while the regulatory lane
 embeds topic, brief, keywords, pain points and persona.
+
+### Resolution — 16 August 2026
+
+Fixed, and calibrated by measurement as the regulatory floors were.
+
+**The measurement.** Three on-topic queries against the live index (15 published
+articles) scored **0.421, 0.533 and 0.687** on their best match. Four off-topic
+queries topped out at **0.318** — and two of those were chosen to be hard, sharing
+the publication's professional register rather than being obviously absurd
+("negotiating a warehouse lease in Rotterdam", "onboarding junior engineers
+remotely"); the genuinely absurd control, sourdough hydration, reached only 0.147.
+
+`PRIOR_COVERAGE_SCORE_FLOOR = 0.37` is the midpoint of that band: 0.05 clear of
+the hardest off-topic case and 0.05 below the weakest on-topic one. The numbers
+are recorded in the code, not just the value, because a bare threshold invites
+someone to "tune" it later with no idea what it was separating.
+
+**Applied per result, not to the top score alone.** An on-topic query typically
+returns two or three genuine neighbours and then a tail around 0.33–0.35, and it
+is the tail that produces "as we have covered before" about a piece that covered
+nothing of the sort.
+
+**Shared with the reader-facing list.** `/api/vectorize`'s related-articles
+write-back imports the same constant, because an unrelated piece under "Related
+Intelligence" is worse than an empty section, and `RelatedArticles` already
+renders nothing when the list is empty.
+
+**Verified end to end** through the real retrieval path — the behaviour is graded,
+which is the point:
+
+| Topic | Result |
+|---|---|
+| Transatlantic policy divergence (0.687) | 5 of 5 kept |
+| AI Act high-risk classification (0.421) | **3 of 5 kept** — the weak tail dropped |
+| Warehouse lease in Rotterdam (0.221) | no block injected |
+| Onboarding junior engineers (0.318) | no block injected |
+
+Before this, all four received five "you have already written on related topics"
+articles.
+
+**The query composition was left alone, deliberately** — and the asymmetry is now
+documented in the code so it is not "fixed" later. Prior coverage embeds the
+topic alone while the regulatory lane composes topic + brief + keywords + pain
+points. That is correct for the mirror-image reason `retrieve.ts` gives for
+excluding the research summary: the keywords come out of the research pass and
+carry its news vocabulary, which here would pull the search toward whatever this
+week's reporting happens to say rather than what the piece is about.
+
+**Not changed:** `/api/search/semantic` (top-K 10, no threshold). It is
+admin-only, returns the score with each result, and a human is reading it. A
+search interface that hides weak results is a worse search interface; the harm a
+floor prevents is a *model* being handed a weak match as context, which is not
+what that endpoint does.
 
 ---
 
@@ -805,7 +896,9 @@ Worth recording, so the fixes above are read in proportion.
 3. ~~**Finding 5** — pass sources through in code.~~ **Done, 16 Aug 2026.**
 4. ~~**Findings 6 and 12** — richer, dated source context.~~ **Done, 16 Aug 2026.**
 5. ~~**Finding 4** — the quotation audit.~~ **Done, 16 Aug 2026.**
-6. Everything else as capacity allows. The highest-value remaining are **7**
-   (run the fact-check automatically on Deep Dives and Signals) and **8** (a
-   score floor on prior-coverage retrieval); **9** and **10** harden the rule
-   pack's own guarantees; **11** puts the index-shape checks in CI.
+6. ~~**Findings 7 and 8**~~ **Done, 16 Aug 2026.**
+7. Remaining: **9** and **10** harden the rule pack's own guarantees (hash the
+   whole pack, not just the corpus text; test that the two normalisers agree);
+   **11** puts the index-shape checks on a schedule; **13** and **14** are
+   source-quality and Inoreader wiring. None is load-bearing on a published
+   fact today, which is why they sit below the line.

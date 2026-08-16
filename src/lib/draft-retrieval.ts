@@ -23,6 +23,27 @@ import { retrieveRegulatoryContext } from './regulatory/retrieve'
 
 export const PRIOR_COVERAGE_TOP_K = 5
 
+/**
+ * Below this cosine score an article is not really related to the topic.
+ *
+ * Calibrated 2026-08-16 against the live index (15 published articles). Three
+ * on-topic queries — AI Act classification, the Chips Act and supply chain,
+ * transatlantic policy divergence — scored 0.421, 0.533 and 0.687 on their best
+ * match. Four off-topic queries, deliberately including two that share the
+ * publication's professional register ("negotiating a warehouse lease in
+ * Rotterdam", "onboarding junior engineers remotely"), topped out at 0.318. The
+ * floor is the midpoint of that band, so it clears the hardest off-topic case by
+ * 0.05 and the weakest on-topic case by the same.
+ *
+ * Applied per result, not to the top score alone: an on-topic query typically
+ * returns two or three genuine neighbours and then a tail in the 0.33–0.35 range,
+ * and it is the tail that produces "as we have covered before" about a piece that
+ * covered nothing of the sort. The regulatory lane's reasoning holds here too —
+ * a weak match is worse than no match, because the model uses whatever it is
+ * given.
+ */
+export const PRIOR_COVERAGE_SCORE_FLOOR = 0.37
+
 export interface DraftContextInput {
   topic: string
   brief?: string
@@ -45,6 +66,12 @@ async function gatherPriorCoverage(topic: string): Promise<{ block?: string; not
     return { note: '[prior-coverage] skipped — PINECONE_INDEX_NAME is not set' }
   }
 
+  // Embeds the topic alone, deliberately, while the regulatory lane composes a
+  // query from topic + brief + keywords + pain points. That asymmetry is not an
+  // oversight: the keywords come out of the research pass and carry its news
+  // vocabulary, which is the exact thing the regulatory lane excludes its
+  // summary to avoid. Here it would pull the search toward whatever this week's
+  // reporting happens to say rather than what the piece is about.
   const vector = await generateEmbedding(topic)
   const similar = await searchSimilar(vector, PRIOR_COVERAGE_TOP_K)
 
@@ -52,7 +79,18 @@ async function gatherPriorCoverage(topic: string): Promise<{ block?: string; not
     return { note: '[prior-coverage] 0 related articles' }
   }
 
-  const lines = similar.map(
+  const related = similar.filter((result) => result.score >= PRIOR_COVERAGE_SCORE_FLOOR)
+  const topScore = similar[0].score.toFixed(3)
+
+  if (related.length === 0) {
+    return {
+      note:
+        `[prior-coverage] ${similar.length} hit(s) but topScore=${topScore} below floor ` +
+        `${PRIOR_COVERAGE_SCORE_FLOOR} — no block injected`,
+    }
+  }
+
+  const lines = related.map(
     (result) =>
       `- "${result.metadata.title}": ${result.metadata.excerpt} (/analysis/${result.metadata.slug})`,
   )
@@ -62,7 +100,9 @@ async function gatherPriorCoverage(topic: string): Promise<{ block?: string; not
       `=== PRIOR COVERAGE IN YOUR KNOWLEDGE BASE ===\n` +
       `You have already written on related topics. Reference, extend, or differentiate ` +
       `from this prior work rather than repeating it:\n${lines.join('\n')}`,
-    note: `[prior-coverage] ${similar.length} article(s), topScore=${similar[0].score.toFixed(3)}`,
+    note:
+      `[prior-coverage] ${related.length} of ${similar.length} article(s) above floor ` +
+      `${PRIOR_COVERAGE_SCORE_FLOOR}, topScore=${topScore}`,
   }
 }
 

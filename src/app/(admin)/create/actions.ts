@@ -80,7 +80,15 @@ export async function pollResearchJob(
     }
 }
 
-export type CreateDraftResult = { ok: true } | { error: string };
+/**
+ * `articleId` is the created draft's document id, returned so the client can
+ * start the fact-check on it. The check runs from the browser rather than here
+ * on purpose: /api/fact-check already owns the auth, rate-limit, re-entrancy
+ * and background-run guards, and giving it its own invocation keeps a 90–180s
+ * verification off the end of a generation that has already spent most of this
+ * route's 300s budget on five sequential model calls.
+ */
+export type CreateDraftResult = { ok: true; articleId?: string } | { error: string };
 
 /**
  * Map a thrown error from the draft pipeline to a specific, user-facing message
@@ -131,6 +139,7 @@ export async function createDraftFromResearch(
     brief: string = ""
 ): Promise<CreateDraftResult> {
     let stage = "initialising";
+    let articleId = "";
     try {
         await requireAdmin();
 
@@ -180,7 +189,7 @@ export async function createDraftFromResearch(
 
         // Pass-3 (voice edit) → Pass-2 (metadata) → Sanity write — shared with /import.
         stage = "saving the draft to Sanity";
-        await finalizeDraft({
+        const created = await finalizeDraft({
             draft,
             format,
             personaSlug,
@@ -190,6 +199,8 @@ export async function createDraftFromResearch(
             regulatoryCorpus: draftContext.regulatoryCorpus,
             logPrefix: "/create",
         });
+
+        articleId = String(created?._id ?? "").replace(/^drafts\./, "");
 
     } catch (error) {
         // Log the raw error server-side (visible in Vercel logs) and return a
@@ -204,5 +215,5 @@ export async function createDraftFromResearch(
     // throwing NEXT_REDIRECT, which — for a directly-invoked server action — can
     // surface to the client's try/catch as a rejection and trigger a spurious
     // "failed" alert even though the draft saved. Let the client navigate.
-    return { ok: true };
+        return { ok: true, ...(articleId ? { articleId } : {}) };
 }

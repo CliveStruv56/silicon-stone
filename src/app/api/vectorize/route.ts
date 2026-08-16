@@ -6,6 +6,7 @@ import { getPineconeIndex } from '@/lib/pinecone'
 import { generateEmbedding, extractArticleText, buildArticleMetadata } from '@/lib/embeddings'
 import { getClientIp } from '@/lib/rate-limit'
 import { checkDurableRateLimit } from '@/lib/durable-rate-limit'
+import { PRIOR_COVERAGE_SCORE_FLOOR } from '@/lib/draft-retrieval'
 
 const sanity = createClient({
   projectId,
@@ -115,8 +116,13 @@ export async function POST(req: NextRequest) {
       includeMetadata: false,
       includeValues: false,
     })
+    // Same floor as the drafting lane, for the same reason and against the same
+    // measurements: an unrelated piece under "Related Intelligence" is worse
+    // than an empty section, and RelatedArticles renders nothing when the list
+    // is empty. See PRIOR_COVERAGE_SCORE_FLOOR in src/lib/draft-retrieval.ts.
     const relatedIds = (related.matches ?? [])
       .filter((match) => match.id !== _id)
+      .filter((match) => (match.score ?? 0) >= PRIOR_COVERAGE_SCORE_FLOOR)
       .slice(0, 3)
       .map((match) => match.id)
 

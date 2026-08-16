@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, Zap, FileText, Search, BrainCircuit, ExternalLink, Activity, Video, BookOpen } from "lucide-react";
 import { startResearch, pollResearchJob, createDraftFromResearch } from "./actions";
+import { shouldAutoFactCheck } from "@/lib/auto-fact-check";
 import type { PersonaData } from "@/lib/sanity";
 
 import { ResearchResult, ResearchSource } from "@/types/research";
@@ -76,6 +77,37 @@ export function CreateForm({ initialPersonas, initialFormat = "signal" }: Create
         }
     }
 
+    /**
+     * Start the fact-check on a freshly saved Signal or Deep Dive.
+     *
+     * These are the two formats with the highest claim density, and the
+     * Deep Dive is also the only one the voice pass audits rather than rewrites
+     * — the piece with the most facts had the least automatic scrutiny. The
+     * check is advisory and lands on the draft, so it costs the author nothing
+     * but a few seconds here.
+     *
+     * Awaited, not fired-and-forgotten: /api/fact-check returns 202 as soon as
+     * it has claimed the run, and navigating away before that would cancel the
+     * request. Failures are deliberately silent — an unstarted fact-check must
+     * never look like a failed generation, and the draft is already saved. The
+     * "Run fact-check" button in Studio remains the manual path.
+     */
+    async function startAutoFactCheck(draftFormat: string, articleId?: string) {
+        if (!articleId || !shouldAutoFactCheck(draftFormat)) return;
+        try {
+            const res = await fetch("/api/fact-check", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ documentId: articleId }),
+            });
+            if (!res.ok) {
+                console.warn(`[create] auto fact-check did not start (${res.status})`);
+            }
+        } catch (error) {
+            console.warn("[create] auto fact-check request failed:", error);
+        }
+    }
+
     async function handleGenerateDraft() {
         if (!researchResult) return;
 
@@ -91,6 +123,7 @@ export function CreateForm({ initialPersonas, initialFormat = "signal" }: Create
                 setIsGenerating(false);
                 return;
             }
+            await startAutoFactCheck(format, result.articleId);
             router.push("/studio/structure/article");
         } catch (error) {
             console.error("Generation failed:", error);
