@@ -22,6 +22,14 @@ export interface AssessmentOption {
   label: string
   value: string
   description?: string
+  /**
+   * Label to use where the option is shown away from its sibling options — the
+   * agentic intake's review card, which lists one question and its proposed
+   * answer with no option list beneath it. "None of these" is unreadable there:
+   * there is no "these". Set it only where the plain label depends on the list
+   * being visible; the questionnaire always uses `label`.
+   */
+  reviewLabel?: string
   /** Short status chip rendered beside the label, e.g. an application date. */
   badge?: string
   /**
@@ -235,7 +243,11 @@ export const assessmentQuestions: AssessmentQuestion[] = [
       { label: 'Critical infrastructure or safety component', value: 'critical-infrastructure' },
       { label: 'Law enforcement, migration, border control, or asylum', value: 'law-migration' },
       { label: 'Justice, legal decision support, or democratic processes', value: 'justice-democracy' },
-      { label: 'None of these', value: 'none' },
+      {
+        label: 'None of these',
+        value: 'none',
+        reviewLabel: 'None of the listed sensitive areas',
+      },
     ],
   },
   {
@@ -291,8 +303,16 @@ export const assessmentQuestions: AssessmentQuestion[] = [
         value: 'art5-h',
         group: 'Law enforcement contexts',
       },
-      { label: 'None of these', value: 'none' },
-      { label: 'Not sure', value: 'not-sure' },
+      {
+        label: 'None of these',
+        value: 'none',
+        reviewLabel: 'None of the ten Article 5(1) prohibited practices',
+      },
+      {
+        label: 'Not sure',
+        value: 'not-sure',
+        reviewLabel: 'Not sure whether any Article 5(1) prohibited practice applies',
+      },
     ],
   },
   {

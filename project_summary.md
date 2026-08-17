@@ -464,6 +464,32 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 17, 2026 — the intake review card stopped pointing at a list it never showed
+
+On the Compliance Checker's agentic intake, the review card rendered only the
+question and the proposed answer. That is fine for "Who can be materially
+affected by the outputs? → Customers or consumers", and wrong for
+`prohibited_screen`: "Does the use involve any of these red-flag practices?" →
+"None of these", where **neither** "these" was on screen. The reader was being
+asked to confirm that no Article 5(1) prohibited practice applies without being
+shown what was screened. No data was missing — the ten options and the help line
+exist and both render on the questionnaire path; the review card omitted them.
+
+- The card now renders `question.help` under the question, exactly as the
+  questionnaire does (`ComplianceIntake.tsx`).
+- New optional `reviewLabel` on `AssessmentOption`: the self-contained wording
+  for contexts where an option appears away from its siblings. Set on three
+  options only — `prohibited_screen` "None of these" → "None of the ten
+  Article 5(1) prohibited practices", its "Not sure" → "Not sure whether any
+  Article 5(1) prohibited practice applies", and `sensitive_domains` "None of
+  these" → "None of the listed sensitive areas". The questionnaire still reads
+  `label`; nothing the engine consumes changed, since option **values** are
+  untouched.
+- `buildVocabulary` deliberately keeps feeding the model `label`, not
+  `reviewLabel` — that map is the extraction vocabulary, not display copy.
+- 395 tests green; verified in a browser with the intake route stubbed, so no
+  API credit was spent rendering the card.
+
 ### August 17, 2026 — the persona cards on /intelligence now filter the feed
 
 "Find Your Perspective" told the reader to pick a perspective and then ignored

@@ -27,8 +27,16 @@ interface Props {
 
 type Stage = 'describe' | 'review'
 
+/**
+ * The review card shows one question and its proposed answer with no option
+ * list beneath it, so an option whose label leans on its siblings ("None of
+ * these") loses its referent. `reviewLabel` is the self-contained wording for
+ * exactly that context; everywhere else still reads `label`.
+ */
 function labelFor(question: AssessmentQuestion, value: AssessmentValue): string {
-  const byValue = new Map((question.options ?? []).map((option) => [option.value, option.label]))
+  const byValue = new Map(
+    (question.options ?? []).map((option) => [option.value, option.reviewLabel ?? option.label]),
+  )
   if (Array.isArray(value)) return value.map((item) => byValue.get(item) ?? item).join(', ')
   return byValue.get(value) ?? value
 }
@@ -120,6 +128,13 @@ export function ComplianceIntake({ questions, onConfirm, onSkip }: Props) {
                 }`}
               >
                 <div className="text-sm text-text-muted">{question.text}</div>
+                {/* The questionnaire shows this line under the question; the
+                    review card omitted it, which left questions that point at
+                    their own options ("any of these red-flag practices") with
+                    nothing to point at. */}
+                {question.help && (
+                  <div className="mt-1 text-xs text-text-muted/85">{question.help}</div>
+                )}
                 <div className="mt-1 font-medium text-text-primary">
                   {labelFor(question, proposal.value)}
                 </div>
