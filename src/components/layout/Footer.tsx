@@ -62,7 +62,7 @@ export function Footer() {
           {/* Intelligence */}
           <div>
             <h3 className="text-sm font-semibold text-text-primary">Intelligence</h3>
-            <ul className="mt-4 space-y-3">
+            <ul className="mt-4 space-y-2">
               {footerNavigation.intelligence.map((item) => (
                 <li key={item.name}>
                   <Link
@@ -79,7 +79,7 @@ export function Footer() {
           {/* Engage */}
           <div>
             <h3 className="text-sm font-semibold text-text-primary">Engage</h3>
-            <ul className="mt-4 space-y-3">
+            <ul className="mt-4 space-y-2">
               {footerNavigation.engage.map((item) => (
                 <li key={item.name}>
                   <Link
@@ -96,7 +96,7 @@ export function Footer() {
           {/* Company */}
           <div>
             <h3 className="text-sm font-semibold text-text-primary">Company</h3>
-            <ul className="mt-4 space-y-3">
+            <ul className="mt-4 space-y-2">
               {footerNavigation.company.map((item) => (
                 <li key={item.name}>
                   <Link

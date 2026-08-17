@@ -214,7 +214,7 @@ export function HeroSection({ settings }: HeroSectionProps) {
 
                         <motion.div
                             variants={itemVariants}
-                            className="mt-2 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6"
+                            className="mt-2 flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6"
                         >
                             <div className="flex flex-col gap-1.5">
                                 <Link href="/advisory#contact">
@@ -244,7 +244,7 @@ export function HeroSection({ settings }: HeroSectionProps) {
 
                             <Link
                                 href="/methodology"
-                                className="group inline-flex items-center gap-2 whitespace-nowrap font-medium text-[#8fcbc4] hover:text-[#b6e0da] transition-colors"
+                                className="group inline-flex h-10 items-center gap-2 whitespace-nowrap font-medium text-[#8fcbc4] hover:text-[#b6e0da] transition-colors"
                             >
                                 Read the methodology
                                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />

@@ -2,6 +2,40 @@
 
 > Track every change shipped as part of the 2026 homepage redesign here. Append-only.
 
+## 2026-08-17 — three chrome corrections: hero CTAs, Products menu, footer rhythm
+
+Three small visual fixes, all reported from the rendered page and each verified
+by measuring the live DOM rather than by eye.
+
+- Files changed: `src/components/home/HeroSection.tsx`,
+  `src/components/layout/Header.tsx`, `src/components/layout/Footer.tsx`
+- Reported by: Clive (screenshots)
+- Notes:
+  - **Hero CTA row — the two buttons did not sit on the same line.** The primary
+    CTA is wrapped in a column with the "Free during our launch window" caption
+    beneath it, and the row was `sm:items-center`, so that two-line block was
+    centred against its single-line siblings and the button floated ~6px above
+    the outline one. The row is now `sm:items-start` — both buttons are `h-10`,
+    so their tops coincide — and "Read the methodology" carries `h-10` of its own
+    so it stays optically centred against them instead of riding the top edge.
+    Measured after: both buttons top 717 / bottom 757.
+  - **Products menu: "All prices" → "All products",** and the destination moved
+    with the label, `/pricing` → `/products`. Renaming the row alone would have
+    left a link whose text promised the product index and whose href went to the
+    pricing page. `/pricing` is still one click away from the Advisory dropdown
+    ("All prices") and from the footer, so nothing lost a route in.
+  - **Footer link columns tightened** from `space-y-3` to `space-y-2` (12px gaps
+    to 8px), taking item pitch from ~37px to ~33px. This applies at every width,
+    so it also tightens the two-column mobile footer; if that reads cramped on a
+    handset the fix is `space-y-3 md:space-y-2`.
+
+Not changed, though it was reported: the **Tools page panels are already
+aligned.** At rest the two cards in each row match to the decimal (row 1 top
+420.4/420.4, row 2 844.6/844.6, frames 550×233.3). The offset in the screenshot
+was `.card-interactive:hover`'s `translateY(-6px)` — the pointer was over
+Scenario Modeler, which is also why that card had its teal hover border.
+Reproduced under hover: 607.6 against 613.6. Left as designed at Clive's call.
+
 ## 2026-08-06 — §Decision Tools: previews replaced with commissioned artwork
 
 The four generated SVG/DOM previews are retired in favour of the commissioned

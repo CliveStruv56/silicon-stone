@@ -48,7 +48,7 @@ const primaryNavigation: NavItem[] = [
       { name: 'AI Audit Checklist Pack', href: '/products/ai-audit-checklist', note: priceOf('ai-audit-checklist') },
       { name: 'AI Act Compliance Toolkit', href: '/products/ai-act-toolkit', note: `From ${priceOf('ai-act-toolkit')}` },
       { name: 'Sector Reports', href: '/products/sector-reports', note: 'Coming soon' },
-      { name: 'All prices', href: '/pricing' },
+      { name: 'All products', href: '/products' },
     ],
   },
   {

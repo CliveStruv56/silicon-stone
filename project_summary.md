@@ -1,7 +1,7 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-08-16
+> Last Updated: 2026-08-17
 > Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (78 static pages), 395 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
@@ -463,6 +463,25 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 17, 2026 — three chrome corrections, measured rather than eyeballed
+
+Cosmetic only; no behaviour, no data, no prices. Detail in the homepage-redesign
+CHANGELOG.
+
+- **Hero CTA row** — the primary button sat ~6px above the outline one, because
+  the row was `sm:items-center` and the primary is wrapped in a column with the
+  launch-window caption under it. Row is now `sm:items-start`; the methodology
+  link carries `h-10` so it stays centred against the two buttons.
+- **Products dropdown** — "All prices" → "All products", href `/pricing` →
+  `/products`. `/pricing` is still linked from the Advisory dropdown and the
+  footer.
+- **Footer link columns** — `space-y-3` → `space-y-2`, item pitch ~37px → ~33px.
+  Applies at every width, mobile included.
+
+The Tools page grid was reported as misaligned and **was not changed**: the
+panels are already identical at rest, and the offset was the `-6px` hover lift on
+the card under the pointer. Confirmed by measuring both states.
 
 ### August 16, 2026 — the documentation caught up with the day's five commits
 
