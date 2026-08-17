@@ -28,7 +28,7 @@ const facts: FixedFacts = {
   confidence: 'High',
   reasons: ['Annex III employment domain present'],
   missingFacts: [],
-  obligations: [],
+  actions: [],
   reviewTriggers: [],
   firedRules: [
     { id: 'annex-iii-profiling-override', title: 'Profiling override', article: 'Article 6(3)', explanation: '' },

@@ -2,7 +2,7 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-08-17
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (78 static pages), 395 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (98 static pages), 415 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
@@ -463,6 +463,70 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 17, 2026 — "Immediate obligations" was true of about a third of the list
+
+The Compliance Checker's result card headed **"Immediate obligations"** rendered a
+flat `string[]`: a genuine Article 26(6) log-retention duty sat beside an SME
+concession the reader *may* use, a support measure whose sandboxes need not exist
+until 2027, and a statement about how fines are calculated. None of the last three
+is an obligation, and none is immediate. Article numbers survived only as prose in
+parentheses, so nothing in the UI could join a bullet to the rule or the provision
+that produced it — even though `RuleFinding` already carried `legalStatus`,
+`source.article` and `explanation`, and `firedRules` already reached the client.
+
+Checking the four SME items against the pinned corpus turned up a **substantive
+accuracy defect** behind the labelling one. `sme-proportionate-relief` fired on
+organisation size alone, so every SME was told all four regardless of role or tier:
+
+- **Art 11(1)** relieves the technical documentation of a **high-risk** system,
+  drawn up by the **provider** — and if you simplify, you *shall use* the
+  Commission's form, one the Commission is still required to establish.
+- **Art 17(2)** scales a quality management system that Art 17(1) requires only of
+  "Providers of high-risk AI systems". An SME deployer of a limited-risk tool has
+  no Art 17 duty to scale down.
+- **Art 57** — the priority-access wording is **Article 57(3a)**, about the
+  Union-level sandbox the AI Office has discretion to establish. National
+  sandboxes need only be operational by **2 August 2027**.
+- **Art 99(6)** is accurate, but it is enforcement information, not a task.
+
+What shipped:
+
+- `obligations: string[]` → `actions: RuleItem[]`, each carrying `kind`
+  (`duty` / `conditional` / `concession` / `support` / `enforcement` /
+  `good-practice`), a per-item `article` and `corpusArticle`, plus authored
+  `basis`, `inPractice` and `condition`. The aggregator dedupes on `id` rather
+  than on prose and stamps the emitting `ruleId`.
+- The card is now **"Recommended actions and applicable provisions"**, grouped
+  under four headings so a duty is never rendered as a concession, with a
+  per-item disclosure showing legal basis, conditions and what to do. Moved to
+  full width beneath a three-up grid — it is several times taller than its old
+  neighbours.
+- Articles 11(1) and 17(2) are gated on `hasProviderDuties() && inAnnexIIIDomain()`
+  using the predicates two other rules already use. Art 57 is re-anchored and its
+  timing stated. The two "AI system record" items say plainly that they are our
+  recommendation, not a requirement of the Regulation.
+- **New: `/tools/compliance-checker/provisions`** — 19 statically prerendered
+  server pages carrying the verbatim pinned corpus, one per covered Article, each
+  hash-verified against the manifest and carrying the EUR-Lex "no legal value"
+  notice. Every result item links to the provision behind it. In the sitemap.
+- The paid report's prompt now receives three labelled blocks instead of one
+  `<engine_obligations>` list, so a concession cannot be handed to the model as a
+  duty. **This is mitigation, not a guarantee** — the citation verifier cannot
+  catch a promoted concession, because the quote would be genuine.
+- Markdown export mirrors the screen through the same `groupObligations()`, with
+  absolute links to the provisions pages.
+
+**No rule pack edit, so no version bump** — `rulepack:check` still reports
+"19 corpus files and 4 pack files verified". Per-item anchors and basis prose live
+in TypeScript, where the obligation prose already was. 415 tests green (was 395),
+including 15 new invariants: no size-relief item may be a duty, every duty carries
+an Article, every `corpusArticle` resolves to a pinned Article, and a coverage
+guard that fails if the profile matrix stops firing a rule that emits items.
+
+Not addressed, and now visibly the next candidate: `vendorQuestions`,
+`missingFacts`, `reasons` and `adjacentRisks` are still bare `string[]` with
+citations embedded in prose. One shape migration at a time.
 
 ### August 17, 2026 — the intake review card stopped pointing at a list it never showed
 

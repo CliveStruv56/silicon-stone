@@ -6,6 +6,7 @@ import {
   AUTHOR_SLUGS_QUERY,
 } from '@/sanity/lib/queries'
 import { absoluteUrl } from '@/lib/site'
+import { RULE_PACK } from '@/lib/rulepack'
 
 /**
  * Dynamic sitemap.xml — enumerates the public site for crawlers and AI engines.
@@ -40,6 +41,9 @@ const STATIC_ROUTES: Array<{
   { path: '/products/sector-reports', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/tools', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/tools/compliance-checker', changeFrequency: 'monthly', priority: 0.5 },
+  // Index of the pinned AI Act provisions. The 19 Article pages beneath it are
+  // generated below from the pack manifest rather than listed here.
+  { path: '/tools/compliance-checker/provisions', changeFrequency: 'monthly', priority: 0.5 },
   { path: '/tools/policy-stress-test', changeFrequency: 'monthly', priority: 0.5 },
   { path: '/tools/scenario-modeler', changeFrequency: 'monthly', priority: 0.5 },
   { path: '/tools/supply-chain-mapper', changeFrequency: 'monthly', priority: 0.5 },
@@ -74,6 +78,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: route.priority,
   }))
 
+  /**
+   * One entry per pinned Article. Read from the pack manifest rather than from
+   * `coveredArticles()` in rulepack/corpus.ts — that module is `server-only` and
+   * reads statute from disk, and the sitemap has no business importing it just to
+   * enumerate keys. The manifest is already bundled.
+   *
+   * These change only when the pack version changes, which is a deploy.
+   */
+  const provisionEntries: MetadataRoute.Sitemap = Object.keys(RULE_PACK.manifest.corpus).map(
+    (article) => ({
+      url: absoluteUrl(`/tools/compliance-checker/provisions/${article}`),
+      changeFrequency: 'yearly' as const,
+      priority: 0.4,
+    })
+  )
+
   const articleEntries: MetadataRoute.Sitemap = (
     (articles ?? []) as Array<{
       slug: string
@@ -106,6 +126,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     ...staticEntries,
+    ...provisionEntries,
     ...articleEntries,
     ...categoryEntries,
     ...authorEntries,

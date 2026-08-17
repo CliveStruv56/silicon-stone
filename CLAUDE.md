@@ -59,6 +59,55 @@ Three invariants the tool promises on screen and must keep:
   generated report is string-matched against the pinned corpus
   (`src/lib/report/verify.ts`); an unmatched claim renders an explicit note in
   place of the quote, and three failures withhold the whole report.
+- **A result item is never presented as a duty unless it is one** (since
+  2026-08-17). `RuleFinding.actions` is `RuleItem[]`, not `string[]`, and each
+  item carries a `kind`: `duty`, `conditional`, `concession`, `support`,
+  `enforcement` or `good-practice`. The card was once headed "Immediate
+  obligations" over a list that mixed an Article 26(6) retention duty with an SME
+  concession, a support measure whose sandboxes need not exist until 2027, and a
+  statement about how fines are calculated. Invariants in
+  `src/lib/ai-act-rules.test.ts` hold the line: no `-proportionate-relief` item
+  may be a duty, every duty carries an `article`, and every item carries a
+  substantive `basis`.
+
+Three consequences of that shape worth not undoing:
+
+- **The Article anchor is a field, not prose.** `article` and `corpusArticle` are
+  per *item*, where the pack's `ruleAnchors` are per *rule* and can hold only one
+  provision each — `sme-proportionate-relief` is anchored to the lump
+  "Articles 11, 17, 57 and 99(6)". A test asserts every `corpusArticle` is a key
+  of `RULE_PACK.manifest.corpus`, so an explainer link can never 404, and that
+  `articleNumberFrom(article)` agrees with it, so an anchor cannot be
+  copy-pasted onto the wrong provision. Do not put citations back in the prose.
+- **`basis` and per-item anchors live in TypeScript, deliberately.** They are
+  authored explanation, the same class of content as the obligation prose that
+  already sat there, and `src/lib/rulepack/index.ts` scopes the pack to dates,
+  ceilings, anchors, citations and corpus. Keeping them out of the pack is what
+  let this ship without a version bump. Note the pack has **no `article17` or
+  `article57` entry in `sources.json`**, so per-item Service Desk links would
+  force the full bump procedure — the corpus-backed provisions page does not, and
+  is the stronger citation anyway.
+- **Reliefs scoped to high-risk providers are gated on that path.**
+  Articles 11(1) and 17(2) relieve *provider* duties on *high-risk* systems.
+  `sizeReliefActions()` gates them on `hasProviderDuties() && inAnnexIIIDomain()`;
+  firing them on organisation size alone told an SME deploying a minimal-risk
+  chatbot it could simplify Annex IV documentation it never owed.
+
+The paid report is handed these items in three labelled prompt blocks
+(`src/lib/report/generate.ts`), never one flat list. **The citation verifier
+cannot catch a promoted concession** — a model writing "you must use the
+simplified form" can quote Article 11(1)'s genuine "*it shall use the form
+referred to in this paragraph*" and verify clean, because that sentence is
+mandatory once you opt in. The structural split and the labelling are the whole
+mitigation; do not assume `verifyReport()` covers this.
+
+`/tools/compliance-checker/provisions/[article]` renders the pinned corpus for a
+reader: 19 statically prerendered server pages, because `rulepack/corpus.ts` is
+`server-only` and the checker is a Client Component. Each sets its **own**
+canonical — the parent layout hard-codes one pointing at the checker, which
+inherited would deindex all 19. Statute published on a commercial site carries the
+EUR-Lex "consolidated text, no legal value, only the OJ is authentic" notice and
+the EU source acknowledgement; that is not decoration.
 
 Corpus coverage is partial (19 Articles). `verifyCitation()` returns
 `uncovered` for anything else — treat that as unverifiable, never as a pass.

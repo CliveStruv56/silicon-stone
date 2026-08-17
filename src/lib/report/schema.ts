@@ -1,4 +1,5 @@
 import type { Classification, UserRole } from '@/lib/ai-act-assessment'
+import type { ResultItem } from '@/lib/ai-act-rules'
 
 /**
  * Shape and validation of the generated compliance report.
@@ -63,7 +64,7 @@ export interface FixedFacts {
   confidence: 'High' | 'Medium' | 'Low'
   reasons: string[]
   missingFacts: string[]
-  obligations: string[]
+  actions: ResultItem[]
   reviewTriggers: string[]
   firedRules: Array<{ id: string; title: string; article: string; explanation: string }>
   packVersion: string

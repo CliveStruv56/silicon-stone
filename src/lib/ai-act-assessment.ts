@@ -1,4 +1,4 @@
-import { derivesProfiling, evaluateRuleLibrary, type RuleFinding } from './ai-act-rules'
+import { derivesProfiling, evaluateRuleLibrary, type ResultItem, type RuleFinding } from './ai-act-rules'
 
 export type AssessmentValue = string | string[]
 
@@ -66,7 +66,7 @@ export interface AssessmentResult {
   summary: string
   reasons: string[]
   missingFacts: string[]
-  obligations: string[]
+  actions: ResultItem[]
   vendorQuestions: string[]
   adjacentRisks: string[]
   reviewTriggers: string[]
@@ -406,7 +406,7 @@ export function evaluateAssessment(answers: AssessmentAnswers): AssessmentResult
     summary,
     reasons: ruleEvaluation.reasons,
     missingFacts: ruleEvaluation.missingFacts,
-    obligations: ruleEvaluation.obligations,
+    actions: ruleEvaluation.actions,
     vendorQuestions: ruleEvaluation.vendorQuestions,
     adjacentRisks: ruleEvaluation.adjacentRisks,
     reviewTriggers: ruleEvaluation.reviewTriggers,

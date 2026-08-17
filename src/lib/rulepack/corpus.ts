@@ -57,6 +57,65 @@ export function readArticle(
   }
 }
 
+/**
+ * One Article as it should be *displayed*: heading, title, and the numbered
+ * paragraphs with their structure intact.
+ *
+ * `readArticle()` cannot serve this. It normalises, and normalisation collapses
+ * every whitespace run — newlines included — so a quote spanning a line break
+ * still matches. That is right for the verifier and useless for a reader, who
+ * gets one unbroken blob of statute.
+ *
+ * So this returns the source text, and pairs it with the integrity check that
+ * makes showing unnormalised bytes safe: `hashVerified` is true when the
+ * displayed text still normalises to the hash the pinned manifest recorded. The
+ * wording is therefore guaranteed even though the whitespace is not hashed.
+ *
+ * Never use `paragraphs` for citation matching — that is `verifyCitation`'s job,
+ * and it must keep comparing normalised text on both sides.
+ */
+export interface ArticleForDisplay {
+  article: string
+  /** The "Article 11" line. */
+  heading: string
+  /** The title line beneath it, e.g. "Technical documentation". */
+  title: string
+  /** Remaining blocks in order: paragraph numbers, sub-points and prose. */
+  paragraphs: string[]
+  hashVerified: boolean
+}
+
+export function readArticleForDisplay(
+  article: string,
+  version: string = PINNED_RULE_PACK_VERSION,
+): ArticleForDisplay | null {
+  if (!hasCorpus(article, version)) return null
+
+  let source: string
+  try {
+    source = readFileSync(corpusPath(version, article), 'utf8')
+  } catch (error) {
+    console.error(`Rule pack corpus read failed for Article ${article}:`, error)
+    return null
+  }
+
+  const blocks = source
+    .split(/\n\s*\n/)
+    .map((block) => block.replace(/\s+/g, ' ').trim())
+    .filter((block) => block.length > 0)
+
+  const [heading = `Article ${article}`, title = '', ...paragraphs] = blocks
+
+  return {
+    article,
+    heading,
+    title,
+    paragraphs,
+    hashVerified:
+      sha256(normaliseLegalText(source)) === getRulePack(version).manifest.corpus[article],
+  }
+}
+
 export type CitationVerdict =
   | { status: 'verified' }
   | { status: 'not-found' }

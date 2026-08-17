@@ -24,6 +24,67 @@ export interface RuleSource extends SourceReference {
   publisher: string
 }
 
+/**
+ * What kind of thing a result item is.
+ *
+ * The card used to render all of them under "Immediate obligations", which was
+ * true of roughly a third. A relief you may take up, a support measure whose
+ * sandboxes need not exist until 2027, and a statement about how fines are
+ * calculated are not tasks — and presenting them as tasks is what made a
+ * careful triage read like a guess.
+ *
+ * `legalStatus` on the rule is a different axis and stays: it says how firm the
+ * *authority* is. This says what the reader is being asked to do about it.
+ */
+export type ActionKind =
+  /** Binds you now, on these answers. */
+  | 'duty'
+  /** Binds only if `condition` holds. The condition is stated, never implied. */
+  | 'conditional'
+  /** A relief you MAY use. Taking it up has its own conditions. */
+  | 'concession'
+  /** A support measure available to you. */
+  | 'support'
+  /** How penalties are calculated. Information, not a task. */
+  | 'enforcement'
+  /** Recommended, with no standalone statutory duty behind it. */
+  | 'good-practice'
+
+/**
+ * One item in the result list, as a rule emits it.
+ *
+ * The Article anchor is a *field*, not prose inside `text`. That is the whole
+ * point: a rule can emit four items spanning four provisions and each carries
+ * its own anchor, where the rule-level `source` could only carry one. It is
+ * also what lets the UI link an item to the pinned corpus instead of leaving
+ * the reader to go and look "(Article 11(1))" up themselves.
+ */
+export interface RuleItem {
+  /** Stable across runs. The dedupe key and the React key. */
+  id: string
+  /** The action or fact. Never ends in a bare "(Article N)" — see `article`. */
+  text: string
+  kind: ActionKind
+  /** The narrow anchor for THIS item, e.g. 'Article 11(1)'. */
+  article?: string
+  /**
+   * Corpus key for the explainer link, e.g. '11'. Set only where the pinned
+   * pack actually carries the Article, so a link can never 404.
+   */
+  corpusArticle?: string
+  /** The legal basis, and the conditions that decide whether it applies. */
+  basis: string
+  /** What to actually do, or what taking the relief up requires. */
+  inPractice?: string
+  /** For `kind: 'conditional'` — the condition, in the reader's terms. */
+  condition?: string
+}
+
+/** A `RuleItem` once the aggregator has stamped the rule that emitted it. */
+export interface ResultItem extends RuleItem {
+  ruleId: string
+}
+
 export interface RuleFinding {
   id: string
   title: string
@@ -47,7 +108,7 @@ export interface RuleFinding {
   confidenceOverride?: 'High' | 'Medium'
   reasons: string[]
   missingFacts: string[]
-  obligations: string[]
+  actions: RuleItem[]
   vendorQuestions: string[]
   adjacentRisks: string[]
   reviewTriggers: string[]
@@ -79,7 +140,7 @@ export interface RuleEvaluation {
   confidence: 'High' | 'Medium' | 'Low'
   reasons: string[]
   missingFacts: string[]
-  obligations: string[]
+  actions: ResultItem[]
   vendorQuestions: string[]
   adjacentRisks: string[]
   reviewTriggers: string[]
@@ -305,6 +366,131 @@ function rule(
   }
 }
 
+/**
+ * Items shared by more than one rule.
+ *
+ * These are `const`, not functions, so they must be declared above
+ * `AI_ACT_RULE_LIBRARY` — the array is built at module load and a `const` is not
+ * hoisted. Sharing the object rather than repeating the prose is what keeps the
+ * `id` identical, which is what lets the aggregator dedupe them.
+ *
+ * A note on `article`: it is set only where the pinned pack already anchors the
+ * rule to that provision, or where the corpus carries the Article so the claim
+ * can be checked. An item with no verifiable anchor gets no anchor rather than a
+ * plausible one.
+ */
+
+/**
+ * The Annex III application date, read from the pinned pack.
+ *
+ * Deliberately not typed here. A date in this file would be a legal claim the
+ * rule-pack hash gate cannot see, which is the whole reason dates live in the
+ * pack. `ANNEX_III_APPLIES_FROM` is exported so a test can assert it still
+ * resolves — a pack that renamed this timeline label would otherwise quietly
+ * drop the date from every condition below.
+ */
+export const ANNEX_III_APPLIES_FROM = RULE_PACK.timeline.find(
+  (entry) => entry.label === 'Standalone high-risk systems'
+)?.date
+
+/**
+ * Shared by every duty the engine fires on Annex III *domain presence* rather
+ * than on a confirmed tier. Two separate caveats, and the old flat list carried
+ * neither: the tier is not settled, and the obligations are not yet in
+ * application.
+ */
+const HIGH_RISK_CONDITION = [
+  'Only if the system is in fact high-risk.',
+  ANNEX_III_APPLIES_FROM
+    ? `The standalone high-risk obligations apply from ${ANNEX_III_APPLIES_FROM} — so this is evidence to have in place before then, not work that is overdue today.`
+    : 'Check the application date for standalone high-risk systems before treating this as work for today.',
+].join(' ')
+
+/** Emitted by both Annex III routes — the domain rule and the primary-use rule. */
+const ANNEX_III_HIGH_RISK_CANDIDATE: RuleItem = {
+  id: 'annex-iii-treat-as-high-risk',
+  text: 'Treat this as a high-risk candidate until the classification and intended-purpose evidence are confirmed.',
+  kind: 'conditional',
+  condition:
+    'Unless the provider has documented an Article 6(3) exemption. That derogation is narrow and it is the provider’s to claim, not yours to assume.',
+  article: 'Article 6(2) and (3)',
+  corpusArticle: '6',
+  basis:
+    'Article 6(2) makes Annex III systems high-risk. Article 6(3) derogates from that only where the system “does not pose a significant risk of harm to the health, safety or fundamental rights of natural persons”, and only where one of four narrow conditions is also met — a narrow procedural task, improving a previously completed human activity, detecting decision-making patterns, or a preparatory task. Until that assessment exists in writing, paragraph 2 is the position.',
+  inPractice:
+    'Ask the vendor for its classification in writing. If it claims the exemption, ask for the Article 6(4) assessment behind it — a claim without the document is not a classification.',
+}
+
+/**
+ * The SME and SMC size reliefs.
+ *
+ * Articles 11(1) and 17(2) are reliefs from *provider* duties on *high-risk*
+ * systems, so the rules below emit them only on that path. Firing them for every
+ * SME told a deployer of a minimal-risk chatbot it could simplify Annex IV
+ * documentation it never owed in the first place.
+ */
+const ART_11_SIMPLIFIED_DOCS: RuleItem = {
+  id: 'sme-art-11-simplified-documentation',
+  text: 'You may supply the Annex IV technical documentation in simplified form, and a notified body must accept it.',
+  kind: 'concession',
+  article: 'Article 11(1)',
+  corpusArticle: '11',
+  basis:
+    'Article 11(1) requires technical documentation for high-risk AI systems, containing at a minimum the elements in Annex IV. SMEs, start-ups and SMCs “may provide the elements … in a simplified manner”, and notified bodies “shall accept the form for the purposes of the conformity assessment”. It is a relief from a duty you only have as the provider of a high-risk system.',
+  inPractice:
+    'The relief is not a free hand with the format. If you simplify, Article 11(1) requires you to use the Commission’s simplified form — which the Commission is itself required to establish, so check it exists before planning around it.',
+}
+
+const ART_17_PROPORTIONATE_QMS: RuleItem = {
+  id: 'sme-art-17-proportionate-qms',
+  text: 'Your quality management system may be scaled to the size of your organisation — but not below a floor on rigour.',
+  kind: 'concession',
+  article: 'Article 17(2)',
+  corpusArticle: '17',
+  basis:
+    'Article 17(1) requires a documented quality management system of “Providers of high-risk AI systems”. Article 17(2) makes its implementation “proportionate to the size of the provider’s organisation, in particular, if the provider is an SME, including a start-up, or an SMC” — then sets the floor: providers “shall, in any event, respect the degree of rigour and the level of protection required”. Proportionate means smaller, not weaker.',
+  inPractice:
+    'Fewer documents and lighter process, covering the same ground. The aspects listed in Article 17(1) still all need an answer.',
+}
+
+const ART_57_SANDBOX_PRIORITY: RuleItem = {
+  id: 'sme-art-57-sandbox-priority',
+  text: 'You are entitled to priority access to an AI regulatory sandbox, once one is running.',
+  kind: 'support',
+  condition:
+    'Not available yet in most of the EU. Member States need only have a national sandbox operational by 2 August 2027.',
+  article: 'Article 57(3a), with Article 57(1)',
+  corpusArticle: '57',
+  basis:
+    'Narrower than it sounds. The express priority-access wording is in Article 57(3a), and it is about the sandbox the AI Office has discretion to establish at Union level for Article 75(1) systems: that sandbox “shall provide priority access to SMEs, including start-ups, and SMCs”. Article 57(1) separately requires each Member State to have at least one national sandbox “operational by 2 August 2027”. Article 57 also names accelerating market access for SMEs among the sandboxes’ objectives. Provisions outside this pack’s verified corpus may widen the entitlement; we do not assert what we cannot check.',
+  inPractice:
+    'A 2027 planning item, not something to act on this quarter. Worth knowing before you buy external assurance you could get inside a sandbox instead.',
+}
+
+const ART_99_6_LOWER_OF: RuleItem = {
+  id: 'sme-art-99-6-lower-of',
+  text: 'If you were fined, the cap is the lower of the percentage and the fixed amount, not the higher.',
+  kind: 'enforcement',
+  article: 'Article 99(6)',
+  corpusArticle: '99',
+  basis:
+    'For everyone else, Article 99 sets each ceiling as whichever of the fixed sum or the turnover percentage is the higher of the two. Article 99(6) inverts that for SMEs and start-ups across paragraphs 3, 4 and 5 — “whichever thereof is lower”. Article 99(1) separately requires Member States to take the economic viability of SMEs into account when imposing penalties.',
+  inPractice:
+    'Nothing to do. It is here because it changes what the exposure actually is, which is what most people are trying to work out.',
+}
+
+const ART_99_6A_LOWER_OF_SMC: RuleItem = {
+  id: 'smc-art-99-6a-lower-of',
+  text: 'The lower-of cap applies to you for Article 99(4) and (5) only — Article 5 prohibited-practice fines are not capped this way.',
+  kind: 'enforcement',
+  article: 'Article 99(6a)',
+  corpusArticle: '99',
+  basis:
+    'Article 99(6a), inserted by the Digital Omnibus, extends the lower-of treatment to small mid-caps — but only for paragraphs 4 and 5, not paragraph 3. So a prohibited-practice infringement stays at the higher of €35 000 000 or 7 % of total worldwide annual turnover. This is narrower than the SME relief at Article 99(6), which does reach paragraph 3.',
+  inPractice:
+    'Nothing to do, but do not read across from SME guidance: the one tier where the fine is largest is the one where the relief does not reach you.',
+}
+
 export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
   rule({
     id: 'scope-no-eu-connection',
@@ -322,7 +508,18 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
       confidenceImpact: 0,
       reasons: ['You indicated no EU users, market presence, or affected people, so the AI Act may not apply.'],
       missingFacts: [],
-      obligations: ['Confirm and document the territorial scope position before deprioritising AI Act work; revisit if EU usage, customers, or outputs change.'],
+      actions: [
+        {
+          id: 'scope-document-position',
+          text: 'Record the territorial scope position, and who signed it off, before deprioritising AI Act work.',
+          kind: 'good-practice',
+          article: 'Article 2',
+          basis:
+            'Article 2 sets the Regulation’s territorial scope. If it does not reach you, you have no AI Act duties at all — so this is not one of them. It earns its place because scope is the assumption every other answer here rests on, and the one most likely to change quietly.',
+          inPractice:
+            'Note which EU connections you considered — EU users, placement on the EU market, outputs affecting people in the EU — and revisit the moment any of them changes.',
+        },
+      ],
       vendorQuestions: [],
       adjacentRisks: ['Local AI rules (UK, US state laws, sector-specific regimes) may still apply even when the EU AI Act does not.'],
       reviewTriggers: ['EU users, customers, market placement, or EU-affecting outputs are added'],
@@ -345,7 +542,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
       confidenceImpact: 2,
       reasons: [],
       missingFacts: ['Confirm whether the system is used in the EU, placed on the EU market, or affects people in the EU.'],
-      obligations: [],
+      actions: [],
       vendorQuestions: [],
       adjacentRisks: [],
       reviewTriggers: [],
@@ -368,7 +565,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
       confidenceImpact: 0,
       reasons: ['You appear primarily to be a deployer using a third-party AI system.'],
       missingFacts: [],
-      obligations: [],
+      actions: [],
       vendorQuestions: [],
       adjacentRisks: [],
       reviewTriggers: [],
@@ -391,7 +588,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
       confidenceImpact: 1,
       reasons: ['You are using a third-party system, but integration choices may create deployer duties and could create provider-like responsibilities if the intended purpose changes.'],
       missingFacts: ['Confirm whether integration changes the intended purpose communicated by the vendor.'],
-      obligations: [],
+      actions: [],
       vendorQuestions: [],
       adjacentRisks: [],
       reviewTriggers: ['New integration, configuration, or workflow automation is added'],
@@ -414,7 +611,20 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
       confidenceImpact: 0,
       reasons: ['You may have provider-side responsibilities because you build or place an AI product on the market.'],
       missingFacts: [],
-      obligations: ['Document intended purpose, risk classification, instructions for use, and lifecycle monitoring responsibilities.'],
+      actions: [
+        {
+          id: 'provider-document-baseline',
+          text: 'Document the intended purpose, your risk classification, the instructions for use, and who owns lifecycle monitoring.',
+          kind: 'conditional',
+          condition: 'The three duties behind this bind providers of high-risk systems. If this system is not high-risk, none of them applies to you.',
+          article: 'Articles 11, 13 and 72',
+          corpusArticle: '11',
+          basis:
+            'Three separate provider duties sit behind this, and all three are scoped to high-risk systems: technical documentation under Article 11, instructions for deployers under Article 13, and post-market monitoring under Article 72. The intended purpose is what the classification turns on, so writing it down is what you need first either way.',
+          inPractice:
+            'Write the intended purpose down before you argue the tier, not after. Stating it once, plainly, is what makes the classification defensible rather than convenient.',
+        },
+      ],
       vendorQuestions: [],
       adjacentRisks: [],
       reviewTriggers: ['Product intended purpose, model, feature set, or market changes'],
@@ -437,7 +647,17 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
       confidenceImpact: 1,
       reasons: ['You may have provider-side responsibilities because you fine-tune, materially modify, rebrand, resell, or set a new intended purpose.'],
       missingFacts: ['Confirm exactly what is modified and whether the original vendor classification still applies.'],
-      obligations: ['Maintain evidence of what changed from the vendor baseline and who controls intended purpose.'],
+      actions: [
+        {
+          id: 'modified-keep-change-evidence',
+          text: 'Keep evidence of what changed from the vendor baseline, and of who controls the intended purpose.',
+          kind: 'good-practice',
+          basis:
+            'Fine-tuning, rebranding or reselling can move you from deployer to provider, which changes whose duties the AI Act’s high-risk requirements are. This evidence is not itself required by the Regulation — it is what settles which side of that line you are on when someone asks.',
+          inPractice:
+            'A dated change log against the vendor’s original intended-purpose statement is usually enough. The question it has to answer is whether you changed what the system is for, not merely how it is configured.',
+        },
+      ],
       vendorQuestions: ['Does the vendor permit fine-tuning, resale, rebranding, or material modification under its AI Act and product terms?'],
       adjacentRisks: ['Contractual allocation of AI Act and data protection responsibilities should be reviewed.'],
       reviewTriggers: ['Fine-tuning, resale, rebranding, or product positioning changes'],
@@ -461,7 +681,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
       confidenceImpact: 2,
       reasons: [],
       missingFacts: ['Clarify whether you are only using the tool, or whether you modify, rebrand, resell, or set a new intended purpose for it.'],
-      obligations: [],
+      actions: [],
       vendorQuestions: ['Ask the vendor which party is provider, deployer, importer, distributor, or product manufacturer for this deployment.'],
       adjacentRisks: [],
       reviewTriggers: [],
@@ -478,9 +698,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
       priority: 100 + index,
       when: (answers) => has(answers, 'prohibited_screen', `art5-${practice.point}`),
       build: () =>
-        practice.futureDated
-          ? futureProhibitedFinding(practice.summary)
-          : prohibitedFinding(practice.summary),
+        practice.futureDated ? futureProhibitedFinding(practice) : prohibitedFinding(practice),
     })
   ),
   rule({
@@ -499,7 +717,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
       confidenceImpact: 2,
       reasons: [],
       missingFacts: ['Confirm whether the system involves any Article 5 prohibited-practice red flags before deployment or renewal.'],
-      obligations: [],
+      actions: [],
       vendorQuestions: ['Ask the vendor whether the system is designed or restricted to avoid Article 5 prohibited practices.'],
       adjacentRisks: [],
       reviewTriggers: ['System behaviour or use expands into biometric, profiling, or vulnerable-person contexts'],
@@ -526,7 +744,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
       missingFacts: performsProfiling(answers).value
         ? []
         : ['Annex III use cases default to high-risk under the AI Act. Article 6(3) offers a narrow-task exemption (narrow procedural tasks, improving prior human activity, etc.) — confirm the vendor classification and intended purpose before assuming a lower tier applies.'],
-      obligations: ['Treat this as a likely high-risk candidate until the vendor classification and intended-purpose evidence are confirmed.'],
+      actions: [ANNEX_III_HIGH_RISK_CANDIDATE],
       // The Article 6(3) classification question belongs to
       // vendor-classification-missing, which asks it with its anchor attached.
       vendorQuestions: [],
@@ -556,7 +774,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
         confidenceImpact: 2,
         reasons: [`The primary use (${primaryUseAnnexIII[primaryUse] ?? primaryUse}) sits inside an Annex III high-risk area, even though no specific sensitive-domain box was ticked.`],
         missingFacts: ['Confirm the specific sensitive-domain breakdown — the primary use suggests Annex III applicability that should be cross-checked against the actual workflow.'],
-        obligations: ['Treat this as a likely high-risk candidate until the vendor classification and intended-purpose evidence are confirmed.'],
+        actions: [ANNEX_III_HIGH_RISK_CANDIDATE],
         vendorQuestions: performsProfiling(answers).value
           ? []
           : ['Does the vendor classify this use case as high-risk under Annex III?'],
@@ -603,8 +821,18 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
         missingFacts: assumed
           ? ['Confirm whether the system evaluates personal aspects of an individual. The high-risk tier here follows from an assumed answer to that question.']
           : [],
-        obligations: [
-          'Do not plan around an Article 6(3) narrow-task exemption for this system. Where profiling of natural persons is performed, the exemption is unavailable as a matter of law.',
+        actions: [
+          {
+            id: 'profiling-no-exemption',
+            text: 'Do not plan around an Article 6(3) narrow-task exemption for this system. It is unavailable as a matter of law.',
+            kind: 'duty',
+            article: 'Article 6(3)',
+            corpusArticle: '6',
+            basis:
+              'The final subparagraph of Article 6(3) is unqualified: “Notwithstanding the first subparagraph, an AI system referred to in Annex III shall always be considered to be high-risk where the AI system performs profiling of natural persons.” None of the four narrow-task conditions can rescue such a system, so there is no exemption argument left to make.',
+            inPractice:
+              'Plan on the full high-risk requirements. If a vendor’s classification relies on the narrow-task exemption for a system that profiles people, that classification is wrong and worth challenging in writing.',
+          },
         ],
         vendorQuestions: [
           'Does the vendor acknowledge that Article 6(3)’s profiling proviso removes the narrow-task exemption for this system, and does its classification reflect that?',
@@ -635,13 +863,45 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
         confidenceImpact: 0,
         reasons: [],
         missingFacts: [],
-        obligations: provider
+        actions: provider
           ? [
-              'If you rely on an Article 6(3) narrow-task exemption, document that assessment before the system is placed on the market or put into service, and produce it to national competent authorities on request (Article 6(4)).',
-              'Register yourself and the system in the EU database even where the exemption applies (Article 49(2)).',
+              {
+                id: 'exemption-document-assessment',
+                text: 'If you rely on the narrow-task exemption, document that assessment before the system is placed on the market or put into service, and produce it on request.',
+                kind: 'conditional',
+                condition: 'Only if you actually claim the Article 6(3) exemption. Not claiming it costs you nothing here.',
+                article: 'Article 6(4)',
+                corpusArticle: '6',
+                basis:
+                  'Article 6(4): “A provider who considers that an AI system referred to in Annex III is not high-risk shall document its assessment before that system is placed on the market or put into service… Upon request of national competent authorities, the provider shall provide the documentation of the assessment.” The exemption is a documented position, not a silent one.',
+                inPractice:
+                  'The assessment has to exist before launch, not after. Writing it up after a regulator asks does not satisfy the provision, and the date on the document is what shows which happened.',
+              },
+              {
+                id: 'exemption-register-anyway',
+                text: 'Register yourself and the system in the EU database even where you rely on the exemption.',
+                kind: 'conditional',
+                condition: 'Only if you claim the Article 6(3) exemption — the registration duty is attached to the claim.',
+                article: 'Article 49(2)',
+                corpusArticle: '49',
+                basis:
+                  'Article 6(4) states that such a provider “shall be subject to the registration obligation set out in Article 49(2)”, and Article 49(2) requires that provider to “register themselves and that system in the EU database referred to in Article 71” before placing it on the market. Claiming the exemption does not take you out of the register; it changes which entry you make.',
+                inPractice:
+                  'This is the step most often missed, because it feels contradictory — you register a system precisely in order to say it is not high-risk.',
+              },
             ]
           : [
-              'Where your vendor relies on an Article 6(3) narrow-task exemption, obtain its Article 6(4) assessment for your file — the duty is the provider’s, but the evidence is what makes your own position defensible.',
+              {
+                id: 'exemption-obtain-vendor-assessment',
+                text: 'Where your vendor relies on the narrow-task exemption, obtain its Article 6(4) assessment for your file.',
+                kind: 'good-practice',
+                article: 'Article 6(4)',
+                corpusArticle: '6',
+                basis:
+                  'The Article 6(4) duty to document the assessment is the provider’s, not yours — so this is not an obligation on you. But if the vendor’s classification is wrong, the system is high-risk and the deployer duties in Article 26 are yours. Holding the assessment is what makes your own position defensible.',
+                inPractice:
+                  'Ask for it during procurement, while you still have leverage. A vendor that cannot produce it has not done the assessment.',
+              },
             ],
         // The Article 49 registration question is asked once, by
         // vendor-registration-missing, so it is not duplicated here.
@@ -670,14 +930,55 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
       confidenceImpact: 0,
       reasons: [],
       missingFacts: [],
-      obligations: hasProviderDuties(answers)
+      actions: hasProviderDuties(answers)
         ? [
-            'As provider, keep the automatically generated logs for at least six months, subject to any longer period required by Union or national law (Article 19(1)).',
-            'Ensure the system technically records events over its lifetime — that logging capability is Article 12, and is separate from how long you keep the output.',
+            {
+              id: 'art-19-1-provider-log-retention',
+              text: 'As provider, keep the automatically generated logs for at least six months.',
+              kind: 'conditional',
+              condition: HIGH_RISK_CONDITION,
+              article: 'Article 19(1)',
+              corpusArticle: '19',
+              basis:
+                'Article 19(1) requires providers of high-risk AI systems to keep the Article 12(1) logs “to the extent such logs are under their control”, for “a period appropriate to the intended purpose of the high-risk AI system, of at least six months, unless provided otherwise in the applicable Union or national law, in particular in Union law on the protection of personal data”. Six months is a floor, not a target.',
+              inPractice:
+                'Check the logs are genuinely under your control — the duty is scoped to those that are. Where they sit with a hosting provider, retention becomes a contract question rather than a configuration one.',
+            },
+            {
+              id: 'art-12-logging-capability',
+              text: 'Ensure the system technically records events over its lifetime.',
+              kind: 'conditional',
+              condition: HIGH_RISK_CONDITION,
+              article: 'Article 12',
+              corpusArticle: '12',
+              basis:
+                'Article 12(1): “High-risk AI systems shall technically allow for the automatic recording of events (logs) over the lifetime of the system.” This is a capability requirement on the system itself, and it is a different duty from how long anyone keeps the output — that is Article 19(1) for providers and Article 26(6) for deployers.',
+              inPractice:
+                'A system that cannot log cannot be made compliant by a retention policy. This one is settled at design or procurement time, not afterwards.',
+            },
           ]
         : [
-            'As deployer, keep the automatically generated logs under your control for a period appropriate to the intended purpose and in any event at least six months, unless Union or national law — including data protection law — provides otherwise (Article 26(6)).',
-            'Confirm the system technically records events over its lifetime; that logging capability is the vendor’s Article 12 duty, and is separate from your retention period.',
+            {
+              id: 'art-26-6-deployer-log-retention',
+              text: 'As deployer, keep the automatically generated logs under your control for at least six months.',
+              kind: 'conditional',
+              condition: HIGH_RISK_CONDITION,
+              article: 'Article 26(6)',
+              corpusArticle: '26',
+              basis:
+                'Article 26(6) requires deployers of high-risk AI systems to keep the logs the system generates automatically, “to the extent such logs are under their control, for a period appropriate to the intended purpose of the high-risk AI system, of at least six months, unless provided otherwise in applicable Union or national law, in particular in Union law on the protection of personal data”.',
+              inPractice:
+                'Ask what the vendor’s default retention is, and whether you can export. A six-month floor you cannot reach because the platform rolls logs at 30 days is still your problem.',
+            },
+            {
+              id: 'art-12-logging-capability-vendor',
+              text: 'Confirm the system technically records events over its lifetime — that capability is your vendor’s duty, not yours.',
+              kind: 'good-practice',
+              article: 'Article 12',
+              corpusArticle: '12',
+              basis:
+                'Article 12(1) puts the logging capability on the high-risk system, which makes it the provider’s duty to build. Confirming it is therefore not an obligation on you — but your own Article 26(6) retention duty is unachievable if the capability is absent, so it is worth establishing before you rely on it.',
+            },
           ],
       vendorQuestions: [],
       adjacentRisks: [
@@ -702,7 +1003,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
       confidenceImpact: 0,
       reasons: ['The output can rank, determine eligibility, automate adverse action, or control safety-related activity.'],
       missingFacts: [],
-      obligations: [],
+      actions: [],
       vendorQuestions: [],
       adjacentRisks: [],
       reviewTriggers: ['Less human review or more automation'],
@@ -724,7 +1025,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
       confidenceImpact: 0,
       reasons: ['The system influences a human decision, so the intended purpose and oversight model matter.'],
       missingFacts: [],
-      obligations: [],
+      actions: [],
       vendorQuestions: [],
       adjacentRisks: [],
       reviewTriggers: ['Decision support becomes ranking, scoring, eligibility, or automated action'],
@@ -746,7 +1047,21 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
       confidenceImpact: 0,
       reasons: ['Human oversight appears weak, which increases operational and compliance risk.'],
       missingFacts: [],
-      obligations: ['Define who reviews outputs, what they must check, and when they can override the system.'],
+      actions: [
+        {
+          id: 'define-human-oversight-roles',
+          text: 'Define who reviews outputs, what they must check, and when they can override the system.',
+          kind: 'conditional',
+          condition:
+            'A duty at the high-risk tier. Below it, this is our recommendation rather than the Regulation’s requirement — but weak oversight is what turns a tool’s error into your decision.',
+          article: 'Article 26(2)',
+          corpusArticle: '26',
+          basis:
+            'Article 26(2): deployers of high-risk AI systems “shall assign human oversight to natural persons who have the necessary competence, training and authority, as well as the necessary support.” Article 26(3) preserves your freedom to organise your own resources to achieve it, so the shape is yours to choose — the competence, authority and support are not.',
+          inPractice:
+            'Name people, not teams, and write down what authority they have to say no. Oversight that cannot override is the rubber stamp the Regulation is trying to prevent.',
+        },
+      ],
       vendorQuestions: ['What human oversight procedures and operator competence expectations does the vendor recommend?'],
       adjacentRisks: [],
       reviewTriggers: ['Human review is reduced, removed, or becomes a rubber stamp'],
@@ -768,7 +1083,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
       confidenceImpact: 1,
       reasons: [],
       missingFacts: ['Confirm whether human review is meaningful and whether reviewers have authority to override the AI output.'],
-      obligations: [],
+      actions: [],
       vendorQuestions: ['What oversight controls, escalation routes, and override mechanisms are available?'],
       adjacentRisks: [],
       reviewTriggers: [],
@@ -845,7 +1160,17 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
       confidenceImpact: 0,
       reasons: ['A generative AI product or model route may create GPAI or provider-side obligations separate from deployer duties.'],
       missingFacts: ['Confirm whether you provide a GPAI model, a downstream application, or an AI feature built on a third-party model.'],
-      obligations: ['Document model/application role, intended purpose, downstream users, and dependency on third-party model providers.'],
+      actions: [
+        {
+          id: 'document-gpai-role-and-dependencies',
+          text: 'Document your model/application role, the intended purpose, downstream users, and your dependency on third-party model providers.',
+          kind: 'good-practice',
+          basis:
+            'Which duties attach depends on whether you provide a general-purpose AI model, a downstream application built on someone else’s model, or an AI feature inside your own product — and those three sit under different parts of the Regulation. This record is what makes that question answerable; it is not itself a requirement.',
+          inPractice:
+            'The dependency is the part people skip. If your obligations move when your model provider changes its terms, that is a fact about your compliance posture, not just your architecture.',
+        },
+      ],
       vendorQuestions: ['If built on a third-party model, what GPAI documentation, acceptable-use restrictions, and model update notices does the model provider supply?'],
       adjacentRisks: [],
       reviewTriggers: ['Model capability, distribution model, or downstream customer base changes'],
@@ -959,7 +1284,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
       confidenceImpact: 1,
       reasons: [],
       missingFacts: ['Obtain the vendor intended-purpose statement, AI Act classification, instructions for use, oversight guidance, and data processing terms.'],
-      obligations: [],
+      actions: [],
       vendorQuestions: [],
       adjacentRisks: [],
       reviewTriggers: ['Vendor evidence pack is received or materially updated'],
@@ -974,20 +1299,15 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     source: anchor('sme-proportionate-relief'),
     priority: 650,
     when: (answers) => hasAny(answers, 'org_size', ['micro', 'small', 'medium']),
-    build: () => ({
+    build: (answers) => ({
       evidence: ['Organisation size: SME'],
       explanation:
-        'The AI Act treats SMEs and start-ups proportionately on documentation, quality management, sandbox access, and fine ceilings.',
+        'The AI Act treats SMEs and start-ups proportionately on documentation, quality management, sandbox access, and fine ceilings. The documentation and quality-management reliefs are reliefs from provider duties on high-risk systems, so they only apply on that path.',
       scoreDelta: 0,
       confidenceImpact: 0,
       reasons: [],
       missingFacts: [],
-      obligations: [
-        'As an SME you may supply Annex IV technical documentation in the simplified form set out in the Commission’s form, which notified bodies must accept (Article 11(1)).',
-        'Your quality management system may be implemented proportionately to the size of your organisation, subject to a floor on rigour (Article 17(2)).',
-        'You have priority access to AI regulatory sandboxes (Article 57).',
-        'Fines take the lower of the percentage and the fixed amount, across Article 99 paragraphs 3, 4 and 5 (Article 99(6)).',
-      ],
+      actions: sizeReliefActions(answers, ART_99_6_LOWER_OF),
       vendorQuestions: [],
       adjacentRisks: [],
       reviewTriggers: ['Organisation grows past the SME thresholds'],
@@ -1002,7 +1322,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     source: anchor('smc-proportionate-relief'),
     priority: 651,
     when: (answers) => has(answers, 'org_size', 'small-mid-cap'),
-    build: () => ({
+    build: (answers) => ({
       evidence: ['Organisation size: small mid-cap (SMC)'],
       explanation:
         'The Digital Omnibus extended several SME reliefs to small mid-caps, a category defined by reference to point (2) of the Annex to Recommendation (EU) 2025/1099. The fine relief is narrower than the SME version.',
@@ -1010,12 +1330,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
       confidenceImpact: 0,
       reasons: [],
       missingFacts: [],
-      obligations: [
-        'As a small mid-cap you may supply Annex IV technical documentation in simplified form using the Commission’s form, which notified bodies must accept (Article 11(1)).',
-        'Your quality management system may be implemented proportionately to the size of your organisation, subject to a floor on rigour (Article 17(2)).',
-        'You have priority access to AI regulatory sandboxes (Article 57).',
-        'Fines take the lower of the percentage and the fixed amount for Article 99 paragraphs 4 and 5 only (Article 99(6a)). This relief does not extend to Article 5 prohibited-practice fines, which remain at the higher of €35M or 7% of total worldwide annual turnover.',
-      ],
+      actions: sizeReliefActions(answers, ART_99_6A_LOWER_OF_SMC),
       vendorQuestions: [],
       adjacentRisks: [],
       reviewTriggers: ['Organisation grows past the small mid-cap thresholds'],
@@ -1037,7 +1352,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
       confidenceImpact: 0,
       reasons: [],
       missingFacts: [],
-      obligations: [],
+      actions: [],
       vendorQuestions: [],
       adjacentRisks: ['Personal or sensitive data is involved; check GDPR lawful basis, minimisation, retention, security, and DPIA requirements.'],
       reviewTriggers: ['New data category or more personal data'],
@@ -1059,7 +1374,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
       confidenceImpact: 1,
       reasons: [],
       missingFacts: [],
-      obligations: [],
+      actions: [],
       vendorQuestions: [],
       adjacentRisks: ['Sensitive data context detected; a human data protection review is recommended alongside AI Act triage.'],
       reviewTriggers: ['Sensitive data category or affected group changes'],
@@ -1081,7 +1396,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
       confidenceImpact: 0,
       reasons: [],
       missingFacts: [],
-      obligations: [],
+      actions: [],
       vendorQuestions: [],
       adjacentRisks: ['This use sits in a sector where vendor contracts, audit rights, and evidence quality matter materially.'],
       reviewTriggers: ['Vendor contract renewal or procurement review'],
@@ -1103,9 +1418,25 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
       confidenceImpact: 0,
       reasons: [],
       missingFacts: [],
-      obligations: [
-        'Maintain an AI system record covering intended purpose, owner, users, affected people, data, vendor, and review date.',
-        'Keep evidence of vendor documentation, internal oversight decisions, and material changes.',
+      actions: [
+        {
+          id: 'maintain-ai-system-record',
+          text: 'Maintain an AI system record covering intended purpose, owner, users, affected people, data, vendor, and review date.',
+          kind: 'good-practice',
+          basis:
+            'This is our recommendation, not a requirement of the Regulation — no provision of the AI Act obliges an SME deploying a system that is not high-risk to keep a register. It earns its place because it is what every duty that could apply presupposes you can produce: the Article 26 deployer obligations, Article 11 technical documentation, Article 72 post-market monitoring. It is also what makes this assessment re-usable when the system changes, rather than an answer with a shelf life.',
+          inPractice:
+            'One row per system. The review date is the field that does the work — it is what turns a document into a process.',
+        },
+        {
+          id: 'retain-governance-evidence',
+          text: 'Keep evidence of vendor documentation, internal oversight decisions, and material changes.',
+          kind: 'good-practice',
+          basis:
+            'Also our recommendation rather than a statutory duty. Every position in this result — the tier, your role, your oversight model — rests on evidence you either hold or do not. Holding it is the difference between a position and an assertion when a customer, an insurer or an authority asks how you reached it.',
+          inPractice:
+            'Keep the vendor’s own words: its classification, its intended-purpose statement, its instructions. A summary you wrote is evidence of what you believed, not of what you were told.',
+        },
       ],
       vendorQuestions: [],
       adjacentRisks: [],
@@ -1136,7 +1467,7 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
         confidenceImpact: 0,
         reasons: [],
         missingFacts: [],
-        obligations: [],
+        actions: [],
         vendorQuestions: [],
         adjacentRisks: [],
         reviewTriggers: triggers.length ? triggers.map(reviewTriggerLabel) : [
@@ -1150,7 +1481,36 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
   }),
 ]
 
-function prohibitedFinding(label: string): Omit<RuleFinding, 'id' | 'title' | 'category' | 'version' | 'lastReviewed' | 'legalStatus' | 'source'> {
+/**
+ * The size reliefs that apply, given who the reader is.
+ *
+ * Articles 11(1) and 17(2) relieve *provider* duties on *high-risk* systems, so
+ * they are gated on that path with the same predicates the Article 6(4) and
+ * log-retention rules already use. Firing them on organisation size alone — as
+ * this did — told an SME deploying a minimal-risk chatbot that it could simplify
+ * Annex IV technical documentation it never owed, and scale down a quality
+ * management system Article 17(1) never required of it.
+ *
+ * Sandbox access and the fine ceiling are not tier-dependent, so they always
+ * apply. The penalty item differs between SMEs and SMCs and is passed in.
+ */
+function sizeReliefActions(answers: AssessmentAnswers, penaltyRelief: RuleItem): RuleItem[] {
+  const highRiskProvider = hasProviderDuties(answers) && inAnnexIIIDomain(answers)
+  return [
+    ...(highRiskProvider ? [ART_11_SIMPLIFIED_DOCS, ART_17_PROPORTIONATE_QMS] : []),
+    ART_57_SANDBOX_PRIORITY,
+    penaltyRelief,
+  ]
+}
+
+/**
+ * The practice is passed whole rather than as a label so each item can carry its
+ * own point-level anchor — `Article 5(1)(f)` rather than a generic `Article 5`.
+ * The "stop" item's id is per-point for the same reason: two selected practices
+ * produce two anchored bullets, where the old identical prose collapsed to one.
+ */
+function prohibitedFinding(practice: Art5Practice): Omit<RuleFinding, 'id' | 'title' | 'category' | 'version' | 'lastReviewed' | 'legalStatus' | 'source'> {
+  const label = practice.summary
   return {
     evidence: [`Prohibited-practice screen selected: ${label}`],
     explanation: `The selected use involves ${label}, which is a prohibited-practice red flag requiring immediate review.`,
@@ -1159,9 +1519,24 @@ function prohibitedFinding(label: string): Omit<RuleFinding, 'id' | 'title' | 'c
     confidenceImpact: 0,
     reasons: ['One or more selected practices maps to a prohibited-practice red flag and needs immediate human/legal review.'],
     missingFacts: [],
-    obligations: [
-      'Stop or pause the affected use until the prohibited-practice position is reviewed.',
-      'Document the use case, affected people, and vendor/system behaviour before any further deployment.',
+    actions: [
+      {
+        id: `stop-prohibited-use-${practice.point}`,
+        text: `Stop or pause this use — ${label} — until the prohibited-practice position is reviewed.`,
+        kind: 'duty',
+        article: `Article 5(1)(${practice.point})`,
+        corpusArticle: '5',
+        basis: `Article 5(1) prohibits this practice outright, and has done since ${practice.appliesFrom}. A prohibition is not a requirement you can satisfy: there is no conformity assessment route, no documentation that cures it, and no risk-management measure that makes it lawful.`,
+        inPractice:
+          'This is the one result in the tool that warrants a call to a lawyer today rather than a plan. Prohibited-practice infringements also carry the highest penalty ceiling in the Regulation.',
+      },
+      {
+        id: 'document-prohibited-use-case',
+        text: 'Document the use case, affected people, and vendor/system behaviour before any further deployment.',
+        kind: 'good-practice',
+        basis:
+          'Not a requirement of the Regulation — it is what your own legal review will ask for first. Pausing a use without recording why tends to mean the same use returns in six months under a different name.',
+      },
     ],
     vendorQuestions: ['Ask the vendor to confirm whether the system is designed, marketed, or technically capable of this prohibited-practice use.'],
     adjacentRisks: [],
@@ -1176,7 +1551,8 @@ function prohibitedFinding(label: string): Omit<RuleFinding, 'id' | 'title' | 'c
  * ordering an immediate stop — and it scores below `prohibitedFinding` so a
  * practice prohibited today always takes the headline.
  */
-function futureProhibitedFinding(label: string): Omit<RuleFinding, 'id' | 'title' | 'category' | 'version' | 'lastReviewed' | 'legalStatus' | 'source'> {
+function futureProhibitedFinding(practice: Art5Practice): Omit<RuleFinding, 'id' | 'title' | 'category' | 'version' | 'lastReviewed' | 'legalStatus' | 'source'> {
+  const label = practice.summary
   return {
     evidence: [`Prohibited-practice screen selected: ${label}`],
     explanation: `The selected use involves ${label}, which becomes a prohibited practice on 2 December 2026 under Article 5(1)(ba)–(bb), inserted by Regulation (EU) 2026/1744. It is not prohibited today.`,
@@ -1187,9 +1563,28 @@ function futureProhibitedFinding(label: string): Omit<RuleFinding, 'id' | 'title
       'A selected practice is prohibited from 2 December 2026 under the Digital Omnibus amendments. It is not prohibited today, but the use cannot continue past that date.',
     ],
     missingFacts: [],
-    obligations: [
-      'Plan the redesign, restriction, or withdrawal of the affected use so it is complete before 2 December 2026.',
-      'Document the intended purpose and the technical safeguards that prevent this output — the prohibition catches outputs that are a reasonably foreseeable and reproducible outcome without adequate safety measures, not only outputs that are the intended purpose (Article 5(1a)).',
+    actions: [
+      {
+        id: `plan-withdrawal-${practice.point}`,
+        text: `Plan the redesign, restriction, or withdrawal of this use — ${label} — so it is complete before ${practice.appliesFrom}.`,
+        kind: 'duty',
+        article: `Article 5(1)(${practice.point})`,
+        corpusArticle: '5',
+        basis: `Inserted by Regulation (EU) 2026/1744 and prohibited from ${practice.appliesFrom}. It is not prohibited today, which is why this is a date to finish work against rather than an instruction to stop now — but a prohibition admits no compliance route, so there is nothing to build towards except stopping.`,
+        inPractice:
+          'Work back from the date. A redesign that lands the week before leaves no room for the safeguards below to be tested.',
+      },
+      {
+        id: 'document-art-5-1a-safeguards',
+        text: 'Document the intended purpose and the technical safeguards that prevent this output.',
+        kind: 'good-practice',
+        article: 'Article 5(1a)',
+        corpusArticle: '5',
+        basis:
+          'Article 5(1a) decides when these two prohibitions bite, and it reaches further than intended purpose: the practice is caught where generation or manipulation is the intended purpose, or else where the system’s “design, training, architecture, capabilities or user-facing functionalities make that generation or manipulation a reasonably foreseeable and reproducible outcome, without requiring significant technical modification, and the system does not have reasonable and adequate technical safety measures”. The safeguards are what keep a general-purpose system outside the prohibition; the documentation is what shows they were there.',
+        inPractice:
+          'Record what the safeguards are and when you tested them. "Reasonably foreseeable and reproducible" is a question about capability, not about what anyone intended.',
+      },
     ],
     vendorQuestions: [
       'What technical safeguards prevent this system generating non-consensual intimate imagery or child sexual abuse material, and will the vendor attest to Article 5(1)(ba)–(bb) compliance before 2 December 2026?',
@@ -1214,7 +1609,21 @@ function transparencyFinding(label: string): Omit<RuleFinding, 'id' | 'title' | 
     confidenceImpact: 0,
     reasons: ['The system may trigger transparency duties because it interacts with people, generates content, or detects emotion/biometric categories.'],
     missingFacts: [],
-    obligations: ['Ensure users are told when they interact with AI and label AI-generated or synthetic content where required.'],
+    // One shared id across all five Article 50 rules, so several transparency
+    // signals still produce one bullet rather than five identical ones.
+    actions: [
+      {
+        id: 'transparency-inform-and-label',
+        text: 'Tell people when they are interacting with AI, and mark AI-generated or synthetic content.',
+        kind: 'duty',
+        article: 'Article 50',
+        corpusArticle: '50',
+        basis:
+          'Article 50 splits these duties by role, and each limb carries its own exceptions. 50(1) puts the “you are interacting with an AI system” disclosure on providers, unless it is obvious to a reasonably well-informed, observant and circumspect person. 50(2) requires providers of systems generating synthetic audio, image, video or text to mark outputs in a machine-readable, detectable format. 50(3) requires deployers of emotion-recognition or biometric-categorisation systems to inform the people exposed to them. 50(4) requires deployers to disclose deep fakes, and AI-generated text published to inform the public on matters of public interest.',
+        inPractice:
+          'Work out which limb you are on before designing the notice. The provider-side machine-readable marking duty and the deployer-side disclosure duty are different jobs, and a banner on your site satisfies neither on its own.',
+      },
+    ],
     vendorQuestions: ['What user-facing transparency notices, labels, and technical disclosure controls does the vendor provide?'],
     adjacentRisks: [],
     reviewTriggers: ['The system becomes user-facing or begins generating external content'],
@@ -1233,7 +1642,7 @@ function vendorEvidenceFinding(
     confidenceImpact: 0,
     reasons: [],
     missingFacts: [],
-    obligations: [],
+    actions: [],
     vendorQuestions: [question],
     adjacentRisks: [],
     reviewTriggers: [],
@@ -1275,7 +1684,14 @@ export function evaluateRuleLibrary(answers: AssessmentAnswers): RuleEvaluation 
 
   const reasons = unique(flatten(firedRules.map((item) => item.reasons)))
   const missingFacts = unique(flatten(firedRules.map((item) => item.missingFacts)))
-  const obligations = unique(flatten(firedRules.map((item) => item.obligations)))
+  // Deduped by `id`, not by prose: two rules wording the same duty slightly
+  // differently used to render twice, because the string was the only identity
+  // an item had. The rule id rides along so the UI can join an item back to the
+  // "Rules fired" audit card.
+  const actions = uniqueBy(
+    flatten(firedRules.map((rule) => rule.actions.map((item) => ({ ...item, ruleId: rule.id })))),
+    (item) => item.id
+  )
   const vendorQuestions = unique(flatten(firedRules.map((item) => item.vendorQuestions)))
   const adjacentRisks = unique(flatten(firedRules.map((item) => item.adjacentRisks)))
   const reviewTriggers = unique(flatten(firedRules.map((item) => item.reviewTriggers)))
@@ -1296,7 +1712,7 @@ export function evaluateRuleLibrary(answers: AssessmentAnswers): RuleEvaluation 
     ),
     reasons: reasons.length ? reasons : ['No high-risk, prohibited-practice, transparency, or GPAI trigger was selected, based on the answers provided.'],
     missingFacts,
-    obligations,
+    actions,
     vendorQuestions,
     adjacentRisks,
     reviewTriggers,

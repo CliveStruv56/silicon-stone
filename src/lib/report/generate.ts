@@ -5,6 +5,7 @@ import { recordUsage } from '@/lib/usage'
 import { RULE_PACK } from '@/lib/rulepack'
 import { coveredArticles, hasCorpus, readArticle, verifyCitation } from '@/lib/rulepack/corpus'
 import type { AssessmentResult } from '@/lib/ai-act-assessment'
+import type { ActionKind, ResultItem } from '@/lib/ai-act-rules'
 import { parseGeneratedReport, type FixedFacts, type RejectionReason } from './schema'
 import { articleNumberFrom, shouldWithhold, verifyReport, type VerifiedReport } from './verify'
 
@@ -39,6 +40,34 @@ export function reportGenerationConfigured(): boolean {
   return Boolean(API_KEY)
 }
 
+/**
+ * Serialise result items for the prompt, one kind-group at a time.
+ *
+ * The engine separates a duty from a concession; handing the model one
+ * undifferentiated `<engine_obligations>` list threw that away and invited it to
+ * write "you must obtain simplified documentation" about a relief the reader may
+ * decline. Each item's `basis` goes through too, because that is the sentence
+ * that says "option, not task" in the engine's own words.
+ *
+ * Note the limit, honestly: the citation verifier cannot catch a promoted
+ * concession. A model that writes "you must use the simplified form" can quote
+ * Article 11(1)'s genuine "it shall use the form referred to in this paragraph"
+ * and verify clean, because that sentence *is* mandatory once you opt in. The
+ * structural split and the labelling are the mitigation; there is no mechanical
+ * backstop for this one.
+ */
+function engineItems(items: ResultItem[], kinds: ActionKind[]): string {
+  const selected = items.filter((item) => kinds.includes(item.kind))
+  if (selected.length === 0) return '(none)'
+  return selected
+    .map((item) => {
+      const anchor = [item.kind, item.article].filter(Boolean).join(', ')
+      const condition = item.condition ? ` Condition: ${item.condition}` : ''
+      return `- [${anchor}] ${item.text} — basis: ${item.basis}${condition}`
+    })
+    .join('\n')
+}
+
 export function toFixedFacts(result: AssessmentResult, toolName: string): FixedFacts {
   return {
     toolName,
@@ -47,7 +76,7 @@ export function toFixedFacts(result: AssessmentResult, toolName: string): FixedF
     confidence: result.confidence,
     reasons: result.reasons,
     missingFacts: result.missingFacts,
-    obligations: result.obligations,
+    actions: result.actions,
     reviewTriggers: result.reviewTriggers,
     firedRules: result.firedRules.map((rule) => ({
       id: rule.id,
@@ -111,6 +140,7 @@ HONESTY
 - "what_we_did_not_ask" is required and must be substantive: the specific facts this questionnaire never established that would change the tier or the obligations if they went the other way. This is the section that stops a fourteen-question triage from reading like an audit.
 - Where the answers genuinely cannot settle something — multi-purpose systems, contested Annex III boundaries — put it in "unresolved" and say what a lawyer would need to be asked. Refusing to decide is more useful than a hedged decision.
 - Address the reader as "you". This is their system, not a case study.
+- The engine distinguishes duties from concessions, support measures, enforcement information and this tool's own recommendations, and labels each item accordingly. Never promote an item from a lower category into a duty, and never attribute one of this tool's recommendations to the Regulation. A concession the reader may decline is not something they must do.
 
 STYLE
 Clinical, specific, and free of filler. No throat-clearing, no "in today's rapidly evolving regulatory landscape", no restating the question before answering it. A compliance officer is going to paste this into a file.
@@ -235,9 +265,24 @@ ${facts.reasons.map((reason) => `- ${reason}`).join('\n') || '(none)'}
 ${facts.missingFacts.map((fact) => `- ${fact}`).join('\n') || '(none)'}
 </engine_identified_gaps>
 
-<engine_obligations>
-${facts.obligations.map((item) => `- ${item}`).join('\n') || '(none)'}
-</engine_obligations>
+<engine_duties>
+Requirements the engine attributes to the reader. Each carries its Article, and
+where it is conditional, the condition it depends on.
+${engineItems(facts.actions, ['duty', 'conditional'])}
+</engine_duties>
+
+<engine_concessions_and_support>
+NOT obligations. Each is a concession the reader MAY use, a support measure they
+may apply for, or a statement of how a fine would be calculated. Never restate
+one as something the reader must do, and never describe one as an obligation.
+${engineItems(facts.actions, ['concession', 'support', 'enforcement'])}
+</engine_concessions_and_support>
+
+<engine_recommended_practice>
+This tool's governance recommendations, not requirements of the Regulation. If
+you refer to one, say whose recommendation it is.
+${engineItems(facts.actions, ['good-practice'])}
+</engine_recommended_practice>
 
 <engine_review_triggers>
 ${facts.reviewTriggers.map((item) => `- ${item}`).join('\n') || '(none)'}

@@ -5,6 +5,9 @@
 import type { AssessmentResult, AssessmentAnswers, AssessmentQuestion } from './ai-act-assessment'
 import { AI_ACT_TIMELINE, LEGAL_CORPUS_CUT_OFF, PENALTY_TIERS } from './ai-act-timeline'
 import { RULE_PACK } from './rulepack'
+import { ACTION_KIND_LABEL, groupObligations } from './ai-act-obligations'
+import type { ResultItem } from './ai-act-rules'
+import { absoluteUrl } from './site'
 import type { Policy, IndustryImpact } from '@/types/policy'
 import type { Scenario, ExposureProfile as ScenarioExposureProfile } from '@/types/scenario'
 import type {
@@ -19,6 +22,44 @@ const isoDate = () => new Date().toISOString().slice(0, 10)
 const bullets = (items: string[] | undefined, fallback = ''): string => {
   if (!items || items.length === 0) return fallback ? `- ${fallback}` : ''
   return items.map((item) => `- ${item}`).join('\n')
+}
+
+/**
+ * The result items, under the same headings the screen uses.
+ *
+ * Both sides call `groupObligations()`, which is the point: the export is what
+ * gets pasted into a board pack, so a heading that said "Immediate obligations"
+ * here while the screen said otherwise would put the misdescription back into
+ * circulation in the copy that gets read by other people.
+ *
+ * Links are absolute for the same reason — a relative href is useless once the
+ * markdown leaves the site.
+ */
+const obligationSections = (items: ResultItem[]): string => {
+  const groups = groupObligations(items)
+  if (groups.length === 0) return '_No actions or applicable provisions were identified._'
+
+  return groups
+    .map((group) => {
+      const lines = group.items.map((item) => {
+        const prefix = item.article
+          ? `**${item.article} — ${ACTION_KIND_LABEL[item.kind].toLowerCase()}.**`
+          : `**${ACTION_KIND_LABEL[item.kind]}.**`
+        const detail = [
+          item.condition ? `  - Applies only if: ${item.condition}` : '',
+          `  - Basis: ${item.basis}`,
+          item.inPractice ? `  - In practice: ${item.inPractice}` : '',
+          item.corpusArticle
+            ? `  - Full text: ${absoluteUrl(`/tools/compliance-checker/provisions/${item.corpusArticle}`)}`
+            : '',
+        ]
+          .filter(Boolean)
+          .join('\n')
+        return `- ${prefix} ${item.text}\n${detail}`
+      })
+      return `### ${group.heading}\n_${group.blurb}_\n\n${lines.join('\n')}`
+    })
+    .join('\n\n')
 }
 
 // --- Compliance Checker --------------------------------------------------
@@ -63,8 +104,8 @@ ${bullets(result.reasons)}
 ## Missing evidence
 ${bullets(result.missingFacts, 'No critical missing facts identified.')}
 
-## Immediate obligations
-${bullets(result.obligations)}
+## Recommended actions and applicable provisions
+${obligationSections(result.actions)}
 
 ## Vendor questions
 ${bullets(result.vendorQuestions, 'Keep current vendor evidence on file and refresh it when the system changes.')}

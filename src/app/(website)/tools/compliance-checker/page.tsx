@@ -30,6 +30,7 @@ import {
 import { AI_ACT_TIMELINE, PENALTY_TIERS } from '@/lib/ai-act-timeline'
 import { RULE_PACK } from '@/lib/rulepack'
 import { ComplianceIntake } from '@/components/tools/ComplianceIntake'
+import { ObligationList } from '@/components/tools/ObligationList'
 import { ReportGate } from '@/components/tools/ReportGate'
 import { CopyMarkdownButton } from '@/components/tools/CopyMarkdownButton'
 import { ToolSubscribeCard } from '@/components/tools/ToolSubscribeCard'
@@ -499,7 +500,13 @@ export default function ComplianceCheckerPage() {
                 </CardHeader>
               </Card>
 
-              <div className="grid gap-6 lg:grid-cols-2">
+              {/*
+                Three cards across, then the actions card full width beneath.
+                It carries grouped sub-headings and a disclosure per item, so it
+                is several times taller than its old grid neighbours and made a
+                2×2 layout lopsided.
+              */}
+              <div className="grid gap-6 lg:grid-cols-3">
                 <ResultCard
                   icon={<ShieldCheck className="w-5 h-5 text-stone-teal" />}
                   title="Why this result"
@@ -511,16 +518,13 @@ export default function ComplianceCheckerPage() {
                   items={result.missingFacts.length ? result.missingFacts : ['No critical missing facts were identified from this answer set.']}
                 />
                 <ResultCard
-                  icon={<ClipboardCheck className="w-5 h-5 text-stone-teal" />}
-                  title="Immediate obligations"
-                  items={result.obligations}
-                />
-                <ResultCard
                   icon={<FileText className="w-5 h-5 text-silicon-amber-strong" />}
                   title="Vendor questions"
                   items={result.vendorQuestions.length ? result.vendorQuestions : ['Keep current vendor evidence on file and refresh it when the system changes.']}
                 />
               </div>
+
+              <ObligationList items={result.actions} />
 
               <Card className="bg-stone-charcoal border-border-subtle">
                 <CardHeader>
