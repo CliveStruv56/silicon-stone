@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { SlidersHorizontal } from 'lucide-react'
@@ -376,6 +376,7 @@ export function IntelligenceFeed({
   const [selectedTier, setSelectedTier] = useState<IntelligenceTier | null>(initialFilters?.tier ?? null)
   const [selectedTopic, setSelectedTopic] = useState<string | null>(initialFilters?.topic ?? null)
   const [filterSheetOpen, setFilterSheetOpen] = useState(false)
+  const resultsRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
     function syncFiltersFromUrl() {
@@ -467,6 +468,20 @@ export function IntelligenceFeed({
       persona: persona ?? 'all',
       tier: tier ?? 'all',
       topic: topic ?? 'all',
+    })
+  }
+
+  // The persona cards sit a long way above the feed they filter, so a card
+  // click also brings the results into view — otherwise the only feedback is a
+  // list changing off-screen. Honours prefers-reduced-motion.
+  function selectPersonaFromCards(persona: string | null) {
+    updateFilters(persona, selectedTier)
+
+    if (!persona) return
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    resultsRef.current?.scrollIntoView({
+      behavior: reduced ? 'auto' : 'smooth',
+      block: 'start',
     })
   }
 
@@ -566,8 +581,13 @@ export function IntelligenceFeed({
         {/* Three Readings of Every Briefing — relocated from the homepage */}
         <ThreeReadings className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-10 border-b border-border-subtle" />
 
-        {/* Persona Introduction */}
-        <PersonaIntro />
+        {/* Persona Introduction — the cards are filter controls in their own
+            right; the pill row below does the same job in compact form. */}
+        <PersonaIntro
+          selectedPersona={selectedPersona}
+          onPersonaSelect={selectPersonaFromCards}
+          personaCounts={personaCounts}
+        />
 
         {/* Feed Filters — stacked pills on desktop, compact trigger + bottom
             sheet on mobile (P1-5) */}
@@ -695,7 +715,7 @@ export function IntelligenceFeed({
         </BottomSheet>
 
         {/* Content */}
-        <section className="py-10">
+        <section ref={resultsRef} id="briefings" className="scroll-mt-20 py-10">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             {loading ? (
               <div className="text-center py-10">

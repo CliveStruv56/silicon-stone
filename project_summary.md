@@ -464,6 +464,21 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 17, 2026 — the persona cards on /intelligence now filter the feed
+
+"Find Your Perspective" told the reader to pick a perspective and then ignored
+the pick — filtering lived only in the pill row below. Each card is now a toggle
+button calling the same `updateFilters` as the pills, so the two controls cannot
+disagree and `?persona=<slug>` deep links, `popstate` sync and the SSR-filtered
+first paint all keep working as they were. Cards carry their match count and
+show a selected state; choosing one scrolls the feed into view
+(`prefers-reduced-motion` respected). `PersonaIntro`'s new props are optional, so
+the component still renders as a plain explainer without a filtering host.
+
+Verified in-browser: 11 articles → 3 for Clara, toggle restores 11,
+`?persona=troy` arrives pressed. Files: `src/components/briefings/PersonaIntro.tsx`,
+`src/app/(website)/intelligence/IntelligenceFeed.tsx`.
+
 ### August 17, 2026 — three chrome corrections, measured rather than eyeballed
 
 Cosmetic only; no behaviour, no data, no prices. Detail in the homepage-redesign

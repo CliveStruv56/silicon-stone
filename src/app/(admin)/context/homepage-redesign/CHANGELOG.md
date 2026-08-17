@@ -2,6 +2,42 @@
 
 > Track every change shipped as part of the 2026 homepage redesign here. Append-only.
 
+## 2026-08-17 — §Find Your Perspective: the persona cards became the filter
+
+The cards on `/intelligence` said "pick the perspective closest to your work to
+filter the feed below" and then did nothing when picked — the filtering lived
+entirely in the pill row further down. They are now the primary control.
+
+- Files changed: `src/components/briefings/PersonaIntro.tsx`,
+  `src/app/(website)/intelligence/IntelligenceFeed.tsx`
+- Requested by: Clive
+- Notes:
+  - Each card is a `<button aria-pressed>` wrapping the existing `ForensicCard`,
+    with a visible focus ring and an `sr-only` label that names the action
+    ("Filter briefings for Compliance Clara, Legal/Compliance Officer" /
+    "Clear the Compliance Clara filter"). Clicking a selected card clears it,
+    matching how the pills already behave.
+  - It calls the **same** `updateFilters` the pill row calls rather than holding
+    its own state, so the two controls cannot disagree, the URL still gains
+    `?persona=<slug>`, and the existing `popstate` sync and SSR deep-link path
+    (`filters.ts`) keep working untouched. The `Feed Filter` Plausible event
+    fires as before.
+  - `PersonaIntro`'s three new props are optional. Without `onPersonaSelect` it
+    renders exactly the informational section it was — the component lives in
+    `components/briefings/`, so it should not require a filtering host.
+  - **Counts on the cards** ("3 briefings", "Showing 3 briefings" when selected),
+    from the same `personaCounts` the pills use — computed after the topic and
+    tier filters, so the number is what that card will actually give you.
+  - **Selecting scrolls the feed into view** (`#briefings`, `scroll-mt-20`),
+    honouring `prefers-reduced-motion`. The cards sit ~1,700px above the
+    articles they filter; without it the only feedback is a list changing
+    off-screen.
+  - Verified in a browser against the live feed: 11 articles → 3 on Clara, URL
+    `?persona=clara`, toggling back restores 11, and `?persona=troy` arrives
+    with the Troy card pressed. No console errors; `tsc --noEmit` clean.
+  - The homepage's `PersonaCompass` is unchanged — it already links to
+    `/intelligence?persona=<slug>`, which now lands with the card selected.
+
 ## 2026-08-17 — three chrome corrections: hero CTAs, Products menu, footer rhythm
 
 Three small visual fixes, all reported from the rendered page and each verified
