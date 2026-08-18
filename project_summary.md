@@ -2,11 +2,13 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-08-18
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (99 static pages), 626 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (99 static pages), 651 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
 **The AI Act Compliance Checker was rebuilt on 2026-08-10** (Stages 0–3 of the agentic build spec): the rule base is corrected and versioned at `v2026-08-10`, backed by a git-tracked rule pack carrying 19 Articles of verbatim consolidated statute; a conversational intake proposes answers the user confirms before the unchanged deterministic engine classifies; and the result screen now offers an email-gated written report whose every legal quotation is string-matched against that corpus before a reader sees it. The paid half of Stage 3 — the £39 Evidence Pack and the £39→£79 credit — is built dark behind a flag and blocked on the Lemon Squeezy store. A legal review of the report template, disclaimer and credit terms is an open item before it ships. **Reworked again on 2026-08-17**: result items are typed rather than bare strings, so the card (now "Recommended actions and applicable provisions") groups duties apart from concessions, support measures and enforcement information, each expandable to its legal basis and conditions; and `/tools/compliance-checker/provisions` serves the 19 pinned Articles as verbatim statute a reader can follow a citation into. **The vendor questions followed on 2026-08-18**, each now carrying its own Article anchor, a corpus link and a stated reason for asking — including, where the vendor owes you no answer, the fact that it does not. See §9 and §11.
+
+**A v2 rebuild of the Compliance Checker is in progress and is the largest thread of work in the repo.** Plan of record: `docs/# EU AI Act Compliance Checker v2 — Impl.md` (23 sections, 8 phases). **Phases 0–6 are built** under `src/lib/compliance-v2/`, behind `NEXT_PUBLIC_COMPLIANCE_CHECKER_V2` + `?v2=1`; v1 is untouched and is what every user still gets. Its central move is removing the score from legal classification. Six v1 defects are documented in `docs/compliance-checker-v1-known-defects.md` and held as characterisation tests; three are fixed in v2. **Start here: `docs/compliance-checker-v2-state.md`** — one page on how to run it, what exists, what is deliberately not done, and which decisions are still open. Per-phase history is §9; CLAUDE.md carries the invariants. Two carve-outs are recorded rather than hidden: Article 5's per-practice condition trees are unwritten, and no model call or email send is wired.
 
 **The blocker is a P0, re-confirmed against the live API on 2026-08-11: the production Kit API key is a legacy v3 key (22 chars, no `kit_` prefix), so `/api/subscribe` 401s and — because `NEXT_PUBLIC_PRE_LAUNCH` is still `true`, making every product CTA an email capture — the entire funnel currently terminates in a failed POST.** Beyond that: Lemon Squeezy store not yet created, 9 drafts unpublished, and 7 of 12 published articles still lack cover images. Go-live sequence lives in `LAUNCH.md`; defects and debt in §10.
 
@@ -463,6 +465,50 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 18, 2026 — Compliance Checker v2, Phase 6: the report
+
+The deterministic core, the §14.4 verifier, the prose contract and the consent
+model. 651 tests green. Flag still dark.
+
+**The deterministic document is complete on its own** — scope, roles,
+classification, findings, extracts, sources, unknowns, dates, review triggers,
+disclaimer and version stamps, all from `ComplianceResultV2` and the approved
+library. A model is optional. That ordering matters: v1's report *is* the
+generation, so a model outage there is a missing report; here it is a report
+without an executive summary.
+
+**What a model may write is a separate object with no legal fields in it at
+all.** There is nowhere in `GeneratedProse` to put an obligation, a citation or a
+date, which is a stronger guarantee than asking it not to.
+`citedPropositionIds` must be a subset of what the document offered; an id
+outside it drops the prose whole rather than being patched out.
+
+**Verification implements §14.4's seven checks with no tolerance threshold.** The
+corpus check is split deliberately: every proposition's extract is
+string-matched against the pinned statute **at build time** by
+`compliance-v2-check.ts` (`corpus.ts` is `server-only` and unreachable from the
+browser), and what runs at request time is the check that closes the gap — that a
+finding's embedded extract is still identical to the library's, so a report
+cannot carry a doctored copy of text verified in a different form.
+
+Most of the tests are a model *trying to cheat and failing*: inventing a
+proposition, quoting text nobody verified, speaking in duties on a result that
+has none. Each is dropped and the report survives. A model that throws costs the
+summary, not the report.
+
+**Consent has two fields, not one** (§13.2), and no path where agreeing to
+delivery produces a marketing opt-in — the only way to get `true` is to pass it.
+The wording shown is recorded with the record, because "consented" without saying
+to what is not evidence of anything. `loggableConsent()` carries no address.
+
+**The email cannot reach the model, structurally.** It is not omitted from the
+prompt; it is not in `AnswerRecordV2` at all, because it is not an answer.
+
+**Not done, deliberately:** no model is wired and no email is sent. There is no
+mail sender in this codebase, and §22's report-retention decision is open — the
+spec says not to invent one. The seams are built and tested; wiring them is small
+once those land.
 
 ### August 18, 2026 — Compliance Checker v2, Phase 5: the result
 
@@ -4124,7 +4170,9 @@ phases; **Phase 0 shipped 2026-08-18** (see §9). v1 stays live behind
 | 3 — Article 5, Annex, Article 50 routes | **Done 2026-08-18**, with one carve-out. Defects 2, 3 and 6 fixed; Annex I, Annex III, Article 6(3) and paragraph-specific Article 50 all built. **Outstanding: the per-practice Article 5 condition trees** (§7.6). Until they exist every positive screen holds at `potentially_prohibited` with an explicit unresolved list, which is the safe direction but is not the whole of §7.6. |
 | 4 — Questionnaire UI | **Done 2026-08-18.** Behind `COMPLIANCE_CHECKER_V2` + `?v2=1`. All three exit criteria verified: keyboard-only completion in a real browser, no dead end from an unknown answer, and stranded answers held outside what the engine sees. |
 | 5 — Result UI | **Done 2026-08-18.** Typed finding cards, §12.1's sections with empties hidden, §12.4's contextual penalties, §9.4's date-aware duty status. All three exit criteria pass. |
-| 6 — Report and email flow | Next. Deterministic legal report sections, restricted AI prose, proposition-applicability verification, and the core result shown before the email gate. §22's open decisions start to bite here: report retention, and whether the report email may be used for marketing (default: delivery only). |
+| 6 — Report and email flow | **Library done 2026-08-18**; delivery not wired. Deterministic report, §14.4 verifier, prose contract, consent model — all tested. **Outstanding: an actual model call and an actual send.** Blocked on there being no mail sender at all, and on §22.1's retention decision. |
+| 7 — GDPR overlay | Next, and unblocked. §11: conditional questions triggered when `personal_data_use` is yes/possibly/unknown, findings typed `adjacent_law` / `recommended_safeguard` / `unresolved_issue` only, EU vs UK GDPR distinguished where the answers allow and both flagged where they do not. The result already has a `gdprOverlay` field and an "Related data-protection considerations" section waiting for it. |
+| 8 — Validation and release | Golden matrix completion, editorial review of the legal content, usability and accessibility testing, shadow-mode v1/v2 comparison, then the opt-in beta. |
 | 6 — Report and email flow | — |
 | 7 — GDPR overlay | — |
 | 8 — Validation and release | Includes shadow-mode v1/v2 comparison and optional counsel review. |

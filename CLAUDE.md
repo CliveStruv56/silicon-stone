@@ -134,6 +134,51 @@ The report generator only supplies Articles the pack covers, so an `uncovered`
 verdict means the model cited outside its evidence, not merely that coverage is
 thin.
 
+## Compliance Checker v2 (in build, behind a flag)
+
+**Read `docs/compliance-checker-v2-state.md` first** — one page on how to run it,
+what exists, what is deliberately unfinished, and which decisions are open.
+`docs/# EU AI Act Compliance Checker v2 — Impl.md` is the plan of record — 23
+sections, 8 phases. **Phases 0–6 are built** under `src/lib/compliance-v2/` and
+`src/components/tools/checker-v2/`; v1 is untouched and remains what every user
+gets. Reaching v2 needs `NEXT_PUBLIC_COMPLIANCE_CHECKER_V2=true` **and** `?v2=1`
+on the checker URL. Progress and per-phase state live in `project_summary.md` §11.
+
+Its central move: **no score decides a legal classification.** v1 returns
+"Likely high-risk" on `score >= 5` with no rule having classified anything —
+that and five other defects are documented in
+`docs/compliance-checker-v1-known-defects.md` and asserted as *still present* in
+`src/lib/compliance-v2/v1-invariants.test.ts`. Those are characterisation tests:
+when v2 fixes one, the test fails and must be moved and inverted, never deleted.
+
+Five things not to undo:
+
+- **An unknown is a state, never a value.** `AnswerState` is
+  `answered | unknown | not_applicable | declined`, and `evaluateCondition`
+  refuses to satisfy a value test from a non-answered state. v1's defect 5 is
+  that "not sure" about personal data produced a result byte-identical to "no".
+- **Branch conditions are data, not closures.** That is what lets
+  `validateCatalogue()` reject a condition referencing a question that does not
+  exist *or one asked later* — a forward reference means the branch never opens
+  and nothing errors.
+- **Every high-risk result cites an exact route.** `classify.ts` contains no
+  arithmetic; `statutoryRoutes` is empty exactly when nothing was cited, and
+  `hasStatutoryRoute()` is asserted across every golden scenario.
+- **Legal content is curated, versioned and corpus-verified.**
+  `legal-content/propositions.ts` holds every quotable extract;
+  `npm run test:checker-v2` (in `prebuild`) string-matches all of them against
+  the pinned pack and fails the build on a mismatch. A finding may only cite a
+  proposition, and a report may only cite what its own findings carry.
+- **The model writes prose, never law.** `report/schema.ts` gives generated
+  output no field for an obligation, a citation or a date;
+  `report/verify.ts` implements §14.4 with no tolerance threshold. The email
+  address is not in `AnswerRecordV2` at all, so it cannot reach a prompt.
+
+Two carve-outs recorded rather than hidden: **Article 5's per-practice condition
+trees are unwritten** (every positive screen holds at `potentially_prohibited`
+with an explicit unresolved list), and **no model call or email send is wired** —
+there is no mail sender, and §22.1's retention decision is open.
+
 ## Regulatory retrieval corpus (editorial only — do not blur)
 
 `corpus/regulatory/`, `src/lib/regulatory/` and the Pinecone index named by
