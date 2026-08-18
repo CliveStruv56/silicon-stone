@@ -10,25 +10,23 @@ import type { AssessmentQuestionV2 } from '../types'
  * prohibited' unless the complete deterministic rule path has been satisfied and
  * the relevant exceptions have been excluded."
  *
- * **Scope note, stated rather than left to be discovered.** §7.6 also asks for
- * separate conditions and exception questions for *every* supported prohibited
- * practice. What is here is the screen, the law-enforcement authorisation
- * exception that recurs across several of the points, and the Article 5(1a)
- * safeguards test that decides when the two future-dated prohibitions reach a
- * general-purpose system. The remaining per-practice condition trees are legal
- * content still to author, and until they exist the engine holds every positive
- * screen at `potentially_prohibited` — which is the safe direction and exactly
- * what §7.6 requires of an unresolved path.
+ * This module holds only the **screen** — the one broad question asked of
+ * everyone, whatever their sector, because a prohibition attaches to a practice
+ * rather than to an industry. The per-practice conditions and exceptions §7.6
+ * also asks for live in `article-5-conditions.ts`, and are asked only of a
+ * reader who ticked the practice they belong to.
+ *
+ * Two questions that used to sit here moved there on 2026-08-19:
+ * `technical_safety_measures`, which is the second half of Article 5(1a)(a)(ii)
+ * and reads as a non-sequitur anywhere else, and `law_enforcement_authorisation`,
+ * which was a generic stand-in for exceptions that are now asked in the specific
+ * terms each provision actually uses. A question that no longer decides anything
+ * is a question that should not be asked.
  *
  * The practice list comes from the pinned pack rather than a literal here, so a
  * change to the prohibitions is a pack edit and a version bump, not a code
  * change.
  */
-
-const YES_NO = [
-  { value: 'yes', label: 'Yes' },
-  { value: 'no', label: 'No' },
-]
 
 const PRACTICE_OPTIONS = RULE_PACK.prohibitedPractices.map((practice) => ({
   value: `art5_${practice.point}`,
@@ -61,46 +59,6 @@ export const PROHIBITED_QUESTIONS: AssessmentQuestionV2[] = [
     validate: [
       { kind: 'maxSelections', value: PRACTICE_OPTIONS.length + 1, message: 'Select from the list.' },
     ],
-  },
-  {
-    id: 'law_enforcement_authorisation',
-    section: 'Prohibited practices',
-    prompt: 'Is this use specifically authorised by law for a law enforcement purpose?',
-    shortPrompt: 'Authorised by law',
-    help:
-      'Authorised by a specific legal basis, not merely lawful in general. If you are not a public authority acting under one, the answer is no.',
-    whyAsked:
-      'Several of Article 5’s prohibitions carry narrow law enforcement exceptions with their own safeguards and authorisation requirements. A "no" here closes those exceptions rather than opening them, which is why it is worth asking plainly.',
-    answerType: 'single',
-    options: YES_NO,
-    allowUnknown: true,
-    allowNotApplicable: false,
-    importance: 'classification_decisive',
-    required: true,
-    visibleWhen: {
-      not: { questionId: 'prohibited_screen', includesAny: ['none_of_these'] },
-    },
-  },
-  {
-    id: 'technical_safety_measures',
-    section: 'Prohibited practices',
-    prompt: 'Does the system have reasonable and adequate technical safety measures against that output, and have you tested them?',
-    shortPrompt: 'Safety measures',
-    help: 'Both halves matter: the measures, and evidence that they were tested.',
-    whyAsked:
-      'For the two prohibitions that arrive on 2 December 2026, Article 5(1a) turns on whether the system’s design and capabilities make that output a reasonably foreseeable and reproducible outcome without significant technical modification, absent reasonable and adequate technical safety measures. The safeguards are what keep a general-purpose system outside the prohibition.',
-    answerType: 'single',
-    options: YES_NO,
-    allowUnknown: true,
-    allowNotApplicable: false,
-    importance: 'classification_decisive',
-    required: true,
-    visibleWhen: {
-      questionId: 'prohibited_screen',
-      includesAny: RULE_PACK.prohibitedPractices
-        .filter((practice) => practice.futureDated)
-        .map((practice) => `art5_${practice.point}`),
-    },
   },
 ]
 

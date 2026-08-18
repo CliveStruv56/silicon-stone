@@ -184,10 +184,17 @@ Five things not to undo:
   (controller is not a deployer). `verifyReport` checks those three absences and
   drops the whole block rather than showing a heading over nothing.
 
-Two carve-outs recorded rather than hidden: **Article 5's per-practice condition
-trees are unwritten** (every positive screen holds at `potentially_prohibited`
-with an explicit unresolved list), and **no model call or email send is wired** —
-there is no mail sender, and §22.1's retention decision is open.
+**Article 5's prohibitions are conjunctions, and clearing one is a feature.**
+`engine/article-5.ts` evaluates every limb of all ten practices and returns
+`not_engaged`, `unresolved` or `all_limbs_met`. A cleared practice is *shown*,
+not dropped — the reader ticked the box and is owed the answer. A complete path
+still reports `potentially_prohibited` at `medium` confidence: §6.3's enum has no
+`prohibited` value, the answers are self-reported judgements about the user's own
+system, and the content is `reviewStatus: 'internal'`. Do not add a `prohibited`
+classification without counsel review.
+
+One carve-out recorded rather than hidden: **no model call or email send is
+wired** — there is no mail sender, and §22.1's retention decision is open.
 
 One flow rule worth not undoing: **`isFinished` and `isLastQuestion` are
 different questions**, and the nav renders both buttons when both are true. The

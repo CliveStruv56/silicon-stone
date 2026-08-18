@@ -384,14 +384,195 @@ GOLDEN_SCENARIOS.push(
   },
   {
     id: 'prohibitedScreenPositive',
-    spec: '§7.6 — a positive screen stays "potentially prohibited" until resolved',
+    spec: '§7.6 — a positive screen stays "potentially prohibited" while a limb is unanswered',
     answers: record(
       ...IN_SCOPE_DEPLOYER,
       answered('intended_use_family', 'employment'),
       answered('individual_impact', 'recommends_ranks_scores'),
       answered('annex_iii_employment_use', ['none_of_these']),
+      answered('prohibited_screen', ['art5_f'])
+    ),
+  }
+)
+
+/**
+ * Phase 7b: the Article 5 per-practice condition trees (§7.6).
+ *
+ * Three shapes per practice wherever they are meaningful — a limb failing, an
+ * exception the provision states being made out, and every limb satisfied. The
+ * middle one is the case the old generic screen could not express and that made
+ * the tool wrong in practice: an emotion-inference system used for a medical
+ * reason is excepted by Article 5(1)(f) in its own words, and used to receive
+ * the gravest result this tool can give, permanently.
+ */
+const ARTICLE_5_BASE = [
+  ...IN_SCOPE_DEPLOYER,
+  answered('intended_use_family', 'something_else'),
+  answered('intended_use_description', 'It analyses recorded interactions with people.'),
+  answered('individual_impact', 'informs_human_decision'),
+]
+
+GOLDEN_SCENARIOS.push(
+  {
+    id: 'article5EmotionMedicalException',
+    spec: '§7.6 — Article 5(1)(f)’s medical-or-safety exception, made out',
+    answers: record(
+      ...ARTICLE_5_BASE,
       answered('prohibited_screen', ['art5_f']),
-      answered('law_enforcement_authorisation', 'no')
+      answered('art5_f_context', ['workplace']),
+      answered('art5_f_medical_safety', 'yes')
+    ),
+  },
+  {
+    id: 'article5EmotionAllLimbsMet',
+    spec: '§7.6 — the same practice with every limb satisfied and no exception',
+    answers: record(
+      ...ARTICLE_5_BASE,
+      answered('prohibited_screen', ['art5_f']),
+      answered('art5_f_context', ['workplace']),
+      answered('art5_f_medical_safety', 'no')
+    ),
+  },
+  {
+    id: 'article5EmotionOutsideWorkplace',
+    spec: '§7.6 — a limb failing: emotion inference, but not in a workplace or school',
+    answers: record(
+      ...ARTICLE_5_BASE,
+      answered('prohibited_screen', ['art5_f']),
+      answered('art5_f_context', ['none_of_these']),
+      answered('art5_f_medical_safety', 'no')
+    ),
+  },
+  {
+    id: 'article5ManipulationNoHarm',
+    spec: '§7.6 — Article 5(1)(a): a deceptive technique that causes no significant harm',
+    answers: record(
+      ...ARTICLE_5_BASE,
+      answered('prohibited_screen', ['art5_a']),
+      answered('art5_a_technique', ['deceptive']),
+      answered('art5_a_informed_decision', 'yes'),
+      answered('art5_ab_material_distortion', 'yes'),
+      answered('art5_ab_significant_harm', 'no')
+    ),
+  },
+  {
+    id: 'article5ManipulationAllLimbsMet',
+    spec: '§7.6 — Article 5(1)(a) with all four limbs satisfied',
+    answers: record(
+      ...ARTICLE_5_BASE,
+      answered('prohibited_screen', ['art5_a']),
+      answered('art5_a_technique', ['subliminal', 'deceptive']),
+      answered('art5_a_informed_decision', 'yes'),
+      answered('art5_ab_material_distortion', 'yes'),
+      answered('art5_ab_significant_harm', 'yes')
+    ),
+  },
+  {
+    id: 'article5ManipulationHarmUnknown',
+    spec: '§7.6 with §4.3 — an unknown limb leaves it unresolved, never cleared',
+    answers: record(
+      ...ARTICLE_5_BASE,
+      answered('prohibited_screen', ['art5_a']),
+      answered('art5_a_technique', ['deceptive']),
+      answered('art5_a_informed_decision', 'yes'),
+      answered('art5_ab_material_distortion', 'yes'),
+      unknown('art5_ab_significant_harm')
+    ),
+  },
+  {
+    id: 'article5PredictivePolicingException',
+    spec: '§7.6 — Article 5(1)(d)’s exception: supporting a human assessment on objective facts',
+    answers: record(
+      ...ARTICLE_5_BASE,
+      answered('prohibited_screen', ['art5_d']),
+      answered('art5_d_solely_profiling', 'yes'),
+      answered('art5_d_supports_human_assessment', 'yes')
+    ),
+  },
+  {
+    id: 'article5BiometricCategorisationCarveout',
+    spec: '§7.6 — Article 5(1)(g)’s labelling and law-enforcement carve-out',
+    answers: record(
+      ...ARTICLE_5_BASE,
+      answered('prohibited_screen', ['art5_g']),
+      answered('art5_g_characteristics', ['race']),
+      answered('art5_g_carveout', 'yes')
+    ),
+  },
+  {
+    id: 'article5RealTimeBiometricEngaged',
+    spec: '§7.6 — Article 5(1)(h) with no listed objective, so the exception cannot open',
+    answers: record(
+      ...ARTICLE_5_BASE,
+      answered('prohibited_screen', ['art5_h']),
+      answered('art5_h_realtime_public', 'yes'),
+      answered('art5_h_objective', ['none_of_these']),
+      answered('art5_h_safeguards', ['prior_authorisation'])
+    ),
+  },
+  {
+    id: 'article5RealTimeBiometricAuthorised',
+    spec: '§7.6 — Article 5(1)(h) with a listed objective and all three safeguards',
+    answers: record(
+      ...ARTICLE_5_BASE,
+      answered('prohibited_screen', ['art5_h']),
+      answered('art5_h_realtime_public', 'yes'),
+      answered('art5_h_objective', ['imminent_threat']),
+      answered('art5_h_safeguards', [
+        'prior_authorisation',
+        'fundamental_rights_assessment',
+        'eu_database_registration',
+      ])
+    ),
+  },
+  {
+    id: 'article5RealTimeBiometricPartialSafeguards',
+    spec: '§7.6 — a listed objective but incomplete safeguards leaves the prohibition engaged',
+    answers: record(
+      ...ARTICLE_5_BASE,
+      answered('prohibited_screen', ['art5_h']),
+      answered('art5_h_realtime_public', 'yes'),
+      answered('art5_h_objective', ['imminent_threat']),
+      answered('art5_h_safeguards', ['prior_authorisation'])
+    ),
+  },
+  {
+    id: 'article5DeepfakeDeployerNotUsing',
+    spec: '§7.6 — Article 5(1a)(b): a deployer who does not use the system for that purpose',
+    answers: record(
+      ...ARTICLE_5_BASE,
+      answered('prohibited_screen', ['art5_ba']),
+      answered('art5_ba_consent', 'no'),
+      answered('art5_ba_manipulation_scope', 'generates_new'),
+      answered('art5_babb_intended_purpose', 'no'),
+      answered('art5_babb_foreseeable_output', 'no'),
+      answered('art5_babb_deployer_use', 'no')
+    ),
+  },
+  {
+    id: 'article5DeepfakeNoSafeguards',
+    spec: '§7.6 — Article 5(1a)(a)(ii): foreseeable output with no adequate safeguards',
+    answers: record(
+      ...ARTICLE_5_BASE,
+      answered('prohibited_screen', ['art5_ba']),
+      answered('art5_ba_consent', 'no'),
+      answered('art5_ba_manipulation_scope', 'increases_or_alters'),
+      answered('art5_babb_intended_purpose', 'no'),
+      answered('art5_babb_foreseeable_output', 'yes'),
+      answered('technical_safety_measures', 'no'),
+      answered('art5_babb_deployer_use', 'no')
+    ),
+  },
+  {
+    id: 'article5TwoPracticesMixedOutcome',
+    spec: '§7.6 — one practice cleared and one engaged in the same assessment',
+    answers: record(
+      ...ARTICLE_5_BASE,
+      answered('prohibited_screen', ['art5_f', 'art5_e']),
+      answered('art5_e_database', 'yes'),
+      answered('art5_e_untargeted', 'yes'),
+      answered('art5_f_context', ['workplace']),
+      answered('art5_f_medical_safety', 'yes')
     ),
   }
 )

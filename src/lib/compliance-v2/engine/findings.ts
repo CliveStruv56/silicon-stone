@@ -83,33 +83,99 @@ export function buildLegalFindings(context: FindingContext): ComplianceFindingV2
    */
   if (scope.outcome === 'out_of_scope') return []
 
+  /**
+   * Article 5, in three shapes rather than one (§7.6).
+   *
+   * Before the per-practice trees existed this loop emitted one alarm per ticked
+   * box and never cleared. Now a practice arrives here as `all_limbs_met`,
+   * `unresolved` or `not_engaged`, and each gets a different card — including,
+   * importantly, the last one. A reader who ticked "infers emotions" and whose
+   * use is a medical one is *told* that Article 5(1)(f) excepts it, rather than
+   * being left with an alarm and no way to clear it.
+   */
   const article5 = evaluateArticle5(answers)
+  const article5Roles = held.length ? held : (['deployer'] as LegalRole[])
+
   for (const practice of article5.engaged) {
+    const complete = practice.outcome === 'all_limbs_met'
     findings.push({
       id: `article-5-${practice.point}`,
-      ruleId: 'article-5-screen',
-      title: `Possible prohibited practice: ${practice.summary}`,
-      // Not a `current_obligation`: §7.6 forbids concluding "prohibited" until
-      // the conditions and exceptions are resolved, and this tool has not
-      // resolved them. Calling it an obligation would assert what it cannot.
+      ruleId: 'article-5-conditions',
+      title: complete
+        ? `Every limb of this prohibition is met on your answers: ${practice.summary}`
+        : `Possible prohibited practice: ${practice.summary}`,
+      // Never a `current_obligation`, on either path. §7.6 forbids concluding
+      // "prohibited", and a prohibition is not an obligation in any case: there
+      // is nothing to do that discharges it.
       kind: 'unresolved_issue',
-      applicability: 'possibly_applies',
-      appliesToRoles: held.length ? held : ['deployer'],
+      applicability: complete ? 'likely_applies' : 'possibly_applies',
+      appliesToRoles: article5Roles,
       effectiveFrom: practice.appliesFrom,
-      whyItApplies: `You selected this practice on the Article 5 screen.${
-        practice.appliesFrom ? ` It becomes prohibited on ${practice.appliesFrom}, not today.` : ''
-      }`,
-      practicalMeaning:
-        'A prohibition has no compliance route: there is no conformity assessment that satisfies it, no documentation that cures it and no risk measure that makes it lawful. Whether it is engaged here depends on conditions this assessment has not worked through.',
-      action:
-        'Take legal advice on this specific use before continuing. It is the one result in this tool that warrants a call today rather than a plan.',
+      whyItApplies: complete
+        ? `You selected this practice on the Article 5 screen, and your answers satisfy every limb of the definition: ${practice.satisfied.join('; ')}. No exception the provision states applies on those answers.${
+            practice.appliesFrom ? ` It becomes prohibited on ${practice.appliesFrom}, not today.` : ''
+          }`
+        : `You selected this practice on the Article 5 screen. ${
+            practice.satisfied.length
+              ? `Your answers establish that ${practice.satisfied.join('; ')}.`
+              : 'None of its limbs has been settled yet.'
+          } ${
+            practice.unresolved.length === 1 ? 'One limb is' : `${practice.unresolved.length} limbs are`
+          } still open, so this is unresolved rather than cleared.${
+            practice.appliesFrom ? ` It becomes prohibited on ${practice.appliesFrom}, not today.` : ''
+          }`,
+      practicalMeaning: complete
+        ? 'A prohibition has no compliance route: there is no conformity assessment that satisfies it, no documentation that cures it and no risk measure that makes it lawful. Every limb of the definition being met on your own answers is as close as this tool comes to a conclusion — and it stops there, because these are judgements about your system that a court would take evidence on.'
+        : `A prohibition has no compliance route: there is no conformity assessment that satisfies it, no documentation that cures it and no risk measure that makes it lawful. Whether it is engaged here turns on ${
+            practice.unresolved.length === 1 ? 'one limb' : 'limbs'
+          } this assessment has not settled: ${practice.unresolved.join('; ')}.`,
+      action: complete
+        ? 'Take legal advice on this specific use today, before the system goes any further. Bring this result and the answers behind it — the limbs are already identified, which is most of what an adviser needs to start.'
+        : `Settle the open ${practice.unresolved.length === 1 ? 'limb' : 'limbs'} first — they are questions about your own system, not about the law — and take legal advice on what is left.`,
       evidenceToKeep: [
         'A written description of the use, the people affected, and what the system actually does.',
+        'Your answers to the Article 5 questions, and who in the organisation gave them.',
       ],
-      triggeringAnswerIds: article5.triggeringAnswerIds,
-      missingAnswerIds: article5.missingAnswerIds,
+      triggeringAnswerIds: practice.triggeringAnswerIds,
+      missingAnswerIds: practice.missingAnswerIds,
+      source: sourceFrom(`prop-art-5-1-${practice.point}`),
       priority: 'urgent',
-      confidence: 'low',
+      // Never `high`. A complete path is a complete path through self-reported
+      // answers, against legal content that has not been counsel-reviewed.
+      confidence: complete ? 'medium' : 'low',
+    })
+  }
+
+  /**
+   * The cleared practices, reported rather than dropped.
+   *
+   * §4.5 forbids irrelevant material, and this is not that: the reader raised
+   * the flag, and the tool owes them the answer. It is typed
+   * `recommended_safeguard` because what survives *is* a recommendation — the
+   * exclusion rests on a fact that can change, and saying which fact is the
+   * useful part.
+   */
+  for (const practice of article5.cleared) {
+    findings.push({
+      id: `article-5-cleared-${practice.point}`,
+      ruleId: 'article-5-conditions',
+      title: `Not engaged on your answers: ${practice.summary}`,
+      kind: 'recommended_safeguard',
+      applicability: 'applies',
+      appliesToRoles: article5Roles,
+      whyItApplies: `You flagged this practice on the Article 5 screen, and it is not engaged on your answers, because ${practice.clearedBecause}. That is a conclusion about the answers you gave rather than about the system in general.`,
+      practicalMeaning:
+        'Article 5’s prohibitions are cumulative: every limb of the definition has to be met, and where the provision states an exception, that exception takes the case out. One limb failing is enough, which is why most systems that trip the broad screen are not caught by the provision behind it.',
+      action:
+        'Record why this does not apply, in one paragraph, with the date. If the fact it rests on changes — a different setting, a different purpose, a safeguard that lapses — re-run this assessment before the change goes live.',
+      evidenceToKeep: [
+        'A dated note of the limb that is not met, and the evidence for it.',
+      ],
+      triggeringAnswerIds: practice.triggeringAnswerIds,
+      missingAnswerIds: [],
+      source: sourceFrom(`prop-art-5-1-${practice.point}`),
+      priority: 'normal',
+      confidence: 'medium',
     })
   }
 

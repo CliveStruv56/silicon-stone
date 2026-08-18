@@ -82,6 +82,301 @@ const AI_ACT = {
 
 export const LEGAL_PROPOSITIONS: LegalProposition[] = [
   {
+    id: 'prop-art-5-1-a',
+    ruleId: 'article-5-conditions',
+    ...AI_ACT,
+    provision: 'Article 5(1)(a)',
+    corpusArticle: '5',
+    // Article 5 reaches placing on the market, putting into service *and*
+    // use, so it binds every role rather than a subset. An importer placing
+    // a prohibited system on the EU market is caught exactly as its provider is.
+    applicableRoles: ['provider', 'deployer', 'importer', 'distributor', 'product_manufacturer', 'authorised_representative'],
+    conditions: [
+      'The system deploys a subliminal, purposefully manipulative or deceptive technique.',
+      'Materially distorting behaviour is its objective or its effect.',
+      'It appreciably impairs the ability to make an informed decision, producing a decision the person would not otherwise have taken.',
+      'It causes, or is reasonably likely to cause, significant harm.',
+    ],
+    exceptions: [
+
+    ],
+    effectiveFrom: '2025-02-02',
+    plainEnglishSummary:
+      'A system that manipulates or deceives people into decisions they would not otherwise take, causing significant harm, is prohibited outright.',
+    practicalMeaning:
+      'All four limbs are needed. Influence that leaves someone able to decide for themselves, or that causes no significant harm, does not reach this prohibition however uncomfortable it is.',
+    shortExtract:
+      'deploys subliminal techniques beyond a person’s consciousness or purposefully manipulative or deceptive techniques',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-5',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-5-1-b',
+    ruleId: 'article-5-conditions',
+    ...AI_ACT,
+    provision: 'Article 5(1)(b)',
+    corpusArticle: '5',
+    // Article 5 reaches placing on the market, putting into service *and*
+    // use, so it binds every role rather than a subset. An importer placing
+    // a prohibited system on the EU market is caught exactly as its provider is.
+    applicableRoles: ['provider', 'deployer', 'importer', 'distributor', 'product_manufacturer', 'authorised_representative'],
+    conditions: [
+      'The system exploits a vulnerability of age, disability, or a specific social or economic situation.',
+      'Materially distorting behaviour is its objective or its effect.',
+      'It causes, or is reasonably likely to cause, significant harm.',
+    ],
+    exceptions: [
+
+    ],
+    effectiveFrom: '2025-02-02',
+    plainEnglishSummary:
+      'A system that works through a person’s age, disability or social or economic situation to distort their behaviour and cause significant harm is prohibited outright.',
+    practicalMeaning:
+      'The three vulnerabilities are exhaustive, and "exploits" is stronger than "affects". A system that serves vulnerable users is not caught; one that works through the vulnerability is.',
+    shortExtract:
+      'exploits any of the vulnerabilities of a natural person or a specific group of persons due to their age, disability or a specific social or economic situation',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-5',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-5-1-ba',
+    ruleId: 'article-5-conditions',
+    ...AI_ACT,
+    provision: 'Article 5(1)(ba)',
+    corpusArticle: '5',
+    // Article 5 reaches placing on the market, putting into service *and*
+    // use, so it binds every role rather than a subset. An importer placing
+    // a prohibited system on the EU market is caught exactly as its provider is.
+    applicableRoles: ['provider', 'deployer', 'importer', 'distributor', 'product_manufacturer', 'authorised_representative'],
+    conditions: [
+      'The system generates or manipulates realistic material depicting an identifiable person’s intimate parts, or that person engaged in sexually explicit activity.',
+      'The depicted person has not given freely-given, specific, informed, unambiguous and explicit consent to that generation or manipulation.',
+      'Article 5(1a) is engaged by how the system is supplied or used.',
+    ],
+    exceptions: [
+      'Article 5(1b): manipulation that neither increases the exposure of depicted intimate parts nor alters the nature of a depicted sexual activity is not "manipulation" for this purpose.',
+    ],
+    effectiveFrom: '2026-12-02',
+    plainEnglishSummary:
+      'Generating or manipulating non-consensual intimate imagery of an identifiable person becomes prohibited on 2 December 2026.',
+    practicalMeaning:
+      'Consent is the defining absence, and it has to be consent to this generation or manipulation specifically. Article 5(1a) then narrows who is caught: a deployer only where they use the system for that purpose.',
+    shortExtract:
+      'without that person’s freely-given, specific, informed, unambiguous and explicit consent for that generation or manipulation',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-5',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-5-1-bb',
+    ruleId: 'article-5-conditions',
+    ...AI_ACT,
+    provision: 'Article 5(1)(bb)',
+    corpusArticle: '5',
+    // Article 5 reaches placing on the market, putting into service *and*
+    // use, so it binds every role rather than a subset. An importer placing
+    // a prohibited system on the EU market is caught exactly as its provider is.
+    applicableRoles: ['provider', 'deployer', 'importer', 'distributor', 'product_manufacturer', 'authorised_representative'],
+    conditions: [
+      'The system generates or manipulates material or performance within the meaning of Article 2, points (c) and (e), of Directive 2011/93/EU.',
+      'Article 5(1a) is engaged by how the system is supplied or used.',
+    ],
+    exceptions: [
+      'A "without right" defence under national law.',
+    ],
+    effectiveFrom: '2026-12-02',
+    plainEnglishSummary:
+      'Generating or manipulating child sexual abuse material becomes prohibited on 2 December 2026.',
+    practicalMeaning:
+      'The only exception the provision states is a "without right" defence under national law, which is a question of the national law that applies to you rather than of the Regulation.',
+    shortExtract:
+      'except where a ‘without right’ defence applies under national law',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-5',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-5-1-c',
+    ruleId: 'article-5-conditions',
+    ...AI_ACT,
+    provision: 'Article 5(1)(c)',
+    corpusArticle: '5',
+    // Article 5 reaches placing on the market, putting into service *and*
+    // use, so it binds every role rather than a subset. An importer placing
+    // a prohibited system on the EU market is caught exactly as its provider is.
+    applicableRoles: ['provider', 'deployer', 'importer', 'distributor', 'product_manufacturer', 'authorised_representative'],
+    conditions: [
+      'The system evaluates or classifies people over a period of time by their social behaviour or their known, inferred or predicted personal or personality characteristics.',
+      'The resulting social score leads to detrimental treatment in an unrelated context, or to detrimental treatment that is unjustified or disproportionate.',
+    ],
+    exceptions: [
+
+    ],
+    effectiveFrom: '2025-02-02',
+    plainEnglishSummary:
+      'Social scoring that leads to detrimental treatment in an unrelated context, or treatment disproportionate to the behaviour, is prohibited outright.',
+    practicalMeaning:
+      'A score is not enough on its own: the provision needs the detrimental treatment as well, and of one of two specific kinds. Ordinary credit or fraud scoring on relevant data is not what this addresses.',
+    shortExtract:
+      'with the social score leading to either or both of the following',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-5',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-5-1-d',
+    ruleId: 'article-5-conditions',
+    ...AI_ACT,
+    provision: 'Article 5(1)(d)',
+    corpusArticle: '5',
+    // Article 5 reaches placing on the market, putting into service *and*
+    // use, so it binds every role rather than a subset. An importer placing
+    // a prohibited system on the EU market is caught exactly as its provider is.
+    applicableRoles: ['provider', 'deployer', 'importer', 'distributor', 'product_manufacturer', 'authorised_representative'],
+    conditions: [
+      'The system assesses or predicts the risk of a person committing a criminal offence.',
+      'That assessment rests solely on profiling the person, or on assessing their personality traits and characteristics.',
+    ],
+    exceptions: [
+      'Systems supporting a human assessment of involvement in criminal activity that is already based on objective and verifiable facts directly linked to that activity.',
+    ],
+    effectiveFrom: '2025-02-02',
+    plainEnglishSummary:
+      'Predicting who will commit a criminal offence, based solely on profiling or personality, is prohibited outright.',
+    practicalMeaning:
+      '"Solely" is the word doing the work, and the exception is broad in practice: a tool that helps an investigator weigh objective evidence is expressly outside it.',
+    shortExtract:
+      'based solely on the profiling of a natural person or on assessing their personality traits and characteristics',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-5',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-5-1-e',
+    ruleId: 'article-5-conditions',
+    ...AI_ACT,
+    provision: 'Article 5(1)(e)',
+    corpusArticle: '5',
+    // Article 5 reaches placing on the market, putting into service *and*
+    // use, so it binds every role rather than a subset. An importer placing
+    // a prohibited system on the EU market is caught exactly as its provider is.
+    applicableRoles: ['provider', 'deployer', 'importer', 'distributor', 'product_manufacturer', 'authorised_representative'],
+    conditions: [
+      'The system creates or expands a facial recognition database.',
+      'It does so through untargeted scraping of facial images from the internet or from CCTV footage.',
+    ],
+    exceptions: [
+
+    ],
+    effectiveFrom: '2025-02-02',
+    plainEnglishSummary:
+      'Building or expanding facial recognition databases by untargeted scraping of the internet or CCTV is prohibited outright.',
+    practicalMeaning:
+      'The prohibition is about how the database is built, not about recognising faces. Images obtained by enrolment, consent or a targeted lawful request are outside it.',
+    shortExtract:
+      'create or expand facial recognition databases through the untargeted scraping of facial images from the internet or CCTV footage',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-5',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-5-1-f',
+    ruleId: 'article-5-conditions',
+    ...AI_ACT,
+    provision: 'Article 5(1)(f)',
+    corpusArticle: '5',
+    // Article 5 reaches placing on the market, putting into service *and*
+    // use, so it binds every role rather than a subset. An importer placing
+    // a prohibited system on the EU market is caught exactly as its provider is.
+    applicableRoles: ['provider', 'deployer', 'importer', 'distributor', 'product_manufacturer', 'authorised_representative'],
+    conditions: [
+      'The system infers the emotions of a natural person.',
+      'It does so in the workplace or in an education institution.',
+    ],
+    exceptions: [
+      'Use intended to be put in place or placed on the market for medical or safety reasons.',
+    ],
+    effectiveFrom: '2025-02-02',
+    plainEnglishSummary:
+      'Inferring emotions in the workplace or in education is prohibited outright, unless it is for medical or safety reasons.',
+    practicalMeaning:
+      'Both the setting and the purpose matter. Fatigue detection in a driver is a safety reason; measuring how engaged staff seem in meetings is not, however it is described internally.',
+    shortExtract:
+      'except where the use of the AI system is intended to be put in place or into the market for medical or safety reasons',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-5',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-5-1-g',
+    ruleId: 'article-5-conditions',
+    ...AI_ACT,
+    provision: 'Article 5(1)(g)',
+    corpusArticle: '5',
+    // Article 5 reaches placing on the market, putting into service *and*
+    // use, so it binds every role rather than a subset. An importer placing
+    // a prohibited system on the EU market is caught exactly as its provider is.
+    applicableRoles: ['provider', 'deployer', 'importer', 'distributor', 'product_manufacturer', 'authorised_representative'],
+    conditions: [
+      'The system categorises individuals on the basis of their biometric data.',
+      'It does so to deduce or infer race, political opinions, trade union membership, religious or philosophical beliefs, sex life or sexual orientation.',
+    ],
+    exceptions: [
+      'Labelling or filtering of lawfully acquired biometric datasets, and categorising of biometric data in the area of law enforcement.',
+    ],
+    effectiveFrom: '2025-02-02',
+    plainEnglishSummary:
+      'Using biometric data to deduce a person’s race, politics, union membership, beliefs or sexuality is prohibited outright.',
+    practicalMeaning:
+      'The list of characteristics is exhaustive, and the carve-out is stated in the provision itself rather than being a defence to be argued.',
+    shortExtract:
+      'to deduce or infer their race, political opinions, trade union membership, religious or philosophical beliefs, sex life or sexual orientation',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-5',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-5-1-h',
+    ruleId: 'article-5-conditions',
+    ...AI_ACT,
+    provision: 'Article 5(1)(h)',
+    corpusArticle: '5',
+    // Article 5 reaches placing on the market, putting into service *and*
+    // use, so it binds every role rather than a subset. An importer placing
+    // a prohibited system on the EU market is caught exactly as its provider is.
+    applicableRoles: ['provider', 'deployer', 'importer', 'distributor', 'product_manufacturer', 'authorised_representative'],
+    conditions: [
+      'The use is "real-time" remote biometric identification.',
+      'It takes place in a publicly accessible space.',
+      'It is for the purposes of law enforcement.',
+    ],
+    exceptions: [
+      'Use strictly necessary for one of three listed objectives, and then only with the prior authorisation, fundamental rights impact assessment and EU database registration that Articles 5(2) and 5(3) require.',
+    ],
+    effectiveFrom: '2025-02-02',
+    plainEnglishSummary:
+      'Real-time remote biometric identification in public spaces for law enforcement is prohibited, subject to three narrow objectives with their own authorisation regime.',
+    practicalMeaning:
+      'Falling within one of the three objectives does not make the use lawful on its own — the authorisation, the impact assessment and the registration are cumulative with it.',
+    shortExtract:
+      'unless and in so far as such use is strictly necessary for one of the following objectives',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-5',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT,
+    reviewStatus: 'internal',
+  },
+  {
     id: 'prop-art-6-2-annex-iii-high-risk',
     ruleId: 'annex-iii-route',
     ...AI_ACT,

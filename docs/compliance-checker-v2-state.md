@@ -26,13 +26,13 @@ decision.
 |-------|------|
 | `src/lib/compliance-v2/types.ts` | §6 contracts. `AnswerState`, `FindingKind` (nine — §4.2's eight plus `enforcement_information`), `FINDING_KIND_FROM_ACTION_KIND` as a total map from v1's vocabulary |
 | `conditions.ts` | Branch conditions as **data**, and their evaluator |
-| `questions/` | 56 questions: core triage (§7.2), role (§7.3), Annex III branches (§7.4), Annex I + Article 5 screen, transparency + Article 6(3), organisation size, and ten optional data-protection questions (§11.2) |
+| `questions/` | 79 questions: core triage (§7.2), role (§7.3), Annex III branches (§7.4), Annex I + Article 5 screen, transparency + Article 6(3), organisation size, 23 Article 5 per-practice condition questions (§7.6), and ten optional data-protection questions (§11.2) |
 | `engine/` | `scope`, `roles`, `organisation-size`, `annex-routes`, `article-5`, `article-50`, `classify`, `findings`, `dates`, `gdpr-ai`, `assemble` |
-| `legal-content/propositions.ts` | 17 curated propositions, every extract corpus-verified at build time |
+| `legal-content/propositions.ts` | 27 curated propositions, every extract corpus-verified at build time |
 | `report/` | `deterministic`, `schema`, `verify` (§14.4), `generate`, `consent` |
 | `result-sections.ts` | §12.1's sections, the hide-empties rule, and `resultBlocks()` — which puts the GDPR overlay in §12.1's seventh slot without folding it into a finding-kind bucket |
 | `flow.ts` | Questionnaire navigation and answer invalidation |
-| `test-fixtures/golden-scenarios.ts` | 27 scenarios |
+| `test-fixtures/golden-scenarios.ts` | 41 scenarios |
 | `components/tools/checker-v2/` | `ComplianceCheckerV2`, `QuestionCard`, `ResultV2`, `FindingCard`, `GdprOverlayCard` |
 
 `npm run test:checker-v2` validates the catalogue and string-matches every
@@ -40,13 +40,13 @@ proposition extract against the pinned corpus. It runs in `prebuild`.
 
 ## What is deliberately not done
 
-1. **Article 5's per-practice condition trees** (§7.6). The screen, the
-   law-enforcement authorisation exception and Article 5(1a)'s safety-measures
-   test exist. The per-practice conditions do not, so every positive screen holds
-   at `potentially_prohibited` with an explicit `unresolved` list and low
-   confidence. That is the safe direction and what §7.6 requires of an incomplete
-   path — but it is not the whole of §7.6. **This is legal-content authoring and
-   probably wants counsel.**
+1. **Article 5's condition trees are built but not counsel-reviewed**
+   (done 2026-08-19). All ten practices have limb-by-limb trees, and a flagged
+   practice can now be *cleared* by a failing limb or a stated exception. The
+   readings of the consolidated text are this assistant's, held at
+   `reviewStatus: 'internal'`; §22.4's counsel-review decision is still open. A
+   complete path reports `potentially_prohibited` at `medium` confidence and
+   never `prohibited` — do not add that classification without counsel.
 2. **No model call and no email send.** The prose contract, the verifier and the
    consent model are built and tested against a stub model; nothing calls a real
    one. There is no mail sender in this codebase, and §22.1's retention decision

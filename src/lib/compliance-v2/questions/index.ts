@@ -4,6 +4,7 @@ import { CORE_QUESTIONS } from './core'
 import { ROLE_QUESTIONS } from './role'
 import { ANNEX_III_QUESTIONS } from './annex-iii'
 import { ANNEX_I_QUESTIONS, PROHIBITED_QUESTIONS } from './prohibited'
+import { ARTICLE_5_CONDITION_QUESTIONS } from './article-5-conditions'
 import { EXEMPTION_QUESTIONS, TRANSPARENCY_QUESTIONS } from './transparency'
 import { ORGANISATION_SIZE_QUESTIONS } from './organisation-size'
 import { GDPR_QUESTIONS } from './gdpr-ai'
@@ -34,6 +35,11 @@ export const QUESTION_CATALOGUE: AssessmentQuestionV2[] = [
   ...EXEMPTION_QUESTIONS,
   ...TRANSPARENCY_QUESTIONS,
   ...PROHIBITED_QUESTIONS,
+  // The per-practice trees, immediately behind the screen that opens them. Every
+  // one of their conditions reads from `prohibited_screen`, so they cannot come
+  // before it — `validateCatalogue` rejects a forward reference for exactly this
+  // reason.
+  ...ARTICLE_5_CONDITION_QUESTIONS,
   ...ORGANISATION_SIZE_QUESTIONS,
   // Last, and not by accident. §11's overlay is adjacent law: it must be
   // reachable, and it must never stand between a reader and their AI Act
@@ -168,6 +174,7 @@ export {
   EXEMPTION_QUESTIONS,
   TRANSPARENCY_QUESTIONS,
   PROHIBITED_QUESTIONS,
+  ARTICLE_5_CONDITION_QUESTIONS,
   ORGANISATION_SIZE_QUESTIONS,
   GDPR_QUESTIONS,
 }

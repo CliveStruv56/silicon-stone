@@ -1,8 +1,8 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-08-18
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (99 static pages), 693 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
+> Last Updated: 2026-08-19
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (99 static pages), 736 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
@@ -465,6 +465,51 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 19, 2026 — Compliance Checker v2: Article 5's condition trees
+
+The carve-out that had been open since Phase 3 is closed. 23 per-practice
+condition questions, ten corpus-verified propositions, and an engine that can
+now **clear** a flagged practice instead of alarming about it forever. 736 tests
+green. Flag still dark.
+
+**The defect this fixes was live in the design, not in the code.** Every
+prohibition in Article 5 is a conjunction — (f) needs emotion inference *and* a
+workplace or education setting *and* the absence of a medical or safety purpose —
+and the old screen evaluated none of those limbs. A user who ticked "infers
+emotions" and whose use is a medical one, which Article 5(1)(f) excepts in its
+own words, received the gravest result this tool can produce, permanently, with
+no way to clear it. Verified end to end in a browser: that user now gets "No
+specific category identified" and a card explaining which limb took it out.
+
+**Three outcomes per practice, and the third is reported rather than dropped.**
+`not_engaged` (a limb failed or a stated exception is made out), `unresolved`
+(every limb so far satisfied, at least one unanswered), `all_limbs_met`. A
+cleared practice gets its own card typed `recommended_safeguard` — the reader
+raised the flag and is owed the answer, and the exclusion rests on a fact that
+can change.
+
+**A complete path still says "potentially prohibited".** §6.3's classification
+enum has no `prohibited` value and this was not the moment to invent one: every
+answer feeding these trees is a self-reported judgement about the user's own
+system, and the legal content is `internal` review status. What a complete path
+buys is a much stronger statement — every limb met, no stated exception, here is
+the provision — and `medium` confidence instead of `low`. Never `high`.
+
+**Ten propositions, every extract verbatim from the pinned corpus**, verified at
+build time on the first run. They bind all six roles, because Article 5 reaches
+placing on the market, putting into service *and* use — a narrower list would
+make `verifyReport` strip the finding from an importer's report.
+
+**Two questions retired.** `law_enforcement_authorisation` was a generic
+stand-in for exceptions now asked in the specific terms each provision uses, and
+`technical_safety_measures` moved behind the Article 5(1a)(a)(ii) route it
+qualifies, where it is no longer a non-sequitur.
+
+**Still not counsel-reviewed.** These are readings of the consolidated text by
+this assistant, held at `reviewStatus: 'internal'`, and §22.4's counsel-review
+decision remains open. The trees make the tool's reasoning inspectable, which is
+what makes that review a review rather than a rewrite.
 
 ### August 18, 2026 — Compliance Checker v2, Phase 7: the GDPR overlay
 
@@ -4220,7 +4265,7 @@ phases; **Phase 0 shipped 2026-08-18** (see §9). v1 stays live behind
 | 0 — Safety harness and baseline | **Done.** Flag, version stamps, legacy baseline, six documented v1 defects. |
 | 1 — Types, catalogue, legal propositions | **Done 2026-08-18.** §6 contracts, the §7.2 universal triage, condition expressions as data, five corpus-verified propositions, §15.2 validation. Vocabulary extends `ActionKind` (spec §23.1). |
 | 2 — Scope, roles, size | **Done 2026-08-18.** Three evaluators, twelve questions, four Article 3 propositions, eleven golden scenarios. §20.8 held: declining every financial question still completes. |
-| 3 — Article 5, Annex, Article 50 routes | **Done 2026-08-18**, with one carve-out. Defects 2, 3 and 6 fixed; Annex I, Annex III, Article 6(3) and paragraph-specific Article 50 all built. **Outstanding: the per-practice Article 5 condition trees** (§7.6). Until they exist every positive screen holds at `potentially_prohibited` with an explicit unresolved list, which is the safe direction but is not the whole of §7.6. |
+| 3 — Article 5, Annex, Article 50 routes | **Done 2026-08-18; the Article 5 carve-out closed 2026-08-19.** Defects 2, 3 and 6 fixed; Annex I, Annex III, Article 6(3) and paragraph-specific Article 50 all built. §7.6's per-practice condition trees now exist for all ten practices — 23 questions, ten corpus-verified propositions, and three outcomes including a *cleared* one. A complete path still reports "potentially prohibited"; the legal content is not counsel-reviewed. |
 | 4 — Questionnaire UI | **Done 2026-08-18.** Behind `COMPLIANCE_CHECKER_V2` + `?v2=1`. All three exit criteria verified: keyboard-only completion in a real browser, no dead end from an unknown answer, and stranded answers held outside what the engine sees. |
 | 5 — Result UI | **Done 2026-08-18.** Typed finding cards, §12.1's sections with empties hidden, §12.4's contextual penalties, §9.4's date-aware duty status. All three exit criteria pass. |
 | 6 — Report and email flow | **Library done 2026-08-18**; delivery not wired. Deterministic report, §14.4 verifier, prose contract, consent model — all tested. **Outstanding: an actual model call and an actual send.** Blocked on there being no mail sender at all, and on §22.1's retention decision. |
