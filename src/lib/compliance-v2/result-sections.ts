@@ -193,6 +193,20 @@ export const KIND_LABEL: Record<FindingKind, string> = {
   unresolved_issue: 'Unresolved',
 }
 
+/**
+ * How a review status is described to a reader.
+ *
+ * `internal` does not say "internal review" — that would sound like a process
+ * with a standard behind it. It says what is actually true, which is that a
+ * lawyer has not seen it. Phase 8's exit criterion is that the status is
+ * displayed *accurately*, and accuracy here is mostly about not flattering.
+ */
+export const REVIEW_STATUS_LABEL: Record<string, string> = {
+  internal: 'Not reviewed by counsel',
+  counsel_reviewed: 'Reviewed by counsel',
+  superseded: 'Superseded — do not rely on this',
+}
+
 export const ROLE_LABEL: Record<string, string> = {
   provider: 'Provider',
   deployer: 'Deployer',

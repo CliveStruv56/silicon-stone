@@ -3,6 +3,7 @@ import {
   APPLICABILITY_LABEL,
   CLASSIFICATION_LABEL,
   GDPR_OVERLAY_BLOCK,
+  REVIEW_STATUS_LABEL,
   ROLE_LABEL,
   resultSections,
 } from '../result-sections'
@@ -143,7 +144,12 @@ export function reportMarkdown(document: ReportDocument): string {
       }
       if (finding.source) {
         lines.push(`> ${finding.source.shortExtract}`, '')
-        lines.push(`— ${finding.source.documentTitle}, ${finding.source.provision}`, '')
+        lines.push(
+          `— ${finding.source.documentTitle}, ${finding.source.provision} · ${
+            REVIEW_STATUS_LABEL[finding.source.reviewStatus] ?? finding.source.reviewStatus
+          }, last checked ${finding.source.reviewedAt}`,
+          ''
+        )
       }
     }
   }

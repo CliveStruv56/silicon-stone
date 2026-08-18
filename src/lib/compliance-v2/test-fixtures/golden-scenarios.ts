@@ -564,6 +564,71 @@ GOLDEN_SCENARIOS.push(
     ),
   },
   {
+    id: 'article5VulnerabilityExploitation',
+    spec: '§7.6 — Article 5(1)(b) with all three limbs satisfied',
+    answers: record(
+      ...ARTICLE_5_BASE,
+      answered('prohibited_screen', ['art5_b']),
+      answered('art5_b_vulnerability', ['social_economic']),
+      answered('art5_ab_material_distortion', 'yes'),
+      answered('art5_ab_significant_harm', 'yes')
+    ),
+  },
+  {
+    id: 'article5VulnerabilityNotExploited',
+    spec: '§7.6 — Article 5(1)(b)’s negative case: none of the three vulnerabilities',
+    answers: record(
+      ...ARTICLE_5_BASE,
+      answered('prohibited_screen', ['art5_b']),
+      answered('art5_b_vulnerability', ['none_of_these']),
+      answered('art5_ab_material_distortion', 'yes'),
+      answered('art5_ab_significant_harm', 'yes')
+    ),
+  },
+  {
+    id: 'article5SocialScoring',
+    spec: '§7.6 — Article 5(1)(c): a score leading to detriment in an unrelated context',
+    answers: record(
+      ...ARTICLE_5_BASE,
+      answered('prohibited_screen', ['art5_c']),
+      answered('art5_c_evaluation', 'yes'),
+      answered('art5_c_detriment', ['unrelated_context'])
+    ),
+  },
+  {
+    id: 'article5SocialScoringNoDetriment',
+    spec: '§7.6 — Article 5(1)(c)’s negative case: a score that leads to no detriment',
+    answers: record(
+      ...ARTICLE_5_BASE,
+      answered('prohibited_screen', ['art5_c']),
+      answered('art5_c_evaluation', 'yes'),
+      answered('art5_c_detriment', ['none_of_these'])
+    ),
+  },
+  {
+    id: 'article5CsamWithoutRightDefence',
+    spec: '§7.6 — Article 5(1)(bb)’s only stated exception: a "without right" defence',
+    answers: record(
+      ...ARTICLE_5_BASE,
+      answered('prohibited_screen', ['art5_bb']),
+      answered('art5_bb_without_right', 'yes'),
+      answered('art5_babb_intended_purpose', 'no'),
+      answered('art5_babb_foreseeable_output', 'no'),
+      answered('art5_babb_deployer_use', 'no')
+    ),
+  },
+  {
+    id: 'article5CsamIntendedPurpose',
+    spec: '§7.6 — Article 5(1)(bb) via Article 5(1a)(a)(i): intended purpose',
+    answers: record(
+      ...ARTICLE_5_BASE,
+      answered('prohibited_screen', ['art5_bb']),
+      answered('art5_bb_without_right', 'no'),
+      answered('art5_babb_intended_purpose', 'yes'),
+      answered('art5_babb_deployer_use', 'no')
+    ),
+  },
+  {
     id: 'article5TwoPracticesMixedOutcome',
     spec: '§7.6 — one practice cleared and one engaged in the same assessment',
     answers: record(
@@ -677,6 +742,217 @@ GOLDEN_SCENARIOS.push(
       answered('gdpr_transfers', 'not_established'),
       answered('gdpr_supplier_data_use', 'retention_only'),
       answered('gdpr_subject_requests', 'with_effort')
+    ),
+  }
+)
+
+
+/**
+ * Phase 8: completing the golden matrix (§17.2).
+ *
+ * Two gaps the audit found. §17.2's first mandatory regression scenario — a
+ * microbusiness using third-party general productivity AI — had no fixture at
+ * all, which is awkward given it is the single most common shape of the tool's
+ * actual audience. And §17.1 asks for "every Annex III intended-purpose route"
+ * to be tested, where eight of the ten families had never been exercised end to
+ * end. `golden-matrix.test.ts` now asserts both, so a family added to the
+ * catalogue later fails a test rather than going quietly untested.
+ */
+const ANNEX_III_BASE = [
+  answered('organisation_establishment', 'eu_eea'),
+  answered('ai_market_connection', ['used_from_eu_establishment']),
+  answered('organisation_activity', ['used_internally_or_for_customers']),
+  answered('own_name_supply', 'no'),
+  answered('intended_purpose_changed', 'no'),
+  answered('material_modification', 'no'),
+  answered('individual_impact', 'recommends_ranks_scores'),
+  answered('personal_data_use', 'yes'),
+  answered('employee_band', '50_249'),
+  answered('prohibited_screen', ['none_of_these']),
+]
+
+/**
+ * `performs_profiling` is only asked once a listed use is actually selected, so
+ * it lives with the positive scenarios rather than in the base. The negative and
+ * unknown cases never reach it, and `validateAnswers` rejects an answer to a
+ * question the path does not ask — which is the check working, not a nuisance.
+ */
+const PROFILES = answered('performs_profiling', 'yes')
+
+GOLDEN_SCENARIOS.push(
+  {
+    id: 'microProductivityDeployer',
+    spec: '§17.2.1 — microbusiness using third-party general productivity AI',
+    answers: record(
+      answered('organisation_establishment', 'eu_eea'),
+      answered('ai_market_connection', ['used_from_eu_establishment']),
+      answered('organisation_activity', ['used_internally_or_for_customers']),
+      answered('own_name_supply', 'no'),
+      answered('intended_purpose_changed', 'no'),
+      answered('material_modification', 'no'),
+      answered('intended_use_family', 'something_else'),
+      answered('intended_use_description', 'We use an off-the-shelf assistant to summarise meetings and draft internal notes.'),
+      answered('individual_impact', 'administrative_only'),
+      answered('personal_data_use', 'possibly'),
+      answered('employee_band', '1_9'),
+      answered('prohibited_screen', ['none_of_these'])
+    ),
+  },
+  {
+    id: 'annexIiiBiometrics',
+    spec: '§17.1 — Annex III point 1: remote biometric identification',
+    answers: record(
+      ...ANNEX_III_BASE,
+      answered('intended_use_family', 'biometrics'),
+      answered('annex_iii_biometrics_use', ['remote_identification']),
+      PROFILES
+    ),
+  },
+  {
+    id: 'annexIiiCriticalInfrastructure',
+    spec: '§17.1 — Annex III point 2: safety component of critical infrastructure',
+    answers: record(
+      ...ANNEX_III_BASE,
+      answered('intended_use_family', 'critical_infrastructure'),
+      answered('individual_impact', 'no_decisions_about_people'),
+      answered('annex_iii_infrastructure_use', ['safety_component']),
+      PROFILES
+    ),
+  },
+  {
+    id: 'annexIiiEducation',
+    spec: '§17.1 — Annex III point 3: admission to an education institution',
+    answers: record(
+      ...ANNEX_III_BASE,
+      answered('intended_use_family', 'education'),
+      answered('annex_iii_education_use', ['admission']),
+      PROFILES
+    ),
+  },
+  {
+    id: 'annexIiiCreditInsurance',
+    spec: '§17.1 — Annex III point 5(b): creditworthiness evaluation',
+    answers: record(
+      ...ANNEX_III_BASE,
+      answered('intended_use_family', 'credit_insurance'),
+      answered('annex_iii_credit_insurance_use', ['creditworthiness']),
+      PROFILES
+    ),
+  },
+  {
+    id: 'annexIiiEmergencyDispatch',
+    spec: '§17.1 — Annex III point 5(d): emergency call triage',
+    answers: record(
+      ...ANNEX_III_BASE,
+      answered('intended_use_family', 'emergency_dispatch'),
+      answered('annex_iii_emergency_use', ['emergency_triage']),
+      PROFILES
+    ),
+  },
+  {
+    id: 'annexIiiLawEnforcement',
+    spec: '§17.1 — Annex III point 6: assessing the risk of a person becoming a victim',
+    answers: record(
+      ...ANNEX_III_BASE,
+      answered('intended_use_family', 'law_enforcement'),
+      answered('annex_iii_law_enforcement_use', ['victim_risk']),
+      PROFILES
+    ),
+  },
+  {
+    id: 'annexIiiMigration',
+    spec: '§17.1 — Annex III point 7: assessing a security or irregular-migration risk',
+    answers: record(
+      ...ANNEX_III_BASE,
+      answered('intended_use_family', 'migration_border'),
+      answered('annex_iii_migration_use', ['entry_risk']),
+      PROFILES
+    ),
+  },
+  {
+    id: 'annexIiiJustice',
+    spec: '§17.1 — Annex III point 8: assisting a judicial authority',
+    answers: record(
+      ...ANNEX_III_BASE,
+      answered('intended_use_family', 'justice_democracy'),
+      answered('annex_iii_justice_use', ['judicial_assistance']),
+      PROFILES
+    ),
+  },
+  {
+    id: 'annexIiiNegativeCase',
+    spec: '§17.2 — the closely related negative case: a listed sector, none of its listed uses',
+    answers: record(
+      ...ANNEX_III_BASE,
+      answered('intended_use_family', 'education'),
+      answered('annex_iii_education_use', ['none_of_these'])
+    ),
+  },
+  {
+    id: 'annexIiiUnknownUse',
+    spec: '§17.2 — the unknown case: a listed sector, unsure which use applies',
+    answers: record(
+      ...ANNEX_III_BASE,
+      answered('intended_use_family', 'education'),
+      unknown('annex_iii_education_use')
+    ),
+  }
+)
+
+
+/**
+ * Shadow-mode counterparts (Phase 8).
+ *
+ * `release/shadow.ts` pairs a v1 scenario with a v2 one and asks whether the two
+ * engines disagree. That question is only meaningful if the two records describe
+ * the *same system* — and for §17.2 scenarios 7 and 9 they did not: the v1
+ * fixtures describe an Annex III employment system and a customer-service
+ * chatbot, while the v2 scope fixtures of the same name describe neither,
+ * because they exist to test establishment and market connection rather than
+ * use. The mismatch showed up as two "unexplained divergences" that were really
+ * a comparison of two different things.
+ *
+ * These two mirror the v1 records answer for answer. The scope fixtures keep
+ * their own job.
+ */
+GOLDEN_SCENARIOS.push(
+  {
+    id: 'usProviderEmploymentAnnexIii',
+    spec: '§17.2.7 as v1 states it — US provider of an Annex III employment system',
+    answers: record(
+      answered('organisation_establishment', 'us'),
+      answered('ai_market_connection', ['placed_on_eu_market']),
+      answered('organisation_activity', ['built_or_commissioned', 'supplied_under_own_name']),
+      answered('places_on_eu_market_from_outside', 'yes'),
+      answered('regulated_product_own_name', 'no'),
+      answered('intended_use_family', 'employment'),
+      answered('individual_impact', 'recommends_ranks_scores'),
+      answered('personal_data_use', 'yes'),
+      answered('employee_band', '10_49'),
+      answered('annex_iii_employment_use', ['recruitment_selection']),
+      answered('performs_profiling', 'yes'),
+      answered('prohibited_screen', ['none_of_these'])
+    ),
+  },
+  {
+    id: 'ukDeployerChatbot',
+    spec: '§17.2.9 as v1 states it — UK deployer of a customer-service chatbot with EU users',
+    answers: record(
+      answered('organisation_establishment', 'uk'),
+      answered('ai_market_connection', ['output_used_in_eu']),
+      answered('organisation_activity', ['used_internally_or_for_customers']),
+      answered('own_name_supply', 'no'),
+      answered('intended_purpose_changed', 'no'),
+      answered('material_modification', 'no'),
+      answered('intended_use_family', 'chatbot_interaction'),
+      answered('individual_impact', 'informs_human_decision'),
+      answered('personal_data_use', 'yes'),
+      answered('employee_band', '50_249'),
+      answered('interacts_with_people', 'yes'),
+      answered('interaction_obvious', 'no'),
+      answered('generates_synthetic_content', 'no'),
+      answered('deploys_emotion_or_categorisation', 'no'),
+      answered('prohibited_screen', ['none_of_these'])
     ),
   }
 )

@@ -424,6 +424,7 @@ describe('the overlay in a report', () => {
                   plainEnglishSummary: 'Invented.',
                   conditions: [],
                   exceptions: [],
+                  reviewStatus: 'internal' as const,
                 },
               }
             : finding

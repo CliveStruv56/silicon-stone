@@ -2,7 +2,7 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-08-19
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (99 static pages), 736 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (99 static pages), 847 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
@@ -465,6 +465,61 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 19, 2026 — Compliance Checker v2, Phase 8: validation, and what it found
+
+The release harness — §20's criteria as something that runs, a completed golden
+matrix, shadow mode against v1, and an accessibility pass. 847 tests green,
+60 golden scenarios, 33 propositions. **Flag still dark, and this does not
+change that.**
+
+**Phase 8's own audits found two real defects, which is the argument for doing
+it.** The golden-matrix audit found that eight of the ten Annex III families had
+never been evaluated end to end, and that §17.2's first mandatory scenario — a
+microbusiness using third-party productivity AI, the single most common shape of
+this tool's audience — had no fixture at all. The shadow comparison then found
+something worse: **a high-risk *provider* was told it owed nothing.** The
+deployer path emitted Article 26(6) and the supplier-instructions item; the
+provider path emitted only an SME documentation relief unless the Article 6(3)
+derogation happened to be available. Six provider duties now exist (Articles 9,
+11, 12, 17, 19 and 49), every extract corpus-verified, and a seventh finding
+says in terms that the list is a subset — Articles 10, 14, 15, 16 and 43 are not
+in the pinned corpus, so nothing could verify a citation to them.
+
+**§20's eighteen criteria are executable.** `release/acceptance.ts` checks
+sixteen of them against all sixty scenarios and reports the other two as what
+they are: 14 needs a person to look at a screen, and 16 is *blocked* on §22.1
+and §22.2 being decided. Neither reports as passing. `npm run
+checker-v2:release` prints the lot, and the summary field is called
+`automatedClean` rather than `ready`, because those are different claims.
+
+**Shadow mode compares the engines without showing v2 to anyone.** v2 asks
+different questions, so there is no live answer record to replay; what is
+comparable is the pair of §17.2 scenario sets. Every divergence is accounted for
+per scenario rather than by a global allow-list — six agreements, three intended
+changes, none unexplained. Two apparent divergences turned out to be fixture
+mismatches (the v1 and v2 records for scenarios 7 and 9 described different
+systems), which is exactly what the exercise is for. Duty counts are recorded
+beside the classification, because defect 6 is invisible to a classification
+comparison: both engines say "limited risk" and only one applies the Article
+50(4) editorial exception.
+
+**Accessibility: zero WCAG 2.1 A/AA violations** across the questionnaire at
+390px, the result at 390px with every disclosure open, and the result at 1280px;
+keyboard-only completion confirmed end to end. `npm run checker-v2:a11y`
+re-runs it against a dev server. Comprehension and completion testing with real
+users are §17.5's other two items and have not been run.
+
+**Review status is now displayed.** Every proposition is `reviewStatus:
+'internal'`, and until today nothing showed it — the field was dropped between
+the proposition and the finding. Cards and reports now read "Not reviewed by
+counsel · last checked 2026-08-18". The label says what is true rather than
+dressing it up as a process.
+
+**What Phase 8 does not close:** counsel review of the decision matrix (§22.4),
+usability testing with real users (§17.5), and the retention and marketing
+decisions (§22.1, §22.2) that criterion 16 waits on. All three need a person,
+and two of them need the owner. v2 stays behind the flag.
 
 ### August 19, 2026 — Compliance Checker v2: Article 5's condition trees
 
@@ -4270,7 +4325,7 @@ phases; **Phase 0 shipped 2026-08-18** (see §9). v1 stays live behind
 | 5 — Result UI | **Done 2026-08-18.** Typed finding cards, §12.1's sections with empties hidden, §12.4's contextual penalties, §9.4's date-aware duty status. All three exit criteria pass. |
 | 6 — Report and email flow | **Library done 2026-08-18**; delivery not wired. Deterministic report, §14.4 verifier, prose contract, consent model — all tested. **Outstanding: an actual model call and an actual send.** Blocked on there being no mail sender at all, and on §22.1's retention decision. |
 | 7 — GDPR overlay | **Done 2026-08-18.** Ten conditional questions, an answers-only overlay evaluator, EU/UK distinguished where the answers allow and both offered where they do not, its own result block and report section, and three absence-checks in the verifier. All three exit criteria pass. It cites no provision and quotes no text — there is no pinned GDPR corpus, so there is nothing to verify a citation against. |
-| 8 — Validation and release | Golden matrix completion, editorial review of the legal content, usability and accessibility testing, shadow-mode v1/v2 comparison, then the opt-in beta. |
+| 8 — Validation and release | **Harness done 2026-08-19; release is not.** §20's criteria run (`npm run checker-v2:release`): 16/18 automated and passing, 14 needs a person, 16 blocked on §22.1–22.2. Golden matrix completed (60 scenarios, every Annex III family and every Article 5 practice). Shadow mode: 6 agreements, 3 intended changes, 0 unexplained. Accessibility: 0 WCAG 2.1 A/AA violations, keyboard-only completion confirmed. **Outstanding: counsel review, usability testing with real users, and the retention/marketing decisions.** |
 
 **§22 listed six decisions that must not be guessed. Four remain**: session and
 report retention periods, whether the report email may be used for marketing

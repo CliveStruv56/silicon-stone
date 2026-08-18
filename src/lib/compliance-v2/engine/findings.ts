@@ -53,6 +53,7 @@ function sourceFrom(propositionId: string): LegalSourceReference | undefined {
     plainEnglishSummary: proposition.plainEnglishSummary,
     conditions: proposition.conditions,
     exceptions: proposition.exceptions,
+    reviewStatus: proposition.reviewStatus,
   }
 }
 
@@ -239,6 +240,162 @@ export function buildLegalFindings(context: FindingContext): ComplianceFindingV2
         missingAnswerIds: [],
         source: sourceFrom('prop-art-13-3-d-oversight-measures'),
         priority: 'normal',
+        confidence: 'high',
+      })
+    }
+
+    /**
+     * The provider's own duties (Chapter III, Section 2).
+     *
+     * Added 2026-08-19, after Phase 8's shadow comparison showed a high-risk
+     * *provider* receiving no duty at all — only an SME documentation relief.
+     * The deployer path had Article 26(6) and the supplier-instructions item;
+     * the provider path had nothing unless the Article 6(3) derogation was
+     * available. A tool that tells the provider of a high-risk recruitment
+     * system that they owe nothing is worse than one that says nothing at all.
+     *
+     * Not the whole of Section 2 — Articles 10, 14, 15, 16 and 43 are not in the
+     * pinned corpus, so nothing here could verify a citation to them. What is
+     * here is the subset the pack can back, and the last finding says plainly
+     * that it is a subset. Adding the rest means adding them to the corpus,
+     * which is a pack version bump.
+     */
+    if (held.includes('provider')) {
+      const PROVIDER_DUTIES: Array<{
+        id: string
+        propositionId: string
+        title: string
+        why: string
+        action: string
+        evidence: string[]
+        priority: ComplianceFindingV2['priority']
+      }> = [
+        {
+          id: 'art-9-risk-management',
+          propositionId: 'prop-art-9-risk-management',
+          title: 'Run a risk management system for the system’s whole life',
+          why: 'You supply this system, and it reaches the high-risk tier, so the Chapter III requirements fall on you rather than on the organisations using it.',
+          action:
+            'Give it an owner and a review cadence before you give it a template. A process nobody runs is the failure mode here, and it is the one an auditor finds first.',
+          evidence: ['The risk register, its review dates, and who signed each review.'],
+          priority: 'high',
+        },
+        {
+          id: 'art-11-technical-documentation',
+          propositionId: 'prop-art-11-technical-documentation',
+          title: 'Draw up the technical documentation before launch, not after',
+          why: 'You supply this system. Annex IV sets out what the documentation contains, and Article 11 sets out when it has to exist.',
+          action:
+            'Start it now and date it. If your organisation is an SME or a small mid-cap, look at the simplified form in Article 11(1) — it is a real reduction in work, and it is yours to take up.',
+          evidence: ['The dated technical documentation, and the version history showing it is kept current.'],
+          priority: 'high',
+        },
+        {
+          id: 'art-12-record-keeping',
+          propositionId: 'prop-art-12-record-keeping',
+          title: 'Build the system so it records its own events',
+          why: 'You supply this system, so its logging capability is a design decision you make rather than one your customers can retrofit.',
+          action:
+            'Check what the system records today against what Article 12(2) asks it to enable, and treat any gap as engineering work with a deadline rather than as documentation.',
+          evidence: ['A description of what is logged, and a sample export.'],
+          priority: 'high',
+        },
+        {
+          id: 'art-17-quality-management',
+          propositionId: 'prop-art-17-quality-management',
+          title: 'Put a quality management system in place, in writing',
+          why: 'You supply this system. This is the largest single item on a small provider’s list, and the one with the longest lead time.',
+          action:
+            'Read Article 17(1)’s list before deciding how big this is — much of it is describing what you already do. If you are an SME, Article 17(2) allows a simplified approach.',
+          evidence: ['The written policies, procedures and instructions, and their approval dates.'],
+          priority: 'high',
+        },
+        {
+          id: 'art-19-provider-log-retention',
+          propositionId: 'prop-art-19-provider-log-retention',
+          title: 'Keep the logs your system generates, where they are yours to keep',
+          why: 'You supply this system. This is the provider side of the same duty your deployers owe under Article 26(6).',
+          action:
+            'Establish which logs are under your control and which sit on a customer’s infrastructure. The answer decides whose duty it is, and it is worth having in writing before anyone asks.',
+          evidence: ['The retention period chosen, the reasoning for it, and where the logs live.'],
+          priority: 'normal',
+        },
+      ]
+
+      for (const duty of PROVIDER_DUTIES) {
+        findings.push({
+          id: duty.id,
+          ruleId: 'high-risk-provider-duties',
+          title: duty.title,
+          kind: highRiskKind,
+          applicability:
+            classification.classification === 'likely_high_risk' ? 'applies' : 'possibly_applies',
+          appliesToRoles: ['provider'],
+          effectiveFrom: highRiskDate.display,
+          whyItApplies: `${duty.why} The route is ${classification.statutoryRoutes.join(' and ')}.`,
+          practicalMeaning:
+            PROPOSITION_BY_ID.get(duty.propositionId)?.practicalMeaning ??
+            'A requirement of Chapter III, Section 2, which applies to providers of high-risk systems.',
+          action: duty.action,
+          evidenceToKeep: duty.evidence,
+          triggeringAnswerIds: classification.triggeringAnswerIds,
+          missingAnswerIds: [],
+          source: sourceFrom(duty.propositionId),
+          priority: duty.priority,
+          confidence: classification.confidence,
+        })
+      }
+
+      // Registration is Annex III only — Article 49(1) is written about systems
+      // listed in Annex III, and an Annex I product route reaches the database
+      // by a different provision the pack does not carry.
+      if (annexIII.applicability === 'applies' || annexIII.applicability === 'likely_applies') {
+        findings.push({
+          id: 'art-49-registration',
+          ruleId: 'high-risk-provider-duties',
+          title: 'Register yourself and the system in the EU database before launch',
+          kind: highRiskKind,
+          applicability:
+            classification.classification === 'likely_high_risk' ? 'applies' : 'possibly_applies',
+          appliesToRoles: ['provider'],
+          effectiveFrom: highRiskDate.display,
+          whyItApplies: `You supply this system and it is listed in Annex III, so registration is a condition of placing it on the market. The route is ${classification.statutoryRoutes.join(' and ')}.`,
+          practicalMeaning:
+            PROPOSITION_BY_ID.get('prop-art-49-registration')?.practicalMeaning ?? '',
+          action:
+            'Treat this as part of the launch checklist rather than as paperwork that follows launch. Note that Article 49(2) requires the same registration even where you have concluded the system is *not* high-risk under Article 6(3).',
+          evidenceToKeep: ['The registration reference, and the date it was completed.'],
+          triggeringAnswerIds: classification.triggeringAnswerIds,
+          missingAnswerIds: [],
+          source: sourceFrom('prop-art-49-registration'),
+          priority: 'high',
+          confidence: classification.confidence,
+        })
+      }
+
+      /**
+       * And the honest limit on the list above. §4.5 forbids irrelevant
+       * material; it does not permit a subset presented as a whole. A provider
+       * reading five duties and inferring that five is the number would be
+       * misled by an omission this tool created.
+       */
+      findings.push({
+        id: 'high-risk-provider-duties-incomplete',
+        ruleId: 'high-risk-provider-duties',
+        title: 'This is not the complete list of what a provider owes',
+        kind: 'unresolved_issue',
+        applicability: 'applies',
+        appliesToRoles: ['provider'],
+        whyItApplies:
+          'The duties above are the ones this tool can quote from the statute it has pinned. Chapter III, Section 2 contains more of them, and they are no less binding for being absent here.',
+        practicalMeaning:
+          'Data governance, human oversight, accuracy and robustness, the provider obligations in Article 16 and the conformity assessment in Article 43 all apply to a high-risk system and are not assessed above. This tool shows what it can verify against its pinned copy of the Regulation, and says so rather than letting a short list read as a complete one.',
+        action:
+          'Read Chapter III, Section 2 in full, or have someone read it for you, before treating the list above as your scope of work.',
+        evidenceToKeep: [],
+        triggeringAnswerIds: classification.triggeringAnswerIds,
+        missingAnswerIds: [],
+        priority: 'high',
         confidence: 'high',
       })
     }

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { BookOpen, CalendarClock } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import type { ComplianceFindingV2, FindingKind } from '@/lib/compliance-v2/types'
-import { KIND_LABEL, ROLE_LABEL } from '@/lib/compliance-v2/result-sections'
+import { KIND_LABEL, REVIEW_STATUS_LABEL, ROLE_LABEL } from '@/lib/compliance-v2/result-sections'
 
 /**
  * One finding, with everything §12.2 asks a card to show.
@@ -139,6 +139,16 @@ export function FindingCard({ finding }: { finding: ComplianceFindingV2 }) {
             <p className="text-sm italic text-text-primary">“{finding.source.shortExtract}”</p>
             <p className="mt-2 text-xs text-text-muted">
               {finding.source.documentTitle}, {finding.source.provision}
+            </p>
+            {/*
+              §20.17 and Phase 8's exit criterion: the review status is
+              displayed, and displayed accurately. Every proposition is
+              `internal` today, and the label says what that means rather than
+              dressing it up as a process.
+            */}
+            <p className="mt-1 text-xs text-text-muted">
+              {REVIEW_STATUS_LABEL[finding.source.reviewStatus] ?? finding.source.reviewStatus} ·
+              last checked {finding.source.reviewedAt}
             </p>
             <div className="mt-2 flex flex-wrap gap-4">
               {href && (

@@ -82,6 +82,163 @@ const AI_ACT = {
 
 export const LEGAL_PROPOSITIONS: LegalProposition[] = [
   {
+    id: 'prop-art-9-risk-management',
+    ruleId: 'high-risk-provider-duties',
+    ...AI_ACT,
+    provision: 'Article 9',
+    corpusArticle: '9',
+    applicableRoles: ['provider', 'product_manufacturer', 'authorised_representative'],
+    conditions: [
+      'The system is classified high-risk under Article 6.',
+      'Your organisation is its provider.',
+    ],
+    exceptions: [
+      'Article 6(3) removes the classification where the narrow-task conditions are met.',
+    ],
+    effectiveFrom: '2027-12-02',
+    plainEnglishSummary:
+      'A provider of a high-risk AI system has to establish, implement, document and maintain a risk management system across the whole life of the system.',
+    practicalMeaning:
+      'Not a document produced once. The Regulation describes a continuous iterative process requiring regular systematic review, which means it needs an owner and a cadence rather than a file.',
+    shortExtract:
+      'A risk management system shall be established, implemented, documented and maintained in relation to high-risk AI systems',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-9',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-11-technical-documentation',
+    ruleId: 'high-risk-provider-duties',
+    ...AI_ACT,
+    provision: 'Article 11',
+    corpusArticle: '11',
+    applicableRoles: ['provider', 'product_manufacturer', 'authorised_representative'],
+    conditions: [
+      'The system is classified high-risk under Article 6.',
+      'Your organisation is its provider.',
+    ],
+    exceptions: [
+      'SMEs and small mid-cap enterprises may supply the Annex IV elements in the simplified form Article 11(1) provides.',
+    ],
+    effectiveFrom: '2027-12-02',
+    plainEnglishSummary:
+      'The technical documentation has to be drawn up before the system is placed on the market or put into service, and kept up to date.',
+    practicalMeaning:
+      'The timing is the substance: documentation written after launch does not satisfy the Article, and the date on it is what shows which happened. Annex IV sets the minimum contents.',
+    shortExtract:
+      'The technical documentation of a high-risk AI system shall be drawn up before that system is placed on the market or put into service and shall be kept up-to date',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-11',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-12-record-keeping',
+    ruleId: 'high-risk-provider-duties',
+    ...AI_ACT,
+    provision: 'Article 12',
+    corpusArticle: '12',
+    applicableRoles: ['provider', 'product_manufacturer', 'authorised_representative'],
+    conditions: [
+      'The system is classified high-risk under Article 6.',
+      'Your organisation is its provider.',
+    ],
+    exceptions: [
+
+    ],
+    effectiveFrom: '2027-12-02',
+    plainEnglishSummary:
+      'A high-risk system has to be built so that it automatically records events over its lifetime.',
+    practicalMeaning:
+      'This is a design duty rather than an operational one, and it is the technical precondition for the deployer log-retention duty in Article 26(6). A system that cannot produce logs leaves its deployer owing a duty they cannot discharge.',
+    shortExtract:
+      'High-risk AI systems shall technically allow for the automatic recording of events (logs) over the lifetime of the system',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-12',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-17-quality-management',
+    ruleId: 'high-risk-provider-duties',
+    ...AI_ACT,
+    provision: 'Article 17',
+    corpusArticle: '17',
+    applicableRoles: ['provider', 'product_manufacturer', 'authorised_representative'],
+    conditions: [
+      'The system is classified high-risk under Article 6.',
+      'Your organisation is its provider.',
+    ],
+    exceptions: [
+      'Article 17(2) allows providers that are SMEs, including start-ups, to comply in a simplified manner.',
+    ],
+    effectiveFrom: '2027-12-02',
+    plainEnglishSummary:
+      'A provider of a high-risk AI system has to put a quality management system in place, documented in written policies, procedures and instructions.',
+    practicalMeaning:
+      'The Article lists what it has to cover, from a regulatory-compliance strategy through design control to post-market monitoring. For a small provider this is the single largest item on the list.',
+    shortExtract:
+      'Providers of high-risk AI systems shall put a quality management system in place that ensures compliance with this Regulation',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-17',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-19-provider-log-retention',
+    ruleId: 'high-risk-provider-duties',
+    ...AI_ACT,
+    provision: 'Article 19',
+    corpusArticle: '19',
+    applicableRoles: ['provider', 'product_manufacturer', 'authorised_representative'],
+    conditions: [
+      'The system is classified high-risk under Article 6.',
+      'Your organisation is its provider.',
+      'The logs are under your control.',
+    ],
+    exceptions: [
+      'Union or national law may provide otherwise, in particular data protection law.',
+    ],
+    effectiveFrom: '2027-12-02',
+    plainEnglishSummary:
+      'A provider has to keep the logs its high-risk system generates automatically, for at least six months, so far as those logs are under its control.',
+    practicalMeaning:
+      'The provider mirror of the deployer duty in Article 26(6). "Under their control" is the limit: logs held only on a customer infrastructure are the customer duty to keep.',
+    shortExtract:
+      'Providers of high-risk AI systems shall keep the logs referred to in Article 12(1), automatically generated by their high-risk AI systems, to the extent such logs are under their control',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-19',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-49-registration',
+    ruleId: 'high-risk-provider-duties',
+    ...AI_ACT,
+    provision: 'Article 49',
+    corpusArticle: '49',
+    applicableRoles: ['provider', 'product_manufacturer', 'authorised_representative'],
+    conditions: [
+      'The system is listed in Annex III.',
+      'Your organisation is its provider, or its authorised representative.',
+    ],
+    exceptions: [
+      'Systems referred to in point 2 of Annex III are excluded from paragraph 1.',
+    ],
+    effectiveFrom: '2027-12-02',
+    plainEnglishSummary:
+      'Before a high-risk Annex III system is placed on the market or put into service, its provider has to register themselves and the system in the EU database.',
+    practicalMeaning:
+      'Registration is a gate on launch rather than a follow-up task. Article 49(2) applies the same requirement to a provider who has concluded the system is not high-risk under Article 6(3), which is why claiming the derogation is not a silent act.',
+    shortExtract:
+      'the provider or, where applicable, the authorised representative shall register themselves and their system in the EU database',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-49',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT,
+    reviewStatus: 'internal',
+  },
+  {
     id: 'prop-art-5-1-a',
     ruleId: 'article-5-conditions',
     ...AI_ACT,

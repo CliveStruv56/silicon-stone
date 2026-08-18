@@ -193,6 +193,20 @@ still reports `potentially_prohibited` at `medium` confidence: §6.3's enum has 
 system, and the content is `reviewStatus: 'internal'`. Do not add a `prohibited`
 classification without counsel review.
 
+**A short list of duties must say that it is short.** The high-risk provider path
+emits Articles 9, 11, 12, 17, 19 and 49, because those are the ones the pinned
+corpus can back — and a seventh finding says in terms that Articles 10, 14, 15,
+16 and 43 apply and are not assessed. Before that existed, a high-risk provider
+was told it owed nothing at all, which Phase 8's shadow comparison found. Do not
+delete the caveat finding to tidy the list.
+
+**§20 is executable, and `automatedClean` is not `ready`.**
+`release/acceptance.ts` checks 16 of the 18 criteria; criterion 14 is `manual`
+and 16 is `blocked` on §22.1–22.2, and neither reports as passing. Shadow mode
+accounts for divergences **per scenario**, never by a global allow-list of
+classification pairs — that is what stops a real divergence being waved through
+in the one scenario nobody meant it to happen in. `npm run checker-v2:release`.
+
 One carve-out recorded rather than hidden: **no model call or email send is
 wired** — there is no mail sender, and §22.1's retention decision is open.
 

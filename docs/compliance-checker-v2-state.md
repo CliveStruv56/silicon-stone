@@ -1,6 +1,6 @@
 # Compliance Checker v2 — where it is, and what to read first
 
-**Updated:** 2026-08-18. Phases 0–7 built. Flag dark; v1 unchanged.
+**Updated:** 2026-08-19. Phases 0–8 built; **release not taken**. Flag dark; v1 unchanged.
 
 This is the one-page orientation. The plan of record is
 `docs/# EU AI Act Compliance Checker v2 — Impl.md`; per-phase history is
@@ -28,15 +28,22 @@ decision.
 | `conditions.ts` | Branch conditions as **data**, and their evaluator |
 | `questions/` | 79 questions: core triage (§7.2), role (§7.3), Annex III branches (§7.4), Annex I + Article 5 screen, transparency + Article 6(3), organisation size, 23 Article 5 per-practice condition questions (§7.6), and ten optional data-protection questions (§11.2) |
 | `engine/` | `scope`, `roles`, `organisation-size`, `annex-routes`, `article-5`, `article-50`, `classify`, `findings`, `dates`, `gdpr-ai`, `assemble` |
-| `legal-content/propositions.ts` | 27 curated propositions, every extract corpus-verified at build time |
+| `legal-content/propositions.ts` | 33 curated propositions, every extract corpus-verified at build time |
 | `report/` | `deterministic`, `schema`, `verify` (§14.4), `generate`, `consent` |
 | `result-sections.ts` | §12.1's sections, the hide-empties rule, and `resultBlocks()` — which puts the GDPR overlay in §12.1's seventh slot without folding it into a finding-kind bucket |
 | `flow.ts` | Questionnaire navigation and answer invalidation |
-| `test-fixtures/golden-scenarios.ts` | 41 scenarios |
+| `test-fixtures/golden-scenarios.ts` | 60 scenarios — every Annex III family, every Article 5 practice, §17.2's ten mandatory shapes |
 | `components/tools/checker-v2/` | `ComplianceCheckerV2`, `QuestionCard`, `ResultV2`, `FindingCard`, `GdprOverlayCard` |
+
+| `release/` | §20's criteria as checks (`acceptance.ts`), the v1/v2 shadow comparison (`shadow.ts`), and the golden-matrix coverage assertions |
 
 `npm run test:checker-v2` validates the catalogue and string-matches every
 proposition extract against the pinned corpus. It runs in `prebuild`.
+
+`npm run checker-v2:release` prints §20's eighteen criteria and the shadow
+comparison. `npm run checker-v2:a11y` runs axe over the questionnaire and result
+and walks the whole flow with the keyboard alone — it needs a dev server with
+the flag on.
 
 ## What is deliberately not done
 
@@ -59,9 +66,20 @@ proposition extract against the pinned corpus. It runs in `prebuild`.
    overlay finding names no provision, carries no `source`, and quotes nothing.
    Authoring GDPR propositions would need a pinned, hashed corpus first. Until
    then the absence is deliberate, and `verifyReport` enforces it.
-4. **Phase 8 (validation and release).** Golden matrix completion, editorial
-   review of the legal content, usability and accessibility testing, shadow-mode
-   v1/v2 comparison, then the opt-in beta.
+4. **Phase 8's harness is built; the release is not taken.** As of 2026-08-19:
+   16 of §20's 18 criteria are automated and passing, criterion 14 needs a
+   person to look at a screen, and criterion 16 is *blocked* on §22.1 and §22.2.
+   Shadow mode reports no unexplained divergence. Accessibility is clean. What
+   remains is not code: **counsel review of the decision matrix**, **usability
+   testing with users who do not know legal terminology or their own financial
+   figures** (§17.5), and **the retention and marketing decisions**. v2 stays
+   behind the flag until those land.
+5. **Six provider duties, not the whole of Chapter III Section 2.** Articles 9,
+   11, 12, 17, 19 and 49 are emitted and corpus-verified; Articles 10, 14, 15, 16
+   and 43 are not in the pinned corpus, so nothing could verify a citation to
+   them. A finding says so on screen rather than letting a short list read as a
+   complete one. Adding them means adding them to the corpus, which is a pack
+   version bump.
 
 ## Decisions taken, and decisions still open
 

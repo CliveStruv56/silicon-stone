@@ -218,6 +218,17 @@ export interface LegalSourceReference {
   plainEnglishSummary: string
   conditions: string[]
   exceptions: string[]
+  /**
+   * How far the proposition behind this finding has been reviewed.
+   *
+   * Carried onto the finding rather than left on the proposition because §20 and
+   * Phase 8 require the review status to be *displayed accurately*, and a field
+   * the card cannot reach cannot be displayed at all. Every proposition is
+   * `internal` today: these are readings of the consolidated text by this
+   * project, not by counsel, and §22.4's counsel-review decision is open. A card
+   * that showed nothing would let a reader assume otherwise.
+   */
+  reviewStatus: 'internal' | 'counsel_reviewed' | 'superseded'
 }
 
 export interface ComplianceFindingV2 {

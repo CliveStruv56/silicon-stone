@@ -45,7 +45,9 @@
     "test:sanity-prices": "tsx scripts/sanity-price-checks.ts",
     "render-briefing": "tsx scripts/render-briefing-pdf.ts",
     "draft:local": "TSX_TSCONFIG_PATH=scripts/local-draft/tsconfig.json tsx scripts/local-draft/pipeline.ts",
-    "graph": "bash scripts/view-graph.sh"
+    "graph": "bash scripts/view-graph.sh",
+    "checker-v2:release": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/compliance-v2-release.ts",
+    "checker-v2:a11y": "node scripts/compliance-v2-a11y.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
