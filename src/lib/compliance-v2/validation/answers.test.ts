@@ -24,6 +24,12 @@ const COMPLETE = {
   individual_impact: answered('individual_impact', 'recommends_ranks_scores'),
   personal_data_use: answered('personal_data_use', 'yes'),
   employee_band: answered('employee_band', '10_49'),
+  // The role branch opens for anyone downstream of the original supplier, and
+  // its three transfer questions are classification-decisive, so a complete
+  // record answers them.
+  own_name_supply: answered('own_name_supply', 'no'),
+  intended_purpose_changed: answered('intended_purpose_changed', 'no'),
+  material_modification: answered('material_modification', 'no'),
 }
 
 describe('validateAnswers', () => {

@@ -1,6 +1,8 @@
 import type { AnswerRecordV2, AssessmentQuestionV2 } from '../types'
 import { collectQuestionIds, evaluateCondition } from '../conditions'
 import { CORE_QUESTIONS } from './core'
+import { ROLE_QUESTIONS } from './role'
+import { ORGANISATION_SIZE_QUESTIONS } from './organisation-size'
 
 /**
  * The question catalogue, and the validation that keeps it honest.
@@ -11,7 +13,17 @@ import { CORE_QUESTIONS } from './core'
  * always first, because every branch condition depends on it.
  */
 
-export const QUESTION_CATALOGUE: AssessmentQuestionV2[] = [...CORE_QUESTIONS]
+/**
+ * Order is the flow, and it is load-bearing: `validateCatalogue` rejects a
+ * condition that depends on a question asked later, so a branch can only ever
+ * depend on something already established. The universal triage is first for
+ * that reason — every branch condition below reads from it.
+ */
+export const QUESTION_CATALOGUE: AssessmentQuestionV2[] = [
+  ...CORE_QUESTIONS,
+  ...ROLE_QUESTIONS,
+  ...ORGANISATION_SIZE_QUESTIONS,
+]
 
 export const QUESTION_BY_ID = new Map(QUESTION_CATALOGUE.map((item) => [item.id, item]))
 
@@ -132,4 +144,4 @@ export function assertCatalogueValid(catalogue: AssessmentQuestionV2[] = QUESTIO
   }
 }
 
-export { CORE_QUESTIONS }
+export { CORE_QUESTIONS, ROLE_QUESTIONS, ORGANISATION_SIZE_QUESTIONS }

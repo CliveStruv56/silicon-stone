@@ -201,6 +201,103 @@ export const LEGAL_PROPOSITIONS: LegalProposition[] = [
     reviewedAt: REVIEWED_AT,
     reviewStatus: 'internal',
   },
+  // --- Article 3 definitions ---------------------------------------------
+  //
+  // The role evaluator rests on these four, so they are quoted rather than
+  // paraphrased. Article 25's role-transfer conditions — supplying under your
+  // own name, changing the intended purpose, substantially modifying — are NOT
+  // here: Article 25 is not among the 19 Articles the pinned corpus carries, so
+  // no extract from it could be verified. The role questions establish those
+  // conditions from the user's own answers instead, and the explanations they
+  // produce are authored prose rather than quotation.
+  {
+    id: 'prop-art-3-3-provider-definition',
+    ruleId: 'role-provider',
+    ...AI_ACT,
+    provision: 'Article 3(3)',
+    corpusArticle: '3',
+    applicableRoles: ['provider'],
+    conditions: [
+      'The party develops an AI system or general-purpose AI model, or has one developed.',
+      'It places that system on the market, or puts it into service, under its own name or trademark.',
+    ],
+    exceptions: [],
+    plainEnglishSummary:
+      'A provider is the party that develops an AI system, or has it developed, and puts it on the market or into service under its own name.',
+    practicalMeaning:
+      'Payment is irrelevant — supplying free of charge makes you a provider on the same terms. Article 3(11) defines putting into service to include supply for own use, so building a system only for your own staff still makes you its provider.',
+    shortExtract:
+      '‘provider’ means a natural or legal person, public authority, agency or other body that develops an AI system or a general-purpose AI model or that has an AI system or a general-purpose AI model developed and places it on the market or puts the AI system into service under its own name or trademark, whether for payment or free of charge',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-3',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-3-4-deployer-definition',
+    ruleId: 'role-deployer',
+    ...AI_ACT,
+    provision: 'Article 3(4)',
+    corpusArticle: '3',
+    applicableRoles: ['deployer'],
+    conditions: ['The party uses an AI system under its own authority.'],
+    exceptions: ['Use in the course of a personal, non-professional activity.'],
+    plainEnglishSummary:
+      'A deployer is the party using an AI system under its own authority — the most common role, and the one that cannot be contracted away to the supplier.',
+    practicalMeaning:
+      'Nothing about building, buying or configuring is required. If your organisation decides that the system is used and on what, you are its deployer, and a set of duties attaches to you that the supplier does not discharge on your behalf.',
+    shortExtract:
+      '‘deployer’ means a natural or legal person, public authority, agency or other body using an AI system under its authority except where the AI system is used in the course of a personal non-professional activity',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-3',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-3-6-importer-definition',
+    ruleId: 'role-importer',
+    ...AI_ACT,
+    provision: 'Article 3(6)',
+    corpusArticle: '3',
+    applicableRoles: ['importer'],
+    conditions: [
+      'The party is located or established in the Union.',
+      'It places on the market an AI system bearing the name or trademark of a person established in a third country.',
+    ],
+    exceptions: [],
+    plainEnglishSummary:
+      'An importer is a party established in the Union that places on the market an AI system carrying the name of a supplier established outside it.',
+    practicalMeaning:
+      'Being established in the Union is part of the definition, not incidental to it. A supplier outside the Union selling directly into it is not an importer — it is the provider, and the duties it owes are the longer set.',
+    shortExtract:
+      '‘importer’ means a natural or legal person located or established in the Union that places on the market an AI system that bears the name or trademark of a natural or legal person established in a third country',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-3',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-3-7-distributor-definition',
+    ruleId: 'role-distributor',
+    ...AI_ACT,
+    provision: 'Article 3(7)',
+    corpusArticle: '3',
+    applicableRoles: ['distributor'],
+    conditions: [
+      'The party is in the supply chain and makes an AI system available on the Union market.',
+    ],
+    exceptions: ['The provider and the importer, who are expressly excluded.'],
+    plainEnglishSummary:
+      'A distributor is anyone in the supply chain, other than the provider or the importer, who makes an AI system available on the Union market.',
+    practicalMeaning:
+      'The exclusion is what matters in practice: these roles are alternatives, not a set you can hold at once. Once you take on the provider’s position — by putting your name on the system, changing what it is for, or substantially modifying it — you stop being its distributor.',
+    shortExtract:
+      '‘distributor’ means a natural or legal person in the supply chain, other than the provider or the importer, that makes an AI system available on the Union market',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-3',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT,
+    reviewStatus: 'internal',
+  },
 ]
 
 export const PROPOSITION_BY_ID = new Map(LEGAL_PROPOSITIONS.map((item) => [item.id, item]))

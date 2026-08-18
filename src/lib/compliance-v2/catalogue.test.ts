@@ -31,8 +31,15 @@ describe('the live catalogue', () => {
     expect(validateCatalogue()).toEqual([])
   })
 
-  it('asks the whole universal triage §7.2 requires', () => {
-    expect(QUESTION_CATALOGUE.map((item) => item.id)).toEqual([
+  /**
+   * The triage comes first and in this order. Branch modules append, so this
+   * asserts the prefix rather than the whole catalogue — but the prefix is not
+   * cosmetic: `validateCatalogue` rejects a condition depending on a question
+   * asked later, so every branch below can only read from what the triage has
+   * already established.
+   */
+  it('opens with the whole universal triage §7.2 requires, in order', () => {
+    expect(QUESTION_CATALOGUE.slice(0, 8).map((item) => item.id)).toEqual([
       'organisation_establishment',
       'ai_market_connection',
       'organisation_activity',
@@ -42,6 +49,14 @@ describe('the live catalogue', () => {
       'personal_data_use',
       'employee_band',
     ])
+    expect(CORE_QUESTIONS).toHaveLength(8)
+  })
+
+  it('carries the role and size branches after it', () => {
+    const ids = QUESTION_CATALOGUE.map((item) => item.id)
+    expect(ids).toContain('own_name_supply')
+    expect(ids).toContain('size_precision_opt_in')
+    expect(ids.indexOf('own_name_supply')).toBeGreaterThan(ids.indexOf('organisation_activity'))
   })
 
   /**

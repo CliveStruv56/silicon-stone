@@ -2,7 +2,7 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-08-18
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (98 static pages), 491 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (98 static pages), 528 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
@@ -463,6 +463,65 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 18, 2026 — Compliance Checker v2, Phase 2: scope, roles and size
+
+The three evaluators that run before any classification, plus the twelve
+questions they need. Still nothing user-facing — the flag is dark.
+
+**Scope** (`engine/scope.ts`). The decisive fact is the **connection**, not the
+establishment: an organisation anywhere is caught once its system is placed on
+the Union market, put into service there, or its output is used there.
+`organisation_establishment` is read for one purpose only — noticing when the
+two answers contradict each other. An EU-established organisation that ticks "no
+EU connection" returns `scope_uncertain` with the conflict explained, never
+`out_of_scope`: of the two definite answers available, that is much the more
+expensive one to get wrong (§4.6). `likely_in_scope` covers an EU organisation
+whose connection is unsettled, and names the missing answer rather than assuming
+it.
+
+**Roles** (`engine/roles.ts`). Built around §7.3's rule that integration,
+configuration, fine-tuning and resale must not automatically create provider
+status. Provider arrives by three specific routes — supplying under your own
+name, changing what the system is for, substantially modifying it — and each is a
+question the user answers rather than an inference from having touched the
+system. Where a route is unsettled the role is `cannot_determine`, not
+`does_not_apply`: defaulting to no understates duties, defaulting to yes invents
+them. Two details worth keeping: a modification-based transfer stays
+`possibly_applies` while the tier is unknown (Phase 3 settles it), and the
+distributor role is dropped the moment the provider position transfers, because
+Article 3(7) defines a distributor as someone *other than* the provider or
+importer — showing both would double a reader's apparent duties.
+
+**Size** (`engine/organisation-size.ts`). §8.3's four states, and the §8.4
+restraint: at most one band, never the ladder, never a threshold the reader is
+nowhere near, never a calculated fine. `uncertain_group_relationship` is its own
+status rather than folded into "provisional" — a small company owned by a large
+group is generally not small, and that uncertainty has a known cause and a known
+fix. The financial questions are gated behind an explicit opt-in offered only
+below the SME thresholds; §8.1's other two triggers are post-evaluation facts
+that cannot gate a question in a linear flow, and `provisional_headcount_only` is
+the honest answer to them.
+
+**Four Article 3 definition propositions** — provider, deployer, importer,
+distributor — all verbatim-verified against the pinned corpus. Article 25's
+role-transfer conditions are deliberately **not** in the library: Article 25 is
+not among the 19 Articles the corpus carries, so no extract from it could be
+verified. The role questions establish those conditions from the user's own
+answers instead, and the explanations are authored prose rather than quotation.
+
+**Golden scenarios** (`test-fixtures/golden-scenarios.ts`) — eleven, covering
+§17.2's EU/UK/US/Canada cases plus the positive, negative, unknown and
+contradiction variants of each Phase 2 route.
+
+All three exit criteria pass, each asserted as its own test: an out-of-scope
+result comes only from a stated absence of connection (and no other scenario
+reaches it); an integrator who changed nothing is not a provider, *stated* rather
+than left as an absence; and a user who declines every financial question still
+validates, still satisfies minimum facts, and still gets a size result, a scope
+outcome and a role.
+
+528 tests green (was 491), build clean at 98 static pages.
 
 ### August 18, 2026 — Compliance Checker v2, Phase 1: types, catalogue, legal content
 
@@ -3867,8 +3926,8 @@ phases; **Phase 0 shipped 2026-08-18** (see §9). v1 stays live behind
 |-------|-------|
 | 0 — Safety harness and baseline | **Done.** Flag, version stamps, legacy baseline, six documented v1 defects. |
 | 1 — Types, catalogue, legal propositions | **Done 2026-08-18.** §6 contracts, the §7.2 universal triage, condition expressions as data, five corpus-verified propositions, §15.2 validation. Vocabulary extends `ActionKind` (spec §23.1). |
-| 2 — Scope, roles, size | Next. Needs the §7.3 role branch and the §8 size questions. Watch §20.8 — v1 satisfies it today by never asking for financials, and this is the phase that could regress it. |
-| 3 — Article 5, Annex, Article 50 routes | Where defects 2, 3 and 6 get fixed. The largest phase. |
+| 2 — Scope, roles, size | **Done 2026-08-18.** Three evaluators, twelve questions, four Article 3 propositions, eleven golden scenarios. §20.8 held: declining every financial question still completes. |
+| 3 — Article 5, Annex, Article 50 routes | Next, and the largest phase. Where defects 2, 3 and 6 get fixed — the score stops deciding the tier, sector selection stops creating high-risk status, and Article 50 gains its exceptions. Needs §7.4's fourteen intended-purpose modules. |
 | 4–5 — Questionnaire and result UI | — |
 | 6 — Report and email flow | — |
 | 7 — GDPR overlay | — |
