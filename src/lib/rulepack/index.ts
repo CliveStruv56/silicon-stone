@@ -3,6 +3,11 @@ import sources2026_08_10 from '../../../rulepack/versions/2026-08-10/sources.jso
 import timeline2026_08_10 from '../../../rulepack/versions/2026-08-10/timeline.json'
 import penalties2026_08_10 from '../../../rulepack/versions/2026-08-10/penalties.json'
 import rules2026_08_10 from '../../../rulepack/versions/2026-08-10/rules.json'
+import manifest2026_08_18 from '../../../rulepack/versions/2026-08-18/manifest.json'
+import sources2026_08_18 from '../../../rulepack/versions/2026-08-18/sources.json'
+import timeline2026_08_18 from '../../../rulepack/versions/2026-08-18/timeline.json'
+import penalties2026_08_18 from '../../../rulepack/versions/2026-08-18/penalties.json'
+import rules2026_08_18 from '../../../rulepack/versions/2026-08-18/rules.json'
 
 /**
  * The versioned rule pack: the legal payload behind the AI Act triage engine,
@@ -98,12 +103,27 @@ const PACKS: Record<string, RulePack> = {
     prohibitedPractices: rules2026_08_10.prohibitedPractices as PackProhibitedPractice[],
     ruleAnchors: rules2026_08_10.ruleAnchors as Record<string, PackRuleAnchor>,
   },
+  /**
+   * Adds Annex III to the corpus and changes nothing else — the four data files
+   * and the nineteen Article texts are byte-identical to 2026-08-10, which their
+   * hashes in both manifests show rather than assert. The version moved because
+   * the pack changed; that is the rule, and it holds even when the change is
+   * additive.
+   */
+  '2026-08-18': {
+    manifest: manifest2026_08_18 as PackManifest,
+    sources: sources2026_08_18 as Record<string, PackSource>,
+    timeline: timeline2026_08_18 as PackTimelineEntry[],
+    penalties: penalties2026_08_18 as PackPenaltyTier[],
+    prohibitedPractices: rules2026_08_18.prohibitedPractices as PackProhibitedPractice[],
+    ruleAnchors: rules2026_08_18.ruleAnchors as Record<string, PackRuleAnchor>,
+  },
 }
 
 export const AVAILABLE_RULE_PACK_VERSIONS = Object.keys(PACKS).sort()
 
 /** The version served when nothing is pinned. Never "latest" — see below. */
-const DEFAULT_RULE_PACK_VERSION = '2026-08-10'
+const DEFAULT_RULE_PACK_VERSION = '2026-08-18'
 
 /**
  * The pinned version. Deliberately an explicit version string, never a

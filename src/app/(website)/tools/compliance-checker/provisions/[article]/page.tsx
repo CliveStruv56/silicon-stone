@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 import { BadgeCheck } from 'lucide-react'
 import { Header, Footer } from '@/components/layout'
 import { Badge } from '@/components/ui/badge'
-import { coveredArticles, readArticleForDisplay } from '@/lib/rulepack/corpus'
+import { coveredArticles, provisionLabel, readArticleForDisplay } from '@/lib/rulepack/corpus'
 import { RULE_PACK } from '@/lib/rulepack'
 
 /**
@@ -20,9 +20,11 @@ import { RULE_PACK } from '@/lib/rulepack'
  * is the only way to put verbatim text in front of a reader without shipping the
  * corpus to them.
  *
- * `generateStaticParams` prerenders all 19 covered Articles at build time, so
+ * `generateStaticParams` prerenders every covered provision at build time, so
  * there is no runtime cost and no failure mode — the text cannot change between
- * deploys, because a change to it fails `prebuild`.
+ * deploys, because a change to it fails `prebuild`. The set is Articles plus
+ * Annex III, and `provisionLabel` is what keeps a page from being headed
+ * "Article annex-iii" on a page whose whole claim is exactness.
  */
 
 export const dynamicParams = false
@@ -41,12 +43,13 @@ export async function generateMetadata({
   if (!provision) return { title: 'Provision not found' }
 
   const path = `/tools/compliance-checker/provisions/${article}`
+  const label = provisionLabel(article)
   return {
-    title: `AI Act Article ${article}: ${provision.title} | Silicon and Stone`,
-    description: `The consolidated text of Article ${article} of the EU AI Act (${provision.title}), as pinned to the Compliance Checker's rule pack.`,
+    title: `AI Act ${label}: ${provision.title} | Silicon and Stone`,
+    description: `The consolidated text of ${label} of the EU AI Act (${provision.title}), as pinned to the Compliance Checker's rule pack.`,
     // The parent layout hard-codes a canonical pointing at the checker itself.
-    // Inherited, that would collapse all 19 of these pages into one and deindex
-    // every provision — so each page sets its own.
+    // Inherited, that would collapse every one of these pages into one and
+    // deindex the lot — so each page sets its own.
     alternates: { canonical: path },
   }
 }
@@ -134,9 +137,9 @@ export default async function ProvisionPage({
               checked against the pack hash on every build.
             </p>
             <p>
-              This pack pins {coveredArticles().length} Articles — the ones the Compliance Checker
-              cites. It is not the whole Regulation, and an Article absent from this set is not an
-              Article that does not apply to you.
+              This pack pins {coveredArticles().length} provisions — the ones the Compliance
+              Checker cites. It is not the whole Regulation, and a provision absent from this set is
+              not one that does not apply to you.
             </p>
           </div>
 

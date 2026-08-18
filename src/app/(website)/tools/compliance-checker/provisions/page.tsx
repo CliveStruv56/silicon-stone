@@ -2,7 +2,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { Header, Footer } from '@/components/layout'
 import { Badge } from '@/components/ui/badge'
-import { coveredArticles, readArticleForDisplay } from '@/lib/rulepack/corpus'
+import { coveredArticles, provisionLabel, readArticleForDisplay } from '@/lib/rulepack/corpus'
 import { RULE_PACK } from '@/lib/rulepack'
 
 /**
@@ -59,7 +59,7 @@ export default function ProvisionsIndexPage() {
                   className="flex items-baseline gap-4 py-3 hover:bg-surface-elevated"
                 >
                   <span className="font-mono text-sm text-stone-teal shrink-0">
-                    Article {provision.article}
+                    {provisionLabel(provision.article)}
                   </span>
                   <span className="text-text-primary">{provision.title}</span>
                 </Link>

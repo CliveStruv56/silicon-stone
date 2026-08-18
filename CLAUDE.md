@@ -115,14 +115,20 @@ mandatory once you opt in. The structural split and the labelling are the whole
 mitigation; do not assume `verifyReport()` covers this.
 
 `/tools/compliance-checker/provisions/[article]` renders the pinned corpus for a
-reader: 19 statically prerendered server pages, because `rulepack/corpus.ts` is
+reader: 20 statically prerendered server pages, because `rulepack/corpus.ts` is
 `server-only` and the checker is a Client Component. Each sets its **own**
 canonical — the parent layout hard-codes one pointing at the checker, which
 inherited would deindex all 19. Statute published on a commercial site carries the
 EUR-Lex "consolidated text, no legal value, only the OJ is authentic" notice and
 the EU source acknowledgement; that is not decoration.
 
-Corpus coverage is partial (19 Articles). `verifyCitation()` returns
+Corpus coverage is partial: **19 Articles plus Annex III** (added 2026-08-18 in
+pack `2026-08-18`, from the same CELEX). Annex III is keyed `annex-iii`, not a
+number — `corpusPath()` and `coveredArticles()` branch on that prefix, and
+`provisionLabel()` exists so no page is ever headed "Article annex-iii". A
+numeric sort over a mixed key set yields NaN comparisons, which is an unstable
+order rather than an error, so annexes are sorted separately and appended.
+`verifyCitation()` returns
 `uncovered` for anything else — treat that as unverifiable, never as a pass.
 The report generator only supplies Articles the pack covers, so an `uncovered`
 verdict means the model cited outside its evidence, not merely that coverage is

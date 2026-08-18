@@ -21,19 +21,50 @@ import { corpusContainsQuote, normaliseLegalText } from './normalise'
 
 const CORPUS_ROOT = path.join(process.cwd(), 'rulepack', 'versions')
 
+/**
+ * Corpus keys are the file name with a leading `article-` stripped, so an
+ * Article is keyed `6` and an Annex `annex-iii`. Two shapes, one directory, and
+ * the key is always exactly what `manifest.corpus` holds.
+ */
+function isAnnexKey(key: string): boolean {
+  return key.startsWith('annex-')
+}
+
 function corpusPath(version: string, article: string): string {
-  return path.join(CORPUS_ROOT, version, 'corpus', `article-${article}.txt`)
+  const file = isAnnexKey(article) ? `${article}.txt` : `article-${article}.txt`
+  return path.join(CORPUS_ROOT, version, 'corpus', file)
 }
 
 export function sha256(text: string): string {
   return createHash('sha256').update(text, 'utf8').digest('hex')
 }
 
-/** Article numbers this pack carries verbatim text for. */
+/**
+ * Provisions this pack carries verbatim text for: Article numbers, then Annexes.
+ *
+ * Numeric sort on an Annex key yields NaN, which in a comparator means "leave
+ * it wherever it happens to be" — a silently unstable order that would reshuffle
+ * the provisions index between builds. Annexes are therefore sorted separately
+ * and appended, which is also how a reader expects to find them.
+ */
 export function coveredArticles(version: string = PINNED_RULE_PACK_VERSION): string[] {
-  return Object.keys(getRulePack(version).manifest.corpus).sort(
-    (a, b) => Number.parseInt(a, 10) - Number.parseInt(b, 10),
-  )
+  const keys = Object.keys(getRulePack(version).manifest.corpus)
+  const articles = keys
+    .filter((key) => !isAnnexKey(key))
+    .sort((a, b) => Number.parseInt(a, 10) - Number.parseInt(b, 10))
+  const annexes = keys.filter(isAnnexKey).sort()
+  return [...articles, ...annexes]
+}
+
+/**
+ * How to name a corpus key on screen: "Article 6", "Annex III".
+ *
+ * One helper rather than two branches in every consumer, because the failure it
+ * prevents is a page headed "Article annex-iii" — which is not a typo a reader
+ * forgives on a page whose whole claim is that it reproduces the statute exactly.
+ */
+export function provisionLabel(key: string): string {
+  return isAnnexKey(key) ? `Annex ${key.replace(/^annex-/, '').toUpperCase()}` : `Article ${key}`
 }
 
 export function hasCorpus(article: string, version: string = PINNED_RULE_PACK_VERSION): boolean {
@@ -104,7 +135,7 @@ export function readArticleForDisplay(
     .map((block) => block.replace(/\s+/g, ' ').trim())
     .filter((block) => block.length > 0)
 
-  const [heading = `Article ${article}`, title = '', ...paragraphs] = blocks
+  const [heading = provisionLabel(article), title = '', ...paragraphs] = blocks
 
   return {
     article,

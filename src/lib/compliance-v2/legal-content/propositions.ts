@@ -206,7 +206,7 @@ export const LEGAL_PROPOSITIONS: LegalProposition[] = [
   // The role evaluator rests on these four, so they are quoted rather than
   // paraphrased. Article 25's role-transfer conditions — supplying under your
   // own name, changing the intended purpose, substantially modifying — are NOT
-  // here: Article 25 is not among the 19 Articles the pinned corpus carries, so
+  // here: Article 25 is not among the provisions the pinned corpus carries, so
   // no extract from it could be verified. The role questions establish those
   // conditions from the user's own answers instead, and the explanations they
   // produce are authored prose rather than quotation.

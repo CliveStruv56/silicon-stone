@@ -7,6 +7,7 @@
     "gen:style": "node scripts/gen-style-rules.mjs",
     "rulepack:check": "node scripts/rulepack-check.mjs",
     "rulepack:hash": "node scripts/rulepack-check.mjs --write",
+    "rulepack:fetch-annex": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/rulepack-fetch-annex.ts",
     "test:checker-v2": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/compliance-v2-check.ts",
     "reg:fetch": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/regulatory/fetch.ts",
     "reg:check": "tsx scripts/regulatory/check.ts",

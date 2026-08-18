@@ -1,0 +1,32 @@
+[
+  {
+    "infringement": "Article 5 prohibited practices",
+    "ceiling": "€35M or 7% of total worldwide annual turnover, whichever is higher",
+    "basis": "Article 99(3)"
+  },
+  {
+    "infringement": "Operator and notified-body duties other than Article 5 — including Article 50 transparency",
+    "ceiling": "€15M or 3%, whichever is higher",
+    "basis": "Article 99(4), point (g) covers Article 50"
+  },
+  {
+    "infringement": "Supplying incorrect, incomplete, or misleading information to notified bodies or competent authorities",
+    "ceiling": "€7.5M or 1%, whichever is higher",
+    "basis": "Article 99(5)"
+  },
+  {
+    "infringement": "General-purpose AI model providers",
+    "ceiling": "€15M or 3%, whichever is higher",
+    "basis": "Article 101(1)"
+  },
+  {
+    "infringement": "SMEs, including start-ups",
+    "ceiling": "the lower of the percentage or the fixed amount, across paragraphs 3, 4 and 5",
+    "basis": "Article 99(6)"
+  },
+  {
+    "infringement": "Small mid-cap enterprises (SMCs)",
+    "ceiling": "the lower of the two, for paragraphs 4 and 5 only — not Article 5 fines",
+    "basis": "Article 99(6a)"
+  }
+]

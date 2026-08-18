@@ -2,7 +2,7 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-08-18
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (98 static pages), 528 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (99 static pages), 549 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
@@ -463,6 +463,40 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 18, 2026 — rule pack `2026-08-18`: Annex III enters the corpus
+
+Compliance Checker v2 §20.2 makes "every high-risk result identifies an exact
+Article 6 / Annex route" a release gate, and that could not be honoured against a
+corpus of Articles only: an Annex III citation returned `uncovered` from
+`verifyCitation()`, which the verifier must treat as unverifiable rather than as
+a pass. So the pack now carries Annex III.
+
+**It is a version bump, because every pack change is.** `rulepack/versions/2026-08-18/`
+is a new directory; `2026-08-10` is untouched and still resolvable by env var.
+The nineteen `article-*.txt` files are byte-identical carry-overs, and **their
+hashes in the two manifests are the same values** — that identity is the
+evidence that no Article text moved, not a claim in a changelog. `corpusCutOff`
+stays `2026-07-27` and the CELEX is the same consolidation, so `reg:check`'s
+cross-lane assertion still holds.
+
+**Fetched, not pasted.** `npm run rulepack:fetch-annex -- --version 2026-08-18
+--annex III` reads CELEX `02024R1689-20260727` from the Publications Office
+(Cellar — `eur-lex.europa.eu` answers automated clients with a bot challenge) and
+**refuses to write unless the served document's own consolidation date matches
+the manifest**. It reuses `scripts/regulatory/source-fetch.ts` and `extract.ts`,
+which is not a blurring of the two lanes: those are a fetcher and an XHTML
+parser, and the text becomes authority only at the human step of reading the
+diff and hashing it into a pack version.
+
+**Keying.** Annex III is `annex-iii`, not a number. `corpusPath()` and
+`coveredArticles()` branch on the prefix, and a numeric sort over mixed keys
+yields NaN comparisons — an unstable order rather than an error — so annexes sort
+separately and append. `provisionLabel()` is new, because the failure it prevents
+is a page headed "Article annex-iii" on a page whose whole claim is exactness.
+The provisions index is now 20 pages and the site 99.
+
+Both packs verify in `prebuild`. 549 tests green.
 
 ### August 18, 2026 — Compliance Checker v2, Phase 2: scope, roles and size
 
@@ -3850,7 +3884,7 @@ discount codes, booking URL, LinkedIn URL). This table is for defects and debt.
 | ~~`LAUNCH.md` URLs named `www`~~ — corrected 2026-08-10 | **The canonical host is the bare apex** as of 2026-08-06 (commit `50996d27`) — `SITE_URL` in `src/lib/site.ts` is `https://siliconandstone.com` and `www` 308s to it, reversing the June decision. The Lemon Squeezy redirect targets and webhook URL in `LAUNCH.md` still gave `www`, which would have put a redirect hop inside a payment callback; both now use the apex. Historical `www` mentions in §9 changelog entries are left as written. | Resolved |
 | Inoreader redirect URI still localhost | `http://localhost:3000/api/auth/callback/inoreader` in the Inoreader dev portal. Research-pipeline OAuth therefore cannot complete in production; it works locally. Change to `https://siliconandstone.com/api/auth/callback/inoreader` (apex, not www). | Medium |
 | Three checker result fields are still bare `string[]` | Updated 2026-08-18. `actions` (2026-08-17) and `vendorQuestions` (2026-08-18) now carry per-item Article anchors, corpus links and authored explanation. `missingFacts`, `reasons` and `adjacentRisks` remain untyped strings. They are the weaker candidates of the four: `reasons` is narrative about how the classification was reached rather than a list of citable claims, and `adjacentRisks` is mostly GDPR and contract risk, where an AI Act anchor would be the wrong citation rather than a missing one. `missingFacts` is the one worth converting — it is the evidence-gap list, and several entries already name Article 6(3) in prose. | Low |
-| Rule-pack corpus covers 19 Articles, not all of them | `rulepack/versions/2026-08-10/corpus/` holds Arts 3, 5, 6, 9, 11, 12, 13, 17, 19, 26, 49, 50, 57, 72, 73, 99, 101, 111, 113. `hasCorpus()` answers honestly and `verifyCitation()` returns `uncovered` for anything else. **Stage 3's verifier must treat `uncovered` as unverifiable, never as a pass.** Extending coverage is a data task (re-scrape from the same CELEX id), not a code change. | Medium |
+| Rule-pack corpus covers 19 Articles and Annex III, not all of the Regulation | `rulepack/versions/2026-08-18/corpus/` holds Arts 3, 5, 6, 9, 11, 12, 13, 17, 19, 26, 49, 50, 57, 72, 73, 99, 101, 111, 113 **and Annex III** (added 2026-08-18). `hasCorpus()` answers honestly and `verifyCitation()` returns `uncovered` for anything else. **The verifier must treat `uncovered` as unverifiable, never as a pass.** Extending coverage is a data task — `npm run rulepack:fetch-annex` reads the same CELEX the manifest names and refuses to write unless the served consolidation date matches — but it is a **pack version bump**, which invalidated nothing here only because the carried-over hashes prove the Article text did not move. Article 25 (role transfer) and Article 2 (scope) are the next gaps worth closing; v2's role and scope explanations are authored prose because neither can be quoted. | Medium |
 | ~~No monthly model-spend ceiling~~ — shipped 2026-08-10 | `src/lib/model-budget.ts` checks `AI_MONTHLY_BUDGET_USD` against the `mtd` usage summary before dispatching a report. **Unset by default, so no ceiling is currently enforced** — set it in Vercel to turn it on. Note the deliberate fail-closed: a configured ceiling plus an unreadable ledger blocks generation. | Resolved (needs the env var set) |
 | Report generation is not durable across an instance death | Generation runs in `after()` rather than a Vercel Workflow (see §9 for why). An instance evicted mid-generation orphans a `pending` record, which the status route converts to `failed` after 320s so the user can retry. The user-visible cost is a wasted wait plus a re-request; the model spend is already incurred. Revisit if Next 16 lands and `workflow` becomes viable. | Low |
 | Report gate renders even where generation is unconfigured | The checker page is a client component and cannot read `ANTHROPIC_API_KEY`, so the "Get the written report" card always shows and a deployment without the key fails at submit with an honest 503. Production has the key, so this is cosmetic — but a `NEXT_PUBLIC_` capability flag would remove the dead-end. | Low |
