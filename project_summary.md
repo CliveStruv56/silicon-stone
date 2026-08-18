@@ -1,12 +1,12 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-08-17
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (98 static pages), 415 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
+> Last Updated: 2026-08-18
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (98 static pages), 422 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
-**The AI Act Compliance Checker was rebuilt on 2026-08-10** (Stages 0–3 of the agentic build spec): the rule base is corrected and versioned at `v2026-08-10`, backed by a git-tracked rule pack carrying 19 Articles of verbatim consolidated statute; a conversational intake proposes answers the user confirms before the unchanged deterministic engine classifies; and the result screen now offers an email-gated written report whose every legal quotation is string-matched against that corpus before a reader sees it. The paid half of Stage 3 — the £39 Evidence Pack and the £39→£79 credit — is built dark behind a flag and blocked on the Lemon Squeezy store. A legal review of the report template, disclaimer and credit terms is an open item before it ships. **Reworked again on 2026-08-17**: result items are typed rather than bare strings, so the card (now "Recommended actions and applicable provisions") groups duties apart from concessions, support measures and enforcement information, each expandable to its legal basis and conditions; and `/tools/compliance-checker/provisions` serves the 19 pinned Articles as verbatim statute a reader can follow a citation into. See §9 and §11.
+**The AI Act Compliance Checker was rebuilt on 2026-08-10** (Stages 0–3 of the agentic build spec): the rule base is corrected and versioned at `v2026-08-10`, backed by a git-tracked rule pack carrying 19 Articles of verbatim consolidated statute; a conversational intake proposes answers the user confirms before the unchanged deterministic engine classifies; and the result screen now offers an email-gated written report whose every legal quotation is string-matched against that corpus before a reader sees it. The paid half of Stage 3 — the £39 Evidence Pack and the £39→£79 credit — is built dark behind a flag and blocked on the Lemon Squeezy store. A legal review of the report template, disclaimer and credit terms is an open item before it ships. **Reworked again on 2026-08-17**: result items are typed rather than bare strings, so the card (now "Recommended actions and applicable provisions") groups duties apart from concessions, support measures and enforcement information, each expandable to its legal basis and conditions; and `/tools/compliance-checker/provisions` serves the 19 pinned Articles as verbatim statute a reader can follow a citation into. **The vendor questions followed on 2026-08-18**, each now carrying its own Article anchor, a corpus link and a stated reason for asking — including, where the vendor owes you no answer, the fact that it does not. See §9 and §11.
 
 **The blocker is a P0, re-confirmed against the live API on 2026-08-11: the production Kit API key is a legacy v3 key (22 chars, no `kit_` prefix), so `/api/subscribe` 401s and — because `NEXT_PUBLIC_PRE_LAUNCH` is still `true`, making every product CTA an email capture — the entire funnel currently terminates in a failed POST.** Beyond that: Lemon Squeezy store not yet created, 9 drafts unpublished, and 7 of 12 published articles still lack cover images. Go-live sequence lives in `LAUNCH.md`; defects and debt in §10.
 
@@ -463,6 +463,68 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 18, 2026 — the vendor questions get the same treatment the obligations got
+
+`actions` was typed on 2026-08-17; `vendorQuestions` was left as `string[]` in the
+same commit, deliberately, on the "one shape migration at a time" principle. That
+left it in a worse state than either end of the migration: **seven questions
+opened `Article 13 — …` and eight carried no anchor at all**, and nothing told a
+reader which was which. The prefix looked like a citation but was a string — it
+could not be linked or checked, and a question copied into a procurement email
+arrived carrying an Article reference the vendor had no way to follow. The
+questions that were genuinely unanchored, meanwhile, looked like an oversight.
+
+`VendorQuestion` now mirrors `RuleItem`: `id`, `question`, `article`,
+`corpusArticle`, and `why` — the vendor-side counterpart of `basis`, saying what
+the answer settles. **Nineteen question definitions** were rewritten —
+seventeen fixed, plus two generated per Article 5 practice point so two selected
+practices produce two anchored questions rather than one collapsed string.
+Seventeen carry an Article anchor, and all seventeen link into the pinned corpus
+pages. Two are deliberately unanchored: data processing terms (GDPR, not the AI
+Act) and the GPAI documentation question (the general-purpose model chapter is
+outside the 19-Article corpus). Both render a muted **"No AI Act anchor"** badge
+rather than a blank where every neighbour shows a citation.
+
+Two substantive corrections fell out of writing the `why` fields against the
+corpus rather than from memory:
+
+- **The two human-oversight questions had no stated basis at all.** They now cite
+  Article 13(3)(d), which is what actually obliges a provider to give "*the human
+  oversight measures referred to in Article 14*" in the instructions for use — and
+  the `why` says plainly that below the high-risk tier the vendor owes you no
+  answer. The old bare strings implied a duty that does not exist at that tier.
+- **The classification question conflated two provisions.** It asked for the
+  Article 6(4) assessment under an `Article 6(3) — ` prefix. The anchor is now
+  6(3) (the exemption) and the `why` names 6(4) (the duty to document it), which
+  is the actual relationship between them.
+
+Every quotation in a `why` was checked against `rulepack/versions/2026-08-10/corpus/`
+before it was written: Article 26(6)'s retention period, Article 9's "*continuous
+iterative process*", Article 13's "*concise, complete, correct and clear*",
+Article 49's registration wording and Article 3's provider definition. No pack
+file changed, so **no version bump** — same reasoning as the obligations work,
+`why` and per-item anchors are authored explanation and `src/lib/rulepack/index.ts`
+scopes the pack to dates, ceilings, anchors, citations and corpus.
+
+**Where it renders.** The questions moved out of the three-across grid at the top
+of the result — a card with a disclosure per item made that grid lopsided, the
+same reason the obligations card sits full width — into `VendorQuestionList`
+below `ObligationList`. The grid is now two across. The markdown export prints
+each question with its anchor, its `why`, and an absolute link to the provisions
+page, because the export is the copy that actually reaches the vendor.
+
+**Seven new invariants** in `src/lib/ai-act-rules.test.ts` hold it: no question may
+open with an `Article N` prefix, every question outside a named two-item exception
+list must carry an anchor, every `corpusArticle` must be a key of
+`RULE_PACK.manifest.corpus`, the anchor and the corpus link must agree, every
+`why` must be substantive, and ids and prose must agree in both directions. The
+profile matrix gained three "not sure" answer paths (`roleUnclear`,
+`prohibitedUncertain`, `oversightUncertain`) — those rules emit vendor questions
+and no obligations, so nothing previously covered them. 422 tests green, build
+clean at 98 static pages.
+
+Still bare `string[]`: `missingFacts`, `reasons` and `adjacentRisks`. See §10.
 
 ### August 17, 2026 — "Immediate obligations" was true of about a third of the list
 
@@ -3613,7 +3675,7 @@ discount codes, booking URL, LinkedIn URL). This table is for defects and debt.
 | Sanity `product.checkoutUrl` blank on all three products | The commerce gate opens `checkoutUrl` when set and otherwise links to `productPath`. Setting the three `NEXT_PUBLIC_LEMONSQUEEZY_*_URL` env vars lights up the **product pages only** — the in-article gate keeps sending readers to the product page until the same links are pasted into the Sanity product docs. `LAUNCH.md` had no Sanity step at all; one was added 2026-08-15. | Medium (blocked on LS) |
 | ~~`LAUNCH.md` URLs named `www`~~ — corrected 2026-08-10 | **The canonical host is the bare apex** as of 2026-08-06 (commit `50996d27`) — `SITE_URL` in `src/lib/site.ts` is `https://siliconandstone.com` and `www` 308s to it, reversing the June decision. The Lemon Squeezy redirect targets and webhook URL in `LAUNCH.md` still gave `www`, which would have put a redirect hop inside a payment callback; both now use the apex. Historical `www` mentions in §9 changelog entries are left as written. | Resolved |
 | Inoreader redirect URI still localhost | `http://localhost:3000/api/auth/callback/inoreader` in the Inoreader dev portal. Research-pipeline OAuth therefore cannot complete in production; it works locally. Change to `https://siliconandstone.com/api/auth/callback/inoreader` (apex, not www). | Medium |
-| Checker result fields other than `actions` are still bare `string[]` | Noted 2026-08-17. `actions` now carries `kind`, a per-item Article anchor and an authored `basis` (`RuleItem` in `src/lib/ai-act-rules.ts`), but `vendorQuestions`, `missingFacts`, `reasons` and `adjacentRisks` remain untyped strings with citations embedded in prose — `vendorQuestions` in particular carries "Article 13 — …" prefixes that a test depends on. The asymmetry is deliberate for now (one shape migration at a time), not a considered distinction. Converting `vendorQuestions` next would let it link into the provisions pages the same way. | Low |
+| Three checker result fields are still bare `string[]` | Updated 2026-08-18. `actions` (2026-08-17) and `vendorQuestions` (2026-08-18) now carry per-item Article anchors, corpus links and authored explanation. `missingFacts`, `reasons` and `adjacentRisks` remain untyped strings. They are the weaker candidates of the four: `reasons` is narrative about how the classification was reached rather than a list of citable claims, and `adjacentRisks` is mostly GDPR and contract risk, where an AI Act anchor would be the wrong citation rather than a missing one. `missingFacts` is the one worth converting — it is the evidence-gap list, and several entries already name Article 6(3) in prose. | Low |
 | Rule-pack corpus covers 19 Articles, not all of them | `rulepack/versions/2026-08-10/corpus/` holds Arts 3, 5, 6, 9, 11, 12, 13, 17, 19, 26, 49, 50, 57, 72, 73, 99, 101, 111, 113. `hasCorpus()` answers honestly and `verifyCitation()` returns `uncovered` for anything else. **Stage 3's verifier must treat `uncovered` as unverifiable, never as a pass.** Extending coverage is a data task (re-scrape from the same CELEX id), not a code change. | Medium |
 | ~~No monthly model-spend ceiling~~ — shipped 2026-08-10 | `src/lib/model-budget.ts` checks `AI_MONTHLY_BUDGET_USD` against the `mtd` usage summary before dispatching a report. **Unset by default, so no ceiling is currently enforced** — set it in Vercel to turn it on. Note the deliberate fail-closed: a configured ceiling plus an unreadable ledger blocks generation. | Resolved (needs the env var set) |
 | Report generation is not durable across an instance death | Generation runs in `after()` rather than a Vercel Workflow (see §9 for why). An instance evicted mid-generation orphans a `pending` record, which the status route converts to `failed` after 320s so the user can retry. The user-visible cost is a wasted wait plus a re-request; the model spend is already incurred. Revisit if Next 16 lands and `workflow` becomes viable. | Low |

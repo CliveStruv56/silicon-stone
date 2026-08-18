@@ -1,4 +1,10 @@
-import { derivesProfiling, evaluateRuleLibrary, type ResultItem, type RuleFinding } from './ai-act-rules'
+import {
+  derivesProfiling,
+  evaluateRuleLibrary,
+  type ResultItem,
+  type ResultVendorQuestion,
+  type RuleFinding,
+} from './ai-act-rules'
 
 export type AssessmentValue = string | string[]
 
@@ -67,7 +73,7 @@ export interface AssessmentResult {
   reasons: string[]
   missingFacts: string[]
   actions: ResultItem[]
-  vendorQuestions: string[]
+  vendorQuestions: ResultVendorQuestion[]
   adjacentRisks: string[]
   reviewTriggers: string[]
   reportSections: string[]

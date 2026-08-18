@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { ANNEX_III_APPLIES_FROM, evaluateRuleLibrary, type ResultItem } from './ai-act-rules'
+import {
+  ANNEX_III_APPLIES_FROM,
+  evaluateRuleLibrary,
+  type ResultItem,
+  type ResultVendorQuestion,
+} from './ai-act-rules'
 import { RULE_PACK } from './rulepack'
 import { articleNumberFrom } from './report/verify'
 
@@ -12,6 +17,11 @@ import type { AssessmentAnswers } from './ai-act-assessment'
  */
 function text(items: ResultItem[]): string {
   return items.map((item) => item.text).join(' ')
+}
+
+/** The same, for vendor questions — which carry their anchor in a field too. */
+function questions(items: ResultVendorQuestion[]): string {
+  return items.map((item) => item.question).join(' ')
 }
 
 /**
@@ -189,7 +199,7 @@ describe('Article 6(3) profiling override', () => {
 
   it('suppresses the narrow-task exemption caveat, which would contradict it', () => {
     const result = evaluateRuleLibrary({ ...hrScreening, profiling_confirm: 'yes' })
-    const surfaced = [...result.missingFacts, ...result.vendorQuestions].join(' ')
+    const surfaced = [...result.missingFacts, questions(result.vendorQuestions)].join(' ')
     expect(surfaced).not.toMatch(/narrow-task exemption \(/i)
     expect(surfaced).not.toMatch(/what Article 6\(3\) exemption analysis/i)
     expect(text(result.actions)).toMatch(/not available|unavailable/i)
@@ -305,7 +315,9 @@ describe('Article 6(3) exemption duties and log retention', () => {
 
   it('frames the duties as vendor evidence for a pure deployer', () => {
     const result = evaluateRuleLibrary(annexIIINoProfiling)
-    expect(result.vendorQuestions.join(' ')).toMatch(/Article 6\(4\) — Has your vendor documented/)
+    const exemption = result.vendorQuestions.find((item) => item.id === 'vendor-exemption-assessment')
+    expect(exemption?.article).toBe('Article 6(4)')
+    expect(exemption?.question).toMatch(/documented the assessment/)
     expect(text(result.actions)).not.toMatch(/Register yourself/)
   })
 
@@ -337,6 +349,18 @@ describe('Article 6(3) exemption duties and log retention', () => {
   })
 })
 
+/**
+ * The two questions that carry no Article anchor, and why each is allowed to.
+ * Named rather than pattern-matched: a question that loses its anchor by
+ * accident should fail the invariant below, not slip through a regex.
+ */
+const UNANCHORED = new Set([
+  // Data processing terms are GDPR, not the AI Act.
+  'vendor-evidence-data-terms',
+  // The general-purpose model chapter is outside the pinned corpus.
+  'vendor-gpai-documentation',
+])
+
 describe('vendor questions and organisation size', () => {
   it('anchors every vendor question to an Article', () => {
     const result = evaluateRuleLibrary({
@@ -346,11 +370,10 @@ describe('vendor questions and organisation size', () => {
       decision_impact: 'assistive',
       vendor_docs: ['none'],
     })
-    // The DPA question is GDPR, held deliberately outside the AI Act anchors.
-    const aiActQuestions = result.vendorQuestions.filter((item) => !/DPA/.test(item))
+    const aiActQuestions = result.vendorQuestions.filter((item) => !UNANCHORED.has(item.id))
     expect(aiActQuestions.length).toBeGreaterThan(3)
     for (const question of aiActQuestions) {
-      expect(question).toMatch(/^Articles? \d+/)
+      expect(question.article, question.id).toMatch(/^Articles? \d+/)
     }
   })
 
@@ -360,7 +383,8 @@ describe('vendor questions and organisation size', () => {
       sensitive_domains: ['employment'],
       vendor_docs: ['none'],
     })
-    expect(result.vendorQuestions.join(' ')).toMatch(/Article 49 — Has this system been registered/)
+    const registration = result.vendorQuestions.find((item) => item.article === 'Article 49')
+    expect(registration?.question).toMatch(/registered in the EU database/)
   })
 
   it('asks it only once, even where the exemption rule also fires', () => {
@@ -371,7 +395,9 @@ describe('vendor questions and organisation size', () => {
       decision_impact: 'assistive',
       vendor_docs: ['none'],
     })
-    const matches = result.vendorQuestions.filter((item) => /registered in the EU database/.test(item))
+    const matches = result.vendorQuestions.filter((item) =>
+      /registered in the EU database/.test(item.question)
+    )
     expect(matches.length).toBe(1)
   })
 
@@ -381,7 +407,7 @@ describe('vendor questions and organisation size', () => {
       sensitive_domains: ['employment'],
       vendor_docs: ['registration'],
     })
-    expect(result.vendorQuestions.join(' ')).not.toMatch(/registration reference/)
+    expect(questions(result.vendorQuestions)).not.toMatch(/registration reference/)
   })
 
   it('surfaces SME relief across paragraphs 3, 4 and 5', () => {
@@ -588,10 +614,21 @@ describe('result items', () => {
     gpai: { ...inScopeBase, primary_use: 'gpai-product' },
     modifiedResold: { ...inScopeBase, origin: 'modified-or-resold' },
     weakOversight: { ...inScopeBase, human_oversight: 'none' },
+    // The three "not sure" routes. They emit no obligations at all — only
+    // vendor questions — so the matrix did not need them until now.
+    roleUnclear: { ...inScopeBase, origin: 'not-sure' },
+    prohibitedUncertain: { ...inScopeBase, prohibited_screen: ['not-sure'] },
+    oversightUncertain: { ...inScopeBase, human_oversight: 'not-sure' },
   }
 
   const allItems: ResultItem[] = Object.values(PROFILES).flatMap(
     (answers) => evaluateRuleLibrary(answers).actions
+  )
+
+  // No profile answers `vendor_docs`, so every vendor-evidence rule fires in
+  // all of them — which is what makes this matrix cover the questions too.
+  const allQuestions: ResultVendorQuestion[] = Object.values(PROFILES).flatMap(
+    (answers) => evaluateRuleLibrary(answers).vendorQuestions
   )
 
   /**
@@ -771,5 +808,104 @@ describe('result items', () => {
     const retention = items.find((item) => item.article === 'Article 26(6)')
     expect(retention?.kind).toBe('conditional')
     expect(retention?.condition).toMatch(/2 December 2027/)
+  })
+
+  /*
+   * The same invariants over vendor questions. They are stated separately
+   * rather than folded into the ones above because the two shapes fail
+   * differently: an obligation with no basis misdescribes a duty, where a
+   * vendor question with no `why` sends someone into a procurement
+   * conversation unable to say why they are asking.
+   */
+
+  it('the profile matrix fires every rule that emits a vendor question', () => {
+    const EXPECTED_EMITTERS = [
+      'role-modified-resold',
+      'role-unclear',
+      'prohibited-uncertain',
+      'annex-iii-primary-use',
+      'annex-iii-profiling-override',
+      'annex-iii-exemption-duties',
+      'weak-human-oversight',
+      'human-oversight-uncertain',
+      'gpai-product-route',
+      'prohibited-art5-f',
+      'prohibited-art5-ba',
+      'article-50-chatbot',
+      'vendor-classification-missing',
+      'vendor-instructions-missing',
+      'vendor-risk-management-missing',
+      'vendor-registration-missing',
+      'vendor-dpa-missing',
+      'vendor-logs-missing',
+      'vendor-change-policy-missing',
+    ]
+    const emitters = new Set(allQuestions.map((item) => item.ruleId))
+    for (const id of EXPECTED_EMITTERS) {
+      expect(emitters, `${id} emitted no vendor question`).toContain(id)
+    }
+  })
+
+  it('every vendor question explains what the answer settles', () => {
+    expect(allQuestions.length).toBeGreaterThan(0)
+    for (const item of allQuestions) {
+      expect(item.why.length, `${item.id} has a thin why`).toBeGreaterThan(120)
+    }
+  })
+
+  /**
+   * The prefix this migration existed to remove. Seven questions opened
+   * "Article 13 — …", which read as a citation but was a string: nothing could
+   * link it, and the reader could not tell it apart from the eight questions
+   * that carried no anchor at all.
+   */
+  it('the anchor is a field, never a prefix on the question', () => {
+    for (const item of allQuestions) {
+      expect(item.question, item.id).not.toMatch(/^Articles?\s\d/)
+      expect(item.question, item.id).not.toMatch(/\(Articles?\s[^)]*\)\s*$/)
+    }
+  })
+
+  it('every vendor question carries an Article anchor unless it is a known exception', () => {
+    for (const item of allQuestions.filter((i) => !UNANCHORED.has(i.id))) {
+      expect(item.article, `${item.id} lost its anchor`).toMatch(/^Articles? \d/)
+    }
+  })
+
+  it('every vendor-question corpus link resolves to an Article the pinned pack carries', () => {
+    const covered = Object.keys(RULE_PACK.manifest.corpus)
+    const linked = allQuestions.filter((item) => item.corpusArticle)
+    expect(linked.length).toBeGreaterThan(0)
+    for (const item of linked) {
+      expect(covered, `${item.id} links to uncovered Article ${item.corpusArticle}`).toContain(
+        item.corpusArticle
+      )
+    }
+  })
+
+  it('the vendor-question corpus link points at an Article the question cites', () => {
+    for (const item of allQuestions.filter((i) => i.corpusArticle && i.article)) {
+      const cited = item.article!.match(/\d+[a-z]?/g) ?? []
+      expect(cited, item.id).toContain(item.corpusArticle)
+      if (!/^Articles /.test(item.article!)) {
+        expect(articleNumberFrom(item.article!), item.id).toBe(item.corpusArticle)
+      }
+    }
+  })
+
+  it('vendor-question ids and prose agree in both directions', () => {
+    const byId = new Map<string, ResultVendorQuestion>()
+    const byText = new Map<string, string>()
+    for (const item of allQuestions) {
+      const seen = byId.get(item.id)
+      if (seen) {
+        expect(item.question, `${item.id} question differs`).toBe(seen.question)
+      } else {
+        byId.set(item.id, item)
+      }
+      const owner = byText.get(item.question)
+      expect(owner ?? item.id, `"${item.question}" is emitted under two ids`).toBe(item.id)
+      byText.set(item.question, item.id)
+    }
   })
 })

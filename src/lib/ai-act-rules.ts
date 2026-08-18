@@ -85,6 +85,42 @@ export interface ResultItem extends RuleItem {
   ruleId: string
 }
 
+/**
+ * A question to put to the vendor, as a rule emits it.
+ *
+ * Same shape discipline as `RuleItem`, and for the same reason. These were bare
+ * strings: seven of them carried an "Article 13 — " prefix inside the prose,
+ * eight carried no anchor at all, and nothing distinguished the two cases to a
+ * reader. The card could not link a question to the provision it comes from, and
+ * a question pasted into a procurement email arrived carrying a citation the
+ * vendor had no way to follow.
+ *
+ * `why` is the vendor-side counterpart of `RuleItem.basis`: what the answer
+ * settles, and what it costs you not to have it. Several questions here are
+ * owed to you only at the high-risk tier — `why` says so rather than letting
+ * the question imply a duty the vendor does not have.
+ */
+export interface VendorQuestion {
+  /** Stable across runs. The dedupe key and the React key. */
+  id: string
+  /** The question, as you would put it to the vendor. Never opens with an "Article N — " prefix; see `article`. */
+  question: string
+  /** The narrow anchor for THIS question, e.g. 'Article 13(3)(d)'. */
+  article?: string
+  /**
+   * Corpus key for the explainer link, e.g. '13'. Set only where the pinned pack
+   * carries the Article, so a link can never 404.
+   */
+  corpusArticle?: string
+  /** What the answer settles, and why the question earns its place. */
+  why: string
+}
+
+/** A `VendorQuestion` once the aggregator has stamped the rule that emitted it. */
+export interface ResultVendorQuestion extends VendorQuestion {
+  ruleId: string
+}
+
 export interface RuleFinding {
   id: string
   title: string
@@ -109,7 +145,7 @@ export interface RuleFinding {
   reasons: string[]
   missingFacts: string[]
   actions: RuleItem[]
-  vendorQuestions: string[]
+  vendorQuestions: VendorQuestion[]
   adjacentRisks: string[]
   reviewTriggers: string[]
   reportSections: string[]
@@ -141,7 +177,7 @@ export interface RuleEvaluation {
   reasons: string[]
   missingFacts: string[]
   actions: ResultItem[]
-  vendorQuestions: string[]
+  vendorQuestions: ResultVendorQuestion[]
   adjacentRisks: string[]
   reviewTriggers: string[]
   reportSections: string[]
@@ -658,7 +694,17 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
             'A dated change log against the vendor’s original intended-purpose statement is usually enough. The question it has to answer is whether you changed what the system is for, not merely how it is configured.',
         },
       ],
-      vendorQuestions: ['Does the vendor permit fine-tuning, resale, rebranding, or material modification under its AI Act and product terms?'],
+      vendorQuestions: [
+        {
+          id: 'vendor-modification-permitted',
+          question:
+            'Do your terms permit fine-tuning, material modification, rebranding, or resale — and which party do you consider the provider once we do any of those?',
+          article: 'Article 3',
+          corpusArticle: '3',
+          why:
+            'Article 3 defines a provider as the party that develops an AI system and places it on the market or puts it into service “under its own name or trademark”. Modifying or rebranding is what carries you across that definition, so one answer settles two questions at once: whether the contract permits the change at all, and whose duties attach to what you end up with.',
+        },
+      ],
       adjacentRisks: ['Contractual allocation of AI Act and data protection responsibilities should be reviewed.'],
       reviewTriggers: ['Fine-tuning, resale, rebranding, or product positioning changes'],
       reportSections: ['Provider obligations summary'],
@@ -682,7 +728,17 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
       reasons: [],
       missingFacts: ['Clarify whether you are only using the tool, or whether you modify, rebrand, resell, or set a new intended purpose for it.'],
       actions: [],
-      vendorQuestions: ['Ask the vendor which party is provider, deployer, importer, distributor, or product manufacturer for this deployment.'],
+      vendorQuestions: [
+        {
+          id: 'vendor-role-allocation',
+          question:
+            'Which party do you consider the provider, deployer, importer, distributor, or product manufacturer for this deployment?',
+          article: 'Article 3',
+          corpusArticle: '3',
+          why:
+            'Every duty in the Regulation attaches to a role, and Article 3 defines each of them. A vendor that will not state which role it holds has left the allocation unresolved — which is a contract problem you can still fix during procurement and cannot fix after it.',
+        },
+      ],
       adjacentRisks: [],
       reviewTriggers: [],
       reportSections: ['Role analysis: deployer/provider/both'],
@@ -718,7 +774,17 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
       reasons: [],
       missingFacts: ['Confirm whether the system involves any Article 5 prohibited-practice red flags before deployment or renewal.'],
       actions: [],
-      vendorQuestions: ['Ask the vendor whether the system is designed or restricted to avoid Article 5 prohibited practices.'],
+      vendorQuestions: [
+        {
+          id: 'vendor-article-5-position',
+          question:
+            'Is the system designed or technically restricted so that it cannot be used for the practices Article 5 prohibits?',
+          article: 'Article 5',
+          corpusArticle: '5',
+          why:
+            'A prohibition bites on the practice, not on the product, so no vendor assurance can certify you out of one. What the answer does tell you is whether the capability is present at all — and because a prohibition admits no compliance route, this is the screening question worth resolving before signature rather than after it.',
+        },
+      ],
       adjacentRisks: [],
       reviewTriggers: ['System behaviour or use expands into biometric, profiling, or vulnerable-person contexts'],
       reportSections: ['Prohibited-practice screening'],
@@ -777,7 +843,17 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
         actions: [ANNEX_III_HIGH_RISK_CANDIDATE],
         vendorQuestions: performsProfiling(answers).value
           ? []
-          : ['Does the vendor classify this use case as high-risk under Annex III?'],
+          : [
+              {
+                id: 'vendor-annex-iii-classification',
+                question:
+                  'Do you classify this use case as high-risk under Annex III, and what intended purpose does that classification rest on?',
+                article: 'Article 6(2)',
+                corpusArticle: '6',
+                why:
+                  'Article 6(2) provides that “AI systems referred to in Annex III shall be considered to be high-risk”. The vendor’s classification does not bind you — the tier follows the use, and you control the use — but a vendor with no position on it has not done the analysis you would otherwise be relying on.',
+              },
+            ],
         adjacentRisks: [],
         reviewTriggers: ['Use case or affected group changes'],
         reportSections: ['Annex III classification rationale'],
@@ -835,7 +911,15 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
           },
         ],
         vendorQuestions: [
-          'Does the vendor acknowledge that Article 6(3)’s profiling proviso removes the narrow-task exemption for this system, and does its classification reflect that?',
+          {
+            id: 'vendor-profiling-proviso',
+            question:
+              'Does your classification take account of the profiling proviso — that an Annex III system performing profiling of natural persons is always high-risk, with no narrow-task exemption available to it?',
+            article: 'Article 6(3)',
+            corpusArticle: '6',
+            why:
+              'The final subparagraph of Article 6(3) is unqualified, so a classification resting on the narrow-task exemption for a system that profiles people is wrong as a matter of law. Asking in writing is what turns that from your inference into their stated position.',
+          },
         ],
         adjacentRisks: [],
         reviewTriggers: ['The system stops evaluating personal aspects of individuals, or leaves the Annex III domain'],
@@ -907,7 +991,17 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
         // vendor-registration-missing, so it is not duplicated here.
         vendorQuestions: provider
           ? []
-          : ['Article 6(4) — Has your vendor documented its Article 6(3) assessment, and will it produce that documentation on request?'],
+          : [
+              {
+                id: 'vendor-exemption-assessment',
+                question:
+                  'Have you documented the assessment behind your narrow-task exemption, and will you produce that documentation on request?',
+                article: 'Article 6(4)',
+                corpusArticle: '6',
+                why:
+                  'Article 6(4) requires a provider relying on the exemption to document its assessment before the system is placed on the market or put into service, and to provide that documentation to national competent authorities on request. The duty is the provider’s and not yours — but if the assessment does not exist, the classification you are relying on has nothing behind it.',
+              },
+            ],
         adjacentRisks: [],
         reviewTriggers: ['The vendor changes its Article 6(3) position or the system’s intended purpose'],
         reportSections: ['Annex III classification rationale'],
@@ -1062,7 +1156,17 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
             'Name people, not teams, and write down what authority they have to say no. Oversight that cannot override is the rubber stamp the Regulation is trying to prevent.',
         },
       ],
-      vendorQuestions: ['What human oversight procedures and operator competence expectations does the vendor recommend?'],
+      vendorQuestions: [
+        {
+          id: 'vendor-oversight-measures',
+          question:
+            'What human oversight measures do you specify for this system, and what competence do you expect of the people performing them?',
+          article: 'Article 13(3)(d)',
+          corpusArticle: '13',
+          why:
+            'Where the system is high-risk, the provider’s instructions for use must state “the human oversight measures referred to in Article 14, including the technical measures put in place to facilitate the interpretation of the outputs”. Below that tier the vendor owes you no answer — but the answer is still what tells you whether your reviewers can act on what they see.',
+        },
+      ],
       adjacentRisks: [],
       reviewTriggers: ['Human review is reduced, removed, or becomes a rubber stamp'],
       reportSections: ['Human oversight review'],
@@ -1084,7 +1188,17 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
       reasons: [],
       missingFacts: ['Confirm whether human review is meaningful and whether reviewers have authority to override the AI output.'],
       actions: [],
-      vendorQuestions: ['What oversight controls, escalation routes, and override mechanisms are available?'],
+      vendorQuestions: [
+        {
+          id: 'vendor-override-controls',
+          question:
+            'What override, escalation, and intervention controls does the system provide, and can a reviewer stop or reverse an output in practice?',
+          article: 'Article 13(3)(d)',
+          corpusArticle: '13',
+          why:
+            'The same instructions-for-use duty covers the technical measures behind oversight, which is the difference between oversight that exists on an organisation chart and oversight that can act. Ask for the controls rather than for the policy: a policy cannot be tested and a control can.',
+        },
+      ],
       adjacentRisks: [],
       reviewTriggers: [],
       reportSections: ['Human oversight review'],
@@ -1171,7 +1285,15 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
             'The dependency is the part people skip. If your obligations move when your model provider changes its terms, that is a fact about your compliance posture, not just your architecture.',
         },
       ],
-      vendorQuestions: ['If built on a third-party model, what GPAI documentation, acceptable-use restrictions, and model update notices does the model provider supply?'],
+      vendorQuestions: [
+        {
+          id: 'vendor-gpai-documentation',
+          question:
+            'If we build on your model: what documentation, acceptable-use restrictions, and advance notice of model changes do you supply to downstream providers?',
+          why:
+            'Your own duties move when the model provider changes its model, its terms or its acceptable-use policy, so the notice period is a compliance fact before it is a commercial one. No Article anchor is offered here because the general-purpose model chapter is outside the corpus pinned to this assessment — treat the answer as procurement evidence rather than as a citation.',
+        },
+      ],
       adjacentRisks: [],
       reviewTriggers: ['Model capability, distribution model, or downstream customer base changes'],
       reportSections: ['GPAI/provider route analysis'],
@@ -1187,7 +1309,15 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     when: (answers) => !has(answers, 'vendor_docs', 'classification'),
     build: () => vendorEvidenceFinding(
       'vendor AI Act classification or intended-purpose statement is missing',
-      'Article 6(3) — What AI Act classification and intended purpose do you assign to this system, and if you rely on a narrow-task exemption, can you provide the Article 6(4) assessment?'
+      {
+        id: 'vendor-evidence-classification',
+        question:
+          'What AI Act classification and intended purpose do you assign to this system, and if you rely on a narrow-task exemption, can you provide the assessment behind it?',
+        article: 'Article 6(3)',
+        corpusArticle: '6',
+        why:
+          'Classification decides which duties exist at all, and intended purpose is what any classification is argued from. Where the vendor relies on the Article 6(3) exemption, Article 6(4) requires that assessment to exist in documented form already — so this asks for a document, not for an opinion.',
+      }
     ),
   }),
   rule({
@@ -1200,7 +1330,15 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     when: (answers) => !has(answers, 'vendor_docs', 'instructions'),
     build: () => vendorEvidenceFinding(
       'transparency documentation and instructions for use are missing',
-      'Article 13 — Where is your transparency documentation covering capabilities, performance boundaries, known limitations, and instructions for safe use?'
+      {
+        id: 'vendor-evidence-instructions',
+        question:
+          'Where is your documentation covering capabilities, performance boundaries, known limitations, and instructions for safe use?',
+        article: 'Article 13',
+        corpusArticle: '13',
+        why:
+          'Article 13 requires a high-risk system to be accompanied by instructions for use in a form that is “concise, complete, correct and clear”, covering its characteristics, capabilities and limitations of performance. Below that tier it is not owed to you — but its absence is what leaves you unable to state what the system is for.',
+      }
     ),
   }),
   rule({
@@ -1213,7 +1351,15 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     when: (answers) => !has(answers, 'vendor_docs', 'risk-management'),
     build: () => vendorEvidenceFinding(
       'risk management system documentation is missing',
-      'Article 9 — Can you provide your risk management system documentation showing a continuous, iterative process across the system’s lifecycle?'
+      {
+        id: 'vendor-evidence-risk-management',
+        question:
+          'Can you provide your risk management system documentation, showing a process that runs across the system’s lifecycle rather than a one-off exercise at launch?',
+        article: 'Article 9',
+        corpusArticle: '9',
+        why:
+          'Article 9 requires the risk management system for a high-risk system to be “a continuous iterative process planned and run throughout the entire lifecycle”, with regular systematic review and updating. A document carrying a single date is evidence that the process does not exist.',
+      }
     ),
   }),
   rule({
@@ -1227,7 +1373,15 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     when: (answers) => inAnnexIIIDomain(answers) && !has(answers, 'vendor_docs', 'registration'),
     build: () => vendorEvidenceFinding(
       'EU database registration reference is missing',
-      'Article 49 — Has this system been registered in the EU database? If so, what is the registration reference? If not, what is your timeline?'
+      {
+        id: 'vendor-evidence-registration',
+        question:
+          'Has this system been registered in the EU database? If so, what is the registration reference; if not, what is your timeline?',
+        article: 'Article 49',
+        corpusArticle: '49',
+        why:
+          'Article 49 requires the provider of an Annex III high-risk system to “register themselves and that system in the EU database referred to in Article 71” before it is placed on the market. It is the sharpest question in this set because the answer is a public fact you can check rather than a claim you have to take on trust.',
+      }
     ),
   }),
   rule({
@@ -1240,7 +1394,13 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     when: (answers) => !has(answers, 'vendor_docs', 'dpa'),
     build: () => vendorEvidenceFinding(
       'data processing agreement or privacy terms are missing',
-      'Does the vendor provide a DPA, data retention terms, sub-processor list, and position on training with customer data?'
+      {
+        id: 'vendor-evidence-data-terms',
+        question:
+          'Do you provide a data processing agreement, retention terms, a sub-processor list, and a written position on training with customer data?',
+        why:
+          'This one is data protection law rather than the AI Act, which is why it carries no Article anchor. It belongs in an AI Act assessment because the same deployment almost always raises both — and because a vendor’s position on training with your data is the term most often absent from the contract and most expensive to discover late.',
+      }
     ),
   }),
   rule({
@@ -1253,7 +1413,15 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     when: (answers) => !has(answers, 'vendor_docs', 'logs'),
     build: () => vendorEvidenceFinding(
       'logging, audit, or export options are missing',
-      'Articles 12 and 26(6) — Does the system automatically record events over its lifetime, and can you export logs, decisions, prompts, outputs, user actions, and configuration history for audit?'
+      {
+        id: 'vendor-evidence-logs',
+        question:
+          'Does the system automatically record events over its lifetime, and can we export logs, decisions, prompts, outputs, user actions, and configuration history for audit?',
+        article: 'Articles 12 and 26(6)',
+        corpusArticle: '12',
+        why:
+          'Article 12 puts the recording capability on the provider. Article 26(6) puts the keeping of those logs on you, “for a period appropriate to the intended purpose of the high-risk AI system, of at least six months”, to the extent they are under your control. A system that cannot export what it recorded leaves you owing a duty you have no means to discharge.',
+      }
     ),
   }),
   rule({
@@ -1266,7 +1434,15 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
     when: (answers) => !has(answers, 'vendor_docs', 'change-policy'),
     build: () => vendorEvidenceFinding(
       'model update or change notification policy is missing',
-      'Article 72 — What does your post-market monitoring cover, and how will you notify us about model, feature, policy, or performance changes?'
+      {
+        id: 'vendor-evidence-change-policy',
+        question:
+          'What does your post-market monitoring cover, and how will you notify us of model, feature, policy, or performance changes?',
+        article: 'Article 72',
+        corpusArticle: '72',
+        why:
+          'Article 72 requires providers of high-risk systems to establish and document a post-market monitoring system proportionate to the risks. Your side of it is simpler and nowhere written down: an assessment is current only until the system changes, and you cannot re-run it on a change nobody told you about.',
+      }
     ),
   }),
   rule({
@@ -1538,7 +1714,15 @@ function prohibitedFinding(practice: Art5Practice): Omit<RuleFinding, 'id' | 'ti
           'Not a requirement of the Regulation — it is what your own legal review will ask for first. Pausing a use without recording why tends to mean the same use returns in six months under a different name.',
       },
     ],
-    vendorQuestions: ['Ask the vendor to confirm whether the system is designed, marketed, or technically capable of this prohibited-practice use.'],
+    vendorQuestions: [
+      {
+        id: `vendor-prohibited-capability-${practice.point}`,
+        question: `Is this system designed, marketed, or technically capable of the use we have flagged — ${label}?`,
+        article: `Article 5(1)(${practice.point})`,
+        corpusArticle: '5',
+        why: `Article 5(1) prohibits this practice outright, and has done since ${practice.appliesFrom}. Nothing the vendor says makes it lawful — but a written answer is the first thing your legal review will ask for, and a vendor that markets the capability has told you where the risk sits.`,
+      },
+    ],
     adjacentRisks: [],
     reviewTriggers: ['Any biometric, profiling, worker, education, public-space, or vulnerable-person use is proposed'],
     reportSections: ['Prohibited-practice screening'],
@@ -1587,7 +1771,13 @@ function futureProhibitedFinding(practice: Art5Practice): Omit<RuleFinding, 'id'
       },
     ],
     vendorQuestions: [
-      'What technical safeguards prevent this system generating non-consensual intimate imagery or child sexual abuse material, and will the vendor attest to Article 5(1)(ba)–(bb) compliance before 2 December 2026?',
+      {
+        id: `vendor-future-prohibited-safeguards-${practice.point}`,
+        question: `What technical safety measures prevent this system being used for ${label}, and will you attest to compliance before ${practice.appliesFrom}?`,
+        article: `Article 5(1)(${practice.point})`,
+        corpusArticle: '5',
+        why: `The practice is prohibited from ${practice.appliesFrom}. Article 5(1a) decides when the prohibition reaches a general-purpose system, and it turns on whether the system’s design and capabilities make that use a reasonably foreseeable and reproducible outcome absent reasonable and adequate technical safety measures — so the safeguards, and evidence that they were tested, are what keep the system outside it.`,
+      },
     ],
     adjacentRisks: [
       'Non-consensual intimate imagery and CSAM carry criminal and platform-liability exposure independent of the AI Act; this is a matter for legal counsel now, not on 2 December 2026.',
@@ -1624,7 +1814,17 @@ function transparencyFinding(label: string): Omit<RuleFinding, 'id' | 'title' | 
           'Work out which limb you are on before designing the notice. The provider-side machine-readable marking duty and the deployer-side disclosure duty are different jobs, and a banner on your site satisfies neither on its own.',
       },
     ],
-    vendorQuestions: ['What user-facing transparency notices, labels, and technical disclosure controls does the vendor provide?'],
+    vendorQuestions: [
+      {
+        id: 'vendor-transparency-controls',
+        question:
+          'What user-facing disclosure, labelling, and machine-readable marking does the system provide, and which of those can we configure?',
+        article: 'Article 50',
+        corpusArticle: '50',
+        why:
+          'Article 50 places disclosure duties on providers and deployers alike, and the deployer half is unsatisfiable where the vendor supplies no controls to satisfy it with. Establish what exists before you tell a customer or a regulator that a notice is in place.',
+      },
+    ],
     adjacentRisks: [],
     reviewTriggers: ['The system becomes user-facing or begins generating external content'],
     reportSections: ['Transparency obligations'],
@@ -1633,7 +1833,7 @@ function transparencyFinding(label: string): Omit<RuleFinding, 'id' | 'title' | 
 
 function vendorEvidenceFinding(
   evidence: string,
-  question: string
+  question: VendorQuestion
 ): Omit<RuleFinding, 'id' | 'title' | 'category' | 'version' | 'lastReviewed' | 'legalStatus' | 'source'> {
   return {
     evidence: [`Vendor evidence gap: ${evidence}`],
@@ -1692,7 +1892,13 @@ export function evaluateRuleLibrary(answers: AssessmentAnswers): RuleEvaluation 
     flatten(firedRules.map((rule) => rule.actions.map((item) => ({ ...item, ruleId: rule.id })))),
     (item) => item.id
   )
-  const vendorQuestions = unique(flatten(firedRules.map((item) => item.vendorQuestions)))
+  // Deduped by `id` for the same reason the actions are: the rule that owns
+  // the anchor and the rule that merely raises the topic used to emit two
+  // near-identical strings, and only one of them carried a citation.
+  const vendorQuestions = uniqueBy(
+    flatten(firedRules.map((rule) => rule.vendorQuestions.map((item) => ({ ...item, ruleId: rule.id })))),
+    (item) => item.id
+  )
   const adjacentRisks = unique(flatten(firedRules.map((item) => item.adjacentRisks)))
   const reviewTriggers = unique(flatten(firedRules.map((item) => item.reviewTriggers)))
   const reportSections = unique(flatten(firedRules.map((item) => item.reportSections)))

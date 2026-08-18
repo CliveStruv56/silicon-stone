@@ -6,7 +6,7 @@ import type { AssessmentResult, AssessmentAnswers, AssessmentQuestion } from './
 import { AI_ACT_TIMELINE, LEGAL_CORPUS_CUT_OFF, PENALTY_TIERS } from './ai-act-timeline'
 import { RULE_PACK } from './rulepack'
 import { ACTION_KIND_LABEL, groupObligations } from './ai-act-obligations'
-import type { ResultItem } from './ai-act-rules'
+import type { ResultItem, ResultVendorQuestion } from './ai-act-rules'
 import { absoluteUrl } from './site'
 import type { Policy, IndustryImpact } from '@/types/policy'
 import type { Scenario, ExposureProfile as ScenarioExposureProfile } from '@/types/scenario'
@@ -62,6 +62,30 @@ const obligationSections = (items: ResultItem[]): string => {
     .join('\n\n')
 }
 
+/**
+ * The vendor questions, each with its anchor and the reason it is being asked.
+ *
+ * The export is the copy that gets pasted into a procurement email, so this is
+ * the surface where a bare "Article 13 — " prefix did the most damage: the
+ * vendor received a citation with no way to read it. The full-text link is
+ * absolute for the same reason the obligation links are.
+ */
+const vendorQuestionLines = (items: ResultVendorQuestion[]): string => {
+  if (items.length === 0) {
+    return '- Keep current vendor evidence on file and refresh it when the system changes.'
+  }
+
+  return items
+    .map((item) => {
+      const prefix = item.article ? `**${item.article}.**` : '**No AI Act anchor.**'
+      const link = item.corpusArticle
+        ? `\n  - Full text: ${absoluteUrl(`/tools/compliance-checker/provisions/${item.corpusArticle}`)}`
+        : ''
+      return `- ${prefix} ${item.question}\n  - Why: ${item.why}${link}`
+    })
+    .join('\n')
+}
+
 // --- Compliance Checker --------------------------------------------------
 
 export function complianceCheckerMarkdown(
@@ -107,8 +131,8 @@ ${bullets(result.missingFacts, 'No critical missing facts identified.')}
 ## Recommended actions and applicable provisions
 ${obligationSections(result.actions)}
 
-## Vendor questions
-${bullets(result.vendorQuestions, 'Keep current vendor evidence on file and refresh it when the system changes.')}
+## Questions to put to your vendor
+${vendorQuestionLines(result.vendorQuestions)}
 
 ## Adjacent GDPR and vendor-risk signals
 ${bullets(result.adjacentRisks, 'No adjacent risks flagged by these answers.')}

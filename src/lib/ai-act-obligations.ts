@@ -82,8 +82,13 @@ export function groupObligations(items: ResultItem[]): GroupedObligations[] {
  * `corpusArticle` is set — which is only where the pinned pack carries that
  * Article verbatim. A test asserts every `corpusArticle` is a key of
  * `RULE_PACK.manifest.corpus`, so this cannot produce a 404.
+ *
+ * Typed on the field rather than on `ResultItem` because vendor questions carry
+ * the same anchor and deserve the same link — the two shapes have nothing else
+ * in common, and inventing a shared supertype for one optional string would be
+ * a worse description of them than this.
  */
-export function provisionHref(item: ResultItem): string | undefined {
+export function provisionHref(item: { corpusArticle?: string }): string | undefined {
   return item.corpusArticle
     ? `/tools/compliance-checker/provisions/${item.corpusArticle}`
     : undefined

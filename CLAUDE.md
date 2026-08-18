@@ -47,7 +47,7 @@ not in TypeScript constants. Two rules:
   they drift, the build gate and the citation verifier compute different hashes
   for the same text, and the symptom appears nowhere near the cause.
 
-Three invariants the tool promises on screen and must keep:
+Four invariants the tool promises on screen and must keep:
 
 - **The model never decides the tier.** Agentic intake proposes answers the user
   confirms; classification is the deterministic engine's alone. The report route
@@ -60,7 +60,8 @@ Three invariants the tool promises on screen and must keep:
   (`src/lib/report/verify.ts`); an unmatched claim renders an explicit note in
   place of the quote, and three failures withhold the whole report.
 - **A result item is never presented as a duty unless it is one** (since
-  2026-08-17). `RuleFinding.actions` is `RuleItem[]`, not `string[]`, and each
+  2026-08-17), **and no result item asserts a citation it cannot link** (since
+  2026-08-18). `RuleFinding.actions` is `RuleItem[]`, not `string[]`, and each
   item carries a `kind`: `duty`, `conditional`, `concession`, `support`,
   `enforcement` or `good-practice`. The card was once headed "Immediate
   obligations" over a list that mixed an Article 26(6) retention duty with an SME
@@ -69,6 +70,18 @@ Three invariants the tool promises on screen and must keep:
   `src/lib/ai-act-rules.test.ts` hold the line: no `-proportionate-relief` item
   may be a duty, every duty carries an `article`, and every item carries a
   substantive `basis`.
+
+  `RuleFinding.vendorQuestions` is `VendorQuestion[]` on the same pattern, with
+  `why` in place of `basis`. Seven of those questions used to open
+  "Article 13 — …" inside the prose and eight carried no anchor at all, so a
+  reader could not tell a citation from a sentence and the card could not link
+  either. The tests forbid the prefix, require an anchor on every question
+  outside a **named** two-item exception list (`vendor-evidence-data-terms`,
+  which is GDPR rather than the AI Act; `vendor-gpai-documentation`, whose
+  chapter is outside the corpus), and hold `article` and `corpusArticle` in
+  agreement exactly as they do for actions. Both exceptions render a "No AI Act
+  anchor" badge — a blank where every neighbour shows a citation reads as an
+  omission rather than a decision.
 
 Three consequences of that shape worth not undoing:
 
