@@ -89,8 +89,18 @@ function validateAnswer(
   if (answer.state === 'unknown' && !question.allowUnknown) {
     errors.push(invalid(question.id, 'This question does not offer a "not sure" answer.'))
   }
-  if (answer.state === 'not_applicable' && !question.allowNotApplicable) {
-    errors.push(invalid(question.id, 'This question cannot be marked not applicable.'))
+  // `not_applicable` and `declined` are both escapes from giving a value, and
+  // both are offered by the same flag — the UI renders them as "Not applicable"
+  // and "Prefer not to say". Checking only the first left `declined` able to
+  // bypass validation on any question at all, which is not a hole worth keeping
+  // for the sake of a distinction the questionnaire does not draw.
+  if (
+    (answer.state === 'not_applicable' || answer.state === 'declined') &&
+    !question.allowNotApplicable
+  ) {
+    errors.push(
+      invalid(question.id, 'This question must be answered, or marked "not sure" where offered.')
+    )
   }
   if (answer.state !== 'answered') return errors
 

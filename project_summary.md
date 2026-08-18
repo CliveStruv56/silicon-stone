@@ -2,7 +2,7 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-08-18
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (99 static pages), 585 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (99 static pages), 603 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
@@ -463,6 +463,56 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 18, 2026 — Compliance Checker v2, Phase 4: the questionnaire
+
+The v2 questionnaire is reachable, behind two gates: `COMPLIANCE_CHECKER_V2`
+must be on **and** the reader must add `?v2=1`. It renders *instead of* v1,
+never mixed into it, with a link back on every screen — spec §23.2, the opt-in
+beta decision. Nothing is stored, so closing the tab returns you to v1, which is
+the right default while v2 is unreleased. 603 tests green.
+
+**All the rules live in `lib/compliance-v2/flow.ts`, not in the component.**
+`vitest.config.ts` collects only `src/**/*.test.ts` and there are no `.test.tsx`
+files, so anything defined inside a component is untestable — and the two rules
+that matter most here are exactly the ones that must not drift.
+
+- **Answer invalidation.** Two buckets. `answers` is what an evaluator sees and
+  holds only questions on the live path; `historical` holds everything stranded
+  by a changed upstream answer. A user who changes their mind and changes it back
+  gets their answers returned rather than re-asked, and the engine never sees a
+  stranded one. The prune runs to a **fixed point**, because closing a branch can
+  strand an answer whose own branch then closes — tested on the
+  Annex III → profiling → narrow-task → risk chain.
+- **Section-based progress, never "question 9 of 14".** §7.1 forbids a fixed
+  count when branching is dynamic, and the test asserts the reason rather than
+  the rule: four different use families produce more than one distinct visible-
+  question count, so no single number is true of the questionnaire.
+
+**Verified in a browser, not just in tests.** A Puppeteer pass completed the
+whole assessment — **23 questions, keyboard only**, no mouse in the loop — and
+reached a result carrying `Article 5(1)(a)` and three Article 50 paragraph
+routes. No horizontal overflow at 390px. No page errors.
+
+**Interaction details worth keeping.** Native `<fieldset>` radios and checkboxes
+rather than styled buttons: arrow-key navigation, a group label and a checked
+state come free, where a grid of buttons has to reimplement all three badly.
+"Not sure" and "Prefer not to say" sit in the same group and the same visual
+class as the real options — they are answers (§6.1), and putting them in a
+different visual class is how a questionnaire teaches people that not knowing is
+a failure to complete something. "None of these" is made exclusive on the way in,
+and the data-entry warnings catch the combination arriving from elsewhere.
+
+**One hole closed on the way.** `validateAnswer` checked `not_applicable`
+against `allowNotApplicable` but never checked `declined` at all, so a declined
+answer bypassed validation on any question. Both are escapes from giving a value
+and both now sit behind the same flag.
+
+**The result panel is deliberately plain.** Phase 5 owns the result experience —
+typed finding cards, embedded legal explanations, §12's suppression rules — and
+rendering a convincing-looking version now would make an unfinished thing look
+finished. What is there is the classification, its statutory routes, scope, roles,
+size and the answers it rests on, under a note saying so.
 
 ### August 18, 2026 — Compliance Checker v2, Phase 3: the classification routes
 
@@ -4018,7 +4068,8 @@ phases; **Phase 0 shipped 2026-08-18** (see §9). v1 stays live behind
 | 1 — Types, catalogue, legal propositions | **Done 2026-08-18.** §6 contracts, the §7.2 universal triage, condition expressions as data, five corpus-verified propositions, §15.2 validation. Vocabulary extends `ActionKind` (spec §23.1). |
 | 2 — Scope, roles, size | **Done 2026-08-18.** Three evaluators, twelve questions, four Article 3 propositions, eleven golden scenarios. §20.8 held: declining every financial question still completes. |
 | 3 — Article 5, Annex, Article 50 routes | **Done 2026-08-18**, with one carve-out. Defects 2, 3 and 6 fixed; Annex I, Annex III, Article 6(3) and paragraph-specific Article 50 all built. **Outstanding: the per-practice Article 5 condition trees** (§7.6). Until they exist every positive screen holds at `potentially_prohibited` with an explicit unresolved list, which is the safe direction but is not the whole of §7.6. |
-| 4–5 — Questionnaire and result UI | Next. Phase 4 must build the v2 questionnaire **alongside** v1's, not in place of it — the opt-in beta decision (§23.2). 46 questions now, so section-based progress matters more than it did. |
+| 4 — Questionnaire UI | **Done 2026-08-18.** Behind `COMPLIANCE_CHECKER_V2` + `?v2=1`. All three exit criteria verified: keyboard-only completion in a real browser, no dead end from an unknown answer, and stranded answers held outside what the engine sees. |
+| 5 — Result UI | Next. Typed finding cards, embedded legal explanations and excerpts, §12's suppression rules (no penalty band, size category or timeline that does not relate to the reader's own result), version and reassessment information. The engine already returns everything it needs. |
 | 6 — Report and email flow | — |
 | 7 — GDPR overlay | — |
 | 8 — Validation and release | Includes shadow-mode v1/v2 comparison and optional counsel review. |

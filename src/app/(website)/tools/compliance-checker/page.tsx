@@ -31,6 +31,8 @@ import { RULE_PACK } from '@/lib/rulepack'
 import { ComplianceIntake } from '@/components/tools/ComplianceIntake'
 import { ObligationList } from '@/components/tools/ObligationList'
 import { VendorQuestionList } from '@/components/tools/VendorQuestionList'
+import { ComplianceCheckerV2 } from '@/components/tools/checker-v2/ComplianceCheckerV2'
+import { COMPLIANCE_CHECKER_V2 } from '@/lib/flags'
 import { ReportGate } from '@/components/tools/ReportGate'
 import { CopyMarkdownButton } from '@/components/tools/CopyMarkdownButton'
 import { ToolSubscribeCard } from '@/components/tools/ToolSubscribeCard'
@@ -245,6 +247,18 @@ export default function ComplianceCheckerPage() {
     setCurrentIndex(firstUnanswered === -1 ? 0 : firstUnanswered)
   }
 
+  /**
+   * Opt-in is read from the URL after mount rather than during render. The page
+   * is statically prerendered, so reading `window` during render would produce
+   * markup that cannot match on the server; the first paint is always v1, which
+   * is also the correct default.
+   */
+  const [v2Active, setV2Active] = useState(false)
+  useEffect(() => {
+    if (!COMPLIANCE_CHECKER_V2) return
+    setV2Active(new URLSearchParams(window.location.search).get('v2') === '1')
+  }, [])
+
   const reset = () => {
     setAnswers({})
     setCurrentIndex(0)
@@ -288,12 +302,30 @@ export default function ComplianceCheckerPage() {
               <p className="text-sm italic text-text-muted mt-5 opacity-80">
                 Informational triage only; not formal legal advice.
               </p>
+              {COMPLIANCE_CHECKER_V2 && !v2Active && (
+                <p className="mt-4 text-sm text-text-muted">
+                  <a href="?v2=1" className="text-stone-teal hover:underline">
+                    Try the v2 preview
+                  </a>{' '}
+                  — a rebuilt assessment that names the exact statutory route behind every result.
+                  It is not yet the version this site stands behind.
+                </p>
+              )}
             </div>
           </div>
         </section>
 
         <section className="mx-auto max-w-5xl px-6 py-10">
-          {showIntake && !showResult ? (
+          {/*
+            v2 renders *instead of* v1, never mixed into it — spec §23.2. The
+            flag decides whether the preview is offered at all; the URL decides
+            whether this reader took it up. Nothing is stored, so a reader who
+            closes the tab is back on v1, which is the right default while v2 is
+            unreleased.
+          */}
+          {v2Active ? (
+            <ComplianceCheckerV2 exitHref="/tools/compliance-checker" />
+          ) : showIntake && !showResult ? (
             <ComplianceIntake
               questions={assessmentQuestions}
               onConfirm={applyIntake}
