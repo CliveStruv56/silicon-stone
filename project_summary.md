@@ -2,7 +2,7 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-08-18
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (98 static pages), 422 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (98 static pages), 449 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
@@ -463,6 +463,70 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 18, 2026 — Compliance Checker v2, Phase 0: the safety harness
+
+`docs/# EU AI Act Compliance Checker v2 — Impl.md` landed as the plan of record
+(committed `01cc918b`) — 22 sections, 8 phases, whose central move is **removing
+the score from legal classification**. Phase 0 is the safety harness that has to
+exist before any of it starts, and it is now in place. **Nothing user-facing
+changed**: the flag is dark, the checker renders exactly as it did.
+
+- **`COMPLIANCE_CHECKER_V2`** in `src/lib/flags.ts`, default false, so v1 and v2
+  can be built side by side rather than through a long-lived branch.
+- **`src/lib/checker-version.ts`** — the four version stamps §15.1 requires
+  (schema, checker, question catalogue, rulepack), each answering a different
+  question when a stored result has to be reproduced later. `CheckerSession` now
+  carries `schemaVersion`; a record written before the field existed reads back
+  as 1, never defaulted forward, because §15.4 forbids reinterpreting an old
+  answer record as a v2 one.
+- **`src/lib/compliance-v2/legacy-baseline.ts`** — the ten mandatory regression
+  scenarios of §17.2 in v1's vocabulary, with v1's current output recorded. A
+  characterisation baseline, explicitly **not** a specification: v1 stays live
+  until the §20 gates pass, and this is what fails when a refactor moves a live
+  classification by accident.
+
+**The audit is the substance of it.** Running those ten scenarios through the
+live engine — rather than reading the code — found six defects, now written up
+in `docs/compliance-checker-v1-known-defects.md` and asserted as *still present*
+in `src/lib/compliance-v2/v1-invariants.test.ts`, so fixing one forces the test
+to be moved and inverted rather than quietly dropped:
+
+1. **An out-of-scope result still renders AI Act duties.** Scenario 3 returns
+   "Out of EU scope" as the headline and then an Article 6(3) duty plus three
+   conditional duties including Article 26(6) retention. The engine suppresses
+   the classification and nothing else. The two halves of the screen contradict
+   each other; this is the sharpest of the six.
+2. **A score alone produces high-risk.** A general-productivity provider scores 7
+   and is classified "Likely high-risk" with **no classification rule fired at
+   all**, then handed provider documentation duties on the strength of an
+   arithmetic total. This is the defect the whole v2 spec is built around.
+3. **Ticking a sector alone produces high-risk.** Ordinary medical
+   administration is not an Annex III use, but "healthcare" is the only way to
+   describe the context, and the anchor v1 emits — "Article 6(2) and (3)" —
+   names the mechanism rather than a point, because there is no point to name.
+4. **A minimal-risk micro business is shown penalty and sandbox material**, and
+   the markdown export prints the full penalty table and full timeline on every
+   result whatever the classification.
+5. **An unknown personal-data answer is silently treated as "none"** — a result
+   byte-identical to answering "no personal data". The four *decisive* unknowns
+   are handled properly; this is a hole in one question, failing in the
+   direction that matters.
+6. **The Article 50(4) published-text exception is not modelled** at all.
+
+Two representational gaps rather than wrong answers: v1 has **no establishment
+country** (scenarios 7 and 8 produce identical results, which the baseline test
+asserts so the gap is visible), and **no Annex III point** — it records a sector
+where the Regulation classifies by intended purpose, which is defect 3's cause.
+
+Four things v1 already gets right are asserted as passing tests, because Phases
+2–5 are where they would be lost by accident: recommendations never render as
+obligations, provider-only findings never reach a pure deployer, unknown
+decisive answers keep confidence below High, and a user who will not state
+organisation size still reaches a result (§20.8 — v1 never asks for turnover or
+balance sheet, and Phase 2's size evaluator is where that could regress).
+
+449 tests green (was 422), lint, typecheck and build clean at 98 static pages.
 
 ### August 18, 2026 — the vendor questions get the same treatment the obligations got
 
@@ -3741,6 +3805,30 @@ Nothing downstream matters until email capture works.
 | **Inoreader redirect URI** | Update the dev portal to the production callback so research OAuth works outside localhost. |
 | **VAPID keys for Web Push** | `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` — Phase 3 push is code-complete but cannot send until these are set and verified on a real device. |
 | **Confirm Plausible goal names** | Phase 3 + `LAUNCH.md` §3 events must exist by exact name (with spaces) to register. |
+
+### Priority 2a — Compliance Checker v2 (spec approved, Phase 0 done)
+
+Plan of record: `docs/# EU AI Act Compliance Checker v2 — Impl.md`. Eight
+phases; **Phase 0 shipped 2026-08-18** (see §9). v1 stays live behind
+`COMPLIANCE_CHECKER_V2` until §20's eighteen release acceptance criteria pass.
+
+| Phase | State |
+|-------|-------|
+| 0 — Safety harness and baseline | **Done.** Flag, version stamps, legacy baseline, six documented v1 defects. |
+| 1 — Types, catalogue, legal propositions | Next. Note the overlap with the shipped typed-item work: §4.2 wants eight legal-status labels where `ActionKind` has six, and §4.4's "explain, then cite" is largely what `RuleItem.basis` plus the provisions pages already do. Reconcile rather than build a parallel vocabulary. |
+| 2 — Scope, roles, size | Blocked on nothing. Watch §20.8 — v1 satisfies it today by never asking for financials. |
+| 3 — Article 5, Annex, Article 50 routes | Where defects 2, 3 and 6 get fixed. The largest phase. |
+| 4–5 — Questionnaire and result UI | — |
+| 6 — Report and email flow | — |
+| 7 — GDPR overlay | — |
+| 8 — Validation and release | Includes shadow-mode v1/v2 comparison and optional counsel review. |
+
+**§22 lists six decisions that must not be guessed** — session and report
+retention periods, whether the report email may be used for marketing (default:
+delivery only), anonymous session recovery, counsel review, disclaimer wording,
+and whether v2 replaces v1 immediately or ships as an opt-in beta. The spec says
+none blocks Phases 0–5; the beta-vs-replace answer does change how much parallel
+v1/v2 surface Phase 4 has to build.
 
 ### Priority 2b — Compliance Checker Stage 3 (spec'd, partly blocked)
 

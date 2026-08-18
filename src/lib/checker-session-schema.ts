@@ -1,4 +1,9 @@
 import { assessmentQuestions, type AssessmentAnswers } from '@/lib/ai-act-assessment'
+import {
+  CURRENT_CHECKER_SCHEMA_VERSION,
+  parseCheckerSchemaVersion,
+  type CheckerSchemaVersion,
+} from '@/lib/checker-version'
 
 /**
  * Shape and validation for a saved Compliance Checker run.
@@ -16,6 +21,13 @@ const MAX_VALUES_PER_QUESTION = 24
 const MAX_VALUE_LENGTH = 500
 
 export interface CheckerSession {
+  /**
+   * Which answer-record schema this session is written in. A record stored
+   * before this field existed reads back as 1, which is what it is — see
+   * `parseCheckerSchemaVersion`, and §15.4 of the v2 spec on why an old record
+   * is never defaulted forward.
+   */
+  schemaVersion: CheckerSchemaVersion
   answers: AssessmentAnswers
   /** Index into the visible-question list the user had reached. */
   step: number
@@ -60,6 +72,14 @@ export function sanitiseSession(input: unknown): CheckerSession {
     : 0
 
   return {
+    // A session already in the store keeps the version it was written at; a
+    // new one takes the version this build writes. Nothing reads this yet —
+    // it exists so that when v2 starts writing records, the ones already in
+    // Upstash identify themselves rather than having to be guessed at.
+    schemaVersion:
+      source.schemaVersion === undefined
+        ? CURRENT_CHECKER_SCHEMA_VERSION
+        : parseCheckerSchemaVersion(source.schemaVersion),
     answers: sanitiseAnswers(source.answers),
     step,
     showResult: source.showResult === true,
