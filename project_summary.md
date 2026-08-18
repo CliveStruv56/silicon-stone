@@ -2,7 +2,7 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-08-18
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (98 static pages), 449 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (98 static pages), 491 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
@@ -463,6 +463,57 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 18, 2026 — Compliance Checker v2, Phase 1: types, catalogue, legal content
+
+Two decisions of record first, both now written into the spec as §23 so a later
+phase cannot reopen them:
+
+- **The v2 finding vocabulary extends the shipped one.** §4.2 lists eight
+  legal-status labels; v1 already types every item with a six-value `ActionKind`.
+  `FINDING_KIND_FROM_ACTION_KIND` is a total map, `Record<ActionKind, FindingKind>`,
+  so adding a v1 kind without deciding its v2 meaning fails to compile. It needed
+  a **ninth** kind — `enforcement_information` — because v1's `enforcement` (how
+  a fine is calculated) is not an obligation, a recommendation or an entitlement,
+  and `adjacent_law` would claim it comes from another regime. `conditional` maps
+  to `conditional_obligation` and never to `future_obligation`: v1 keeps futurity
+  in prose, so the map cannot tell which is which and must not guess.
+- **v2 ships as an extended opt-in beta, not a cutover** (resolving §22.6). The
+  cost lands in Phase 4, which must now build the v2 questionnaire *alongside*
+  v1's rather than in place of it — which is why it was worth settling early.
+
+Phase 1 itself, all under `src/lib/compliance-v2/`:
+
+- **`types.ts`** — the §6 contracts. The one that carries the weight is the
+  answer model: `AnswerState` makes "not sure" a state rather than a value, which
+  is the structural fix for defect 5.
+- **`conditions.ts`** — branch conditions as *data* rather than predicate
+  closures. That is what makes the catalogue checkable: a `(answers) => boolean`
+  cannot be inspected for referencing a question that does not exist, or one
+  asked later in the flow. The forward-reference check is the valuable one — a
+  branch depending on a later answer never opens, and nothing errors.
+- **`questions/core.ts`** — the eight universal-triage questions of §7.2, with
+  help, "Why we ask" and examples. §7.2 lists "Not sure" among the *options* for
+  most of them; §6.1 forbids an unknown becoming "a default enum value", and an
+  option value is one. Every "Not sure" is therefore `allowUnknown: true`, and
+  the catalogue validator rejects an option value that spells an unknown out.
+  `intended_use_family` is deliberately `context_only`, not decisive — sector
+  selects the branch and must never establish the tier (defect 3).
+- **`legal-content/propositions.ts`** — the §10 library. Five seed propositions,
+  each restating law already authored and corpus-verified in v1; no new legal
+  claims. `shortExtract` must be a contiguous verbatim run, and
+  `npm run test:checker-v2` string-matches all five against the pinned corpus.
+  **That check runs in `prebuild`, not in a test**, because `rulepack/corpus.ts`
+  is `server-only` and throws under vitest — so a proposition that misquotes the
+  statute cannot reach a deployment.
+- **`validation/answers.ts`** — §15.2 validation and §15.3's error codes. It
+  differs from v1's `sanitiseAnswers` deliberately: v1 *drops* what it does not
+  recognise, v2 **rejects**. A dropped answer in v1 costs a question; in v2 it
+  could remove the fact a classification rested on, and §4.1 requires every
+  conclusion to name the answers behind it.
+
+491 tests green (was 449), lint, typecheck and build clean at 98 static pages.
+Still nothing user-facing: the flag is dark and the checker renders as before.
 
 ### August 18, 2026 — Compliance Checker v2, Phase 0: the safety harness
 
@@ -3815,20 +3866,20 @@ phases; **Phase 0 shipped 2026-08-18** (see §9). v1 stays live behind
 | Phase | State |
 |-------|-------|
 | 0 — Safety harness and baseline | **Done.** Flag, version stamps, legacy baseline, six documented v1 defects. |
-| 1 — Types, catalogue, legal propositions | Next. Note the overlap with the shipped typed-item work: §4.2 wants eight legal-status labels where `ActionKind` has six, and §4.4's "explain, then cite" is largely what `RuleItem.basis` plus the provisions pages already do. Reconcile rather than build a parallel vocabulary. |
-| 2 — Scope, roles, size | Blocked on nothing. Watch §20.8 — v1 satisfies it today by never asking for financials. |
+| 1 — Types, catalogue, legal propositions | **Done 2026-08-18.** §6 contracts, the §7.2 universal triage, condition expressions as data, five corpus-verified propositions, §15.2 validation. Vocabulary extends `ActionKind` (spec §23.1). |
+| 2 — Scope, roles, size | Next. Needs the §7.3 role branch and the §8 size questions. Watch §20.8 — v1 satisfies it today by never asking for financials, and this is the phase that could regress it. |
 | 3 — Article 5, Annex, Article 50 routes | Where defects 2, 3 and 6 get fixed. The largest phase. |
 | 4–5 — Questionnaire and result UI | — |
 | 6 — Report and email flow | — |
 | 7 — GDPR overlay | — |
 | 8 — Validation and release | Includes shadow-mode v1/v2 comparison and optional counsel review. |
 
-**§22 lists six decisions that must not be guessed** — session and report
-retention periods, whether the report email may be used for marketing (default:
-delivery only), anonymous session recovery, counsel review, disclaimer wording,
-and whether v2 replaces v1 immediately or ships as an opt-in beta. The spec says
-none blocks Phases 0–5; the beta-vs-replace answer does change how much parallel
-v1/v2 surface Phase 4 has to build.
+**§22 listed six decisions that must not be guessed. Four remain**: session and
+report retention periods, whether the report email may be used for marketing
+(default: delivery only), anonymous session recovery, counsel review, and
+disclaimer wording. §22.6 is **resolved — extended opt-in beta** (2026-08-18),
+recorded in spec §23.2 along with the vocabulary decision. None of the remaining
+four blocks Phases 2–5.
 
 ### Priority 2b — Compliance Checker Stage 3 (spec'd, partly blocked)
 

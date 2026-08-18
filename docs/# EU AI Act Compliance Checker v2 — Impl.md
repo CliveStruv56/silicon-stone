@@ -1275,6 +1275,55 @@ These must not be guessed during implementation:
 3. Whether anonymous browser-session recovery is desired.
 4. Whether and when external EU AI Act counsel will review the decision matrix.
 5. The final editorial wording of the disclaimer and privacy notice.
-6. Whether v2 replaces v1 immediately after approval or is released through an extended opt-in beta.
+6. ~~Whether v2 replaces v1 immediately after approval or is released through an extended opt-in beta.~~ **Resolved 2026-08-18: extended opt-in beta.** See §23.
 
 None of these blocks Phase 0–5 if the implementation preserves current external behaviour and keeps affected settings configurable.
+
+---
+
+## 23. Decisions taken during implementation
+
+Recorded here as they are made, so a later phase does not reopen them.
+
+### 23.1 The v2 finding vocabulary extends the shipped one (2026-08-18, Phase 1)
+
+§6 requires a new v2 namespace, and §4.2 lists eight legal-status labels. The
+shipped v1 result already types every item with a six-value `ActionKind`, added
+2026-08-17, with invariants holding it in production.
+
+**Decision: `FindingKind` is `ActionKind` extended, not a parallel vocabulary.**
+`FINDING_KIND_FROM_ACTION_KIND` in `src/lib/compliance-v2/types.ts` is a total
+map from the six to the nine, typed `Record<ActionKind, FindingKind>` so adding
+a v1 kind without deciding its v2 meaning fails to compile. Two consequences:
+
+- **A ninth kind, `enforcement_information`, was added to §4.2's eight.** v1
+  types a penalty-ceiling statement as `enforcement`, because how a fine is
+  calculated is neither an obligation, a recommendation nor an entitlement —
+  which is precisely the confusion the 2026-08-17 work removed. §4.2 has no home
+  for it and `adjacent_law` would say it comes from another regime. Having a kind
+  for it does not license showing it: §4.5 and defect 4 still forbid penalty
+  material unrelated to the user's own result.
+- **`conditional` maps to `conditional_obligation`, never `future_obligation`.**
+  v1 has no future status and encodes futurity in the condition prose, so the
+  map cannot tell which conditionals are really future duties. Phase 3 splits
+  them at the source; the map must not guess.
+
+This keeps Phase 8's shadow comparison honest — a v1 result and a v2 result can
+be compared without a lossy translation between two sets of words for the same
+distinctions.
+
+### 23.2 v2 ships as an extended opt-in beta (2026-08-18, resolving §22.6)
+
+**Decision: opt-in beta, not a cutover.** v1 remains the default for every user
+until §20's release acceptance criteria pass *and* the beta has run. Consequences
+for the phases that have not been built yet:
+
+- `COMPLIANCE_CHECKER_V2` stays false by default and gates the route, not the
+  build. Both engines ship in the same bundle.
+- **Phase 4 must build the v2 questionnaire alongside v1's, not in place of it.**
+  This is the phase where the decision costs something, and it is why it was
+  worth resolving before Phase 1 finished.
+- A beta user must be able to leave. An opt-out returns them to v1 with their v1
+  session intact, which is why v2 records carry `schemaVersion` from Phase 0 and
+  why §15.4 forbids reinterpreting a v1 record as a v2 one.
+- Phase 8's shadow-mode comparison runs before the beta opens, not instead of it.
