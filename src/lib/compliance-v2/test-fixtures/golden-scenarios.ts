@@ -41,12 +41,22 @@ export function record(...entries: AssessmentAnswerV2[]): AnswerRecordV2 {
   return Object.fromEntries(entries.map((entry) => [entry.questionId, entry]))
 }
 
-/** The triage answers a plain third-party deployer gives, as a base to vary. */
+/**
+ * The triage answers a plain third-party deployer gives, as a base to vary.
+ *
+ * `annex_iii_employment_use: none_of_these` is the load-bearing one. The family
+ * opens the employment branch; saying none of its listed uses applies is what
+ * keeps the scenario out of high-risk, and it is the answer most organisations
+ * in a listed sector honestly give. A scenario that wanted high-risk has to say
+ * which listed use it performs — which is the whole point of Phase 3.
+ */
 const DEPLOYER_BASE = [
   answered('intended_use_family', 'employment'),
   answered('individual_impact', 'recommends_ranks_scores'),
   answered('personal_data_use', 'yes'),
   answered('employee_band', '10_49'),
+  answered('annex_iii_employment_use', ['none_of_these']),
+  answered('prohibited_screen', ['none_of_these']),
 ]
 
 export interface GoldenScenario {
@@ -188,6 +198,8 @@ export const GOLDEN_SCENARIOS: GoldenScenario[] = [
       answered('individual_impact', 'recommends_ranks_scores'),
       answered('personal_data_use', 'yes'),
       answered('employee_band', '1_9'),
+      answered('annex_iii_employment_use', ['none_of_these']),
+      answered('prohibited_screen', ['none_of_these']),
       answered('size_precision_opt_in', 'yes'),
       declined('annual_turnover_band'),
       declined('balance_sheet_band'),
@@ -205,6 +217,184 @@ export const GOLDEN_SCENARIOS: GoldenScenario[] = [
     ),
   },
 ]
+
+/** Triage answers shared by the Phase 3 classification scenarios. */
+const IN_SCOPE_DEPLOYER = [
+  answered('organisation_establishment', 'eu_eea'),
+  answered('ai_market_connection', ['used_from_eu_establishment']),
+  answered('organisation_activity', ['used_internally_or_for_customers']),
+  answered('own_name_supply', 'no'),
+  answered('intended_purpose_changed', 'no'),
+  answered('material_modification', 'no'),
+  answered('personal_data_use', 'yes'),
+  answered('employee_band', '10_49'),
+  answered('prohibited_screen', ['none_of_these']),
+]
+
+GOLDEN_SCENARIOS.push(
+  {
+    id: 'medicalAdminMicro',
+    spec: 'v1 defect 3 — ordinary medical administration is not an Annex III use',
+    answers: record(
+      ...IN_SCOPE_DEPLOYER,
+      answered('employee_band', '1_9'),
+      answered('intended_use_family', 'essential_services'),
+      answered('individual_impact', 'administrative_only'),
+      answered('annex_iii_essential_services_use', ['none_of_these'])
+    ),
+  },
+  {
+    id: 'publicBenefitsEligibility',
+    spec: 'The positive case in the same area — eligibility decided for a public authority',
+    answers: record(
+      ...IN_SCOPE_DEPLOYER,
+      answered('intended_use_family', 'essential_services'),
+      answered('individual_impact', 'determines_outcome'),
+      answered('annex_iii_essential_services_use', ['public_benefits_eligibility']),
+      answered('performs_profiling', 'yes')
+    ),
+  },
+  {
+    id: 'hrScreeningProfiling',
+    spec: 'Annex III point 4(a) with profiling — the derogation is foreclosed',
+    answers: record(
+      ...IN_SCOPE_DEPLOYER,
+      answered('intended_use_family', 'employment'),
+      answered('individual_impact', 'recommends_ranks_scores'),
+      answered('annex_iii_employment_use', ['recruitment_selection']),
+      answered('performs_profiling', 'yes')
+    ),
+  },
+  {
+    id: 'hrNarrowTaskExemption',
+    spec: 'The same route with the derogation available — both halves of Article 6(3) met',
+    answers: record(
+      ...IN_SCOPE_DEPLOYER,
+      answered('intended_use_family', 'employment'),
+      answered('individual_impact', 'informs_human_decision'),
+      answered('annex_iii_employment_use', ['recruitment_selection']),
+      answered('performs_profiling', 'no'),
+      answered('narrow_task_condition', ['narrow_procedural']),
+      answered('no_significant_risk_of_harm', 'yes')
+    ),
+  },
+  {
+    id: 'hrProfilingUnresolved',
+    spec: 'The unknown case — profiling unresolved, so the tier cannot be settled',
+    answers: record(
+      ...IN_SCOPE_DEPLOYER,
+      answered('intended_use_family', 'employment'),
+      answered('individual_impact', 'recommends_ranks_scores'),
+      answered('annex_iii_employment_use', ['recruitment_selection']),
+      unknown('performs_profiling')
+    ),
+  },
+  {
+    id: 'highImpactNoRoute',
+    spec: 'v1 defect 2 — high operational impact, no statutory route, therefore not high-risk',
+    answers: record(
+      answered('organisation_establishment', 'eu_eea'),
+      answered('ai_market_connection', ['placed_on_eu_market']),
+      answered('organisation_activity', ['built_or_commissioned']),
+      answered('regulated_product_own_name', 'no'),
+      answered('intended_use_family', 'something_else'),
+      answered('intended_use_description', 'It routes and drafts replies to inbound customer email.'),
+      answered('individual_impact', 'determines_outcome'),
+      answered('personal_data_use', 'yes'),
+      answered('employee_band', '10_49'),
+      answered('prohibited_screen', ['none_of_these'])
+    ),
+  },
+  {
+    id: 'regulatedProductBothLimbs',
+    spec: 'Annex I / Article 6(1) — both limbs met',
+    answers: record(
+      answered('organisation_establishment', 'eu_eea'),
+      answered('ai_market_connection', ['placed_on_eu_market']),
+      answered('organisation_activity', ['built_or_commissioned']),
+      answered('regulated_product_own_name', 'yes'),
+      answered('intended_use_family', 'regulated_product'),
+      answered('individual_impact', 'no_decisions_about_people'),
+      answered('personal_data_use', 'no'),
+      answered('employee_band', '250_749'),
+      answered('annex_i_route', ['safety_component_of_regulated_product', 'third_party_conformity_assessment']),
+      answered('prohibited_screen', ['none_of_these'])
+    ),
+  },
+  {
+    id: 'regulatedProductOneLimb',
+    spec: 'The negative case — a safety component whose product needs no third-party assessment',
+    answers: record(
+      answered('organisation_establishment', 'eu_eea'),
+      answered('ai_market_connection', ['placed_on_eu_market']),
+      answered('organisation_activity', ['built_or_commissioned']),
+      answered('regulated_product_own_name', 'yes'),
+      answered('intended_use_family', 'regulated_product'),
+      answered('individual_impact', 'no_decisions_about_people'),
+      answered('personal_data_use', 'no'),
+      answered('employee_band', '250_749'),
+      answered('annex_i_route', ['safety_component_of_regulated_product']),
+      answered('prohibited_screen', ['none_of_these'])
+    ),
+  },
+  {
+    id: 'chatbotNotObvious',
+    spec: 'Article 50(1) — a provider design duty, not the deployer’s',
+    answers: record(
+      ...IN_SCOPE_DEPLOYER,
+      answered('intended_use_family', 'chatbot_interaction'),
+      answered('individual_impact', 'informs_human_decision'),
+      answered('interacts_with_people', 'yes'),
+      answered('interaction_obvious', 'no'),
+      answered('generates_synthetic_content', 'no'),
+      answered('deploys_emotion_or_categorisation', 'no')
+    ),
+  },
+  {
+    id: 'reviewedPublicInterestText',
+    spec: 'v1 defect 6 — the Article 50(4) editorial exception, met',
+    answers: record(
+      ...IN_SCOPE_DEPLOYER,
+      answered('intended_use_family', 'synthetic_content'),
+      answered('individual_impact', 'no_decisions_about_people'),
+      answered('interacts_with_people', 'no'),
+      answered('generates_synthetic_content', 'yes'),
+      answered('synthetic_assistive_only', 'no'),
+      answered('deepfake_output', 'no'),
+      answered('public_interest_text', 'yes'),
+      answered('editorial_review_responsibility', 'yes'),
+      answered('deploys_emotion_or_categorisation', 'no')
+    ),
+  },
+  {
+    id: 'unreviewedPublicInterestText',
+    spec: 'The same route without editorial responsibility — the duty stands',
+    answers: record(
+      ...IN_SCOPE_DEPLOYER,
+      answered('intended_use_family', 'synthetic_content'),
+      answered('individual_impact', 'no_decisions_about_people'),
+      answered('interacts_with_people', 'no'),
+      answered('generates_synthetic_content', 'yes'),
+      answered('synthetic_assistive_only', 'no'),
+      answered('deepfake_output', 'no'),
+      answered('public_interest_text', 'yes'),
+      answered('editorial_review_responsibility', 'no'),
+      answered('deploys_emotion_or_categorisation', 'no')
+    ),
+  },
+  {
+    id: 'prohibitedScreenPositive',
+    spec: '§7.6 — a positive screen stays "potentially prohibited" until resolved',
+    answers: record(
+      ...IN_SCOPE_DEPLOYER,
+      answered('intended_use_family', 'employment'),
+      answered('individual_impact', 'recommends_ranks_scores'),
+      answered('annex_iii_employment_use', ['none_of_these']),
+      answered('prohibited_screen', ['art5_f']),
+      answered('law_enforcement_authorisation', 'no')
+    ),
+  }
+)
 
 export function scenario(id: string): AnswerRecordV2 {
   const found = GOLDEN_SCENARIOS.find((item) => item.id === id)

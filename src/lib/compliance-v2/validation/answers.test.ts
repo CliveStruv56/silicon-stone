@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import type { AssessmentAnswerV2, AssessmentQuestionV2 } from '../types'
+import type { AnswerRecordV2, AssessmentAnswerV2, AssessmentQuestionV2 } from '../types'
+import { visibleQuestions } from '../questions'
 import { minimumFactsSatisfied, validateAnswers } from './answers'
 
 /**
@@ -30,6 +31,11 @@ const COMPLETE = {
   own_name_supply: answered('own_name_supply', 'no'),
   intended_purpose_changed: answered('intended_purpose_changed', 'no'),
   material_modification: answered('material_modification', 'no'),
+  // The employment family opens its exact-use branch, and the Article 5 screen
+  // is asked of everyone. Both are classification-decisive and therefore
+  // required — "none of these" is the answer, not the absence of one.
+  annex_iii_employment_use: answered('annex_iii_employment_use', ['none_of_these']),
+  prohibited_screen: answered('prohibited_screen', ['none_of_these']),
 }
 
 describe('validateAnswers', () => {
@@ -236,15 +242,35 @@ describe('minimumFactsSatisfied', () => {
    * that stops them finishing.
    */
   it('is satisfied by a record of nothing but "not sure"', () => {
-    const allUnknown = Object.fromEntries(
-      Object.keys(COMPLETE).map((id) => [
-        id,
-        { questionId: id, state: 'unknown' as const, value: null, source: 'manual' as const },
-      ])
-    )
-    const { answers, ok } = validateAnswers(allUnknown)
-    expect(ok).toBe(true)
-    expect(minimumFactsSatisfied(answers)).toEqual([])
+    /**
+     * Walked rather than enumerated, because answering "not sure" *opens*
+     * branches: a question whose condition tests `state: 'unknown'` becomes
+     * visible precisely when the user says they do not know. So this marks every
+     * visible question unknown, re-reads what is visible, and repeats until the
+     * set stops growing — which is also a proof that the questionnaire converges
+     * for such a user rather than reaching a dead end.
+     */
+    let answers: AnswerRecordV2 = {}
+    for (let pass = 0; pass < 10; pass += 1) {
+      const before = Object.keys(answers).length
+      for (const question of visibleQuestions(answers)) {
+        if (answers[question.id] || !question.allowUnknown) continue
+        answers = {
+          ...answers,
+          [question.id]: {
+            questionId: question.id,
+            state: 'unknown',
+            value: null,
+            source: 'manual',
+          },
+        }
+      }
+      if (Object.keys(answers).length === before) break
+    }
+
+    const validated = validateAnswers(answers)
+    expect(validated.errors).toEqual([])
+    expect(minimumFactsSatisfied(validated.answers)).toEqual([])
   })
 
   /**

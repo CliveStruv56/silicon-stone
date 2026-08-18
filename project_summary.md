@@ -2,7 +2,7 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-08-18
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (99 static pages), 549 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (99 static pages), 585 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
@@ -463,6 +463,62 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 18, 2026 — Compliance Checker v2, Phase 3: the classification routes
+
+The largest phase, and where **three of the six documented v1 defects are
+fixed**. 46 questions, 17 corpus-verified propositions, 585 tests green. Flag
+still dark.
+
+**Defect 2 — the score is gone.** `engine/classify.ts` contains no arithmetic.
+A route either fires with a named statutory point or it does not fire, and
+`statutoryRoutes` is empty exactly when nothing was cited — which is how §20.2
+is enforced rather than merely intended (`hasStatutoryRoute()` is asserted across
+every golden scenario). v1's own regression case, a general-productivity provider
+with adverse automated decisions, now returns `no_specific_category_identified`
+with an empty route list instead of "Likely high-risk" on a score of 7.
+
+**Defect 3 — sector no longer decides the tier.** Ten Annex III branch questions
+(`questions/annex-iii.ts`), one per listed area, each offering the area's
+sub-points **plus an explicit "none of these"**. High-risk requires selecting a
+sub-point. Ordinary medical administration now returns no route; deciding
+eligibility for public benefits on behalf of an authority returns
+`Annex III, point 5(a)`. Asserted across eight areas, not one example.
+
+**Defect 6 — Article 50 has its exceptions.** `engine/article-50.ts` evaluates
+each paragraph separately, and every route carries `owedBy`. §7.7's rule — a
+provider duty must not be relabelled as the deployer's — is enforced by
+`routesOwedBy()`, which splits owed duties from supplier-side ones. 50(4)'s
+editorial-responsibility exception is modelled: AI-generated public-interest text
+that has been through human review *with an identified person holding editorial
+responsibility* now returns `does_not_apply`, and the test for the negative case
+asserts the explanation says human review alone does not lift it.
+
+**Article 6(3)** is cumulative and foreclosed by profiling — both properties
+tested. A narrow-task condition alone does not lift the classification, and an
+Annex III system that profiles people is `likely_high_risk` with `high`
+confidence and Article 6(3) among its cited routes.
+
+**Article 5** returns `potentially_prohibited`, never "prohibited". §7.6 requires
+the output to stay there until the conditions and exceptions are resolved, and
+**the per-practice condition trees are not authored yet** — so every positive
+screen carries an explicit `unresolved` list and low confidence. That is the
+honest state, and it is recorded in the module comment rather than left to be
+discovered. The screen, the recurring law-enforcement authorisation exception and
+Article 5(1a)'s safety-measures test for the two future-dated prohibitions are
+built.
+
+**Eight new propositions**, all verbatim-verified against the pinned corpus —
+including three from Annex III, which is why the corpus was extended first. The
+Annex III point 5(a) proposition's `practicalMeaning` says in terms that "this is
+the point most often misread as 'healthcare is high-risk'".
+
+One test worth noting: the all-unknown case is now a **convergence walk** rather
+than a fixed list. Answering "not sure" *opens* branches — a condition testing
+`state: 'unknown'` becomes visible precisely when the user says they do not know
+— so the test marks every visible question unknown, re-reads visibility, and
+repeats until stable. It proves the questionnaire terminates for such a user
+rather than reaching a dead end, which is Phase 4's exit criterion arriving early.
 
 ### August 18, 2026 — rule pack `2026-08-18`: Annex III enters the corpus
 
@@ -3961,8 +4017,8 @@ phases; **Phase 0 shipped 2026-08-18** (see §9). v1 stays live behind
 | 0 — Safety harness and baseline | **Done.** Flag, version stamps, legacy baseline, six documented v1 defects. |
 | 1 — Types, catalogue, legal propositions | **Done 2026-08-18.** §6 contracts, the §7.2 universal triage, condition expressions as data, five corpus-verified propositions, §15.2 validation. Vocabulary extends `ActionKind` (spec §23.1). |
 | 2 — Scope, roles, size | **Done 2026-08-18.** Three evaluators, twelve questions, four Article 3 propositions, eleven golden scenarios. §20.8 held: declining every financial question still completes. |
-| 3 — Article 5, Annex, Article 50 routes | Next, and the largest phase. Where defects 2, 3 and 6 get fixed — the score stops deciding the tier, sector selection stops creating high-risk status, and Article 50 gains its exceptions. Needs §7.4's fourteen intended-purpose modules. |
-| 4–5 — Questionnaire and result UI | — |
+| 3 — Article 5, Annex, Article 50 routes | **Done 2026-08-18**, with one carve-out. Defects 2, 3 and 6 fixed; Annex I, Annex III, Article 6(3) and paragraph-specific Article 50 all built. **Outstanding: the per-practice Article 5 condition trees** (§7.6). Until they exist every positive screen holds at `potentially_prohibited` with an explicit unresolved list, which is the safe direction but is not the whole of §7.6. |
+| 4–5 — Questionnaire and result UI | Next. Phase 4 must build the v2 questionnaire **alongside** v1's, not in place of it — the opt-in beta decision (§23.2). 46 questions now, so section-based progress matters more than it did. |
 | 6 — Report and email flow | — |
 | 7 — GDPR overlay | — |
 | 8 — Validation and release | Includes shadow-mode v1/v2 comparison and optional counsel review. |

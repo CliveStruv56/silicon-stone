@@ -298,6 +298,194 @@ export const LEGAL_PROPOSITIONS: LegalProposition[] = [
     reviewedAt: REVIEWED_AT,
     reviewStatus: 'internal',
   },
+  // --- Classification routes (Phase 3) -----------------------------------
+  //
+  // Annex III entered the corpus in pack 2026-08-18 precisely so these could be
+  // verified. Before that a route citation was unverifiable, and §20.2 makes an
+  // exact route a release gate — an unverifiable citation behind a gate is worse
+  // than no citation, because it reads as though it had been checked.
+  {
+    id: 'prop-annex-iii-scope',
+    ruleId: 'annex-iii-route',
+    ...AI_ACT,
+    provision: 'Annex III',
+    corpusArticle: 'annex-iii',
+    applicableRoles: ['provider', 'deployer'],
+    conditions: ['The system’s intended purpose falls within one of the eight listed areas.'],
+    exceptions: ['Article 6(3), where the system does not profile natural persons.'],
+    effectiveFrom: '2027-12-02',
+    plainEnglishSummary:
+      'Annex III lists the uses that make a system high-risk. It is a list of uses, not of sectors — which is why being in a listed industry is not the test.',
+    practicalMeaning:
+      'Read the point that matches your use, not the heading of the area. Most work inside a listed sector is not a listed use, and the difference is what decides whether the full high-risk requirements apply to you.',
+    shortExtract:
+      'High-risk AI systems pursuant to Article 6(2) are the AI systems listed in any of the following areas:',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/annex-3',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-annex-iii-4a-recruitment',
+    ruleId: 'annex-iii-route',
+    ...AI_ACT,
+    provision: 'Annex III, point 4(a)',
+    corpusArticle: 'annex-iii',
+    applicableRoles: ['provider', 'deployer'],
+    conditions: ['The system is intended for the recruitment or selection of natural persons.'],
+    exceptions: ['Article 6(3), where the system does not profile natural persons.'],
+    effectiveFrom: '2027-12-02',
+    plainEnglishSummary:
+      'Systems intended to recruit or select people are high-risk — including those that target job adverts, filter applications, or evaluate candidates.',
+    practicalMeaning:
+      'The verbs are the test. Drafting a job advert for a person to review is not targeting one; ranking applicants is evaluating candidates.',
+    shortExtract:
+      'AI systems intended to be used for the recruitment or selection of natural persons, in particular to place targeted job advertisements, to analyse and filter job applications, and to evaluate candidates',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/annex-3',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-annex-iii-5a-public-benefits',
+    ruleId: 'annex-iii-route',
+    ...AI_ACT,
+    provision: 'Annex III, point 5(a)',
+    corpusArticle: 'annex-iii',
+    applicableRoles: ['provider', 'deployer'],
+    conditions: [
+      'The system is used by a public authority, or on its behalf.',
+      'It evaluates eligibility for essential public assistance benefits and services, or grants, reduces, revokes or reclaims them.',
+    ],
+    exceptions: ['Article 6(3), where the system does not profile natural persons.'],
+    effectiveFrom: '2027-12-02',
+    plainEnglishSummary:
+      'Deciding who is eligible for essential public benefits and services — healthcare among them — is high-risk where it is done by or for a public authority.',
+    practicalMeaning:
+      'This is the point most often misread as "healthcare is high-risk". It is not: the use is eligibility for benefits and services, and the actor is a public authority or someone acting for one. Ordinary medical administration is neither.',
+    shortExtract:
+      'AI systems intended to be used by public authorities or on behalf of public authorities to evaluate the eligibility of natural persons for essential public assistance benefits and services, including healthcare services, as well as to grant, reduce, revoke, or reclaim such benefits and services',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/annex-3',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-6-1-annex-i-route',
+    ruleId: 'annex-i-route',
+    ...AI_ACT,
+    provision: 'Article 6(1)(a)',
+    corpusArticle: '6',
+    applicableRoles: ['provider', 'product_manufacturer'],
+    conditions: [
+      'The system is a safety component of a product, or is itself a product, covered by the Union harmonisation legislation in Annex I.',
+      'That product must undergo a third-party conformity assessment.',
+    ],
+    exceptions: [
+      'Article 6(1a): systems used solely for non-safety aspects of user assistance, performance optimisation, service efficiency, automation, convenience or quality control do not qualify as safety components.',
+    ],
+    effectiveFrom: '2028-08-02',
+    plainEnglishSummary:
+      'The product-safety route to high-risk. Both limbs are required: the system is a safety component of a regulated product, and that product needs third-party assessment.',
+    practicalMeaning:
+      'One limb without the other does not reach it. This route is also the one that usually means a single conformity assessment through the product’s own rules rather than two separate ones.',
+    shortExtract:
+      'the AI system is intended to be used as a safety component of a product, or the AI system is itself a product, covered by the Union harmonisation legislation listed in Annex I',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-6',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-6-3-derogation',
+    ruleId: 'annex-iii-exemption',
+    ...AI_ACT,
+    provision: 'Article 6(3)',
+    corpusArticle: '6',
+    applicableRoles: ['provider'],
+    conditions: [
+      'The system poses no significant risk of harm to health, safety or fundamental rights, including by not materially influencing the outcome of decision making.',
+      'One of the four narrow-task conditions is met.',
+    ],
+    exceptions: ['Unavailable where the system performs profiling of natural persons.'],
+    effectiveFrom: '2027-12-02',
+    plainEnglishSummary:
+      'An Annex III system is not high-risk where it poses no significant risk of harm and meets one of four narrow-task conditions. Both halves are required.',
+    practicalMeaning:
+      'It is a derogation you claim, not a default you fall into — and claiming it creates documentation and registration duties of its own under Article 6(4).',
+    shortExtract:
+      'By derogation from paragraph 2, an AI system referred to in Annex III shall not be considered to be high-risk where it does not pose a significant risk of harm to the health, safety or fundamental rights of natural persons, including by not materially influencing the outcome of decision making.',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-6',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-6-3-profiling-proviso',
+    ruleId: 'annex-iii-exemption',
+    ...AI_ACT,
+    provision: 'Article 6(3), final subparagraph',
+    corpusArticle: '6',
+    applicableRoles: ['provider', 'deployer'],
+    conditions: ['The system is listed in Annex III.', 'It performs profiling of natural persons.'],
+    exceptions: [],
+    effectiveFrom: '2027-12-02',
+    plainEnglishSummary:
+      'An Annex III system that profiles natural persons is always high-risk. The narrow-task derogation cannot reach it.',
+    practicalMeaning:
+      'Unqualified, so there is no exemption argument left to make. A vendor classification resting on the narrow-task derogation for a system that profiles people is wrong as a matter of law, and worth challenging in writing.',
+    shortExtract:
+      'Notwithstanding the first subparagraph, an AI system referred to in Annex III shall always be considered to be high-risk where the AI system performs profiling of natural persons.',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-6',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-50-3-emotion-categorisation',
+    ruleId: 'article-50-emotion',
+    ...AI_ACT,
+    provision: 'Article 50(3)',
+    corpusArticle: '50',
+    applicableRoles: ['deployer'],
+    conditions: ['An emotion recognition or biometric categorisation system is operated on people.'],
+    exceptions: [
+      'Systems permitted by law to detect, prevent or investigate criminal offences, subject to safeguards.',
+    ],
+    plainEnglishSummary:
+      'A deployer of an emotion recognition or biometric categorisation system must tell the people exposed to it that it is operating.',
+    practicalMeaning:
+      'This one is yours whoever built the system, and it carries a data-protection limb alongside it — a separate regime this assessment does not audit.',
+    shortExtract:
+      'Deployers of an emotion recognition system or a biometric categorisation system shall inform the natural persons exposed thereto of the operation of the system',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-50',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-50-4-editorial-exception',
+    ruleId: 'article-50-public-interest-text',
+    ...AI_ACT,
+    provision: 'Article 50(4), second subparagraph',
+    corpusArticle: '50',
+    applicableRoles: ['deployer'],
+    conditions: ['AI-generated or manipulated text is published to inform the public on a matter of public interest.'],
+    exceptions: [
+      'Use authorised by law to detect, prevent, investigate or prosecute criminal offences.',
+      'Content that has undergone human review or editorial control where a natural or legal person holds editorial responsibility for the publication.',
+    ],
+    plainEnglishSummary:
+      'Publishing AI-generated public-interest text carries a disclosure duty — unless the content has been through human review or editorial control and someone holds editorial responsibility for it.',
+    practicalMeaning:
+      'Both halves of the exception are required. Human review on its own does not lift the duty; there must also be an identified person or organisation answerable for the publication.',
+    shortExtract:
+      'This obligation shall not apply where the use is authorised by law to detect, prevent, investigate or prosecute criminal offences or where the AI-generated content has undergone a process of human review or editorial control and where a natural or legal person holds editorial responsibility for the publication of the content.',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-50',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT,
+    reviewStatus: 'internal',
+  },
 ]
 
 export const PROPOSITION_BY_ID = new Map(LEGAL_PROPOSITIONS.map((item) => [item.id, item]))

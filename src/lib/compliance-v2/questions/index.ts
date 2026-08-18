@@ -2,6 +2,9 @@ import type { AnswerRecordV2, AssessmentQuestionV2 } from '../types'
 import { collectQuestionIds, evaluateCondition } from '../conditions'
 import { CORE_QUESTIONS } from './core'
 import { ROLE_QUESTIONS } from './role'
+import { ANNEX_III_QUESTIONS } from './annex-iii'
+import { ANNEX_I_QUESTIONS, PROHIBITED_QUESTIONS } from './prohibited'
+import { EXEMPTION_QUESTIONS, TRANSPARENCY_QUESTIONS } from './transparency'
 import { ORGANISATION_SIZE_QUESTIONS } from './organisation-size'
 
 /**
@@ -22,6 +25,14 @@ import { ORGANISATION_SIZE_QUESTIONS } from './organisation-size'
 export const QUESTION_CATALOGUE: AssessmentQuestionV2[] = [
   ...CORE_QUESTIONS,
   ...ROLE_QUESTIONS,
+  // Exact use before the exemption: Article 6(3) is a derogation from a
+  // classification, so the classification has to exist before anyone is invited
+  // to claim relief from it.
+  ...ANNEX_III_QUESTIONS,
+  ...ANNEX_I_QUESTIONS,
+  ...EXEMPTION_QUESTIONS,
+  ...TRANSPARENCY_QUESTIONS,
+  ...PROHIBITED_QUESTIONS,
   ...ORGANISATION_SIZE_QUESTIONS,
 ]
 
@@ -144,4 +155,13 @@ export function assertCatalogueValid(catalogue: AssessmentQuestionV2[] = QUESTIO
   }
 }
 
-export { CORE_QUESTIONS, ROLE_QUESTIONS, ORGANISATION_SIZE_QUESTIONS }
+export {
+  CORE_QUESTIONS,
+  ROLE_QUESTIONS,
+  ANNEX_III_QUESTIONS,
+  ANNEX_I_QUESTIONS,
+  EXEMPTION_QUESTIONS,
+  TRANSPARENCY_QUESTIONS,
+  PROHIBITED_QUESTIONS,
+  ORGANISATION_SIZE_QUESTIONS,
+}
