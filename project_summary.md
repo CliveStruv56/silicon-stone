@@ -2,7 +2,7 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-08-18
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (99 static pages), 603 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (99 static pages), 626 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
@@ -463,6 +463,60 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 18, 2026 — Compliance Checker v2, Phase 5: the result
+
+Typed finding cards, §12.1's nine sections with empties hidden, and the
+suppression rules that keep irrelevant material off the page. 626 tests green.
+Flag still dark; reachable at `?v2=1` when it is on.
+
+**Findings are built, not narrated.** `engine/findings.ts` turns route
+evaluations into `ComplianceFindingV2[]`, each carrying everything §12.2 asks a
+card to show — status, role, why it applies here, what the law means, the action,
+evidence to keep, effective date, conditions, exceptions, the unresolved facts it
+rests on, and a short extract. Every extract comes from an approved proposition,
+so §20.11 is structural rather than a matter of care.
+
+**Three suppression rules, each a v1 defect closed:**
+
+- **Out of scope emits no legal finding at all** — an early return rather than a
+  filter at the end, because a filter is something a later edit slips past. §9.3
+  permits a readiness recommendation, so one survives, saying plainly that the
+  Regulation does not apply.
+- **Uncertain scope downgrades every duty to conditional**, applied to the whole
+  finding set rather than at each emit site: a rule applied in fourteen places is
+  one that will eventually be applied in thirteen.
+- **Penalty information is contextual, never a table** (§12.4). It appears only
+  where a prohibited-practice screen or a *live* transparency duty makes it
+  relevant — and specifically not where the only such duty turned out to be
+  excepted away, which would be the universal table wearing a condition. The
+  size relief is gated on holding provider duties on a high-risk path, which is
+  where Articles 11(1) and 17(2) actually bite.
+
+**§9.4 is computed, not displayed.** `engine/dates.ts` reads application dates
+from the pinned pack **by label, and throws when the label is missing** — a pack
+rename would otherwise drop the date out of every finding that depended on it,
+and a finding with no date reads as "now". `assessedAt` is a parameter rather
+than `new Date()`, so a duty that has come into application since is reported as
+current rather than staying "later" forever, and a result stored today says the
+same thing when it is read next year.
+
+**Explain, then cite** (§4.4). The plain-English account comes first on every
+card and the verbatim extract last, because §10 says the reader should not need
+to open the source to understand the finding. Each extract links both to the
+pinned provisions page and to the official source.
+
+**21 new display-invariant tests**, asserted against whole results across all 23
+golden scenarios: no recommendation in an obligations section, no relief typed as
+a duty, every future duty naming its date, every high-risk result citing a route,
+every card answering why and what, and every section that renders having
+something in it.
+
+Verified in a browser as well: drove the questionnaire to a `likely_high_risk`
+HR-screening result and confirmed the sections, the Article 26(6) card with its
+"From 2 December 2027" stamp, and the corpus extract. Caught one real defect that
+way — a `<Badge>` is `inline-flex` and does not wrap, so a sentence inside one
+ran off a 390px viewport. It is a paragraph now, which is what it always was.
 
 ### August 18, 2026 — Compliance Checker v2, Phase 4: the questionnaire
 
@@ -4069,7 +4123,8 @@ phases; **Phase 0 shipped 2026-08-18** (see §9). v1 stays live behind
 | 2 — Scope, roles, size | **Done 2026-08-18.** Three evaluators, twelve questions, four Article 3 propositions, eleven golden scenarios. §20.8 held: declining every financial question still completes. |
 | 3 — Article 5, Annex, Article 50 routes | **Done 2026-08-18**, with one carve-out. Defects 2, 3 and 6 fixed; Annex I, Annex III, Article 6(3) and paragraph-specific Article 50 all built. **Outstanding: the per-practice Article 5 condition trees** (§7.6). Until they exist every positive screen holds at `potentially_prohibited` with an explicit unresolved list, which is the safe direction but is not the whole of §7.6. |
 | 4 — Questionnaire UI | **Done 2026-08-18.** Behind `COMPLIANCE_CHECKER_V2` + `?v2=1`. All three exit criteria verified: keyboard-only completion in a real browser, no dead end from an unknown answer, and stranded answers held outside what the engine sees. |
-| 5 — Result UI | Next. Typed finding cards, embedded legal explanations and excerpts, §12's suppression rules (no penalty band, size category or timeline that does not relate to the reader's own result), version and reassessment information. The engine already returns everything it needs. |
+| 5 — Result UI | **Done 2026-08-18.** Typed finding cards, §12.1's sections with empties hidden, §12.4's contextual penalties, §9.4's date-aware duty status. All three exit criteria pass. |
+| 6 — Report and email flow | Next. Deterministic legal report sections, restricted AI prose, proposition-applicability verification, and the core result shown before the email gate. §22's open decisions start to bite here: report retention, and whether the report email may be used for marketing (default: delivery only). |
 | 6 — Report and email flow | — |
 | 7 — GDPR overlay | — |
 | 8 — Validation and release | Includes shadow-mode v1/v2 comparison and optional counsel review. |
