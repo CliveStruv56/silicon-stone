@@ -3,12 +3,13 @@
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { FindingCard } from './FindingCard'
+import { GdprOverlayCard } from './GdprOverlayCard'
 import type { ComplianceResultV2 } from '@/lib/compliance-v2/types'
 import {
   APPLICABILITY_LABEL,
   CLASSIFICATION_LABEL,
   ROLE_LABEL,
-  resultSections,
+  resultBlocks,
 } from '@/lib/compliance-v2/result-sections'
 
 /**
@@ -28,7 +29,7 @@ import {
  */
 
 export function ResultV2({ result }: { result: ComplianceResultV2 }) {
-  const sections = resultSections(result)
+  const blocks = resultBlocks(result)
   const heldRoles = result.roles.filter(
     (role) => role.applicability === 'applies' || role.applicability === 'likely_applies'
   )
@@ -109,22 +110,30 @@ export function ResultV2({ result }: { result: ComplianceResultV2 }) {
         </CardContent>
       </Card>
 
-      {/* 2–8. The typed sections, in §12.1's order, empties hidden. */}
-      {sections.map((section) => (
-        <Card key={section.key} className="bg-stone-charcoal border-border-subtle">
-          <CardHeader>
-            <CardTitle className="text-lg text-text-primary">{section.heading}</CardTitle>
-            <CardDescription>{section.blurb}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-3">
-              {section.findings.map((finding) => (
-                <FindingCard key={finding.id} finding={finding} />
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-      ))}
+      {/*
+        2–8. The typed sections and the data-protection overlay, in §12.1's
+        order, empties hidden. The order comes from `resultBlocks`, where it is
+        asserted — this file must not be the place a section moves.
+      */}
+      {blocks.map((block) =>
+        block.kind === 'gdpr' ? (
+          <GdprOverlayCard key={block.key} overlay={block.overlay} heading={block.heading} />
+        ) : (
+          <Card key={block.key} className="bg-stone-charcoal border-border-subtle">
+            <CardHeader>
+              <CardTitle className="text-lg text-text-primary">{block.section.heading}</CardTitle>
+              <CardDescription>{block.section.blurb}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-3">
+                {block.section.findings.map((finding) => (
+                  <FindingCard key={finding.id} finding={finding} />
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+        )
+      )}
 
       {result.materialUnknowns.length > 0 && (
         <Card className="bg-stone-charcoal border-border-subtle">

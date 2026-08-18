@@ -282,12 +282,49 @@ export interface MaterialUnknown {
   importance: QuestionImportance
 }
 
+export type GdprRegime = 'eu_gdpr' | 'uk_gdpr'
+
+/**
+ * A pointer to a data-protection instrument, at instrument level.
+ *
+ * Deliberately not a `LegalSourceReference`. That type carries a `shortExtract`
+ * and a `rulepackVersion`, and both mean the same thing here: the text was
+ * string-matched against the pinned corpus at build time. **No GDPR text is in
+ * the pinned pack** — the rule pack is the AI Act, and the regulatory retrieval
+ * corpus that does hold the GDPR is editorial-only and is never an authority for
+ * anything this tool puts on screen. Reusing `LegalSourceReference` would let a
+ * GDPR quotation inherit a guarantee nothing gave it.
+ *
+ * So the overlay quotes nothing and cites no provision. It links the instrument,
+ * names the concept, and says what to go and check. That is the honest shape
+ * until §11.3's "separately approved GDPR proposition" exists.
+ */
+export interface GdprReference {
+  label: string
+  url: string
+  appliesTo: GdprRegime | 'both'
+}
+
 export interface GdprAiOverlayResult {
   /** §11.3: EU, UK, or both where the answers cannot separate them. */
-  regimes: Array<'eu_gdpr' | 'uk_gdpr'>
+  regimes: GdprRegime[]
+  /** Why those regimes, including the case where the answers could not separate them. */
+  jurisdictionNote: string
   findings: ComplianceFindingV2[]
+  references: GdprReference[]
   notice: string
 }
+
+/**
+ * The only kinds an overlay finding may take (§11.3), absent an approved GDPR
+ * proposition. Nothing binding: this tool has not established a data-protection
+ * duty and must not present one.
+ */
+export const GDPR_OVERLAY_KINDS: readonly FindingKind[] = [
+  'adjacent_law',
+  'recommended_safeguard',
+  'unresolved_issue',
+]
 
 export interface ComplianceResultV2 {
   schemaVersion: '2'

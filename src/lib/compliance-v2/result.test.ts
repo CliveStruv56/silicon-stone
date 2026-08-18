@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { evaluateAssessmentV2, materialUnknowns } from './engine/assemble'
-import { RESULT_SECTIONS, groupFindings, resultSections } from './result-sections'
+import {
+  GDPR_OVERLAY_BLOCK,
+  RESULT_SECTIONS,
+  groupFindings,
+  resultBlocks,
+  resultSections,
+} from './result-sections'
 import { GOLDEN_SCENARIOS, scenario } from './test-fixtures/golden-scenarios'
 import { BINDING_FINDING_KINDS, type ComplianceResultV2 } from './types'
 
@@ -29,9 +35,38 @@ describe('sections', () => {
       'Recommended safeguards',
       'Information to request from your supplier',
       'Reliefs and support available to you',
-      'Related data-protection considerations',
+      // §12.1's seventh slot is the GDPR overlay, which is not a finding-kind
+      // bucket — see `GDPR_OVERLAY_BLOCK`. This section is the catch-all for
+      // other-law findings the AI Act engine may emit, and is headed
+      // differently so the two can never be read as the same thing.
+      'Related duties under other law',
       'How enforcement would work',
     ])
+  })
+
+  /**
+   * §12.1's order as a *reader* meets it, overlay included. `resultBlocks` walks
+   * the canonical list rather than the present sections, so the overlay lands
+   * between the reliefs and enforcement whether or not either exists.
+   */
+  it('puts the data-protection overlay in §12.1’s seventh slot', () => {
+    const result = evaluate('hrScreeningProfiling')
+    expect(result.gdprOverlay).toBeDefined()
+
+    const keys = resultBlocks(result).map((block) => block.key)
+    expect(keys).toContain(GDPR_OVERLAY_BLOCK.key)
+
+    const at = keys.indexOf(GDPR_OVERLAY_BLOCK.key)
+    const before = keys.slice(0, at)
+    const after = keys.slice(at + 1)
+    expect(before.every((key) => key !== 'enforcement')).toBe(true)
+    expect(after.every((key) => key !== 'entitlements')).toBe(true)
+  })
+
+  it('omits the overlay block entirely where no personal data is involved', () => {
+    const result = evaluate('regulatedProductBothLimbs')
+    expect(result.gdprOverlay).toBeUndefined()
+    expect(resultBlocks(result).some((block) => block.kind === 'gdpr')).toBe(false)
   })
 
   /** §12.1: hide empty sections. A heading with nothing under it is a claim. */

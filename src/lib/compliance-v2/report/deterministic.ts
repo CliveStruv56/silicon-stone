@@ -1,5 +1,11 @@
 import type { ComplianceResultV2 } from '../types'
-import { APPLICABILITY_LABEL, CLASSIFICATION_LABEL, ROLE_LABEL, resultSections } from '../result-sections'
+import {
+  APPLICABILITY_LABEL,
+  CLASSIFICATION_LABEL,
+  GDPR_OVERLAY_BLOCK,
+  ROLE_LABEL,
+  resultSections,
+} from '../result-sections'
 import { PROPOSITION_BY_ID } from '../legal-content/propositions'
 import type { ReportDocument } from './schema'
 
@@ -58,6 +64,7 @@ export function buildReportDocument(result: ComplianceResultV2, toolName: string
     })),
     materialUnknowns: result.materialUnknowns,
     reviewTriggers: result.reviewTriggers,
+    gdprOverlay: result.gdprOverlay,
     disclaimer: result.disclaimer,
     versions: {
       checker: result.checkerVersion,
@@ -138,6 +145,30 @@ export function reportMarkdown(document: ReportDocument): string {
         lines.push(`> ${finding.source.shortExtract}`, '')
         lines.push(`— ${finding.source.documentTitle}, ${finding.source.provision}`, '')
       }
+    }
+  }
+
+  if (document.gdprOverlay) {
+    const overlay = document.gdprOverlay
+    lines.push(`## ${GDPR_OVERLAY_BLOCK.heading}`, '', `_${overlay.notice}_`, '')
+    lines.push(overlay.jurisdictionNote, '')
+
+    for (const finding of overlay.findings) {
+      lines.push(`### ${finding.title}`, '')
+      lines.push(`**Why we raise it.** ${finding.whyItApplies}`, '')
+      lines.push(`**What it means.** ${finding.practicalMeaning}`, '')
+      lines.push(`**What to check.** ${finding.action}`, '')
+      if (finding.evidenceToKeep.length) {
+        lines.push(`**Evidence to keep.** ${finding.evidenceToKeep.join(' ')}`, '')
+      }
+    }
+
+    if (overlay.references.length) {
+      lines.push('**Where to read the law itself.**', '')
+      for (const reference of overlay.references) {
+        lines.push(`- [${reference.label}](${reference.url})`)
+      }
+      lines.push('')
     }
   }
 

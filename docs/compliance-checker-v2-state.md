@@ -1,6 +1,6 @@
 # Compliance Checker v2 — where it is, and what to read first
 
-**Updated:** 2026-08-18. Phases 0–6 built. Flag dark; v1 unchanged.
+**Updated:** 2026-08-18. Phases 0–7 built. Flag dark; v1 unchanged.
 
 This is the one-page orientation. The plan of record is
 `docs/# EU AI Act Compliance Checker v2 — Impl.md`; per-phase history is
@@ -26,14 +26,14 @@ decision.
 |-------|------|
 | `src/lib/compliance-v2/types.ts` | §6 contracts. `AnswerState`, `FindingKind` (nine — §4.2's eight plus `enforcement_information`), `FINDING_KIND_FROM_ACTION_KIND` as a total map from v1's vocabulary |
 | `conditions.ts` | Branch conditions as **data**, and their evaluator |
-| `questions/` | 46 questions: core triage (§7.2), role (§7.3), Annex III branches (§7.4), Annex I + Article 5 screen, transparency + Article 6(3), organisation size |
-| `engine/` | `scope`, `roles`, `organisation-size`, `annex-routes`, `article-5`, `article-50`, `classify`, `findings`, `dates`, `assemble` |
+| `questions/` | 56 questions: core triage (§7.2), role (§7.3), Annex III branches (§7.4), Annex I + Article 5 screen, transparency + Article 6(3), organisation size, and ten optional data-protection questions (§11.2) |
+| `engine/` | `scope`, `roles`, `organisation-size`, `annex-routes`, `article-5`, `article-50`, `classify`, `findings`, `dates`, `gdpr-ai`, `assemble` |
 | `legal-content/propositions.ts` | 17 curated propositions, every extract corpus-verified at build time |
 | `report/` | `deterministic`, `schema`, `verify` (§14.4), `generate`, `consent` |
-| `result-sections.ts` | §12.1's sections and the hide-empties rule |
+| `result-sections.ts` | §12.1's sections, the hide-empties rule, and `resultBlocks()` — which puts the GDPR overlay in §12.1's seventh slot without folding it into a finding-kind bucket |
 | `flow.ts` | Questionnaire navigation and answer invalidation |
-| `test-fixtures/golden-scenarios.ts` | 23 scenarios |
-| `components/tools/checker-v2/` | `ComplianceCheckerV2`, `QuestionCard`, `ResultV2`, `FindingCard` |
+| `test-fixtures/golden-scenarios.ts` | 27 scenarios |
+| `components/tools/checker-v2/` | `ComplianceCheckerV2`, `QuestionCard`, `ResultV2`, `FindingCard`, `GdprOverlayCard` |
 
 `npm run test:checker-v2` validates the catalogue and string-matches every
 proposition extract against the pinned corpus. It runs in `prebuild`.
@@ -51,15 +51,27 @@ proposition extract against the pinned corpus. It runs in `prebuild`.
    consent model are built and tested against a stub model; nothing calls a real
    one. There is no mail sender in this codebase, and §22.1's retention decision
    is open — the spec says not to invent one.
-3. **Phase 7 (GDPR overlay) and Phase 8 (validation and release).** Phase 7 is
-   unblocked: `ComplianceResultV2` already has a `gdprOverlay` field and the
-   result already has a "Related data-protection considerations" section waiting
-   for it.
+3. **The GDPR overlay cites nothing.** Phase 7 is built, but §11.3 permits a
+   specific data-protection duty only where "a separately approved GDPR
+   proposition" establishes one — and there are none. There is no pinned GDPR
+   corpus for this lane (the retrieval corpus that holds the GDPR is
+   editorial-only and is never an authority for anything on screen), so an
+   overlay finding names no provision, carries no `source`, and quotes nothing.
+   Authoring GDPR propositions would need a pinned, hashed corpus first. Until
+   then the absence is deliberate, and `verifyReport` enforces it.
+4. **Phase 8 (validation and release).** Golden matrix completion, editorial
+   review of the legal content, usability and accessibility testing, shadow-mode
+   v1/v2 comparison, then the opt-in beta.
 
 ## Decisions taken, and decisions still open
 
 Taken (spec §23): the finding vocabulary **extends** v1's `ActionKind` rather
 than paralleling it; v2 ships as an **extended opt-in beta**, not a cutover.
+
+Also taken, in Phase 7: the overlay is a **pure function of the answers** —
+handed no classification, no roles and no findings — and its findings carry no AI
+Act role. Both are how "GDPR cannot change the AI Act classification" is made
+structural rather than asserted.
 
 Open (spec §22, four remaining) — **do not guess these**:
 

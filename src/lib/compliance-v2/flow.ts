@@ -165,6 +165,30 @@ export function canAdvance(
   return !isRequired(question, state.answers) || isComplete(state.answers[question.id])
 }
 
+/**
+ * Is the user on the last question they will be asked?
+ *
+ * The reason this exists rather than being read off `index` in the component:
+ * `isFinished` and "there is nothing left to ask" are **not** the same
+ * condition, and treating them as one hides questions. A question that is
+ * visible but not `required` — every §11 data-protection question, and the
+ * organisation-size opt-in — leaves the assessment finishable while there is
+ * still more to answer. A "See the result" button that replaces "Continue" the
+ * moment `isFinished` turns true makes all of those unreachable: they are on
+ * the path, and the path has no next step.
+ *
+ * So the two questions are asked separately. `isFinished` says whether the
+ * result may be shown; this says whether there is anything after this screen.
+ */
+export function isLastQuestion(
+  state: FlowState,
+  catalogue: AssessmentQuestionV2[] = QUESTION_CATALOGUE
+): boolean {
+  const visible = visibleQuestions(state.answers, catalogue)
+  if (!visible.length) return true
+  return Math.min(state.index, visible.length - 1) >= visible.length - 1
+}
+
 /** True when every visible question has been settled and the result can be shown. */
 export function isFinished(
   state: FlowState,

@@ -83,6 +83,25 @@ export function buildProsePrompt(document: ReportDocument, answers: AnswerRecord
     )
   )
 
+  /**
+   * The overlay, in its own labelled block.
+   *
+   * Never appended to `findings` above. The whole reason v1's generator hands
+   * the model three labelled blocks rather than one flat list is that a model
+   * given a flat list writes about it as one thing — and here the two things are
+   * conclusions under a Regulation the tool has evidence for, and considerations
+   * under one it does not. Losing that distinction in the prose would undo §11's
+   * separation at the last step.
+   */
+  const overlay = document.gdprOverlay
+  const overlayBlock = overlay
+    ? `
+
+ADJACENT LAW — DATA PROTECTION, NOT THE EU AI ACT
+These are data-protection considerations raised by the same deployment. They are NOT AI Act findings, they are NOT obligations this tool has established, and no provision has been cited for any of them. You may acknowledge in one sentence that the report also raises data-protection considerations. You may not restate them as duties, attach a citation to them, name an Article of any data-protection instrument, or fold them into the practical plan.
+${overlay.findings.map((finding) => `- [${finding.kind}] ${finding.title}`).join('\n')}`
+    : ''
+
   return `You are drafting the explanatory half of an EU AI Act assessment report.
 
 WHAT IS ALREADY DECIDED AND IS NOT YOURS TO REVISIT
@@ -99,6 +118,7 @@ WHAT YOU MAY NOT WRITE
 - Any quotation that is not one of the extracts already in this report.
 - The words "must", "shall", "required" or "prohibited", unless a finding below is typed as a duty. Where the result contains no duty, say what is recommended and why, in those words.
 - Any proposition id that is not in the list below. You may cite fewer; you may not cite more.
+- Any data-protection duty. The report's data-protection material is adjacent law this tool has not established, and it is not part of the AI Act position.
 
 CLASSIFICATION
 ${document.classification}. ${document.classificationExplanation}
@@ -107,7 +127,7 @@ FINDINGS
 ${findings.join('\n') || '(none)'}
 
 PROPOSITION IDS YOU MAY CITE
-${document.propositionIds.join(', ') || '(none)'}
+${document.propositionIds.join(', ') || '(none)'}${overlayBlock}
 
 WHAT THE USER TOLD US
 ${answerDigest(answers)}

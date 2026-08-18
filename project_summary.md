@@ -2,7 +2,7 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-08-18
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (99 static pages), 651 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (99 static pages), 693 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
@@ -465,6 +465,59 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 18, 2026 — Compliance Checker v2, Phase 7: the GDPR overlay
+
+Ten conditional data-protection questions, an overlay engine, its own result
+block, its own report section, and its own verification. 693 tests green — 36 of
+them new. Flag still dark.
+
+**"GDPR cannot change the AI Act classification" is structural, not asserted.**
+`evaluateGdprAiOverlay(answers)` takes the answers and nothing else — no
+classification, no roles, no findings — so there is no argument by which the AI
+Act result could reach it, and `assemble.ts` attaches its output to a field
+nothing downstream reads back. The test that proves it is a pair of golden
+scenarios, `gdprExposed` and `gdprSettled`, whose AI Act answers are identical
+and whose data-protection answers are opposite: every AI Act field is compared
+deeply and must be equal.
+
+**The overlay cites nothing and quotes nothing, and that is the honest shape.**
+§11.3 permits a specific data-protection duty only where "a separately approved
+GDPR proposition" establishes one — and there are none. The pinned rule pack is
+the AI Act; the retrieval corpus that does hold the GDPR is editorial-only and is
+never an authority for anything on screen. So no overlay finding carries a
+`source`, no provision is named in its prose (a test greps for `Article \d+`),
+and the instrument is linked once at block level. Reusing `LegalSourceReference`
+would have let a GDPR quotation inherit a guarantee nothing gave it, so
+`GdprReference` is a separate type with no extract and no rule-pack version.
+
+**Nothing in it is binding and nothing wears an AI Act role.** Every finding is
+`adjacent_law`, `recommended_safeguard` or `unresolved_issue`, and
+`appliesToRoles` is empty — controller and processor are data-protection roles,
+and badging a data-protection consideration "Deployer" would assert a
+correspondence that does not hold. `verifyReport` now checks the overlay for
+exactly those three absences, so a future edit that adds a source or a role is
+removed from the report rather than shown.
+
+**EU and UK are distinguished where the answers allow, and both are offered
+where they do not** (§11.3). An EU establishment gets the EU regime and is told
+when the UK one would also apply; a UK establishment with an EU market
+connection gets both; anything else — multiple establishments, elsewhere,
+unanswered — gets both with a note saying the answers did not settle it, rather
+than one chosen by assumption.
+
+**A browser walk-through caught a real defect that no unit test would have.**
+Making the data-protection questions optional — which is what stops them
+blocking the AI Act result — made them *unreachable*: the questionnaire replaced
+"Continue" with "See the result" the moment `isFinished` turned true, and every
+optional trailing question sat behind a button that no longer existed. That had
+been true of the organisation-size opt-in since Phase 4. `isLastQuestion()` now
+separates "the result may be shown" from "there is nothing left to ask", and both
+buttons render while both are true.
+
+**Not done:** the overlay is where §11 ends. Article 5's per-practice condition
+trees and the model/email wiring are still the two outstanding carve-outs, and
+§22's four decisions are still open.
 
 ### August 18, 2026 — Compliance Checker v2, Phase 6: the report
 
@@ -4171,18 +4224,15 @@ phases; **Phase 0 shipped 2026-08-18** (see §9). v1 stays live behind
 | 4 — Questionnaire UI | **Done 2026-08-18.** Behind `COMPLIANCE_CHECKER_V2` + `?v2=1`. All three exit criteria verified: keyboard-only completion in a real browser, no dead end from an unknown answer, and stranded answers held outside what the engine sees. |
 | 5 — Result UI | **Done 2026-08-18.** Typed finding cards, §12.1's sections with empties hidden, §12.4's contextual penalties, §9.4's date-aware duty status. All three exit criteria pass. |
 | 6 — Report and email flow | **Library done 2026-08-18**; delivery not wired. Deterministic report, §14.4 verifier, prose contract, consent model — all tested. **Outstanding: an actual model call and an actual send.** Blocked on there being no mail sender at all, and on §22.1's retention decision. |
-| 7 — GDPR overlay | Next, and unblocked. §11: conditional questions triggered when `personal_data_use` is yes/possibly/unknown, findings typed `adjacent_law` / `recommended_safeguard` / `unresolved_issue` only, EU vs UK GDPR distinguished where the answers allow and both flagged where they do not. The result already has a `gdprOverlay` field and an "Related data-protection considerations" section waiting for it. |
+| 7 — GDPR overlay | **Done 2026-08-18.** Ten conditional questions, an answers-only overlay evaluator, EU/UK distinguished where the answers allow and both offered where they do not, its own result block and report section, and three absence-checks in the verifier. All three exit criteria pass. It cites no provision and quotes no text — there is no pinned GDPR corpus, so there is nothing to verify a citation against. |
 | 8 — Validation and release | Golden matrix completion, editorial review of the legal content, usability and accessibility testing, shadow-mode v1/v2 comparison, then the opt-in beta. |
-| 6 — Report and email flow | — |
-| 7 — GDPR overlay | — |
-| 8 — Validation and release | Includes shadow-mode v1/v2 comparison and optional counsel review. |
 
 **§22 listed six decisions that must not be guessed. Four remain**: session and
 report retention periods, whether the report email may be used for marketing
 (default: delivery only), anonymous session recovery, counsel review, and
 disclaimer wording. §22.6 is **resolved — extended opt-in beta** (2026-08-18),
 recorded in spec §23.2 along with the vocabulary decision. None of the remaining
-four blocks Phases 2–5.
+four blocks Phases 2–7; the first two block Phase 8.
 
 ### Priority 2b — Compliance Checker Stage 3 (spec'd, partly blocked)
 

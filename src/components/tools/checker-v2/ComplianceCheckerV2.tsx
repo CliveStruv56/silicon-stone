@@ -18,6 +18,7 @@ import {
   goBack,
   goNext,
   isFinished,
+  isLastQuestion,
   type FlowState,
 } from '@/lib/compliance-v2/flow'
 import type { AssessmentAnswerV2 } from '@/lib/compliance-v2/types'
@@ -56,6 +57,9 @@ export function ComplianceCheckerV2({ exitHref }: { exitHref: string }) {
   const progress = flowProgress(flow)
   const warnings = dataEntryWarnings(flow)
   const finished = isFinished(flow)
+  // Not the same condition — see `isLastQuestion`. An optional question left to
+  // ask must keep a way of reaching it.
+  const lastQuestion = isLastQuestion(flow)
 
   const onAnswer = (answer: AssessmentAnswerV2) => {
     if (!question) return
@@ -172,24 +176,37 @@ export function ComplianceCheckerV2({ exitHref }: { exitHref: string }) {
               Back
             </Button>
 
-            {finished ? (
-              <Button
-                onClick={() => setShowResult(true)}
-                className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90"
-              >
-                See the result
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            ) : (
-              <Button
-                onClick={() => setFlow(goNext)}
-                disabled={!canAdvance(flow)}
-                className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90"
-              >
-                Continue
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            )}
+            {/*
+              Both, where both apply. The assessment can be finishable while
+              optional questions remain — §11's data-protection section is
+              entirely optional by design — so "See the result" must be an
+              offer rather than a replacement for "Continue".
+            */}
+            <div className="flex items-center gap-2">
+              {!lastQuestion && (
+                <Button
+                  onClick={() => setFlow(goNext)}
+                  disabled={!canAdvance(flow)}
+                  className={
+                    finished
+                      ? 'border border-border-subtle bg-transparent text-text-primary hover:bg-surface-elevated'
+                      : 'bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90'
+                  }
+                >
+                  Continue
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              )}
+              {finished && (
+                <Button
+                  onClick={() => setShowResult(true)}
+                  className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90"
+                >
+                  See the result
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </div>

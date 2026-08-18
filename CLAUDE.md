@@ -173,11 +173,29 @@ Five things not to undo:
   output no field for an obligation, a citation or a date;
   `report/verify.ts` implements §14.4 with no tolerance threshold. The email
   address is not in `AnswerRecordV2` at all, so it cannot reach a prompt.
+- **The GDPR overlay is downstream of everything and upstream of nothing.**
+  `engine/gdpr-ai.ts` takes the answers and nothing else — no classification, no
+  roles, no findings — so there is no argument by which a data-protection answer
+  could change an AI Act conclusion. `gdprExposed` and `gdprSettled` are two
+  golden scenarios with identical AI Act answers and opposite data-protection
+  ones, and the test compares the whole AI Act half deeply. It also **cites
+  nothing**: no pinned GDPR corpus exists for this lane, so every overlay finding
+  has no `source`, names no provision in its prose, and wears no AI Act role
+  (controller is not a deployer). `verifyReport` checks those three absences and
+  drops the whole block rather than showing a heading over nothing.
 
 Two carve-outs recorded rather than hidden: **Article 5's per-practice condition
 trees are unwritten** (every positive screen holds at `potentially_prohibited`
 with an explicit unresolved list), and **no model call or email send is wired** —
 there is no mail sender, and §22.1's retention decision is open.
+
+One flow rule worth not undoing: **`isFinished` and `isLastQuestion` are
+different questions**, and the nav renders both buttons when both are true. The
+data-protection questions are optional by design — that is what stops them
+blocking the AI Act result — and a "See the result" button that *replaces*
+"Continue" the moment the assessment becomes finishable makes every optional
+trailing question unreachable. A browser walk-through is what caught it; no unit
+test on the flow functions would have.
 
 ## Regulatory retrieval corpus (editorial only — do not blur)
 

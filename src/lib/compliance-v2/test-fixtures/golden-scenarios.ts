@@ -396,6 +396,110 @@ GOLDEN_SCENARIOS.push(
   }
 )
 
+/**
+ * Phase 7: the data-protection overlay (§11).
+ *
+ * Four variants, and the pairing is the test. `gdprExposed` and `gdprSettled`
+ * hold every AI Act answer identical and differ only in the data-protection
+ * section — which is what lets `gdpr-ai.test.ts` assert that the whole AI Act
+ * half of the result is byte-identical across them. A scenario that varied
+ * both at once could not distinguish "GDPR changed nothing" from "nothing
+ * changed".
+ */
+const GDPR_TRIAGE = [
+  answered('organisation_establishment', 'eu_eea'),
+  answered('ai_market_connection', ['used_from_eu_establishment']),
+  answered('organisation_activity', ['used_internally_or_for_customers']),
+  answered('own_name_supply', 'no'),
+  answered('intended_purpose_changed', 'no'),
+  answered('material_modification', 'no'),
+  answered('intended_use_family', 'employment'),
+  answered('individual_impact', 'determines_outcome'),
+  answered('personal_data_use', 'yes'),
+  answered('employee_band', '50_249'),
+  answered('annex_iii_employment_use', ['recruitment_selection']),
+  answered('performs_profiling', 'yes'),
+  answered('prohibited_screen', ['none_of_these']),
+]
+
+GOLDEN_SCENARIOS.push(
+  {
+    id: 'gdprExposed',
+    spec: '§11 — every data-protection answer at its worst, on a high-risk deployment',
+    answers: record(
+      ...GDPR_TRIAGE,
+      answered('gdpr_data_categories', ['health', 'protected_characteristics']),
+      answered('gdpr_data_source', ['from_individuals', 'purchased_dataset']),
+      answered('gdpr_lawful_basis', 'not_reviewed'),
+      answered('gdpr_significant_effects', 'yes'),
+      answered('gdpr_human_intervention', 'no_review'),
+      answered('gdpr_dpia_status', 'not_considered'),
+      answered('gdpr_controller_role', 'not_established'),
+      answered('gdpr_transfers', 'yes'),
+      answered('gdpr_supplier_data_use', 'training_permitted'),
+      answered('gdpr_subject_requests', 'no_route')
+    ),
+  },
+  {
+    id: 'gdprSettled',
+    spec: '§11 — the same deployment with the data-protection work done',
+    answers: record(
+      ...GDPR_TRIAGE,
+      answered('gdpr_data_categories', ['none_of_these']),
+      answered('gdpr_data_source', ['from_individuals']),
+      answered('gdpr_lawful_basis', 'reviewed_and_recorded'),
+      answered('gdpr_significant_effects', 'yes'),
+      answered('gdpr_human_intervention', 'meaningful_review'),
+      answered('gdpr_dpia_status', 'completed'),
+      answered('gdpr_controller_role', 'controller'),
+      answered('gdpr_transfers', 'no'),
+      answered('gdpr_supplier_data_use', 'excluded_by_terms'),
+      answered('gdpr_subject_requests', 'routine')
+    ),
+  },
+  {
+    id: 'gdprAllUnknown',
+    spec: '§11 with §4.3 — a reader who does not know any of it, and is not blocked by that',
+    answers: record(
+      ...GDPR_TRIAGE,
+      unknown('gdpr_data_categories'),
+      unknown('gdpr_data_source'),
+      unknown('gdpr_lawful_basis'),
+      unknown('gdpr_significant_effects'),
+      unknown('gdpr_dpia_status'),
+      unknown('gdpr_controller_role'),
+      unknown('gdpr_transfers'),
+      unknown('gdpr_supplier_data_use'),
+      unknown('gdpr_subject_requests')
+    ),
+  },
+  {
+    id: 'gdprJurisdictionUnsettled',
+    spec: '§11.3 — establishment in more than one place, so both regimes are offered',
+    answers: record(
+      answered('organisation_establishment', 'multiple'),
+      answered('ai_market_connection', ['placed_on_eu_market']),
+      answered('organisation_activity', ['built_or_commissioned']),
+      answered('places_on_eu_market_from_outside', 'yes'),
+      answered('regulated_product_own_name', 'no'),
+      answered('intended_use_family', 'something_else'),
+      answered('intended_use_description', 'It drafts replies to inbound customer email.'),
+      answered('individual_impact', 'administrative_only'),
+      answered('personal_data_use', 'possibly'),
+      answered('employee_band', '10_49'),
+      answered('prohibited_screen', ['none_of_these']),
+      answered('gdpr_data_categories', ['none_of_these']),
+      answered('gdpr_data_source', ['from_individuals']),
+      answered('gdpr_lawful_basis', 'identified_not_recorded'),
+      answered('gdpr_dpia_status', 'considered_not_required'),
+      answered('gdpr_controller_role', 'joint'),
+      answered('gdpr_transfers', 'not_established'),
+      answered('gdpr_supplier_data_use', 'retention_only'),
+      answered('gdpr_subject_requests', 'with_effort')
+    ),
+  }
+)
+
 export function scenario(id: string): AnswerRecordV2 {
   const found = GOLDEN_SCENARIOS.find((item) => item.id === id)
   if (!found) throw new Error(`no golden scenario ${id}`)

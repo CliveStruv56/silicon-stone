@@ -39,6 +39,16 @@ export interface ReportDocument {
   reviewTriggers: string[]
   disclaimer: string
   versions: { checker: string; rulepack: string; schema: string }
+  /**
+   * §11's overlay, carried as its own field rather than as a section.
+   *
+   * Deliberately not merged into `sections`. Everything in `sections` is an AI
+   * Act conclusion drawn from the pinned rule pack; nothing in the overlay is,
+   * and the two must not become indistinguishable to anything downstream — the
+   * markdown renderer, the verifier, or the prompt. §11.3: do not mix GDPR
+   * findings into the AI Act legal classification.
+   */
+  gdprOverlay?: ComplianceResultV2['gdprOverlay']
   /** Every proposition the report is allowed to rest on. */
   propositionIds: string[]
   /** Present only where a model ran and its output survived verification. */

@@ -69,9 +69,9 @@ export const RESULT_SECTIONS: ResultSection[] = [
   },
   {
     key: 'adjacent',
-    heading: 'Related data-protection considerations',
+    heading: 'Related duties under other law',
     blurb:
-      'Another regime, included because the same deployment usually raises both. This is not a data-protection audit.',
+      'Regimes other than the AI Act that the same deployment engages. Nothing here is an AI Act conclusion.',
     kinds: ['adjacent_law'],
   },
   {
@@ -82,6 +82,29 @@ export const RESULT_SECTIONS: ResultSection[] = [
     kinds: ['enforcement_information'],
   },
 ]
+
+/**
+ * §12.1's seventh slot, which is not a finding-kind bucket.
+ *
+ * The GDPR overlay is its own object on the result, with its own regimes, its
+ * own references and its own notice — so it cannot be grouped by kind the way
+ * the sections above are, and it must not be. Its findings share three kinds
+ * with the AI Act sections (`recommended_safeguard`, `unresolved_issue`,
+ * `adjacent_law`), and folding them in by kind would put a data-protection
+ * recommendation under a heading that reads as an AI Act one. §11.3: "Do not mix
+ * GDPR findings into the AI Act legal classification."
+ *
+ * `adjacent` above therefore keeps a different heading from the one §12.1 gives
+ * this slot. It exists for other-law findings the AI Act engine may emit, of
+ * which there are currently none — kept rather than deleted so that if one ever
+ * appears it has somewhere to render instead of vanishing.
+ */
+export const GDPR_OVERLAY_BLOCK = {
+  key: 'data-protection',
+  heading: 'Related data-protection considerations',
+  /** The position §12.1 gives it: after the reliefs, before enforcement. */
+  afterSectionKey: 'entitlements',
+} as const
 
 export interface GroupedSection extends ResultSection {
   findings: ComplianceFindingV2[]
@@ -104,6 +127,48 @@ export function groupFindings(findings: ComplianceFindingV2[]): GroupedSection[]
 /** Every section a whole result renders, legal and readiness together. */
 export function resultSections(result: ComplianceResultV2): GroupedSection[] {
   return groupFindings([...result.legalFindings, ...result.readinessFindings])
+}
+
+export type ResultBlock =
+  | { kind: 'findings'; key: string; section: GroupedSection }
+  | { kind: 'gdpr'; key: string; heading: string; overlay: NonNullable<ComplianceResultV2['gdprOverlay']> }
+
+/**
+ * Everything the result renders, in §12.1's order, with the overlay in its slot.
+ *
+ * A `.ts` function rather than JSX ordering for the reason the sections
+ * themselves are: `vitest.config.ts` collects only `src/**\/*.test.ts`, so an
+ * order expressed in a component is an order nothing can assert. The overlay
+ * sits after the reliefs and before enforcement whether or not the sections
+ * either side of it exist — an absent neighbour must not move it.
+ */
+export function resultBlocks(result: ComplianceResultV2): ResultBlock[] {
+  const sections = resultSections(result)
+  const blocks: ResultBlock[] = []
+
+  const overlayBlock: ResultBlock | undefined = result.gdprOverlay
+    ? {
+        kind: 'gdpr',
+        key: GDPR_OVERLAY_BLOCK.key,
+        heading: GDPR_OVERLAY_BLOCK.heading,
+        overlay: result.gdprOverlay,
+      }
+    : undefined
+
+  // Walk the canonical order rather than the present sections, so the overlay
+  // lands in the right place even when the section it follows is empty.
+  let placed = false
+  for (const canonical of RESULT_SECTIONS) {
+    const section = sections.find((item) => item.key === canonical.key)
+    if (section) blocks.push({ kind: 'findings', key: section.key, section })
+    if (canonical.key === GDPR_OVERLAY_BLOCK.afterSectionKey && overlayBlock) {
+      blocks.push(overlayBlock)
+      placed = true
+    }
+  }
+  if (overlayBlock && !placed) blocks.push(overlayBlock)
+
+  return blocks
 }
 
 export const CLASSIFICATION_LABEL: Record<ComplianceResultV2['classification'], string> = {

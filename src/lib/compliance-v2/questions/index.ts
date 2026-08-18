@@ -6,6 +6,7 @@ import { ANNEX_III_QUESTIONS } from './annex-iii'
 import { ANNEX_I_QUESTIONS, PROHIBITED_QUESTIONS } from './prohibited'
 import { EXEMPTION_QUESTIONS, TRANSPARENCY_QUESTIONS } from './transparency'
 import { ORGANISATION_SIZE_QUESTIONS } from './organisation-size'
+import { GDPR_QUESTIONS } from './gdpr-ai'
 
 /**
  * The question catalogue, and the validation that keeps it honest.
@@ -34,6 +35,10 @@ export const QUESTION_CATALOGUE: AssessmentQuestionV2[] = [
   ...TRANSPARENCY_QUESTIONS,
   ...PROHIBITED_QUESTIONS,
   ...ORGANISATION_SIZE_QUESTIONS,
+  // Last, and not by accident. §11's overlay is adjacent law: it must be
+  // reachable, and it must never stand between a reader and their AI Act
+  // result. Nothing below is `required`, so the flow is finishable without it.
+  ...GDPR_QUESTIONS,
 ]
 
 export const QUESTION_BY_ID = new Map(QUESTION_CATALOGUE.map((item) => [item.id, item]))
@@ -164,4 +169,5 @@ export {
   TRANSPARENCY_QUESTIONS,
   PROHIBITED_QUESTIONS,
   ORGANISATION_SIZE_QUESTIONS,
+  GDPR_QUESTIONS,
 }

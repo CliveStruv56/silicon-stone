@@ -1,6 +1,6 @@
 import { corpusContainsQuote } from '@/lib/rulepack/normalise'
 import type { ComplianceFindingV2, ComplianceResultV2, LegalRole } from '../types'
-import { BINDING_FINDING_KINDS } from '../types'
+import { BINDING_FINDING_KINDS, GDPR_OVERLAY_KINDS } from '../types'
 import { PROPOSITION_BY_ID } from '../legal-content/propositions'
 import type { GeneratedProse, ReportDocument } from './schema'
 
@@ -154,6 +154,47 @@ function verifyFinding(
 }
 
 /**
+ * The overlay's own checks (§11.3).
+ *
+ * `verifyFinding` above passes anything with no `source` in a single line — "a
+ * finding with no source makes no legal claim to verify" — which is right for a
+ * recommendation but leaves the overlay unchecked, because none of its findings
+ * has a source *by design*. So the overlay gets the three checks that matter for
+ * it, and they are the inverse shape: what must be **absent**.
+ *
+ * A GDPR proposition library does not exist. If one is ever authored, the second
+ * check here is the thing that has to be relaxed deliberately rather than the
+ * thing that quietly already allowed it.
+ */
+function verifyOverlayFinding(finding: ComplianceFindingV2): FindingVerdict {
+  const failed: CheckName[] = []
+  const notes: string[] = []
+
+  if (!GDPR_OVERLAY_KINDS.includes(finding.kind)) {
+    failed.push('kind-matches-wording')
+    notes.push(
+      `A data-protection consideration is typed ${finding.kind}. §11.3 allows only ${GDPR_OVERLAY_KINDS.join(', ')} absent an approved GDPR proposition.`
+    )
+  }
+
+  if (finding.source) {
+    failed.push('proposition-exists')
+    notes.push(
+      'A data-protection finding carries a legal source. No GDPR text is in the pinned pack, so nothing verified it.'
+    )
+  }
+
+  if (finding.appliesToRoles.length) {
+    failed.push('role-matches')
+    notes.push(
+      'A data-protection finding names an AI Act role. Controller and processor are not AI Act roles, and the badge would assert a correspondence that does not hold.'
+    )
+  }
+
+  return { findingId: finding.id, ok: failed.length === 0, failed, notes }
+}
+
+/**
  * Check the prose a model produced.
  *
  * Three rules, and the first is the one §14.3 is built on: the model cannot add
@@ -234,11 +275,21 @@ export function verifyReport(
     .filter((role) => role.applicability === 'applies' || role.applicability === 'likely_applies')
     .map((role) => role.role)
 
-  const verdicts = document.sections
-    .flatMap((section) => section.findings)
-    .map((finding) => verifyFinding(finding, result, heldRoles))
+  const verdicts = [
+    ...document.sections
+      .flatMap((section) => section.findings)
+      .map((finding) => verifyFinding(finding, result, heldRoles)),
+    ...(document.gdprOverlay?.findings ?? []).map(verifyOverlayFinding),
+  ]
 
   const removed = new Set(verdicts.filter((verdict) => !verdict.ok).map((v) => v.findingId))
+
+  const overlay = document.gdprOverlay
+    ? {
+        ...document.gdprOverlay,
+        findings: document.gdprOverlay.findings.filter((finding) => !removed.has(finding.id)),
+      }
+    : undefined
 
   const sections = document.sections
     .map((section) => ({
@@ -256,6 +307,10 @@ export function verifyReport(
     document: {
       ...document,
       sections,
+      // An overlay with every finding removed is dropped whole. A heading, a
+      // notice and nothing under it reads as a clean bill of health, which is
+      // the one thing this section must never accidentally say.
+      gdprOverlay: overlay && overlay.findings.length ? overlay : undefined,
       prose: proseProblems.length ? undefined : document.prose,
     },
     verification: {

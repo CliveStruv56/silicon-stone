@@ -6,6 +6,7 @@ import { evaluateLegalRoles } from './roles'
 import { evaluateOrganisationSize } from './organisation-size'
 import { classify } from './classify'
 import { buildLegalFindings, buildReadinessFindings } from './findings'
+import { evaluateGdprAiOverlay } from './gdpr-ai'
 
 /**
  * The whole assessment (§9.1), assembled from deterministic inputs only.
@@ -58,6 +59,13 @@ export function evaluateAssessmentV2(
     organisationSize: size,
     legalFindings: buildLegalFindings(context),
     readinessFindings: buildReadinessFindings(context),
+    /**
+     * §11, and last on purpose. The overlay is a pure function of the answers —
+     * it is handed no classification, no roles and no findings, so there is no
+     * path by which a data-protection answer could reach the AI Act result. That
+     * is Phase 7's first exit criterion made structural rather than asserted.
+     */
+    gdprOverlay: evaluateGdprAiOverlay(answers),
     materialUnknowns: materialUnknowns(answers),
     reviewTriggers: REVIEW_TRIGGERS,
     disclaimer: DISCLAIMER,
