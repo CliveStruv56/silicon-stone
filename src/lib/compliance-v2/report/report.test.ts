@@ -56,8 +56,14 @@ describe('the deterministic core', () => {
     for (const id of document.propositionIds) {
       expect(id).toMatch(/^prop-/)
     }
-    // A quiet result offers nothing to cite, so nothing can be cited.
-    expect(buildReportDocument(evaluate('medicalAdminMicro'), 'Acme').propositionIds).toEqual([])
+    // A result with nothing to cite cites nothing.
+    //
+    // This was `medicalAdminMicro` until rule pack 2026-08-19b, when Article 4
+    // arrived: AI literacy binds providers and deployers at every tier, so a
+    // minimal-risk deployer is no longer duty-free and does have a proposition
+    // to offer. `outOfScope` is the genuinely empty result, and it is empty by
+    // construction — `buildLegalFindings` returns before emitting anything.
+    expect(buildReportDocument(evaluate('outOfScope'), 'Acme').propositionIds).toEqual([])
   })
 })
 
@@ -229,7 +235,10 @@ describe('what a model cannot do', () => {
 
   /** §14.3: no mandatory language on a result that contains no duty. */
   it('cannot speak in obligations on a result that has none', () => {
-    const quiet = evaluate('medicalAdminMicro')
+    // See the note above on why this is `outOfScope` rather than a minimal-risk
+    // scenario: Article 4 means "minimal risk" and "no duties" are no longer
+    // the same result.
+    const quiet = evaluate('outOfScope')
     const document = buildReportDocument(quiet, 'Acme')
     const problems = verifyProse(
       prose({ executiveSummary: 'You must register this system before you continue using it.' }),
@@ -240,8 +249,8 @@ describe('what a model cannot do', () => {
   })
 
   it('and its prose is dropped whole rather than patched', async () => {
-    const quiet = evaluate('medicalAdminMicro')
-    const report = await generateReport(quiet, scenario('medicalAdminMicro'), {
+    const quiet = evaluate('outOfScope')
+    const report = await generateReport(quiet, scenario('outOfScope'), {
       toolName: 'Acme',
       model: async () => ({
         executiveSummary: 'You must do this immediately.',
@@ -256,7 +265,7 @@ describe('what a model cannot do', () => {
     expect(report.document.prose).toBeUndefined()
     expect(report.verification.proseProblems.length).toBeGreaterThan(0)
     // And the report itself survives.
-    expect(report.document.classification).toBe('No specific category identified')
+    expect(report.document.classification).toBe('Outside EU AI Act scope')
   })
 
   it('a model failure costs the summary, not the report', async () => {

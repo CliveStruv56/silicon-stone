@@ -17,7 +17,10 @@ import { evaluateArticle50, routesOwedBy } from './article-50'
 import { includesAny } from './read'
 import { evaluateConformityAssessment, requiresReassessment } from './article-43'
 import type { ClassificationResult } from './classify'
-import { ANNEX_III_APPLIES, ANNEX_I_APPLIES, isInApplication, packDate } from './dates'
+import { ANNEX_III_APPLIES, ANNEX_I_APPLIES, isInApplication, packDate,
+  AI_LITERACY_APPLIES,
+  GENERAL_APPLICATION_APPLIES,
+} from './dates'
 
 /**
  * Turning route evaluations into the typed findings the result renders.
@@ -429,40 +432,115 @@ export function buildLegalFindings(context: FindingContext): ComplianceFindingV2
       }
 
       /**
-       * The honest limit on the list above.
+       * Article 27 — the fundamental rights impact assessment.
        *
-       * Article 26 is now complete — all eleven of its operative paragraphs. The
-       * deployer's duties are not confined to Article 26, and the pinned corpus
-       * does not carry the rest: **Article 27**'s fundamental rights impact
-       * assessment above all, which falls on public bodies, on private entities
-       * providing public services, and on deployers of the Annex III point 5(b)
-       * and 5(c) credit and insurance systems — a set that overlaps heavily with
-       * this tool's readers. Article 4's AI literacy duty and Article 86's right
-       * to an explanation are outside it too.
+       * This closes the caveat the deployer path used to carry. The Article was
+       * added to the pinned corpus in pack `2026-08-19b`, together with
+       * Articles 4 and 86, which the same caveat named.
        *
-       * This is the same caveat the provider path carried until rule pack
-       * `2026-08-19` closed it, and it goes the same way: it is deleted when the
-       * corpus catches up, not tidied away before.
+       * It splits, and the split is the point. Article 26 addresses deployers
+       * generally; Article 27 reaches three groups only — bodies governed by
+       * public law, private entities providing public services, and deployers of
+       * the Annex III point 5(b) and 5(c) credit and insurance systems. The
+       * engine can settle the third from the route it already cited and cannot
+       * settle the first two, which the questionnaire never asks about. So a
+       * credit or insurance deployer gets a flat duty and everyone else gets a
+       * conditional one, on exactly the Article 26(8) pattern.
+       *
+       * The exclusion is real and is applied rather than mentioned: a system
+       * routed solely under Annex III point 2 is outside Article 27 altogether,
+       * and emitting a "check whether this reaches you" card to a reader the
+       * Article expressly excepts is the kind of noise that teaches people to
+       * ignore the result.
        */
-      findings.push({
-        id: 'high-risk-deployer-duties-incomplete',
-        ruleId: 'high-risk-deployer-duties',
-        title: 'Article 26 is complete here; a deployer’s duties are not confined to it',
-        kind: 'unresolved_issue',
-        applicability: 'applies',
-        appliesToRoles: ['deployer'],
-        whyItApplies:
-          'Every operative paragraph of Article 26 is above, quoted from the pinned statute. Other Articles place duties on deployers as well, and this assessment does not reach them because the pack cannot quote them.',
-        practicalMeaning:
-          'Article 27 is the one to look at first. It calls for a fundamental rights impact assessment before a high-risk system is used, and it falls on bodies governed by public law, on private entities providing public services, and on deployers of the credit-scoring and life and health insurance systems at Annex III points 5(b) and 5(c). If any of those describes you, it is a substantial piece of work this result has not sized. Article 4 on AI literacy and Article 86 on a person’s right to an explanation of a decision are also outside what is assessed here.',
-        action:
-          'Read Article 27 and decide whether it reaches you, before treating the list above as your scope of work. This tool shows what it can verify against its pinned copy of the Regulation, and says so rather than letting a complete Article read as a complete picture.',
-        evidenceToKeep: [],
-        triggeringAnswerIds: classification.triggeringAnswerIds,
-        missingAnswerIds: [],
-        priority: 'high',
-        confidence: 'high',
-      })
+      const friaExcludedPointTwoOnly =
+        annexIII.routes.length > 0 && annexIII.routes.every((route) => route.annexPoint === '2')
+
+      const creditOrInsuranceDeployer = annexIII.routes.some(
+        (route) => route.annexPoint === '5(b)' || route.annexPoint === '5(c)'
+      )
+
+      if (annexIiiApplies && !friaExcludedPointTwoOnly) {
+        findings.push({
+          id: 'art-27-fundamental-rights-impact-assessment',
+          ruleId: 'high-risk-deployer-duties',
+          title: creditOrInsuranceDeployer
+            ? 'Assess the impact on fundamental rights before you start using it'
+            : 'If you are a public body or provide public services, assess fundamental rights impact first',
+          kind: creditOrInsuranceDeployer ? highRiskKind : 'conditional_obligation',
+          applicability: creditOrInsuranceDeployer
+            ? classification.classification === 'likely_high_risk'
+              ? 'applies'
+              : 'possibly_applies'
+            : 'possibly_applies',
+          appliesToRoles: ['deployer'],
+          effectiveFrom: highRiskDate.display,
+          whyItApplies: creditOrInsuranceDeployer
+            ? `Article 27 names deployers of the Annex III point 5(b) and 5(c) systems directly, and that is the route this result cites — ${classification.statutoryRoutes.join(' and ')}. You do not need to be a public body for it to reach you.`
+            : 'Article 27 reaches bodies governed by public law and private entities providing public services. We have not asked you which you are, so this is stated as a condition rather than asserted about you.',
+          practicalMeaning:
+            PROPOSITION_BY_ID.get('prop-art-27-1-fundamental-rights-impact-assessment')
+              ?.practicalMeaning ??
+            'An assessment of the impact on fundamental rights, performed before the system is first used.',
+          action: creditOrInsuranceDeployer
+            ? 'Plan the assessment now rather than near go-live: it covers six elements, including the specific risks to the people affected and what happens when one materialises. It is owed before first use, and its results are notified to the market surveillance authority on the AI Office template. Where you already hold a data protection impact assessment, Article 27(4) lets you cross-refer to it rather than repeat the work.'
+            : 'Settle whether you are a body governed by public law, or a private entity providing a public service. If either is you, this is a substantial piece of work owed before first use — six elements, notified to the market surveillance authority — and an existing data protection impact assessment can be cross-referenced into it under Article 27(4).',
+          evidenceToKeep: [
+            'The assessment itself, covering all six elements of Article 27(1).',
+            'The notification to the market surveillance authority, and the completed template.',
+            'Any data protection impact assessment you cross-referenced, and which parts.',
+          ],
+          triggeringAnswerIds: classification.triggeringAnswerIds,
+          missingAnswerIds: [],
+          source: sourceFrom('prop-art-27-1-fundamental-rights-impact-assessment'),
+          priority: 'high',
+          confidence: classification.confidence,
+        })
+      }
+
+      /**
+       * Article 86 — and note the date.
+       *
+       * This one has applied since **2 August 2026**, because Chapter IX is not
+       * among Article 113's carve-outs, while the Chapter III duties for the
+       * very same systems wait until 2 December 2027. That is not a mistake to
+       * be smoothed over: a deployer already inside Annex III can owe an
+       * explanation to an affected person before it owes most of Article 26.
+       * The card says so, and takes its date from the general application entry
+       * rather than the high-risk one.
+       */
+      const generalApplicationDate = packDate(GENERAL_APPLICATION_APPLIES)
+
+      if (annexIiiApplies && !friaExcludedPointTwoOnly && decidesAboutPeople) {
+        findings.push({
+          id: 'art-86-right-to-explanation',
+          ruleId: 'high-risk-deployer-duties',
+          title: 'Be able to explain a decision to the person it was made about',
+          kind: isInApplication(generalApplicationDate, assessedAt)
+            ? ('current_obligation' as const)
+            : ('future_obligation' as const),
+          applicability:
+            classification.classification === 'likely_high_risk' ? 'applies' : 'possibly_applies',
+          appliesToRoles: ['deployer'],
+          effectiveFrom: generalApplicationDate.display,
+          whyItApplies:
+            'You told us the system decides about people, or helps decide, and the route cited is Annex III. The right in Article 86 is owed by the deployer — you — rather than by whoever built the system.',
+          practicalMeaning:
+            PROPOSITION_BY_ID.get('prop-art-86-right-to-explanation')?.practicalMeaning ??
+            'An affected person may ask for clear and meaningful explanations of the role the system played in a decision.',
+          action:
+            'Work out, before you are asked, what you would actually say: what part the system played in this decision, and what its main elements were. Establish now whether you could give that answer at all — the vendor\u2019s documentation describes the system, not the decision you made with it, so it will not answer this for you.',
+          evidenceToKeep: [
+            'The explanation you would give, and who is able to produce it.',
+            'A record of explanation requests received and how they were answered.',
+          ],
+          triggeringAnswerIds: classification.triggeringAnswerIds,
+          missingAnswerIds: [],
+          source: sourceFrom('prop-art-86-right-to-explanation'),
+          priority: 'high',
+          confidence: classification.confidence,
+        })
+      }
 
       findings.push({
         id: 'art-13-instructions-for-use',
@@ -952,6 +1030,58 @@ export function buildLegalFindings(context: FindingContext): ComplianceFindingV2
       triggeringAnswerIds: classification.triggeringAnswerIds,
       missingAnswerIds: [],
       priority: 'low',
+      confidence: 'high',
+    })
+  }
+
+  /**
+   * Article 4 — the duty that does not wait, and is not about risk tiers.
+   *
+   * Every other legal finding in this file is gated on a classification. This
+   * one is not, and that is the whole reason it is worth emitting: Article 4
+   * binds providers and deployers of *any* AI system, and Chapter I has applied
+   * since 2 February 2025. So the reader who reaches the end of a minimal-risk
+   * result and is told there is nothing to do is being told something false —
+   * there is one thing, it is proportionate, and it is already in force.
+   *
+   * It sits after the tier-specific findings deliberately: it is the smallest
+   * duty on the page for a high-risk deployer and the only one for everybody
+   * else, and leading with it on a high-risk result would misrepresent the
+   * shape of the work.
+   *
+   * Out-of-scope results never reach here — `buildLegalFindings` returned early
+   * — which is what keeps §20.5 true.
+   */
+  const aiLiteracyRoles = held.filter(
+    (role): role is LegalRole => role === 'provider' || role === 'deployer'
+  )
+
+  if (aiLiteracyRoles.length) {
+    const literacyDate = packDate(AI_LITERACY_APPLIES)
+    findings.push({
+      id: 'art-4-ai-literacy',
+      ruleId: 'ai-literacy',
+      title: 'Make sure the people using this system understand it well enough',
+      kind: isInApplication(literacyDate, assessedAt)
+        ? ('current_obligation' as const)
+        : ('future_obligation' as const),
+      applicability: 'applies',
+      appliesToRoles: aiLiteracyRoles,
+      effectiveFrom: literacyDate.display,
+      whyItApplies: `Article 4 falls on providers and deployers of any AI system, whatever its risk tier, and you are ${aiLiteracyRoles.length > 1 ? 'both' : `a ${aiLiteracyRoles[0]}`}. Unlike most of this Regulation it is not waiting for a future date.`,
+      practicalMeaning:
+        PROPOSITION_BY_ID.get('prop-art-4-ai-literacy')?.practicalMeaning ??
+        'Providers and deployers take measures to support AI literacy among the people operating and using their systems.',
+      action:
+        'Judge what the people operating this system already know against what it actually does, and close the gap in proportion to it. There is no syllabus to follow, so a short briefing pitched at the context can be enough where a formal course would be disproportionate. Write down what you did and why you judged it sufficient — that reasoning is the evidence, not a certificate.',
+      evidenceToKeep: [
+        'What was covered, with whom, and when.',
+        'Your reasoning on what level was appropriate for this system and these people.',
+      ],
+      triggeringAnswerIds: classification.triggeringAnswerIds,
+      missingAnswerIds: [],
+      source: sourceFrom('prop-art-4-ai-literacy'),
+      priority: 'normal',
       confidence: 'high',
     })
   }

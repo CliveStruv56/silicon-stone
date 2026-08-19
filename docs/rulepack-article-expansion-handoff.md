@@ -1,4 +1,4 @@
-# Adding Articles 10, 14, 15, 16 and 43 to the rule pack
+# Adding Articles to the rule pack — the record of two completed runs
 
 > **DONE — 2026-08-19 (evening).** All five Articles are in rule pack
 > `2026-08-19`, the fetch script exists as `npm run rulepack:fetch-article`, and
@@ -18,9 +18,38 @@
 > had been pinned since the first extraction. Check the corpus before assuming
 > the next gap of this shape needs a new version.
 >
-> **Steps 2 to 7 are still the route for adding an Article** — Article 27 is the
-> next candidate and is not approved. The traps recorded in them are real ones
-> somebody hit.
+> **Steps 2 to 7 are still the route for adding an Article.** The traps recorded
+> in them are real ones somebody hit.
+>
+> **Second run, same day: Articles 4, 27 and 86, in pack `2026-08-19b`.** The
+> owner approved all three together on 2026-08-19, on the reasoning that a pack
+> bump costs the same whether it carries one Article or three, and that doing
+> them together let the deployer's caveat finding be *deleted* rather than
+> narrowed. Four things that run taught, none of them in the steps below:
+>
+> - **Version strings can collide.** Two packs on one day; the second is
+>   `2026-08-19b`, not `2026-08-20`, because a pack version is provenance for a
+>   legal claim and should not carry a date nothing happened on. This needed
+>   `rulepack.test.ts`'s format assertion relaxed to
+>   `^\d{4}-\d{2}-\d{2}[a-z]?$` — the test's real subject is "explicit, not a
+>   moving pointer", and a suffix does not threaten that.
+> - **Check the application date per Article, from Article 113, not by analogy.**
+>   These three do not share one. Article 4 is Chapter I (2 Feb 2025); Article 86
+>   is Chapter IX, which none of Article 113's carve-outs reach, so it runs from
+>   the general date (2 Aug 2026) — *ahead* of the Chapter III duties on the same
+>   systems; only Article 27 waits to 2 Dec 2027. Assuming "new Article, therefore
+>   2027" would have been wrong twice out of three.
+> - **A duty that applies at every tier changes every scenario.** Article 4 added
+>   one binding finding to nearly every shadow row, which silently cancelled the
+>   `dutyDelta` that had been the evidence for v1 defect 6. Two things were
+>   rewritten as a result: the shadow test now asserts the absence of a binding
+>   Article 50 duty rather than a count, and the release script prints every
+>   authored note instead of inferring from arithmetic that there is nothing to
+>   explain. **Watch for this whenever a finding is added outside a tier gate.**
+> - **The browser walk-through paid for itself a third time.** It found the same
+>   point stated twice on one card, in two different cards (Articles 4 and 86) —
+>   `practicalMeaning` and `action` each carrying the same sentence. No unit test
+>   looks for redundancy, and both read badly.
 
 **Written 2026-08-19**, scope settled the same day: **all five Articles are one
 job.** Everything below was verified against the repo on that date; paths, script

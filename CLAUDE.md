@@ -124,10 +124,14 @@ commercial site carries the
 EUR-Lex "consolidated text, no legal value, only the OJ is authentic" notice and
 the EU source acknowledgement; that is not decoration.
 
-Corpus coverage is partial: **24 Articles plus Annex III**. Annex III arrived
-2026-08-18; Articles 10, 14, 15, 16 and 43 on 2026-08-19 in pack `2026-08-19`,
-both from the same CELEX and with `corpusCutOff` unmoved at `2026-07-27` — the
-same consolidation, just more of it read out of it. Fetch an Article with
+Corpus coverage is partial: **27 Articles plus Annex III**. Annex III arrived
+2026-08-18; Articles 10, 14, 15, 16 and 43 on 2026-08-19 in pack `2026-08-19`;
+Articles 4, 27 and 86 the same day in pack `2026-08-19b`. All from the same CELEX
+and with `corpusCutOff` unmoved at `2026-07-27` — the same consolidation, just
+more of it read out of it. **The `b` suffix is deliberate**: two packs were cut
+on 2026-08-19, and dating the second `2026-08-20` would put a false date on the
+provenance of a legal claim. Version keys sort lexicographically, so a suffix
+orders after its parent; `rulepack.test.ts` allows `^\d{4}-\d{2}-\d{2}[a-z]?$`. Fetch an Article with
 `npm run rulepack:fetch-article -- --version <pack> --article <n>`, which is the
 Annex script's twin and asserts the served consolidation date the same way. It
 emits each lettered point on one line, as the Annex fetcher does; the original
@@ -223,11 +227,42 @@ them to flat duties: that asserts things about the reader nobody established.
 biometrics route because it governs *post*-remote identification, where Article
 5(1)(h) governs the real-time case.
 
-**The deployer path carries the caveat the provider path shed**, naming Article
-27's fundamental rights impact assessment — which falls on public bodies, private
-entities providing public services, and Annex III 5(b)/5(c) credit and insurance
-deployers, and which the corpus cannot quote. Same rule as before: deleted when
-the corpus catches up, not tidied away first.
+**Both caveat findings are now gone.** The deployer's
+(`high-risk-deployer-duties-incomplete`) went the way the provider's did, when
+pack `2026-08-19b` added Articles 4, 27 and 86 — the three it named. Do not
+reintroduce either; the surviving idea, that the pack holds the provisions this
+tool cites rather than the Regulation, is said once in the result footer.
+
+**Articles 4, 27 and 86 do not share an application date, and that is the thing
+most likely to be got wrong.** Article 4 (AI literacy) is Chapter I and has
+applied since **2 February 2025**; Article 86 (right to an explanation) is
+Chapter IX, which none of Article 113's carve-outs reach, so it has applied since
+**2 August 2026** — ahead of the Chapter III duties owed on the very same
+systems. Only Article 27 waits, to 2 December 2027 on the Annex III route.
+`dates.ts` exposes `AI_LITERACY_APPLIES` and `GENERAL_APPLICATION_APPLIES` so
+neither date is written in a finding; the second is an alias of the transparency
+label because the pack's entry for 2 Aug 2026 carries the *general* application
+basis (Article 113, second paragraph), and a finding about Article 86 must not
+appear to cite Article 50.
+
+**Article 4 is the only legal finding not gated on a classification.** It binds
+providers and deployers of any AI system at any tier, so it reaches the reader a
+minimal-risk result would otherwise tell to do nothing — which was false. It is
+emitted after the tier-specific findings, and never on an out-of-scope result,
+where `buildLegalFindings` has already returned. Two consequences that bit once:
+every shadow scenario's v2 duty count rose by one, which cancelled the `dutyDelta`
+that used to evidence v1 defect 6 — so `shadow.test.ts` now asserts the *absence
+of a binding Article 50 duty* rather than a count, and the release script prints
+every authored note unconditionally instead of inferring from arithmetic that
+there is nothing to explain.
+
+**Article 27 splits, and only one branch is flat.** It excepts Annex III point 2
+outright, and otherwise reaches bodies governed by public law, private entities
+providing public services, and Annex III 5(b)/5(c) credit and insurance
+deployers. The engine settles the third from the route it already cited, so that
+one is a duty; the other two are `conditional_obligation`, on the Article 26(8)
+pattern, because the questionnaire never asks whether you are a public body. Do
+not promote them.
 
 **Check the corpus before assuming a gap needs a pack bump.** Article 26 was
 completed with no version change at all — the text had been pinned since the

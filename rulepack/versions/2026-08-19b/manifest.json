@@ -1,0 +1,50 @@
+{
+  "version": "2026-08-19b",
+  "lastReviewed": "2026-08-19",
+  "corpusCutOff": "2026-07-27",
+  "normalisation": "v1",
+  "provenance": {
+    "instrument": "Regulation (EU) 2024/1689 (AI Act), as amended by Regulation (EU) 2026/1744 (Digital Omnibus on AI)",
+    "celex": "02024R1689-20260727",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A02024R1689-20260727",
+    "retrieved": "2026-08-19",
+    "note": "Corpus files are the consolidated Article text with EUR-Lex consolidation markers (▼B, ▼M1), markdown link syntax, non-breaking spaces and soft hyphens removed. See src/lib/rulepack/normalise.ts — the citation verifier applies the same normalisation to both sides before matching."
+  },
+  "changelog": "Adds Articles 4, 27 and 86 to the corpus — AI literacy, the fundamental rights impact assessment, and the right to an explanation of individual decision-making. These are the three Articles the Compliance Checker v2 deployer path named in a caveat finding as applying but not assessed; that finding is now deleted rather than narrowed, as the provider path's was in 2026-08-19. Nothing else changed: the four data files and the twenty-five carried-over corpus files are byte-identical to 2026-08-19 and their hashes here are the same values, which is the evidence rather than a claim. corpusCutOff is unchanged at 2026-07-27 and the CELEX is the same consolidation (02024R1689-20260727); the three new files were fetched from it on 2026-08-19 via scripts/rulepack-fetch-article.ts, which refuses to write unless the served document's own consolidation date matches this manifest. VERSION NAMING: the 'b' suffix is because this is the second pack cut on 2026-08-19. A version string is part of the provenance of a legal claim, so dating it 2026-08-20 to avoid a collision would have put a false date on the artefact. APPLICATION DATES, which differ across the three and are the thing most likely to be got wrong: Article 4 is in Chapter I and has applied since 2 February 2025 (Article 113, third paragraph, point (a)) — it binds providers and deployers of any AI system at any risk tier, and is the only duty most readers of this tool owe today. Article 86 is in Chapter IX, which none of Article 113's carve-outs reach, so it applies from the general date of 2 August 2026 (Article 113, second paragraph) — ahead of the Chapter III duties owed on the very same systems. Only Article 27 waits with Chapter III Section 3, applying from 2 December 2027 for the Annex III route. SCOPE NOTE: Articles 27 and 86 both except systems in the area listed at Annex III point 2, and Article 27 reaches only bodies governed by public law, private entities providing public services, and deployers of the Annex III point 5(b) and 5(c) credit and insurance systems. Carried forward from 2026-08-10: Digital Omnibus on AI (Regulation (EU) 2026/1744, OJ 24.7.2026, in force 27.7.2026) — Annex III high-risk from 2 Dec 2027; Annex I from 2 Aug 2028; new Art 5(1)(ba) and (bb) prohibitions from 2 Dec 2026; SMC category (Arts 11, 17, 57, 99(6a)); Art 50 transparency in force 2 Aug 2026; penalty tiers at EUR 15M/3% for Art 50 and GPAI (Arts 99(4)(g), 101); the Art 6(3) profiling override; retention at Arts 19(1)/26(6) with Art 12 as the logging capability only; Art 57(1) sandbox deadline 2 Aug 2027.",
+  "corpus": {
+    "3": "c41cdd2e27346d0bdd449209c9f08004cdca6c96c0acf8a9d9ed8a6b700b002b",
+    "4": "34e904f2fe66bf1465dd2e8a2097f98fc610b1195f213e908c8caef3673067ac",
+    "5": "51a49fefa11df2e740913ae8833fce0857365c238dd7791b9e108218a487ffbe",
+    "6": "c816401472cd1d406aa259a7de6d00777704c848f80982d2059a9f9e4bd3236c",
+    "9": "0cb4966d8980391b2ff0fc506353e2b49a1088644aecc95b71ceff8f8f164b21",
+    "10": "c5caf8199b3b94ed4d2544930a39b2ee6ef5fd57dd46bfcf062b031e06100871",
+    "11": "93205639f72bda05cab0f20061d5c5d4e1d129d28e99b4d76312eadc75c31da1",
+    "12": "6ede0f56bc42c894796c0f9ccf9603e22398733884ddd3334712fca4639219e9",
+    "13": "af2cfb1cfe843f89e01684e987fed5ab91d1e756e260622dd388efdf902e2a71",
+    "14": "8f7f762c1b2dcbe2f93a5d6ea096bceef868a4317e538485ccfe8d210dbecf71",
+    "15": "8e0f0d2d47bc2b2bcea0807645a8077357bb0633812d956373c43a83f6e89b23",
+    "16": "4f4b015de29fa6d4cfbbd7f0ff26b94782fa07c8acb5262e77e1a1608b4bdeae",
+    "17": "b5f9226d3713cbb9d5b7b7e34a9947184b59bb695a8e047780222ee8f78cfc48",
+    "19": "474593b1b53d17ce9c3530721fb241f161e7c375bd617d76f484348e153bc301",
+    "26": "6d3761cef2af94efdfc067d32168ebb5f54881b671418d1f3b4a71e221afd2eb",
+    "27": "94a674c13e1b510e6ce366c4e653127082f8af3f8a2a6dc0aa23042e883d1265",
+    "43": "575333f57536f7c81c234d077ec0df4ac34c663a723d8384b5450fcac17e527c",
+    "49": "fc07a541be29fe5b0677b7c22daae6dd628e0205e881be29e30576af75e9241b",
+    "50": "11f28a1ff626c026c7273e5bc4a167367953365eac70239ec53bd86ee8c9b84f",
+    "57": "7ace3a0ebf2903bfdbd5109c92cf430e0210f8bd0e94aed104c54dc4c82a2ba7",
+    "72": "1472fcac169374ee93202a4deac453a5e65a9a0aecaabe7b16c9714c2e4281ff",
+    "73": "b2fa52f7c64642c676304254915c814747be7a8f8dc6fc7a42762637ab50b59f",
+    "86": "2888cd76d139f7e27ebfafd74bf6601a354695c0b9260779c4d7253cfbf694cc",
+    "99": "e731913990eb3a71f1f5527ce0dfb36777813580eb0955dd8d7b616eb2ef1595",
+    "101": "d0eabf47387c8221eaa3d08f68425911d7ae619bde5046c22ddf1762672a6ec2",
+    "111": "b983e07e9fb3f3ebb999a78efdbfcb3e3f8411e6b1028540ecd8c9b484c48f86",
+    "113": "9f08310801e72bb4975974f53098d04a4c2fb0d9b05d3f0259a656eee1dfc519",
+    "annex-iii": "2e7bec57713a9d134eeb01b5f765ab46952bf0a9253b6dd0c0e49d7785b5b094"
+  },
+  "files": {
+    "penalties.json": "6aed52fc92b728412c219ee6ac43c6decb669df659c8300b4734e01541694daf",
+    "rules.json": "1bd00fd547b633e77caa3a043fb8ef3cc8d938a07b5be4179b9fdd778e90154e",
+    "sources.json": "e1a825d382fe31dc1620c464850f9d11f70e4a9c571483efc5ff8c6470bb408b",
+    "timeline.json": "b88ecca79c238abb659883c002f059ec2c531cff3eec6a1ab5a9aafd2724eb18"
+  }
+}

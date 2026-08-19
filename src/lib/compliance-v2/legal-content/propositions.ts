@@ -347,6 +347,176 @@ export const LEGAL_PROPOSITIONS: LegalProposition[] = [
     reviewedAt: REVIEWED_AT_2026_08_19,
     reviewStatus: 'internal',
   },
+  /**
+   * Article 27, and the two Articles that used to sit beside it in a caveat.
+   *
+   * These closed the last gap the deployer path admitted to in prose. Two of
+   * them are not deferred, which is the thing to hold on to: Article 4 is in
+   * Chapter I and has applied since 2 February 2025, and Article 86 is in
+   * Chapter IX, which Article 113's carve-outs do not reach, so it has applied
+   * since 2 August 2026. Only Article 27 waits for Chapter III Section 3.
+   *
+   * Article 27's own scope is narrower than the Article it lives next to.
+   * Article 26 addresses deployers generally; Article 27 reaches only bodies
+   * governed by public law, private entities providing public services, and
+   * deployers of the Annex III point 5(b) and 5(c) credit and insurance
+   * systems — and it excludes point 2 outright. The engine can settle the
+   * 5(b)/5(c) limb from the answers and cannot settle the other two, which is
+   * why the findings split the way they do.
+   */
+  {
+    id: 'prop-art-27-1-fundamental-rights-impact-assessment',
+    ruleId: 'high-risk-deployer-duties',
+    ...AI_ACT,
+    provision: 'Article 27(1)',
+    corpusArticle: '27',
+    applicableRoles: ['deployer'],
+    conditions: [
+      'The system is high-risk under Article 6(2) — the Annex III route.',
+      'The deployer is a body governed by public law, or a private entity providing public services, or deploys an Annex III point 5(b) or 5(c) system.',
+    ],
+    exceptions: [
+      'Systems intended to be used in the area listed in point 2 of Annex III are excluded.',
+      'Where the elements are already covered by a data protection impact assessment, Article 27(4) permits cross-referencing rather than duplicating them.',
+    ],
+    effectiveFrom: '2027-12-02',
+    plainEnglishSummary:
+      'Some deployers must assess the impact on fundamental rights before they start using an Annex III high-risk system — not all deployers, but public bodies, providers of public services, and credit and insurance deployers.',
+    practicalMeaning:
+      'Six things have to be written down: the process the system sits in, how long and how often it runs, who it affects, the specific risks to those people, the human oversight actually implemented, and what happens if a risk materialises — including internal governance and complaint routes. It is done before first use, not after.',
+    shortExtract:
+      'Prior to deploying a high-risk AI system referred to in Article 6(2), with the exception of high-risk AI systems intended to be used in the area listed in point 2 of Annex III, deployers that are bodies governed by public law, or are private entities providing public services, and deployers of high-risk AI systems referred to in points 5 (b) and (c) of Annex III, shall perform an assessment of the impact on fundamental rights that the use of such system may produce.',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-27',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT_2026_08_19,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-27-2-first-use-and-reuse',
+    ruleId: 'high-risk-deployer-duties',
+    ...AI_ACT,
+    provision: 'Article 27(2)',
+    corpusArticle: '27',
+    applicableRoles: ['deployer'],
+    conditions: ['An assessment is owed under Article 27(1).'],
+    exceptions: [],
+    effectiveFrom: '2027-12-02',
+    plainEnglishSummary:
+      'The assessment attaches to first use, and an existing one can be relied on in similar cases rather than repeated.',
+    practicalMeaning:
+      'This is the paragraph that stops the duty being a per-deployment treadmill. A previous assessment, or one the provider carried out, can be relied on in similar cases — but if any element changes or goes out of date during use, updating it is a positive obligation rather than good practice.',
+    shortExtract:
+      'The obligation laid down in paragraph 1 applies to the first use of the high-risk AI system. The deployer may, in similar cases, rely on previously conducted fundamental rights impact assessments or existing impact assessments carried out by provider.',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-27',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT_2026_08_19,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-27-3-notify-market-surveillance',
+    ruleId: 'high-risk-deployer-duties',
+    ...AI_ACT,
+    provision: 'Article 27(3)',
+    corpusArticle: '27',
+    applicableRoles: ['deployer'],
+    conditions: ['An assessment has been performed under Article 27(1).'],
+    exceptions: [
+      'In the case referred to in Article 46(1), deployers may be exempt from the obligation to notify.',
+    ],
+    effectiveFrom: '2027-12-02',
+    plainEnglishSummary:
+      'Once the assessment is done, its results go to the market surveillance authority on the AI Office template.',
+    practicalMeaning:
+      'The assessment is not an internal file. It is notified, and the notification uses the template the AI Office is to develop under paragraph 5 — so the template is worth watching for, because its shape determines how much of the work is presentational.',
+    shortExtract:
+      'Once the assessment referred to in paragraph 1 of this Article has been performed, the deployer shall notify the market surveillance authority of its results, submitting the filled-out template referred to in paragraph 5 of this Article as part of the notification.',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-27',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT_2026_08_19,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-27-4-dpia-cross-reference',
+    ruleId: 'high-risk-deployer-duties',
+    ...AI_ACT,
+    provision: 'Article 27(4)',
+    corpusArticle: '27',
+    applicableRoles: ['deployer'],
+    conditions: [
+      'An assessment is owed under Article 27(1).',
+      'A data protection impact assessment under Article 35 GDPR, or Article 27 of Directive (EU) 2016/680, already meets some of those obligations.',
+    ],
+    exceptions: [],
+    effectiveFrom: '2027-12-02',
+    plainEnglishSummary:
+      'Work already done for a data protection impact assessment can be cross-referenced rather than redone.',
+    practicalMeaning:
+      'A permission, not a duty. Where a DPIA already covers part of the ground, the fundamental rights assessment may cross-refer to it or lift the relevant parts across. Worth knowing before commissioning the second assessment from scratch.',
+    shortExtract:
+      'If any of the obligations laid down in this Article is already met through the data protection impact assessment conducted pursuant to Article 35 of Regulation (EU) 2016/679 or Article 27 of Directive (EU) 2016/680, the deployer may, when conducting the fundamental rights impact assessment referred to in paragraph 1 of this Article, include cross-references to the relevant sections of that data protection impact assessment or include relevant parts thereof in the fundamental rights impact assessment.',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-27',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT_2026_08_19,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-86-right-to-explanation',
+    ruleId: 'high-risk-deployer-duties',
+    ...AI_ACT,
+    provision: 'Article 86(1)',
+    corpusArticle: '86',
+    applicableRoles: ['deployer'],
+    conditions: [
+      'The decision is taken by the deployer on the basis of output from an Annex III high-risk system.',
+      'The decision produces legal effects, or similarly significantly affects the person, in a way they consider adverse to their health, safety or fundamental rights.',
+    ],
+    exceptions: [
+      'Systems listed under point 2 of Annex III are excluded.',
+      'Where Union or national law provides exceptions or restrictions to the obligation.',
+      'The Article applies only to the extent the right is not otherwise provided for under Union law.',
+    ],
+    effectiveFrom: '2026-08-02',
+    plainEnglishSummary:
+      'A person on the receiving end of a decision made with an Annex III high-risk system can ask the deployer to explain the system\u2019s role in it, and the main elements of the decision.',
+    practicalMeaning:
+      'The duty is owed to the affected person and lands on the deployer, not the provider. "Clear and meaningful" is the standard, which is a higher bar than disclosing that a system was involved. Note the timing: this Article has applied since 2 August 2026, ahead of the Chapter III duties for the same systems.',
+    shortExtract:
+      'Any affected person subject to a decision which is taken by the deployer on the basis of the output from a high-risk AI system listed in Annex III, with the exception of systems listed under point 2 thereof, and which produces legal effects or similarly significantly affects that person in a way that they consider to have an adverse impact on their health, safety or fundamental rights shall have the right to obtain from the deployer clear and meaningful explanations of the role of the AI system in the decision-making procedure and the main elements of the decision taken.',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-86',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT_2026_08_19,
+    reviewStatus: 'internal',
+  },
+  /**
+   * Article 4 is the odd one in this file: it is not a high-risk duty at all.
+   * It binds providers and deployers of *any* AI system, at any tier, and has
+   * applied since 2 February 2025 — so it reaches the reader who was told they
+   * had nothing to do. Its own last sentence is quoted with it deliberately,
+   * because "take measures to support the development of AI literacy" without
+   * "does not require ... any specific level" invites reading a training
+   * mandate into a provision that does not contain one.
+   */
+  {
+    id: 'prop-art-4-ai-literacy',
+    ruleId: 'ai-literacy',
+    ...AI_ACT,
+    provision: 'Article 4',
+    corpusArticle: '4',
+    applicableRoles: ['provider', 'deployer'],
+    conditions: ['The organisation is a provider or a deployer of an AI system.'],
+    exceptions: [],
+    effectiveFrom: '2025-02-02',
+    plainEnglishSummary:
+      'Providers and deployers take measures so the people operating and using their AI systems understand them well enough for the job.',
+    practicalMeaning:
+      'This applies whatever the risk tier, and it has been in force since February 2025 — it is the one duty here that does not wait for anything. What it asks is proportionate rather than fixed: it is measured against your staff\u2019s existing knowledge and the context the system is used in. It expressly does not require you to guarantee any particular level of literacy in any individual.',
+    shortExtract:
+      'Providers and deployers of AI systems shall take measures to support the development of AI literacy of their staff and other persons dealing with the operation and use of AI systems on their behalf, taking into account their technical knowledge, experience, education and training and the context the AI systems are to be used in, and considering the persons or groups of persons on whom the AI systems are to be used. This obligation does not require providers or deployers to guarantee any specific level of AI literacy of any individual.',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-4',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT_2026_08_19,
+    reviewStatus: 'internal',
+  },
   {
     id: 'prop-art-9-risk-management',
     ruleId: 'high-risk-provider-duties',

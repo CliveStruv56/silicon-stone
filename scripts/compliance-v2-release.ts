@@ -64,7 +64,22 @@ function main() {
       `       v1 ${item.legacy.classification} (score ${item.legacy.score}, ${item.legacy.duties} duties)` +
         `  →  v2 ${item.v2.classification} (${item.v2.duties} duties)`
     )
-    if (item.kind !== 'agreement' || item.dutyDelta !== 0) console.log(`       ${item.note}`)
+    /**
+     * Always print the note.
+     *
+     * This used to be gated on `kind !== 'agreement' || dutyDelta !== 0` — a
+     * proxy for "is there anything to explain here". Rule pack `2026-08-19b`
+     * broke the proxy: Article 4's literacy duty is owed at every tier, so it
+     * added one binding finding to the v2 side of nearly every row, and three
+     * scenarios whose delta had been -1 became 0. Their notes stopped printing,
+     * including the one recording v1 defect 6 — the report went quiet about a
+     * defect precisely because a second, unrelated change cancelled the
+     * arithmetic out.
+     *
+     * A note exists because somebody decided the row needed explaining. That is
+     * not a fact about a count, so it is no longer inferred from one.
+     */
+    if (item.note) console.log(`       ${item.note}`)
   }
   console.log(
     `\n  ${shadow.agreements} agree · ${shadow.intended} intended change · ` +

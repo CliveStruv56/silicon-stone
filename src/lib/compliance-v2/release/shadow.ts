@@ -72,7 +72,8 @@ const PAIRS: Array<{
     spec: '1. Microbusiness using third-party general productivity AI',
     legacy: 'microProductivity',
     v2: 'microProductivityDeployer',
-    note: 'Both should land on no specific category. A divergence here is unexplained.',
+    note:
+      'Both land on no specific category, which is the agreement this row exists to confirm. The duty counts differ because v2 emits the Article 4 AI literacy duty, which binds providers and deployers at every tier and has applied since 2 February 2025; v1 has no such finding.',
   },
   {
     spec: '2. Microbusiness using AI for ordinary medical administration',

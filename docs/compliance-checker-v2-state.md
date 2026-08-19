@@ -17,6 +17,14 @@ This is the one-page orientation. The plan of record is
 > paragraphs of Article 26, with **no pack bump**, because that text had been
 > pinned since the first extraction. Check the corpus before assuming a gap of
 > this shape needs a new version.
+>
+> **Then Articles 4, 27 and 86 landed, in pack `2026-08-19b`** — the three the
+> deployer's caveat finding named. That finding is now deleted, so **neither role
+> path carries a caveat any more**. Note the dates differ: Article 4 has applied
+> since 2 February 2025 and Article 86 since 2 August 2026, while Article 27
+> waits for 2 December 2027. Article 4 is not gated on a classification at all —
+> it reaches every in-scope reader, including the minimal-risk one who was
+> previously told there was nothing to do.
 
 ---
 
@@ -40,7 +48,7 @@ decision.
 | `conditions.ts` | Branch conditions as **data**, and their evaluator |
 | `questions/` | 80 questions: core triage (§7.2), role (§7.3), Annex III branches (§7.4), Annex I + Article 5 screen, transparency + Article 6(3), organisation size, 23 Article 5 per-practice condition questions (§7.6), the one Article 43 standards question, and ten optional data-protection questions (§11.2) |
 | `engine/` | `scope`, `roles`, `organisation-size`, `annex-routes`, `article-5`, `article-43`, `article-50`, `classify`, `findings`, `dates`, `gdpr-ai`, `assemble` |
-| `legal-content/propositions.ts` | 52 curated propositions, every extract corpus-verified at build time |
+| `legal-content/propositions.ts` | 58 curated propositions, every extract corpus-verified at build time |
 | `report/` | `deterministic`, `schema`, `verify` (§14.4), `generate`, `consent` |
 | `result-sections.ts` | §12.1's sections, the hide-empties rule, and `resultBlocks()` — which puts the GDPR overlay in §12.1's seventh slot without folding it into a finding-kind bucket |
 | `flow.ts` | Questionnaire navigation and answer invalidation |
@@ -91,18 +99,18 @@ the flag on.
    full (Articles 9, 10, 11, 12, 14, 15, 16, 17 and 19), with Article 49
    registration and Article 43's conformity assessment. The deployer emits all
    eleven operative paragraphs of Article 26 — five of them
-   `conditional_obligation`, because Article 26 addresses deployers generally
-   while paragraphs 4, 7, 8, 9 and 10 each turn on a fact the questionnaire never
-   asks. The provider's caveat finding is deleted; what survives is one line in
-   the result footer.
-6. **Article 27 is the next gap of this shape, and is not approved.** The
-   fundamental rights impact assessment falls on public bodies, on private
-   entities providing public services, and on deployers of the Annex III 5(b) and
-   5(c) credit and insurance systems — a set that overlaps heavily with this
-   tool's readers. It is not in the corpus, so nothing can quote it, and a
-   finding on the deployer path says so. Articles 4 (AI literacy) and 86 (right
-   to an explanation) are outside the corpus too. Adding any of them is a pack
-   version bump; `docs/rulepack-article-expansion-handoff.md` is the procedure.
+   `conditional_obligation` — plus Article 27's fundamental rights impact
+   assessment and Article 86's right to an explanation. Article 4's literacy duty
+   goes to every in-scope provider and deployer regardless of tier. **Both caveat
+   findings are deleted**; what survives is one line in the result footer.
+6. **Articles 4, 27 and 86 are done; the next gap is not yet named.** They
+   landed in pack `2026-08-19b` and the caveat that named them is deleted. What
+   the corpus still does not carry is the whole of Chapter V (general-purpose AI
+   models), Article 25's value-chain reallocation, and Article 72's post-market
+   monitoring beyond the Article it already holds — none of which the engine
+   currently cites, so none is a live inconsistency. Adding any Article is a pack
+   version bump; `docs/rulepack-article-expansion-handoff.md` is the procedure,
+   and it now records two completed runs.
 
 ## Decisions taken, and decisions still open
 
@@ -131,12 +139,15 @@ Open (spec §22, four remaining) — **do not guess these**:
 regression — it is the signal that v2 fixed something, and the test must be moved
 into the v2 suite with its assertion inverted rather than deleted.
 
-The second most likely: **the rule pack is `2026-08-19` now**, and every pack
-change is a version bump. `2026-08-10` and `2026-08-18` are still there and still
-resolvable by `NEXT_PUBLIC_RULEPACK_VERSION`; do not edit any of them in place.
+The second most likely: **the rule pack is `2026-08-19b` now**, and every pack
+change is a version bump. `2026-08-10`, `2026-08-18` and `2026-08-19` are still
+there and still resolvable by `NEXT_PUBLIC_RULEPACK_VERSION`; do not edit any of
+them in place. The `b` suffix is because two packs were cut on the same day —
+a version string is provenance for a legal claim, so it should not carry a date
+nothing happened on.
 `prebuild` fails on hash drift, which is the point.
 
 The third: **`reviewedAt` is per proposition and is not a batch stamp.** It
-renders as "last checked" on the card, so the nine propositions written on
-2026-08-19 carry that date and their thirty-three neighbours still carry
-2026-08-18. Re-dating a proposition nobody re-read is a false claim about work.
+renders as "last checked" on the card, so the propositions written on 2026-08-19
+carry that date and their older neighbours still carry 2026-08-18. Re-dating a
+proposition nobody re-read is a false claim about work.

@@ -317,19 +317,96 @@ describe('§17.1 — every branch has a scenario', () => {
     expect(cites(employment), 'an employment deployer should not').toBe(false)
   })
 
-  /** The caveat the provider path shed, now on the deployer path, and honest. */
-  it('says plainly that Article 26 is not the whole of a deployer’s duties', () => {
+  /**
+   * What replaced the deployer's caveat finding.
+   *
+   * Until rule pack `2026-08-19b` this asserted that
+   * `high-risk-deployer-duties-incomplete` existed and named Article 27. The
+   * pack now carries Articles 4, 27 and 86, so the caveat was deleted rather
+   * than narrowed — exactly as the provider's was — and the invariant worth
+   * keeping is the one underneath it: a high-risk deployer is told what it
+   * owes, by Article, and the finding is gone rather than quietly still there.
+   */
+  it('emits the deployer duties the caveat used to stand in for', () => {
     const deployer = evaluateAssessmentV2(
       GOLDEN_SCENARIOS.find((item) => item.id === 'hrScreeningProfiling')!.answers,
       ASSESSED_AT
     )
-    const caveat = deployer.legalFindings.find(
-      (finding) => finding.id === 'high-risk-deployer-duties-incomplete'
+    const ids = deployer.legalFindings.map((finding) => finding.id)
+
+    expect(ids).not.toContain('high-risk-deployer-duties-incomplete')
+    expect(ids).toContain('art-27-fundamental-rights-impact-assessment')
+    expect(ids).toContain('art-86-right-to-explanation')
+    expect(ids).toContain('art-4-ai-literacy')
+  })
+
+  /**
+   * Article 27 reaches three groups, and the engine can only settle one of them
+   * from the answers. A credit or insurance deployer is named in the Article
+   * itself, so its duty is flat; everybody else gets a condition, because the
+   * questionnaire never asks whether you are a public body. Promoting the
+   * second to the first would assert something about the reader nobody
+   * established — the same rule that governs Article 26(8).
+   */
+  it('states Article 27 flatly only where the Annex III route settles it', () => {
+    const creditInsurance = evaluateAssessmentV2(
+      GOLDEN_SCENARIOS.find((item) => item.id === 'annexIiiCreditInsurance')!.answers,
+      ASSESSED_AT
     )
-    expect(caveat?.kind).toBe('unresolved_issue')
-    expect(caveat?.practicalMeaning).toMatch(/Article 27/)
-    // A non-binding finding whose action speaks in duties reads as one.
-    expect(caveat?.action).not.toMatch(/\b(must|shall|required|prohibited)\b/i)
+    const employment = evaluateAssessmentV2(
+      GOLDEN_SCENARIOS.find((item) => item.id === 'hrScreeningProfiling')!.answers,
+      ASSESSED_AT
+    )
+    const fria = (result: ReturnType<typeof evaluateAssessmentV2>) =>
+      result.legalFindings.find(
+        (finding) => finding.id === 'art-27-fundamental-rights-impact-assessment'
+      )
+
+    expect(fria(creditInsurance)?.kind).not.toBe('conditional_obligation')
+    expect(fria(employment)?.kind).toBe('conditional_obligation')
+  })
+
+  /**
+   * Articles 27 and 86 both except Annex III point 2, and the exception is
+   * applied rather than described. A "check whether this reaches you" card
+   * shown to a reader the provision expressly excepts is how a result teaches
+   * people to skim it.
+   */
+  it('excepts the Annex III point 2 deployer from Articles 27 and 86', () => {
+    const criticalInfrastructure = evaluateAssessmentV2(
+      GOLDEN_SCENARIOS.find((item) => item.id === 'annexIiiCriticalInfrastructure')!.answers,
+      ASSESSED_AT
+    )
+    const ids = criticalInfrastructure.legalFindings.map((finding) => finding.id)
+
+    expect(ids).not.toContain('art-27-fundamental-rights-impact-assessment')
+    expect(ids).not.toContain('art-86-right-to-explanation')
+  })
+
+  /**
+   * Article 4 is the only legal finding in the file that is not gated on a
+   * classification, and the only one most readers will ever owe. If it stops
+   * reaching a minimal-risk deployer, the result goes back to telling that
+   * reader they have nothing to do, which is false.
+   */
+  it('gives even a minimal-risk deployer the Article 4 literacy duty, in force now', () => {
+    const micro = evaluateAssessmentV2(
+      GOLDEN_SCENARIOS.find((item) => item.id === 'microProductivityDeployer')!.answers,
+      ASSESSED_AT
+    )
+    const literacy = micro.legalFindings.find((finding) => finding.id === 'art-4-ai-literacy')
+
+    expect(literacy?.kind).toBe('current_obligation')
+    expect(literacy?.effectiveFrom).toBe('2 February 2025')
+  })
+
+  /** An out-of-scope result still emits nothing at all, Article 4 included. */
+  it('and does not give it to an out-of-scope reader', () => {
+    const outOfScope = evaluateAssessmentV2(
+      GOLDEN_SCENARIOS.find((item) => item.id === 'outOfScope')!.answers,
+      ASSESSED_AT
+    )
+    expect(outOfScope.legalFindings).toEqual([])
   })
 
   it('and the deployer of the same tier is told something different', () => {

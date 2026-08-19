@@ -52,6 +52,26 @@ export const TRANSPARENCY_APPLIES = 'Article 50 transparency, GPAI enforcement, 
 export const NEW_PROHIBITIONS_APPLY = 'New prohibitions, and machine-readable marking'
 
 /**
+ * Chapter I's application date, which is what Article 4's AI literacy duty runs
+ * from. The pack labels the entry for the prohibitions because those are the
+ * headline, but Article 113(a) applies it to the whole of Chapters I and II and
+ * the entry's `detail` names the literacy duty explicitly.
+ */
+export const AI_LITERACY_APPLIES = 'Prohibited practices and AI literacy'
+
+/**
+ * The Regulation's *general* application date — Article 113, second paragraph.
+ *
+ * The pack labels this entry for the Article 50 transparency duties, because
+ * those are what most readers meet on that day. Its `basis` is the general rule,
+ * though, and any provision Article 113's carve-outs do not reach runs from it.
+ * Article 86 is one such: it sits in Chapter IX, which points (a) to (d) do not
+ * mention. Aliased rather than reused under the transparency name so a finding
+ * about the right to an explanation does not appear to cite Article 50.
+ */
+export const GENERAL_APPLICATION_APPLIES = TRANSPARENCY_APPLIES
+
+/**
  * Is a duty in application on the assessment date?
  *
  * `assessedAt` is passed in rather than read from the clock so a result is

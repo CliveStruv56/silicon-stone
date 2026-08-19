@@ -12,7 +12,20 @@ import { evaluateRuleLibrary } from '../ai-act-rules'
 
 describe('pack resolution', () => {
   it('pins an explicit version, never a "latest" pointer', () => {
-    expect(PINNED_RULE_PACK_VERSION).toMatch(/^\d{4}-\d{2}-\d{2}$/)
+    /**
+     * A date, optionally with a single-letter suffix.
+     *
+     * The suffix exists because two packs were cut on 2026-08-19 — the Chapter
+     * III Section 2 batch and then Articles 4, 27 and 86 — and the alternative
+     * was stamping `2026-08-20` on a pack built the day before. A pack version
+     * is part of the provenance of a legal claim, so a date it carries should
+     * be a date something actually happened on. Suffixed keys still sort after
+     * their parent, which is all `AVAILABLE_RULE_PACK_VERSIONS` needs.
+     *
+     * What this test is really guarding is the next line: an explicit version
+     * that resolves, never a moving pointer like "latest".
+     */
+    expect(PINNED_RULE_PACK_VERSION).toMatch(/^\d{4}-\d{2}-\d{2}[a-z]?$/)
     expect(AVAILABLE_RULE_PACK_VERSIONS).toContain(PINNED_RULE_PACK_VERSION)
   })
 

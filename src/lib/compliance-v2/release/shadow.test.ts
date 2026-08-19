@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { runShadowComparison, shadowSummary } from './shadow'
+import { evaluateAssessmentV2 } from '../engine/assemble'
+import { GOLDEN_SCENARIOS } from '../test-fixtures/golden-scenarios'
+
+const ASSESSED_AT = '2026-08-19'
 
 /**
  * Phase 8's shadow-mode task: "compare v1 and v2 without showing v2 to users."
@@ -51,12 +55,38 @@ describe('shadow mode', () => {
   /**
    * Defect 6 is invisible to a classification comparison: both engines say
    * "limited risk" for human-reviewed public-interest text, and only v2 applies
-   * the Article 50(4) editorial exception. The duty count is what shows it.
+   * the Article 50(4) editorial exception.
+   *
+   * **The duty *count* stopped showing it in rule pack `2026-08-19b`.** Article 4
+   * binds providers and deployers at every tier, so v2 now emits one binding
+   * finding here where it used to emit none, and `dutyDelta` reads 0 — the same
+   * number it would read if v2 had never applied the exception at all. Netting
+   * a removed Article 50 duty against an added Article 4 one and asserting on
+   * the total would be a test that passes for the wrong reason.
+   *
+   * So the assertion moved to the substance: v2 hands this reader no binding
+   * Article 50 duty, which is the defect, and its transparency finding is the
+   * exception rather than an obligation.
    */
   it('catches a duty-level divergence the classification hides', () => {
     const editorial = comparisons.find((item) => item.spec.startsWith('6.'))
     expect(editorial?.kind).toBe('agreement')
-    expect(editorial?.dutyDelta, 'v2 should assert fewer duties here, not the same').toBeLessThan(0)
+
+    const v2 = evaluateAssessmentV2(
+      GOLDEN_SCENARIOS.find((item) => item.id === 'reviewedPublicInterestText')!.answers,
+      ASSESSED_AT
+    )
+    const bindingArticle50 = v2.legalFindings.filter(
+      (finding) =>
+        /art-50/.test(finding.id) &&
+        (finding.kind === 'current_obligation' || finding.kind === 'future_obligation')
+    )
+    expect(bindingArticle50, 'the Article 50(4) exception should leave no duty').toEqual([])
+
+    const exception = v2.legalFindings.find(
+      (finding) => finding.id === 'art-50-4-public-interest-text-exception'
+    )
+    expect(exception?.kind).toBe('unresolved_issue')
   })
 
   /**

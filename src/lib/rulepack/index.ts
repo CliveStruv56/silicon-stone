@@ -13,6 +13,11 @@ import sources2026_08_19 from '../../../rulepack/versions/2026-08-19/sources.jso
 import timeline2026_08_19 from '../../../rulepack/versions/2026-08-19/timeline.json'
 import penalties2026_08_19 from '../../../rulepack/versions/2026-08-19/penalties.json'
 import rules2026_08_19 from '../../../rulepack/versions/2026-08-19/rules.json'
+import manifest2026_08_19b from '../../../rulepack/versions/2026-08-19b/manifest.json'
+import sources2026_08_19b from '../../../rulepack/versions/2026-08-19b/sources.json'
+import timeline2026_08_19b from '../../../rulepack/versions/2026-08-19b/timeline.json'
+import penalties2026_08_19b from '../../../rulepack/versions/2026-08-19b/penalties.json'
+import rules2026_08_19b from '../../../rulepack/versions/2026-08-19b/rules.json'
 
 /**
  * The versioned rule pack: the legal payload behind the AI Act triage engine,
@@ -139,12 +144,37 @@ const PACKS: Record<string, RulePack> = {
     prohibitedPractices: rules2026_08_19.prohibitedPractices as PackProhibitedPractice[],
     ruleAnchors: rules2026_08_19.ruleAnchors as Record<string, PackRuleAnchor>,
   },
+  /**
+   * Adds Articles 4, 27 and 86 to the corpus, closing the last gap the deployer
+   * path admitted to in prose. The three are unlike the 2026-08-19 batch in one
+   * way worth knowing: they are not all deferred. Article 4 sits in Chapter I
+   * and has applied since 2 February 2025; Article 86 sits in Chapter IX, which
+   * Article 113 does not carve out, so it has applied since 2 August 2026. Only
+   * Article 27 waits with the rest of Chapter III Section 3.
+   *
+   * The version is suffixed rather than dated forward because both packs were
+   * cut on 2026-08-19 and a version string that claimed 2026-08-20 would be a
+   * false date on a legal artefact. Keys sort lexicographically, so "b" orders
+   * after its parent.
+   *
+   * The four data files and the twenty-five carried-over corpus files are
+   * byte-identical to 2026-08-19; same CELEX consolidation, so `corpusCutOff`
+   * does not move and the regulatory lane needs no re-verification.
+   */
+  '2026-08-19b': {
+    manifest: manifest2026_08_19b as PackManifest,
+    sources: sources2026_08_19b as Record<string, PackSource>,
+    timeline: timeline2026_08_19b as PackTimelineEntry[],
+    penalties: penalties2026_08_19b as PackPenaltyTier[],
+    prohibitedPractices: rules2026_08_19b.prohibitedPractices as PackProhibitedPractice[],
+    ruleAnchors: rules2026_08_19b.ruleAnchors as Record<string, PackRuleAnchor>,
+  },
 }
 
 export const AVAILABLE_RULE_PACK_VERSIONS = Object.keys(PACKS).sort()
 
 /** The version served when nothing is pinned. Never "latest" — see below. */
-const DEFAULT_RULE_PACK_VERSION = '2026-08-19'
+const DEFAULT_RULE_PACK_VERSION = '2026-08-19b'
 
 /**
  * The pinned version. Deliberately an explicit version string, never a
