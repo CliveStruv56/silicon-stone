@@ -196,7 +196,8 @@ classification without counsel review.
 **A short list of duties must say that it is short.** The high-risk provider path
 emits Articles 9, 11, 12, 17, 19 and 49, because those are the ones the pinned
 corpus can back — and a seventh finding says in terms that Articles 10, 14, 15,
-16 and 43 apply and are not assessed. Before that existed, a high-risk provider
+16 and 43 apply and are not assessed. (Adding those five is approved and next
+up: `docs/rulepack-article-expansion-handoff.md`.) Before that existed, a high-risk provider
 was told it owed nothing at all, which Phase 8's shadow comparison found. Do not
 delete the caveat finding to tidy the list.
 

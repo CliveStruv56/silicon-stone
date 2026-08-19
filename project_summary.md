@@ -4309,7 +4309,15 @@ Nothing downstream matters until email capture works.
 | **VAPID keys for Web Push** | `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` — Phase 3 push is code-complete but cannot send until these are set and verified on a real device. |
 | **Confirm Plausible goal names** | Phase 3 + `LAUNCH.md` §3 events must exist by exact name (with spaces) to register. |
 
-### Priority 2a — Compliance Checker v2 (spec approved, Phase 0 done)
+### Priority 2a — Compliance Checker v2 (Phases 0–8 built, release not taken)
+
+**Next up, approved 2026-08-19:** add Articles 10, 14, 15 and 16 to the pinned
+corpus so the high-risk provider path is complete, with Article 43 recommended as
+a separate piece of work because its conformity-assessment procedure branches.
+This is a rule-pack version bump. The verified procedure, the files that move and
+the one decision to confirm first are in
+**`docs/rulepack-article-expansion-handoff.md`**.
+
 
 Plan of record: `docs/# EU AI Act Compliance Checker v2 — Impl.md`. Eight
 phases; **Phase 0 shipped 2026-08-18** (see §9). v1 stays live behind
