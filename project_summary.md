@@ -2,13 +2,13 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-08-19
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (99 static pages), 1,025 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (78 prerendered pages), 1,025 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
 **The AI Act Compliance Checker was rebuilt on 2026-08-10** (Stages 0–3 of the agentic build spec): the rule base is corrected and versioned at `v2026-08-10`, backed by a git-tracked rule pack carrying 19 Articles of verbatim consolidated statute; a conversational intake proposes answers the user confirms before the unchanged deterministic engine classifies; and the result screen now offers an email-gated written report whose every legal quotation is string-matched against that corpus before a reader sees it. The paid half of Stage 3 — the £39 Evidence Pack and the £39→£79 credit — is built dark behind a flag and blocked on the Lemon Squeezy store. A legal review of the report template, disclaimer and credit terms is an open item before it ships. **Reworked again on 2026-08-17**: result items are typed rather than bare strings, so the card (now "Recommended actions and applicable provisions") groups duties apart from concessions, support measures and enforcement information, each expandable to its legal basis and conditions; and `/tools/compliance-checker/provisions` serves the 19 pinned Articles as verbatim statute a reader can follow a citation into. **The vendor questions followed on 2026-08-18**, each now carrying its own Article anchor, a corpus link and a stated reason for asking — including, where the vendor owes you no answer, the fact that it does not. See §9 and §11.
 
-**A v2 rebuild of the Compliance Checker is in progress and is the largest thread of work in the repo.** Plan of record: `docs/# EU AI Act Compliance Checker v2 — Impl.md` (23 sections, 8 phases). **Phases 0–6 are built** under `src/lib/compliance-v2/`, behind `NEXT_PUBLIC_COMPLIANCE_CHECKER_V2` + `?v2=1`; v1 is untouched and is what every user still gets. Its central move is removing the score from legal classification. Six v1 defects are documented in `docs/compliance-checker-v1-known-defects.md` and held as characterisation tests; three are fixed in v2. **Start here: `docs/compliance-checker-v2-state.md`** — one page on how to run it, what exists, what is deliberately not done, and which decisions are still open. Per-phase history is §9; CLAUDE.md carries the invariants. Two carve-outs are recorded rather than hidden: Article 5's per-practice condition trees are unwritten, and no model call or email send is wired.
+**A v2 rebuild of the Compliance Checker is in progress and is the largest thread of work in the repo.** Plan of record: `docs/# EU AI Act Compliance Checker v2 — Impl.md` (23 sections, 8 phases). **All eight phases are built** under `src/lib/compliance-v2/`, behind `NEXT_PUBLIC_COMPLIANCE_CHECKER_V2` + `?v2=1`; v1 is untouched and is what every user still gets. Its central move is removing the score from legal classification. Six v1 defects are documented in `docs/compliance-checker-v1-known-defects.md` and held as characterisation tests; three are fixed in v2. **Start here: `docs/compliance-checker-v2-state.md`** — one page on how to run it, what exists, what is deliberately not done, and which decisions are still open. Per-phase history is §9; CLAUDE.md carries the invariants. **What remains before release is not code**: counsel review of the 52 propositions (all `reviewStatus: 'internal'`), usability testing with non-specialists, and the retention and marketing decisions that release criterion 16 is blocked on. No model call or email send is wired, because no mail sender exists.
 
 **The blocker is a P0, re-confirmed against the live API on 2026-08-11: the production Kit API key is a legacy v3 key (22 chars, no `kit_` prefix), so `/api/subscribe` 401s and — because `NEXT_PUBLIC_PRE_LAUNCH` is still `true`, making every product CTA an email capture — the entire funnel currently terminates in a failed POST.** Beyond that: Lemon Squeezy store not yet created, 9 drafts unpublished, and 7 of 12 published articles still lack cover images. Go-live sequence lives in `LAUNCH.md`; defects and debt in §10.
 
@@ -4442,13 +4442,33 @@ Nothing downstream matters until email capture works.
 
 ### Priority 2a — Compliance Checker v2 (Phases 0–8 built, release not taken)
 
-**Next up, approved 2026-08-19:** add Articles 10, 14, 15, 16 and 43 to the
-pinned corpus — all five as one job — so the high-risk provider path is complete
-and the "this is not the complete list" caveat finding can be deleted. This is a
-rule-pack version bump. The verified procedure, the files that move, and a worked
-design for Article 43's conformity-assessment branch (one new question; the
-catalogue already knows the rest) are in
-**`docs/rulepack-article-expansion-handoff.md`**.
+**Read `docs/compliance-checker-v2-state.md` first.** All eight phases are built
+and both role paths now emit the whole of what the pinned corpus can quote —
+Chapter III Section 2 plus Articles 43 and 49 for providers, all eleven operative
+paragraphs of Article 26 for deployers. The flag is still dark and v1 is still
+what every user gets.
+
+**Nothing left here is code.** The three things standing between v2 and an
+opt-in beta all need a person:
+
+| Blocker | What it needs |
+|---------|---------------|
+| **Counsel review of the decision matrix** (§22.4) | Every one of the 52 propositions is `reviewStatus: 'internal'` — readings of the consolidated text by this project. The cards say "Not reviewed by counsel" on screen. This is the big one. |
+| **Usability testing** (§17.5) | Completion testing with people who do not know legal terminology or their own turnover, balance sheet or group status. Machine checks cover keyboard, screen-reader labelling and mobile; comprehension they cannot. |
+| **Retention and marketing decisions** (§22.1, §22.2) | Release criterion 16 is *blocked*, not merely unchecked, until these are recorded. |
+
+`npm run checker-v2:release` prints §20's eighteen criteria and the v1/v2 shadow
+comparison; `npm run checker-v2:a11y` runs axe and a keyboard-only walk against a
+dev server.
+
+**One coding gap remains and is not approved: Article 27**, the fundamental
+rights impact assessment. It falls on public bodies, on private entities
+providing public services, and on deployers of the Annex III 5(b) and 5(c) credit
+and insurance systems — a set that overlaps heavily with this tool's readers. It
+is not in the corpus, so nothing can quote it, and a deployer finding says so.
+Articles 4 (AI literacy) and 86 (right to an explanation) are outside it too.
+Adding any of them is a rule-pack version bump;
+`docs/rulepack-article-expansion-handoff.md` is the procedure, now proven twice.
 
 
 Plan of record: `docs/# EU AI Act Compliance Checker v2 — Impl.md`. Eight

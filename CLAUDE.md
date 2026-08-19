@@ -149,7 +149,7 @@ thin.
 **Read `docs/compliance-checker-v2-state.md` first** — one page on how to run it,
 what exists, what is deliberately unfinished, and which decisions are open.
 `docs/# EU AI Act Compliance Checker v2 — Impl.md` is the plan of record — 23
-sections, 8 phases. **Phases 0–6 are built** under `src/lib/compliance-v2/` and
+sections, 8 phases. **All eight are built** under `src/lib/compliance-v2/` and
 `src/components/tools/checker-v2/`; v1 is untouched and remains what every user
 gets. Reaching v2 needs `NEXT_PUBLIC_COMPLIANCE_CHECKER_V2=true` **and** `?v2=1`
 on the checker URL. Progress and per-phase state live in `project_summary.md` §11.

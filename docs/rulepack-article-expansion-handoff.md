@@ -12,7 +12,15 @@
 > findings with their own titles rather than one condition; and the browser
 > walk-through found two defects in the first cut, which is the third time it has
 > paid for itself.
-
+>
+> **The deployer path followed the same evening** (`b4b74fcb`): all eleven
+> operative paragraphs of Article 26, with **no pack bump**, because that text
+> had been pinned since the first extraction. Check the corpus before assuming
+> the next gap of this shape needs a new version.
+>
+> **Steps 2 to 7 are still the route for adding an Article** — Article 27 is the
+> next candidate and is not approved. The traps recorded in them are real ones
+> somebody hit.
 
 **Written 2026-08-19**, scope settled the same day: **all five Articles are one
 job.** Everything below was verified against the repo on that date; paths, script
@@ -177,7 +185,11 @@ scenario; extend it in the same spirit to assert every Article 43 route has one.
 
 ### 1. Write an article fetch script
 
-There is **no** article fetcher today. `npm run rulepack:fetch-annex` exists
+**Already done** — `scripts/rulepack-fetch-article.ts`, wired as
+`npm run rulepack:fetch-article -- --version <pack> --article <n>`. Skip to
+step 2. The rest of this section is why it is shaped the way it is.
+
+There was **no** article fetcher before 2026-08-19. `npm run rulepack:fetch-annex` exists
 (`scripts/rulepack-fetch-annex.ts`) and handles Annexes only; the original 19
 Articles arrived with the first extraction commit `6204c347`.
 
