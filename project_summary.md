@@ -4311,11 +4311,12 @@ Nothing downstream matters until email capture works.
 
 ### Priority 2a — Compliance Checker v2 (Phases 0–8 built, release not taken)
 
-**Next up, approved 2026-08-19:** add Articles 10, 14, 15 and 16 to the pinned
-corpus so the high-risk provider path is complete, with Article 43 recommended as
-a separate piece of work because its conformity-assessment procedure branches.
-This is a rule-pack version bump. The verified procedure, the files that move and
-the one decision to confirm first are in
+**Next up, approved 2026-08-19:** add Articles 10, 14, 15, 16 and 43 to the
+pinned corpus — all five as one job — so the high-risk provider path is complete
+and the "this is not the complete list" caveat finding can be deleted. This is a
+rule-pack version bump. The verified procedure, the files that move, and a worked
+design for Article 43's conformity-assessment branch (one new question; the
+catalogue already knows the rest) are in
 **`docs/rulepack-article-expansion-handoff.md`**.
 
 

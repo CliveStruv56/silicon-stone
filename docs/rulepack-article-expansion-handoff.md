@@ -1,8 +1,8 @@
-# Adding Articles 10, 14, 15, 16 (and 43) to the rule pack
+# Adding Articles 10, 14, 15, 16 and 43 to the rule pack
 
-**Written 2026-08-19** to hand this to a new session. Everything below was
-verified against the repo on that date; paths, script names and line references
-are real, not remembered.
+**Written 2026-08-19**, scope settled the same day: **all five Articles are one
+job.** Everything below was verified against the repo on that date; paths, script
+names and line references are real, not remembered.
 
 ---
 
@@ -17,21 +17,22 @@ worse product than the complete list.
 
 This task adds the missing Articles to the pinned corpus and emits their duties.
 
-## Confirm this before starting
+## Scope, decided
 
-**Does Article 43 go in this piece of work, or a later one?**
+**All five Articles — 10, 14, 15, 16 and 43 — are one job.** The owner decided
+this on 2026-08-19, against a recommendation to split Article 43 out. It is
+settled; do not re-open it.
 
-The owner said "go ahead" without answering. The recommendation on the table,
-and the default if nobody says otherwise, is:
+The consequence is that the caveat finding
+`high-risk-provider-duties-incomplete` in
+`src/lib/compliance-v2/engine/findings.ts` is **deleted**, not narrowed, once all
+five ship — along with the assertion in
+`src/lib/compliance-v2/release/golden-matrix.test.ts` that its
+`practicalMeaning` matches `/Article 43/`.
 
-> **Articles 10, 14, 15 and 16 now. Article 43 as its own piece of work.**
-
-Ask, then proceed. The reason it matters is in *Why Article 43 is different*
-below — it is plausibly more work than the other four combined, and doing it
-badly is worse than not doing it.
-
-If Article 43 is deferred, **narrow the caveat finding to name Article 43 alone**
-rather than deleting it.
+Replace that assertion rather than dropping it: the useful invariant is that a
+high-risk provider receives the Chapter III Section 2 duties, so assert the
+Article numbers now emitted.
 
 ---
 
@@ -42,24 +43,119 @@ rather than deleting it.
 | 10 | Data and data governance | Self-contained duty. Straightforward. |
 | 14 | Human oversight | Self-contained duty. Straightforward. |
 | 15 | Accuracy, robustness and cybersecurity | Self-contained duty. Straightforward. |
-| 16 | Obligations of providers of high-risk AI systems | An umbrella that mostly cross-references the others. Easy to add, adds least. |
-| 43 | Conformity assessment | **Branches.** See below. |
+| 16 | Obligations of providers of high-risk AI systems | An umbrella that mostly cross-references the others. Easy; adds least. |
+| 43 | Conformity assessment | Branches, but narrowly. Design below. |
 
-### Why Article 43 is different
+---
 
-Article 43 does not state one duty. Which procedure applies depends on:
+## Article 43: the design
 
-- whether the system is Annex III **point 1** (biometrics) or another Annex III
-  point — different default procedures;
-- whether the provider applied **harmonised standards**;
-- Annex VI (internal control) versus Annex VII (notified-body involvement);
-- and separately for the Annex I product route.
+Article 43 does not state one duty, and a finding that says "you must undergo a
+conformity assessment" without saying **which procedure** is the half-answer the
+Article 5 screen used to give. This section specifies the branch so the next
+session implements rather than researches it.
 
-A finding that says "you must undergo a conformity assessment" without saying
-which procedure is the kind of half-answer this tool is built to avoid — the
-same failure the Article 5 screen had before its condition trees. Doing it
-properly probably means one or two new questions and a small branch evaluator,
-on the pattern of `engine/article-5.ts`.
+> **Scoping note.** The structure below was read from the *editorial* copy at
+> `corpus/regulatory/eu-ai-act/2026-07-27/source.txt`, which exists to inform
+> drafting and is **never** an authority for anything the checker displays. It
+> was used to size the work. The `shortExtract` that reaches the pack must come
+> from the Cellar fetch in step 3, like every other extract.
+
+### The routes
+
+Three, and the engine can already tell them apart from answers it collects today:
+
+1. **Annex III point 1 (biometrics)** — Article 43(1). The provider *chooses*
+   between Annex VI (internal control) and Annex VII (notified body), **but only
+   where harmonised standards under Article 40, or common specifications under
+   Article 41, have been applied.** Annex VII becomes mandatory where any of the
+   four Article 43(1) triggers holds: no standards exist and no common
+   specifications are available; the provider has not applied the standard, or
+   applied only part of it; common specifications exist and were not applied; or
+   a standard was published with a restriction, and then only for the restricted
+   part.
+2. **Annex III points 2–8** — Article 43(2). Annex VI internal control, **no
+   notified body**. Flat, no question needed.
+3. **Annex I Section A (the product route)** — Article 43(3). Follow the
+   sectoral procedure under the relevant harmonisation legislation; the Section 2
+   requirements form part of that assessment, and the Article 17 quality
+   management system assessment is undertaken too. **Where a system is both**
+   Annex I Section A and Annex III, the Annex I procedure governs.
+
+Plus Article 43(4), which is not a route but a trigger: a **substantial
+modification** requires a new conformity assessment. Pre-determined changes in a
+continuously-learning system, already described in the Annex IV technical
+documentation, are expressly *not* a substantial modification.
+
+### What the catalogue already knows
+
+- **Which Annex III point applies.** `engine/annex-routes.ts` keys points as
+  `'1(a)'`, `'1(b)'`, `'1(c)'`, `'2'`, `'3(a)'` and so on (see
+  `ANNEX_III_POINTS`). Point 1 is `point.startsWith('1')`.
+- **Whether the Annex I product route applies.** `annex_i_route`, both limbs.
+- **Whether the system has been substantially modified.** `material_modification`
+  in `questions/role.ts`, already asked of everyone.
+
+### What is genuinely new
+
+**One question**, and it opens only on the Annex III point 1 provider path —
+which is the narrowest branch in the catalogue:
+
+```
+id: 'art43_harmonised_standards'
+prompt: Have you applied harmonised standards, or common specifications,
+        covering all of the Section 2 requirements?
+options:
+  applied_in_full      → the Annex VI / Annex VII choice is open
+  applied_in_part      → Annex VII is mandatory (43(1) second subparagraph, (b))
+  restricted_standard  → Annex VII for the restricted part (trigger (d))
+  none_applied         → Annex VII is mandatory (triggers (a) and (c))
+allowUnknown: true     → route cannot be determined; say so, do not guess
+importance: 'finding_decisive'
+visibleWhen: annex III point 1 selected
+```
+
+A second wrinkle is worth a **condition on the finding rather than a question**:
+where the system is intended to be put into service by law enforcement,
+immigration or asylum authorities, or by a Union institution, the market
+surveillance authority acts as the notified body. `intended_use_family` does not
+establish this — it describes the use, not the customer — so state it as a
+condition the reader checks, rather than inferring it.
+
+### Emitting it
+
+Follow `engine/article-50.ts` rather than the flat `PROVIDER_DUTIES` array: like
+Article 50, this is one Article with paragraph-specific outcomes, and the useful
+finding names the procedure. Three findings are better than one generic duty:
+
+- the route that applies, and why (`current_obligation` / `future_obligation`
+  on `highRiskKind`, as the other provider duties are);
+- where the route could not be determined because the standards question is
+  unknown — `unresolved_issue`, naming what would settle it. **Never default an
+  unknown to internal control**: Annex VI is the cheaper procedure, and guessing
+  it is the expensive direction to be wrong in;
+- Article 43(4) where `material_modification` is `yes` — a new conformity
+  assessment is required regardless of whether the system is redistributed.
+
+### Golden scenarios to add
+
+At minimum, and named for what they test:
+
+- `art43BiometricsStandardsApplied` — Annex III point 1, standards in full: the
+  choice is open.
+- `art43BiometricsNoStandards` — Annex III point 1, none applied: Annex VII
+  mandatory.
+- `art43BiometricsStandardsUnknown` — the unknown case; route unresolved, and
+  **not** defaulted to Annex VI.
+- `art43AnnexIiiPointFour` — an existing employment scenario, asserting Annex VI
+  internal control with no notified body.
+- `art43ProductRoute` — `regulatedProductBothLimbs`, asserting the sectoral
+  procedure governs.
+- `art43SubstantialModification` — `material_modification: yes`, asserting the
+  re-assessment finding.
+
+`release/golden-matrix.test.ts` already asserts every Annex III family has a
+scenario; extend it in the same spirit to assert every Article 43 route has one.
 
 ---
 
@@ -116,8 +212,9 @@ existing citations.
 ### 3. Fetch, read, hash — in that order
 
 ```bash
-npm run rulepack:fetch-article -- --version 2026-08-19 --article 10
-# …14, 15, 16, and 43 if it is in scope
+for n in 10 14 15 16 43; do
+  npm run rulepack:fetch-article -- --version 2026-08-19 --article $n
+done
 npm run rulepack:hash
 ```
 
@@ -183,10 +280,16 @@ Two constraints that will bite otherwise:
 - **`practicalMeaning` and `whyItApplies` must exceed 40 characters** and
   `action` 10, or `result.test.ts` fails.
 
-Then **narrow or remove the caveat finding**
-(`high-risk-provider-duties-incomplete`, same file). Its `practicalMeaning`
-currently names "Data governance, human oversight, accuracy and robustness, the
-provider obligations in Article 16 and the conformity assessment in Article 43".
+Then **delete the caveat finding** (`high-risk-provider-duties-incomplete`, same
+file). Its `practicalMeaning` currently names "Data governance, human oversight,
+accuracy and robustness, the provider obligations in Article 16 and the
+conformity assessment in Article 43" — with all five shipped it has nothing left
+to be about, and a caveat that no longer bites is worse than none.
+
+Keep the *idea* somewhere, though: the pack still does not carry every Article of
+Chapter III Section 2's neighbourhood, and a future reader should be able to tell
+what is assessed from what is not. Saying so once in the section blurb is enough;
+a finding is too loud for it.
 
 ### 7. Update what moves
 
@@ -194,8 +297,10 @@ Verified list of things that reference the old version or the old counts:
 
 - `src/lib/compliance-v2/result.test.ts:328` — `expect(result.rulepackVersion).toBe('2026-08-18')`.
 - `src/lib/compliance-v2/release/golden-matrix.test.ts` — asserts the caveat
-  finding's `practicalMeaning` matches `/Article 43/`. If Article 43 ships, this
-  assertion has to change; if it is deferred, it still passes.
+  finding's `practicalMeaning` matches `/Article 43/`. Replace it with an
+  assertion that the provider duties now include the Article numbers emitted;
+  the invariant worth keeping is that a high-risk provider is told what it owes.
+  The same file's `expect(duties.length).toBeGreaterThan(3)` should rise.
 - `docs/compliance-checker-v2-state.md` — proposition count and the "six provider
   duties" note.
 - `CLAUDE.md` — the "short list of duties must say that it is short" paragraph.

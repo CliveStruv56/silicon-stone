@@ -6,11 +6,11 @@ This is the one-page orientation. The plan of record is
 `docs/# EU AI Act Compliance Checker v2 — Impl.md`; per-phase history is
 `project_summary.md` §9 and §11; the invariants are in `CLAUDE.md`.
 
-> **Work in flight:** adding Articles 10, 14, 15, 16 (and possibly 43) to the
-> pinned corpus so the high-risk provider path is complete. The owner has
-> approved it. Read
-> **`docs/rulepack-article-expansion-handoff.md`** before starting — it carries
-> the verified procedure, and one decision to confirm first.
+> **Work in flight:** adding Articles 10, 14, 15, 16 **and 43** to the pinned
+> corpus so the high-risk provider path is complete. Approved 2026-08-19, all
+> five as one job. Read **`docs/rulepack-article-expansion-handoff.md`** before
+> starting — it carries the verified procedure and a worked design for Article
+> 43's conformity-assessment branch.
 
 ---
 
@@ -84,8 +84,9 @@ the flag on.
    11, 12, 17, 19 and 49 are emitted and corpus-verified; Articles 10, 14, 15, 16
    and 43 are not in the pinned corpus, so nothing could verify a citation to
    them. A finding says so on screen rather than letting a short list read as a
-   complete one. **Approved and next up** — the procedure, the gotchas and the
-   one open decision are in `docs/rulepack-article-expansion-handoff.md`.
+   complete one. **Approved and next up, all five as one job** — procedure,
+   gotchas and the Article 43 branch design are in
+   `docs/rulepack-article-expansion-handoff.md`.
 
 ## Decisions taken, and decisions still open
 
