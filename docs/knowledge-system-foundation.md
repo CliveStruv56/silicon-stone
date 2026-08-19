@@ -1,7 +1,13 @@
 # Knowledge system — the canonical foundation
 
 **Status:** wave 1 of the programme in `siliconstone-knowledge-llm-master-spec.md`.
-**Built:** 2026-08-18. **Behaviour changed for users:** none.
+**Shipped:** 2026-08-19 (`8b0032b4`, schema manifest `d614cfcf`).
+**Behaviour changed for users:** none. The only live difference is a new
+**Knowledge** section in Studio.
+
+**The candidate migration has been run** (2026-08-19): one `knowledgeItem`
+created, the candidate untouched, a repeat `--write` a no-op. Re-running it is
+safe.
 
 This wave laid a foundation and wired almost nothing to it. The schemas exist,
 the domain service exists, the feature controls exist and are all off. The

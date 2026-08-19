@@ -15,9 +15,10 @@ seven-wave programme to make Sanity the canonical store for knowledge and
 lineage — sources, derived items, research runs, topics, article provenance —
 so research survives job expiry and an article can say what it was written
 from. Master spec: `docs/siliconstone-knowledge-llm-master-spec.md`. **Wave 0–1
-(schemas, domain service, Studio views, migration dry run) is built, verified
-and deliberately uncommitted**, behind four controls that all default to off and
-that nothing reads yet; no user-visible behaviour changed. Start at
+(schemas, domain service, Studio views, candidate migration) shipped on
+2026-08-19**, behind four controls that all default to off and that nothing
+reads yet; no user-visible behaviour changed, and the only live difference is a
+new **Knowledge** section in Studio. Start at
 `docs/knowledge-system-foundation.md`, then §9.
 
 **The blocker is a P0, re-confirmed against the live API on 2026-08-11: the production Kit API key is a legacy v3 key (22 chars, no `kit_` prefix), so `/api/subscribe` 401s and — because `NEXT_PUBLIC_PRE_LAUNCH` is still `true`, making every product CTA an email capture — the entire funnel currently terminates in a failed POST.** Beyond that: Lemon Squeezy store not yet created, 9 drafts unpublished, and 7 of 12 published articles still lack cover images. Go-live sequence lives in `LAUNCH.md`; defects and debt in §10.
@@ -476,7 +477,7 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
-### August 19, 2026 — The knowledge system's canonical foundation (Wave 0–1), built and uncommitted
+### August 19, 2026 — The knowledge system's canonical foundation (Wave 0–1), shipped
 
 A second large thread opened alongside the Compliance Checker rebuild. Plan of
 record: `docs/siliconstone-knowledge-llm-master-spec.md` — a seven-wave
@@ -486,7 +487,7 @@ ChatGPT/Claude/Codex can capture into a reviewable inbox. **Read
 `docs/knowledge-system-foundation.md` first**; it is the one page describing
 what exists.
 
-**Wave 0–1 is built and changes nothing a user can see.** Four schemas
+**Wave 0–1 is shipped and changes nothing a user can see.** Four schemas
 (`knowledgeItem`, `researchRun`, `knowledgeTopic`, plus additive extensions to
 `knowledgeSource` and `article`), a domain layer at `src/lib/knowledge/`, a
 Studio structure covering inbox/ready/sources/runs/topics/index-errors with the
@@ -538,14 +539,29 @@ string IDs, observed rather than argued. The live dataset holds 1
 `knowledgeSource`, 1 `knowledgeCandidate` and 0 `knowledgeItem`, so this is a
 rehearsal at exactly the right time.
 
-**Status: authored, verified, and not committed.** `check`, `test`,
+**Status: committed, deployed, and migrated.** `8b0032b4` (the wave) and
+`d614cfcf` (the deployed schema manifest) are on `main`; Vercel production
+`dpl_CwoATG8A` is READY on siliconandstone.com. `check`, `test`,
 `test:security`, `test:knowledge-inbox`, `test:evidence-index`, `build` and
-`sanity schema validate` (0 errors, 0 warnings) all pass; nothing was pushed,
-deployed, migrated or written to Sanity. The 1,076-test figure in the header
-above already counts this wave's 181, because vitest ran over the working tree —
-it becomes accurate on commit. One check remains that only a person can do:
-click through Studio → Knowledge to confirm the new structure renders, since
-structure resolution happens after login.
+`sanity schema validate` (0 errors, 0 warnings) all passed immediately before
+the commit.
+
+`npx sanity schema deploy` was run, because a Vercel deploy does not refresh the
+manifest MCP and Sanity Create read — without it the new types are in Studio but
+invisible to anything reading the manifest. Its artifacts are tracked, which is
+why `dist/static/` moved.
+
+**The candidate migration was then run for real** — one `knowledgeItem` created
+at `knowledgeItem.51ecac19…`, `reviewStatus: inbox`, `kind: synthesis`, the
+legacy `candidateId` and original `createdAt` carried over, and both unresolved
+source IDs recorded in `editorNotes` rather than dropped. The candidate is
+untouched: its `_updatedAt` is still 2026-05-30. A second `--write` wrote 0 and
+left `_updatedAt` unmoved, so the idempotence claim is demonstrated rather than
+asserted. Rollback is deleting that one document.
+
+One check still needs a person: open `/studio` on production, click
+**Knowledge**, and confirm the structure renders — structure resolution happens
+after login, so no automated check reaches it.
 
 Not done, and explicitly for later waves: persisting live research, any change
 to draft retrieval or prompts, automatic indexing, the external ingestion
