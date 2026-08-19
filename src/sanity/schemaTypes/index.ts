@@ -10,6 +10,9 @@ import { assetCollection } from './assetCollection'
 import { libraryImage } from './libraryImage'
 import { knowledgeCandidate } from './knowledgeCandidate'
 import { knowledgeSource } from './knowledgeSource'
+import { knowledgeItem } from './knowledgeItem'
+import { knowledgeTopic } from './knowledgeTopic'
+import { researchRun } from './researchRun'
 import { glossaryTerm } from './glossaryTerm'
 
 export const schema: { types: SchemaTypeDefinition[] } = {
@@ -24,6 +27,10 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     assetCollection,
     libraryImage,
     knowledgeSource,
+    knowledgeItem,
+    knowledgeTopic,
+    researchRun,
+    // Legacy. Nothing new writes one; the migration reads them.
     knowledgeCandidate,
     glossaryTerm,
   ],

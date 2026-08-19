@@ -1,4 +1,3 @@
-import { createHash, randomUUID } from 'node:crypto'
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/auth'
 import { writeClient } from '@/lib/sanity'
@@ -9,12 +8,17 @@ import {
   type KnowledgeBrandTag,
   type KnowledgeSourceType,
 } from '@/lib/knowledge-inbox'
+// Hashing, ID minting and URL normalisation now come from the knowledge domain
+// (`src/lib/knowledge/`) rather than being re-implemented here. The contract
+// this route serves is unchanged: same form fields, same status codes, same
+// response body, and still a legacy-compatible `knowledgeSource` document.
+// Rewriting it onto the domain service proper waits for the capture wave,
+// because the service does not mint the `sourceId` this type still requires.
+import { contentHash as sha256 } from '@/lib/knowledge/hash'
+import { canonicalDocumentId } from '@/lib/knowledge/ids'
+import { normalizeCanonicalUrl } from '@/lib/knowledge/normalize'
 
 const MAX_UPLOAD_BYTES = 15 * 1024 * 1024
-
-function sha256(content: string | Uint8Array) {
-  return `sha256:${createHash('sha256').update(content).digest('hex')}`
-}
 
 function parseCommaSeparated(value: FormDataEntryValue | null) {
   return String(value ?? '')
@@ -82,6 +86,12 @@ export async function POST(req: NextRequest) {
   if (!originalUrl && !(upload instanceof File && upload.size > 0)) {
     return NextResponse.json({ error: 'Provide an original URL or upload a file.' }, { status: 400 })
   }
+  // Left exactly as it was, deliberately. `normalizeCanonicalUrl` is stricter
+  // — it rejects mailto:, data: and file: URLs, which this accepts — and
+  // tightening what an existing endpoint accepts is a change for the capture
+  // wave to make openly, not a side effect of a refactor. The normalised form
+  // is stored alongside as an additive field, so nothing that was accepted
+  // before is rejected now.
   if (originalUrl) {
     try {
       new URL(originalUrl)
@@ -89,6 +99,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Original URL is invalid.' }, { status: 400 })
     }
   }
+  const canonicalUrl = originalUrl ? normalizeCanonicalUrl(originalUrl) : null
 
   let asset: { _type: 'file'; asset: { _type: 'reference'; _ref: string } } | undefined
   let contentHash = sha256(extractedText)
@@ -119,7 +130,7 @@ export async function POST(req: NextRequest) {
   }
 
   const capturedAt = new Date().toISOString()
-  const documentId = `knowledgeSource.${randomUUID()}`
+  const documentId = canonicalDocumentId('knowledgeSource')
 
   await writeClient.create({
     _id: documentId,
@@ -130,11 +141,21 @@ export async function POST(req: NextRequest) {
     brandTags,
     topicTags,
     ...(originalUrl ? { originalUrl } : {}),
+    ...(canonicalUrl ? { canonicalUrl } : {}),
     ...(asset ? { asset } : {}),
     extractedText,
     contentHash,
     capturedAt,
+    // Legacy `status` is still written, unchanged, because everything that
+    // reads these documents still reads it. `reviewStatus` is written beside
+    // it so records captured from here forward carry the canonical field too
+    // and the backfill has that much less to do. The two agree: legacy
+    // `pending` means `inbox`.
     status: 'pending',
+    reviewStatus: 'inbox',
+    extractionState: { status: 'not_required' },
+    indexState: { status: 'not_eligible' },
+    provenance: { sourceSystem: 'admin_ui', capturedBy: 'admin' },
   })
 
   return NextResponse.json({

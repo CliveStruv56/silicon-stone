@@ -3,6 +3,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/auth'
 import { writeClient } from '@/lib/sanity'
 import { KNOWLEDGE_BRAND_TAGS, type KnowledgeBrandTag } from '@/lib/knowledge-inbox'
+// This route still creates a legacy `knowledgeCandidate`, on purpose. Moving it
+// onto `knowledgeItem` is the migration and cutover wave's job: the API
+// response shape, the `/knowledge` page that renders it and the candidate
+// migration all read this document type today, and changing the writer before
+// the migration exists would split the records across two types with nothing
+// reconciling them. Only the ID minting is centralised here.
+import { canonicalDocumentId } from '@/lib/knowledge/ids'
 
 function parseStringArray(value: unknown) {
   if (!Array.isArray(value)) return []
@@ -58,7 +65,7 @@ export async function POST(req: NextRequest) {
 
   const candidateId = `candidate-${new Date().toISOString().slice(0, 10)}-${randomUUID().slice(0, 8)}`
   const createdAt = new Date().toISOString()
-  const documentId = `knowledgeCandidate.${randomUUID()}`
+  const documentId = canonicalDocumentId('knowledgeCandidate')
 
   await writeClient.create({
     _id: documentId,

@@ -1,3 +1,16 @@
+/**
+ * Constants the three /api/knowledge routes and the /knowledge page share.
+ *
+ * This is the pre-foundation module and stays where it is: `sourceId`, the
+ * brand tags and the five legacy source types are what existing documents and
+ * the existing UI are built on.
+ *
+ * New work belongs in `src/lib/knowledge/` — the canonical types, transition
+ * guards, normalisation, hashing, identity, parsers, repository and domain
+ * service. `KNOWLEDGE_SOURCE_TYPES` below is the legacy subset of
+ * `KNOWLEDGE_SOURCE_KINDS` there, and `scripts/knowledge-inbox-checks.ts`
+ * asserts it stays a subset so the two lists cannot drift apart.
+ */
 export const KNOWLEDGE_SOURCE_TYPES = [
   'url',
   'pdf',

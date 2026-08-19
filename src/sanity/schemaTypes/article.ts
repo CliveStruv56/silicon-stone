@@ -12,6 +12,10 @@ export const article = defineType({
   groups: [
     { name: 'content', title: 'Content', default: true },
     { name: 'factCheck', title: 'Fact Check' },
+    // Internal lineage. Nothing in this group is projected by any public
+    // query — every article query in src/sanity/lib/queries.ts lists its
+    // fields explicitly, and the only `...` spreads are inside body[] blocks.
+    { name: 'provenance', title: 'Provenance (internal)' },
   ],
   fields: [
     defineField({
@@ -403,6 +407,120 @@ export const article = defineType({
         }),
       ],
     }),
+    /* ===================== internal lineage =====================
+     * Added in the knowledge system's canonical foundation wave. All optional,
+     * all internal, none projected by a public query.
+     *
+     * The split between references and snapshots is the point of this block.
+     * References answer "what does this article relate to *now*" and follow
+     * their targets as those are edited, superseded or rejected. Snapshots
+     * answer "what was actually used at generation time" and must never move,
+     * because that is the question a fact-check or a correction asks. Keeping
+     * only references would quietly rewrite history; keeping only snapshots
+     * would orphan the article from the knowledge graph. */
+
+    defineField({
+      group: 'provenance',
+      name: 'researchRun',
+      title: 'Research Run',
+      description:
+        'The investigation this article came out of. Internal — never published.',
+      type: 'reference',
+      to: [{ type: 'researchRun' }],
+    }),
+    defineField({
+      group: 'provenance',
+      name: 'knowledgeItems',
+      title: 'Knowledge Items',
+      description:
+        'Derived thinking this article was built from — an outline, a set of observations. Internal — never published.',
+      type: 'array',
+      of: [defineArrayMember({ type: 'reference', to: [{ type: 'knowledgeItem' }] })],
+    }),
+    defineField({
+      group: 'provenance',
+      name: 'knowledgeSources',
+      title: 'Canonical Sources',
+      description:
+        'The evidence records behind this article. Distinct from the public "Sources / Citations" list above, which is what the reader sees and stays authored by hand. Internal — never published.',
+      type: 'array',
+      of: [defineArrayMember({ type: 'reference', to: [{ type: 'knowledgeSource' }] })],
+    }),
+    defineField({
+      group: 'provenance',
+      name: 'priorCoverage',
+      title: 'Prior Coverage',
+      description:
+        'Earlier articles the prior-coverage retrieval surfaced while drafting this one. Internal — never published.',
+      type: 'array',
+      of: [defineArrayMember({ type: 'reference', to: [{ type: 'article' }] })],
+    }),
+    defineField({
+      group: 'provenance',
+      name: 'citationSnapshots',
+      title: 'Citation Snapshots',
+      description:
+        'What was cited at generation time, recorded as it stood then. A snapshot does not follow its source: if the source is later corrected or superseded, this still says what this article was actually written from. Internal — never published.',
+      type: 'array',
+      readOnly: true,
+      of: [
+        defineArrayMember({
+          type: 'object',
+          name: 'citationSnapshot',
+          fields: [
+            defineField({ name: 'title', title: 'Title', type: 'string' }),
+            defineField({ name: 'url', title: 'URL', type: 'url' }),
+            defineField({ name: 'publisher', title: 'Publisher', type: 'string' }),
+            defineField({
+              name: 'publishedDate',
+              title: 'Publication Date',
+              description: 'A string, not a date — upstream often gives only a year, or nothing.',
+              type: 'string',
+            }),
+            defineField({
+              name: 'locator',
+              title: 'Locator',
+              description: 'Page, section or Article, where the citation points at part of a document.',
+              type: 'string',
+            }),
+            defineField({
+              name: 'source',
+              title: 'Canonical Source',
+              description: 'The knowledgeSource this citation resolved to, where it resolved to one.',
+              type: 'reference',
+              to: [{ type: 'knowledgeSource' }],
+            }),
+          ],
+          preview: { select: { title: 'title', subtitle: 'url' } },
+        }),
+      ],
+    }),
+    defineField({
+      group: 'provenance',
+      name: 'generationSnapshot',
+      title: 'Generation Snapshot',
+      description:
+        'What was in force when this article was generated — models, rule versions, and the retrieval record IDs actually used. Written by the pipeline so a draft can be explained later rather than re-guessed. Internal — never published.',
+      type: 'object',
+      readOnly: true,
+      options: { collapsible: true, collapsed: true },
+      fields: [
+        defineField({ name: 'generatedAt', title: 'Generated At', type: 'datetime' }),
+        defineField({ name: 'model', title: 'Drafting Model', type: 'string' }),
+        defineField({ name: 'embeddingModel', title: 'Embedding Model', type: 'string' }),
+        defineField({ name: 'rulesVersion', title: 'Rules / Prompt Version', type: 'string' }),
+        defineField({ name: 'rulePackVersion', title: 'Rule Pack Version', type: 'string' }),
+        defineField({
+          name: 'retrievalRecordIds',
+          title: 'Retrieval Record IDs',
+          description: 'The IDs each retrieval lane returned, in the order they were given to the model.',
+          type: 'array',
+          of: [defineArrayMember({ type: 'string' })],
+        }),
+        defineField({ name: 'notes', title: 'Notes', type: 'text', rows: 3 }),
+      ],
+    }),
+
     defineField({
       group: 'content',
       name: 'seo',

@@ -10,6 +10,16 @@
 
 **A v2 rebuild of the Compliance Checker is in progress and is the largest thread of work in the repo.** Plan of record: `docs/# EU AI Act Compliance Checker v2 — Impl.md` (23 sections, 8 phases). **All eight phases are built** under `src/lib/compliance-v2/`, behind `NEXT_PUBLIC_COMPLIANCE_CHECKER_V2` + `?v2=1`; v1 is untouched and is what every user still gets. Its central move is removing the score from legal classification. Six v1 defects are documented in `docs/compliance-checker-v1-known-defects.md` and held as characterisation tests; three are fixed in v2. **Start here: `docs/compliance-checker-v2-state.md`** — one page on how to run it, what exists, what is deliberately not done, and which decisions are still open. Per-phase history is §9; CLAUDE.md carries the invariants. **What remains before release is not code**: counsel review of the 58 propositions (all `reviewStatus: 'internal'`), usability testing with non-specialists, and the retention and marketing decisions that release criterion 16 is blocked on. No model call or email send is wired, because no mail sender exists.
 
+**A second large thread opened on 2026-08-19: the central knowledge system.** A
+seven-wave programme to make Sanity the canonical store for knowledge and
+lineage — sources, derived items, research runs, topics, article provenance —
+so research survives job expiry and an article can say what it was written
+from. Master spec: `docs/siliconstone-knowledge-llm-master-spec.md`. **Wave 0–1
+(schemas, domain service, Studio views, migration dry run) is built, verified
+and deliberately uncommitted**, behind four controls that all default to off and
+that nothing reads yet; no user-visible behaviour changed. Start at
+`docs/knowledge-system-foundation.md`, then §9.
+
 **The blocker is a P0, re-confirmed against the live API on 2026-08-11: the production Kit API key is a legacy v3 key (22 chars, no `kit_` prefix), so `/api/subscribe` 401s and — because `NEXT_PUBLIC_PRE_LAUNCH` is still `true`, making every product CTA an email capture — the entire funnel currently terminates in a failed POST.** Beyond that: Lemon Squeezy store not yet created, 9 drafts unpublished, and 7 of 12 published articles still lack cover images. Go-live sequence lives in `LAUNCH.md`; defects and debt in §10.
 
 ---
@@ -465,6 +475,81 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 19, 2026 — The knowledge system's canonical foundation (Wave 0–1), built and uncommitted
+
+A second large thread opened alongside the Compliance Checker rebuild. Plan of
+record: `docs/siliconstone-knowledge-llm-master-spec.md` — a seven-wave
+programme to make Sanity the canonical store for knowledge and lineage, so
+research survives job expiry, an article can say what it was written from, and
+ChatGPT/Claude/Codex can capture into a reviewable inbox. **Read
+`docs/knowledge-system-foundation.md` first**; it is the one page describing
+what exists.
+
+**Wave 0–1 is built and changes nothing a user can see.** Four schemas
+(`knowledgeItem`, `researchRun`, `knowledgeTopic`, plus additive extensions to
+`knowledgeSource` and `article`), a domain layer at `src/lib/knowledge/`, a
+Studio structure covering inbox/ready/sources/runs/topics/index-errors with the
+legacy candidate lists kept and labelled, and a dry-run candidate migration.
+181 tests across 9 files. Every one of the four feature controls
+(`KNOWLEDGE_V2_UI_ENABLED`, `KNOWLEDGE_AUTO_INDEX_ENABLED`,
+`KNOWLEDGE_DRAFT_RETRIEVAL_ENABLED`, `KNOWLEDGE_EXTERNAL_WRITES_ENABLED`)
+defaults to off and **nothing reads them yet**.
+
+Four things worth not undoing.
+
+**An unreviewed record cannot become trusted by accident.** Everything enters at
+`reviewStatus: 'inbox'` and there is no parameter, adapter or migration flag
+that creates one as `ready` — including for content a model wrote. The parser
+*refuses* a caller that declares a review status rather than ignoring it,
+because ignoring it would leave the caller believing it had been honoured.
+
+**Deduplication reports a conflict instead of resolving one.** Four probes run
+in a fixed precedence — idempotency key, external reference, canonical URL,
+content hash — and all four run even after one matches, so a key pointing at one
+document while the URL points at another surfaces as a conflict rather than a
+silent merge. A duplicate returns the existing record; it never overwrites it,
+because that record may have been reviewed since.
+
+**Legacy documents are read, never rewritten.** `knowledgeSource.status` still
+exists and is still written; `reviewStatus` is written beside it.
+`effectiveSourceReviewStatus()` reads both, and maps legacy `error` to
+`requires_review` rather than `rejected` — `error` described a capture failure,
+never an editorial verdict, and collapsing it would discard records nobody
+judged. Every Studio filter asks both questions, or the inbox would look empty.
+
+**Article lineage is internal and split in two.** References
+(`researchRun`, `knowledgeItems`, `knowledgeSources`, `priorCoverage`) follow
+their targets; snapshots (`citationSnapshots`, `generationSnapshot`) do not,
+because "what was this written from" is the question a correction asks and it
+must not move. No public query projects any of them — every article query lists
+its fields explicitly, and `test:knowledge-inbox` now asserts that stays true.
+
+One invariant was deliberately narrowed. `knowledge-inbox-checks.ts` used to
+assert the article schema never mentions `knowledgeSource`; article lineage
+requires it, so the assertion now covers what it was actually protecting — no
+`knowledgeCandidate`, no local-vault vocabulary, and nothing new made public.
+
+The migration dry run was executed three times against production, read-only,
+with byte-identical output: 1 candidate, 1 would-create, 2 unresolved source
+IDs. Both are genuinely dangling and one contains literal spaces, so it could
+never have been a valid `sourceId` — which is the case for references over
+string IDs, observed rather than argued. The live dataset holds 1
+`knowledgeSource`, 1 `knowledgeCandidate` and 0 `knowledgeItem`, so this is a
+rehearsal at exactly the right time.
+
+**Status: authored, verified, and not committed.** `check`, `test`,
+`test:security`, `test:knowledge-inbox`, `test:evidence-index`, `build` and
+`sanity schema validate` (0 errors, 0 warnings) all pass; nothing was pushed,
+deployed, migrated or written to Sanity. The 1,076-test figure in the header
+above already counts this wave's 181, because vitest ran over the working tree —
+it becomes accurate on commit. One check remains that only a person can do:
+click through Studio → Knowledge to confirm the new structure renders, since
+structure resolution happens after login.
+
+Not done, and explicitly for later waves: persisting live research, any change
+to draft retrieval or prompts, automatic indexing, the external ingestion
+endpoint, URL/PDF extraction, a redesigned `/knowledge`, and the MCP adapter.
 
 ### August 19, 2026 — Compliance Checker v2: §22.1/§22.2 decided, and the report lane wired
 
@@ -4656,6 +4741,10 @@ npm run sync-content:dry # Preview sync changes
 npm run gen:style        # Regenerate bundled style rules from .agent/rules/style/*.md (also runs on prebuild)
 npm run test:style-rules # Assert the guardrail + full rules reach the bundle (guards silent-"" regression)
 # To change the rules: edit Style/*.md in the Ideaverse vault, then run its sync-style.sh
+
+# Knowledge system (see docs/knowledge-system-foundation.md)
+npm run test:knowledge-inbox           # Route, schema, Studio and feature-flag guards
+npm run knowledge:migrate-candidates   # DRY RUN by default; --write is required to write
 
 # Audit
 npm audit                # Expect 24 findings (Sanity toolchain subtree + sharp)
