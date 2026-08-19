@@ -108,3 +108,65 @@ export function parseProse(input: unknown): GeneratedProse | null {
 }
 
 export type { GroupedSection }
+
+/**
+ * The tool-call schema handed to the model, mirroring `GeneratedProse`.
+ *
+ * Lives here rather than in `model.ts` for two reasons. It belongs with the type
+ * it mirrors — a shape and its wire description drifting apart is exactly the
+ * failure this file exists to prevent. And `model.ts` is `server-only`, which
+ * throws under vitest, so a schema defined there could not be tested against the
+ * type at all; `schema.test.ts` asserts the two agree key for key.
+ *
+ * It mirrors rather than derives, deliberately. `parseProse` re-validates
+ * everything this claims, because a forced tool call is a strong hint and not a
+ * guarantee: the API validates against whatever schema this process sent, so the
+ * schema being wrong is precisely the case a derivation could not catch. Two
+ * independent statements with the parser as the authority is the arrangement
+ * that fails loudly.
+ *
+ * Note what has no field here: an obligation, a citation, a date, a
+ * classification. §14.3's guarantee is structural — the model is given nowhere
+ * to put one.
+ */
+export function proseToolSchema() {
+  return {
+    type: 'object' as const,
+    properties: {
+      executiveSummary: {
+        type: 'string',
+        description:
+          'What this result means for this organisation, in plain language. No obligations, no citations, and no date that is not already in the findings.',
+      },
+      transitions: {
+        type: 'object',
+        description:
+          'Section key to a single sentence introducing that section. Keys outside the report are dropped.',
+        additionalProperties: { type: 'string' },
+      },
+      practicalPlan: {
+        type: 'array',
+        description:
+          'The findings you were given, ordered into a sequence someone could work through. Adds nothing that is not among them.',
+        items: { type: 'string' },
+      },
+      contextNote: {
+        type: 'string',
+        description: 'A non-legal restatement of what the user told us about their system.',
+      },
+      citedPropositionIds: {
+        type: 'array',
+        description:
+          'Proposition ids you referred to. Must be a subset of those offered — you may cite fewer, you may not cite more.',
+        items: { type: 'string' },
+      },
+    },
+    required: [
+      'executiveSummary',
+      'transitions',
+      'practicalPlan',
+      'contextNote',
+      'citedPropositionIds',
+    ],
+  }
+}

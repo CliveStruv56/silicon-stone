@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { QuestionCard } from './QuestionCard'
 import { ResultV2 } from './ResultV2'
+import { ReportRequestV2 } from './ReportRequestV2'
 import {
   EMPTY_FLOW,
   applyAnswer,
@@ -72,6 +73,21 @@ export function ComplianceCheckerV2({ exitHref }: { exitHref: string }) {
    * record; a component that read the clock on every render would produce a
    * different one each time the page re-rendered around midnight.
    */
+  /**
+   * What to call the system in the report.
+   *
+   * Taken from the reader's own free-text description where they gave one, and
+   * falling back to a neutral phrase rather than inventing a name. It is a
+   * label, not a fact the engine uses — the classification does not know or care
+   * what the thing is called.
+   */
+  const toolName = useMemo(() => {
+    const described = flow.answers.intended_use_description?.value
+    return typeof described === 'string' && described.trim()
+      ? described.trim().slice(0, 120)
+      : 'this AI system'
+  }, [flow.answers])
+
   const result = useMemo(
     () => (showResult ? evaluateAssessmentV2(flow.answers, assessedAt) : null),
     [flow.answers, showResult, assessedAt]
@@ -82,6 +98,12 @@ export function ComplianceCheckerV2({ exitHref }: { exitHref: string }) {
       <div className="space-y-6">
         <BetaNotice exitHref={exitHref} />
         <ResultV2 result={result} />
+        {/*
+          Below the result, never in front of it (§20.14). The full result is
+          rendered above and does not depend on anything in this card, so a
+          reader who ignores it loses only the written summary.
+        */}
+        <ReportRequestV2 answers={flow.answers} toolName={toolName} />
         <div className="flex flex-wrap gap-3">
           <Button variant="ghost" onClick={() => setShowResult(false)} className="text-text-muted">
             <ArrowLeft className="h-4 w-4" />

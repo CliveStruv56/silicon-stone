@@ -2,7 +2,7 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-08-19
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (78 prerendered pages), 1,058 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (78 prerendered pages), 1,076 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
@@ -465,6 +465,61 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 19, 2026 — Compliance Checker v2: §22.1/§22.2 decided, and the report lane wired
+
+Two blocks in one session, both of which move v2 towards a release that is
+waiting on people rather than on code.
+
+**Release criterion 16 is done.** The owner decided §22.1 and §22.2: adopt the
+three retention periods v1 already runs — a generated report 30 days, the email
+and its consent record two years, an in-progress assessment 24 hours — and keep
+the report email to delivery use, marketing a separate unticked consent.
+`compliance-v2/retention.ts` is the decision record and deliberately *not* the
+configuration; tests assert it agrees with the TTLs the code applies, with the
+`server-only` one asserted in the prebuild script because it throws under vitest.
+Verified by breaking it on purpose. §20 now reads **17/17 automated, 1 needs a
+person, 0 blocked**.
+
+**The v2 report lane is wired end to end.** `POST /api/tools/compliance-checker/v2/report`
+validates the answers, re-runs the engine server-side, writes a pending record
+and generates in `after()`; `GET .../v2/report/[id]?token=` polls it.
+`report/model.ts` is the Anthropic adapter, `ReportRequestV2` the card. Verified
+end to end locally: `complete`, prose generated and verified clean, ~35 seconds.
+
+Three deliberate differences from v1's route. **It sends no statute** — v2's
+model may only quote an extract already in the report it is annotating, so the
+prompt carries no corpus block at all, which is both a smaller prompt and a
+stronger guarantee than v1's ~50k-token cached corpus. **A missing API key is not
+an error**: `generateReport` treats an absent model as "no prose" and returns the
+deterministic report, which is complete on its own — v1 503s because v1's report
+*is* the generation. **The route 404s unless the flag is on**, because a live
+endpoint behind an unreleased feature is a way to reach it.
+
+`withheld` means something narrower in v2 than in v1, and the route says so
+rather than inventing a policy: `verifyReport` removes individual findings that
+fail a check rather than refusing the report, so a partially-verified report is a
+real, shorter, `complete` report. `withheld` is reserved for the case where every
+section was removed — an empty page under a heading would say "nothing applies to
+you" on the strength of a verification failure.
+
+**Criterion 14 was re-verified after wiring, which is what its own note asked
+for.** The card renders below the whole result; roughly 570 lines of rendered
+result precede it and nothing in it gates anything above it. Axe stays at 0
+violations across all three audits with the new form, and keyboard-only
+completion is intact.
+
+**One thing is unexplained and is recorded rather than buried.** The first local
+end-to-end run reported `failed` about fifteen seconds in, carrying the status
+route's stale-pending message, which needs an age of 320 seconds. It did not
+reproduce twice more and the threshold is unit-tested on both sides. The cause
+was not found; the route now logs the arithmetic so a second occurrence is
+diagnosable. It is instrumented, not fixed.
+
+Still open before release, and still not code: counsel review of the decision
+matrix (§22.4) and usability testing with non-specialists (§17.5). §22.3, session
+recovery, remains open and was deliberately not resolved by lengthening the
+24-hour session.
 
 ### August 19, 2026 — Compliance Checker v2: Articles 4, 27 and 86, and the last caveat deleted
 

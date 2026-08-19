@@ -49,11 +49,11 @@ decision.
 | `questions/` | 80 questions: core triage (§7.2), role (§7.3), Annex III branches (§7.4), Annex I + Article 5 screen, transparency + Article 6(3), organisation size, 23 Article 5 per-practice condition questions (§7.6), the one Article 43 standards question, and ten optional data-protection questions (§11.2) |
 | `engine/` | `scope`, `roles`, `organisation-size`, `annex-routes`, `article-5`, `article-43`, `article-50`, `classify`, `findings`, `dates`, `gdpr-ai`, `assemble` |
 | `legal-content/propositions.ts` | 58 curated propositions, every extract corpus-verified at build time |
-| `report/` | `deterministic`, `schema`, `verify` (§14.4), `generate`, `consent` |
+| `report/` | `deterministic`, `schema`, `verify` (§14.4), `generate`, `consent`, `model` (the Anthropic adapter), `record`, `store` |
 | `result-sections.ts` | §12.1's sections, the hide-empties rule, and `resultBlocks()` — which puts the GDPR overlay in §12.1's seventh slot without folding it into a finding-kind bucket |
 | `flow.ts` | Questionnaire navigation and answer invalidation |
 | `test-fixtures/golden-scenarios.ts` | 67 scenarios — every Annex III family, every Article 5 practice, every Article 43 route, §17.2's ten mandatory shapes |
-| `components/tools/checker-v2/` | `ComplianceCheckerV2`, `QuestionCard`, `ResultV2`, `FindingCard`, `GdprOverlayCard` |
+| `components/tools/checker-v2/` | `ComplianceCheckerV2`, `QuestionCard`, `ResultV2`, `FindingCard`, `GdprOverlayCard`, `ReportRequestV2` |
 
 | `release/` | §20's criteria as checks (`acceptance.ts`), the v1/v2 shadow comparison (`shadow.ts`), and the golden-matrix coverage assertions |
 
@@ -74,12 +74,23 @@ the flag on.
    `reviewStatus: 'internal'`; §22.4's counsel-review decision is still open. A
    complete path reports `potentially_prohibited` at `medium` confidence and
    never `prohibited` — do not add that classification without counsel.
-2. **No model call and no email send.** The prose contract, the verifier and the
-   consent model are built and tested against a stub model; nothing calls a real
-   one, and no v2 route exists to call it from. There is still no mail sender in
-   this codebase. §22.1 is now decided, so the store's retention number is no
-   longer the blocker it was — **wiring the report lane is the next block of
-   work**.
+2. **The report lane is wired; there is still no email send.** As of 2026-08-19
+   `POST /api/tools/compliance-checker/v2/report` validates, re-runs the engine
+   server-side, writes a pending record and generates in `after()`;
+   `GET .../v2/report/[id]?token=` polls it. `report/model.ts` is the Anthropic
+   adapter. Verified end to end locally: complete, prose generated and verified
+   clean, about 35 seconds.
+
+   **There is still no mail sender**, so nothing is emailed. The report is
+   delivered on screen through a signed link and the address is kept as the
+   consent record. The card says so rather than implying an inbox.
+
+   Two things about the route worth knowing. It is **404 unless the flag is on**,
+   because a live endpoint behind an unreleased feature is a way to reach it. And
+   **a missing API key is not an error** — `generateReport` treats an absent
+   model as "no prose" and returns the deterministic report, which is complete on
+   its own. That is the opposite of v1, which 503s, and it is right for v2:
+   v1's report *is* the generation, and v2's is not.
 3. **The GDPR overlay cites nothing.** Phase 7 is built, but §11.3 permits a
    specific data-protection duty only where "a separately approved GDPR
    proposition" establishes one — and there are none. There is no pinned GDPR
@@ -139,6 +150,17 @@ Open (spec §22, two remaining) — **do not guess these**:
    on, not a side effect of a retention number.
 2. Whether and when external EU AI Act counsel reviews the decision matrix, and
    the final editorial wording of the disclaimer and privacy notice.
+
+## One unexplained observation
+
+On 2026-08-19, the **first** local end-to-end report run reported `failed` about
+fifteen seconds after the POST, carrying the status route's *stale pending*
+message — which needs an age of 320 seconds. It did not reproduce across two
+further runs, and `record.test.ts` covers the threshold on both sides. **The
+cause was not found.** The status route now logs `createdAt`, the computed age
+and the threshold whenever it declares a record stale, so a second occurrence
+says whether the record, the clock or the store was lying. Do not assume this is
+fixed; it is only instrumented.
 
 ## The thing most likely to be got wrong by a new session
 

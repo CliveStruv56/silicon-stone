@@ -405,7 +405,7 @@ const NOT_AUTOMATED: Array<Omit<CriterionOutcome, 'passed' | 'failures'>> = [
     text: 'Core result is available before the email gate.',
     kind: 'manual',
     evidence:
-      'Structurally true — `evaluateAssessmentV2` is a pure function of the answers and needs no address, and there is no email field in AnswerRecordV2 — but "available before the gate" is a claim about a screen. Verified by browser walk-through on 2026-08-18 and 2026-08-19: the full result renders with no email asked for at any point. Re-verify whenever the report gate is wired, which is when it could regress.',
+      'Structurally true — `evaluateAssessmentV2` is a pure function of the answers and needs no address, and there is no email field in AnswerRecordV2 — but "available before the gate" is a claim about a screen. Verified by browser walk-through on 2026-08-18 and twice on 2026-08-19: the full result renders with no email asked for at any point. **The second 2026-08-19 walk was after the report gate was wired**, which is the moment this could have regressed and the reason the note said to re-check then: ReportRequestV2 renders below the whole result, roughly 570 lines of rendered result precede it, and nothing in it gates anything above it. Re-verify again if the card ever moves or the result gains a collapsed state.',
   },
 ]
 
