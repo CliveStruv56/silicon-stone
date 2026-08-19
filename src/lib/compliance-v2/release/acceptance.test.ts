@@ -35,18 +35,33 @@ describe('§20 — what is not automated', () => {
    * moved deliberately, and if a new criterion quietly becomes manual this
    * fails.
    */
-  it('is exactly criteria 14 and 16, and both are reported', () => {
+  it('is exactly criterion 14, and it is reported', () => {
+    // Was [14, 16] until 2026-08-19. Criterion 16 was `blocked` on §22.1 and
+    // §22.2 being open product decisions; the owner took both that day, so it
+    // became automatable and was moved. That is the intended direction of
+    // travel for this list — a criterion leaves it when the thing it was
+    // waiting on exists, never because it got tidied.
     const unautomated = outcomes.filter((item) => item.kind !== 'automated')
-    expect(unautomated.map((item) => item.id)).toEqual([14, 16])
+    expect(unautomated.map((item) => item.id)).toEqual([14])
     for (const criterion of unautomated) {
       expect(criterion.passed, `${criterion.id} must not report as passing`).toBe(false)
       expect(criterion.evidence.length).toBeGreaterThan(80)
     }
   })
 
-  it('16 is blocked rather than merely unchecked, and says on what', () => {
+  it('has nothing left blocked', () => {
+    expect(outcomes.filter((item) => item.kind === 'blocked')).toEqual([])
+  })
+
+  it('16 now checks the recorded decisions rather than waiting on them', () => {
     const criterion = outcomes.find((item) => item.id === 16)
-    expect(criterion?.kind).toBe('blocked')
+    expect(criterion?.kind).toBe('automated')
+    expect(criterion?.passed).toBe(true)
+    // The evidence must still name the periods, because the criterion is about
+    // what the tool keeps — "enforced" with no figures is not evidence.
+    expect(criterion?.evidence).toMatch(/30 days/)
+    expect(criterion?.evidence).toMatch(/two years/)
+    expect(criterion?.evidence).toMatch(/24 hours/)
     expect(criterion?.evidence).toMatch(/§22\.1/)
   })
 })
@@ -58,10 +73,10 @@ describe('the summary', () => {
     expect(summary.outcomes.map((item) => item.id)).toEqual(
       Array.from({ length: 18 }, (_, index) => index + 1)
     )
-    expect(summary.automatedTotal).toBe(16)
-    expect(summary.automatedPassing).toBe(16)
+    expect(summary.automatedTotal).toBe(17)
+    expect(summary.automatedPassing).toBe(17)
     expect(summary.manual).toBe(1)
-    expect(summary.blocked).toBe(1)
+    expect(summary.blocked).toBe(0)
 
     // The field is named for what it means. `automatedClean` is not "ready".
     expect(summary.automatedClean).toBe(true)

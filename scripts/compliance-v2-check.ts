@@ -21,12 +21,34 @@ import {
   LEGAL_PROPOSITIONS,
 } from '../src/lib/compliance-v2/legal-content/propositions'
 import { hasCorpus, verifyCitation } from '../src/lib/rulepack/corpus'
+import { RETENTION_BY_ID } from '../src/lib/compliance-v2/retention'
+import { CAPTURE_TTL_SECONDS } from '../src/lib/report/capture'
 
 function main() {
   assertCatalogueValid()
   assertPropositionsValid()
 
   const failures: string[] = []
+
+  /**
+   * The one retention assertion that cannot live in a test.
+   *
+   * `src/lib/report/capture.ts` starts with `import 'server-only'`, which throws
+   * under vitest, so `retention.test.ts` asserts the report and session periods
+   * and leaves this one here — this script runs under the scripts tsconfig that
+   * shims that specifier away. The recorded §22.1 policy and the TTL the code
+   * actually applies must not drift: the first is what a privacy notice
+   * promises, the second is what happens.
+   */
+  const emailRetention = RETENTION_BY_ID.get('report-email')
+  if (!emailRetention) {
+    failures.push('retention policy has no entry for the report email')
+  } else if (emailRetention.seconds !== CAPTURE_TTL_SECONDS) {
+    failures.push(
+      `retention policy says the report email is kept ${emailRetention.seconds}s ` +
+        `(${emailRetention.period}) but CAPTURE_TTL_SECONDS is ${CAPTURE_TTL_SECONDS}s`
+    )
+  }
 
   for (const proposition of LEGAL_PROPOSITIONS) {
     const article = proposition.corpusArticle
@@ -54,12 +76,30 @@ function main() {
   }
 
   if (failures.length) {
-    console.error('Compliance Checker v2 legal content failed verification:')
+    console.error('Compliance Checker v2 failed verification:')
     for (const failure of failures) console.error(`  ✗ ${failure}`)
-    console.error(
-      '\nAn extract must be a contiguous verbatim run of the consolidated text.\n' +
-        'If a passage needs cutting to be quotable, quote the shorter part.'
-    )
+    /**
+     * Advice that matches the failure.
+     *
+     * This epilogue used to print the extract guidance unconditionally, so a
+     * retention drift was answered with "an extract must be a contiguous
+     * verbatim run of the consolidated text" — true, and about something else
+     * entirely. The script checks two unrelated things now; the hint has to know
+     * which one broke.
+     */
+    if (failures.some((failure) => failure.startsWith('retention policy'))) {
+      console.error(
+        '\nThe recorded §22.1 retention policy and the TTL the code applies have\n' +
+          'diverged. src/lib/compliance-v2/retention.ts is what a privacy notice\n' +
+          'promises; the TTL constant is what happens. Change both, deliberately.'
+      )
+    }
+    if (failures.some((failure) => !failure.startsWith('retention policy'))) {
+      console.error(
+        '\nAn extract must be a contiguous verbatim run of the consolidated text.\n' +
+          'If a passage needs cutting to be quotable, quote the shorter part.'
+      )
+    }
     process.exit(1)
   }
 

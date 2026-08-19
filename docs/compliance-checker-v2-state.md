@@ -76,8 +76,10 @@ the flag on.
    never `prohibited` — do not add that classification without counsel.
 2. **No model call and no email send.** The prose contract, the verifier and the
    consent model are built and tested against a stub model; nothing calls a real
-   one. There is no mail sender in this codebase, and §22.1's retention decision
-   is open — the spec says not to invent one.
+   one, and no v2 route exists to call it from. There is still no mail sender in
+   this codebase. §22.1 is now decided, so the store's retention number is no
+   longer the blocker it was — **wiring the report lane is the next block of
+   work**.
 3. **The GDPR overlay cites nothing.** Phase 7 is built, but §11.3 permits a
    specific data-protection duty only where "a separately approved GDPR
    proposition" establishes one — and there are none. There is no pinned GDPR
@@ -87,13 +89,13 @@ the flag on.
    Authoring GDPR propositions would need a pinned, hashed corpus first. Until
    then the absence is deliberate, and `verifyReport` enforces it.
 4. **Phase 8's harness is built; the release is not taken.** As of 2026-08-19:
-   16 of §20's 18 criteria are automated and passing, criterion 14 needs a
-   person to look at a screen, and criterion 16 is *blocked* on §22.1 and §22.2.
-   Shadow mode reports no unexplained divergence. Accessibility is clean. What
-   remains is not code: **counsel review of the decision matrix**, **usability
-   testing with users who do not know legal terminology or their own financial
-   figures** (§17.5), and **the retention and marketing decisions**. v2 stays
-   behind the flag until those land.
+   **17 of §20's 18 criteria are automated and passing, and nothing is blocked**
+   — §22.1 and §22.2 were decided that day, which is what freed criterion 16.
+   Criterion 14 still needs a person to look at a screen. Shadow mode reports no
+   unexplained divergence. Accessibility is clean. What remains is not code:
+   **counsel review of the decision matrix** and **usability testing with users
+   who do not know legal terminology or their own financial figures** (§17.5).
+   v2 stays behind the flag until those land.
 5. **Both role paths are complete for the Articles the corpus holds; the corpus
    still is not the Regulation.** The provider emits Chapter III Section 2 in
    full (Articles 9, 10, 11, 12, 14, 15, 16, 17 and 19), with Article 49
@@ -122,13 +124,20 @@ handed no classification, no roles and no findings — and its findings carry no
 Act role. Both are how "GDPR cannot change the AI Act classification" is made
 structural rather than asserted.
 
-Open (spec §22, four remaining) — **do not guess these**:
+Also taken, 2026-08-19 (spec §23.3, resolving §22.1 and §22.2): **retention is
+v1's three periods adopted explicitly** — a generated report 30 days, the email
+and its consent record two years, an in-progress assessment 24 hours — and **the
+report email is delivery-only**, with marketing a separate, unticked consent.
+`compliance-v2/retention.ts` is the decision record; it is *not* the
+configuration, and tests assert it agrees with the TTLs the code applies. This is
+what unblocked release criterion 16.
 
-1. Session and generated-report retention periods.
-2. Whether the report-request email may also be used for marketing. The
-   implementation treats it as delivery only, which is the spec's default.
-3. Whether anonymous browser-session recovery is wanted.
-4. Whether and when external EU AI Act counsel reviews the decision matrix, and
+Open (spec §22, two remaining) — **do not guess these**:
+
+1. Whether anonymous browser-session recovery is wanted. Deliberately not
+   resolved by lengthening the 24-hour session: recovery is a feature to decide
+   on, not a side effect of a retention number.
+2. Whether and when external EU AI Act counsel reviews the decision matrix, and
    the final editorial wording of the disclaimer and privacy notice.
 
 ## The thing most likely to be got wrong by a new session

@@ -1270,8 +1270,8 @@ Implementation should use small, reviewable changes. Legal-content additions and
 
 These must not be guessed during implementation:
 
-1. Session and generated-report retention periods.
-2. Whether the report-request email may also be used for marketing; default implementation must treat it as report delivery only.
+1. ~~Session and generated-report retention periods.~~ **Resolved 2026-08-19: v1's periods, adopted explicitly.** See §23.3.
+2. ~~Whether the report-request email may also be used for marketing; default implementation must treat it as report delivery only.~~ **Resolved 2026-08-19: delivery only.** See §23.3.
 3. Whether anonymous browser-session recovery is desired.
 4. Whether and when external EU AI Act counsel will review the decision matrix.
 5. The final editorial wording of the disclaimer and privacy notice.
@@ -1311,6 +1311,44 @@ a v1 kind without deciding its v2 meaning fails to compile. Two consequences:
 This keeps Phase 8's shadow comparison honest — a v1 result and a v2 result can
 be compared without a lossy translation between two sets of words for the same
 distinctions.
+
+### 23.3 Retention periods and marketing use (2026-08-19, resolving §22.1 and §22.2)
+
+**Decision: adopt the three periods v1 already runs, explicitly, and keep the
+report email to delivery use.** Taken by the owner on 2026-08-19, which unblocked
+release criterion 16 — the last criterion that could not be assessed.
+
+| What is kept | Period | Where the behaviour lives |
+|---|---|---|
+| A generated report and the answers behind it | 30 days | `REPORT_TTL_SECONDS` |
+| The email address and its consent record | two years | `CAPTURE_TTL_SECONDS` |
+| An in-progress assessment | 24 hours | `CHECKER_SESSION_TTL_SECONDS` |
+
+Marketing is a separate consent, offered separately, defaulting to false, with
+the wording shown recorded alongside it. `report/consent.ts` already made the
+alternative unrepresentable; what was missing was the decision that the
+implementation's default is also the *policy*.
+
+Three consequences worth not undoing:
+
+- **The decision record is not the configuration.** `compliance-v2/retention.ts`
+  holds the policy — what a privacy notice promises — and nothing reads it to
+  decide how long to keep anything; v1's constants still do that. The two are
+  asserted to agree, so the promise and the behaviour cannot drift apart
+  silently. This is the same arrangement the regulatory lane uses against the
+  rule pack: assert consistency, never share storage.
+- **The agreement is checked in two places because it has to be.**
+  `retention.test.ts` covers the report and session periods. The email period
+  lives in `report/capture.ts`, which is `server-only` and therefore throws under
+  vitest, so that one is asserted in `scripts/compliance-v2-check.ts` — which
+  `prebuild` runs. The check is not skipped; it is somewhere that can run it.
+- **Adopting is not inheriting.** §22.1 was held open precisely because copying a
+  constant makes it policy by default, and a period nobody chose is not a promise
+  anybody can defend. Each period carries its reasoning in the record.
+
+§22.3 (anonymous session recovery) stays open, and deliberately was not resolved
+by lengthening the session period — recovery is a feature to decide on, not a
+side effect of a retention number.
 
 ### 23.2 v2 ships as an extended opt-in beta (2026-08-18, resolving §22.6)
 

@@ -5,6 +5,7 @@ import { PROPOSITION_BY_ID } from '../legal-content/propositions'
 import { RESULT_SECTIONS, groupFindings } from '../result-sections'
 import { emptyProse } from '../report/schema'
 import { buildConsent } from '../report/consent'
+import { MARKETING_USE, RETENTION } from '../retention'
 import { GOLDEN_SCENARIOS } from '../test-fixtures/golden-scenarios'
 import { evaluateAssessmentV2 } from '../engine/assemble'
 
@@ -296,6 +297,70 @@ const AUTOMATED = [
     }
   }),
 
+  automated(
+    16,
+    'Privacy-safe analytics and data-minimisation rules are enforced.',
+    (samples) => {
+      /**
+       * This was `blocked` until 2026-08-19, and the reason it was blocked is
+       * worth keeping: §22.1 and §22.2 were open product decisions, and a
+       * criterion about what the tool keeps cannot pass while nobody has said
+       * what it keeps. The owner decided both on 2026-08-19 — adopt v1's
+       * periods explicitly, marketing separate and off — and
+       * `compliance-v2/retention.ts` is that decision written down.
+       *
+       * What is checked here is not "a constant exists". It is the three things
+       * that would make the decision meaningless if they stopped holding:
+       *
+       * 1. Every period is recorded, positive and finite. An unbounded
+       *    retention is the failure this criterion is about.
+       * 2. The report email is not in the answer record — so it cannot reach a
+       *    model prompt by mistake. That is structural rather than enforced:
+       *    `AnswerRecordV2` has no field for it.
+       * 3. No answer value looks like an email address. Free-text answers are
+       *    carried in `value` and are passed to the model, and §13.3 warns users
+       *    not to type identifiable data into them; this asserts the golden
+       *    corpus does not itself ship an address as a fixture.
+       *
+       * Analytics remain unwired, and that is now a true statement about
+       * minimisation rather than an absence of evidence: there is no v2
+       * analytics call to audit because there is no v2 analytics call.
+       */
+      const failures: string[] = []
+
+      for (const policy of RETENTION) {
+        if (!(policy.seconds > 0) || !Number.isFinite(policy.seconds)) {
+          failures.push(`retention:${policy.id}`)
+        }
+      }
+
+      if (MARKETING_USE.permitted !== false) failures.push('marketing-use')
+
+      const EMAILISH = /[\w.+-]+@[\w-]+\.[\w.]+/
+      for (const sample of samples) {
+        for (const answer of Object.values(sample.answers)) {
+          const values = Array.isArray(answer.value) ? answer.value : [answer.value]
+          if (values.some((value) => typeof value === 'string' && EMAILISH.test(value))) {
+            failures.push(sample.id)
+            break
+          }
+        }
+      }
+
+      return {
+        failures,
+        evidence:
+          `§22.1 and §22.2 are recorded in compliance-v2/retention.ts (decided ${MARKETING_USE.decidedOn}): ` +
+          `${RETENTION.map((policy) => `${policy.id} ${policy.period}`).join(', ')}; the report email is ` +
+          'delivery-only with marketing a separate, unticked consent. Those periods are asserted against the ' +
+          'TTLs the code applies — REPORT_TTL_SECONDS and CHECKER_SESSION_TTL_SECONDS in retention.test.ts, ' +
+          'CAPTURE_TTL_SECONDS in scripts/compliance-v2-check.ts, which prebuild runs. Data minimisation is ' +
+          'structural: AnswerRecordV2 has no email field, so an address cannot reach a model prompt, and no ' +
+          `answer value across ${samples.length} golden scenarios looks like one. No analytics are wired into v2.`,
+      }
+    }
+  ),
+
   automated(17, 'The result displays assessment date, checker version and rulepack version.', (samples) => {
     const failures = samples
       .filter(
@@ -341,13 +406,6 @@ const NOT_AUTOMATED: Array<Omit<CriterionOutcome, 'passed' | 'failures'>> = [
     kind: 'manual',
     evidence:
       'Structurally true — `evaluateAssessmentV2` is a pure function of the answers and needs no address, and there is no email field in AnswerRecordV2 — but "available before the gate" is a claim about a screen. Verified by browser walk-through on 2026-08-18 and 2026-08-19: the full result renders with no email asked for at any point. Re-verify whenever the report gate is wired, which is when it could regress.',
-  },
-  {
-    id: 16,
-    text: 'Privacy-safe analytics and data-minimisation rules are enforced.',
-    kind: 'blocked',
-    evidence:
-      'No analytics are wired into v2 at all, so there is nothing to assess. Data minimisation is partly structural already — the email address is not in AnswerRecordV2, so it cannot reach a model prompt — but §22.1 and §22.2 (retention periods, marketing use) are open product decisions, and this criterion cannot pass until they are recorded.',
   },
 ]
 
