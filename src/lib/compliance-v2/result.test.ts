@@ -311,6 +311,36 @@ describe('finding cards (§12.2)', () => {
     }
   })
 
+  /**
+   * The cards render plain text, not markdown.
+   *
+   * Added 2026-08-19 after a browser walk-through showed `*before*` on an
+   * Article 26(7) card as three literal characters and a word. It reads as a
+   * typo on a page whose whole claim is care, and nothing in the type system or
+   * the test suite noticed — the string was valid, it just was not prose.
+   */
+  it('no finding smuggles markdown emphasis into prose the card renders literally', () => {
+    const emphasis = /(^|\s)[*_][^*_\s][^*_]*[*_](\s|$|[.,;])/
+    for (const result of allResults()) {
+      const findings = [
+        ...result.legalFindings,
+        ...result.readinessFindings,
+        ...(result.gdprOverlay?.findings ?? []),
+      ]
+      for (const finding of findings) {
+        for (const [field, text] of [
+          ['title', finding.title],
+          ['whyItApplies', finding.whyItApplies],
+          ['practicalMeaning', finding.practicalMeaning],
+          ['action', finding.action],
+          ...finding.evidenceToKeep.map((item, index) => [`evidenceToKeep[${index}]`, item] as const),
+        ] as const) {
+          expect(emphasis.test(text), `${finding.id}.${field}: "${text}"`).toBe(false)
+        }
+      }
+    }
+  })
+
   it('a recommendation never claims to be quoting the Regulation', () => {
     for (const result of allResults()) {
       for (const finding of result.readinessFindings) {

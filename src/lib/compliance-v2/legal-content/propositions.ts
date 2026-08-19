@@ -92,6 +92,262 @@ const AI_ACT = {
 
 export const LEGAL_PROPOSITIONS: LegalProposition[] = [
   {
+    id: 'prop-art-26-1-instructions-for-use',
+    ruleId: 'high-risk-deployer-duties',
+    ...AI_ACT,
+    provision: 'Article 26(1)',
+    corpusArticle: '26',
+    applicableRoles: ['deployer'],
+    conditions: [
+      'The system is high-risk.',
+      'Your organisation deploys it under its own authority.',
+    ],
+    exceptions: [
+    ],
+    effectiveFrom: '2027-12-02',
+    plainEnglishSummary:
+      'A deployer takes appropriate technical and organisational measures to ensure the system is used in accordance with the instructions for use that came with it.',
+    practicalMeaning:
+      'The duty is to use it as instructed, which presupposes having the instructions and having read them. Article 13 makes producing them the provider’s duty; acting on them is yours, and a deployment that departs from them is a deployment outside this paragraph.',
+    shortExtract:
+      'Deployers of high-risk AI systems shall take appropriate technical and organisational measures to ensure they use such systems in accordance with the instructions for use accompanying the systems',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-26',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT_2026_08_19,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-26-2-human-oversight-assignment',
+    ruleId: 'high-risk-deployer-duties',
+    ...AI_ACT,
+    provision: 'Article 26(2)',
+    corpusArticle: '26',
+    applicableRoles: ['deployer'],
+    conditions: [
+      'The system is high-risk.',
+      'Your organisation deploys it under its own authority.',
+    ],
+    exceptions: [
+    ],
+    effectiveFrom: '2027-12-02',
+    plainEnglishSummary:
+      'A deployer assigns human oversight to named people who have the competence, training, authority and support to exercise it.',
+    practicalMeaning:
+      'Four things, and the last two are where this usually fails. Someone with the competence but no authority to overrule the system is not oversight; nor is someone with the authority but no time. This is the duty that decides whether the oversight your provider designed actually happens.',
+    shortExtract:
+      'Deployers shall assign human oversight to natural persons who have the necessary competence, training and authority, as well as the necessary support.',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-26',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT_2026_08_19,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-26-4-input-data-control',
+    ruleId: 'high-risk-deployer-duties',
+    ...AI_ACT,
+    provision: 'Article 26(4)',
+    corpusArticle: '26',
+    applicableRoles: ['deployer'],
+    conditions: [
+      'The system is high-risk.',
+      'The deployer exercises control over the input data.',
+    ],
+    exceptions: [
+      'The duty reaches only so far as that control extends.',
+    ],
+    effectiveFrom: '2027-12-02',
+    plainEnglishSummary:
+      'Where a deployer controls the input data, it ensures that data is relevant and sufficiently representative for what the system is meant to do.',
+    practicalMeaning:
+      'A conditional duty, and the condition is one only you can answer: it bites to the extent you choose what goes in. Feeding a recruitment model your own historic hiring data is exercising that control, and the representativeness of that data becomes your problem rather than the provider’s.',
+    shortExtract:
+      'to the extent the deployer exercises control over the input data, that deployer shall ensure that input data is relevant and sufficiently representative in view of the intended purpose of the high-risk AI system',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-26',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT_2026_08_19,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-26-5-monitoring-and-incidents',
+    ruleId: 'high-risk-deployer-duties',
+    ...AI_ACT,
+    provision: 'Article 26(5)',
+    corpusArticle: '26',
+    applicableRoles: ['deployer'],
+    conditions: [
+      'The system is high-risk.',
+      'Your organisation deploys it under its own authority.',
+    ],
+    exceptions: [
+      'A deployer that is a financial institution may satisfy the monitoring limb through its internal governance arrangements under Union financial services law.',
+      'The duty does not cover sensitive operational data of deployers that are law enforcement authorities.',
+    ],
+    effectiveFrom: '2027-12-02',
+    plainEnglishSummary:
+      'A deployer monitors the system in operation, tells the provider when something goes wrong, and suspends use where the system presents a risk.',
+    practicalMeaning:
+      'Three duties in one paragraph, and the third has teeth: where you have reason to think use in accordance with the instructions may present a risk, you inform the provider or distributor and the market surveillance authority without undue delay, and you suspend use. A serious incident is reported immediately, to the provider first.',
+    shortExtract:
+      'Deployers shall monitor the operation of the high-risk AI system on the basis of the instructions for use and, where relevant, inform providers in accordance with Article 72.',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-26',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT_2026_08_19,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-26-7-inform-workers',
+    ruleId: 'high-risk-deployer-duties',
+    ...AI_ACT,
+    provision: 'Article 26(7)',
+    corpusArticle: '26',
+    applicableRoles: ['deployer'],
+    conditions: [
+      'The system is high-risk.',
+      'The deployer is an employer.',
+      'The system is put into service or used at the workplace.',
+    ],
+    exceptions: [
+    ],
+    effectiveFrom: '2027-12-02',
+    plainEnglishSummary:
+      'An employer deploying a high-risk system at the workplace informs workers’ representatives and the affected workers before it is put into service or used.',
+    practicalMeaning:
+      'Before, not after. The timing is the substance — telling people once a system is already scoring them is not what the paragraph asks for. Where national law and practice lay down consultation procedures, this is done through them.',
+    shortExtract:
+      'Before putting into service or using a high-risk AI system at the workplace, deployers who are employers shall inform workers’ representatives and the affected workers that they will be subject to the use of the high-risk AI system.',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-26',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT_2026_08_19,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-26-8-public-authority-registration',
+    ruleId: 'high-risk-deployer-duties',
+    ...AI_ACT,
+    provision: 'Article 26(8)',
+    corpusArticle: '26',
+    applicableRoles: ['deployer'],
+    conditions: [
+      'The system is high-risk.',
+      'The deployer is a public authority, or a Union institution, body, office or agency.',
+    ],
+    exceptions: [
+    ],
+    effectiveFrom: '2027-12-02',
+    plainEnglishSummary:
+      'A public-authority deployer complies with the Article 49 registration obligations, and does not use a system it finds is unregistered.',
+    practicalMeaning:
+      'The second half is the unusual one: on finding the system is not in the EU database, you do not use it, and you tell the provider or distributor. That is a stop condition rather than a filing task.',
+    shortExtract:
+      'Deployers of high-risk AI systems that are public authorities, or Union institutions, bodies, offices or agencies shall comply with the registration obligations referred to in Article 49.',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-26',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT_2026_08_19,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-26-9-dpia-information',
+    ruleId: 'high-risk-deployer-duties',
+    ...AI_ACT,
+    provision: 'Article 26(9)',
+    corpusArticle: '26',
+    applicableRoles: ['deployer'],
+    conditions: [
+      'The system is high-risk.',
+      'A data protection impact assessment is required of the deployer.',
+    ],
+    exceptions: [
+    ],
+    effectiveFrom: '2027-12-02',
+    plainEnglishSummary:
+      'Where a deployer has to carry out a data protection impact assessment, it uses the Article 13 information the provider supplied to do it.',
+    practicalMeaning:
+      'This is the Regulation pointing at data protection law rather than duplicating it. It is worth knowing about because it makes the provider’s documentation an input to a duty you owe under a different regime — and because it means asking for that documentation late costs you twice.',
+    shortExtract:
+      'deployers of high-risk AI systems shall use the information provided under Article 13 of this Regulation to comply with their obligation to carry out a data protection impact assessment',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-26',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT_2026_08_19,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-26-10-post-remote-biometric-authorisation',
+    ruleId: 'high-risk-deployer-duties',
+    ...AI_ACT,
+    provision: 'Article 26(10)',
+    corpusArticle: '26',
+    applicableRoles: ['deployer'],
+    conditions: [
+      'The system is a high-risk post-remote biometric identification system.',
+      'It is used in an investigation for the targeted search of a person suspected or convicted of a criminal offence.',
+    ],
+    exceptions: [
+      'Initial identification of a potential suspect based on objective and verifiable facts directly linked to the offence.',
+    ],
+    effectiveFrom: '2027-12-02',
+    plainEnglishSummary:
+      'A deployer of a post-remote biometric identification system requests authorisation from a judicial or binding administrative authority, in advance or within 48 hours.',
+    practicalMeaning:
+      'Distinct from the Article 5(1)(h) prohibition, which is about identification happening in real time. This paragraph governs identification against stored material after the event, and it carries its own consequences: a refused authorisation stops the use immediately and the linked personal data is deleted.',
+    shortExtract:
+      'the deployer of a high-risk AI system for post-remote biometric identification shall request an authorisation, ex ante, or without undue delay and no later than 48 hours, by a judicial authority or an administrative authority whose decision is binding and subject to judicial review, for the use of that system',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-26',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT_2026_08_19,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-26-11-inform-affected-persons',
+    ruleId: 'high-risk-deployer-duties',
+    ...AI_ACT,
+    provision: 'Article 26(11)',
+    corpusArticle: '26',
+    applicableRoles: ['deployer'],
+    conditions: [
+      'The system is listed in Annex III.',
+      'It makes decisions about natural persons, or assists in making them.',
+    ],
+    exceptions: [
+      'For systems used for law enforcement purposes, Article 13 of Directive (EU) 2016/680 applies instead.',
+    ],
+    effectiveFrom: '2027-12-02',
+    plainEnglishSummary:
+      'A deployer of an Annex III system that decides, or helps decide, things about people tells those people they are subject to it.',
+    practicalMeaning:
+      'Separate from the Article 50 transparency duties and owed in addition to them. "Assists in making" is deliberately wide — a system that produces a recommendation a person then acts on is within it.',
+    shortExtract:
+      'deployers of high-risk AI systems referred to in Annex III that make decisions or assist in making decisions related to natural persons shall inform the natural persons that they are subject to the use of the high-risk AI system.',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-26',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT_2026_08_19,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-26-12-cooperate-with-authorities',
+    ruleId: 'high-risk-deployer-duties',
+    ...AI_ACT,
+    provision: 'Article 26(12)',
+    corpusArticle: '26',
+    applicableRoles: ['deployer'],
+    conditions: [
+      'The system is high-risk.',
+      'Your organisation deploys it under its own authority.',
+    ],
+    exceptions: [
+    ],
+    effectiveFrom: '2027-12-02',
+    plainEnglishSummary:
+      'A deployer cooperates with the competent authorities in any action they take about the system.',
+    practicalMeaning:
+      'Nothing to do in advance, and it is listed because it shapes what happens when you are contacted rather than what you build now. Knowing who in your organisation would answer is the whole of the preparation it warrants.',
+    shortExtract:
+      'Deployers shall cooperate with the relevant competent authorities in any action those authorities take in relation to the high-risk AI system in order to implement this Regulation.',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-26',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT_2026_08_19,
+    reviewStatus: 'internal',
+  },
+  {
     id: 'prop-art-9-risk-management',
     ruleId: 'high-risk-provider-duties',
     ...AI_ACT,

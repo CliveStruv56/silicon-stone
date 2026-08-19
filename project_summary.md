@@ -2,7 +2,7 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-08-19
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (99 static pages), 1,020 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (99 static pages), 1,025 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
@@ -465,6 +465,50 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 19, 2026 — Compliance Checker v2: the deployer's side of Article 26
+
+The gap the provider work exposed, one role over. A high-risk **deployer** was
+told it owed two things — the Article 26(6) log-retention duty and a supplier-side
+Article 13 item — when Article 26 contains eleven operative paragraphs addressed
+to it. All eleven now emit. 1,025 tests green.
+
+**No pack bump was needed, and that is worth noticing.** Article 26 has been in
+the corpus in full since the first extraction; what was missing was the
+propositions and the findings, which live in TypeScript. Ten new propositions,
+every extract verbatim against the pinned text on the first run. Not every gap of
+this shape needs a new pack version — check the corpus before assuming one does.
+
+**Five of the eleven are typed `conditional_obligation`, deliberately.** Article
+26 addresses deployers generally, but paragraphs 4, 7, 8, 9 and 10 each turn on a
+fact the questionnaire never asks: whether you control the input data, whether
+you are an employer, whether you are a public authority, whether a data
+protection impact assessment is required of you. Emitting them flat would assert
+things about the reader nobody established; omitting them would hide duties most
+deployers do owe. Each card leads with its condition. Article 26(3) emits
+nothing — it is a without-prejudice clause and states no duty.
+
+**Article 26(10) is gated on the biometrics route.** It governs *post*-remote
+biometric identification; Article 5(1)(h) governs the real-time case. Different
+provisions, different consequences, and a test asserts an employment deployer
+never sees it.
+
+**A caveat finding replaces the one the provider path shed**, naming Article 27
+above all: the fundamental rights impact assessment falls on public bodies,
+private entities providing public services, and deployers of the Annex III
+5(b)/5(c) credit and insurance systems — a set that overlaps heavily with this
+tool's readers, and one the corpus cannot quote. It goes the way the provider
+caveat went: deleted when the corpus catches up, not tidied away before.
+
+**The browser walk caught three things no test would have.** `*before*` rendered
+on a card as three literal characters and a word — the cards are plain text, not
+markdown. A sweep found two more, one of them in the GDPR overlay from Phase 7,
+and there is now a test that fails on markdown emphasis in any field a card
+renders. Ten propositions authored today were inheriting the 2026-08-18 review
+date and claiming they were "last checked" a day before they were written. And
+the result footer's inline provisions link was distinguished by colour alone,
+which axe flags as `link-in-text-block` — a WCAG 1.4.1 failure that had regressed
+the a11y run from clean.
 
 ### August 19, 2026 — rule pack `2026-08-19`: five Articles, and a caveat deleted
 

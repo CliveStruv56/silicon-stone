@@ -198,7 +198,17 @@ export function ResultV2({ result }: { result: ComplianceResultV2 }) {
           the ones this assessment cites, not the whole instrument. Every quotation above is matched
           against that text before it is shown, which is also why a duty the pack cannot quote does
           not appear here at all. You can{' '}
-          <Link href="/tools/compliance-checker/provisions" className="text-stone-teal hover:underline">
+          {/*
+            Underlined always, not only on hover. A link sitting inside a
+            paragraph and distinguished by colour alone fails WCAG 1.4.1 — axe
+            flags it as `link-in-text-block`, and `npm run checker-v2:a11y`
+            caught it here. The standalone links elsewhere on this page are fine
+            because they are not inside a block of text.
+          */}
+          <Link
+            href="/tools/compliance-checker/provisions"
+            className="text-stone-teal underline underline-offset-2"
+          >
             read what it holds
           </Link>
           .

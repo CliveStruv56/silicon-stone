@@ -213,6 +213,32 @@ because a caveat that no longer bites is worse than none — its surviving idea,
 the pack holds the provisions this tool cites rather than the Regulation, is said
 once in the result footer instead. Do not reintroduce it as a finding.
 
+**The high-risk deployer path emits the whole of Article 26**, as of 2026-08-19 —
+all eleven operative paragraphs. Before that it was two findings. Five of them
+(26(4), (7), (8), (9), (10)) are `conditional_obligation` because each turns on a
+fact the questionnaire never asks — input-data control, being an employer, being
+a public authority, owing a data protection impact assessment. Do not promote
+them to flat duties: that asserts things about the reader nobody established.
+26(3) emits nothing; it is a without-prejudice clause. 26(10) is gated on the
+biometrics route because it governs *post*-remote identification, where Article
+5(1)(h) governs the real-time case.
+
+**The deployer path carries the caveat the provider path shed**, naming Article
+27's fundamental rights impact assessment — which falls on public bodies, private
+entities providing public services, and Annex III 5(b)/5(c) credit and insurance
+deployers, and which the corpus cannot quote. Same rule as before: deleted when
+the corpus catches up, not tidied away first.
+
+**Check the corpus before assuming a gap needs a pack bump.** Article 26 was
+completed with no version change at all — the text had been pinned since the
+first extraction, and only the propositions and findings were missing.
+
+**Cards render plain text, not markdown.** `*emphasis*` in a finding's `title`,
+`whyItApplies`, `practicalMeaning`, `action` or `evidenceToKeep` reaches the
+reader as literal asterisks. `result.test.ts` fails on it. The test exists
+because three had already shipped, one of them since Phase 7 — and because a
+browser walk-through, not the suite, is what noticed.
+
 **Article 43 is a procedure, not a duty, and is emitted from its own module**
 (`engine/article-43.ts`, shaped like `article-50.ts`). Three routes: Annex I
 sectoral (43(3), checked first — its fourth subparagraph settles the overlap with

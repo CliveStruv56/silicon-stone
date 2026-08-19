@@ -236,7 +236,7 @@ export function evaluateGdprAiOverlay(answers: AnswerRecordV2): GdprAiOverlayRes
         meaning:
           'For the sensitive categories, an ordinary lawful basis is not enough on its own — a further, narrower condition has to be met before the data may be used at all, and the analysis has to be done before the processing starts rather than after a question is raised. Data about children attracts additional expectations about how clearly things are explained and how much is collected.',
         action:
-          'Confirm with whoever owns data protection that a specific condition has been identified for each of these categories, and that it was identified for *this* use of the data rather than for the original collection.',
+          'Confirm with whoever owns data protection that a specific condition has been identified for each of these categories, and that it was identified for this use of the data rather than for the collection it was originally gathered under.',
         evidence: [
           'The written analysis identifying the condition relied on for each sensitive category.',
         ],

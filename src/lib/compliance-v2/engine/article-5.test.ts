@@ -6,7 +6,7 @@ import { evaluateAssessmentV2 } from './assemble'
 import { QUESTION_BY_ID, visibleQuestions } from '../questions'
 import { ARTICLE_5_CONDITION_QUESTIONS } from '../questions/article-5-conditions'
 import { LEGAL_PROPOSITIONS } from '../legal-content/propositions'
-import { GOLDEN_SCENARIOS, answered, record, scenario, unknown } from '../test-fixtures/golden-scenarios'
+import { GOLDEN_SCENARIOS, record, scenario, unknown } from '../test-fixtures/golden-scenarios'
 
 /**
  * §7.6 — the per-practice condition trees.

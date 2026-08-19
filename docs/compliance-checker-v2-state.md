@@ -12,6 +12,11 @@ This is the one-page orientation. The plan of record is
 > the whole of Chapter III Section 2. `docs/rulepack-article-expansion-handoff.md`
 > was the brief and is now history; the procedure it describes is live as
 > `npm run rulepack:fetch-article`.
+>
+> **And the deployer path followed, same evening** — all eleven operative
+> paragraphs of Article 26, with **no pack bump**, because that text had been
+> pinned since the first extraction. Check the corpus before assuming a gap of
+> this shape needs a new version.
 
 ---
 
@@ -35,7 +40,7 @@ decision.
 | `conditions.ts` | Branch conditions as **data**, and their evaluator |
 | `questions/` | 80 questions: core triage (§7.2), role (§7.3), Annex III branches (§7.4), Annex I + Article 5 screen, transparency + Article 6(3), organisation size, 23 Article 5 per-practice condition questions (§7.6), the one Article 43 standards question, and ten optional data-protection questions (§11.2) |
 | `engine/` | `scope`, `roles`, `organisation-size`, `annex-routes`, `article-5`, `article-43`, `article-50`, `classify`, `findings`, `dates`, `gdpr-ai`, `assemble` |
-| `legal-content/propositions.ts` | 42 curated propositions, every extract corpus-verified at build time |
+| `legal-content/propositions.ts` | 52 curated propositions, every extract corpus-verified at build time |
 | `report/` | `deterministic`, `schema`, `verify` (§14.4), `generate`, `consent` |
 | `result-sections.ts` | §12.1's sections, the hide-empties rule, and `resultBlocks()` — which puts the GDPR overlay in §12.1's seventh slot without folding it into a finding-kind bucket |
 | `flow.ts` | Questionnaire navigation and answer invalidation |
@@ -81,15 +86,23 @@ the flag on.
    testing with users who do not know legal terminology or their own financial
    figures** (§17.5), and **the retention and marketing decisions**. v2 stays
    behind the flag until those land.
-5. **The provider path is complete; the corpus still is not the Regulation.**
-   Chapter III Section 2 is emitted in full (Articles 9, 10, 11, 12, 14, 15, 16,
-   17 and 19), with Article 49 registration and Article 43's conformity
-   assessment. The caveat finding that admitted the earlier omission is deleted;
-   what survives is one line in the result footer saying the pack pins the
-   provisions this tool cites rather than the whole instrument. **The deployer
-   path has not had the same treatment** — it emits Article 26(6) and the
-   supplier-side Article 13 item, and the rest of Article 26 is not in the pack.
-   That is the next gap of this shape, and it is not yet approved.
+5. **Both role paths are complete for the Articles the corpus holds; the corpus
+   still is not the Regulation.** The provider emits Chapter III Section 2 in
+   full (Articles 9, 10, 11, 12, 14, 15, 16, 17 and 19), with Article 49
+   registration and Article 43's conformity assessment. The deployer emits all
+   eleven operative paragraphs of Article 26 — five of them
+   `conditional_obligation`, because Article 26 addresses deployers generally
+   while paragraphs 4, 7, 8, 9 and 10 each turn on a fact the questionnaire never
+   asks. The provider's caveat finding is deleted; what survives is one line in
+   the result footer.
+6. **Article 27 is the next gap of this shape, and is not approved.** The
+   fundamental rights impact assessment falls on public bodies, on private
+   entities providing public services, and on deployers of the Annex III 5(b) and
+   5(c) credit and insurance systems — a set that overlaps heavily with this
+   tool's readers. It is not in the corpus, so nothing can quote it, and a
+   finding on the deployer path says so. Articles 4 (AI literacy) and 86 (right
+   to an explanation) are outside the corpus too. Adding any of them is a pack
+   version bump; `docs/rulepack-article-expansion-handoff.md` is the procedure.
 
 ## Decisions taken, and decisions still open
 

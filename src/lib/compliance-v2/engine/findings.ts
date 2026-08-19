@@ -14,6 +14,7 @@ import { sizeReliefIsSettled } from './organisation-size'
 import { evaluateAnnexI, evaluateAnnexIII, evaluateArticle6Exemption } from './annex-routes'
 import { evaluateArticle5 } from './article-5'
 import { evaluateArticle50, routesOwedBy } from './article-50'
+import { includesAny } from './read'
 import { evaluateConformityAssessment, requiresReassessment } from './article-43'
 import type { ClassificationResult } from './classify'
 import { ANNEX_III_APPLIES, ANNEX_I_APPLIES, isInApplication, packDate } from './dates'
@@ -223,6 +224,246 @@ export function buildLegalFindings(context: FindingContext): ComplianceFindingV2
         confidence: classification.confidence,
       })
 
+      /**
+       * The rest of Article 26 (Chapter III, Section 3).
+       *
+       * Added 2026-08-19. Until then a high-risk *deployer* received exactly two
+       * findings — the Article 26(6) log-retention duty above and the
+       * supplier-side Article 13 item below — which is the same shape of gap the
+       * provider path had before rule pack `2026-08-19`: a role told it owes one
+       * thing when the Article addressed to it contains eleven.
+       *
+       * No pack bump was needed. Article 26 has been in the corpus in full since
+       * the first extraction; what was missing was the propositions and the
+       * findings, which live in TypeScript. That is worth noticing before
+       * assuming any future gap of this shape needs a new pack version.
+       *
+       * **Five of these are conditional, and are typed that way.** Article 26
+       * addresses deployers generally, but paragraphs 4, 7, 8, 9 and 10 each
+       * carry a condition the questionnaire does not establish — whether you
+       * control the input data, whether you are an employer, whether you are a
+       * public authority, whether a data protection impact assessment is
+       * required of you. Emitting them as flat duties would assert facts about
+       * the reader that nobody asked them. Emitting them not at all would hide
+       * duties most deployers do owe. `conditional_obligation` is the honest
+       * middle, and each card leads with the condition.
+       */
+      interface DeployerDuty {
+        id: string
+        propositionId: string
+        title: string
+        why: string
+        action: string
+        evidence: string[]
+        priority: ComplianceFindingV2['priority']
+        /** Conditional on a fact the questionnaire does not establish. */
+        conditional?: boolean
+        /** Where present, the finding is emitted only if this holds. */
+        when?: boolean
+      }
+
+      // Annex III point 1(a) is remote biometric identification. Article 26(10)
+      // governs the *post*-remote case; Article 5(1)(h) governs the real-time
+      // one, and they are different provisions with different consequences.
+      const postRemoteBiometrics = annexIII.routes.some((route) => route.annexPoint === '1(a)')
+
+      // Article 26(11) is owed where an Annex III system decides about people or
+      // helps decide. Both halves are answers we already hold, so this one is a
+      // duty rather than a conditional.
+      const decidesAboutPeople = includesAny(answers, 'individual_impact', [
+        'informs_human_decision',
+        'recommends_ranks_scores',
+        'determines_outcome',
+      ])
+      const annexIiiApplies =
+        annexIII.applicability === 'applies' || annexIII.applicability === 'likely_applies'
+
+      const DEPLOYER_DUTIES: DeployerDuty[] = [
+        {
+          id: 'art-26-1-instructions-for-use',
+          propositionId: 'prop-art-26-1-instructions-for-use',
+          title: 'Use the system the way its instructions say to',
+          why: 'You deploy this system under your own authority, so how it is used is your decision and your duty.',
+          action:
+            'Get the instructions for use from the provider first — Article 13 makes producing them their duty — then check that what your people actually do with the system matches them. A deployment that has drifted from the instructions is outside this paragraph.',
+          evidence: [
+            'The instructions for use as supplied, and a note of the measures you took to keep use within them.',
+          ],
+          priority: 'high',
+        },
+        {
+          id: 'art-26-2-human-oversight-assignment',
+          propositionId: 'prop-art-26-2-human-oversight-assignment',
+          title: 'Assign human oversight to named people who can actually exercise it',
+          why: 'You deploy this system under your own authority. The provider designs the oversight; assigning someone able to perform it is yours.',
+          action:
+            'Name them. Then check the two things that usually fail: whether they have the authority to overrule the system, and whether they have the time. Oversight nobody can exercise is oversight in name only.',
+          evidence: [
+            'Who holds the oversight role, what training they have had, and what authority they hold to depart from the system’s output.',
+          ],
+          priority: 'high',
+        },
+        {
+          id: 'art-26-5-monitoring-and-incidents',
+          propositionId: 'prop-art-26-5-monitoring-and-incidents',
+          title: 'Monitor it in use, and know who you tell when something goes wrong',
+          why: 'You deploy this system under your own authority, so you are the party who will see it misbehave first.',
+          action:
+            'Decide now who notices, who they tell, and who can stop the system — before you need the answer. Where use in accordance with the instructions may present a risk, the paragraph asks you to inform the provider and the market surveillance authority without undue delay and, separately, suspend use.',
+          evidence: [
+            'The monitoring arrangement, and a log of anything reported to the provider or an authority.',
+          ],
+          priority: 'high',
+        },
+        {
+          id: 'art-26-12-cooperate-with-authorities',
+          propositionId: 'prop-art-26-12-cooperate-with-authorities',
+          title: 'Cooperate with the competent authorities',
+          why: 'You deploy this system under your own authority, so an authority acting in relation to it will come to you.',
+          action:
+            'Nothing to build. Knowing who in your organisation would answer, and that they could find the material the other duties here ask you to keep, is the whole of the preparation this warrants.',
+          evidence: [],
+          priority: 'low',
+        },
+        {
+          id: 'art-26-4-input-data-control',
+          propositionId: 'prop-art-26-4-input-data-control',
+          title: 'If you choose the input data, its representativeness is yours',
+          why: 'This one is conditional, and only you can settle it: it applies to the extent your organisation controls what goes into the system.',
+          action:
+            'Establish whether you supply or select the input data. If you do — your own historic records, your own case files — its relevance and representativeness for this purpose become your problem rather than the provider’s.',
+          evidence: [
+            'A description of what data you supply, where it came from, and why it suits the system’s intended purpose.',
+          ],
+          priority: 'normal',
+          conditional: true,
+        },
+        {
+          id: 'art-26-7-inform-workers',
+          propositionId: 'prop-art-26-7-inform-workers',
+          title: 'If this is used at work, tell the workforce before it starts',
+          why: 'This one is conditional on two facts we have not asked you for: that your organisation is the employer, and that the system is used at the workplace.',
+          action:
+            'If both hold, inform workers’ representatives and the affected workers before the system goes into service — before, not after. Doing it afterwards does not satisfy the paragraph, and where national law lays down consultation procedures, this goes through them.',
+          evidence: [
+            'What was communicated, to whom, and on what date — before the system went live.',
+          ],
+          priority: 'high',
+          conditional: true,
+        },
+        {
+          id: 'art-26-8-public-authority-registration',
+          propositionId: 'prop-art-26-8-public-authority-registration',
+          title: 'If you are a public body, check the system is registered before using it',
+          why: 'This one is conditional on your organisation being a public authority, or a Union institution, body, office or agency.',
+          action:
+            'If that is you, check the EU database before use. Finding the system unregistered is a stop condition rather than a filing task: the paragraph says you do not use it, and you tell the provider or distributor.',
+          evidence: ['The database check, dated, and the registration reference.'],
+          priority: 'high',
+          conditional: true,
+        },
+        {
+          id: 'art-26-9-dpia-information',
+          propositionId: 'prop-art-26-9-dpia-information',
+          title: 'If you owe a data protection impact assessment, the provider’s documentation feeds it',
+          why: 'This one is conditional on a data protection impact assessment being required of you, which is a question under data protection law rather than under this Regulation.',
+          action:
+            'Ask for the Article 13 information early. It is an input to an assessment you may owe under another regime, and requesting it late costs you twice.',
+          evidence: ['The Article 13 information, and the assessment it fed into.'],
+          priority: 'normal',
+          conditional: true,
+        },
+        {
+          id: 'art-26-10-post-remote-biometric-authorisation',
+          propositionId: 'prop-art-26-10-post-remote-biometric-authorisation',
+          title: 'Post-remote biometric identification needs authorisation, in advance or within 48 hours',
+          why: 'You told us the system performs remote biometric identification. This paragraph governs the post case — identification against stored material after the event — and is conditional on the use being an investigation targeting a suspect.',
+          action:
+            'Where that is the use, obtain authorisation from a judicial or binding administrative authority in advance, or within 48 hours. A refusal stops the use immediately and the linked personal data is deleted. Note this is a different provision from Article 5(1)(h), which governs real-time identification.',
+          evidence: [
+            'The authorisation request and decision, and the police-file record each use has to carry.',
+          ],
+          priority: 'urgent',
+          conditional: true,
+          when: postRemoteBiometrics,
+        },
+        {
+          id: 'art-26-11-inform-affected-persons',
+          propositionId: 'prop-art-26-11-inform-affected-persons',
+          title: 'Tell the people the system makes decisions about',
+          why: 'The system is listed in Annex III and you told us it decides about people, or helps decide. Both halves of this paragraph are met on your answers.',
+          action:
+            'Work out how those people are told, and when. This sits alongside the Article 50 transparency duties rather than instead of them, and "assists in making" is wide enough to reach a system that only produces a recommendation.',
+          evidence: ['The notice given to affected people, and where it appears in the process.'],
+          priority: 'high',
+          when: annexIiiApplies && decidesAboutPeople,
+        },
+      ]
+
+      for (const duty of DEPLOYER_DUTIES) {
+        if (duty.when === false) continue
+        findings.push({
+          id: duty.id,
+          ruleId: 'high-risk-deployer-duties',
+          title: duty.title,
+          kind: duty.conditional ? 'conditional_obligation' : highRiskKind,
+          applicability: duty.conditional
+            ? 'possibly_applies'
+            : classification.classification === 'likely_high_risk'
+              ? 'applies'
+              : 'possibly_applies',
+          appliesToRoles: ['deployer'],
+          effectiveFrom: highRiskDate.display,
+          whyItApplies: `${duty.why} The route is ${classification.statutoryRoutes.join(' and ')}.`,
+          practicalMeaning:
+            PROPOSITION_BY_ID.get(duty.propositionId)?.practicalMeaning ??
+            'A requirement of Chapter III, Section 3, which applies to deployers of high-risk systems.',
+          action: duty.action,
+          evidenceToKeep: duty.evidence,
+          triggeringAnswerIds: classification.triggeringAnswerIds,
+          missingAnswerIds: [],
+          source: sourceFrom(duty.propositionId),
+          priority: duty.priority,
+          confidence: classification.confidence,
+        })
+      }
+
+      /**
+       * The honest limit on the list above.
+       *
+       * Article 26 is now complete — all eleven of its operative paragraphs. The
+       * deployer's duties are not confined to Article 26, and the pinned corpus
+       * does not carry the rest: **Article 27**'s fundamental rights impact
+       * assessment above all, which falls on public bodies, on private entities
+       * providing public services, and on deployers of the Annex III point 5(b)
+       * and 5(c) credit and insurance systems — a set that overlaps heavily with
+       * this tool's readers. Article 4's AI literacy duty and Article 86's right
+       * to an explanation are outside it too.
+       *
+       * This is the same caveat the provider path carried until rule pack
+       * `2026-08-19` closed it, and it goes the same way: it is deleted when the
+       * corpus catches up, not tidied away before.
+       */
+      findings.push({
+        id: 'high-risk-deployer-duties-incomplete',
+        ruleId: 'high-risk-deployer-duties',
+        title: 'Article 26 is complete here; a deployer’s duties are not confined to it',
+        kind: 'unresolved_issue',
+        applicability: 'applies',
+        appliesToRoles: ['deployer'],
+        whyItApplies:
+          'Every operative paragraph of Article 26 is above, quoted from the pinned statute. Other Articles place duties on deployers as well, and this assessment does not reach them because the pack cannot quote them.',
+        practicalMeaning:
+          'Article 27 is the one to look at first. It calls for a fundamental rights impact assessment before a high-risk system is used, and it falls on bodies governed by public law, on private entities providing public services, and on deployers of the credit-scoring and life and health insurance systems at Annex III points 5(b) and 5(c). If any of those describes you, it is a substantial piece of work this result has not sized. Article 4 on AI literacy and Article 86 on a person’s right to an explanation of a decision are also outside what is assessed here.',
+        action:
+          'Read Article 27 and decide whether it reaches you, before treating the list above as your scope of work. This tool shows what it can verify against its pinned copy of the Regulation, and says so rather than letting a complete Article read as a complete picture.',
+        evidenceToKeep: [],
+        triggeringAnswerIds: classification.triggeringAnswerIds,
+        missingAnswerIds: [],
+        priority: 'high',
+        confidence: 'high',
+      })
+
       findings.push({
         id: 'art-13-instructions-for-use',
         ruleId: 'vendor-instructions-missing',
@@ -423,7 +664,7 @@ export function buildLegalFindings(context: FindingContext): ComplianceFindingV2
           practicalMeaning:
             PROPOSITION_BY_ID.get('prop-art-49-registration')?.practicalMeaning ?? '',
           action:
-            'Treat this as part of the launch checklist rather than as paperwork that follows launch. Note that Article 49(2) requires the same registration even where you have concluded the system is *not* high-risk under Article 6(3).',
+            'Treat this as part of the launch checklist rather than as paperwork that follows launch. Note that Article 49(2) requires the same registration even where you have concluded the system is not high-risk under Article 6(3).',
           evidenceToKeep: ['The registration reference, and the date it was completed.'],
           triggeringAnswerIds: classification.triggeringAnswerIds,
           missingAnswerIds: [],

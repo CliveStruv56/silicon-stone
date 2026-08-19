@@ -245,6 +245,93 @@ describe('§17.1 — every branch has a scenario', () => {
     expect(BINDING_FINDING_KINDS).toContain(finding!.kind)
   })
 
+  /**
+   * The deployer half of the same invariant, added 2026-08-20.
+   *
+   * Until then a high-risk deployer received two findings — Article 26(6) and
+   * the supplier-side Article 13 item — while Article 26 contains eleven
+   * operative paragraphs addressed to it. Same shape of gap as the provider path
+   * had, one role over.
+   */
+  it('a high-risk deployer is told the whole of Article 26', () => {
+    const deployer = evaluateAssessmentV2(
+      GOLDEN_SCENARIOS.find((item) => item.id === 'hrScreeningProfiling')!.answers,
+      ASSESSED_AT
+    )
+    expect(deployer.classification).toBe('likely_high_risk')
+
+    const provisions = deployer.legalFindings
+      .filter((finding) => finding.source)
+      .map((finding) => finding.source!.provision)
+
+    // Every operative paragraph of Article 26. (3) is a without-prejudice clause
+    // and states no duty, so it is deliberately absent.
+    for (const paragraph of [1, 2, 4, 5, 6, 7, 8, 9, 11, 12]) {
+      expect(
+        provisions.some((provision) => provision === `Article 26(${paragraph})`),
+        `no deployer finding cites Article 26(${paragraph})`
+      ).toBe(true)
+    }
+    expect(provisions).not.toContain('Article 26(3)')
+  })
+
+  /**
+   * The conditional ones are typed conditional, not asserted as facts about the
+   * reader. Article 26 addresses deployers generally, but paragraphs 4, 7, 8, 9
+   * and 10 each turn on something the questionnaire never asks.
+   */
+  it('does not assert unasked facts about the deployer', () => {
+    const deployer = evaluateAssessmentV2(
+      GOLDEN_SCENARIOS.find((item) => item.id === 'hrScreeningProfiling')!.answers,
+      ASSESSED_AT
+    )
+    for (const paragraph of [4, 7, 8, 9]) {
+      const finding = deployer.legalFindings.find(
+        (item) => item.source?.provision === `Article 26(${paragraph})`
+      )
+      expect(finding?.kind, `Article 26(${paragraph}) is not conditional`).toBe(
+        'conditional_obligation'
+      )
+      expect(finding?.applicability).toBe('possibly_applies')
+    }
+  })
+
+  /**
+   * Article 26(10) governs *post*-remote biometric identification and is emitted
+   * only on the route that reaches it. Article 5(1)(h) governs the real-time
+   * case and is a different provision with different consequences.
+   */
+  it('emits the post-remote biometric duty only on the biometrics route', () => {
+    const biometrics = evaluateAssessmentV2(
+      GOLDEN_SCENARIOS.find((item) => item.id === 'annexIiiBiometrics')!.answers,
+      ASSESSED_AT
+    )
+    const employment = evaluateAssessmentV2(
+      GOLDEN_SCENARIOS.find((item) => item.id === 'hrScreeningProfiling')!.answers,
+      ASSESSED_AT
+    )
+    const cites = (result: typeof biometrics) =>
+      result.legalFindings.some((finding) => finding.source?.provision === 'Article 26(10)')
+
+    expect(cites(biometrics), 'the biometrics route should reach Article 26(10)').toBe(true)
+    expect(cites(employment), 'an employment deployer should not').toBe(false)
+  })
+
+  /** The caveat the provider path shed, now on the deployer path, and honest. */
+  it('says plainly that Article 26 is not the whole of a deployer’s duties', () => {
+    const deployer = evaluateAssessmentV2(
+      GOLDEN_SCENARIOS.find((item) => item.id === 'hrScreeningProfiling')!.answers,
+      ASSESSED_AT
+    )
+    const caveat = deployer.legalFindings.find(
+      (finding) => finding.id === 'high-risk-deployer-duties-incomplete'
+    )
+    expect(caveat?.kind).toBe('unresolved_issue')
+    expect(caveat?.practicalMeaning).toMatch(/Article 27/)
+    // A non-binding finding whose action speaks in duties reads as one.
+    expect(caveat?.action).not.toMatch(/\b(must|shall|required|prohibited)\b/i)
+  })
+
   it('and the deployer of the same tier is told something different', () => {
     const deployer = evaluateAssessmentV2(
       GOLDEN_SCENARIOS.find((item) => item.id === 'hrScreeningProfiling')!.answers,
