@@ -8,6 +8,11 @@ import sources2026_08_18 from '../../../rulepack/versions/2026-08-18/sources.jso
 import timeline2026_08_18 from '../../../rulepack/versions/2026-08-18/timeline.json'
 import penalties2026_08_18 from '../../../rulepack/versions/2026-08-18/penalties.json'
 import rules2026_08_18 from '../../../rulepack/versions/2026-08-18/rules.json'
+import manifest2026_08_19 from '../../../rulepack/versions/2026-08-19/manifest.json'
+import sources2026_08_19 from '../../../rulepack/versions/2026-08-19/sources.json'
+import timeline2026_08_19 from '../../../rulepack/versions/2026-08-19/timeline.json'
+import penalties2026_08_19 from '../../../rulepack/versions/2026-08-19/penalties.json'
+import rules2026_08_19 from '../../../rulepack/versions/2026-08-19/rules.json'
 
 /**
  * The versioned rule pack: the legal payload behind the AI Act triage engine,
@@ -118,12 +123,28 @@ const PACKS: Record<string, RulePack> = {
     prohibitedPractices: rules2026_08_18.prohibitedPractices as PackProhibitedPractice[],
     ruleAnchors: rules2026_08_18.ruleAnchors as Record<string, PackRuleAnchor>,
   },
+  /**
+   * Adds Articles 10, 14, 15, 16 and 43 to the corpus — the rest of the
+   * high-risk provider's Chapter III Section 2 duties, plus the conformity
+   * assessment that decides which procedure they are assessed under. The four
+   * data files and the twenty carried-over corpus files are byte-identical to
+   * 2026-08-18; the same CELEX consolidation, just more of it read out of it,
+   * which is why `corpusCutOff` does not move.
+   */
+  '2026-08-19': {
+    manifest: manifest2026_08_19 as PackManifest,
+    sources: sources2026_08_19 as Record<string, PackSource>,
+    timeline: timeline2026_08_19 as PackTimelineEntry[],
+    penalties: penalties2026_08_19 as PackPenaltyTier[],
+    prohibitedPractices: rules2026_08_19.prohibitedPractices as PackProhibitedPractice[],
+    ruleAnchors: rules2026_08_19.ruleAnchors as Record<string, PackRuleAnchor>,
+  },
 }
 
 export const AVAILABLE_RULE_PACK_VERSIONS = Object.keys(PACKS).sort()
 
 /** The version served when nothing is pinned. Never "latest" — see below. */
-const DEFAULT_RULE_PACK_VERSION = '2026-08-18'
+const DEFAULT_RULE_PACK_VERSION = '2026-08-19'
 
 /**
  * The pinned version. Deliberately an explicit version string, never a

@@ -957,6 +957,127 @@ GOLDEN_SCENARIOS.push(
   }
 )
 
+/**
+ * Article 43's conformity assessment routes (added 2026-08-19 with the five
+ * Articles that made them citable).
+ *
+ * A *provider* base, deliberately: `ANNEX_III_BASE` above is a deployer, and the
+ * Article 43 findings are emitted only where a provider role is actually held.
+ * The standards question is asked on the same condition, so a deployer fixture
+ * would exercise nothing.
+ */
+const ANNEX_III_PROVIDER_BASE = [
+  answered('organisation_establishment', 'eu_eea'),
+  answered('ai_market_connection', ['placed_on_eu_market']),
+  answered('organisation_activity', ['built_or_commissioned', 'supplied_under_own_name']),
+  answered('regulated_product_own_name', 'no'),
+  answered('individual_impact', 'recommends_ranks_scores'),
+  answered('personal_data_use', 'yes'),
+  answered('employee_band', '50_249'),
+  answered('prohibited_screen', ['none_of_these']),
+]
+
+/** Annex III point 1(a), which is the only branch where Article 43(1) bites. */
+const BIOMETRIC_PROVIDER = [
+  ...ANNEX_III_PROVIDER_BASE,
+  answered('intended_use_family', 'biometrics'),
+  answered('annex_iii_biometrics_use', ['remote_identification']),
+  PROFILES,
+]
+
+GOLDEN_SCENARIOS.push(
+  {
+    id: 'art43BiometricsStandardsApplied',
+    spec: '§17.1 — Article 43(1): standards applied in full, so the Annex VI / VII choice is open',
+    answers: record(
+      ...BIOMETRIC_PROVIDER,
+      answered('art43_harmonised_standards', 'applied_in_full')
+    ),
+  },
+  {
+    id: 'art43BiometricsNoStandards',
+    spec: '§17.1 — Article 43(1) second subparagraph: nothing applied, so Annex VII is mandatory',
+    answers: record(
+      ...BIOMETRIC_PROVIDER,
+      answered('art43_harmonised_standards', 'none_applied')
+    ),
+  },
+  {
+    id: 'art43BiometricsPartialStandards',
+    spec: '§17.1 — Article 43(1)(b): part of a standard applied, which does not preserve the choice',
+    answers: record(
+      ...BIOMETRIC_PROVIDER,
+      answered('art43_harmonised_standards', 'applied_in_part')
+    ),
+  },
+  {
+    /**
+     * The unknown case, and the one worth having a fixture for. An unresolved
+     * standards answer must leave the route unresolved — never defaulted to
+     * Annex VI, which is the cheaper procedure and so the expensive direction to
+     * guess in.
+     */
+    id: 'art43BiometricsStandardsUnknown',
+    spec: '§17.1 — Article 43(1) with the standards question unresolved: no default to Annex VI',
+    answers: record(...BIOMETRIC_PROVIDER, unknown('art43_harmonised_standards')),
+  },
+  {
+    id: 'art43AnnexIiiPointFour',
+    spec: '§17.1 — Article 43(2): an Annex III point 4(a) provider, internal control, no notified body',
+    answers: record(
+      ...ANNEX_III_PROVIDER_BASE,
+      answered('intended_use_family', 'employment'),
+      answered('annex_iii_employment_use', ['recruitment_selection']),
+      PROFILES
+    ),
+  },
+  {
+    id: 'art43ProductRoute',
+    spec: '§17.1 — Article 43(3): the Annex I product route, where the sectoral procedure governs',
+    answers: record(
+      answered('organisation_establishment', 'eu_eea'),
+      answered('ai_market_connection', ['placed_on_eu_market']),
+      answered('organisation_activity', ['built_or_commissioned']),
+      answered('regulated_product_own_name', 'yes'),
+      answered('intended_use_family', 'regulated_product'),
+      answered('individual_impact', 'no_decisions_about_people'),
+      answered('personal_data_use', 'no'),
+      answered('employee_band', '250_749'),
+      answered('annex_i_route', [
+        'safety_component_of_regulated_product',
+        'third_party_conformity_assessment',
+      ]),
+      answered('prohibited_screen', ['none_of_these'])
+    ),
+  },
+  {
+    /**
+     * Article 43(4). The provider role here arrives by the modification route
+     * rather than by building the system, which is also what makes the
+     * re-assessment duty theirs.
+     */
+    id: 'art43SubstantialModification',
+    spec: '§17.1 — Article 43(4): a substantially modified high-risk system needs a new assessment',
+    answers: record(
+      answered('organisation_establishment', 'eu_eea'),
+      answered('ai_market_connection', ['used_from_eu_establishment']),
+      answered('organisation_activity', ['integrated_or_configured']),
+      answered('own_name_supply', 'no'),
+      answered('intended_purpose_changed', 'no'),
+      answered('material_modification', 'yes'),
+      answered('configuration_only', 'no'),
+      answered('modification_still_high_risk', 'yes'),
+      answered('individual_impact', 'recommends_ranks_scores'),
+      answered('personal_data_use', 'yes'),
+      answered('employee_band', '50_249'),
+      answered('intended_use_family', 'employment'),
+      answered('annex_iii_employment_use', ['recruitment_selection']),
+      PROFILES,
+      answered('prohibited_screen', ['none_of_these'])
+    ),
+  }
+)
+
 export function scenario(id: string): AnswerRecordV2 {
   const found = GOLDEN_SCENARIOS.find((item) => item.id === id)
   if (!found) throw new Error(`no golden scenario ${id}`)

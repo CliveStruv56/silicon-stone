@@ -2,7 +2,7 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-08-19
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (99 static pages), 847 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (99 static pages), 1,020 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
@@ -465,6 +465,93 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 19, 2026 — rule pack `2026-08-19`: five Articles, and a caveat deleted
+
+Articles **10, 14, 15, 16 and 43** are in the pinned corpus, and the high-risk
+provider path now emits the whole of Chapter III Section 2 rather than six of it.
+1,020 tests green, 67 golden scenarios, 42 propositions, 80 questions.
+**Flag still dark.**
+
+**It is a version bump, because every pack change is.**
+`rulepack/versions/2026-08-19/` is a copy of `2026-08-18` with five new corpus
+files; the twenty carried-over Article texts and the four data files are
+byte-identical, and their hashes in both manifests are the same values — which is
+evidence rather than a claim. `corpusCutOff` stays at **2026-07-27**: it is the
+same CELEX consolidation, just more of it read out of it, which is also why
+`reg:check`'s cross-lane assertion needed nothing.
+
+**Fetched, not pasted.** There was no Article fetcher — the original nineteen
+arrived by hand in the first extraction commit — so
+`scripts/rulepack-fetch-article.ts` was written as the Annex script's twin:
+Publications Office Cellar, never `eur-lex.europa.eu`, and it refuses to write
+unless the served document's own consolidation date matches the manifest. It was
+validated by re-fetching **Article 9** and confirming the result normalises to
+the hash already recorded for it — the strongest available evidence that the
+script reads the pinned text and not something adjacent to it. Its output puts
+each lettered point on one line, as `annex-iii.txt` does; the older files put the
+marker in its own block. The two forms normalise identically, so a citation
+verifies the same either way, and no bespoke reshaping of statute was introduced
+to make them match.
+
+**Article 43 is a procedure, not a duty**, so it went in its own module
+(`engine/article-43.ts`, shaped like `article-50.ts`) rather than as a row in
+`PROVIDER_DUTIES`. Three routes, and which one applies differs by an external
+audit: the Annex I sectoral procedure (43(3), checked *first*, because its fourth
+subparagraph settles the overlap with Annex III explicitly), the Annex VI/VII
+choice on Annex III point 1 (43(1)), and flat Annex VI internal control on points
+2 to 8 (43(2)). One new question, `art43_harmonised_standards`, opens on the point
+1 provider branch and nowhere else — its gate is an exact superset of the ways
+`roles.ts` returns `provider: applies`, so a deployer of someone else's
+face-recognition system is never asked how it was certified. **An unknown answer
+leaves the route unresolved and never defaults to Annex VI**: that is the cheaper
+procedure, so guessing it is the expensive direction to be wrong in, and a test
+asserts the card says neither "Annex VI" nor "internal control" on that path.
+Article 43(4) is separate — a substantial modification needs a *new* assessment
+regardless of redistribution.
+
+**The caveat finding is deleted, not narrowed.**
+`high-risk-provider-duties-incomplete` existed to say that Articles 10, 14, 15,
+16 and 43 applied and were not assessed. With all five shipped it had nothing
+left to be about, and a caveat that no longer bites is worse than none. Its
+surviving idea — the pack pins the provisions this tool cites, not the Regulation
+— is now one line in the result footer, at the volume a footnote deserves. The
+golden-matrix assertion that used to check the caveat mentioned Article 43 was
+**replaced** rather than dropped: it now asserts that a high-risk provider's
+duties cite all ten Article numbers, each from a proposition the pack can quote.
+
+**`reviewedAt` was not restamped.** It renders as "last checked", so the nine new
+propositions carry 2026-08-19 and the thirty-three existing ones still carry
+2026-08-18. Re-dating a proposition nobody re-read would be a claim about work
+that did not happen.
+
+**The browser walk-through found two defects no unit test would have**, which is
+the third time in this project it has earned its place. The Article 43(2) card —
+the one route that expressly involves no notified body — listed "the notified
+body's identification number" as evidence to keep, because the evidence list was
+generic across all three routes. And the reader-check cards, which state the
+conditions the questionnaire cannot establish, all carried the same title, so two
+of them under one heading read as one card. Both are fixed: evidence and action
+are route-specific, and each check carries its own title. A third, pre-existing,
+was fixed while it was visible: `FindingCard` rendered unresolved facts as raw
+question ids in a monospace span — "art43_harmonised_standards" — while the
+"What we did not establish" block a few sections down already resolved the same
+ids to their prompts. The two disagreed on the same page.
+
+Verification: `rulepack:check` clean across all three packs, `test:checker-v2`
+verifies all 42 extracts against the pinned corpus, 1,020 tests green, `tsc`
+clean, `next lint` clean, `checker-v2:release` 16/16 automated criteria with 0
+unexplained divergences, `checker-v2:a11y` 0 WCAG violations and keyboard-only
+completion. Walked by hand in Chrome: `usProviderEmploymentAnnexIii` (13
+findings, every duty card carrying its Article badge, a verbatim extract and
+"Not reviewed by counsel · last checked"), the Annex III point 1 provider with
+standards applied, and the same path with the standards answer unknown.
+
+**Still not done, and not attempted here:** the deployer path has had no
+equivalent treatment — it emits Article 26(6) and the supplier-side Article 13
+item, and the rest of Article 26 is not in the pack. Every proposition remains
+`reviewStatus: 'internal'`. Adding Articles makes the tool more complete, not
+more authoritative.
 
 ### August 19, 2026 — Compliance Checker v2, Phase 8: validation, and what it found
 
@@ -4243,7 +4330,7 @@ discount codes, booking URL, LinkedIn URL). This table is for defects and debt.
 | ~~`LAUNCH.md` URLs named `www`~~ — corrected 2026-08-10 | **The canonical host is the bare apex** as of 2026-08-06 (commit `50996d27`) — `SITE_URL` in `src/lib/site.ts` is `https://siliconandstone.com` and `www` 308s to it, reversing the June decision. The Lemon Squeezy redirect targets and webhook URL in `LAUNCH.md` still gave `www`, which would have put a redirect hop inside a payment callback; both now use the apex. Historical `www` mentions in §9 changelog entries are left as written. | Resolved |
 | Inoreader redirect URI still localhost | `http://localhost:3000/api/auth/callback/inoreader` in the Inoreader dev portal. Research-pipeline OAuth therefore cannot complete in production; it works locally. Change to `https://siliconandstone.com/api/auth/callback/inoreader` (apex, not www). | Medium |
 | Three checker result fields are still bare `string[]` | Updated 2026-08-18. `actions` (2026-08-17) and `vendorQuestions` (2026-08-18) now carry per-item Article anchors, corpus links and authored explanation. `missingFacts`, `reasons` and `adjacentRisks` remain untyped strings. They are the weaker candidates of the four: `reasons` is narrative about how the classification was reached rather than a list of citable claims, and `adjacentRisks` is mostly GDPR and contract risk, where an AI Act anchor would be the wrong citation rather than a missing one. `missingFacts` is the one worth converting — it is the evidence-gap list, and several entries already name Article 6(3) in prose. | Low |
-| Rule-pack corpus covers 19 Articles and Annex III, not all of the Regulation | `rulepack/versions/2026-08-18/corpus/` holds Arts 3, 5, 6, 9, 11, 12, 13, 17, 19, 26, 49, 50, 57, 72, 73, 99, 101, 111, 113 **and Annex III** (added 2026-08-18). `hasCorpus()` answers honestly and `verifyCitation()` returns `uncovered` for anything else. **The verifier must treat `uncovered` as unverifiable, never as a pass.** Extending coverage is a data task — `npm run rulepack:fetch-annex` reads the same CELEX the manifest names and refuses to write unless the served consolidation date matches — but it is a **pack version bump**, which invalidated nothing here only because the carried-over hashes prove the Article text did not move. Article 25 (role transfer) and Article 2 (scope) are the next gaps worth closing; v2's role and scope explanations are authored prose because neither can be quoted. | Medium |
+| Rule-pack corpus covers 24 Articles and Annex III, not all of the Regulation | Updated 2026-08-19. `rulepack/versions/2026-08-19/corpus/` holds Arts 3, 5, 6, 9, **10**, 11, 12, 13, **14**, **15**, **16**, 17, 19, 26, **43**, 49, 50, 57, 72, 73, 99, 101, 111, 113 **and Annex III**. `hasCorpus()` answers honestly and `verifyCitation()` returns `uncovered` for anything else. **The verifier must treat `uncovered` as unverifiable, never as a pass.** Extending coverage is a data task — `npm run rulepack:fetch-article` and `rulepack:fetch-annex` read the same CELEX the manifest names and refuse to write unless the served consolidation date matches — but it is a **pack version bump**, which invalidated nothing here only because the carried-over hashes prove the existing text did not move. The remaining gaps worth closing, in order: the rest of **Article 26** (the deployer path emits 26(6) and nothing else of it), **Article 25** (role transfer) and **Article 2** (scope); v2's role and scope explanations are authored prose because neither can be quoted. | Medium |
 | ~~No monthly model-spend ceiling~~ — shipped 2026-08-10 | `src/lib/model-budget.ts` checks `AI_MONTHLY_BUDGET_USD` against the `mtd` usage summary before dispatching a report. **Unset by default, so no ceiling is currently enforced** — set it in Vercel to turn it on. Note the deliberate fail-closed: a configured ceiling plus an unreadable ledger blocks generation. | Resolved (needs the env var set) |
 | Report generation is not durable across an instance death | Generation runs in `after()` rather than a Vercel Workflow (see §9 for why). An instance evicted mid-generation orphans a `pending` record, which the status route converts to `failed` after 320s so the user can retry. The user-visible cost is a wasted wait plus a re-request; the model spend is already incurred. Revisit if Next 16 lands and `workflow` becomes viable. | Low |
 | Report gate renders even where generation is unconfigured | The checker page is a client component and cannot read `ANTHROPIC_API_KEY`, so the "Get the written report" card always shows and a deployment without the key fails at submit with an honest 503. Production has the key, so this is cosmetic — but a `NEXT_PUBLIC_` capability flag would remove the dead-end. | Low |
@@ -4334,7 +4421,8 @@ phases; **Phase 0 shipped 2026-08-18** (see §9). v1 stays live behind
 | 5 — Result UI | **Done 2026-08-18.** Typed finding cards, §12.1's sections with empties hidden, §12.4's contextual penalties, §9.4's date-aware duty status. All three exit criteria pass. |
 | 6 — Report and email flow | **Library done 2026-08-18**; delivery not wired. Deterministic report, §14.4 verifier, prose contract, consent model — all tested. **Outstanding: an actual model call and an actual send.** Blocked on there being no mail sender at all, and on §22.1's retention decision. |
 | 7 — GDPR overlay | **Done 2026-08-18.** Ten conditional questions, an answers-only overlay evaluator, EU/UK distinguished where the answers allow and both offered where they do not, its own result block and report section, and three absence-checks in the verifier. All three exit criteria pass. It cites no provision and quotes no text — there is no pinned GDPR corpus, so there is nothing to verify a citation against. |
-| 8 — Validation and release | **Harness done 2026-08-19; release is not.** §20's criteria run (`npm run checker-v2:release`): 16/18 automated and passing, 14 needs a person, 16 blocked on §22.1–22.2. Golden matrix completed (60 scenarios, every Annex III family and every Article 5 practice). Shadow mode: 6 agreements, 3 intended changes, 0 unexplained. Accessibility: 0 WCAG 2.1 A/AA violations, keyboard-only completion confirmed. **Outstanding: counsel review, usability testing with real users, and the retention/marketing decisions.** |
+| 8 — Validation and release | **Harness done 2026-08-19; release is not.** §20's criteria run (`npm run checker-v2:release`): 16/18 automated and passing, 14 needs a person, 16 blocked on §22.1–22.2. Golden matrix completed (60 scenarios at the time, every Annex III family and every Article 5 practice). Shadow mode: 6 agreements, 3 intended changes, 0 unexplained. Accessibility: 0 WCAG 2.1 A/AA violations, keyboard-only completion confirmed. **Outstanding: counsel review, usability testing with real users, and the retention/marketing decisions.** |
+| Rule pack `2026-08-19` — the rest of the provider's duties | **Done 2026-08-19 (evening).** Articles 10, 14, 15, 16 and 43 fetched from the pinned CELEX into a new pack version, nine propositions authored and corpus-verified, and the high-risk provider path completed to the whole of Chapter III Section 2 plus Article 43's conformity assessment. Article 43 branches three ways from its own module; an unknown standards answer leaves the route unresolved rather than defaulting to Annex VI. The `high-risk-provider-duties-incomplete` caveat is deleted and its golden-matrix assertion replaced. 67 scenarios, 42 propositions, 80 questions, 1,020 tests. **Flag still dark.** |
 
 **§22 listed six decisions that must not be guessed. Four remain**: session and
 report retention periods, whether the report email may be used for marketing

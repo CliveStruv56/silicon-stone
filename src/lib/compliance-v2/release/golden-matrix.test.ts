@@ -148,18 +148,101 @@ describe('§17.1 — every branch has a scenario', () => {
     const duties = provider.legalFindings.filter((finding) =>
       BINDING_FINDING_KINDS.includes(finding.kind)
     )
-    expect(duties.length, 'a high-risk provider with no duties is the defect').toBeGreaterThan(3)
+    expect(duties.length, 'a high-risk provider with no duties is the defect').toBeGreaterThan(8)
     for (const duty of duties) {
       expect(duty.appliesToRoles, duty.id).toContain('provider')
       expect(duty.source?.provision, `${duty.id} quotes nothing`).toBeTruthy()
     }
 
-    // And the list says it is a subset, because it is one.
-    const caveat = provider.legalFindings.find(
-      (finding) => finding.id === 'high-risk-provider-duties-incomplete'
+    /**
+     * And the list is Chapter III Section 2, not a subset of it.
+     *
+     * This assertion replaces one that checked the caveat finding
+     * `high-risk-provider-duties-incomplete` mentioned Article 43. That finding
+     * existed because Articles 10, 14, 15, 16 and 43 were outside the pinned
+     * corpus and no citation to them could be verified; rule pack `2026-08-19`
+     * put them in, so the caveat was deleted rather than narrowed. The invariant
+     * worth keeping is the one it stood in for: a high-risk provider is told
+     * what it owes, by Article number, from a pack that can quote each one.
+     */
+    const provisions = duties.flatMap((duty) => (duty.source ? [duty.source.provision] : []))
+    for (const article of [
+      'Article 9',
+      'Article 10',
+      'Article 11',
+      'Article 12',
+      'Article 14',
+      'Article 15',
+      'Article 16',
+      'Article 17',
+      'Article 19',
+      'Article 43',
+    ]) {
+      expect(
+        provisions.some((provision) => provision.startsWith(article)),
+        `no duty cites ${article}`
+      ).toBe(true)
+    }
+
+    expect(
+      provider.legalFindings.find(
+        (finding) => finding.id === 'high-risk-provider-duties-incomplete'
+      ),
+      'the caveat is gone because the list it apologised for is complete'
+    ).toBeUndefined()
+  })
+
+  /**
+   * Article 43's routes, each with a scenario. Same spirit as the Annex III
+   * family assertion above: a branch nothing exercises can break silently, and
+   * the three procedures differ by an external audit.
+   */
+  it('every Article 43 route is exercised', () => {
+    const ROUTES: Array<[string, RegExp]> = [
+      ['art43BiometricsStandardsApplied', /Annex VI or Annex VII/],
+      ['art43BiometricsNoStandards', /Annex VII, with a notified body/],
+      ['art43AnnexIiiPointFour', /Annex VI internal control/],
+      ['art43ProductRoute', /the procedure under the product/],
+    ]
+
+    for (const [scenarioId, title] of ROUTES) {
+      const scenario = GOLDEN_SCENARIOS.find((item) => item.id === scenarioId)
+      expect(scenario, `missing ${scenarioId}`).toBeDefined()
+      const finding = evaluateAssessmentV2(scenario!.answers, ASSESSED_AT).legalFindings.find(
+        (item) => item.id === 'art-43-conformity-assessment'
+      )
+      expect(finding?.title, `${scenarioId} names no procedure`).toMatch(title)
+    }
+  })
+
+  /**
+   * The unknown, asserted as an unknown. Annex VI is the cheaper procedure, so
+   * a default in that direction would be both silent and expensive.
+   */
+  it('an unknown standards answer leaves the route unresolved, never Annex VI', () => {
+    const result = evaluateAssessmentV2(
+      GOLDEN_SCENARIOS.find((item) => item.id === 'art43BiometricsStandardsUnknown')!.answers,
+      ASSESSED_AT
     )
-    expect(caveat?.kind).toBe('unresolved_issue')
-    expect(caveat?.practicalMeaning).toMatch(/Article 43/)
+    const finding = result.legalFindings.find(
+      (item) => item.id === 'art-43-conformity-assessment'
+    )
+    expect(finding?.kind).toBe('unresolved_issue')
+    expect(finding?.applicability).toBe('cannot_determine')
+    expect(finding?.missingAnswerIds).toContain('art43_harmonised_standards')
+    expect(finding?.title).not.toMatch(/Annex VI/)
+    expect(finding?.practicalMeaning).not.toMatch(/internal control/)
+  })
+
+  it('a substantial modification adds the Article 43(4) re-assessment', () => {
+    const result = evaluateAssessmentV2(
+      GOLDEN_SCENARIOS.find((item) => item.id === 'art43SubstantialModification')!.answers,
+      ASSESSED_AT
+    )
+    const finding = result.legalFindings.find((item) => item.id === 'art-43-4-reassessment')
+    expect(finding, 'a modified high-risk system is re-assessed').toBeDefined()
+    expect(finding?.source?.provision).toBe('Article 43(4)')
+    expect(BINDING_FINDING_KINDS).toContain(finding!.kind)
   })
 
   it('and the deployer of the same tier is told something different', () => {

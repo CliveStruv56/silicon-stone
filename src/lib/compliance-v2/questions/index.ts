@@ -6,6 +6,7 @@ import { ANNEX_III_QUESTIONS } from './annex-iii'
 import { ANNEX_I_QUESTIONS, PROHIBITED_QUESTIONS } from './prohibited'
 import { ARTICLE_5_CONDITION_QUESTIONS } from './article-5-conditions'
 import { EXEMPTION_QUESTIONS, TRANSPARENCY_QUESTIONS } from './transparency'
+import { CONFORMITY_QUESTIONS } from './conformity'
 import { ORGANISATION_SIZE_QUESTIONS } from './organisation-size'
 import { GDPR_QUESTIONS } from './gdpr-ai'
 
@@ -33,6 +34,11 @@ export const QUESTION_CATALOGUE: AssessmentQuestionV2[] = [
   ...ANNEX_III_QUESTIONS,
   ...ANNEX_I_QUESTIONS,
   ...EXEMPTION_QUESTIONS,
+  // Article 43's one question, after both Annex routes and the derogation that
+  // can lift one of them: which conformity assessment procedure applies is a
+  // question about a system that is high-risk, so everything deciding whether it
+  // is has to come first.
+  ...CONFORMITY_QUESTIONS,
   ...TRANSPARENCY_QUESTIONS,
   ...PROHIBITED_QUESTIONS,
   // The per-practice trees, immediately behind the screen that opens them. Every
@@ -172,6 +178,7 @@ export {
   ANNEX_III_QUESTIONS,
   ANNEX_I_QUESTIONS,
   EXEMPTION_QUESTIONS,
+  CONFORMITY_QUESTIONS,
   TRANSPARENCY_QUESTIONS,
   PROHIBITED_QUESTIONS,
   ARTICLE_5_CONDITION_QUESTIONS,

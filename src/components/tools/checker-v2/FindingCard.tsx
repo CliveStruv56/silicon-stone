@@ -5,6 +5,22 @@ import { BookOpen, CalendarClock } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import type { ComplianceFindingV2, FindingKind } from '@/lib/compliance-v2/types'
 import { KIND_LABEL, REVIEW_STATUS_LABEL, ROLE_LABEL } from '@/lib/compliance-v2/result-sections'
+import { QUESTION_BY_ID } from '@/lib/compliance-v2/questions'
+
+/**
+ * A missing answer, named as the reader was asked it.
+ *
+ * This rendered the raw question id — "art43_harmonised_standards" — in a
+ * monospace span, which reads as a leaked internal reference rather than as the
+ * question it stands for. The "What we did not establish" block a few sections
+ * down already resolved the same ids to their prompts, so the two disagreed on
+ * the same page. Falls back to the id, because an id is still better than a
+ * blank where a fact should be.
+ */
+function unknownLabel(questionId: string): string {
+  const question = QUESTION_BY_ID.get(questionId)
+  return question?.shortPrompt ?? question?.prompt ?? questionId
+}
 
 /**
  * One finding, with everything §12.2 asks a card to show.
@@ -125,7 +141,7 @@ export function FindingCard({ finding }: { finding: ComplianceFindingV2 }) {
           <Detail label="Unresolved">
             This rests on {finding.missingAnswerIds.length === 1 ? 'a fact' : 'facts'} you told us you
             did not know:{' '}
-            <span className="font-mono text-xs">{finding.missingAnswerIds.join(', ')}</span>.
+            {finding.missingAnswerIds.map(unknownLabel).join('; ')}.
           </Detail>
         )}
 

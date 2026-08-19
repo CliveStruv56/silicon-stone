@@ -24,6 +24,18 @@ export interface StatutoryRoute {
   citation: string
   /** Which provision classifies it. */
   provision: 'Article 6(1)' | 'Article 6(2)'
+  /**
+   * The bare Annex III point, where this is an Annex III route: `4(a)`, `1(b)`,
+   * `6(b) / 7(a)`.
+   *
+   * Carried as a field rather than parsed back out of `citation`, because
+   * Article 43 decides the conformity assessment procedure on which *point*
+   * applies — Annex III point 1 gets a choice, points 2 to 8 do not — and a
+   * downstream evaluator reading a display string to make a legal decision is
+   * the kind of coupling that breaks silently the first time the wording is
+   * improved.
+   */
+  annexPoint?: string
   /** The answer that put them here. */
   triggeringAnswerId: string
   explanation: string
@@ -90,6 +102,7 @@ export function evaluateAnnexIII(answers: AnswerRecordV2): AnnexEvaluation {
       routes.push({
         citation: `Annex III, point ${point.point}`,
         provision: 'Article 6(2)',
+        annexPoint: point.point,
         triggeringAnswerId: questionId,
         explanation: `You told us the system is used for ${point.what}, which Annex III lists at point ${point.point}. Article 6(2) makes the systems listed in Annex III high-risk.`,
       })

@@ -74,6 +74,16 @@ export interface LegalProposition {
 
 const PACK_VERSION = RULE_PACK.manifest.version
 const REVIEWED_AT = '2026-08-18'
+/**
+ * A second review date rather than a restamp of the first.
+ *
+ * `reviewedAt` renders on the card as "last checked", so it is a claim about
+ * when a person read the provision against the corpus. Moving every
+ * proposition's date because a later batch was written would make that claim
+ * about work nobody did. Propositions carry the date their own reading happened
+ * and keep it until someone reads them again.
+ */
+const REVIEWED_AT_2026_08_19 = '2026-08-19'
 const AI_ACT = {
   documentId: 'regulation-2024-1689',
   documentTitle: 'Regulation (EU) 2024/1689 (EU AI Act)',
@@ -236,6 +246,264 @@ export const LEGAL_PROPOSITIONS: LegalProposition[] = [
     officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-49',
     rulepackVersion: PACK_VERSION,
     reviewedAt: REVIEWED_AT,
+    reviewStatus: 'internal',
+  },
+  /**
+   * Articles 10, 14, 15, 16 and 43 — added 2026-08-19 with rule pack
+   * `2026-08-19`, which put their text in the corpus for the first time. Until
+   * it did, a citation to any of them returned `uncovered` from
+   * `verifyCitation()`, and the honest thing to do with an unverifiable citation
+   * is not to make it. `reviewedAt` is the new date on these nine and unchanged
+   * on their thirty-three neighbours: the field renders as "last checked", and re-dating a
+   * proposition nobody re-read would be a claim about work that did not happen.
+   */
+  {
+    id: 'prop-art-10-data-governance',
+    ruleId: 'high-risk-provider-duties',
+    ...AI_ACT,
+    provision: 'Article 10',
+    corpusArticle: '10',
+    applicableRoles: ['provider', 'product_manufacturer', 'authorised_representative'],
+    conditions: [
+      'The system is classified high-risk under Article 6.',
+      'Your organisation is its provider.',
+    ],
+    exceptions: [
+      'Where the system does not use techniques involving the training of AI models, Article 10(6) applies paragraphs 2, 3 and 4 to the testing data sets only.',
+      'Article 6(3) removes the classification where the narrow-task conditions are met.',
+    ],
+    effectiveFrom: '2027-12-02',
+    plainEnglishSummary:
+      'Training, validation and testing data sets have to be governed: the design choices, where the data came from, how it was prepared, what was assumed, whether it is enough, and what biases it may carry.',
+    practicalMeaning:
+      'Article 10(2) is a list of eight things the practices must cover, and most of them are decisions your team already made without recording. The work is usually writing down what was done and why, not doing something new — but examining for bias, and taking measures against what that finds, is genuinely additional.',
+    shortExtract:
+      'Training, validation and testing data sets shall be subject to data governance and management practices appropriate for the intended purpose of the high-risk AI system.',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-10',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT_2026_08_19,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-14-human-oversight',
+    ruleId: 'high-risk-provider-duties',
+    ...AI_ACT,
+    provision: 'Article 14',
+    corpusArticle: '14',
+    applicableRoles: ['provider', 'product_manufacturer', 'authorised_representative'],
+    conditions: [
+      'The system is classified high-risk under Article 6.',
+      'Your organisation is its provider.',
+    ],
+    exceptions: [
+      'Article 6(3) removes the classification where the narrow-task conditions are met.',
+    ],
+    effectiveFrom: '2027-12-02',
+    plainEnglishSummary:
+      'The system has to be built so that people can actually oversee it while it is in use — including being able to disregard, override or reverse its output, and to stop it.',
+    practicalMeaning:
+      'This is a design duty, not a policy one. Article 14(3) lets the measures be built into the system or identified for the deployer to implement, but either way the provider decides them before launch. A system a deployer cannot interrupt is one whose provider has not discharged this.',
+    shortExtract:
+      'High-risk AI systems shall be designed and developed in such a way, including with appropriate human-machine interface tools, that they can be effectively overseen by natural persons during the period in which they are in use.',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-14',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT_2026_08_19,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-15-accuracy-robustness',
+    ruleId: 'high-risk-provider-duties',
+    ...AI_ACT,
+    provision: 'Article 15',
+    corpusArticle: '15',
+    applicableRoles: ['provider', 'product_manufacturer', 'authorised_representative'],
+    conditions: [
+      'The system is classified high-risk under Article 6.',
+      'Your organisation is its provider.',
+    ],
+    exceptions: [
+      'Article 6(3) removes the classification where the narrow-task conditions are met.',
+    ],
+    effectiveFrom: '2027-12-02',
+    plainEnglishSummary:
+      'The system has to reach an appropriate level of accuracy, robustness and cybersecurity, and hold it across its lifecycle — with the accuracy levels and metrics declared in the instructions for use.',
+    practicalMeaning:
+      'The declaration in Article 15(3) is the part most often missed: the accuracy figures go in the instructions for use, which means committing to a number a deployer can hold you to. Article 15(5) names the attacks the technical measures should address — data poisoning, model poisoning, adversarial examples, confidentiality attacks — which is a shorter and more concrete list than "cybersecurity" usually implies.',
+    shortExtract:
+      'High-risk AI systems shall be designed and developed in such a way that they achieve an appropriate level of accuracy, robustness, and cybersecurity, and that they perform consistently in those respects throughout their lifecycle.',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-15',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT_2026_08_19,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-16-provider-obligations',
+    ruleId: 'high-risk-provider-duties',
+    ...AI_ACT,
+    provision: 'Article 16',
+    corpusArticle: '16',
+    applicableRoles: ['provider', 'product_manufacturer', 'authorised_representative'],
+    conditions: [
+      'The system is classified high-risk under Article 6.',
+      'Your organisation is its provider.',
+    ],
+    exceptions: [
+      'Article 6(3) removes the classification where the narrow-task conditions are met.',
+    ],
+    effectiveFrom: '2027-12-02',
+    plainEnglishSummary:
+      'Article 16 is the provider’s own checklist: comply with the Section 2 requirements, put your name on the system, run a quality management system, keep the documentation and logs, undergo conformity assessment, declare conformity, affix the CE marking, register, take corrective action, and be able to demonstrate all of it on request.',
+    practicalMeaning:
+      'Most of the twelve points cross-refer to Articles listed separately here, but four do not and are easy to lose: the name and contact address on the system or its packaging, the EU declaration of conformity, the CE marking, and accessibility under Directives (EU) 2016/2102 and (EU) 2019/882. None of them is large; all of them are visible on the product itself, which is where an authority looks first.',
+    shortExtract:
+      'Providers of high-risk AI systems shall: (a) ensure that their high-risk AI systems are compliant with the requirements set out in Section 2;',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-16',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT_2026_08_19,
+    reviewStatus: 'internal',
+  },
+  /**
+   * Article 43, one proposition per route rather than one for the Article.
+   *
+   * Which procedure applies is the whole content of Article 43, and the three
+   * answers are not variations on a theme: Annex VI is an internal check, Annex
+   * VII is an external audit, and the Annex I route is somebody else's
+   * legislation entirely. A single proposition would have to be vague enough to
+   * cover all three, which is the half-answer the branch exists to avoid.
+   */
+  {
+    id: 'prop-art-43-1-biometrics-choice',
+    ruleId: 'high-risk-provider-duties',
+    ...AI_ACT,
+    provision: 'Article 43(1)',
+    corpusArticle: '43',
+    applicableRoles: ['provider', 'product_manufacturer'],
+    conditions: [
+      'The system is listed in point 1 of Annex III (biometrics).',
+      'Your organisation is its provider.',
+      'Harmonised standards under Article 40, or common specifications under Article 41, have been applied in demonstrating compliance with the Section 2 requirements.',
+    ],
+    exceptions: [
+      'Where the system is covered by the Union harmonisation legislation in Section A of Annex I, Article 43(3) governs instead.',
+      'The second subparagraph of Article 43(1) makes Annex VII mandatory where no standard exists, where only part of one was applied, where available common specifications were not applied, or for the restricted part of a standard published with a restriction.',
+    ],
+    effectiveFrom: '2027-12-02',
+    plainEnglishSummary:
+      'For a biometric system whose provider has applied harmonised standards or common specifications, the provider chooses between internal control under Annex VI and a notified body assessment under Annex VII.',
+    practicalMeaning:
+      'The choice is conditional on the standards, not on the organisation. It is the only place in Annex III where a notified body can be required at all, and the difference between the two procedures is an external audit with a lead time measured in months.',
+    shortExtract:
+      'the provider shall opt for one of the following conformity assessment procedures based on: (a) the internal control referred to in Annex VI; or (b) the assessment of the quality management system and the assessment of the technical documentation, with the involvement of a notified body, referred to in Annex VII.',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-43',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT_2026_08_19,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-43-1-notified-body-required',
+    ruleId: 'high-risk-provider-duties',
+    ...AI_ACT,
+    provision: 'Article 43(1), second subparagraph',
+    corpusArticle: '43',
+    applicableRoles: ['provider', 'product_manufacturer'],
+    conditions: [
+      'The system is listed in point 1 of Annex III (biometrics).',
+      'Your organisation is its provider.',
+      'One of the four triggers in the second subparagraph of Article 43(1) holds — no standard and no common specification, a standard applied only in part, available common specifications not applied, or a standard published with a restriction.',
+    ],
+    exceptions: [
+      'Where a standard was published with a restriction, the Annex VII route applies only to the restricted part.',
+      'Where the system is covered by the Union harmonisation legislation in Section A of Annex I, Article 43(3) governs instead.',
+    ],
+    effectiveFrom: '2027-12-02',
+    plainEnglishSummary:
+      'Where harmonised standards or common specifications have not been applied in full, the provider of a biometric system follows the Annex VII procedure, which involves a notified body assessing both the quality management system and the technical documentation.',
+    practicalMeaning:
+      'This is the expensive outcome, and it is reached by inaction rather than by choice: applying nothing, or applying part of a standard, puts you here. It is also the item most likely to set a launch date, because a notified body assessment cannot be compressed.',
+    shortExtract:
+      'In demonstrating the compliance of a high-risk AI system with the requirements set out in Section 2, the provider shall follow the conformity assessment procedure set out in Annex VII where: (a) harmonised standards referred to in Article 40 do not exist, and common specifications referred to in Article 41 are not available; (b) the provider has not applied, or has applied only part of, the harmonised standard;',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-43',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT_2026_08_19,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-43-2-internal-control',
+    ruleId: 'high-risk-provider-duties',
+    ...AI_ACT,
+    provision: 'Article 43(2)',
+    corpusArticle: '43',
+    applicableRoles: ['provider', 'product_manufacturer'],
+    conditions: [
+      'The system is listed in one of points 2 to 8 of Annex III.',
+      'Your organisation is its provider.',
+    ],
+    exceptions: [
+      'Where the system is covered by the Union harmonisation legislation in Section A of Annex I, Article 43(3) governs instead.',
+      'Article 43(6) empowers the Commission to move points 2 to 8 onto the Annex VII procedure by delegated act.',
+    ],
+    effectiveFrom: '2027-12-02',
+    plainEnglishSummary:
+      'For every Annex III use except biometrics, the provider follows the internal control procedure in Annex VI, and no notified body is involved.',
+    practicalMeaning:
+      'Internal control is not the absence of an assessment. Annex VI still requires the quality management system, the technical documentation and a conformity check to exist and to be capable of being shown — what it removes is the external auditor, not the work.',
+    shortExtract:
+      'For high-risk AI systems referred to in points 2 to 8 of Annex III, providers shall follow the conformity assessment procedure based on internal control as referred to in Annex VI, which does not provide for the involvement of a notified body.',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-43',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT_2026_08_19,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-43-3-product-route',
+    ruleId: 'high-risk-provider-duties',
+    ...AI_ACT,
+    provision: 'Article 43(3)',
+    corpusArticle: '43',
+    applicableRoles: ['provider', 'product_manufacturer'],
+    conditions: [
+      'The system is covered by the Union harmonisation legislation listed in Section A of Annex I.',
+      'Your organisation is its provider or the manufacturer of the product it forms part of.',
+    ],
+    exceptions: [
+      'Article 43(3) does not create a second assessment: the Section 2 requirements become part of the sectoral one.',
+    ],
+    effectiveFrom: '2028-08-02',
+    plainEnglishSummary:
+      'Where the system is covered by the Union harmonisation legislation in Section A of Annex I, the provider follows that legislation’s own conformity assessment procedure, and the AI requirements are assessed as part of it.',
+    practicalMeaning:
+      'One assessment, not two — and where a system is both an Annex I product and an Annex III use, Article 43(3) is explicit that the Annex I procedure is the one that governs. The Article 17 quality management system is assessed alongside it, so the AI work does not disappear into the product route; it moves into it.',
+    shortExtract:
+      'For high-risk AI systems covered by the Union harmonisation legislation listed in Section A of Annex I, the provider of the system shall follow the relevant conformity assessment procedure as required in accordance with the relevant Union harmonisation legislation. The requirements set out in Section 2 of this Chapter shall apply to those high-risk AI systems and shall be part of that assessment.',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-43',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT_2026_08_19,
+    reviewStatus: 'internal',
+  },
+  {
+    id: 'prop-art-43-4-substantial-modification',
+    ruleId: 'high-risk-provider-duties',
+    ...AI_ACT,
+    provision: 'Article 43(4)',
+    corpusArticle: '43',
+    applicableRoles: ['provider', 'product_manufacturer'],
+    conditions: [
+      'The system has already been through a conformity assessment procedure.',
+      'It has since been substantially modified.',
+    ],
+    exceptions: [
+      'Changes pre-determined by the provider at the initial conformity assessment, and recorded in the Annex IV technical documentation, are expressly not a substantial modification — which is how a continuously-learning system stays assessed.',
+    ],
+    effectiveFrom: '2027-12-02',
+    plainEnglishSummary:
+      'A substantially modified high-risk system has to go through a new conformity assessment, whether or not the modified version is passed on to anyone else.',
+    practicalMeaning:
+      'The words "regardless of whether the modified system is intended to be further distributed" close the gap people assume is there: a change made only for your own continued use still triggers it. The way to keep a learning system out of this is Article 43(4)’s second subparagraph — describe the anticipated changes in the Annex IV documentation at the first assessment.',
+    shortExtract:
+      'High-risk AI systems that have already been subject to a conformity assessment procedure shall undergo a new conformity assessment procedure in the event of a substantial modification, regardless of whether the modified system is intended to be further distributed or continues to be used by the current deployer.',
+    officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-43',
+    rulepackVersion: PACK_VERSION,
+    reviewedAt: REVIEWED_AT_2026_08_19,
     reviewStatus: 'internal',
   },
   {

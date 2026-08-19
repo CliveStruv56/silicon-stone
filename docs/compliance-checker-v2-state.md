@@ -1,16 +1,17 @@
 # Compliance Checker v2 — where it is, and what to read first
 
-**Updated:** 2026-08-19. Phases 0–8 built; **release not taken**. Flag dark; v1 unchanged.
+**Updated:** 2026-08-19 (evening). Phases 0–8 built; **release not taken**. Flag
+dark; v1 unchanged.
 
 This is the one-page orientation. The plan of record is
 `docs/# EU AI Act Compliance Checker v2 — Impl.md`; per-phase history is
 `project_summary.md` §9 and §11; the invariants are in `CLAUDE.md`.
 
-> **Work in flight:** adding Articles 10, 14, 15, 16 **and 43** to the pinned
-> corpus so the high-risk provider path is complete. Approved 2026-08-19, all
-> five as one job. Read **`docs/rulepack-article-expansion-handoff.md`** before
-> starting — it carries the verified procedure and a worked design for Article
-> 43's conformity-assessment branch.
+> **Landed 2026-08-19 (evening):** Articles 10, 14, 15, 16 and 43 are in the
+> pinned corpus (rule pack **`2026-08-19`**) and the high-risk provider path emits
+> the whole of Chapter III Section 2. `docs/rulepack-article-expansion-handoff.md`
+> was the brief and is now history; the procedure it describes is live as
+> `npm run rulepack:fetch-article`.
 
 ---
 
@@ -32,13 +33,13 @@ decision.
 |-------|------|
 | `src/lib/compliance-v2/types.ts` | §6 contracts. `AnswerState`, `FindingKind` (nine — §4.2's eight plus `enforcement_information`), `FINDING_KIND_FROM_ACTION_KIND` as a total map from v1's vocabulary |
 | `conditions.ts` | Branch conditions as **data**, and their evaluator |
-| `questions/` | 79 questions: core triage (§7.2), role (§7.3), Annex III branches (§7.4), Annex I + Article 5 screen, transparency + Article 6(3), organisation size, 23 Article 5 per-practice condition questions (§7.6), and ten optional data-protection questions (§11.2) |
-| `engine/` | `scope`, `roles`, `organisation-size`, `annex-routes`, `article-5`, `article-50`, `classify`, `findings`, `dates`, `gdpr-ai`, `assemble` |
-| `legal-content/propositions.ts` | 33 curated propositions, every extract corpus-verified at build time |
+| `questions/` | 80 questions: core triage (§7.2), role (§7.3), Annex III branches (§7.4), Annex I + Article 5 screen, transparency + Article 6(3), organisation size, 23 Article 5 per-practice condition questions (§7.6), the one Article 43 standards question, and ten optional data-protection questions (§11.2) |
+| `engine/` | `scope`, `roles`, `organisation-size`, `annex-routes`, `article-5`, `article-43`, `article-50`, `classify`, `findings`, `dates`, `gdpr-ai`, `assemble` |
+| `legal-content/propositions.ts` | 42 curated propositions, every extract corpus-verified at build time |
 | `report/` | `deterministic`, `schema`, `verify` (§14.4), `generate`, `consent` |
 | `result-sections.ts` | §12.1's sections, the hide-empties rule, and `resultBlocks()` — which puts the GDPR overlay in §12.1's seventh slot without folding it into a finding-kind bucket |
 | `flow.ts` | Questionnaire navigation and answer invalidation |
-| `test-fixtures/golden-scenarios.ts` | 60 scenarios — every Annex III family, every Article 5 practice, §17.2's ten mandatory shapes |
+| `test-fixtures/golden-scenarios.ts` | 67 scenarios — every Annex III family, every Article 5 practice, every Article 43 route, §17.2's ten mandatory shapes |
 | `components/tools/checker-v2/` | `ComplianceCheckerV2`, `QuestionCard`, `ResultV2`, `FindingCard`, `GdprOverlayCard` |
 
 | `release/` | §20's criteria as checks (`acceptance.ts`), the v1/v2 shadow comparison (`shadow.ts`), and the golden-matrix coverage assertions |
@@ -80,13 +81,15 @@ the flag on.
    testing with users who do not know legal terminology or their own financial
    figures** (§17.5), and **the retention and marketing decisions**. v2 stays
    behind the flag until those land.
-5. **Six provider duties, not the whole of Chapter III Section 2.** Articles 9,
-   11, 12, 17, 19 and 49 are emitted and corpus-verified; Articles 10, 14, 15, 16
-   and 43 are not in the pinned corpus, so nothing could verify a citation to
-   them. A finding says so on screen rather than letting a short list read as a
-   complete one. **Approved and next up, all five as one job** — procedure,
-   gotchas and the Article 43 branch design are in
-   `docs/rulepack-article-expansion-handoff.md`.
+5. **The provider path is complete; the corpus still is not the Regulation.**
+   Chapter III Section 2 is emitted in full (Articles 9, 10, 11, 12, 14, 15, 16,
+   17 and 19), with Article 49 registration and Article 43's conformity
+   assessment. The caveat finding that admitted the earlier omission is deleted;
+   what survives is one line in the result footer saying the pack pins the
+   provisions this tool cites rather than the whole instrument. **The deployer
+   path has not had the same treatment** — it emits Article 26(6) and the
+   supplier-side Article 13 item, and the rest of Article 26 is not in the pack.
+   That is the next gap of this shape, and it is not yet approved.
 
 ## Decisions taken, and decisions still open
 
@@ -115,6 +118,12 @@ Open (spec §22, four remaining) — **do not guess these**:
 regression — it is the signal that v2 fixed something, and the test must be moved
 into the v2 suite with its assertion inverted rather than deleted.
 
-The second most likely: **the rule pack is `2026-08-18` now**, and every pack
-change is a version bump. `rulepack/versions/2026-08-10/` is still there and
-still resolvable by env var; do not edit either in place.
+The second most likely: **the rule pack is `2026-08-19` now**, and every pack
+change is a version bump. `2026-08-10` and `2026-08-18` are still there and still
+resolvable by `NEXT_PUBLIC_RULEPACK_VERSION`; do not edit any of them in place.
+`prebuild` fails on hash drift, which is the point.
+
+The third: **`reviewedAt` is per proposition and is not a batch stamp.** It
+renders as "last checked" on the card, so the nine propositions written on
+2026-08-19 carry that date and their thirty-three neighbours still carry
+2026-08-18. Re-dating a proposition nobody re-read is a false claim about work.

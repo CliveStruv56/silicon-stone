@@ -14,6 +14,7 @@ import { sizeReliefIsSettled } from './organisation-size'
 import { evaluateAnnexI, evaluateAnnexIII, evaluateArticle6Exemption } from './annex-routes'
 import { evaluateArticle5 } from './article-5'
 import { evaluateArticle50, routesOwedBy } from './article-50'
+import { evaluateConformityAssessment, requiresReassessment } from './article-43'
 import type { ClassificationResult } from './classify'
 import { ANNEX_III_APPLIES, ANNEX_I_APPLIES, isInApplication, packDate } from './dates'
 
@@ -254,11 +255,18 @@ export function buildLegalFindings(context: FindingContext): ComplianceFindingV2
      * available. A tool that tells the provider of a high-risk recruitment
      * system that they owe nothing is worse than one that says nothing at all.
      *
-     * Not the whole of Section 2 — Articles 10, 14, 15, 16 and 43 are not in the
-     * pinned corpus, so nothing here could verify a citation to them. What is
-     * here is the subset the pack can back, and the last finding says plainly
-     * that it is a subset. Adding the rest means adding them to the corpus,
-     * which is a pack version bump.
+     * Completed on 2026-08-19 with rule pack `2026-08-19`, which added Articles
+     * 10, 14, 15, 16 and 43 to the corpus. Until it did, a citation to any of
+     * them returned `uncovered` from `verifyCitation()` and a finding here
+     * carried a caveat saying so. The caveat is gone because it has nothing left
+     * to be about — Chapter III Section 2's requirements and the conformity
+     * assessment that assesses them are all emitted below.
+     *
+     * What is still true, and is said once in the section blurb rather than in a
+     * finding: the pack carries the provisions this engine cites, not the whole
+     * Regulation. Article 43 is handled in its own module because it decides a
+     * *procedure* rather than stating a duty, and which procedure differs by an
+     * external audit.
      */
     if (held.includes('provider')) {
       const PROVIDER_DUTIES: Array<{
@@ -281,6 +289,19 @@ export function buildLegalFindings(context: FindingContext): ComplianceFindingV2
           priority: 'high',
         },
         {
+          id: 'art-10-data-governance',
+          propositionId: 'prop-art-10-data-governance',
+          title: 'Govern the data the system was built on, and record how',
+          why: 'You supply this system. Article 10 is about the data behind it rather than the system itself, which is why it is the requirement most often discovered late.',
+          action:
+            'Work through Article 10(2)’s eight points against what you actually did. Most of them are decisions your team already made and did not write down; the examination for bias, and the measures that follow from it, are the ones that are genuinely new work.',
+          evidence: [
+            'A written description of the data sources, how the sets were prepared, and what was assumed about them.',
+            'The bias examination, what it found, and what was done about it.',
+          ],
+          priority: 'high',
+        },
+        {
           id: 'art-11-technical-documentation',
           propositionId: 'prop-art-11-technical-documentation',
           title: 'Draw up the technical documentation before launch, not after',
@@ -298,6 +319,45 @@ export function buildLegalFindings(context: FindingContext): ComplianceFindingV2
           action:
             'Check what the system records today against what Article 12(2) asks it to enable, and treat any gap as engineering work with a deadline rather than as documentation.',
           evidence: ['A description of what is logged, and a sample export.'],
+          priority: 'high',
+        },
+        {
+          id: 'art-14-human-oversight',
+          propositionId: 'prop-art-14-human-oversight',
+          title: 'Build the system so a person can actually overrule it',
+          why: 'You supply this system, so whether a person can interrupt or reverse its output is a property of what you build rather than something a customer can add.',
+          action:
+            'Check three things against Article 14(4): that a person can interpret the output, that they can decide not to act on it, and that there is a way to stop the system safely. Where a measure is for the deployer to implement, say so in the instructions for use — Article 14(3)(b) allows that, and silence does not.',
+          evidence: [
+            'The oversight measures, split between those built in and those left to the deployer.',
+            'The instructions for use where they describe them.',
+          ],
+          priority: 'high',
+        },
+        {
+          id: 'art-15-accuracy-robustness',
+          propositionId: 'prop-art-15-accuracy-robustness',
+          title: 'Declare the accuracy figures, and defend the system against the attacks named',
+          why: 'You supply this system. Article 15(3) puts the accuracy levels and metrics in the instructions for use, which makes them a commitment your deployers can hold you to.',
+          action:
+            'Decide the metric before you decide the number, and publish both. On the security half, Article 15(5) names what to address — data poisoning, model poisoning, adversarial examples, confidentiality attacks and model flaws — which is a shorter and more concrete list than a general security review would produce.',
+          evidence: [
+            'The declared accuracy levels and metrics, and the testing behind them.',
+            'The technical measures taken against the Article 15(5) attack classes.',
+          ],
+          priority: 'high',
+        },
+        {
+          id: 'art-16-provider-obligations',
+          propositionId: 'prop-art-16-provider-obligations',
+          title: 'Complete the provider’s own checklist, including the four items that are not elsewhere',
+          why: 'You supply this system. Article 16 lists twelve obligations; most cross-refer to the Articles above, and four do not appear anywhere else on this page.',
+          action:
+            'Deal with the four that stand alone: your name and contact address on the system or its packaging, the EU declaration of conformity under Article 47, the CE marking under Article 48, and accessibility under Directives (EU) 2016/2102 and (EU) 2019/882. None is large, and all four are visible on the product itself.',
+          evidence: [
+            'The EU declaration of conformity, and where the CE marking and contact details appear.',
+            'The accessibility assessment.',
+          ],
           priority: 'high',
         },
         {
@@ -374,30 +434,112 @@ export function buildLegalFindings(context: FindingContext): ComplianceFindingV2
       }
 
       /**
-       * And the honest limit on the list above. §4.5 forbids irrelevant
-       * material; it does not permit a subset presented as a whole. A provider
-       * reading five duties and inferring that five is the number would be
-       * misled by an omission this tool created.
+       * Article 43 — which conformity assessment procedure, not whether there is
+       * one.
+       *
+       * Emitted from its own evaluator rather than as a row in PROVIDER_DUTIES,
+       * because the three routes are not variations on one duty: Annex VI is an
+       * internal check, Annex VII is an external audit with a lead time in
+       * months, and the Annex I route is another instrument's procedure
+       * altogether. A card that said "undergo a conformity assessment" would
+       * leave the reader with the one question they came with.
        */
-      findings.push({
-        id: 'high-risk-provider-duties-incomplete',
-        ruleId: 'high-risk-provider-duties',
-        title: 'This is not the complete list of what a provider owes',
-        kind: 'unresolved_issue',
-        applicability: 'applies',
-        appliesToRoles: ['provider'],
-        whyItApplies:
-          'The duties above are the ones this tool can quote from the statute it has pinned. Chapter III, Section 2 contains more of them, and they are no less binding for being absent here.',
-        practicalMeaning:
-          'Data governance, human oversight, accuracy and robustness, the provider obligations in Article 16 and the conformity assessment in Article 43 all apply to a high-risk system and are not assessed above. This tool shows what it can verify against its pinned copy of the Regulation, and says so rather than letting a short list read as a complete one.',
-        action:
-          'Read Chapter III, Section 2 in full, or have someone read it for you, before treating the list above as your scope of work.',
-        evidenceToKeep: [],
-        triggeringAnswerIds: classification.triggeringAnswerIds,
-        missingAnswerIds: [],
-        priority: 'high',
-        confidence: 'high',
-      })
+      const conformity = evaluateConformityAssessment(answers, annexIII, annexI)
+      if (conformity) {
+        const unresolved = conformity.route === 'unresolved'
+        findings.push({
+          id: 'art-43-conformity-assessment',
+          ruleId: 'high-risk-provider-duties',
+          title: unresolved
+            ? 'Which conformity assessment procedure applies is not settled'
+            : `Conformity assessment: ${conformity.procedure}`,
+          /**
+           * An unresolved route is an `unresolved_issue`, never a duty with a
+           * hedge in its prose. §12.1 puts the two in different sections with
+           * different verbs, and `verify.ts` strips mandatory language from a
+           * non-binding finding — so the wording below has to stay descriptive.
+           */
+          kind: unresolved ? 'unresolved_issue' : highRiskKind,
+          applicability: unresolved
+            ? 'cannot_determine'
+            : classification.classification === 'likely_high_risk'
+              ? 'applies'
+              : 'possibly_applies',
+          appliesToRoles: ['provider'],
+          effectiveFrom: unresolved ? undefined : highRiskDate.display,
+          whyItApplies: conformity.explanation,
+          practicalMeaning:
+            PROPOSITION_BY_ID.get(conformity.propositionId)?.practicalMeaning ??
+            'Article 43 decides which conformity assessment procedure a high-risk system goes through before it is placed on the market.',
+          // Route-specific, from the evaluator: one template around `procedure`
+          // reads as English on two of the five routes and as filler on the rest.
+          action: conformity.action,
+          // Route-specific, from the evaluator. A generic list named a notified
+          // body on the one route — Article 43(2) — that expressly has none.
+          evidenceToKeep: conformity.evidence,
+          triggeringAnswerIds: conformity.triggeringAnswerIds,
+          missingAnswerIds: conformity.missingAnswerIds,
+          source: sourceFrom(conformity.propositionId),
+          priority: 'high',
+          confidence: unresolved ? 'low' : classification.confidence,
+        })
+
+        conformity.readerChecks.forEach((check, index) => {
+          // Its own card rather than a line inside the one above, because each is
+          // a fact the questionnaire does not establish — and an assumption
+          // stated is a different object from one made. Each carries its own
+          // title: two cards under one heading in one section read as one card.
+          findings.push({
+            id: `art-43-check-${index}`,
+            ruleId: 'high-risk-provider-duties',
+            title: check.title,
+            kind: 'recommended_safeguard',
+            applicability: 'applies',
+            appliesToRoles: ['provider'],
+            whyItApplies: `The conformity assessment route this result gives you rests on facts about your system and your customers, and this is one the questionnaire cannot establish from your answers. ${conformity.provision} is where it comes from.`,
+            practicalMeaning: check.detail,
+            action:
+              'Settle it against your own position, and record the answer beside the assessment. A route chosen on an unexamined assumption is the one that gets revisited late, when the date has already been promised.',
+            evidenceToKeep: ['A dated note of what you checked and what you concluded.'],
+            triggeringAnswerIds: conformity.triggeringAnswerIds,
+            missingAnswerIds: [],
+            priority: 'normal',
+            confidence: 'medium',
+          })
+        })
+      }
+
+      /**
+       * Article 43(4). Not a route but a trigger, and it can fire alongside any
+       * of them — so it is a separate finding rather than a paragraph inside the
+       * one above.
+       */
+      if (requiresReassessment(answers)) {
+        findings.push({
+          id: 'art-43-4-reassessment',
+          ruleId: 'high-risk-provider-duties',
+          title: 'The modification means a new conformity assessment, not an amended one',
+          kind: highRiskKind,
+          applicability: 'applies',
+          appliesToRoles: ['provider'],
+          effectiveFrom: highRiskDate.display,
+          whyItApplies:
+            'You told us the system has been substantially modified. Article 43(4) requires a high-risk system that has already been through a conformity assessment to undergo a new one in that event — and it says so regardless of whether the modified system is passed on to anyone else, which is the gap most people assume is there.',
+          practicalMeaning:
+            PROPOSITION_BY_ID.get('prop-art-43-4-substantial-modification')?.practicalMeaning ?? '',
+          action:
+            'Treat the modified system as a new one for assessment purposes. If it learns continuously, describe the changes you anticipate in the Annex IV technical documentation at the next assessment — Article 43(4) takes pre-determined changes out of "substantial modification", and that is the only way a learning system stays assessed.',
+          evidenceToKeep: [
+            'A description of what changed, when, and why it is or is not substantial.',
+            'The new conformity assessment record.',
+          ],
+          triggeringAnswerIds: ['material_modification'],
+          missingAnswerIds: [],
+          source: sourceFrom('prop-art-43-4-substantial-modification'),
+          priority: 'high',
+          confidence: classification.confidence,
+        })
+      }
     }
 
     if (held.includes('provider') && exemption.outcome === 'available') {

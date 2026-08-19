@@ -115,15 +115,25 @@ mandatory once you opt in. The structural split and the labelling are the whole
 mitigation; do not assume `verifyReport()` covers this.
 
 `/tools/compliance-checker/provisions/[article]` renders the pinned corpus for a
-reader: 20 statically prerendered server pages, because `rulepack/corpus.ts` is
-`server-only` and the checker is a Client Component. Each sets its **own**
-canonical — the parent layout hard-codes one pointing at the checker, which
-inherited would deindex all 19. Statute published on a commercial site carries the
+reader: 25 statically prerendered server pages, because `rulepack/corpus.ts` is
+`server-only` and the checker is a Client Component. The count is not hardcoded —
+the index renders `coveredArticles().length`, so it follows the pack. Each page
+sets its **own** canonical — the parent layout hard-codes one pointing at the
+checker, which inherited would deindex all but one. Statute published on a
+commercial site carries the
 EUR-Lex "consolidated text, no legal value, only the OJ is authentic" notice and
 the EU source acknowledgement; that is not decoration.
 
-Corpus coverage is partial: **19 Articles plus Annex III** (added 2026-08-18 in
-pack `2026-08-18`, from the same CELEX). Annex III is keyed `annex-iii`, not a
+Corpus coverage is partial: **24 Articles plus Annex III**. Annex III arrived
+2026-08-18; Articles 10, 14, 15, 16 and 43 on 2026-08-19 in pack `2026-08-19`,
+both from the same CELEX and with `corpusCutOff` unmoved at `2026-07-27` — the
+same consolidation, just more of it read out of it. Fetch an Article with
+`npm run rulepack:fetch-article -- --version <pack> --article <n>`, which is the
+Annex script's twin and asserts the served consolidation date the same way. It
+emits each lettered point on one line, as the Annex fetcher does; the original
+nineteen Articles put the marker in its own block. The two forms normalise
+identically, so a citation verifies the same either way — do not add a reshaping
+step to make them look alike. Annex III is keyed `annex-iii`, not a
 number — `corpusPath()` and `coveredArticles()` branch on that prefix, and
 `provisionLabel()` exists so no page is ever headed "Article annex-iii". A
 numeric sort over a mixed key set yields NaN comparisons, which is an unstable
@@ -193,14 +203,27 @@ still reports `potentially_prohibited` at `medium` confidence: §6.3's enum has 
 system, and the content is `reviewStatus: 'internal'`. Do not add a `prohibited`
 classification without counsel review.
 
-**A short list of duties must say that it is short.** The high-risk provider path
-emits Articles 9, 11, 12, 17, 19 and 49, because those are the ones the pinned
-corpus can back — and a seventh finding says in terms that Articles 10, 14, 15,
-16 and 43 apply and are not assessed. (Adding all five is approved and next up,
-as one job: `docs/rulepack-article-expansion-handoff.md`. The caveat finding is
-deleted when they land — do not delete it before.) Before that existed, a high-risk provider
-was told it owed nothing at all, which Phase 8's shadow comparison found. Do not
-delete the caveat finding to tidy the list.
+**The high-risk provider path emits the whole of Chapter III Section 2**, as of
+2026-08-19: Articles 9, 10, 11, 12, 14, 15, 16, 17 and 19, plus registration
+under Article 49 and the conformity assessment under Article 43. Before any of it
+existed a high-risk provider was told it owed nothing at all, which Phase 8's
+shadow comparison found; between 2026-08-19 morning and evening it was a six-item
+list with a caveat finding admitting the omission. **The caveat is now deleted**,
+because a caveat that no longer bites is worse than none — its surviving idea, that
+the pack holds the provisions this tool cites rather than the Regulation, is said
+once in the result footer instead. Do not reintroduce it as a finding.
+
+**Article 43 is a procedure, not a duty, and is emitted from its own module**
+(`engine/article-43.ts`, shaped like `article-50.ts`). Three routes: Annex I
+sectoral (43(3), checked first — its fourth subparagraph settles the overlap with
+Annex III explicitly), the Annex VI/VII choice on Annex III point 1 (43(1)), and
+flat Annex VI internal control on points 2 to 8 (43(2)). The one new question,
+`art43_harmonised_standards`, opens only on the point 1 provider branch. **An
+unknown answer there leaves the route unresolved and must never default to Annex
+VI** — it is the cheaper procedure, so guessing it is the expensive direction to
+be wrong in, and `golden-matrix.test.ts` asserts the card neither says "Annex VI"
+nor "internal control" on that path. Article 43(4) is a separate finding: a
+substantial modification needs a *new* assessment regardless of redistribution.
 
 **§20 is executable, and `automatedClean` is not `ready`.**
 `release/acceptance.ts` checks 16 of the 18 criteria; criterion 14 is `manual`

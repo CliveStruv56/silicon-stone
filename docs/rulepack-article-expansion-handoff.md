@@ -1,5 +1,19 @@
 # Adding Articles 10, 14, 15, 16 and 43 to the rule pack
 
+> **DONE — 2026-08-19 (evening).** All five Articles are in rule pack
+> `2026-08-19`, the fetch script exists as `npm run rulepack:fetch-article`, and
+> the caveat finding is deleted. This page is kept as the record of what was
+> decided and why, not as work outstanding. Current state:
+> `docs/compliance-checker-v2-state.md`; what shipped: `project_summary.md` §9.
+>
+> Three things went differently from the plan below, all recorded there in full:
+> the Article 43 question is gated on the point 1 branch **and** a provider
+> route, not on the branch alone; the reader-check wrinkle became its own
+> findings with their own titles rather than one condition; and the browser
+> walk-through found two defects in the first cut, which is the third time it has
+> paid for itself.
+
+
 **Written 2026-08-19**, scope settled the same day: **all five Articles are one
 job.** Everything below was verified against the repo on that date; paths, script
 names and line references are real, not remembered.

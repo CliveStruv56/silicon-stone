@@ -1,5 +1,7 @@
 'use client'
 
+import Link from 'next/link'
+import { RULE_PACK } from '@/lib/rulepack'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { FindingCard } from './FindingCard'
@@ -178,6 +180,29 @@ export function ResultV2({ result }: { result: ComplianceResultV2 }) {
 
       <div className="space-y-3 rounded-lg border border-border-subtle bg-stone-charcoal p-6 text-sm text-text-muted">
         <p>{result.disclaimer}</p>
+        {/*
+          What the pack covers, said once and here.
+
+          This replaces a finding — `high-risk-provider-duties-incomplete` —
+          which existed while the corpus held six of the high-risk provider's
+          duties and said so on the result. Rule pack 2026-08-19 added the rest,
+          so the finding was deleted rather than narrowed. The idea behind it
+          survives: the pack is the provisions this assessment cites, not the
+          Regulation, and a reader should be able to tell what is assessed from
+          what is not. A footnote is the right volume for that; a finding was
+          too loud once it stopped naming a specific gap.
+        */}
+        <p>
+          The rule pack behind this result pins{' '}
+          {Object.keys(RULE_PACK.manifest.corpus).length} provisions of the Regulation verbatim —
+          the ones this assessment cites, not the whole instrument. Every quotation above is matched
+          against that text before it is shown, which is also why a duty the pack cannot quote does
+          not appear here at all. You can{' '}
+          <Link href="/tools/compliance-checker/provisions" className="text-stone-teal hover:underline">
+            read what it holds
+          </Link>
+          .
+        </p>
         <p className="font-mono text-xs">
           Assessed {result.assessedAt} · checker {result.checkerVersion} · rule pack{' '}
           {result.rulepackVersion} · schema v{result.schemaVersion}
