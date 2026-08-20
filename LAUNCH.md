@@ -207,14 +207,13 @@ one extra click between a reader and a payment.
       (which moves every page at once), then the matching Studio document.
 - [ ] `lemonVariantId` is only read for Model-B on-site unlock. All three
       products are `deliveryModel: download`, so leave it blank.
-- [ ] An article only gets a commerce gate if its `categories` intersect a
-      product's `topics`. Four published articles have **no categories at all**
-      and therefore fall back to the newsletter gate — including
-      `eu-ai-act-compliance-chasm-august-2026`, the most toolkit-aligned piece
-      on the site. Tag them (`ai-act` at minimum) or the flagship article sells
-      nothing. The other three: `tariff-enforcement-collision`,
-      `greenland-critical-minerals-transatlantic-scramble`,
-      `open-source-sovereignty`.
+- [x] ~~Four published articles have no categories and fall back to the
+      newsletter gate.~~ **Done — verified 2026-08-20.** All four now carry two
+      or three categories, and no published article has an empty `categories`.
+      `eu-ai-act-compliance-chasm-august-2026` is tagged `ai-act` +
+      `european-sovereignty`, so the flagship piece does now intersect the
+      toolkit's topics. Kept for the rule, which still holds: an article only
+      gets a commerce gate if its `categories` intersect a product's `topics`.
 
 ### Lemon Squeezy — webhook
 

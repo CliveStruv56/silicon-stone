@@ -140,7 +140,11 @@ describe('captureSource', () => {
     expect(result.created).toBe(true)
     expect(result.documentId).toBe('knowledgeSource.uuid-1')
     expect(result.status).toBe('inbox')
-    expect(result.reviewUrl).toBe('/knowledge?record=knowledgeSource.uuid-1')
+    // Opens the record itself in Studio. It used to point at /knowledge, which
+    // never read the parameter and does not list knowledge records at all.
+    expect(result.reviewUrl).toBe(
+      '/studio/intent/edit/id=knowledgeSource.uuid-1;type=knowledgeSource',
+    )
     expect(result.duplicate.duplicate).toBe(false)
 
     const doc = h.created[0]

@@ -1,13 +1,16 @@
 /**
  * Content Sync Script
  *
- * Syncs markdown articles from AI Writer System to Sanity CMS
+ * Syncs markdown articles from AI Writer System to Sanity CMS.
+ *
+ * It writes DRAFTS ONLY and never publishes. Review and publish in Studio,
+ * where the publish preflight runs. See resolveDraftTarget() for why.
  *
  * Usage: npx tsx scripts/sync-content.ts
  *
  * Options:
  *   --dry-run    Preview what would be synced without making changes
- *   --force      Overwrite existing articles even if unchanged
+ *   --force      Re-write the draft even when the source file is unchanged
  */
 
 import { createClient } from '@sanity/client'
@@ -173,48 +176,78 @@ function parseMarkdownFile(filePath: string): ParsedArticle | null {
 }
 
 /**
- * Check if article already exists in Sanity
+ * Resolve where a synced article should be written.
+ *
+ * The sync writes DRAFTS ONLY, never published documents. In Sanity the id is
+ * the publish state — `drafts.x` is the unpublished draft of `x`, anything else
+ * is live. This script used to `client.create()` with no id (which publishes),
+ * set `publishedAt`, and `.set()`-patch whatever document shared the slug —
+ * so a re-run could overwrite a live article's body, and nothing ever passed
+ * the publish preflight or its [AUTHOR: …] placeholder block.
+ *
+ * Resolution order:
+ *  - an existing article with this slug (published or not) → write to ITS draft
+ *    twin, so the sync stages an edit to that article rather than creating a
+ *    duplicate with the same slug;
+ *  - nothing yet → write to the deterministic `drafts.<slug>`.
+ *
+ * `perspective: 'raw'` is required: on apiVersion >= 2026-01-13 the client
+ * defaults to the published perspective and cannot see `drafts.*` at all.
  */
-async function getExistingArticle(slug: string): Promise<{ _id: string; sourceHash?: string } | null> {
-  const result = await client.fetch(
-    `*[_type == "article" && slug.current == $slug][0]{ _id, sourceHash }`,
-    { slug }
+async function resolveDraftTarget(
+  slug: string,
+): Promise<{ draftId: string; sourceHash?: string; existingPublishedId?: string }> {
+  const rows: Array<{ _id: string; sourceHash?: string }> = await client.fetch(
+    `*[_type == "article" && slug.current == $slug]{ _id, sourceHash }`,
+    { slug },
+    { perspective: 'raw' },
   )
-  return result
+
+  const published = rows.find((r) => !r._id.startsWith('drafts.'))
+  const draftId = published ? `drafts.${published._id}` : `drafts.${slug}`
+  const draft = rows.find((r) => r._id === draftId)
+
+  return {
+    draftId,
+    // Prefer the draft's hash — it is what the previous sync wrote.
+    sourceHash: draft?.sourceHash ?? published?.sourceHash,
+    existingPublishedId: published?._id,
+  }
 }
 
 /**
  * Create or update article in Sanity
  */
 async function syncArticle(article: ParsedArticle): Promise<{ action: string; id: string }> {
-  const existing = await getExistingArticle(article.slug)
+  const target = await resolveDraftTarget(article.slug)
 
   // Check if we need to update
-  if (existing && !forceUpdate && existing.sourceHash === article.hash) {
-    return { action: 'skipped', id: existing._id }
+  if (target.sourceHash === article.hash && !forceUpdate) {
+    return { action: 'skipped', id: target.draftId }
   }
 
   const portableText = markdownToPortableText(article.body)
 
-  const doc: Partial<SanityArticle> & { _type: string } = {
+  const doc: Partial<SanityArticle> & { _type: string; _id: string } = {
+    _id: target.draftId,
     _type: 'article',
     title: article.title,
     slug: { _type: 'slug', current: article.slug },
     excerpt: article.subjectLine || article.previewText,
     body: portableText,
-    publishedAt: new Date().toISOString(),
+    // No publishedAt. Setting it here dated every synced article to the moment
+    // the script ran, on a document nobody had reviewed. Studio sets it when a
+    // human publishes.
     contentType: 'deepdive', // Default to deepdive
     sourceHash: article.hash,
   }
 
-  if (existing) {
-    // Update existing
-    const updated = await client.patch(existing._id).set(doc).commit()
-    return { action: 'updated', id: updated._id }
-  } else {
-    // Create new
-    const created = await client.create(doc)
-    return { action: 'created', id: created._id }
+  // createOrReplace, always against the draft id — idempotent, and it cannot
+  // reach a published document however many times it runs.
+  const written = await client.createOrReplace(doc as SanityArticle & { _id: string })
+  return {
+    action: target.existingPublishedId ? 'staged-edit' : 'drafted',
+    id: written._id,
   }
 }
 
@@ -278,12 +311,12 @@ async function main() {
       const result = await syncArticle(article)
 
       switch (result.action) {
-        case 'created':
-          console.log(`   ✅ ${filename}: Created (${result.id})`)
+        case 'drafted':
+          console.log(`   ✅ ${filename}: New draft (${result.id})`)
           results.created++
           break
-        case 'updated':
-          console.log(`   🔄 ${filename}: Updated (${result.id})`)
+        case 'staged-edit':
+          console.log(`   🔄 ${filename}: Edit staged as a draft of the published article (${result.id})`)
           results.updated++
           break
         case 'skipped':

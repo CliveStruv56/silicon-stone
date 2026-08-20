@@ -194,10 +194,38 @@ describe('sanitiseIdFragment', () => {
 })
 
 describe('knowledgeReviewUrl', () => {
-  it('points at the existing admin page rather than a route that does not exist', () => {
-    expect(knowledgeReviewUrl('knowledgeItem.x')).toBe('/knowledge?record=knowledgeItem.x')
+  it('opens the record itself in Studio', () => {
+    expect(knowledgeReviewUrl('knowledgeItem.x')).toBe(
+      '/studio/intent/edit/id=knowledgeItem.x;type=knowledgeItem',
+    )
+    expect(knowledgeReviewUrl('knowledgeSource.abc')).toBe(
+      '/studio/intent/edit/id=knowledgeSource.abc;type=knowledgeSource',
+    )
+    expect(knowledgeReviewUrl('researchRun.7')).toBe(
+      '/studio/intent/edit/id=researchRun.7;type=researchRun',
+    )
+  })
+
+  it('resolves a draft to its published twin', () => {
+    // Studio opens the draft automatically when one exists; linking to the
+    // drafts.* id directly would not resolve.
     expect(knowledgeReviewUrl('drafts.knowledgeItem.x')).toBe(
-      '/knowledge?record=knowledgeItem.x',
+      '/studio/intent/edit/id=knowledgeItem.x;type=knowledgeItem',
+    )
+  })
+
+  it('accepts an explicit type', () => {
+    expect(knowledgeReviewUrl('legacy-handle', 'knowledgeSource')).toBe(
+      '/studio/intent/edit/id=legacy-handle;type=knowledgeSource',
+    )
+  })
+
+  it('falls back to the admin page for a legacy ID with no type in it', () => {
+    // Pre-foundation records predate the `<type>.<uuid>` shape. An intent
+    // without a type does not resolve, so send them somewhere admin-gated and
+    // real rather than somewhere broken.
+    expect(knowledgeReviewUrl('mittr-2026-05-14-ai-sovereignty')).toBe(
+      '/knowledge?record=mittr-2026-05-14-ai-sovereignty',
     )
   })
 })

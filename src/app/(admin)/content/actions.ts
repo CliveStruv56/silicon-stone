@@ -57,10 +57,17 @@ export async function syncContent(_prevState: ActionState, _formData: FormData):
             }
 
             // 4. Deterministic ID based on filename (which includes date and slug)
-            // Sanity IDs should be valid strings. We can use a prefix.
             // Filename: 2026-01-22-slug.md
+            //
+            // The prefix MUST be `drafts.` (plural). In Sanity the id *is* the
+            // publish state: `drafts.x` is the unpublished draft of `x`, and any
+            // other id is a live document. This used to read `draft.` — singular,
+            // which Sanity treats as an ordinary id — so every sync published
+            // straight to the site, bypassing the publish preflight and its
+            // [AUTHOR: …] placeholder block. Syncing stages content for review;
+            // publishing stays a human act in Studio.
             const fileSlug = file.path.split('/').pop()?.replace('.md', '') || 'unknown';
-            const sanityId = `draft.${fileSlug}`;
+            const sanityId = `drafts.${fileSlug}`;
 
             // 5. Sync
             await createArticleInSanity({

@@ -152,13 +152,34 @@ export function sanitiseIdFragment(value: string): string {
 }
 
 /**
- * Where a human goes to review a record.
+ * Where a human goes to review a record: the document itself, open in Studio.
  *
- * `/knowledge` is the existing admin page and is admin-gated, so this always
- * lands somewhere real. The cockpit that will read the `record` parameter is
- * wave 4; until then the link opens the inbox rather than 404ing, which is the
- * right failure for something an external adapter puts in front of a user.
+ * This used to return `/knowledge?record=<id>`. That page never read the
+ * `record` parameter and does not list knowledge items at all — it is the
+ * pre-foundation capture workspace — so every capture handed the user a link
+ * that landed somewhere real and useless. The wave-4 cockpit that would have
+ * read it does not exist.
+ *
+ * Two things make the Studio **intent** URL the right target rather than a
+ * structure path:
+ *
+ *  - A structure path has to name a pane, and the obvious one
+ *    (`knowledge;inbox;itemsAwaitingReview;<id>`) is a *filtered* list. The
+ *    link would break the moment the record left the inbox — which is exactly
+ *    what the person following it went there to do.
+ *  - An intent resolves by type at navigation time, so it survives the
+ *    structure being retitled, and falls back to a standalone editor rather
+ *    than an empty pane if resolution ever fails.
+ *
+ * The type is derived from the ID's own `<type>.<uuid>` shape, so no caller
+ * has to pass it. Legacy IDs predate that shape; for those we keep the old
+ * admin-gated path, which is at least somewhere the reviewer can act.
  */
-export function knowledgeReviewUrl(documentId: string): string {
-  return `/knowledge?record=${encodeURIComponent(publishedId(documentId))}`
+export function knowledgeReviewUrl(documentId: string, documentType?: string): string {
+  const id = publishedId(documentId)
+  const type = documentType ?? parseCanonicalDocumentId(id)?.type
+  if (!type) {
+    return `/knowledge?record=${encodeURIComponent(id)}`
+  }
+  return `/studio/intent/edit/id=${encodeURIComponent(id)};type=${encodeURIComponent(type)}`
 }

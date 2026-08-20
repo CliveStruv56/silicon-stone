@@ -109,11 +109,16 @@ const captureKnowledgeItemSchema = z.object({
 const captureSourceSchema = z.object({
   title: z.string().describe('A short title. Required.'),
   sourceKind: z.enum(KNOWLEDGE_SOURCE_KINDS).describe('What kind of artefact this is. Required.'),
-  url: z.string().optional().describe('The original URL, if it has one.'),
+  url: z
+    .string()
+    .optional()
+    .describe('The original URL. Required unless you provide `text` instead.'),
   text: z
     .string()
     .optional()
-    .describe('The source text. Provide this or a URL — the text is not fetched for you.'),
+    .describe(
+      'The source text. Required unless you provide `url` instead — the text is not fetched for you.',
+    ),
   publisher: z.string().optional(),
   author: z.string().optional(),
   publishedDate: z
@@ -130,6 +135,18 @@ const captureSourceSchema = z.object({
   tags: z.array(z.string()).optional(),
   provenance: provenanceSchema,
 })
+  // One of `url` or `text` is required. The rule is decided in
+  // src/lib/knowledge/schema.ts, which stays the single decider; this only
+  // DESCRIBES it, so the model can satisfy it first time instead of learning
+  // from an error.
+  //
+  // It has to be .meta() rather than .refine(). A refinement is silently
+  // dropped by both JSON-Schema conversion paths, so the model would never see
+  // it — and worse, it would make the MCP SDK reject the call as a JSON-RPC
+  // protocol error, which is invisible to the model and cannot be corrected.
+  // Tool input schemas here are a loose superset that describes rather than
+  // decides; see the note at the top of this file.
+  .meta({ anyOf: [{ required: ['url'] }, { required: ['text'] }] })
 
 const searchSchema = z.object({
   query: z.string().describe('Words to look for in titles, summaries and bodies.'),

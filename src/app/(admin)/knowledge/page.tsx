@@ -446,7 +446,11 @@ export default function KnowledgePage() {
                       <Link href={`/analysis/${result.slug}`} target="_blank" className="flex items-center gap-1 text-xs text-primary hover:underline">
                         <ExternalLink className="w-3 h-3" /> View
                       </Link>
-                      <Link href={`/studio/structure/article;${result.slug}`} target="_blank" className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground hover:underline">
+                      {/* Intent URL keyed on the document _id. This used to be
+                          `/studio/structure/article;${result.slug}` — a slug
+                          where a document ID is required, so the link never
+                          opened anything. */}
+                      <Link href={`/studio/intent/edit/id=${result.id};type=article`} target="_blank" className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground hover:underline">
                         <FileText className="w-3 h-3" /> Edit
                       </Link>
                     </div>

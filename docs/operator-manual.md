@@ -3,7 +3,7 @@
 How an article gets researched, drafted, edited, checked, published, and captured
 back into knowledge. Written for the person running the publication.
 
-**Verified against commit `638bcf18`, 20 August 2026.** Every claim here was
+**Verified against commit `PENDING`, 20 August 2026.** Every claim here was
 checked against the code on that date. Where something could not be checked by
 reading code, it is listed in [Appendix D — What has not been verified](#appendix-d--what-has-not-been-verified).
 If you are reading this months later, the header is the first thing to distrust.
@@ -525,8 +525,20 @@ Guide starts with zero citations. Either add them by hand from the research pane
 or run a fact-check and let it append what it finds. This is expected behaviour,
 not a fault — but do not let its familiarity train you to dismiss the dialog.
 
-**⚠ The preflight runs entirely in your browser.** Anything that writes or publishes
-outside Studio — a script, the MCP, the CLI — bypasses it completely.
+**⚠ The preflight runs entirely in your browser.** It only fires when you press
+Publish in Studio, so anything that publishes by another route would bypass it.
+
+As of 20 August 2026 nothing in the repo does. Two paths used to: the **Sync**
+button in `/content` and `npm run sync-content` both wrote *published*
+documents, so a markdown file with an unresolved `[AUTHOR: …]` placeholder went
+straight to the live site — and the script could overwrite a published article's
+body. Both now write **drafts only**, which you review and publish in Studio like
+anything else. A test holds that line.
+
+What remains true: a Sanity write token bypasses every client-side control by
+definition. Anyone editing through sanity.io/manage, the CLI or an MCP with a
+write token can publish without the check. That is a property of the token, not
+something the app can prevent.
 
 ---
 
@@ -692,7 +704,7 @@ client alias, not the server's name.
 | Tool | Required | Notes |
 |---|---|---|
 | `capture_knowledge_item` | `title`, `kind`, `body` | `kind` is one of: idea, observation, conversation extract, article foundation, outline, synthesis, claim, question, note. Optionally link topics, sources, related items, and a confidence or intended use. |
-| `capture_source` | `title`, `sourceKind`, and **one of `url` or `text`** | ⚠ The url-or-text rule is enforced but is **not** expressed in the tool's parameter list, so the failure is surprising: *"Provide a URL, the source text, or declare that extraction is expected."* |
+| `capture_source` | `title`, `sourceKind`, and **one of `url` or `text`** | The url-or-text rule is now declared in the tool schema, so Claude should satisfy it first time. If it does not, the error reads: *"Provide a URL, the source text, or declare that extraction is expected."* |
 | `link_sources_to_item` | `itemId`, `sourceIds` | The only write to an existing record, and it touches **one field**. Additive — existing links survive. Refuses an item you have already reviewed. |
 
 **Reads:** `list_knowledge_inbox` (what is waiting), `search_knowledge` (text
@@ -737,19 +749,17 @@ Runs**, **Topics**, **Needs Attention** (index errors, extraction problems), and
 Review states are **Inbox → Ready / Rejected / Superseded**. Superseded is
 terminal.
 
+**Every capture hands back a "Review it here" link that opens the record itself
+in Studio.** Follow it and you land on the document, ready to edit. (Until
+20 August 2026 that link pointed at `/knowledge`, which never read it and does
+not list captured records — it went somewhere real and useless.)
+
 > **Legacy note:** older records use a different status field where `error` meant
 > "capture failed", not "rejected". Those two are kept separate on purpose — an
 > extraction failure is not an editorial verdict, and collapsing them would
 > silently discard records nobody judged.
 
-### ⚠ Two things that do not work as documented
-
-**The "Review it here" link does not take you to the record.** Every capture returns
-a link to `/knowledge?record=<id>`. That page does not read the `record` parameter
-and does not list captured items at all — it is the older capture workspace. The
-link lands somewhere real, just not on your record.
-
-> **Your actual route to a captured record is Studio → Knowledge → Inbox.**
+### ⚠ The review rules are not enforced
 
 **The review rules are not enforced.** The code contains a review state machine —
 legal transitions, withdrawal from the index when a record leaves Ready, a rule
@@ -865,7 +875,10 @@ Expected. `/create` does not save the Source Index. Add citations by hand or run
 fact-check to have primary sources appended. See §7c.
 
 ### I captured something and cannot find it
-The link you were given does not work (§11). Go to **Studio → Knowledge → Inbox**.
+Follow the "Review it here" link the capture returned — it opens the record in
+Studio. If you no longer have it, go to **Studio → Knowledge → Inbox**. Records
+captured before 20 August 2026 were given a link that did not work; the inbox is
+the way to those.
 
 ### The Quotation Audit says UNCOVERED
 No statutory text was retrieved, so nothing could be checked. Either the topic did

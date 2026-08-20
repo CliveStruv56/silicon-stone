@@ -489,6 +489,64 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 20, 2026 — Tier 1 of the manual's findings: two silent publish paths, closed
+
+Auditing the thirteen ⚠ markers in `docs/operator-manual.md` turned up one thing
+much worse than the manual claimed. The manual called the publish guard being
+browser-only a theoretical caveat. **Two in-repo paths were actually publishing
+to the live site.**
+
+**In Sanity the document id IS the publish state** — `drafts.x` is the
+unpublished draft of `x`, anything else is live.
+
+- `src/app/(admin)/content/actions.ts` built the id as `` `draft.${fileSlug}` `` —
+  **singular**, which Sanity treats as an ordinary id. The Sync button in
+  `/content` published every file in `content/substack/` straight to the site.
+  The name read as "this is a draft" and meant the exact opposite.
+- `scripts/sync-content.ts` was worse: `client.create()` with no `_id`
+  (published), it set `publishedAt` itself, and it `.set()`-patched whatever
+  document shared the slug — so a re-run could **overwrite a published
+  article's body**.
+
+Either could publish an article carrying an unresolved `[AUTHOR: …]`
+placeholder, the one thing the publish preflight exists to stop, because neither
+goes near Studio where that check runs.
+
+Both now write drafts only. The script resolves an existing article's **draft
+twin** rather than a bare `drafts.<slug>`, so a sync stages an edit instead of
+creating a duplicate sharing a slug; it reads with `perspective: 'raw'` because
+the default perspective cannot see `drafts.*` at all and the lookup would
+otherwise report "nothing there" every time. `src/lib/sync-publish-safety.test.ts`
+holds all of it, and is mutation-tested — four deliberate regressions
+(the singular prefix, `client.create()`, `publishedAt`, the dropped perspective)
+each fail it.
+
+**Three smaller fixes from the same audit:**
+
+- **`capture_source`'s url-or-text rule now reaches the model**, via zod 4's
+  `.meta({ anyOf: … })`. Verified on both JSON-Schema conversion paths, with
+  runtime parsing unchanged so `schema.ts` stays the single decider. `.refine()`
+  is the obvious approach and is wrong twice over: it is silently dropped by
+  both converters, and it would turn a correctable tool error into a JSON-RPC
+  protocol error the model cannot see.
+- **The "Review it here" link now opens the record in Studio.** It pointed at
+  `/knowledge?record=<id>`, a page that never read the parameter and does not
+  list knowledge records. It uses the Studio **intent** URL, not a structure
+  path: the obvious pane is the *filtered* inbox list, so that link would break
+  the moment the record was reviewed — precisely what the reader went there to
+  do. The type is derived from the id's own `<type>.<uuid>` shape, so no caller
+  changed; legacy ids with no type keep the old admin-gated path.
+- **A pre-existing broken link**, found on the way: the article "Edit" button on
+  `/knowledge` passed a **slug** where a document `_id` is required, so it never
+  opened anything.
+
+**One stale checklist item struck rather than actioned:** `LAUNCH.md` said four
+published articles had no categories. All four now carry two or three, and no
+published article has an empty `categories`.
+
+The manual's §7c, §11 and §12 were rewritten to match, and `npm run test:manual`
+re-run. Suite 1,221 green; build clean.
+
 ### August 20, 2026 — A guard so the manual cannot drift the way the others did
 
 `scripts/manual-checks.ts` (`npm run test:manual`, wired into `prebuild` and
