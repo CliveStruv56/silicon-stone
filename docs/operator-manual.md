@@ -3,7 +3,7 @@
 How an article gets researched, drafted, edited, checked, published, and captured
 back into knowledge. Written for the person running the publication.
 
-**Verified against commit `5dd8e59f`, 20 August 2026.** Every claim here was
+**Verified against commit `0ac7e55c`, 20 August 2026.** Every claim here was
 checked against the code on that date. Where something could not be checked by
 reading code, it is listed in [Appendix D — What has not been verified](#appendix-d--what-has-not-been-verified).
 If you are reading this months later, the header is the first thing to distrust.
