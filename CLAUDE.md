@@ -5,6 +5,29 @@ handoff), `docs/operator-manual.md` (how the publication is actually run —
 research, drafting, the guards, publishing, knowledge capture) and the persistent
 auto-memory in `MEMORY.md`.
 
+## The operator's manual is guarded (do not paper over a failure)
+
+`docs/operator-manual.md` is the single manual for running the publication. It
+replaced four overlapping guides that had gone stale together and then
+**contradicted each other on eight points of fact**, with nothing failing to
+say so. `scripts/manual-checks.ts` (`npm run test:manual`, in `prebuild` and
+CI) is what stops that recurring: 16 checks that read a value out of the code
+and assert the manual still states it.
+
+Two rules when it fails:
+
+- **A failure is a real signal.** Either the code changed and the manual needs
+  updating, or a check went blind. Fix one of those — never delete the check or
+  loosen it to green.
+- **Every extractor must fail loudly when its anchor is missing.** A regex that
+  silently stops matching turns the guard into a rubber stamp, which is the
+  exact failure it exists to prevent. Three checks did this on first run and
+  were caught only because they assert their anchor was found. All 16 are
+  mutation-tested — verified to fail when the underlying code is changed.
+
+Guard facts, not prose: numbers, enum values, field names. Wording changes
+legitimately; a guard that fights the writer gets switched off.
+
 ## Studio's admin session bridge (load-bearing — do not widen)
 
 `/api/studio-session` trades a Sanity user token for the ordinary `/login` admin

@@ -19,6 +19,9 @@ jobs:
       - run: npm test
       - run: npm run test:security
       - run: npm run test:style-rules
+      # Fails when docs/operator-manual.md drifts from the code it documents.
+      # Four guides went stale and contradicted each other before this existed.
+      - run: npm run test:manual
       - run: npm run test:knowledge-inbox
       - run: npm run test:evidence-index
       # The separation guard: the Compliance Checker's legal authority is the

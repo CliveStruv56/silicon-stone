@@ -489,6 +489,43 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 20, 2026 — A guard so the manual cannot drift the way the others did
+
+`scripts/manual-checks.ts` (`npm run test:manual`, wired into `prebuild` and
+`.github/workflows/check.yml`) fails the build when `docs/operator-manual.md`
+disagrees with the code. 16 checks, each reading a value out of the source and
+asserting the manual still states it — never the reverse, because a check
+written the other way round passes forever while the code moves underneath it.
+
+**What it covers:** the six `/create` formats and the *count* of them; the four
+drafted word targets; the Pulse-format vs pulse-tier distinction; the persona
+slugs the article schema accepts, plus the assertion that `positional` is
+*not* among them; the `contentType` collapse of Pulse and Signal; the auto
+fact-check format set; that the publish preflight has **exactly one** blocker;
+the six MCP tool names and their count; the four review states; the capture
+feature-flag name; every figure in the limits table (five rate limits, the
+session lifetime, both input caps, both deep-research timeouts, the stale-run
+window, the related-articles cap); the Studio pane still being called
+"Knowledge"; the two session-bridge invariants; that no price is quoted; that
+every linked document exists; and that the verification stamp is present.
+
+**The format check is deliberately exhaustive.** A seventh format fails it
+until someone adds the format to the guard *and* to the manual — because
+omitting "Guide" is precisely the mistake all four previous guides made.
+
+**Three checks went blind on their first run and were caught**, because every
+extractor asserts its anchor was found rather than returning nothing. That is
+the whole design: a regex that quietly stops matching is a rubber stamp, which
+is the failure this guard exists to prevent.
+
+**All 16 are mutation-tested.** Six deliberate regressions — a seventh format,
+a changed Signal word target, a second publish blocker, a loosened fact-check
+rate limit, a price in the prose, and widening the Sanity identity lookup from
+the project-scoped host to the global one — each produced a targeted failure
+naming the section to fix. One of the six initially appeared to pass; the cause
+was a GNU-only `sed` address silently no-opping on macOS, not a hole in the
+guard, and it fails correctly when the mutation is actually applied.
+
 ### August 20, 2026 — The session bridge, tested in a real Studio
 
 The previous entry shipped `/api/studio-session` but recorded that it had not
