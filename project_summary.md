@@ -489,6 +489,72 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 20, 2026 — A test spec for the article flows, and the paths it exposed
+
+`docs/test-spec-article-flows.md` — eleven tasks covering every way an article
+can come into being, with the cost of each so a run can be scoped, and
+`npm run test:cleanup` to undo it.
+
+**Writing it found that the manual described four paths as two.** There are
+**four** creation paths, not two:
+
+- **`/create`** — research → draft, all guards.
+- **`/import`** — paste an article written elsewhere, reworked into house voice
+  and format. Four model passes, **no research**, so no prior coverage, no
+  statutory corpus, empty `citationSnapshots`, and a quotation audit that can
+  only ever report `UNCOVERED`.
+- **`ss-draft-local`** — the Max-plan route.
+- **By hand in Studio** — press Create and type.
+
+`/import` was undocumented **anywhere** — not in the manual, not in either
+retired guide — and the manual's §5 explicitly framed the world as "two ways to
+produce a draft". Two consequent errors are also fixed: §7b said auto fact-check
+runs "only for Signal and Deep Dive", true of `/create` but **false of
+`/import`**, which has no format gate and fires for everything when its
+default-on checkbox is left ticked; and §12's friendly Anthropic errors do not
+apply to `/import`, which bypasses `describeDraftError` and shows the raw SDK
+message.
+
+**The hand-made path is the weakest and now says so.** No voice edit, no
+quotation audit, no fact-check, no provenance, `source` unset — and because
+nothing generates `[AUTHOR: …]` placeholders on that path, the publish
+preflight's only blocker has nothing to catch. The preflight *does* still scan
+the body, so a pasted placeholder is caught; the point is that nothing puts one
+there for you.
+
+**The two questions the spec was written to answer:**
+
+**Ideas.** A captured idea becomes a `knowledgeItem` in the review inbox and
+stops there. There is no promote-to-article, `/create` cannot be seeded from an
+item (it accepts only `format` in the URL), `article.knowledgeItems` and
+`knowledgeItem.articles` are written by nothing, `intendedUse: 'article_seed'`
+is read by nothing, and `KNOWLEDGE_DRAFT_RETRIEVAL_ENABLED` is read by nothing —
+setting it true has no effect. The workflow is manual: read the item, retype the
+substance into `/create`. Also: the nine `kind` values have no definitions in
+code and nothing branches on them, so the spec proposes a convention and says
+plainly that it is convention.
+
+**Pinecone.** All four creation paths *are* covered, for the simple reason that
+none of them publishes — indexing is triggered by the publish event, not by how
+the article was made. Two caveats the spec records: the triggering **Sanity
+webhook is dashboard-only configuration with no repo record and no checklist
+entry**, so a fresh environment is silently unindexed; and an empty
+`relatedArticles` is the *correct* output when nothing clears the 0.37 floor, so
+checking only that cannot distinguish a working webhook from a dead one — the
+spec asserts three things, not one. The knowledge lane is **not in Pinecone at
+all**: `search_knowledge` is a literal word match, and `indexState` is an intent
+nothing consumes.
+
+**One regression of ours, fixed:** `ss-draft-local`'s SKILL.md still claimed the
+path gets "no quotation audit". True until Tier 2 earlier today; the manual was
+updated and the skill file was missed.
+
+`npm run test:cleanup` finds documents titled `TEST — …`, removes their vectors
+**before** deleting the documents (the other order strands the vector until
+`articles:sync`), clears inbound `relatedArticles` references, and deletes draft
+and published twins together. Verified by creating two scratch records, finding
+them with `--dry-run`, removing them, and confirming the second dry run is clean.
+
 ### August 20, 2026 — Tier 2 of the manual's findings
 
 **Research sources are now recorded, and promotable.** `/create` and `/research`

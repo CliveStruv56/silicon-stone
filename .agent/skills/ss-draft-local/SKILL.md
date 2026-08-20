@@ -172,17 +172,25 @@ user can review and publish.
 
 ### What this path does NOT get
 
-`save` writes to Sanity directly and skips `finalizeDraft`, so two checks the
-website's `/create` runs do not happen here:
+`save` writes to Sanity directly and skips `finalizeDraft`. One check the
+website's `/create` runs does not happen here:
 
-- **no quotation audit** — nothing string-matches statutory quotations in the
-  body against the text they should have come from;
 - **no automatic fact-check** — `/create` starts one for Signals and Deep Dives;
   this path does not.
 
 Tell the user so, and suggest running **Run fact-check** from the Studio document
 action once the draft lands. The publish guard still applies: an unresolved
 `[AUTHOR: …]` placeholder blocks publishing wherever the draft came from.
+
+**It DOES get the quotation audit** (since 2026-08-20). `auditQuotations` is
+pure — no model call, no network — so `save` runs it against the statutory text
+`draft-prompt` retrieved, which it parks in `regulatory-corpus.txt` beside the
+payload. Skip the `draft-prompt` step and the audit has nothing to check
+against and reports `UNCOVERED`, which is not a pass.
+
+It also records the research sources on the article's internal
+`citationSnapshots` when `save` is given `researchSources` — provenance only,
+never the reader-facing Sources list.
 
 ## Notes / caveats
 

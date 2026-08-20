@@ -266,8 +266,18 @@ architecture, the three Pinecone indexes, and the retrieval scoring.
 
 ### Which path
 
-Two ways to produce a draft. They share the same prompts, personas, research,
-retrieval and metadata logic — the difference is which model writes and who pays.
+**Four ways an article can come into being.** Two of them run the full pipeline,
+one reworks something you wrote elsewhere, and one bypasses almost everything.
+
+| Path | What it is | Guards it gets |
+|---|---|---|
+| **`/create`** | Research → draft, in the browser | All of them |
+| **⌨ `/ss-draft-local`** | The same pipeline, run by Claude Code on your Max plan | All but the auto fact-check |
+| **`/import`** | Paste an article written elsewhere; it is reworked into house voice and format | Voice edit, metadata, fact-check. No research, so no prior coverage and no statutory corpus |
+| **By hand in Studio** | Press Create and type or paste | ⚠ **Only the publish preflight — and its one blocker cannot fire.** See below |
+
+The first two share prompts, personas, research, retrieval and metadata logic —
+the difference is which model writes and who pays.
 
 | | **Claude Code (Max plan)** ⌨ | **Website `/create`** |
 |---|---|---|
@@ -338,6 +348,58 @@ Stone Truth, actionable insights, SEO block, categories, intelligence tier,
 methodology pillars, voice edit notes, quotation audit and image prompts.
 
 **It never carries citations.** See §7c.
+
+### Importing something you wrote elsewhere
+
+**`/import`** takes an article written anywhere — by hand, in another tool — and
+reworks it into house voice and one of the five formats. Use it when the thinking
+is already done and you want the system's editorial pass over it.
+
+The form, in order:
+
+1. **Who is the primary target?** — persona, required.
+2. **What format?** — Pulse, Signal, Deep Dive, Guide, YouTube Script. Required.
+   (No Research Only: there is nothing to research.)
+3. **The article** — an optional *Original title*, then either **upload a file**
+   (`.docx`, `.md`, `.markdown`, `.txt`) or **paste the text**. A file wins over
+   pasted text. Minimum ~200 characters.
+4. **Steer the rework (optional)** — 2,000 characters, treated as your
+   authoritative instruction, exactly like the brief on `/create`. Plus a
+   **"Fact-check the reworked draft"** checkbox, **ticked by default**.
+
+Press **"Rework & Save Draft"**. It runs four model passes — rework, voice edit,
+metadata, image prompts — and saves a draft. It never publishes.
+
+What it does **not** do, and this is the important part: **there is no research
+step.** No Exa search, no prior coverage from your back catalogue, no statutory
+corpus. So an imported piece is written blind to what you have published before,
+its Citation Snapshots are empty, and its quotation audit has nothing to check
+against — every statutory quotation comes back `UNCOVERED`, which is not a pass.
+If the piece quotes law, verify it yourself.
+
+The verbatim original is kept on the article as **Original Source Material**, and
+`source` is set to *Imported & Reworked*.
+
+> **One inconsistency worth knowing:** `/import` does not translate Anthropic
+> errors the way `/create` does. If credits run out here you get the raw API
+> message, not the friendly one in §12.
+
+### ⚠ Writing an article by hand in Studio
+
+You can press Create in Studio and type or paste a body directly. It works, and
+it is the weakest path in the system:
+
+- No voice edit, so no house-style pass and **no `[AUTHOR: …]` placeholders**.
+- No quotation audit, no Citation Snapshots, no automatic fact-check.
+- `source` is left unset unless you pick one.
+
+**The consequence is worth stating plainly: the publish preflight's only blocker
+cannot fire on this path.** Nothing generated placeholders, so there are none to
+catch. You will see two warnings — "No fact-check has been run" and "No sources
+listed" — and "Publish anyway" is available.
+
+If you write by hand, the checks are yours: run **Run fact-check** from the
+document menu, and add sources yourself.
 
 ### ⌨ The Claude Code path
 
@@ -483,10 +545,14 @@ path it never runs at all.
 
 ### 7b. Automatic fact-check
 
-**When it runs by itself:** only for **Signal** and **Deep Dive**, immediately after
-generation. Pulse, Guide and YouTube are excluded deliberately. Deep Dive is
-included precisely because it is the one format the voice pass audits rather than
-rewrites.
+**When it runs by itself, from `/create`:** only for **Signal** and **Deep Dive**,
+immediately after generation. Pulse, Guide and YouTube are excluded deliberately.
+Deep Dive is included precisely because it is the one format the voice pass
+audits rather than rewrites.
+
+**From `/import` it runs for every format**, gated only by the "Fact-check the
+reworked draft" checkbox, which is ticked by default. There is no format
+allowlist on that path.
 
 **Running it by hand:** the **"Run fact-check"** action in Studio. This is how you
 check a Pulse, a Guide, an imported piece, or anything from the Claude Code path.

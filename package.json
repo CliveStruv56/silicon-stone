@@ -29,6 +29,7 @@
     "check": "npm run lint && npm run typecheck",
     "test": "vitest run",
     "test:manual": "tsx scripts/manual-checks.ts",
+    "test:cleanup": "tsx scripts/test-cleanup.ts",
     "test:security": "tsx scripts/security-checks.ts",
     "test:style-rules": "tsx scripts/style-rules-checks.ts",
     "sync-content": "tsx scripts/sync-content.ts",
