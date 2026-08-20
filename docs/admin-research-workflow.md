@@ -1,5 +1,11 @@
 # Admin Research Workflow
 
+> **This is reference, not instruction.** If you are trying to *operate* the
+> publication — research, draft, edit, check, publish — start at
+> [`operator-manual.md`](operator-manual.md) and come here when you need the
+> mechanism. This document is deliberately kept as the deep dive rather than
+> folded in.
+
 This document describes what happens in the Silicon & Stone admin area when you press the **research** button. It covers the two admin pages that initiate research, the exact path through Exa and Pinecone, and where each external service is used.
 
 > **Correction to the common assumption:** The research button itself does **not** use Pinecone. The research step is powered by **Exa** (fast web search or the Exa Agent API for Deep Dives). **Pinecone** is used *after* research, when you choose to generate a draft, to find semantically similar articles you have already written and inject them into the draft prompt as “prior coverage.” Pinecone is also the storage layer for the standalone `/knowledge` semantic-search workspace.
@@ -192,7 +198,7 @@ Deep research can run for minutes, which would exceed a Vercel serverless timeou
 1. `startResearch` in `src/app/(admin)/create/actions.ts` calls `startDeepResearchJob`.
 2. That posts to the Railway backend: `POST /v1/research/deep` in `backend/main.py`.
 3. The backend creates a job, stores state in Redis (or in-memory), and spawns `asyncio.create_task(_run_deep_research(...))`.
-4. `_run_deep_research` calls the Exa Research API directly and polls every 3 seconds for up to 10 minutes.
+4. `_run_deep_research` calls the Exa **Agent** API (`POST /agent/runs`) directly and polls every 3 seconds for up to 10 minutes. (Not the Research API — see the migration note above; that endpoint answers `410 RESEARCH_RETIRED`.)
 5. The browser polls `pollResearchJob` every 4 seconds for up to 12 minutes.
 6. When completed, `synthesizeDeepReport` runs Claude over the report and returns a `ResearchResult`.
 
@@ -369,6 +375,21 @@ Input is capped at 24,000 characters to stay well under the ~8,191 token limit.
 | `ANTHROPIC_API_KEY` | `src/lib/anthropic.ts` | Claude synthesis / draft writing |
 | `SANITY_API_WRITE_TOKEN` | `finalizeDraft`, vectorize webhook | Write drafts and related articles |
 | `SANITY_WEBHOOK_SECRET` | `src/app/api/vectorize/route.ts` | Verify Sanity webhook |
+
+**This table covers the research and drafting path only** — it is not a complete
+inventory of the application's environment. Not listed here, and required by
+neighbouring systems:
+
+| Variable | Used by | Purpose |
+|----------|---------|---------|
+| `ADMIN_PASSWORD` | `src/app/(auth)/login/actions.ts` | The `/login` access code |
+| `SESSION_SECRET` | `src/lib/session.ts` | Signs the admin session cookie (min 32 chars) |
+| `KNOWLEDGE_EXTERNAL_WRITES_ENABLED` | `src/lib/knowledge/features.ts` | Gates all knowledge capture; unset means every route answers 404 |
+| `KNOWLEDGE_INGEST_TOKEN` | `src/lib/knowledge/ingest-auth.ts` | Bearer credential for capture (min 32 chars) |
+| `KNOWLEDGE_INGEST_TOKEN_PREVIOUS` | `src/lib/knowledge/ingest-auth.ts` | Rotation slot; both are checked |
+| `SANITY_REVALIDATE_SECRET` | `/api/revalidate` | Verify the revalidation webhook |
+| `REDIS_URL` | `src/lib/durable-rate-limit.ts` | Durable rate limiting |
+| `REGULATORY_RETRIEVAL_DISABLED` | `src/lib/regulatory/retrieve.ts` | Kill switch for the statutory lane |
 
 ---
 

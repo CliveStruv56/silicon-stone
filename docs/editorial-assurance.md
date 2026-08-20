@@ -822,5 +822,6 @@ threshold — see the next point.
 
 - `forensic-technopolitics-methodology.md` — the analytical framework in full
 - `admin-research-workflow.md` — the technical sequence through Exa and Pinecone
-- `authoring-guide.md` — the operator's procedure for research, drafting and publishing
-- `editorial-aios-manual.md` — the knowledge capture and evidence workflow
+- `operator-manual.md` — the operator's procedure for research, drafting,
+  publishing and knowledge capture (replaces `authoring-guide.md` and
+  `editorial-aios-manual.md`, both now pointers)

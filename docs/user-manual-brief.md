@@ -1,7 +1,11 @@
 # Brief — the Silicon & Stone operator's manual
 
 **Written:** 2026-08-20 · **Baseline:** `e048109b`
-**Status:** **contract only. The manual does not exist yet.**
+**Status:** **DISCHARGED 2026-08-20** — the manual is [`operator-manual.md`](operator-manual.md).
+This brief is kept as the record of what was asked for and why. The dispositions it
+asked to be decided were: fold in `authoring-guide.md` and
+`article-generation-guide.md`, keep `admin-research-workflow.md` as the linked
+deep dive, retire `editorial-aios-manual.md`.
 **For:** the next session. This says what to write and what not to; it is not
 the manual and deliberately contains none of its content.
 

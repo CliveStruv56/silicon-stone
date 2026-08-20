@@ -4,7 +4,7 @@
 > Last Updated: 2026-08-20
 > Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (78 prerendered pages), 1,076 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
-**Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
+**Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, **Guide**, YouTube Script, Research Only), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
 **The AI Act Compliance Checker was rebuilt on 2026-08-10** (Stages 0–3 of the agentic build spec): the rule base is corrected and versioned at `v2026-08-10`, backed by a git-tracked rule pack carrying 19 Articles of verbatim consolidated statute; a conversational intake proposes answers the user confirms before the unchanged deterministic engine classifies; and the result screen now offers an email-gated written report whose every legal quotation is string-matched against that corpus before a reader sees it. The paid half of Stage 3 — the £39 Evidence Pack and the £39→£79 credit — is built dark behind a flag and blocked on the Lemon Squeezy store. A legal review of the report template, disclaimer and credit terms is an open item before it ships. **Reworked again on 2026-08-17**: result items are typed rather than bare strings, so the card (now "Recommended actions and applicable provisions") groups duties apart from concessions, support measures and enforcement information, each expandable to its legal basis and conditions; and `/tools/compliance-checker/provisions` serves the 19 pinned Articles as verbatim statute a reader can follow a citation into. **The vendor questions followed on 2026-08-18**, each now carrying its own Article anchor, a corpus link and a stated reason for asking — including, where the vendor owes you no answer, the fact that it does not. See §9 and §11.
 
@@ -488,6 +488,59 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 20, 2026 — The operator's manual, and the four guides it replaces
+
+`docs/operator-manual.md` now exists: one document covering how an article gets
+researched, drafted, edited, checked, published and captured back into knowledge,
+organised by what the operator is doing rather than by system. It discharges the
+contract in `docs/user-manual-brief.md`.
+
+**The job turned out to be consolidation, not writing.** Four guides overlapped,
+all last touched on 16 August and each only lightly patched, while the knowledge
+system was rebuilt underneath them on 19–20 August. Their dispositions:
+`authoring-guide.md` and `article-generation-guide.md` folded in and replaced with
+pointers; `editorial-aios-manual.md` retired with a pointer that names what it got
+wrong; `admin-research-workflow.md` kept as the linked deep dive, with two errors
+fixed (its §4 numbered list still said Deep Dives call the Exa Research API, three
+paragraphs below a note saying that API was retired and answers
+`410 RESEARCH_RETIRED`; and its §9 env table presented itself as complete while
+omitting the admin, session, knowledge and revalidation variables).
+
+**They did not merely drift — they contradicted each other, on eight points.**
+Each is now settled once, from code: the two persona slug namespaces (`clara` on
+the article, `compliance-clara` in the prompt builders, normalised on write);
+Signal at 800–1,200 words, not 800–1,500; the Studio section called "Knowledge",
+not "Knowledge Inbox"; review verdicts `inbox`/`ready`/`rejected`/`superseded`
+rather than the legacy `processed`/`error`; the Agent API, not the Research API;
+and `/create` described as broken by one guide and working by two others when
+nothing in the code makes it fail.
+
+**Two of the eight were not errors but conflations worth keeping.** "Pulse"
+names both a *format* that drafts 100–140 words and an *intelligence tier*
+meaning "under ~600 words" — two different things sharing one word, which is what
+produced the apparent contradiction. And `positional` is missing from every
+authoring table because it is a *reader-facing* persona that routes to
+WaymarkPath, has no content of its own and is not accepted by the article schema;
+its absence was correct.
+
+**`/create` offers six formats, not five.** Every existing guide, the brief, and
+this document's own Current State line omitted **Guide**. Corrected here.
+
+**Two live defects are documented rather than hidden.** Every MCP capture returns
+a "Review it here" link to `/knowledge?record=<id>`, but that page reads no
+`record` parameter and does not list knowledge items — the real route to a
+captured record is Studio → Knowledge → Inbox. And the knowledge review state
+machine (`applyReviewTransition`, the supersession rule, index withdrawal on
+leaving `ready`) **has no caller anywhere in `src/` or `scripts/`**; reviewing is
+a radio button in Studio and none of the guards fire.
+
+**The manual was written from the code, not from a walk-through**, at the owner's
+choice. Appendix D lists what that leaves unverified — rendered Studio layout, a
+complete `/create` run, the MCP round-trip against production, whether the
+Inoreader lane is ever live, and which Deep Dive path production actually takes —
+so the gap is stated rather than written around. Each line is something one real
+run would settle.
 
 ### August 20, 2026 — The migration's two dangling source IDs, repaired
 

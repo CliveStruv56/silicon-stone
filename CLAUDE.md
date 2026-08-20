@@ -1,7 +1,9 @@
 # CLAUDE.md
 
 Guidance for Claude Code in this repo. See also `project_summary.md` (session
-handoff) and the persistent auto-memory in `MEMORY.md`.
+handoff), `docs/operator-manual.md` (how the publication is actually run —
+research, drafting, the guards, publishing, knowledge capture) and the persistent
+auto-memory in `MEMORY.md`.
 
 ## Dependency constraints (load-bearing — do not break)
 
