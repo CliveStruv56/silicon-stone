@@ -340,10 +340,35 @@ no link back to the item; nothing writes that reference.
 
 ### The `kind` convention — yours to set
 
-When you capture something you must pick a `kind` from nine fixed values. **No
-code branches on any of them.** They are labels for your own triage, which means
-nothing will break if you are inconsistent — the inbox will just stop being
-scannable.
+**Where you actually meet this.** `kind` is a *required* field on every capture,
+and the tool description gives Claude no guidance beyond "what sort of thinking
+this is". So **if you do not say which, Claude picks one** — and different
+conversations will label the same sort of thing differently.
+
+You see the result as the subtitle on every inbox row:
+
+```
+Some captured thought — idea · inbox · claude
+Another one          — note · inbox · claude
+```
+
+That is `kind · reviewStatus · sourceSystem`, and it is the only thing
+distinguishing one row from another apart from the title. With five records it
+does not matter. With forty it is the difference between a queue you can triage
+and a list you scroll past. There is also a **Kind** dropdown on the item in
+Studio, so you can correct whatever Claude chose.
+
+Two ways to make it reliable, and you only need one:
+
+1. **Say it in the capture request** — "capture this as an idea", "capture this
+   as an article foundation".
+2. **Let Claude choose and fix it in Studio** when you review.
+
+**No code branches on any of the nine values.** They are labels for your own
+triage, so nothing breaks if you are inconsistent — the inbox just stops being
+scannable. If you are never going to triage by kind, ignore this section
+entirely; the fixed nine-value list looks like it means something enforced, and
+it does not.
 
 Proposed convention. Adopt it, amend it, but write it down somewhere and stick
 to it:
