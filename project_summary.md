@@ -1,7 +1,7 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-08-19
+> Last Updated: 2026-08-20
 > Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (78 prerendered pages), 1,076 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, Research Only, YouTube Script), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
@@ -16,11 +16,16 @@ lineage — sources, derived items, research runs, topics, article provenance �
 so research survives job expiry and an article can say what it was written
 from. Master spec: `docs/siliconstone-knowledge-llm-master-spec.md`. **Wave 0–1
 (schemas, domain service, Studio views, candidate migration) shipped on
-2026-08-19, and Wave 4a (external capture + a hosted MCP server) on
-2026-08-20 — Claude Code can now capture into the inbox from any machine**, behind four controls that all default to off and that nothing
-reads yet; no user-visible behaviour changed, and the only live difference is a
-new **Knowledge** section in Studio. Start at
-`docs/knowledge-system-foundation.md`, then §9.
+2026-08-19, and Wave 4a (external capture + a hosted MCP server, six tools) on
+2026-08-20 — Claude Code can now capture into the inbox from any machine**, and
+that is live on production behind `KNOWLEDGE_EXTERNAL_WRITES_ENABLED`. The other
+three feature controls still default to off and nothing reads them; no
+user-visible behaviour changed, and the only live difference is a new
+**Knowledge** section in Studio. Start at
+`docs/knowledge-system-foundation.md`, then the wave briefs
+(`docs/siliconstone-knowledge-wave-01-execution-brief.md`,
+`…-wave-04-execution-brief.md`), then §9. **Wave 2 (provenance) is the next
+thread and has a contract but no code: `docs/siliconstone-knowledge-wave-02-brief.md`.**
 
 **The blocker is a P0, re-confirmed against the live API on 2026-08-11: the production Kit API key is a legacy v3 key (22 chars, no `kit_` prefix), so `/api/subscribe` 401s and — because `NEXT_PUBLIC_PRE_LAUNCH` is still `true`, making every product CTA an email capture — the entire funnel currently terminates in a failed POST.** Beyond that: Lemon Squeezy store not yet created, 9 drafts unpublished, and 7 of 12 published articles still lack cover images. Go-live sequence lives in `LAUNCH.md`; defects and debt in §10.
 
@@ -487,9 +492,10 @@ machine has no cookie. This adds the doors, and they are **live on production**.
 - `POST /api/knowledge/capture` — plain HTTP. The universal adapter: curl,
   Shortcuts, Zapier, n8n, anything that can send a header.
 - `GET /api/knowledge/inbox` (`?q=` to search), `GET /api/knowledge/record/[id]`.
-- `/api/mcp` — a Streamable HTTP MCP server, protocol revision 2026-07-28, five
-  tools. `claude mcp add --transport http --scope user` connects it from any
-  machine.
+- `/api/mcp` — a Streamable HTTP MCP server, protocol revision 2026-07-28, six
+  tools: `capture_source`, `capture_knowledge_item`, `link_sources_to_item`,
+  `list_knowledge_inbox`, `get_knowledge_record`, `search_knowledge`.
+  `claude mcp add --transport http --scope user` connects it from any machine.
 
 Everything captured lands in `inbox`. Nothing is indexed. No URL is fetched.
 
@@ -499,19 +505,27 @@ or Mixed only — and Mixed is per-tool OAuth-or-none, with no static-token
 branch. It "cannot present custom API keys", in OpenAI's own words. Reaching it
 requires OAuth 2.1 with RFC 9728 discovery, which this repo has no machinery for
 (it is an OAuth *client* for Inoreader, never a provider). Two further findings:
-write-capable connectors may be gated to Business/Enterprise/Edu — two official
-pages contradict each other — and Custom GPT Actions, which *do* support bearer
-auth and would have been the clean escape hatch, stopped being creatable on
-personal plans on 2026-08-16. A Zapier or Make bridge works because those run
-their own OAuth, but solves the auth problem and not the plan problem, and puts
-a CMS write credential inside a third party. **Settle the plan question with a
-ten-minute test before spending anything on Stage 2.**
+write-capable connectors are plan-gated, and Custom GPT Actions, which *do*
+support bearer auth and would have been the clean escape hatch, stopped being
+creatable on personal plans on 2026-08-16.
+
+**The plan question was settled on 2026-08-20, on the owner's own account, and
+the answer parks Stage 2.** Plus has no Developer Mode at all — the setting is
+absent, so a custom connector cannot be created on any terms. Pro has Developer
+Mode but read/fetch only, so paying $100–200/mo would buy search and retrieval
+and still not a write. Business is the first tier with write, at roughly
+$20/user/mo with a two-seat minimum — both cheaper than Pro and the only option
+that works. Zapier does not rescue it: Zapier's MCP is itself a custom
+connector, so it needs the same Developer Mode, and it would put a CMS write
+credential inside a third party besides. **Decision: parked.** Revisit only on
+evidence of repeatedly wanting to capture from ChatGPT, never on the hypothesis
+that it would be nice.
 
 Claude, by contrast, connects from *Anthropic's cloud* rather than the local
 machine even in the desktop app — so hosting was always required, and the local
 stdio adapter originally planned would only ever have served Claude Code.
 
-Six decisions worth not undoing.
+Seven decisions worth not undoing.
 
 **The MCP route calls the domain in-process.** It must never `fetch`
 `/api/knowledge/capture`. A loopback to our own domain meets Vercel's deployment
@@ -537,6 +551,23 @@ invitation.
 **No tool can move a record out of the inbox.** `apply_review_transition` is
 deliberately absent: handing a model that power defeats the invariant the whole
 domain layer exists to hold.
+
+**`link_sources_to_item` is the one tool that writes to a record that already
+exists** (`573ff212`), and four constraints keep it that narrow. It is
+*additive only* — existing references are preserved and new ones merged, with no
+path that removes one, so the worst a confused caller manages is a wrong
+reference a human can see and undo. It touches *inbox records only*: a `ready`
+item has been reviewed, and quietly changing what it rests on would mean the
+thing approved is no longer the thing stored, so editing an approved record
+stays a human act in Studio and the refusal says so. It accepts
+*`knowledgeSource` references only*, each of which must resolve, so arbitrary
+documents cannot be attached. And *nothing else moves*: the patch touches
+`sources` and not the review status, the body or the content hash — a test
+asserts the patched field list is exactly `['sources']`, which is what makes
+`destructiveHint: false` an honest annotation rather than a hopeful one.
+Linking a source already linked writes nothing at all. It exists because the
+candidate migration left a real item pointing at two legacy source IDs it could
+not resolve, and there was no way to repair that from a conversation.
 
 **The credential is digest-compared.** `secretMatches()` in
 `api/vectorize/route.ts` returns early on a length mismatch and leaks token
@@ -573,16 +604,25 @@ no way to see whether the value was right. Its value is the word `true`; it is
 not a secret, and making it one costs the ability to verify it. Only `true` or
 `1` enables. The *token* is a secret and stays sensitive.
 
-Verified: `check`, `test` (1,167 across 50 files), `test:security`,
+Verified: `check`, `test` (1,181 across 50 files), `test:security`,
 `test:knowledge-inbox`, `test:evidence-index`, `build`. On production: capture
 without a token 401, with a wrong token 401 (identical message), `GET /inbox`
 401, `GET /api/mcp` 405, `POST /api/mcp` 401, browser `Origin` 403, and
-`claude mcp list` reports the server connected. Commits `a46abbfe` and
-`2ac33c31`.
+`claude mcp list` reports the server connected. Commits `a46abbfe`,
+`2ac33c31` and `573ff212`.
 
 Still deferred: URL/PDF extraction (server-side fetching of attacker-supplied
 URLs — its own security surface, its own brief), the `/knowledge` cockpit,
-indexing and retrieval, `promote_to_article_draft`, and Stage 2 OAuth.
+indexing and retrieval, and `promote_to_article_draft`. Stage 2 OAuth is
+**parked**, not merely deferred — see the plan finding above.
+
+Outstanding for the owner: rotate the Firecrawl API key (it appeared twice in
+the build transcript); optionally `vercel env rm KNOWLEDGE_INGEST_TOKEN preview`,
+low priority because the flag is Production-only and Preview is dark regardless;
+and check whether the claude.ai **Request headers** beta has become available,
+without which capture reaches Claude Code and curl but not the Claude apps. The
+two dangling legacy source IDs on `knowledgeItem.51ecac19…` can now be repaired
+from a conversation with `capture_source` followed by `link_sources_to_item`.
 
 ### August 19, 2026 — The knowledge system's canonical foundation (Wave 0–1), shipped
 

@@ -18,7 +18,9 @@ machine has no cookie. This wave adds the two doors.
   anything that can send a header can use it (curl, Shortcuts, Zapier, n8n).
 - **`GET /api/knowledge/inbox`**, **`GET /api/knowledge/record/[id]`** — reads.
 - **`/api/mcp`** — a Streamable HTTP MCP server (protocol revision 2026-07-28)
-  exposing five tools.
+  exposing six tools: `capture_source`, `capture_knowledge_item`,
+  `link_sources_to_item`, `list_knowledge_inbox`, `get_knowledge_record`,
+  `search_knowledge`.
 
 Everything captured lands in `inbox`. Nothing is indexed. No URL is fetched.
 
@@ -44,9 +46,9 @@ Researched 2026-08-20; re-check before relying on them.
 2. **Claude connects from Anthropic's cloud, not the local machine** — even in
    Claude Desktop. A hosted server was always required; a local stdio adapter
    would only ever have served Claude Code.
-3. **ChatGPT may gate write tools behind Business/Enterprise/Edu.** Two official
-   pages contradict each other. Settle it empirically before spending anything
-   on Stage 2 (see below).
+3. **ChatGPT gates write tools by plan, and the gate is real.** Settled
+   empirically on 2026-08-20 against the owner's own account; the tier table is
+   under "Stage 2" below. Stage 2 is parked as a result.
 
 ## How to connect
 
@@ -99,6 +101,28 @@ answer is currently no.
 deliberately not exposed; handing a model that power defeats the invariant the
 whole domain layer exists to hold. Checks assert this.
 
+**`link_sources_to_item` is the only tool that writes to an existing record,
+and four constraints keep it that way.** Every other tool creates something new
+or reads. This one exists because the candidate migration left a real item
+pointing at two legacy source IDs it could not resolve, and nothing could repair
+that from a conversation.
+
+- *Additive only.* Existing references are preserved and new ones merged in;
+  there is no path that removes one. The worst a confused caller can do is add a
+  wrong reference, which a human can see and undo.
+- *Inbox records only.* A `ready` item has been reviewed, and quietly changing
+  what it rests on would mean the thing approved is no longer the thing stored.
+  Editing an approved record stays a human act, in Studio — and the refusal says
+  so rather than failing opaquely. This is the constraint most likely to look
+  like an arbitrary restriction later; it is not.
+- *Sources only.* Each reference must resolve to an existing `knowledgeSource`,
+  so the tool cannot attach arbitrary documents.
+- *Nothing else moves.* The patch touches `sources` and nothing besides — not
+  the review status, not the body, not the content hash. A test asserts the
+  patched field list is exactly `['sources']`, which is what lets the tool be
+  annotated `destructiveHint: false` honestly. Linking the same source twice
+  writes nothing at all.
+
 **The credential is digest-compared.** `secretMatches()` in
 `api/vectorize/route.ts` returns early on a length mismatch and so leaks token
 length through timing. `ingest-auth.ts` hashes both sides first so the
@@ -142,7 +166,7 @@ it is fully configured and refusing an anonymous caller — that is success.
 
 ## Verified
 
-`check`, `test` (1,165 across 50 files), `test:security`,
+`check`, `test` (1,181 across 50 files, at `573ff212`), `test:security`,
 `test:knowledge-inbox`, `test:evidence-index`, `build` — all pass. The two new
 check families were each verified by deliberately breaking them.
 
@@ -161,25 +185,44 @@ half was wrong) · `GET /inbox` 401 · `GET /api/mcp` 405 · `POST /api/mcp`
 without a token 401 · with a browser `Origin` 403. `claude mcp list` reports
 the server connected.
 
-## Stage 2 — OAuth, to unlock ChatGPT
+## Stage 2 — OAuth, to unlock ChatGPT: **parked**
 
-**Before spending anything:** connect any free read/write MCP server to the
-owner's ChatGPT account and check whether a write tool actually executes. Ten
-minutes, and it settles what two contradictory official pages cannot. If writes
-are gated, a Business seat is needed whichever route is taken.
+The plan question was settled on 2026-08-20 against the owner's own account,
+and the answer is that no personal tier can do this.
 
-Then: a hosted identity provider (not a hand-rolled authorization server), RFC
+| ChatGPT tier | Developer Mode / custom connectors | Write tools | Cost |
+|---|---|---|---|
+| Plus | **absent entirely** — the setting does not exist | — | $20/mo |
+| Pro | present | **read / fetch only** | $100–200/mo |
+| Business | present | **yes** | ~$20/user/mo, **2-seat minimum** |
+
+Two things follow. Upgrading to Pro would buy nothing here: it is five to ten
+times the price of Business per seat and still cannot call a write tool.
+Business is simultaneously the cheapest option and the only one that works — so
+if ChatGPT capture is ever wanted, the seat is the decision, not the
+engineering.
+
+**Zapier does not rescue it.** Zapier's MCP offering is itself a custom
+connector, so it needs the same Developer Mode on the same gated tier; it solves
+an auth problem the account does not have and leaves the plan problem
+untouched, while putting a CMS write credential inside a third party.
+
+**Decision: parked.** Revisit on evidence of repeatedly wanting to capture from
+ChatGPT — a note of the times it was actually wanted and could not be done — not
+on the hypothesis that it would be convenient. Claude Code covers the case
+today.
+
+### What Stage 2 would take, if it is ever revived
+
+A hosted identity provider (not a hand-rolled authorization server), RFC
 9728 metadata at `/.well-known/oauth-protected-resource` **and** its
 path-suffixed twin, `WWW-Authenticate: Bearer resource_metadata=…` on 401,
 audience pinning so a token issued for another resource is rejected, and — the
 step most easily missed — an **allowlist of permitted subjects**, because a
 hosted IdP authenticates anyone who signs up.
 
-A Zapier or Make bridge also works, because those products run their own OAuth
-and can hold our bearer. It solves the auth problem, not the plan problem: their
-connectors are themselves custom MCP connectors subject to the same write gate,
-and it puts a CMS write credential inside a third party. If a Business seat is
-needed anyway, put OAuth in front of our own server instead.
+A Business seat is needed either way, so if that is ever bought, put OAuth in
+front of our own server rather than a bridge in front of our token.
 
 ## Still deferred
 

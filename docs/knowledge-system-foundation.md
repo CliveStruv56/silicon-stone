@@ -14,6 +14,10 @@ the domain service exists, the feature controls exist and are all off. The
 `/knowledge` page, the article generator, draft retrieval and every Pinecone
 index behave exactly as they did before.
 
+**That is no longer the whole story: wave 4a shipped on 2026-08-20 and there is
+now a way in.** See "Capture, as it stands today" below before concluding that
+nothing can reach the inbox.
+
 ## Which store is authoritative for what
 
 Three stores, and the separation is the safety property — not an accident of
@@ -98,8 +102,9 @@ Nothing has been backfilled and no legacy field has been rewritten.
 
 ## Feature controls
 
-Four, all server-side, all default **off**, and nothing reads them yet. Only
-`true` or `1` turns one on; anything else — including a typo — reads as off.
+Four, all server-side, all default **off**. Only `true` or `1` turns one on;
+anything else — including a typo — reads as off. Three are still read by
+nothing; `KNOWLEDGE_EXTERNAL_WRITES_ENABLED` is live and is set on Production.
 
 ```text
 KNOWLEDGE_V2_UI_ENABLED            the rebuilt /knowledge cockpit (wave 4)
@@ -117,8 +122,8 @@ retrieval, and a `NEXT_PUBLIC_` name is inlined into the browser bundle.
 
 `src/lib/knowledge/` — one place composes validation, normalisation, identity,
 deduplication, reference resolution, transition guards and Sanity access.
-Routes, the research pipeline, migrations and the eventual MCP adapter call in;
-none of them re-implements any of it.
+Routes, the research pipeline, migrations and the MCP adapter call in; none of
+them re-implements any of it.
 
 | File | Holds |
 |---|---|
@@ -141,8 +146,11 @@ documents. A duplicate returns the existing record; it never overwrites it.
 Indexing and extraction are represented as *intents* on the result and are
 never executed. That seam is visible now and cannot start working by accident.
 
-No validation dependency was added. The external-ingestion wave, which is the
-one that has to survive untrusted input, gets to make that choice.
+No validation dependency was added in this wave. Wave 4a added zod, and
+confined it to `src/lib/mcp/` — it is a transport requirement (the SDK reads a
+Standard Schema to publish each tool's `inputSchema`), not a validation
+decision. A check asserts nothing under `src/lib/knowledge/` imports it; every
+real rule stays in `schema.ts`.
 
 ## The candidate migration
 
@@ -169,6 +177,49 @@ Copies each legacy `knowledgeCandidate` into a `knowledgeItem` with
   and `SANITY_API_WRITE_TOKEN`. Missing configuration exits non-zero rather
   than reporting an empty plan.
 
+## Capture, as it stands today
+
+Wave 4a (2026-08-20, brief: `siliconstone-knowledge-wave-04-execution-brief.md`)
+added the doors this wave deliberately left out, and they are **live on
+production**. Read that brief before changing any of it; only the shape is here.
+
+Four routes, all authenticating with a bearer token rather than the browser
+cookie the older `/api/knowledge/*` routes use, because a machine has no cookie:
+
+```text
+POST /api/knowledge/capture        the universal adapter — curl, Shortcuts, n8n
+GET  /api/knowledge/inbox          ?q= to search
+GET  /api/knowledge/record/[id]
+     /api/mcp                      Streamable HTTP MCP, protocol rev 2026-07-28
+```
+
+Six MCP tools, three that write and three that read:
+
+| Tool | Does |
+|---|---|
+| `capture_source` | records evidence somebody else authored |
+| `capture_knowledge_item` | records thinking, an observation, a conversation extract |
+| `link_sources_to_item` | attaches existing sources to an **inbox** item — additive, `sources` only |
+| `list_knowledge_inbox` | lists what is waiting |
+| `get_knowledge_record` | reads one record |
+| `search_knowledge` | searches |
+
+Two controls, and both are needed: `KNOWLEDGE_EXTERNAL_WRITES_ENABLED` (the flag
+above, `true` or `1`) and `KNOWLEDGE_INGEST_TOKEN` (32 characters minimum).
+Unset, every route and method answers **404** — the feature is indistinguishable
+from one never deployed. The status code names the state: 404 flag off, 503 flag
+on but token missing or short, 401 fully configured and refusing an anonymous
+caller.
+
+What has *not* changed: everything captured still lands at `reviewStatus:
+'inbox'`, nothing is indexed, and no URL is fetched. No tool can move a record
+out of the inbox, and `link_sources_to_item` is the only one that touches a
+record that already exists.
+
+Claude Code connects today. **ChatGPT does not**, and that is a plan gate rather
+than an omission — the tier table and the parked decision are in the wave 4a
+brief.
+
 ## What this wave deliberately did not do
 
 Everything below is a later wave, and none of it should be inferred from the
@@ -186,6 +237,11 @@ schemas existing:
 ## Related
 
 - `siliconstone-knowledge-llm-master-spec.md` — the programme, and why.
+- `siliconstone-knowledge-wave-01-execution-brief.md` — how this wave was built.
+- `siliconstone-knowledge-wave-04-execution-brief.md` — external capture: the
+  routes, the tools, the credential rules, and the ChatGPT finding.
+- `siliconstone-knowledge-wave-02-brief.md` — provenance, the next wave. A
+  contract, not an implementation; no code exists yet.
 - `CLAUDE.md` — the regulatory corpus and rule-pack rules this must not blur,
   and the draft-time editorial guards (quotation audit, fact-check, publish
   preflight) that this wave leaves untouched.
