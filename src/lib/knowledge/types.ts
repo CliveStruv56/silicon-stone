@@ -324,6 +324,45 @@ export function effectiveSourceReviewStatus(source: {
 }
 
 /**
+ * The legacy `status` twin of an editorial verdict, or `undefined` where the
+ * legacy vocabulary has no equivalent.
+ *
+ * The inverse of `LEGACY_SOURCE_STATUS_REVIEW_MAP`, and deliberately partial:
+ * legacy `error` described a capture or extraction failure, never a review
+ * decision, so neither `rejected` nor `superseded` maps onto it. Forcing one
+ * would put an editorial verdict into a field that never carried one.
+ *
+ * This exists because `knowledgeSource.status` is still `required` on the
+ * pre-foundation schema, and its `initialValue` only fires when Studio creates
+ * a document — never on an API write. A captured source therefore needs the
+ * legacy field filled, and filling it from the review status rather than from a
+ * literal is what stops the two disagreeing.
+ */
+export function legacySourceStatusFor(
+  reviewStatus: KnowledgeReviewStatus,
+): LegacySourceStatus | undefined {
+  for (const [legacy, mapped] of Object.entries(LEGACY_SOURCE_STATUS_REVIEW_MAP)) {
+    if (mapped === reviewStatus) return legacy as LegacySourceStatus
+  }
+  return undefined
+}
+
+/**
+ * The brand a capture is filed under when nothing says otherwise.
+ *
+ * `knowledgeSource.brandTags` is `required().min(1)` on the pre-foundation
+ * schema and no capture input carries a brand, so an external capture needs a
+ * value to be valid at all. This is a *default*, not a determination: it says
+ * which brand's inbox the record landed in, not that anyone has decided the
+ * material belongs to that brand. `knowledgeItem.brandTags` is optional for
+ * exactly that reason and is left unset.
+ *
+ * If a second brand ever captures through this path, this becomes a capture
+ * parameter rather than a constant.
+ */
+export const DEFAULT_CAPTURE_BRAND_TAG = 'silicon-and-stone'
+
+/**
  * Whether a source document was created after the canonical foundation wave.
  *
  * The discriminator is the presence of a field that did not exist before it:

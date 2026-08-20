@@ -10,6 +10,7 @@ import {
   updateResearchRun,
   type KnowledgeServiceDeps,
 } from './service'
+import { effectiveSourceReviewStatus } from './types'
 
 /**
  * A scripted Sanity. `documents` is the dataset; `fetch` answers the three
@@ -150,6 +151,48 @@ describe('captureSource', () => {
     expect(doc.capturedAt).toBe('2026-08-18T12:00:00.000Z')
     expect((doc.indexState as Record<string, unknown>).status).toBe('not_eligible')
     expect((doc.extractionState as Record<string, unknown>).status).toBe('not_required')
+  })
+
+  it('fills the two required pre-foundation fields a Studio initialValue never reaches', () => {
+    // An API write gets no `initialValue`, so before this a captured source
+    // failed validation in Studio on `status` and `brandTags` alike — a record
+    // a machine wrote, waiting on a human to fill in fields it could not know
+    // it had missed.
+    const h = harness()
+    return captureSource(h.deps, {
+      title: 'Commission guidance',
+      sourceKind: 'url',
+      text: 'Guidance text.',
+      sourceSystem: 'admin_ui',
+    }).then((result) => {
+      expect(result.ok).toBe(true)
+      const doc = h.created[0]
+      expect(doc.status).toBe('pending')
+      expect(doc.brandTags).toEqual(['silicon-and-stone'])
+    })
+  })
+
+  it('keeps the legacy status and the review status saying the same thing', () => {
+    // The point of deriving one from the other. A capture that wrote
+    // `reviewStatus: inbox` next to `status: processed` would report a record
+    // as both unreviewed and approved, depending which field you read.
+    const h = harness()
+    return captureSource(h.deps, {
+      title: 'Commission guidance',
+      sourceKind: 'url',
+      text: 'Guidance text.',
+      sourceSystem: 'admin_ui',
+    }).then(() => {
+      const doc = h.created[0]
+      expect(
+        effectiveSourceReviewStatus({
+          reviewStatus: doc.reviewStatus as string,
+          status: doc.status as string,
+        }),
+      ).toBe('inbox')
+      // And the legacy field alone, which is what a pre-foundation reader sees.
+      expect(effectiveSourceReviewStatus({ status: doc.status as string })).toBe('inbox')
+    })
   })
 
   it('returns the existing record for a repeated capture rather than writing a second', async () => {

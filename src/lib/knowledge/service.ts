@@ -45,9 +45,11 @@ import {
   type KnowledgeValidationError,
 } from './schema'
 import { researchRunTransitions, reviewTransitions } from './transitions'
-import type {
-  KnowledgeReviewStatus,
-  ResearchRunStatus,
+import {
+  DEFAULT_CAPTURE_BRAND_TAG,
+  legacySourceStatusFor,
+  type KnowledgeReviewStatus,
+  type ResearchRunStatus,
 } from './types'
 
 /* ------------------------------------------------------------------ *
@@ -251,6 +253,13 @@ export async function captureSource(
   const documentId = nextId(deps, 'knowledgeSource')
   const extractionStatus = value.extractionExpected ? 'queued' : 'not_required'
 
+  // Two pre-foundation fields that are `required` on the schema and that no
+  // capture input supplies. Without them every externally captured source
+  // landed in the inbox failing Studio validation — an API write never gets a
+  // field's `initialValue`, which only fires when Studio creates a document.
+  const captureReviewStatus = 'inbox' satisfies KnowledgeReviewStatus
+  const legacyStatus = legacySourceStatusFor(captureReviewStatus)
+
   const document: Record<string, unknown> & { _id: string; _type: string } = {
     _id: documentId,
     _type: 'knowledgeSource',
@@ -258,7 +267,13 @@ export async function captureSource(
     sourceType: value.sourceKind,
     capturedAt,
     // `inbox`, always. There is no parameter that changes this.
-    reviewStatus: 'inbox' satisfies KnowledgeReviewStatus,
+    reviewStatus: captureReviewStatus,
+    // Derived from the verdict above rather than written as a literal, so the
+    // legacy field and the new one cannot drift apart.
+    ...(legacyStatus ? { status: legacyStatus } : {}),
+    // A default, not a determination: which brand's inbox this landed in, not
+    // a decision that the material belongs to that brand.
+    brandTags: [DEFAULT_CAPTURE_BRAND_TAG],
     extractionState: { status: extractionStatus },
     indexState: { status: 'not_eligible' },
     provenance: {

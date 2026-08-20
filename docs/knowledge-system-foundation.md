@@ -85,7 +85,15 @@ into active ones except through an edge explicitly marked `repair`.
 Nothing has been backfilled and no legacy field has been rewritten.
 
 - **Every new field is optional.** An existing document validates unchanged.
-- **`knowledgeSource.status` is still written and still read.** Read it with
+- **`knowledgeSource.status` is still written and still read** — including by
+  external capture, since 2026-08-20. `captureSource()` derives it from the
+  review status through `legacySourceStatusFor()` rather than writing a literal,
+  so the legacy field and the new one cannot drift apart; the mapper is partial
+  because `rejected` and `superseded` have no legacy equivalent. It also fills
+  `brandTags`, which is `required().min(1)` here. Neither was written before, and
+  an API write never receives a field's `initialValue` — that fires only when
+  Studio creates a document — so every captured source failed validation on both.
+  Read it with
   `effectiveSourceReviewStatus()` in `src/lib/knowledge/types.ts`, which prefers
   `reviewStatus` where it exists and otherwise maps legacy `pending → inbox` and
   `processed → ready`. Legacy `error` maps to **`requires_review`**, not

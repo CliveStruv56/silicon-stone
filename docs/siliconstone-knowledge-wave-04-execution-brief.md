@@ -143,6 +143,20 @@ decision. The schemas are loose supersets; every real rule stays in
 `src/lib/knowledge/schema.ts`. A check asserts no file under
 `src/lib/knowledge/` imports zod.
 
+**Capture fills the legacy required fields, because Studio's defaults do not
+reach it.** `sourceId`, `status` and `brandTags` are all `required` on the
+pre-foundation `knowledgeSource` schema, and an API write never receives a
+field's `initialValue` — that only fires when Studio creates a document. So the
+first captured source landed in the inbox failing validation on all three, with
+a reviewer asked to fill in fields a machine had written the rest of. Fixed
+2026-08-20: `sourceId` is now required only on pre-foundation records (it exists
+for string reference resolution, which references replaced), while `status` and
+`brandTags` are supplied. `status` is **derived** from the review status via
+`legacySourceStatusFor()`, never written as a literal, so the legacy and new
+verdicts cannot disagree; `brandTags` defaults to `['silicon-and-stone']`, which
+records which inbox the record landed in and not a decision about the material.
+`knowledgeItem.brandTags` stays unset — optional by design there.
+
 ## Operational notes from the rollout
 
 **Set the flag as a NON-sensitive variable.** It was first added as Sensitive,

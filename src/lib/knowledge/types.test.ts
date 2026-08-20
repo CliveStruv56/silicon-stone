@@ -10,6 +10,7 @@ import {
   isKnowledgeItemKind,
   isKnowledgeReviewStatus,
   isPostFoundationSource,
+  legacySourceStatusFor,
   optionList,
   type KnowledgeItemKind,
   type KnowledgeReviewStatus,
@@ -137,5 +138,29 @@ describe('isPostFoundationSource', () => {
     expect(
       isPostFoundationSource({ reviewStatus: 1 } as Parameters<typeof isPostFoundationSource>[0]),
     ).toBe(false)
+  })
+})
+
+describe('legacySourceStatusFor', () => {
+  it('round-trips through the legacy map, so the two fields cannot disagree', () => {
+    // The invariant that matters: whatever legacy status we write for a
+    // verdict must read back as that same verdict.
+    for (const reviewStatus of KNOWLEDGE_REVIEW_STATUSES) {
+      const legacy = legacySourceStatusFor(reviewStatus)
+      if (!legacy) continue
+      expect(effectiveSourceReviewStatus({ status: legacy })).toBe(reviewStatus)
+    }
+  })
+
+  it('maps the two verdicts the legacy vocabulary can express', () => {
+    expect(legacySourceStatusFor('inbox')).toBe('pending')
+    expect(legacySourceStatusFor('ready')).toBe('processed')
+  })
+
+  it('refuses to map the two it cannot', () => {
+    // Legacy `error` meant a capture or extraction failure, never a review
+    // decision. Mapping either of these onto it would invent a verdict.
+    expect(legacySourceStatusFor('rejected')).toBeUndefined()
+    expect(legacySourceStatusFor('superseded')).toBeUndefined()
   })
 })
