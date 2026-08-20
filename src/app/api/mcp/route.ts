@@ -5,7 +5,7 @@ import { checkDurableRateLimit, durableRateLimitConfigured } from '@/lib/durable
 import { getClientIp } from '@/lib/rate-limit'
 import { sha256Hex } from '@/lib/knowledge/hash'
 import { bearerCredential, verifyIngestRequest } from '@/lib/knowledge/ingest-auth'
-import { guardKnowledgeRequest } from '@/lib/knowledge/ingest-guard'
+import { guardKnowledgeRequest, methodNotAllowedStatus } from '@/lib/knowledge/ingest-guard'
 import { knowledgeClient } from '@/lib/knowledge/sanity-client'
 import { KNOWLEDGE_TOOLS } from '@/lib/mcp/knowledge-tools'
 import type { KnowledgeSourceSystem } from '@/lib/knowledge/types'
@@ -159,12 +159,17 @@ export const POST = handle
 
 /**
  * The 2026-07-28 revision removed sessions and the standalone GET stream, so
- * these methods have nothing to do. 405 is the specified answer.
+ * these methods have nothing to do and 405 is the specified answer — but only
+ * once the feature is live. While it is dark the route must be indistinguishable
+ * from one that was never deployed, so the flag decides.
  */
-export async function GET() {
-  return Response.json({ error: 'Method not allowed' }, { status: 405 })
+function methodNotAllowed(): Response {
+  const status = methodNotAllowedStatus()
+  return Response.json(
+    { error: status === 404 ? 'Not found' : 'Method not allowed' },
+    { status },
+  )
 }
 
-export async function DELETE() {
-  return Response.json({ error: 'Method not allowed' }, { status: 405 })
-}
+export const GET = methodNotAllowed
+export const DELETE = methodNotAllowed

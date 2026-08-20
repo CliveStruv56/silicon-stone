@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { checkDurableRateLimit, durableRateLimitConfigured } from '@/lib/durable-rate-limit'
 import { getClientIp } from '@/lib/rate-limit'
 import { ingestCapture } from '@/lib/knowledge/ingest'
-import { guardKnowledgeRequest } from '@/lib/knowledge/ingest-guard'
+import { guardKnowledgeRequest, methodNotAllowedStatus } from '@/lib/knowledge/ingest-guard'
 import {
   SAFE_WRITE_FAILURE_MESSAGE,
   statusForIngestError,
@@ -106,7 +106,14 @@ export async function POST(request: NextRequest) {
   })
 }
 
-/** This endpoint accepts captures and nothing else. */
+/**
+ * This endpoint accepts captures and nothing else — but while the feature is
+ * dark it must not admit to existing either, so the status comes from the flag.
+ */
 export async function GET() {
-  return NextResponse.json({ error: 'Method not allowed' }, { status: 405 })
+  const status = methodNotAllowedStatus()
+  return NextResponse.json(
+    { error: status === 404 ? 'Not found' : 'Method not allowed' },
+    { status },
+  )
 }

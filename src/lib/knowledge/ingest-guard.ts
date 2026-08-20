@@ -49,6 +49,18 @@ export type GuardDecision =
       logMessage?: string
     }
 
+/**
+ * The status for a method this endpoint does not serve.
+ *
+ * 405 tells a caller the route exists, which is right when the feature is live
+ * and wrong when it is dark: a feature behind an unreleased flag should be
+ * indistinguishable from a route that was never deployed. So the flag is
+ * consulted before the method is answered.
+ */
+export function methodNotAllowedStatus(env?: EnvSource): 404 | 405 {
+  return knowledgeFeatureEnabled('externalWrites', env ?? process.env) ? 405 : 404
+}
+
 export async function guardKnowledgeRequest(input: GuardInput): Promise<GuardDecision> {
   const env = input.env ?? process.env
 

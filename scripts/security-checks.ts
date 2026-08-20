@@ -171,10 +171,14 @@ async function main() {
   assert.equal(mcpRouteSource.includes('fetch('), false, 'the MCP route must not call itself over HTTP')
   // It composes the domain service; it does not build documents.
   assert.equal(mcpRouteSource.includes('_type:'), false, 'the MCP route must not shape documents')
-  // 2026-07-28 removed sessions and the standalone GET stream.
-  assert.match(mcpRouteSource, /export async function GET/)
-  assert.match(mcpRouteSource, /export async function DELETE/)
+  // 2026-07-28 removed sessions and the standalone GET stream, so GET and
+  // DELETE are answered rather than routed — but through the flag, so a dark
+  // feature stays indistinguishable from a route that was never deployed.
+  assert.match(mcpRouteSource, /export const GET/)
+  assert.match(mcpRouteSource, /export const DELETE/)
+  assert.match(mcpRouteSource, /methodNotAllowedStatus/)
   assert.match(mcpRouteSource, /origin/i)
+  assert.match(captureRouteSource, /methodNotAllowedStatus/)
 
   // CORS is absent everywhere by design — no Access-Control-Allow-Origin means
   // a browser cannot read a response even if it can send a request. The only

@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import type { DurableRateLimitResult } from '@/lib/durable-rate-limit'
 
 import { MIN_INGEST_TOKEN_LENGTH } from './ingest-auth'
-import { guardKnowledgeRequest, type GuardInput } from './ingest-guard'
+import { guardKnowledgeRequest, methodNotAllowedStatus, type GuardInput } from './ingest-guard'
 
 const TOKEN = 'k'.repeat(MIN_INGEST_TOKEN_LENGTH)
 
@@ -141,5 +141,20 @@ describe('authentication', () => {
   it('never puts the token in the response', async () => {
     const decision = await guardKnowledgeRequest(input({ authorization: `Bearer ${TOKEN}x` }))
     expect(JSON.stringify(decision)).not.toContain(TOKEN)
+  })
+})
+
+describe('methodNotAllowedStatus', () => {
+  it('hides the route entirely while the feature is dark', () => {
+    // 405 would confirm the path exists. A feature behind an unreleased flag
+    // should be indistinguishable from one that was never deployed.
+    expect(methodNotAllowedStatus({})).toBe(404)
+    expect(methodNotAllowedStatus({ KNOWLEDGE_EXTERNAL_WRITES_ENABLED: 'false' })).toBe(404)
+    expect(methodNotAllowedStatus({ KNOWLEDGE_EXTERNAL_WRITES_ENABLED: '' })).toBe(404)
+  })
+
+  it('answers 405 once the feature is live, as the MCP transport requires', () => {
+    expect(methodNotAllowedStatus({ KNOWLEDGE_EXTERNAL_WRITES_ENABLED: 'true' })).toBe(405)
+    expect(methodNotAllowedStatus({ KNOWLEDGE_EXTERNAL_WRITES_ENABLED: '1' })).toBe(405)
   })
 })
