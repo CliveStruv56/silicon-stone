@@ -145,4 +145,85 @@ assert.match(candidateRoute, /status: 'pending'/)
 assert.equal(candidateRoute.includes('git commit'), false)
 assert.equal(candidateRoute.includes('git push'), false)
 
+// ---- External capture and the MCP server (wave 4a) ----
+
+// The new machine endpoints must stay OUT of both middleware lists. The reason
+// is concrete rather than theoretical: middleware REDIRECTS to /login rather
+// than answering 401, so a machine client that matched would receive a 307 to
+// an HTML page and report a confusing parse failure instead of an auth error.
+for (const machinePath of [
+  '/api/knowledge/capture',
+  '/api/knowledge/inbox',
+  '/api/knowledge/record',
+  '/api/mcp',
+]) {
+  assert.equal(
+    middleware.includes(machinePath),
+    false,
+    `${machinePath} must not be behind the admin cookie middleware`,
+  )
+}
+
+// zod is a transport requirement of the MCP SDK, which needs a Standard Schema
+// to publish each tool's inputSchema. It is confined to src/lib/mcp/ so that
+// "the knowledge domain has no validation library" stays literally true — the
+// domain's own parsers in schema.ts remain the only thing that decides.
+for (const file of fs.readdirSync('src/lib/knowledge')) {
+  if (!file.endsWith('.ts')) continue
+  const source = fs.readFileSync(`src/lib/knowledge/${file}`, 'utf8')
+  assert.equal(
+    /from 'zod'/.test(source),
+    false,
+    `src/lib/knowledge/${file} must not import zod — validation lives in schema.ts`,
+  )
+}
+
+const toolsSource = fs.readFileSync('src/lib/mcp/knowledge-tools.ts', 'utf8')
+
+// destructiveHint defaults to TRUE whenever readOnlyHint is false, so leaving
+// it implicit would put a destructive-action confirmation in front of the one
+// action performed constantly. Capture never overwrites: a duplicate returns
+// the record that already existed.
+assert.equal(
+  (toolsSource.match(/destructiveHint: false/g) ?? []).length,
+  2,
+  'both capture tools must declare destructiveHint: false explicitly',
+)
+// ChatGPT treats a MISSING readOnlyHint as a write and gates it behind a
+// confirmation, so the read tools must say so.
+assert.equal(
+  (toolsSource.match(/readOnlyHint: true/g) ?? []).length,
+  3,
+  'all three read tools must declare readOnlyHint: true',
+)
+
+// Neither field may be offered to a model. `sourceSystem` is half of the
+// external-reference duplicate probe, so a model that can set it can split or
+// merge deduplication buckets; `extractionExpected` describes a capability that
+// does not exist, and a field in a schema is an invitation.
+// Matched as an object key (`field: z...`), which is how a zod schema field is
+// written — the module's own comments explain at length why these two are
+// absent, and prose must not trip the check.
+const schemaRegion = toolsSource.slice(0, toolsSource.indexOf('export interface ToolResult'))
+assert.equal(
+  /extractionExpected\s*:/.test(schemaRegion),
+  false,
+  'no tool schema may offer extractionExpected',
+)
+assert.equal(
+  /sourceSystem\s*:/.test(schemaRegion),
+  false,
+  'no tool schema may offer sourceSystem — the server sets it',
+)
+
+// No tool may move a record out of the inbox. That invariant is what the whole
+// domain layer exists to hold, and a tool is the easiest way to lose it.
+for (const forbidden of ['applyReviewTransition', 'reviewTransitions', 'promote_to_article']) {
+  assert.equal(
+    toolsSource.includes(forbidden),
+    false,
+    `the MCP tools must not expose ${forbidden}`,
+  )
+}
+
 console.log('Knowledge inbox checks passed')

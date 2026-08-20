@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { execFileSync } from 'node:child_process'
 import fs from 'node:fs'
 import { validateManagedContentPath } from '../src/lib/api'
 import { checkRateLimit } from '../src/lib/rate-limit'
@@ -102,6 +103,96 @@ async function main() {
   assert.match(backendSourceAfterPatch, /DEEP_RESEARCH_MAX_INSTRUCTION_CHARS/)
   assert.match(backendSourceAfterPatch, /_require_deep_research_budget/)
   assert.match(backendSourceAfterPatch, /research:active-hash/)
+
+  // ---- External knowledge capture (wave 4a) ----
+  //
+  // The integration credential and the admin session must stay separable: if
+  // one could stand in for the other, revoking either would silently widen the
+  // other's blast radius. Master spec §8 forbids reusing the Sanity token, the
+  // admin password or the backend key for this.
+  const ingestAuthSource = fs.readFileSync('src/lib/knowledge/ingest-auth.ts', 'utf-8')
+  for (const forbidden of [
+    'SANITY_API_WRITE_TOKEN',
+    'ADMIN_PASSWORD',
+    'SESSION_SECRET',
+    'BACKEND_API_KEY',
+  ]) {
+    // Matches an actual read, not the name appearing in prose — the module
+    // legitimately explains that its length rule mirrors SESSION_SECRET's.
+    assert.equal(
+      new RegExp(`env[.\\[]['"\`]?${forbidden}(?![A-Z0-9_])`).test(ingestAuthSource),
+      false,
+      `the ingest credential must not read ${forbidden}`,
+    )
+  }
+  // Digest-then-compare, so neither the length nor a prefix of the token leaks
+  // through timing. A plain === here would be a real vulnerability.
+  assert.match(ingestAuthSource, /createHash\('sha256'\)/)
+  assert.match(ingestAuthSource, /timingSafeEqual/)
+
+  const knowledgeRouteFiles = [
+    'src/app/api/knowledge/capture/route.ts',
+    'src/app/api/knowledge/inbox/route.ts',
+    'src/app/api/knowledge/record/[id]/route.ts',
+    'src/app/api/mcp/route.ts',
+  ]
+  for (const file of knowledgeRouteFiles) {
+    const source = fs.readFileSync(file, 'utf-8')
+    // These are machine endpoints. requireAdmin() reads a browser cookie, so
+    // using it here would make them unusable AND imply a session that is not
+    // there.
+    assert.equal(source.includes('requireAdmin'), false, `${file} must not use requireAdmin`)
+    assert.equal(source.includes("@/lib/auth"), false, `${file} must not import the admin auth`)
+    // Every one of them goes through the shared guard, so none can quietly lose
+    // the flag check, the rate limit or the credential check.
+    assert.match(source, /guardKnowledgeRequest/, `${file} must use the shared guard`)
+    assert.equal(
+      source.includes('KNOWLEDGE_INGEST_TOKEN'),
+      false,
+      `${file} must not read the token directly`,
+    )
+  }
+
+  const captureRouteSource = fs.readFileSync('src/app/api/knowledge/capture/route.ts', 'utf-8')
+  // Size is checked on the header and on what arrived, both before parsing.
+  assert.match(captureRouteSource, /content-length/)
+  assert.ok(
+    captureRouteSource.indexOf('MAX_BODY_BYTES') < captureRouteSource.indexOf('JSON.parse'),
+    'the body cap must be checked before parsing',
+  )
+  // The Sanity error message can name the project, dataset and missing
+  // permission. It is logged, never returned.
+  assert.match(captureRouteSource, /SAFE_WRITE_FAILURE_MESSAGE/)
+
+  const mcpRouteSource = fs.readFileSync('src/app/api/mcp/route.ts', 'utf-8')
+  // The MCP server calls the domain in-process. A loopback fetch to our own
+  // domain would meet Vercel's deployment protection on any protected
+  // deployment and would need a second credential authorising us to ourselves.
+  assert.equal(mcpRouteSource.includes('fetch('), false, 'the MCP route must not call itself over HTTP')
+  // It composes the domain service; it does not build documents.
+  assert.equal(mcpRouteSource.includes('_type:'), false, 'the MCP route must not shape documents')
+  // 2026-07-28 removed sessions and the standalone GET stream.
+  assert.match(mcpRouteSource, /export async function GET/)
+  assert.match(mcpRouteSource, /export async function DELETE/)
+  assert.match(mcpRouteSource, /origin/i)
+
+  // CORS is absent everywhere by design — no Access-Control-Allow-Origin means
+  // a browser cannot read a response even if it can send a request. The only
+  // place it may ever appear is the OAuth protected-resource metadata document,
+  // which is public by specification.
+  const appFiles = execFileSync('git', ['ls-files', 'src/app'], { encoding: 'utf8' })
+    .split('\n')
+    .filter((file) => file.endsWith('.ts') || file.endsWith('.tsx'))
+  for (const file of appFiles) {
+    if (!fs.existsSync(file)) continue
+    if (fs.readFileSync(file, 'utf-8').includes('Access-Control-Allow-Origin')) {
+      assert.match(
+        file,
+        /well-known\/oauth-protected-resource/,
+        `${file} must not set CORS headers`,
+      )
+    }
+  }
 
   const workflowSource = fs.readFileSync('.github/workflows/check.yml', 'utf-8')
   assert.match(workflowSource, /npm run test:security/)

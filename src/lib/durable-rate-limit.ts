@@ -7,6 +7,18 @@ import { checkRateLimit } from './rate-limit'
 export type DurableRateLimitResult = {
   allowed: boolean
   retryAfter: number
+  /**
+   * True when this answer came from the per-instance in-memory fallback rather
+   * than the shared store — either Upstash is unconfigured or it failed at
+   * request time.
+   *
+   * Existing callers ignore it and are unaffected. It exists because the
+   * fallback is the right behaviour for login and the public forms (failing
+   * closed would brick the site) and the wrong behaviour for a public,
+   * token-authenticated write endpoint, which needs to be able to tell that its
+   * ceiling is now per-lambda and refuse rather than accept.
+   */
+  degraded?: boolean
 }
 
 type RateLimitConfig = {
@@ -35,6 +47,16 @@ const configs = {
   // than intake by an order of magnitude, deliberately: nobody legitimately
   // needs three reports an hour, and the ceiling is the cost control.
   checkerReport: { limit: 3, window: '1 h', prefix: 'sas:checker-report' },
+  // External knowledge capture, keyed on IP and checked BEFORE the bearer token
+  // is verified. Comfortably above a person pasting conversation extracts all
+  // day, far below a loop — and it is the only thing standing between a leaked
+  // token and unbounded Sanity writes.
+  knowledgeCapture: { limit: 60, window: '15 m', prefix: 'sas:knowledge-capture' },
+  // MCP tool invocations, keyed on the authenticated caller rather than the IP.
+  // Higher than the capture ceiling because one conversation legitimately makes
+  // several read calls per capture, and because the MCP spec's rate-limiting
+  // requirement is per tool invocation, not per HTTP request.
+  knowledgeMcp: { limit: 120, window: '15 m', prefix: 'sas:knowledge-mcp' },
 } satisfies Record<string, RateLimitConfig>
 
 export type DurableRateLimitKey = keyof typeof configs
@@ -100,10 +122,11 @@ function windowToMs(window: RateLimitConfig['window']): number {
  */
 function inMemoryFallback(key: DurableRateLimitKey, identifier: string): DurableRateLimitResult {
   const config = configs[key]
-  return checkRateLimit(`${config.prefix}:${identifier || 'unknown'}`, {
+  const result = checkRateLimit(`${config.prefix}:${identifier || 'unknown'}`, {
     limit: config.limit,
     windowMs: windowToMs(config.window),
   })
+  return { ...result, degraded: true }
 }
 
 export async function checkDurableRateLimit(
