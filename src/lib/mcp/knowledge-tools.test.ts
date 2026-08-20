@@ -26,6 +26,7 @@ function toolNamed(name: KnowledgeToolName) {
 
 function deps(documents: Record<string, Record<string, unknown>> = {}): KnowledgeToolDeps & {
   created: Record<string, unknown>[]
+  documents: Record<string, Record<string, unknown>>
 } {
   const created: Record<string, unknown>[] = []
   const client: KnowledgeClient = {
@@ -34,7 +35,12 @@ function deps(documents: Record<string, Record<string, unknown>> = {}): Knowledg
       if (query.includes('_id == $documentId')) {
         return (documents[String(params.documentId)] ?? null) as T
       }
-      if (query.includes('_id in $documentIds')) return [] as T
+      if (query.includes('_id in $documentIds')) {
+        // Reference resolution asks this. Returning [] would make every
+        // reference look missing.
+        const wanted = new Set((params.documentIds as string[]) ?? [])
+        return all.filter((doc) => wanted.has(String(doc._id))) as T
+      }
       // Duplicate probes, so a repeated capture actually finds the first.
       const ofType = all.filter((doc) => doc._type === params.documentType)
       const prov = (doc: Record<string, unknown>) =>
@@ -70,18 +76,26 @@ function deps(documents: Record<string, Record<string, unknown>> = {}): Knowledg
     async createOrReplace(document) {
       return this.create(document)
     },
-    patch(): KnowledgePatch {
+    patch(id: string): KnowledgePatch {
+      const staged: Record<string, unknown> = {}
       const p: KnowledgePatch = {
-        set: () => p,
+        set: (fields) => {
+          Object.assign(staged, fields)
+          return p
+        },
         setIfMissing: () => p,
         unset: () => p,
-        commit: async () => ({ _id: 'x' }),
+        commit: async () => {
+          documents[id] = { ...(documents[id] ?? {}), ...staged }
+          return { _id: id }
+        },
       }
       return p
     },
   }
   return {
     created,
+    documents,
     service: { client, now: () => '2026-08-20T12:00:00.000Z', uuid: () => 'uuid-1' },
     context: { sourceSystem: 'claude', capturedBy: 'mcp' },
   }
@@ -119,7 +133,11 @@ describe('annotations', () => {
   it('marks the two write tools non-destructive, explicitly', () => {
     // destructiveHint defaults to TRUE when readOnlyHint is false. Leaving it
     // implicit would put a destructive-action warning in front of every save.
-    for (const name of ['capture_knowledge_item', 'capture_source'] as const) {
+    for (const name of [
+      'capture_knowledge_item',
+      'capture_source',
+      'link_sources_to_item',
+    ] as const) {
       const annotations = toolNamed(name).config.annotations
       expect(annotations.readOnlyHint).toBe(false)
       expect(annotations.destructiveHint).toBe(false)
@@ -260,5 +278,57 @@ describe('read behaviour', () => {
     const result = await toolNamed('get_knowledge_record').run({ documentId: 'knowledgeItem.a' }, d)
     expect(result.isError).toBeUndefined()
     expect(result.content[0].text).toContain('A thing')
+  })
+})
+
+describe('link_sources_to_item', () => {
+  const world = (itemOverrides: Record<string, unknown> = {}) => ({
+    'knowledgeItem.a': {
+      _id: 'knowledgeItem.a',
+      _type: 'knowledgeItem',
+      reviewStatus: 'inbox',
+      ...itemOverrides,
+    },
+    'knowledgeSource.one': { _id: 'knowledgeSource.one', _type: 'knowledgeSource' },
+  })
+
+  it('attaches a source and says the item is still awaiting review', async () => {
+    const d = deps(world())
+    const result = await toolNamed('link_sources_to_item').run(
+      { itemId: 'knowledgeItem.a', sourceIds: ['knowledgeSource.one'] },
+      d,
+    )
+    expect(result.isError).toBeUndefined()
+    expect(result.content[0].text).toContain('still awaiting review')
+    expect(result.structuredContent?.status).toBe('inbox')
+    const sources = d.documents['knowledgeItem.a'].sources as { _ref: string }[]
+    expect(sources.map((entry) => entry._ref)).toEqual(['knowledgeSource.one'])
+  })
+
+  it('refuses an item that has already been reviewed', async () => {
+    const d = deps(world({ reviewStatus: 'ready' }))
+    const result = await toolNamed('link_sources_to_item').run(
+      { itemId: 'knowledgeItem.a', sourceIds: ['knowledgeSource.one'] },
+      d,
+    )
+    expect(result.isError).toBe(true)
+    expect(result.content[0].text).toContain('Studio')
+  })
+
+  it('refuses a source that does not exist, correctably', async () => {
+    const d = deps(world())
+    const result = await toolNamed('link_sources_to_item').run(
+      { itemId: 'knowledgeItem.a', sourceIds: ['knowledgeSource.nope'] },
+      d,
+    )
+    expect(result.isError).toBe(true)
+    expect(result.content[0].text).toContain('knowledgeSource.nope')
+  })
+
+  it('offers no way to remove a source or change a status', () => {
+    const shape = JSON.stringify(shapeOf(toolNamed('link_sources_to_item')))
+    for (const forbidden of ['remove', 'reviewStatus', 'status', 'delete', 'replace']) {
+      expect(shape).not.toContain(forbidden)
+    }
   })
 })

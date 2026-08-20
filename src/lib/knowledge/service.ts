@@ -539,6 +539,120 @@ export async function updateResearchRun(
 }
 
 /* ------------------------------------------------------------------ *
+ * Linking sources to an item
+ * ------------------------------------------------------------------ */
+
+export interface LinkSourcesInput {
+  itemId: string
+  sourceIds: string[]
+}
+
+/**
+ * Adds source references to a knowledge item.
+ *
+ * This is the only operation in the domain that an external caller can use to
+ * modify a record that already exists, and it is deliberately the narrowest
+ * useful one. Four constraints define it, and each closes a way it could turn
+ * into something else:
+ *
+ *  - **Additive only.** Existing references are preserved and the new ones are
+ *    merged in. There is no path here that removes a reference, so the worst a
+ *    confused caller can do is add a wrong one, which a human can see and undo.
+ *  - **Inbox records only.** A `ready` item has been reviewed; quietly changing
+ *    what it rests on would mean the thing approved is no longer the thing
+ *    stored. Editing an approved record stays a human act, in Studio.
+ *  - **Sources only.** Each reference must resolve to an existing
+ *    `knowledgeSource`, so this cannot be used to attach arbitrary documents.
+ *  - **Nothing else moves.** The patch touches `sources` and nothing besides —
+ *    not the review status, not the body, not the content hash. Which is why it
+ *    can honestly be annotated as non-destructive.
+ *
+ * It exists because the migration left real items pointing at legacy string
+ * source IDs that resolve to nothing, and re-capturing a source from a
+ * conversation only to switch to Studio to attach it is the kind of friction
+ * that stops the system being used.
+ */
+export async function linkSourcesToItem(
+  deps: KnowledgeServiceDeps,
+  input: LinkSourcesInput,
+): Promise<KnowledgeResult> {
+  if (input.sourceIds.length === 0) {
+    return fail('validation_failed', 'Name at least one source to link.', {
+      errors: [
+        { field: 'sourceIds', code: 'required', message: 'Name at least one source to link.' },
+      ],
+    })
+  }
+
+  const item = await getDocument<{
+    _id: string
+    _type: string
+    reviewStatus?: string
+    sources?: { _ref?: string }[]
+  }>(deps.client, input.itemId)
+
+  if (!item) return fail('not_found', `No document at ${input.itemId}.`)
+  if (item._type !== 'knowledgeItem') {
+    return fail(
+      'unresolved_reference',
+      `${input.itemId} is a ${item._type}, not a knowledgeItem.`,
+    )
+  }
+
+  // `inbox` covers a record with no reviewStatus at all, which is what a
+  // document written before this field existed looks like.
+  const status = item.reviewStatus ?? 'inbox'
+  if (status !== 'inbox') {
+    return fail(
+      'transition_refused',
+      `${input.itemId} is ${status}, not awaiting review. Only a record still in the inbox can be edited this way; change an approved record in Studio.`,
+    )
+  }
+
+  const referenceFailure = await resolveReferences(deps.client, [
+    { field: 'sourceIds', ids: input.sourceIds, expectedType: 'knowledgeSource' },
+  ])
+  if (referenceFailure) return referenceFailure
+
+  const existing = (item.sources ?? [])
+    .map((reference) => reference?._ref)
+    .filter((ref): ref is string => Boolean(ref))
+  // Existing first, so the merge never reorders what was already there.
+  const merged = keyedReferences([...existing, ...input.sourceIds])
+
+  if (merged.length === existing.length) {
+    return {
+      ok: true,
+      documentId: input.itemId,
+      documentType: 'knowledgeItem',
+      status,
+      created: false,
+      duplicate: NO_DUPLICATE,
+      reviewUrl: knowledgeReviewUrl(input.itemId),
+      events: [],
+    }
+  }
+
+  try {
+    // `sources` and nothing else.
+    await patchDocument(deps.client, input.itemId, { sources: merged })
+  } catch (error) {
+    return fail('write_failed', writeMessage(error))
+  }
+
+  return {
+    ok: true,
+    documentId: input.itemId,
+    documentType: 'knowledgeItem',
+    status,
+    created: false,
+    duplicate: NO_DUPLICATE,
+    reviewUrl: knowledgeReviewUrl(input.itemId),
+    events: [],
+  }
+}
+
+/* ------------------------------------------------------------------ *
  * Review transitions
  * ------------------------------------------------------------------ */
 

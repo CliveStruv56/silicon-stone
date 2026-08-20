@@ -6,6 +6,7 @@ import {
   captureKnowledgeItem,
   captureSource,
   createResearchRun,
+  linkSourcesToItem,
   updateResearchRun,
   type KnowledgeServiceDeps,
 } from './service'
@@ -611,5 +612,132 @@ describe('applyReviewTransition', () => {
     expect(result.ok).toBe(false)
     if (result.ok) return
     expect(result.code).toBe('write_failed')
+  })
+})
+
+describe('linkSourcesToItem', () => {
+  const item = (overrides: Record<string, unknown> = {}) => ({
+    'knowledgeItem.a': {
+      _id: 'knowledgeItem.a',
+      _type: 'knowledgeItem',
+      reviewStatus: 'inbox',
+      ...overrides,
+    },
+    'knowledgeSource.one': { _id: 'knowledgeSource.one', _type: 'knowledgeSource' },
+    'knowledgeSource.two': { _id: 'knowledgeSource.two', _type: 'knowledgeSource' },
+  })
+
+  it('links a source to an inbox item', async () => {
+    const h = harness(item())
+    const result = await linkSourcesToItem(h.deps, {
+      itemId: 'knowledgeItem.a',
+      sourceIds: ['knowledgeSource.one'],
+    })
+    expect(result.ok).toBe(true)
+    const sources = h.documents['knowledgeItem.a'].sources as { _ref: string }[]
+    expect(sources.map((s) => s._ref)).toEqual(['knowledgeSource.one'])
+  })
+
+  it('adds without removing what was already there', async () => {
+    // The worst a confused caller can do is add a wrong reference, which a
+    // human can see and undo. There is no path here that removes one.
+    const h = harness(
+      item({ sources: [{ _type: 'reference', _ref: 'knowledgeSource.one', _key: 'k1' }] }),
+    )
+    await linkSourcesToItem(h.deps, {
+      itemId: 'knowledgeItem.a',
+      sourceIds: ['knowledgeSource.two'],
+    })
+    const sources = h.documents['knowledgeItem.a'].sources as { _ref: string }[]
+    expect(sources.map((s) => s._ref)).toEqual(['knowledgeSource.one', 'knowledgeSource.two'])
+  })
+
+  it('is idempotent and writes nothing when there is nothing to add', async () => {
+    const h = harness(
+      item({ sources: [{ _type: 'reference', _ref: 'knowledgeSource.one', _key: 'k1' }] }),
+    )
+    const result = await linkSourcesToItem(h.deps, {
+      itemId: 'knowledgeItem.a',
+      sourceIds: ['knowledgeSource.one'],
+    })
+    expect(result.ok).toBe(true)
+    expect(h.patched).toHaveLength(0)
+  })
+
+  it('touches sources and nothing else', async () => {
+    // Not the review status, not the body, not the content hash — which is what
+    // lets it be annotated as non-destructive honestly.
+    const h = harness(item())
+    await linkSourcesToItem(h.deps, {
+      itemId: 'knowledgeItem.a',
+      sourceIds: ['knowledgeSource.one'],
+    })
+    expect(Object.keys(h.patched[0].fields)).toEqual(['sources'])
+    expect(h.documents['knowledgeItem.a'].reviewStatus).toBe('inbox')
+  })
+
+  it('refuses an item that is no longer awaiting review', async () => {
+    for (const status of ['ready', 'rejected', 'superseded']) {
+      const h = harness(item({ reviewStatus: status }))
+      const result = await linkSourcesToItem(h.deps, {
+        itemId: 'knowledgeItem.a',
+        sourceIds: ['knowledgeSource.one'],
+      })
+      expect(result.ok).toBe(false)
+      if (result.ok) return
+      expect(result.code).toBe('transition_refused')
+      expect(h.patched).toHaveLength(0)
+    }
+  })
+
+  it('treats a record with no reviewStatus as inbox', async () => {
+    const h = harness(item({ reviewStatus: undefined }))
+    expect(
+      (await linkSourcesToItem(h.deps, {
+        itemId: 'knowledgeItem.a',
+        sourceIds: ['knowledgeSource.one'],
+      })).ok,
+    ).toBe(true)
+  })
+
+  it('refuses a reference that is not a source', async () => {
+    const h = harness({ ...item(), [topic._id]: topic })
+    const result = await linkSourcesToItem(h.deps, {
+      itemId: 'knowledgeItem.a',
+      sourceIds: [topic._id],
+    })
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.code).toBe('unresolved_reference')
+    expect(h.patched).toHaveLength(0)
+  })
+
+  it('refuses a source that does not exist', async () => {
+    const h = harness(item())
+    const result = await linkSourcesToItem(h.deps, {
+      itemId: 'knowledgeItem.a',
+      sourceIds: ['knowledgeSource.missing'],
+    })
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.code).toBe('unresolved_reference')
+  })
+
+  it('refuses a target that is not a knowledge item', async () => {
+    const h = harness({ ...item(), [topic._id]: topic })
+    const result = await linkSourcesToItem(h.deps, {
+      itemId: topic._id,
+      sourceIds: ['knowledgeSource.one'],
+    })
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.message).toContain('not a knowledgeItem')
+  })
+
+  it('refuses a missing item and an empty list', async () => {
+    const h = harness(item())
+    expect(
+      (await linkSourcesToItem(h.deps, { itemId: 'knowledgeItem.nope', sourceIds: ['knowledgeSource.one'] })).ok,
+    ).toBe(false)
+    const empty = await linkSourcesToItem(h.deps, { itemId: 'knowledgeItem.a', sourceIds: [] })
+    expect(empty.ok).toBe(false)
+    if (!empty.ok) expect(empty.code).toBe('validation_failed')
   })
 })

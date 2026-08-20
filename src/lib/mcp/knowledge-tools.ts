@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { ingestCapture, type IngestContext } from '@/lib/knowledge/ingest'
+import { linkSourcesToItem } from '@/lib/knowledge/service'
 import { SAFE_WRITE_FAILURE_MESSAGE } from '@/lib/knowledge/ingest-status'
 import {
   getKnowledgeRecord,
@@ -54,6 +55,7 @@ export const KNOWLEDGE_TOOL_NAMES = [
   'search_knowledge',
   'list_knowledge_inbox',
   'get_knowledge_record',
+  'link_sources_to_item',
 ] as const
 export type KnowledgeToolName = (typeof KNOWLEDGE_TOOL_NAMES)[number]
 
@@ -140,6 +142,13 @@ const listSchema = z.object({
 
 const getSchema = z.object({
   documentId: z.string().describe('The canonical document ID, e.g. knowledgeItem.abc123.'),
+})
+
+const linkSourcesSchema = z.object({
+  itemId: z.string().describe('The knowledgeItem to add sources to. It must still be awaiting review.'),
+  sourceIds: z
+    .array(z.string())
+    .describe('knowledgeSource document IDs to add. Existing sources are kept.'),
 })
 
 /** What a tool hands back. Mirrors the SDK's `CallToolResult` without importing
@@ -317,6 +326,50 @@ export const KNOWLEDGE_TOOLS: KnowledgeToolDefinition[] = [
         limit: typeof args.limit === 'number' ? args.limit : undefined,
       })
       return summaryResult(rows, 'The knowledge inbox is empty.')
+    },
+  },
+  {
+    name: 'link_sources_to_item',
+    config: {
+      title: 'Attach sources to an item awaiting review',
+      description:
+        'Attach existing sources to a knowledge item that is still awaiting review, so a claim can say what it rests on. Adds only — sources already attached are kept, and nothing else about the item changes. It cannot approve, publish, edit or delete anything, and it will not touch an item that has already been reviewed.',
+      inputSchema: linkSourcesSchema,
+      annotations: {
+        title: 'Attach sources to an item awaiting review',
+        readOnlyHint: false,
+        // Honest: it adds references and never removes one, and the patch
+        // touches `sources` and nothing else — not the review status, not the
+        // body, not the content hash.
+        destructiveHint: false,
+        // Linking the same source twice writes nothing at all.
+        idempotentHint: true,
+        openWorldHint: false,
+      },
+    },
+    run: async (args, deps) => {
+      const sourceIds = Array.isArray(args.sourceIds) ? args.sourceIds.map(String) : []
+      const result = await linkSourcesToItem(deps.service, {
+        itemId: String(args.itemId ?? ''),
+        sourceIds,
+      })
+      if (!result.ok) {
+        if (result.code === 'write_failed') {
+          console.error('MCP link write failed:', result.message)
+          return toolError(SAFE_WRITE_FAILURE_MESSAGE)
+        }
+        return toolError(result.message)
+      }
+      return text(
+        `Sources attached. The item is still awaiting review.\n\nID: ${result.documentId}\nReview it here: ${result.reviewUrl}`,
+        {
+          structuredContent: {
+            documentId: result.documentId,
+            status: result.status,
+            reviewUrl: result.reviewUrl,
+          },
+        },
+      )
     },
   },
   {

@@ -186,8 +186,8 @@ const toolsSource = fs.readFileSync('src/lib/mcp/knowledge-tools.ts', 'utf8')
 // the record that already existed.
 assert.equal(
   (toolsSource.match(/destructiveHint: false/g) ?? []).length,
-  2,
-  'both capture tools must declare destructiveHint: false explicitly',
+  3,
+  'every write tool must declare destructiveHint: false explicitly',
 )
 // ChatGPT treats a MISSING readOnlyHint as a write and gates it behind a
 // confirmation, so the read tools must say so.
@@ -215,6 +215,11 @@ assert.equal(
   false,
   'no tool schema may offer sourceSystem — the server sets it',
 )
+
+// link_sources_to_item is the ONLY tool that may modify an existing record, and
+// it may only add source references to something still awaiting review. If it
+// ever reaches for a review transition, the invariant is gone.
+assert.match(toolsSource, /linkSourcesToItem/)
 
 // No tool may move a record out of the inbox. That invariant is what the whole
 // domain layer exists to hold, and a tool is the easiest way to lose it.
