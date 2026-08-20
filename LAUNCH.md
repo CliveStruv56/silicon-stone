@@ -16,7 +16,18 @@ Vercel env change + redeploy — never a code edit.
   variants, all §4 advisory changes (Exposure Diagnostic, founding rate,
   Baseline Month guarantee), unified subscribe copy, tool subscribe cards,
   footer LinkedIn placeholder.
-- 🟠 **P0 nearly resolved — one owner step left (invalid Kit API key).**
+- ✅ **P0 RESOLVED 2026-08-20 — the Kit key is valid and capture works.**
+  The owner swapped the key; verified the same day against Kit's own API with a
+  read-only `GET /v4/account` (creates nothing, touches no list): **HTTP 200**,
+  account "SIlicon and Stone", key is 36 chars with the `kit_` prefix. The
+  22-character legacy v3 key that had been in place for 142 days is gone.
+  **No redeploy was needed** — this project reads env at request time.
+  *Not yet proven end to end:* nobody has run a live `POST /api/subscribe`,
+  because that puts a real subscriber on the list. The parts are verified; the
+  whole path is not. History of the failure, kept because it explains the code
+  shape:
+
+- 🟠 ~~P0 nearly resolved — one owner step left (invalid Kit API key).~~
   Production subscribe was 503ing via the unconfigured Railway proxy. Code
   fix shipped and verified live: the subscribe route now posts **directly
   to Kit** and only proxies to Railway when `SUBSCRIBE_VIA_BACKEND=true`
@@ -36,6 +47,30 @@ Vercel env change + redeploy — never a code edit.
 - ⏳ Everything in §0 below is owner setup that code cannot do (Kit tags,
   LS store, discount codes, booking URL, LinkedIn URL).
 
+- 🟠 **Three Kit findings from the 2026-08-20 verification, all still open.**
+  Read-only reconciliation of the live Kit account against production env:
+  1. **The form ID may be the wrong form.** `CONVERTKIT_FORM_ID = 9270944`
+     resolves to a form named **"Mills form"**. The account also holds
+     `9266701` named **"Newsletter site"**. Every subscriber the site creates
+     is posted to `/v4/forms/9270944/subscribers`, so if "Mills form" is a
+     leftover, every signup is landing in it. Confirm which is intended.
+  2. **Two env vars hold literal placeholder text**, not IDs:
+     `CONVERTKIT_TOOL_LEAD_TAG_ID` = `your_tool_lead_tag_id` and
+     `CONVERTKIT_WAYMARKPATH_TAG_ID` = `your_waymarkpath_tag_id`.
+  3. **None of the launch tags exist yet, at either end.** The Kit account
+     holds exactly two tags — "New contact" and "Imported March 31st, 2026" —
+     and production defines four Kit ID variables against the ~18 that
+     `src/lib/kit.ts` maps. So the §0 table below is not a paste job: the tags
+     have to be created in Kit first. Subscribes still succeed (a missing ID is
+     skipped by design); they simply arrive untagged, and no segmentation
+     happens.
+
+- 🟠 **The Kit sending address is unverified.** `clive.struver@gmail.com` has
+  status **pending**, and its `from_name` is the raw email address. Subscribing
+  over the API is unaffected, but a broadcast cannot be sent from an unverified
+  address, and a newsletter arriving from a gmail address with no from-name is a
+  deliverability and presentation problem. Fix before the first send, not after.
+
 **Re-verified 2026-08-05** (no owner steps taken since; step 1 still blocks the
 other eight):
 
@@ -45,14 +80,18 @@ other eight):
   25-minute conversation" CTA with no calendar link behind it.
 - Plausible **is** live (`script.tagged-events.js` served on production).
 - The product files in §0 are **already built** — see the paths added below.
-- The Kit 401 has not been re-tested since 2026-07-19; assume unchanged until
-  the v4 key is swapped.
+- ~~The Kit 401 has not been re-tested since 2026-07-19~~ — re-tested and
+  **resolved 2026-08-20**, see above.
 
 ## Go-live quick reference (the whole process in order)
 
-1. Fix the P0 above: set a valid **Kit v4 API key** as `CONVERTKIT_API_KEY`
-   in Vercel and redeploy — nothing else matters until capture works.
-2. Create the 14 Kit tags, paste IDs into Vercel env (§0 Kit table).
+1. ~~Fix the P0 above: set a valid **Kit v4 API key**~~ — **done 2026-08-20.**
+   Optional last step: one live `POST /api/subscribe` with a throwaway address,
+   then delete the subscriber, to prove the whole path rather than its parts.
+2. Confirm `CONVERTKIT_FORM_ID` is the intended form (see the finding above —
+   it currently points at "Mills form", not "Newsletter site"), then create the
+   14 Kit tags and paste IDs into Vercel env (§0 Kit table). **The tags do not
+   exist in Kit yet**; creating them is the first half of this step.
 3. Create the 3 LS products in test mode: files attached, redirect URLs to
    `/products/success?product={sku}`, checkout links + variant IDs into env (§0 LS).
 4. Configure the LS webhook with `order_created` + signing secret (§0 webhook).
@@ -70,9 +109,17 @@ other eight):
 
 - [ ] One form only, site-wide: confirm `CONVERTKIT_FORM_ID` points at the
       single briefing form. "Atlantic Drift" is a segment tag, not a second form.
+      **Verified 2026-08-20: it points at form `9270944` "Mills form", while a
+      form named "Newsletter site" (`9266701`) also exists.** Decide which is
+      right before launch — this is where every subscriber currently lands.
 - [ ] Create these tags in Kit and put each tag's numeric ID in the matching
       env var (Vercel, all environments). A missing ID never breaks subscribe —
       that tag is just skipped:
+
+  **Status 2026-08-20: none of these tags exist in Kit.** The account holds
+  only "New contact" and "Imported March 31st, 2026", and four of the env vars
+  below are set (two of those to placeholder strings). Create the tag, then
+  paste its ID.
 
   | Kit tag | Env var |
   |---|---|

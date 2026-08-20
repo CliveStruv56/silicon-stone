@@ -27,7 +27,13 @@ user-visible behaviour changed, and the only live difference is a new
 `…-wave-04-execution-brief.md`), then §9. **Wave 2 (provenance) is the next
 thread and has a contract but no code: `docs/siliconstone-knowledge-wave-02-brief.md`.**
 
-**The blocker is a P0, re-confirmed against the live API on 2026-08-11: the production Kit API key is a legacy v3 key (22 chars, no `kit_` prefix), so `/api/subscribe` 401s and — because `NEXT_PUBLIC_PRE_LAUNCH` is still `true`, making every product CTA an email capture — the entire funnel currently terminates in a failed POST.** Beyond that: Lemon Squeezy store not yet created, 9 drafts unpublished, and 7 of 12 published articles still lack cover images. Go-live sequence lives in `LAUNCH.md`; defects and debt in §10.
+**The next session's stated priority is an operator's manual** for the
+publication and the article-generation pipeline. Its contract is
+`docs/user-manual-brief.md` — the central point being that four overlapping
+guides already exist and one of them (`editorial-aios-manual.md`) is partly
+obsolete, so the job is consolidation rather than a fifth document.
+
+**The long-standing P0 is resolved as of 2026-08-20: the production Kit API key is now a valid v4 key** (36 chars, `kit_` prefix), verified the same day with a read-only `GET /v4/account` returning 200 for account "SIlicon and Stone". The funnel no longer terminates in a failed POST. It has **not** been proven end to end — nobody has run a live `POST /api/subscribe`, because that puts a real subscriber on the list — so the parts are verified and the whole path is not. The same verification found three things behind it, all open: `CONVERTKIT_FORM_ID` points at a form named **"Mills form"** while one named "Newsletter site" also exists; two tag env vars still hold literal placeholder strings; and **none of the ~18 launch tags exist in Kit at all** (the account has two tags), so subscribes succeed but arrive untagged. The Kit sending address is also unverified. Beyond that: Lemon Squeezy store not yet created, 9 drafts unpublished, and 7 of 12 published articles still lack cover images. Go-live sequence lives in `LAUNCH.md`; defects and debt in §10.
 
 ---
 
@@ -482,6 +488,76 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 20, 2026 — The migration's two dangling source IDs, repaired
+
+The candidate migration left `knowledgeItem.51ecac19…` pointing at two legacy
+source ID strings it could not resolve. Both are now attached as references,
+and the fix was asymmetric in a way worth recording.
+
+**One was never missing evidence.** The string
+`mit-technology-review-insights-edb-2026-05-ai-data-sovereignty-report` was a
+*descriptive* slug that never matched the record's own
+`sourceId` (`mittr-2026-05-14-ai-sovereignty`) — and that source has existed in
+the dataset since 2026-05-30, with its full extracted text. So the migration's
+"unresolvable" verdict was right about the string and wrong as an impression:
+nothing was lost, the pointer was simply written in a form nothing could look
+up. It was linked, not re-captured.
+
+**The other was genuinely absent** and was captured from the primary publisher
+with its real text — gov.uk, 25 May 2026, "UK and Australia pact on fast-moving
+AI security risks" (the AISI / Australian AI Safety Institute MoU). No URL was
+guessed and no text was summarised into the record.
+
+Done with `link_sources_to_item`, whose patch touches `sources` and nothing
+else. The item's `editorNotes` gained a "Resolved 2026-08-20" line and a
+`summary` was authored, both by a separate one-off write against the
+**published** document — the Sanity MCP writes to `drafts.<id>`, which would
+have left the API and Studio disagreeing about the same record. That repair
+script is not in the repo: it is data, not code.
+
+Reviewing the result in Studio is what exposed the capture-path validation
+defects recorded in the next two entries. **Three defects in a row found by
+opening a record rather than by running the suite** — the pattern is worth
+carrying into wave 2.
+
+### August 20, 2026 — The Kit P0 closed, and what it was hiding
+
+The owner swapped the key; it was verified the same day **without touching the
+mailing list** — a read-only `GET /v4/account` against Kit's own API, which
+creates nothing. **HTTP 200**, account "SIlicon and Stone", key 36 chars with
+the `kit_` prefix. The 22-character legacy v3 key had been in Vercel for 142
+days. No redeploy was needed: this project reads env at request time, the same
+property established for the wave 4a feature flag.
+
+`/api/subscribe` posts **direct to Kit** — `SUBSCRIBE_VIA_BACKEND` is not set in
+production, so the Railway proxy is not in the path and the Vercel variable is
+the one that matters. That mattered to the diagnosis: it ruled out the "changed
+in the right place, wrong place looked" explanation while the key still read as
+legacy.
+
+**Verified in parts, not end to end.** No live `POST /api/subscribe` has been
+run, because it would put a real subscriber on the list. Deliberate, and the
+last remaining step whenever the owner wants it.
+
+Reconciling the live Kit account against production env — still read-only —
+turned up three open problems the 401 had been masking, plus one unrelated:
+
+- **The form may be wrong.** `CONVERTKIT_FORM_ID = 9270944` resolves to a form
+  named **"Mills form"**; the account also holds `9266701` **"Newsletter
+  site"**. Every subscriber the site creates is posted to form 9270944.
+- **Two env vars hold placeholder text**: `CONVERTKIT_TOOL_LEAD_TAG_ID` and
+  `CONVERTKIT_WAYMARKPATH_TAG_ID` are literally `your_..._tag_id`.
+- **Segmentation is off, and cannot be switched on by pasting IDs.**
+  `src/lib/kit.ts` maps ~18 tags; production defines four Kit ID variables; and
+  the Kit account contains **two** tags, neither of them a launch tag. The tags
+  have to be created in Kit first. Subscribes still succeed — a missing ID is
+  skipped by design — they simply arrive untagged.
+- **The sending address is unverified.** `clive.struver@gmail.com` is `pending`
+  with `from_name` set to the raw address. Irrelevant to API subscribes, fatal
+  to a broadcast.
+
+`LAUNCH.md` §0 and its go-live sequence are updated accordingly.
 
 ### August 20, 2026 — `sourceId` loosened for post-foundation sources
 
@@ -4765,7 +4841,10 @@ discount codes, booking URL, LinkedIn URL). This table is for defects and debt.
 
 | Issue | Notes | Priority |
 |-------|-------|----------|
-| **Kit API key invalid — nothing on the site can capture a lead** | Production `/api/subscribe` returns Kit **401 "The API key is invalid"**; the stored `CONVERTKIT_API_KEY` is a legacy v3 key and `api.kit.com/v4` needs a v4 key. Because `NEXT_PUBLIC_PRE_LAUNCH` is `true`, *every* product CTA is an early-access email capture — so the entire funnel currently terminates in a failed POST. Verified still pre-launch on 2026-08-05: `/products/ai-act-toolkit` serves 8× "Request Early Access" and zero checkout links. Code side is done; this is one Vercel env var. Fix + verification steps in `LAUNCH.md` "Current state". | **P0** |
+| ~~**Kit API key invalid — nothing on the site can capture a lead**~~ — **fixed 2026-08-20** | The owner replaced the legacy v3 key with a v4 `kit_…` key. Verified read-only against Kit (`GET /v4/account` → 200, account "SIlicon and Stone"); the old key had sat in Vercel for 142 days. No redeploy needed — env is read at request time. **Not proven end to end**: no live `POST /api/subscribe` has been run, because it would put a real subscriber on the list. `SUBSCRIBE_VIA_BACKEND` is unset, so subscribe goes direct to Kit and the Vercel var is the one that matters. | Resolved |
+| Kit form ID may point at the wrong form | `CONVERTKIT_FORM_ID = 9270944` resolves to a form named **"Mills form"**. The account also holds `9266701` **"Newsletter site"**. `/api/subscribe` posts every subscriber to `/v4/forms/9270944/subscribers`, so if "Mills form" is a leftover or a test, that is where every signup on the site is landing. One decision in the Kit dashboard; no code change either way. | **High** |
+| Kit segmentation is off — the tags do not exist | `src/lib/kit.ts` maps ~18 tags; production defines **four** Kit ID variables, two of which hold the literal placeholder strings `your_tool_lead_tag_id` and `your_waymarkpath_tag_id`; and the Kit account itself contains **two** tags ("New contact", "Imported March 31st, 2026"), neither a launch tag. So this is not a paste job — the tags must be created in Kit first (`LAUNCH.md` §0 table). Subscribes are unaffected: a missing ID is skipped by design, so leads simply arrive untagged and no segmentation happens. Blocks the EU Exposure / Atlantic Drift lead split. | **High** |
+| Kit sending address unverified | `clive.struver@gmail.com` has status `pending` and `from_name` set to the raw email address. API subscribes are unaffected; a broadcast cannot be sent from an unverified address, and a newsletter arriving from a gmail address with no from-name is a deliverability and presentation problem. Verify before the first send. | Medium |
 | 7 of 12 published articles have no cover image | Verified via GROQ 2026-08-05 — `mainImage` is undefined on `welcome-to-silicon-and-stone`, `atlantic-fault-lines-us-tech-policy-eu-autonomy`, `tariff-enforcement-collision`, `semiconductor-testing-bottleneck-ai-accelerators`, `korean-memory-fab-capacity-squeeze-2027`, `greenland-critical-minerals-transatlantic-scramble`, `open-source-sovereignty`. Placeholders render on the live site and in OG cards. The Studio has image-prompt suggestions + a media library to speed this up. | **High** |
 | 9 unpublished drafts, 8 of them without images | Verified 2026-08-05: drafts have grown from 2 (May) to **9** while publishing stalled — GPAI enforcement, EU Chips Act mid-point, China mineral licences, the token-bill piece, Fable 5 shutdown (the only one with an image), open-source exemption, GPT-5.6 two-tier market, plus the two long-standing Iran/Gulf drafts. Several are time-sensitive and decaying. | **High** |
 | ~~`article.gate` configured on zero articles~~ — the claim was wrong, corrected 2026-08-15 | The count was right; the conclusion was not. `auto` resolves to **commerce** whenever an article's categories intersect a product's `topics`, and (since 2026-08-15) to whatever `category.defaultGateMode` asks for when nothing matches — so the ladder was live all along. `gate` is still set on zero articles **by design**: the routing is driven by product `topics` and category defaults, not per-article config. Split across the 15 published: **11 commerce, 4 lead, 0 newsletter**. See `src/lib/gate.ts` and its test file for the precedence rules. | Resolved |
