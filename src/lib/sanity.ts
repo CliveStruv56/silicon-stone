@@ -5,6 +5,7 @@ import { apiVersion, dataset, projectId } from '../sanity/env';
 import { CATEGORIES_QUERY } from '../sanity/lib/queries';
 import { markdownToPortableText, stripAuthoringPreamble } from './markdown-to-portable-text';
 import { CLAUDE_MODEL } from './anthropic';
+import { normalizeUrl } from './citations';
 
 const token = process.env.SANITY_API_WRITE_TOKEN;
 
@@ -40,6 +41,22 @@ export interface ArticleData {
     voiceEditNotes?: string;         // Pass-3 voice-edit summary + [AUTHOR: …] list
     quotationAudit?: string;         // statutory quotations checked against the retrieved text
     imagePrompts?: string[];         // two "what to depict" prompts for the main image
+    /**
+     * What the drafting model was actually given to write from, recorded in the
+     * internal provenance group — NOT the public Sources list, which stays
+     * authored by hand. An editor promotes the ones that belong to the reader
+     * with the "Add from research" control on the Sources field.
+     */
+    citationSnapshots?: ResearchSnapshot[];
+}
+
+/** One source as the research pass returned it, for `citationSnapshots`. */
+export interface ResearchSnapshot {
+    title?: string;
+    url?: string;
+    publisher?: string;
+    publishedDate?: string;
+    locator?: string;
 }
 
 export interface CategoryOption {
@@ -47,6 +64,34 @@ export interface CategoryOption {
     title: string;
     slug: string;
     description?: string;
+}
+
+/**
+ * Shape research sources into `citationSnapshot` array members, dropping
+ * repeats. Uses the shared URL rule so a snapshot an editor later promotes to
+ * the Sources list dedupes correctly against what the fact-check appends.
+ * Entries with no URL are kept — a snapshot's job is to record what was there.
+ */
+function dedupeSnapshots(snapshots: ResearchSnapshot[]) {
+    const seen = new Set<string>();
+    const out: Array<ResearchSnapshot & { _type: 'citationSnapshot'; _key: string }> = [];
+    for (const snap of snapshots) {
+        const normalized = snap.url ? normalizeUrl(snap.url) : null;
+        if (normalized) {
+            if (seen.has(normalized)) continue;
+            seen.add(normalized);
+        }
+        out.push({
+            _type: 'citationSnapshot',
+            _key: crypto.randomUUID().slice(0, 8),
+            ...(snap.title ? { title: snap.title } : {}),
+            ...(snap.url ? { url: snap.url } : {}),
+            ...(snap.publisher ? { publisher: snap.publisher } : {}),
+            ...(snap.publishedDate ? { publishedDate: snap.publishedDate } : {}),
+            ...(snap.locator ? { locator: snap.locator } : {}),
+        });
+    }
+    return out;
 }
 
 export async function listSanityCategories(): Promise<CategoryOption[]> {
@@ -147,6 +192,12 @@ export async function createArticleInSanity(data: ArticleData) {
             generatedAt: new Date().toISOString(),
             model: CLAUDE_MODEL,
         };
+    }
+    if (data.citationSnapshots && data.citationSnapshots.length > 0) {
+        // Everything the model was handed, deduped by URL but not filtered:
+        // this is a provenance record, so a source that turned out to be
+        // useless is still part of what the draft was written from.
+        doc.citationSnapshots = dedupeSnapshots(data.citationSnapshots);
     }
 
     return await writeClient.createOrReplace(doc);

@@ -237,11 +237,16 @@ A panel headed **"Intelligence Gathered"** — "N sources analysed" — containi
 - **Contextual Hooks** — pill chips, the pain points it extracted.
 - **Source Index** — clickable source cards.
 
-### ⚠ The Source Index is not saved
+### The Source Index is recorded, but not published
 
-Those sources are shown to you and fed to the drafting model. They are **never
-written to the article**. See §7c for the consequence — it is why almost every
-fresh draft warns "No sources listed".
+Those sources are shown to you, fed to the drafting model, and recorded on the
+article's **Citation Snapshots** field under *Provenance* — what the draft was
+actually written from, as it stood then.
+
+They do **not** go on the reader-facing Sources list. That stays authored by
+hand, deliberately: these are what the model was handed, not sources anyone has
+checked. When you are ready, the Sources field carries an **"Add N from
+research"** button that brings them in for you to keep or delete (§8).
 
 ### If research fails
 
@@ -271,7 +276,7 @@ retrieval and metadata logic — the difference is which model writes and who pa
 | Model | Whatever Claude Code is running | `claude-sonnet-4-6` |
 | Speed | You drive it | Self-serve button |
 | Output | A **draft** in Studio | A **draft** in Studio |
-| Guards | ⚠ **No quotation audit, no auto fact-check** | All three |
+| Guards | Quotation audit yes; ⚠ **no auto fact-check** — run it from Studio | All three |
 | Use when | Credits are empty, or you want to steer each pass | Quick and self-serve |
 
 ### The website path
@@ -354,8 +359,15 @@ imports the repo's own prompt builders, so the prompts stay identical to the
 website's.
 
 **⚠ What this path does not get.** It writes to Sanity directly and skips the
-finalisation step, which means **no quotation audit and no automatic fact-check**.
-Run "Run fact-check" from Studio manually. The publish guard still applies.
+finalisation step, so there is **no automatic fact-check** — run "Run fact-check"
+from Studio manually. The publish guard still applies.
+
+It *does* get the quotation audit and the research provenance, as of 20 August
+2026: the audit is a pure string match with no model call, so it costs nothing
+to run here. It checks against the statutory text the prompt step retrieved,
+saved alongside your working files. If you skip the `draft-prompt` step the
+audit has nothing to check against and reports `UNCOVERED` — which, as always,
+is not a pass.
 
 ---
 
@@ -519,11 +531,15 @@ worth internalising:
 It scans the **body, excerpt, Stone Truth and each actionable insight** — and finds
 a placeholder even if bold formatting splits it across several spans.
 
-**⚠ "No sources listed" will fire on nearly every fresh draft.** Because `/create`
-never saves the Source Index (§4), every newly generated Signal, Deep Dive and
-Guide starts with zero citations. Either add them by hand from the research panel,
-or run a fact-check and let it append what it finds. This is expected behaviour,
-not a fault — but do not let its familiarity train you to dismiss the dialog.
+**"No sources listed" fires until you populate the list.** The reader-facing
+Sources list is authored by hand, so a freshly generated article starts empty.
+Three ways to fill it: press **"Add N from research"** on the Sources field,
+which brings in what the draft was written from (§8); run a fact-check, which
+appends the primary sources it verified; or type them.
+
+Until 20 August 2026 the research sources were not saved anywhere, so this
+warning fired on every single generated article — which is how a warning trains
+you to click past the dialog that also carries the placeholder blocker.
 
 **⚠ The preflight runs entirely in your browser.** It only fires when you press
 Publish in Studio, so anything that publishes by another route would bypass it.
@@ -607,6 +623,21 @@ There is no dimension validation; the site crops to 1200×675 for the hero and
 read the article and describe **what the cover image should depict** — deliberately
 not style, colour, medium or camera, because the house style belongs to whatever
 image tool you run next. Copy a prompt and take it there.
+
+### Sources: "Add N from research"
+
+Where the draft came from research, the **Sources / Citations** field shows how
+many of those sources are not yet on the list, and a button to bring them in.
+One click adds them; delete the ones that do not belong.
+
+This is deliberately a copy rather than an automatic write. What the model was
+handed is not the same as what a reader should be told supports the piece —
+you decide which is which. Nothing reaches the Sources list without passing
+through you.
+
+They are deduplicated against what is already there, using the same URL rule the
+fact-check uses, so promoting a source and then running a fact-check does not
+list the same page twice under different tracking parameters.
 
 ### The fact-check controls
 
@@ -759,14 +790,24 @@ not list captured records — it went somewhere real and useless.)
 > extraction failure is not an editorial verdict, and collapsing them would
 > silently discard records nobody judged.
 
-### ⚠ The review rules are not enforced
+### Reviewing a record
 
-**The review rules are not enforced.** The code contains a review state machine —
-legal transitions, withdrawal from the index when a record leaves Ready, a rule
-that superseding something must name its replacement. **Nothing calls it.** In
-practice, reviewing is: open the document in Studio, change the Review Status
-radio, publish. None of those guards fire. Treat the rules as your discipline, not
-the system's.
+Open it and use the document actions: **Mark ready**, **Reject**, **Return to
+inbox**. Only the moves the state machine allows are offered, so from the inbox
+you see *Mark ready* and *Reject*, and a rejected record offers only a return to
+the inbox. Superseding is not a button — it has to name the record that replaced
+this one, so use the Review Status field and fill in Superseded By.
+
+The actions are **disabled while you have unsaved edits**. The verdict is written
+to the published record, and an unpublished draft would shadow it — you would not
+see the change in the editor in front of you. Publish or discard first; the
+tooltip says so.
+
+> Until 20 August 2026 none of this was wired. The review state machine existed
+> but nothing called it, so the Review Status radio let you jump straight to
+> Superseded naming nothing, or back out of Superseded, which is forbidden. The
+> actions route the verdict through the rules; the radio is still there, and
+> still bypasses them.
 
 ### Nothing auto-publishes
 
@@ -1026,6 +1067,11 @@ Not confirmed by running it:
 - **Which Deep Dive path production takes.** Whether the research backend is
   configured — and therefore whether Deep Dives run as a polled job or as an
   in-process fallback — was not checked against the live environment.
+- **Citation Snapshots end to end.** The dedupe and shaping are unit-tested and
+  the wiring typechecks, but no article has been generated through `/create`
+  since, so no snapshot has been *observed* on a real draft — and the
+  "Add N from research" button in §8 has not been clicked in Studio. The first
+  article you draft will settle both in one go.
 - **The non-administrator refusal in §2.** Both ends are unit-tested — a
   non-admin role is refused, and the client is held to *not* sending that person
   to `/login` — but it has not been exercised with a real non-administrator

@@ -34,6 +34,9 @@ const configs = {
   // Sanity user token, and the client retries it silently on a 401 — but capped
   // because every call costs an upstream request to Sanity.
   studioSession: { limit: 20, window: '15 m', prefix: 'sas:studio-session' },
+  // Editorial verdicts from the Studio actions. Generous — clearing an inbox is
+  // a burst of legitimate clicks — but bounded, because each one is a write.
+  knowledgeReview: { limit: 60, window: '15 m', prefix: 'sas:knowledge-review' },
   subscribe: { limit: 10, window: '15 m', prefix: 'sas:subscribe' },
   contact: { limit: 5, window: '15 m', prefix: 'sas:contact' },
   vectorize: { limit: 120, window: '1 m', prefix: 'sas:vectorize' },

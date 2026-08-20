@@ -63,6 +63,7 @@ export async function createDraftFromResearch(summary: string, topic: string, so
             format: 'signal',
             personaSlug: 'global-citizen',
             source: 'generated',
+            researchSources: sources,
             logPrefix: '/research',
         });
 

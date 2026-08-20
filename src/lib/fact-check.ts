@@ -5,6 +5,7 @@ import { searchExa } from './exa';
 import { extractArticleText } from './embeddings';
 import { extractJsonObject } from './draft-pipeline';
 import { writeClient } from './sanity';
+import { buildCitationMembers, type CitationMember } from './citations';
 
 /**
  * On-demand fact-check pipeline, triggered from the Studio "Run fact-check"
@@ -118,21 +119,10 @@ function newKey(): string {
   return crypto.randomUUID().slice(0, 8);
 }
 
-/** Strip tracking noise so the same source under two URLs dedupes to one. */
-function normalizeUrl(raw: string): string | null {
-  try {
-    const url = new URL(raw);
-    if (!['http:', 'https:'].includes(url.protocol)) return null;
-    url.hash = '';
-    url.hostname = url.hostname.toLowerCase();
-    for (const key of [...url.searchParams.keys()]) {
-      if (key.startsWith('utm_')) url.searchParams.delete(key);
-    }
-    return url.toString().replace(/\/$/, '');
-  } catch {
-    return null;
-  }
-}
+// normalizeUrl and the citation-member shaping moved to src/lib/citations.ts.
+// Three writers now touch the Sources list at different times and they must
+// agree on when two URLs are the same source, or this pass will duplicate a
+// source an editor already promoted from the research snapshots.
 
 /** Small concurrency pool — keeps Exa/Claude fan-out bounded without a dependency. */
 async function mapWithConcurrency<T, R>(
@@ -334,26 +324,11 @@ function buildSummary(results: ClaimResult[], verdict: string): string {
 function buildNewCitations(
   results: ClaimResult[],
   existing: { url?: string }[],
-): { _type: 'citation'; _key: string; title: string; url: string; publisher?: string }[] {
-  const seen = new Set(
-    existing.map((c) => (c.url ? normalizeUrl(c.url) : null)).filter((u): u is string => !!u),
-  );
-  const out: { _type: 'citation'; _key: string; title: string; url: string; publisher?: string }[] = [];
-  for (const result of results.filter((r) => r.verdict === 'accurate')) {
-    for (const citation of result.suggestedCitations) {
-      const normalized = normalizeUrl(citation.url);
-      if (!normalized || seen.has(normalized)) continue;
-      seen.add(normalized);
-      out.push({
-        _type: 'citation',
-        _key: newKey(),
-        title: citation.title,
-        url: citation.url,
-        ...(citation.publisher ? { publisher: citation.publisher } : {}),
-      });
-    }
-  }
-  return out;
+): CitationMember[] {
+  const candidates = results
+    .filter((r) => r.verdict === 'accurate')
+    .flatMap((r) => r.suggestedCitations);
+  return buildCitationMembers(candidates, existing, newKey);
 }
 
 /**

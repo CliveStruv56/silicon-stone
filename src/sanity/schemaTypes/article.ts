@@ -3,6 +3,7 @@ import { DocumentTextIcon } from '@sanity/icons'
 import { slugify } from '@/lib/utils'
 import { ClaimCheckInput } from '../components/ClaimCheckInput'
 import { ImagePromptsInput } from '../components/ImagePromptsInput'
+import { CitationsInput } from '../components/CitationsInput'
 
 export const article = defineType({
   name: 'article',
@@ -376,8 +377,11 @@ export const article = defineType({
       description:
         'Primary sources cited in this piece. Renders as the "Sources" list and ' +
         'feeds Article structured data (schema.org citation). Prefer primary ' +
-        'sources — official filings, regulators, named reporting.',
+        'sources — official filings, regulators, named reporting. Authored by ' +
+        'hand: where the draft came from research, "Add from research" below ' +
+        'brings the candidates in for you to keep or delete.',
       type: 'array',
+      components: { input: CitationsInput },
       of: [
         defineArrayMember({
           type: 'object',

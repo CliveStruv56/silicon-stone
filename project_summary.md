@@ -489,6 +489,67 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 20, 2026 — Tier 2 of the manual's findings
+
+**Research sources are now recorded, and promotable.** `/create` and `/research`
+write what the drafting model was given to the article's internal
+`citationSnapshots` — a field that has existed since wave 2 and that nothing
+wrote. The public Sources list is untouched by the machine: the schema says it
+"stays authored by hand" and that stays true. Instead the Sources field carries
+an **"Add N from research"** control (`CitationsInput`), so the gathering is
+automatic and the editorial judgement is not. This was the owner's choice
+between three options; writing `citations[]` directly would have flipped a
+stated policy and could have put unvetted search hits into schema.org markup.
+
+**One URL rule, three writers.** `normalizeUrl` and the citation shaping moved
+out of `fact-check.ts` into `src/lib/citations.ts` — pure, no `server-only`, so
+the Studio browser bundle uses the identical rule. Without that, promoting a
+source and then running a fact-check lists the same page twice under different
+tracking parameters. 12 tests.
+
+**The Claude Code path gets the quotation audit.** `auditQuotations` is pure — no
+model, no network — so `save` runs it. `draft-prompt` now parks the retrieved
+statutory corpus in a sidecar for `save` to audit against; re-running retrieval
+at save time would be non-deterministic and would check the draft against
+passages the model never saw, breaking the contract the module states. Verified
+live: a fabricated Article 6 quotation came back `unmatched=1` against a real
+4KB retrieved corpus, and `uncovered=1` with no corpus — never a false pass.
+The auto fact-check stays a Studio action; it is a UI step, not part of
+`finalizeDraft`, which is a correction to the manual.
+
+**The review state machine has a caller.** `POST /api/knowledge/review` plus
+three Studio document actions (Mark ready / Reject / Return to inbox) on
+`knowledgeItem` and `knowledgeSource`. `sanity.config.ts` now dispatches actions
+per type instead of hard-filtering on `article`.
+
+Verified by driving a real Studio with **no admin cookie at all**:
+
+- the record opened via the new intent URL — the same link a capture returns;
+- from `inbox` exactly *Mark ready* and *Reject* were offered, `Return to inbox`
+  correctly hidden because from-equals-to is refused, not a no-op;
+- the click produced `401 → /api/studio-session 200 → 200`, so the session
+  bridge carries this route too;
+- `reviewStatus` became `ready`, then `rejected`, and `indexState.status` was
+  eagerly withdrawn to `not_eligible` on leaving `ready`.
+
+Route refusals confirmed with the right codes: supersede with no replacement
+named → 400 with a field error; `ready → ready` → 409 `transition_refused`;
+unknown document → 404; a non-status value → 400; anonymous → 401.
+
+Superseding is deliberately **not** a button — it must name the replacement,
+which is a reference picker rather than a one-click action. The Review Status
+radio still exists and still bypasses the rules; the actions are the sanctioned
+path, and `scripts/knowledge-inbox-checks.ts` still forbids the MCP tools from
+exposing any of this.
+
+`applyReviewTransition` is patched against the **published** id and the actions
+disable themselves while a draft exists, because a draft would shadow the write
+and the editor would not see their own verdict.
+
+55 test files, 1,242 tests, build clean. Manual §4, §5, §7c, §8 and §11
+rewritten; Appendix D records that no article has yet been generated since, so
+`citationSnapshots` has not been observed on a real draft.
+
 ### August 20, 2026 — Tier 1 of the manual's findings: two silent publish paths, closed
 
 Auditing the thirteen ⚠ markers in `docs/operator-manual.md` turned up one thing

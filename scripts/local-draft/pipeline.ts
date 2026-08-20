@@ -84,6 +84,22 @@ interface SavePayload {
   intelligenceTier?: 'pulse' | 'briefing' | 'audit'
   methodologyPillars?: string[]
   voiceEditNotes?: string
+  /**
+   * The verbatim statutory block the draft was written against. Supplied so the
+   * quotation audit checks what the model wrote against what it was actually
+   * given — the retrieved block is the contract the prompt makes about
+   * quotation, not the corpus at large. `draft-prompt` writes it to a sidecar;
+   * `save` picks it up from there if the payload omits it.
+   */
+  regulatoryCorpus?: string
+  /** Research sources, recorded as internal provenance (citationSnapshots). */
+  researchSources?: ExaLite[]
+}
+
+/** Where `draft-prompt` parks the retrieved corpus for `save` to audit against. */
+function corpusSidecarPath(inFile: string | boolean | undefined): string | null {
+  if (typeof inFile !== 'string') return null
+  return path.join(path.dirname(inFile), 'regulatory-corpus.txt')
 }
 
 const errMsg = (e: unknown): string => (e instanceof Error ? e.message : String(e))
@@ -197,6 +213,20 @@ async function cmdDraftPrompt(flags: Flags): Promise<void> {
     warn(`Draft context retrieval skipped: ${errMsg(e)}`)
   }
 
+  // Park the retrieved corpus for `save` to audit against. Re-running retrieval
+  // at save time would be non-deterministic — the audit would check the draft
+  // against passages the model may never have seen, which is precisely the
+  // contract quotation-audit.ts says it is enforcing.
+  const sidecar = corpusSidecarPath(flags.in)
+  if (sidecar) {
+    try {
+      fs.writeFileSync(sidecar, regulatoryCorpus ?? '')
+      if (regulatoryCorpus) warn(`Regulatory corpus saved for the quotation audit: ${sidecar}`)
+    } catch (e) {
+      warn(`Could not save the regulatory corpus (the quotation audit will report UNCOVERED): ${errMsg(e)}`)
+    }
+  }
+
   const { systemPrompt, userPrompt } = await buildDraftPrompt({
     topic: p.topic,
     personaKey: p.persona,
@@ -260,6 +290,29 @@ async function cmdSave(flags: Flags): Promise<void> {
 
   const { createArticleInSanity } = await import('../../src/lib/sanity')
   const { slugify } = await import('../../src/lib/utils')
+  const { auditQuotations, formatQuotationAudit } = await import('../../src/lib/quotation-audit')
+
+  // The quotation audit is PURE — no model call, no network — so this path gets
+  // the same check /create does. It is the one guard the local path was missing
+  // that costs nothing to run here.
+  let quotationAudit: string | undefined
+  try {
+    const sidecar = corpusSidecarPath(flags.in)
+    const corpus =
+      d.regulatoryCorpus ??
+      (sidecar && fs.existsSync(sidecar) ? fs.readFileSync(sidecar, 'utf-8') : undefined)
+    const audit = auditQuotations(d.body, corpus || undefined)
+    if (audit.checked > 0) {
+      quotationAudit = formatQuotationAudit(audit)
+      warn(
+        `Quotation audit — checked=${audit.checked} verified=${audit.verified} ` +
+          `unmatched=${audit.unmatched} uncovered=${audit.uncovered}`,
+      )
+    }
+  } catch (e) {
+    // Never block the save on the audit; /create does not either.
+    warn(`Quotation audit failed: ${errMsg(e)}`)
+  }
 
   const result = (await createArticleInSanity({
     title: d.title,
@@ -277,6 +330,16 @@ async function cmdSave(flags: Flags): Promise<void> {
     methodologyPillars: d.methodologyPillars,
     voiceEditNotes: d.voiceEditNotes,
     source: 'generated',
+    ...(quotationAudit ? { quotationAudit } : {}),
+    ...(d.researchSources?.length
+      ? {
+          citationSnapshots: d.researchSources.map((r) => ({
+            title: r.title ?? undefined,
+            url: r.url,
+            publishedDate: r.publishedDate,
+          })),
+        }
+      : {}),
   })) as unknown as { _id?: string }
 
   process.stdout.write(`Saved draft: ${result?._id ?? '(unknown id)'}\n`)

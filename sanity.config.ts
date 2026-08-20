@@ -16,6 +16,7 @@ import {structure} from './src/sanity/structure'
 import {FactCheckAction} from './src/sanity/actions/factCheckAction'
 import {withPublishPreflight} from './src/sanity/actions/publishPreflight'
 import {factCheckBadge} from './src/sanity/badges/factCheckBadge'
+import {ReviewActions} from './src/sanity/actions/reviewActions'
 
 export default defineConfig({
   basePath: '/studio',
@@ -30,15 +31,24 @@ export default defineConfig({
     // keyboard shortcut; it blocks on an unresolved [AUTHOR: …] placeholder and
     // asks for confirmation on a missing or adverse fact-check. See
     // src/lib/publish-preflight.ts.
-    actions: (prev, ctx) =>
-      ctx.schemaType === 'article'
-        ? [
-            ...prev.map((action) =>
-              action.action === 'publish' ? withPublishPreflight(action) : action,
-            ),
-            FactCheckAction,
-          ]
-        : prev,
+    // Per-type dispatch. Articles get the publish guard and the fact-check;
+    // knowledge records get the editorial verdicts, which route through
+    // applyReviewTransition() rather than letting the Review Status radio
+    // bypass every rule the state machine enforces.
+    actions: (prev, ctx) => {
+      if (ctx.schemaType === 'article') {
+        return [
+          ...prev.map((action) =>
+            action.action === 'publish' ? withPublishPreflight(action) : action,
+          ),
+          FactCheckAction,
+        ]
+      }
+      if (ctx.schemaType === 'knowledgeItem' || ctx.schemaType === 'knowledgeSource') {
+        return [...prev, ...ReviewActions]
+      }
+      return prev
+    },
     badges: (prev, ctx) => (ctx.schemaType === 'article' ? [...prev, factCheckBadge] : prev),
   },
   plugins: [

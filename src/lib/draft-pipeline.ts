@@ -4,6 +4,7 @@ import { buildImagePrompts } from './image-prompts';
 import { createArticleInSanity, listSanityCategories } from './sanity';
 import { slugify } from './utils';
 import { auditQuotations, formatQuotationAudit } from './quotation-audit';
+import type { ResearchSource } from '@/types/research';
 
 /**
  * Shared draft-finalisation pipeline used by both /create and /import.
@@ -128,6 +129,14 @@ export interface FinalizeDraftInput {
      * contract the prompt makes about quotation.
      */
     regulatoryCorpus?: string;
+    /**
+     * The sources the research pass selected and the drafting prompt was built
+     * from. Recorded on the article's internal `citationSnapshots` — provenance,
+     * never the reader-facing Sources list, which stays authored by hand. An
+     * editor promotes the ones that belong to the reader from the Sources field
+     * in Studio. Imported articles have none.
+     */
+    researchSources?: ResearchSource[];
     /** Log label, e.g. "/create" or "/import". */
     logPrefix?: string;
 }
@@ -145,6 +154,7 @@ export async function finalizeDraft({
     source,
     sourceMaterial,
     regulatoryCorpus,
+    researchSources,
     logPrefix = 'draft',
 }: FinalizeDraftInput) {
     // Pass 3 — humanising voice edit (Deep Dives audit-only, others rewritten).
@@ -225,5 +235,21 @@ export async function finalizeDraft({
         source,
         ...(imagePrompts?.length ? { imagePrompts } : {}),
         ...(sourceMaterial ? { sourceMaterial } : {}),
+        ...(researchSources?.length
+            ? { citationSnapshots: researchSources.map(toSnapshot) }
+            : {}),
     });
+}
+
+/**
+ * A research source as a provenance snapshot. `publishedDate` is carried as the
+ * string the search returned — the schema field is a string precisely because
+ * upstream often gives only a year, and inferring one would be inventing it.
+ */
+function toSnapshot(source: ResearchSource) {
+    return {
+        title: source.title,
+        url: source.url,
+        publishedDate: source.publishedDate,
+    };
 }
