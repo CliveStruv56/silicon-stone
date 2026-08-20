@@ -483,6 +483,36 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 20, 2026 — `sourceId` loosened for post-foundation sources
+
+Found by reviewing a captured record in Studio, not by a test. `captureSource()`
+never writes `sourceId`, which was `rule.required()` — so **every** source
+captured through the wave 4a path lands in the inbox failing validation, asking
+a reviewer to hand-author an identifier.
+
+The field's purpose is string-based reference resolution: a legacy
+`knowledgeCandidate.sourceIds` entry is matched against it by
+`resolveSourceIdsToDocuments`. Nothing looks a post-foundation source up that
+way — those are referred to by reference, which is the whole point of the
+foundation wave. So the rule is now required on pre-foundation records and
+optional on new ones. Loosened, never tightened, exactly as `extractedText` was.
+
+`isPostFoundationSource()` lives in `src/lib/knowledge/types.ts` as a pure
+function with its own tests, because a Sanity validation rule cannot be
+unit-tested otherwise; the schema calls it. The discriminator is a field that
+did not exist before the wave — `reviewStatus` (every Studio-created record has
+it from `initialValue`) or `provenance.sourceSystem` (every captured record has
+it). **When the cutover wave backfills `reviewStatus` onto legacy records the
+requirement lifts for them too.** That is correct — cutover is where the
+candidates and their string references are retired — but the backfill and this
+rule now move together, which is worth knowing before writing the backfill.
+
+**Two more required legacy fields are still unset by capture and are not fixed
+here**: `status` (legacy, `required`, `initialValue: 'pending'` — which only
+applies to Studio creation, not an API write) and `brandTags` (`required`,
+`min(1)`, and no capture tool takes a brand). Both need a decision rather than a
+mechanical loosening. See §10.
+
 ### August 20, 2026 — Knowledge capture from Claude, on any machine (Wave 4a)
 
 Wave 0–1 built the knowledge domain and gave it no way in from outside: the
@@ -4725,6 +4755,7 @@ discount codes, booking URL, LinkedIn URL). This table is for defects and debt.
 | ~~3 published articles upsell "Sector Reports", which cannot be bought~~ — fixed 2026-08-15 | `korean-memory-fab-capacity-squeeze-2027`, `helium-scarcity-semiconductor-production` and `the-same-money-counted-three-times-ais-circular-financing` matched only `product-sector-reports`' topics, so their gate read "Go deeper: Sector Reports / Get it — From £39" with the CTA landing on the Coming Soon waitlist. Fixed by **clearing `topics` on `product-sector-reports`** (owner decision) — `auto` can no longer select a product that has nothing to sell, and those three fall back to the newsletter gate. **Restore the three topics when the first sector report goes on sale**; noted in `LAUNCH.md`. | Resolved |
 | Sanity `product.checkoutUrl` blank on all three products | The commerce gate opens `checkoutUrl` when set and otherwise links to `productPath`. Setting the three `NEXT_PUBLIC_LEMONSQUEEZY_*_URL` env vars lights up the **product pages only** — the in-article gate keeps sending readers to the product page until the same links are pasted into the Sanity product docs. `LAUNCH.md` had no Sanity step at all; one was added 2026-08-15. | Medium (blocked on LS) |
 | ~~`LAUNCH.md` URLs named `www`~~ — corrected 2026-08-10 | **The canonical host is the bare apex** as of 2026-08-06 (commit `50996d27`) — `SITE_URL` in `src/lib/site.ts` is `https://siliconandstone.com` and `www` 308s to it, reversing the June decision. The Lemon Squeezy redirect targets and webhook URL in `LAUNCH.md` still gave `www`, which would have put a redirect hop inside a payment callback; both now use the apex. Historical `www` mentions in §9 changelog entries are left as written. | Resolved |
+| Two required legacy `knowledgeSource` fields are unset by external capture | Found 2026-08-20 while reviewing the first captured source in Studio. `captureSource()` writes neither `status` (legacy, `required`; its `initialValue: 'pending'` only applies to Studio creation, never to an API write) nor `brandTags` (`required`, `min(1)`, and no capture tool takes a brand). So a record captured through wave 4a lands in the inbox failing validation on both, and a reviewer has to fill them by hand. `sourceId` was the third and was fixed the same day by loosening it for post-foundation records — see §9. These two are not mechanical: `status` could be loosened the same way *or* written as `pending` on capture (the legacy mapping of `inbox`), and `brandTags` needs a real editorial answer — default every capture to `silicon-and-stone`, add a brand parameter to the tools, or loosen. Owner's call. | Medium |
 | Inoreader redirect URI still localhost | `http://localhost:3000/api/auth/callback/inoreader` in the Inoreader dev portal. Research-pipeline OAuth therefore cannot complete in production; it works locally. Change to `https://siliconandstone.com/api/auth/callback/inoreader` (apex, not www). | Medium |
 | Three checker result fields are still bare `string[]` | Updated 2026-08-18. `actions` (2026-08-17) and `vendorQuestions` (2026-08-18) now carry per-item Article anchors, corpus links and authored explanation. `missingFacts`, `reasons` and `adjacentRisks` remain untyped strings. They are the weaker candidates of the four: `reasons` is narrative about how the classification was reached rather than a list of citable claims, and `adjacentRisks` is mostly GDPR and contract risk, where an AI Act anchor would be the wrong citation rather than a missing one. `missingFacts` is the one worth converting — it is the evidence-gap list, and several entries already name Article 6(3) in prose. | Low |
 | Rule-pack corpus covers 24 Articles and Annex III, not all of the Regulation | Updated 2026-08-19. `rulepack/versions/2026-08-19/corpus/` holds Arts 3, 5, 6, 9, **10**, 11, 12, 13, **14**, **15**, **16**, 17, 19, 26, **43**, 49, 50, 57, 72, 73, 99, 101, 111, 113 **and Annex III**. `hasCorpus()` answers honestly and `verifyCitation()` returns `uncovered` for anything else. **The verifier must treat `uncovered` as unverifiable, never as a pass.** Extending coverage is a data task — `npm run rulepack:fetch-article` and `rulepack:fetch-annex` read the same CELEX the manifest names and refuse to write unless the served consolidation date matches — but it is a **pack version bump**, which invalidated nothing here only because the carried-over hashes prove the existing text did not move. The remaining gaps worth closing, in order: the rest of **Article 26** (the deployer path emits 26(6) and nothing else of it), **Article 25** (role transfer) and **Article 2** (scope); v2's role and scope explanations are authored prose because neither can be quoted. | Medium |

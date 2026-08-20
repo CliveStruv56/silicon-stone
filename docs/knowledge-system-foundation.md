@@ -97,6 +97,18 @@ Nothing has been backfilled and no legacy field has been rewritten.
 - **`extractedText` is still required** — except where extraction is queued,
   processing or failed, which are states that did not exist before. The rule was
   only ever loosened.
+- **`sourceId` is still required on legacy sources, and optional on new ones**
+  (since 2026-08-20). Same shape, same direction: loosened, never tightened.
+  That string is how a legacy `knowledgeCandidate` refers to a source
+  (`resolveSourceIdsToDocuments`), so a record something may look up that way
+  keeps the requirement; a post-foundation record is referred to by reference
+  and does not. `isPostFoundationSource()` in `types.ts` is the discriminator —
+  a record carrying `reviewStatus` or `provenance.sourceSystem`, neither of
+  which existed before the wave. It is a pure function with its own tests
+  because a Sanity validation rule cannot otherwise be unit-tested. **When the
+  cutover wave backfills `reviewStatus` onto legacy records the requirement
+  lifts for them too** — correct, since cutover retires the candidates and their
+  string references, but it means the backfill and this rule move together.
 - **`topicTags` (strings) and `topics` (references) coexist.** So do the legacy
   `knowledgeCandidate` records and their `knowledgeItem` copies.
 

@@ -4,6 +4,7 @@ import { DocumentTextIcon } from '@sanity/icons'
 import {
   KNOWLEDGE_SOURCE_CLASSES,
   KNOWLEDGE_TRUST_TIERS,
+  isPostFoundationSource,
   optionList,
 } from '@/lib/knowledge/types'
 import {
@@ -58,12 +59,32 @@ export const knowledgeSource = defineType({
       group: 'content',
       name: 'sourceId',
       title: 'Source ID',
-      description: 'Stable lower-case kebab-case ID for this source.',
+      description:
+        'Stable lower-case kebab-case ID. Required on records that predate the ' +
+        'knowledge foundation, because a legacy knowledgeCandidate refers to those ' +
+        'by this string. Anything captured or created since is referred to by ' +
+        'reference instead, and may leave this empty.',
       type: 'string',
+      // Was `rule.required()`. Loosened, never tightened, and only for records
+      // that did not exist before the foundation wave — the same shape as the
+      // `extractedText` rule below. The field's purpose is string-based
+      // reference resolution (`resolveSourceIdsToDocuments`), and nothing looks
+      // a post-foundation source up that way. Requiring it there made every
+      // record written by `captureSource` land in Studio failing validation,
+      // asking a reviewer to hand-author an identifier for a namespace with no
+      // remaining readers. Every document written before this wave has one and
+      // still validates.
       validation: (rule) =>
-        rule.required().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
-          name: 'lower-case kebab-case',
-        }),
+        rule
+          .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, { name: 'lower-case kebab-case' })
+          .custom((value, context) => {
+            if (typeof value === 'string' && value.trim().length > 0) return true
+            return isPostFoundationSource(
+              context.document as Parameters<typeof isPostFoundationSource>[0],
+            )
+              ? true
+              : 'Source ID is required on records that predate the knowledge foundation; they are referred to by this string.'
+          }),
     }),
     defineField({
       group: 'content',

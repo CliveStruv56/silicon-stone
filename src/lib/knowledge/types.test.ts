@@ -9,6 +9,7 @@ import {
   effectiveSourceReviewStatus,
   isKnowledgeItemKind,
   isKnowledgeReviewStatus,
+  isPostFoundationSource,
   optionList,
   type KnowledgeItemKind,
   type KnowledgeReviewStatus,
@@ -97,5 +98,44 @@ describe('optionList', () => {
       { value: 'url', title: 'URL' },
       { value: 'pdf', title: 'PDF' },
     ])
+  })
+})
+
+describe('isPostFoundationSource', () => {
+  it('reads a legacy source — no reviewStatus, no provenance — as pre-foundation', () => {
+    // The shape of the one real legacy record in the dataset.
+    expect(
+      isPostFoundationSource({
+        sourceId: 'mittr-2026-05-14-ai-sovereignty',
+        status: 'processed',
+        manifestId: 'mittr-2026-05-14-ai-sovereignty',
+      } as Parameters<typeof isPostFoundationSource>[0]),
+    ).toBe(false)
+  })
+
+  it('reads a captured record as post-foundation, from provenance alone', () => {
+    expect(isPostFoundationSource({ provenance: { sourceSystem: 'api' } })).toBe(true)
+  })
+
+  it('reads a Studio-created record as post-foundation, from reviewStatus alone', () => {
+    // `reviewStatus` has initialValue 'inbox', so a hand-created source has it
+    // before anyone types anything. That is what keeps the Studio path from
+    // being treated as legacy.
+    expect(isPostFoundationSource({ reviewStatus: 'inbox' })).toBe(true)
+  })
+
+  it('is not fooled by an empty string or a missing document', () => {
+    expect(isPostFoundationSource({ reviewStatus: '' })).toBe(false)
+    expect(isPostFoundationSource({ provenance: { sourceSystem: '' } })).toBe(false)
+    expect(isPostFoundationSource({ provenance: null })).toBe(false)
+    expect(isPostFoundationSource({})).toBe(false)
+    expect(isPostFoundationSource(null)).toBe(false)
+    expect(isPostFoundationSource(undefined)).toBe(false)
+  })
+
+  it('does not treat a non-string reviewStatus as a marker', () => {
+    expect(
+      isPostFoundationSource({ reviewStatus: 1 } as Parameters<typeof isPostFoundationSource>[0]),
+    ).toBe(false)
   })
 })

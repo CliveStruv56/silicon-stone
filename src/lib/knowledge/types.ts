@@ -323,6 +323,42 @@ export function effectiveSourceReviewStatus(source: {
   return 'unknown'
 }
 
+/**
+ * Whether a source document was created after the canonical foundation wave.
+ *
+ * The discriminator is the presence of a field that did not exist before it:
+ * `reviewStatus` (which every Studio-created record gets from its
+ * `initialValue`) or `provenance.sourceSystem` (which every captured record
+ * gets from the service). A record carrying neither predates the wave.
+ *
+ * This exists so `sourceId` can be required exactly where something still
+ * depends on it. Legacy sources are referred to by that *string* — a
+ * `knowledgeCandidate.sourceIds` entry is matched against it — while anything
+ * created since is referred to by reference. Requiring it on a record nothing
+ * looks up by string asks a reviewer to invent an identifier for a namespace
+ * that no longer has readers.
+ *
+ * One coupling worth stating rather than discovering: when the cutover wave
+ * backfills `reviewStatus` onto legacy records, this returns true for them too
+ * and the requirement lifts. That is correct, not accidental — cutover is where
+ * the legacy candidates and their string references are retired — but it means
+ * the backfill and this rule move together.
+ */
+export function isPostFoundationSource(
+  source:
+    | {
+        reviewStatus?: unknown
+        provenance?: { sourceSystem?: unknown } | null
+      }
+    | null
+    | undefined,
+): boolean {
+  if (!source) return false
+  if (typeof source.reviewStatus === 'string' && source.reviewStatus.length > 0) return true
+  const sourceSystem = source.provenance?.sourceSystem
+  return typeof sourceSystem === 'string' && sourceSystem.length > 0
+}
+
 /* ------------------------------------------------------------------ *
  * Shared shapes
  * ------------------------------------------------------------------ */
