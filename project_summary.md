@@ -489,6 +489,52 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 20, 2026 — The session bridge, tested in a real Studio
+
+The previous entry shipped `/api/studio-session` but recorded that it had not
+been clicked in a running Studio with an expired cookie. It has now.
+
+**Method.** A correctly-signed admin cookie was minted with `exp` two hours in
+the past — the exact state after a 24-hour session lapses, not merely a missing
+cookie. Confirmed refused first: `/create` answered 307 to `/login` and
+`/api/fact-check` answered 401. Puppeteer then drove the embedded Studio with
+that cookie set and a real Sanity administrator token in
+`__studio_auth_token_<projectId>`, and clicked the action through the
+pane-footer menu (`data-testid="action-menu-button"` — the action is secondary,
+not the primary Publish button).
+
+**Result — the network trace is the evidence:**
+
+```
+401  /api/fact-check
+200  /api/studio-session
+202  /api/fact-check
+```
+
+The cookie was replaced, no `/login` tab was opened, and the fact-check **ran
+to completion** on the scratch article — `status: completed`, verdict `clean`,
+one claim. "Suggest two prompts" gives the identical shape
+(`401 → 200 → 200`), confirming both call sites, not just the one.
+
+**Server half verified separately against the live Sanity API:** a real
+administrator token returns `{ok: true, user: {...}}` with an `HttpOnly`,
+`SameSite=Lax`, `Path=/` cookie, and that cookie then opens `/create`. No
+header returns 401; a bogus token returns 401; `GET` returns 405.
+
+**One branch turns out to be unreachable, which is reassuring.** With no Sanity
+session in local storage, Studio does not render at all — it shows its own
+login. So the "Not signed in to Sanity" message cannot be reached from a working
+Studio; it survives only as cover for a mid-session token expiry or a Sanity
+upgrade moving the storage key.
+
+**Still untested by use:** the non-administrator refusal, because this project
+has no non-admin account. Both ends are unit-tested; the four lines joining them
+in the route are the seam. Recorded in the manual's Appendix D rather than
+quietly dropped.
+
+The scratch article was deleted and never published; the test scripts were
+throwaway and are not in the repo.
+
 ### August 20, 2026 — One login inside Studio: the two-sessions trap, removed
 
 Studio's own buttons — "Run fact-check" and "Suggest two prompts" — call this

@@ -110,6 +110,11 @@ nothing else.
 > **This used to be the manual's sharpest warning.** Until 20 August 2026 an
 > expired admin session left you signed into Studio and refused by its own
 > buttons, with a toast sending you to `/login` in a new tab. That trap is gone.
+>
+> Verified by driving a real Studio with a deliberately expired admin cookie:
+> clicking "Run fact-check" produced `401` → `/api/studio-session 200` →
+> `202`, and the fact-check then ran to completion. "Suggest two prompts"
+> behaves identically. No login tab was opened.
 
 Two things can still stop it, and they say different things:
 
@@ -1008,14 +1013,11 @@ Not confirmed by running it:
 - **Which Deep Dive path production takes.** Whether the research backend is
   configured — and therefore whether Deep Dives run as a polled job or as an
   in-process fallback — was not checked against the live environment.
-- **The silent session renewal in §2, in a running Studio.** Added 20 August
-  2026. The server half is verified against the live Sanity API (a valid
-  administrator token returns the administrator role; an invalid token is
-  refused) and both halves are covered by 20 unit tests. What has *not* been
-  done is clicking "Run fact-check" in a real Studio with a deliberately expired
-  admin cookie. The one thing that would break it is a Sanity upgrade moving
-  where Studio keeps its token — in which case the button falls back to the old
-  `/login` behaviour rather than failing, which is why that fallback was kept.
+- **The non-administrator refusal in §2.** Both ends are unit-tested — a
+  non-admin role is refused, and the client is held to *not* sending that person
+  to `/login` — but it has not been exercised with a real non-administrator
+  Sanity account, because there isn't one on this project. The four lines wiring
+  those two together in the route are the untested seam.
 
 Each line is something one real run would settle. When you next take an article
 from `/create` to publish, note anything that differs and correct this document.
