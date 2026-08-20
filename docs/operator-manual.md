@@ -91,28 +91,39 @@ Research · Context · Knowledge · Studio**.
 "Studio" is a full page load rather than a soft navigation — the embedded Sanity
 Studio is a separate application.
 
-### ⚠ The two-logins trap
+### Two logins, but only one you have to think about
 
-**These are different logins and it will catch you out.**
+There are still two credentials, and it is worth knowing which is which:
 
 | Surface | Authenticated by |
 |---|---|
 | `/admin`, `/create`, `/content`, `/research`, `/knowledge`, `/analytics`, `/import`, `/context`, `/editor` | The `/login` access code |
-| `/studio` (Sanity Studio itself) | **Your Sanity account** — project membership |
-| "Run fact-check" and "Suggest two prompts" **inside Studio** | The **`/login` access code** |
+| `/studio` (Sanity Studio itself) | **Your Sanity account** |
+| "Run fact-check" and "Suggest two prompts" **inside Studio** | Either — see below |
 
-Those last two are the trap. They are buttons in Studio, but they call the site's
-own API, which checks the admin cookie — not Sanity. When your 24-hour session
-expires you stay logged into Studio and the buttons start failing.
+**Inside Studio you do not need the access code.** Those two buttons call the
+site's own API, which wants the admin cookie rather than your Sanity session.
+When that cookie has expired, the button now trades your Sanity login for a fresh
+admin session and retries automatically. You see a slightly slower click and
+nothing else.
 
-The app knows this and says so. A 401 from "Run fact-check" opens `/login` in a
-new tab and toasts:
+> **This used to be the manual's sharpest warning.** Until 20 August 2026 an
+> expired admin session left you signed into Studio and refused by its own
+> buttons, with a toast sending you to `/login` in a new tab. That trap is gone.
 
-> **Admin session expired** — Opened the admin login in a new tab — sign in
-> there, then run the fact-check again. (This is the /login access code, not your
-> Sanity login.)
+Two things can still stop it, and they say different things:
 
-Sign in on the new tab, come back, click again.
+- **"Not signed in to Sanity"** — Studio has no session to trade. Reload Studio
+  and sign in, or use the access code at `/login`.
+- **"Your Sanity account cannot run this"** — you are signed in correctly, but
+  your Sanity account is not an **administrator** of the project. Site tools are
+  limited to administrators, deliberately: a Sanity account invited as an editor
+  or viewer would otherwise inherit the metered Claude, Exa and OpenAI pipeline.
+  This one does **not** send you to `/login`, because signing in again would not
+  change the answer.
+
+The `/login` access code is still what gets you into `/create`, `/content` and
+the rest of the admin area. Nothing about that changed.
 
 ---
 
@@ -812,9 +823,16 @@ warns.
 as crashed and lets you start a fresh one, which overwrites the stuck status. There
 is nothing to clear by hand.
 
-### "Fact-check failed to start (401)" in Studio
-Your 24-hour `/login` session expired. Studio does not know or care. Sign in again
-at `/login` — the access code, not your Sanity password. See §2.
+### "Admin session expired" in Studio
+This should now be rare — a lapsed admin session is renewed from your Sanity login
+automatically. Seeing it means the renewal itself failed: either Studio's own
+session has gone (reload Studio and sign in) or the site could not reach Sanity.
+The `/login` access code still works as a fallback and opens in a new tab. See §2.
+
+### "Your Sanity account cannot run this"
+Your Sanity account is not an administrator of the project, and site tools are
+restricted to administrators. Signing in again will not help. Either have your
+role changed in Sanity, or use the `/login` access code.
 
 ### Capture returns 404
 The knowledge feature flag is off, or was set as a *sensitive* variable and cannot
@@ -990,6 +1008,14 @@ Not confirmed by running it:
 - **Which Deep Dive path production takes.** Whether the research backend is
   configured — and therefore whether Deep Dives run as a polled job or as an
   in-process fallback — was not checked against the live environment.
+- **The silent session renewal in §2, in a running Studio.** Added 20 August
+  2026. The server half is verified against the live Sanity API (a valid
+  administrator token returns the administrator role; an invalid token is
+  refused) and both halves are covered by 20 unit tests. What has *not* been
+  done is clicking "Run fact-check" in a real Studio with a deliberately expired
+  admin cookie. The one thing that would break it is a Sanity upgrade moving
+  where Studio keeps its token — in which case the button falls back to the old
+  `/login` behaviour rather than failing, which is why that fallback was kept.
 
 Each line is something one real run would settle. When you next take an article
 from `/create` to publish, note anything that differs and correct this document.

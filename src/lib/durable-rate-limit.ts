@@ -29,6 +29,11 @@ type RateLimitConfig = {
 
 const configs = {
   login: { limit: 5, window: '15 m', prefix: 'sas:login' },
+  // Exchanging a Sanity admin token for an admin session. Higher than login
+  // because it is not a guessing surface — the caller must already hold a valid
+  // Sanity user token, and the client retries it silently on a 401 — but capped
+  // because every call costs an upstream request to Sanity.
+  studioSession: { limit: 20, window: '15 m', prefix: 'sas:studio-session' },
   subscribe: { limit: 10, window: '15 m', prefix: 'sas:subscribe' },
   contact: { limit: 5, window: '15 m', prefix: 'sas:contact' },
   vectorize: { limit: 120, window: '1 m', prefix: 'sas:vectorize' },

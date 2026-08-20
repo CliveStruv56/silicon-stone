@@ -489,6 +489,52 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 20, 2026 — One login inside Studio: the two-sessions trap, removed
+
+Studio's own buttons — "Run fact-check" and "Suggest two prompts" — call this
+app's API, which authenticates on the `/login` admin cookie rather than on
+Sanity. The two sessions expired independently, so after 24 hours an editor was
+signed into Studio and refused by its own buttons, with a toast sending them to
+`/login` in a new tab. The manual written earlier the same day called it the
+sharpest warning in the document.
+
+**`/api/studio-session` is the bridge.** The Studio client trades the Sanity
+user token it already holds for the ordinary admin cookie, then replays the
+request. The editor sees a slightly slower click and nothing else.
+
+**It mints no new session format.** The cookie is exactly what `/login` sets,
+same lifetime, flags and verifier, so `isAuthenticatedAdmin()`, `/api/fact-check`,
+`/api/image-prompts` and the middleware are all untouched. The blast radius is
+one route and a retry helper.
+
+**Administrator, not member.** The project-scoped `/users/me` endpoint returns
+the caller's roles for this project on the same response as their identity, so
+one call settles both. Membership alone is explicitly not enough — an account
+invited to Sanity as an editor or viewer would otherwise inherit the metered
+Claude/Exa/OpenAI generation pipeline. Verified against the live API before
+building: an administrator token returns `roles: [{name: 'administrator'}]`, an
+invalid one is refused with 401.
+
+**Two properties are the whole security of it** and both are asserted, because
+both fail silently: the lookup uses the *project-scoped* host rather than the
+global `api.sanity.io` (on which any valid Sanity token anywhere would
+authenticate), and a Sanity outage fails closed rather than passing. A third
+test holds the client to one retry and forbids retrying a 403/409/429 — those
+are real answers, and replaying them would hide the reason.
+
+**A non-administrator is told so, and is not sent to `/login`** — that account
+is signed in correctly, and the loop would have no exit.
+
+Net security posture improves. Until now a single shared password was the only
+guard on the whole admin surface, and `docs/review-report.md` records that an
+early value of it remains recoverable from git history. This adds a path where
+the credential is a named, individually revocable Sanity account. The eventual
+destination — replacing the password with Sanity auth across the whole admin
+area — is a strict superset of this and nothing here gets thrown away.
+
+20 new tests; suite 1,211 green; build clean. CLAUDE.md carries the invariants,
+and the manual's §2 was rewritten from a warning into a description.
+
 ### August 20, 2026 — The operator's manual, and the four guides it replaces
 
 `docs/operator-manual.md` now exists: one document covering how an article gets

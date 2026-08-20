@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 import { Badge, Button, Card, Flex, Spinner, Stack, Text, useToast } from '@sanity/ui'
 import { SparklesIcon, CopyIcon } from '@sanity/icons'
 import { useFormValue, type ObjectInputProps } from 'sanity'
+import { describeExchangeFailure, fetchWithAdminSession } from '../lib/studio-session'
 
 /**
  * Custom input for the article `imagePrompts` field. Renders a "Suggest two
@@ -11,7 +12,8 @@ import { useFormValue, type ObjectInputProps } from 'sanity'
  * can paste it straight into the external image agent (which owns the style).
  *
  * Mirrors the fact-check action's auth model: the same-origin request carries
- * the admin session cookie, so the editor must also be signed in at /login.
+ * the admin session cookie, and a lapsed session is renewed from the editor's
+ * Sanity login rather than sending them to /login.
  */
 
 interface ImagePromptsValue {
@@ -50,20 +52,23 @@ export function ImagePromptsInput(props: ObjectInputProps) {
     if (!docId) return
     setBusy(true)
     try {
-      const res = await fetch('/api/image-prompts', {
+      // A lapsed admin session is renewed from the Sanity login and the request
+      // replayed, so the editor normally never sees a 401 here. See
+      // ../lib/studio-session.
+      const { res, exchange } = await fetchWithAdminSession('/api/image-prompts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ documentId: docId }),
       })
-      if (res.status === 401) {
-        // Admin session (separate from the Sanity Studio login) is missing or
-        // expired — open /login so the editor can re-auth without losing place.
-        if (typeof window !== 'undefined') window.open('/login', '_blank', 'noopener')
+      if (res.status === 401 || res.status === 403) {
+        const failure = describeExchangeFailure(exchange)
+        if (failure.openLogin && typeof window !== 'undefined') {
+          window.open('/login', '_blank', 'noopener')
+        }
         toast.push({
           status: 'error',
-          title: 'Admin session expired',
-          description:
-            'Opened the admin login in a new tab — sign in there, then try again. (This is the /login access code, not your Sanity login.)',
+          title: failure.title,
+          description: failure.description,
         })
       } else if (res.status === 429) {
         toast.push({ status: 'warning', title: 'Rate limited — wait a little, then try again' })

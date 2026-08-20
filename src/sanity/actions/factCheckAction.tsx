@@ -1,6 +1,7 @@
 import { useToast } from '@sanity/ui'
 import { CheckmarkCircleIcon } from '@sanity/icons'
 import type { DocumentActionComponent } from 'sanity'
+import { describeExchangeFailure, fetchWithAdminSession } from '../lib/studio-session'
 
 type FactCheckState = { status?: string }
 
@@ -8,8 +9,9 @@ type FactCheckState = { status?: string }
  * "Run fact-check" document action for articles. POSTs to /api/fact-check,
  * which verifies every checkable claim against fresh web searches and patches
  * the report onto the document's factCheck field. The route authenticates via
- * the admin session cookie (same origin), so the editor must also be logged
- * in at /login. Advisory only — nothing here blocks publishing.
+ * the admin session cookie (same origin); when that has lapsed it is renewed
+ * from the editor's Sanity login rather than sending them to /login — see
+ * ../lib/studio-session. Advisory only — nothing here blocks publishing.
  */
 export const FactCheckAction: DocumentActionComponent = (props) => {
   const toast = useToast()
@@ -25,24 +27,25 @@ export const FactCheckAction: DocumentActionComponent = (props) => {
       : 'Verify every checkable claim against fresh web searches of primary sources',
     onHandle: async () => {
       try {
-        const res = await fetch('/api/fact-check', {
+        // A 401 here means the admin session lapsed while Studio stayed signed
+        // in. fetchWithAdminSession renews it from the Sanity login and replays
+        // the request, so the editor normally sees nothing. The /login fallback
+        // below is only reached when that renewal itself fails.
+        const { res, exchange } = await fetchWithAdminSession('/api/fact-check', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ documentId: props.id }),
         })
-        if (res.status === 401) {
-          // The admin session (separate from the Sanity Studio login) is
-          // missing or expired. Open /login in a new tab so the editor can
-          // re-authenticate without losing their place in this document, then
-          // re-run the action. Best-effort: popup blockers may swallow open().
-          if (typeof window !== 'undefined') {
+        if (res.status === 401 || res.status === 403) {
+          const failure = describeExchangeFailure(exchange)
+          if (failure.openLogin && typeof window !== 'undefined') {
+            // Best-effort: popup blockers may swallow open().
             window.open('/login', '_blank', 'noopener')
           }
           toast.push({
             status: 'error',
-            title: 'Admin session expired',
-            description:
-              'Opened the admin login in a new tab — sign in there, then run the fact-check again. (This is the /login access code, not your Sanity login.)',
+            title: failure.title,
+            description: failure.description,
           })
         } else if (res.status === 409) {
           toast.push({ status: 'warning', title: 'A fact-check is already running' })

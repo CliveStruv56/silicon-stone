@@ -5,6 +5,29 @@ handoff), `docs/operator-manual.md` (how the publication is actually run —
 research, drafting, the guards, publishing, knowledge capture) and the persistent
 auto-memory in `MEMORY.md`.
 
+## Studio's admin session bridge (load-bearing — do not widen)
+
+`/api/studio-session` trades a Sanity user token for the ordinary `/login` admin
+cookie, so Studio's own buttons ("Run fact-check", "Suggest two prompts") stop
+failing when the 24-hour admin session lapses. Three properties are the whole
+security of it, and `src/lib/sanity-identity.test.ts` asserts each:
+
+- **The identity lookup goes to the project-scoped host**
+  (`https://<projectId>.api.sanity.io/...`), never the global `api.sanity.io`.
+  On the global host a valid token for somebody else's project would
+  authenticate here.
+- **Administrator role, not membership.** Sanity returns the caller's roles for
+  this project on the same response. An account invited as an editor or viewer
+  must not inherit the metered Claude/Exa/OpenAI pipeline.
+- **It fails closed.** A Sanity outage returns null, not a pass.
+
+It mints no new session format — the cookie is exactly what `/login` sets, with
+the same verifier — so nothing downstream had to learn about Sanity. Do not add
+`/api/studio-session` to the middleware matcher: it is what creates the session
+the matcher looks for. The client half (`src/sanity/lib/studio-session.ts`)
+retries a 401 **once**, never a 403/409/429, and degrades to the old `/login`
+fallback if Studio's token storage ever moves.
+
 ## Dependency constraints (load-bearing — do not break)
 
 These ceilings are required for the build to work on the current Next.js 15 /
