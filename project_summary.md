@@ -16,7 +16,8 @@ lineage — sources, derived items, research runs, topics, article provenance �
 so research survives job expiry and an article can say what it was written
 from. Master spec: `docs/siliconstone-knowledge-llm-master-spec.md`. **Wave 0–1
 (schemas, domain service, Studio views, candidate migration) shipped on
-2026-08-19**, behind four controls that all default to off and that nothing
+2026-08-19, and Wave 4a (external capture + a hosted MCP server) on
+2026-08-20 — Claude Code can now capture into the inbox from any machine**, behind four controls that all default to off and that nothing
 reads yet; no user-visible behaviour changed, and the only live difference is a
 new **Knowledge** section in Studio. Start at
 `docs/knowledge-system-foundation.md`, then §9.
@@ -476,6 +477,112 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 20, 2026 — Knowledge capture from Claude, on any machine (Wave 4a)
+
+Wave 0–1 built the knowledge domain and gave it no way in from outside: the
+existing `/api/knowledge/*` routes authenticate with a browser cookie, and a
+machine has no cookie. This adds the doors, and they are **live on production**.
+
+- `POST /api/knowledge/capture` — plain HTTP. The universal adapter: curl,
+  Shortcuts, Zapier, n8n, anything that can send a header.
+- `GET /api/knowledge/inbox` (`?q=` to search), `GET /api/knowledge/record/[id]`.
+- `/api/mcp` — a Streamable HTTP MCP server, protocol revision 2026-07-28, five
+  tools. `claude mcp add --transport http --scope user` connects it from any
+  machine.
+
+Everything captured lands in `inbox`. Nothing is indexed. No URL is fetched.
+
+**ChatGPT is not reachable yet, and that is a platform constraint rather than
+an omission.** ChatGPT's custom MCP connectors accept OAuth, No Authentication
+or Mixed only — and Mixed is per-tool OAuth-or-none, with no static-token
+branch. It "cannot present custom API keys", in OpenAI's own words. Reaching it
+requires OAuth 2.1 with RFC 9728 discovery, which this repo has no machinery for
+(it is an OAuth *client* for Inoreader, never a provider). Two further findings:
+write-capable connectors may be gated to Business/Enterprise/Edu — two official
+pages contradict each other — and Custom GPT Actions, which *do* support bearer
+auth and would have been the clean escape hatch, stopped being creatable on
+personal plans on 2026-08-16. A Zapier or Make bridge works because those run
+their own OAuth, but solves the auth problem and not the plan problem, and puts
+a CMS write credential inside a third party. **Settle the plan question with a
+ten-minute test before spending anything on Stage 2.**
+
+Claude, by contrast, connects from *Anthropic's cloud* rather than the local
+machine even in the desktop app — so hosting was always required, and the local
+stdio adapter originally planned would only ever have served Claude Code.
+
+Six decisions worth not undoing.
+
+**The MCP route calls the domain in-process.** It must never `fetch`
+`/api/knowledge/capture`. A loopback to our own domain meets Vercel's deployment
+protection on any protected deployment — failing only at runtime, only on
+preview — needs a second credential authorising the server to itself, keys the
+rate limiter on Vercel's shared egress IP so every caller shares one bucket, and
+flattens a six-code typed union into a status integer. A check forbids `fetch(`
+in that file.
+
+**`destructiveHint: false` is explicit on both capture tools.** It defaults to
+*true* whenever `readOnlyHint` is false, which would put a destructive-action
+confirmation in front of the one action performed constantly. Capture never
+overwrites — a duplicate returns the record that already existed. The three read
+tools declare `readOnlyHint: true`, because ChatGPT treats a *missing* hint as a
+write.
+
+**No tool offers `sourceSystem` or `extractionExpected`.** The first is half of
+the external-reference duplicate probe, so a model that could set it could split
+or merge dedup buckets; the server derives it from the transport. The second
+describes a capability that does not exist, and a field in a schema is an
+invitation.
+
+**No tool can move a record out of the inbox.** `apply_review_transition` is
+deliberately absent: handing a model that power defeats the invariant the whole
+domain layer exists to hold.
+
+**The credential is digest-compared.** `secretMatches()` in
+`api/vectorize/route.ts` returns early on a length mismatch and leaks token
+length through timing; `ingest-auth.ts` hashes both sides first so the compare
+is unconditionally 32 bytes. `KNOWLEDGE_INGEST_TOKEN_PREVIOUS` is accepted
+alongside the primary, so rotation is not a flag day. Unconfigured **fails
+closed** — one test exists purely to assert that an absent env var denies rather
+than permits.
+
+**The rate limiter's fail-open is refused here.** `checkDurableRateLimit`
+degrades to a per-instance in-memory bucket when Upstash is unreachable — right
+for login, wrong for a public write endpoint — so these routes 503 instead, in
+production only, leaving them testable locally.
+
+zod arrived as a direct dependency, confined to `src/lib/mcp/` and asserted to
+stay out of `src/lib/knowledge/`. It is a transport requirement — the MCP SDK
+reads a Standard Schema to publish each tool's `inputSchema` — not a validation
+decision; every real rule stays in `knowledge/schema.ts`. Top-level resolves to
+zod 4.4.3 with `exa-js`, `sanity-plugin-media` and `sanity` keeping nested v3.
+
+Two things found by probing production rather than by a test, which is worth
+recording because no unit test could have caught either. `GET`/`DELETE` on
+`/api/mcp` answered 405 regardless of the flag, so a probe could tell the routes
+were deployed while the feature was dark; `methodNotAllowedStatus()` now returns
+404 while dark and 405 once live, which the transport does require. And the
+first version of the credential-separation check matched `env['X']` but not
+`process.env.X` — it would have passed vacuously forever. Both new check
+families are now verified by deliberately breaking them.
+
+**Rollout note worth keeping:** set `KNOWLEDGE_EXTERNAL_WRITES_ENABLED` as a
+**non-sensitive** variable. It was first added as Sensitive, which is write-only
+— unreadable from CLI and dashboard alike — so when the endpoint 404'd there was
+no way to see whether the value was right. Its value is the word `true`; it is
+not a secret, and making it one costs the ability to verify it. Only `true` or
+`1` enables. The *token* is a secret and stays sensitive.
+
+Verified: `check`, `test` (1,167 across 50 files), `test:security`,
+`test:knowledge-inbox`, `test:evidence-index`, `build`. On production: capture
+without a token 401, with a wrong token 401 (identical message), `GET /inbox`
+401, `GET /api/mcp` 405, `POST /api/mcp` 401, browser `Origin` 403, and
+`claude mcp list` reports the server connected. Commits `a46abbfe` and
+`2ac33c31`.
+
+Still deferred: URL/PDF extraction (server-side fetching of attacker-supplied
+URLs — its own security surface, its own brief), the `/knowledge` cockpit,
+indexing and retrieval, `promote_to_article_draft`, and Stage 2 OAuth.
 
 ### August 19, 2026 — The knowledge system's canonical foundation (Wave 0–1), shipped
 

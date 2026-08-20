@@ -3,8 +3,10 @@
 **Project:** `silicon-and-stone-web`
 **Built:** 2026-08-20 · **Baseline:** `c3b135f1`
 **Governing spec:** `siliconstone-knowledge-llm-master-spec.md`
-**Status:** built and verified locally. **Not deployed.** All of it is dark
-behind `KNOWLEDGE_EXTERNAL_WRITES_ENABLED`, which defaults to off.
+**Status:** **live on production since 2026-08-20.** Claude Code connects and
+the tools work end to end. Gated by `KNOWLEDGE_EXTERNAL_WRITES_ENABLED`, which
+defaults to off — with it unset, every route and every method answers 404 and
+the feature is indistinguishable from one that was never deployed.
 
 ## What this is
 
@@ -117,6 +119,27 @@ decision. The schemas are loose supersets; every real rule stays in
 `src/lib/knowledge/schema.ts`. A check asserts no file under
 `src/lib/knowledge/` imports zod.
 
+## Operational notes from the rollout
+
+**Set the flag as a NON-sensitive variable.** It was first added as Sensitive,
+which makes it write-only — unreadable from both the CLI and the dashboard. The
+endpoint then returned 404 with no way to see whether the value was right, and
+the fault could not be diagnosed, only re-done. Its value is the word `true`;
+it is not a secret, and making it one costs the ability to verify it. The
+*token* is a secret and should stay sensitive.
+
+**Only `true` or `1` enables it**, trimmed and lower-cased. Anything else —
+including an empty value — reads as off. That strictness is deliberate: a typo
+must not switch on a write endpoint.
+
+**Env vars are read at request time, not build time**, so a variable added after
+a build still applies. What does *not* apply is a variable added to the wrong
+environment; Production is the one that matters.
+
+**Reading the status code tells you the state.** 404 means the flag is off. 503
+means the flag is on but the token is missing or under 32 characters. 401 means
+it is fully configured and refusing an anonymous caller — that is success.
+
 ## Verified
 
 `check`, `test` (1,165 across 50 files), `test:security`,
@@ -131,6 +154,12 @@ with the same document ID and no second record · `tools/list` → five tools wi
 the expected annotations · `tools/call list_knowledge_inbox` → the inbox.
 
 The one test record written to production during that run was deleted.
+
+On production, once configured: `POST /capture` without a token 401 · with a
+wrong token 401 (identical message — an attacker learns nothing about which
+half was wrong) · `GET /inbox` 401 · `GET /api/mcp` 405 · `POST /api/mcp`
+without a token 401 · with a browser `Origin` 403. `claude mcp list` reports
+the server connected.
 
 ## Stage 2 — OAuth, to unlock ChatGPT
 
