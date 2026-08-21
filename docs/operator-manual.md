@@ -408,10 +408,9 @@ never appeared on the intelligence hub. Fixed 21 August 2026 (found by
 publishing one). The feed no longer filters on the tier, so an untiered article
 is listed; what it loses is the PULSE / BRIEFING / AUDIT badge, the tier filter,
 and — for Audit — the push notification on publish. (The same query lives in
-four places, including the Railway backend `/intelligence` refreshes from. All
-four are fixed in the repo; the Railway half needs its own deploy, so if the
-hub still drops untiered articles a moment after loading, that is what has not
-shipped yet.) The preflight now says so as
+four places, including the Railway backend `/intelligence` refreshes from, and
+Vercel and Railway deploy separately. If the hub ever shows an article on load
+and drops it a moment later, that is the two halves disagreeing.) The preflight now says so as
 a **warning**, "No intelligence tier set". Categories remain the harder rule:
 they are required and will block Publish.
 
