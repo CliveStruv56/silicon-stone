@@ -558,6 +558,33 @@ quotation-audit passes, so none of them reads the scaffold. Falls back to
 recovering `[AUTHOR: …]` tokens from the edit summary when the model skips the
 new marker, which is what the observed run actually did.
 
+**The claim controls, tested — and a fifth defect.** "Insert into article" works:
+the claim rows are collapsed previews and the control only mounts once an item
+is opened, after which editing the Suggested Revision and inserting puts *the
+edited text* into the body, sets `applied`, and flips the card to "Revision
+applied". The badge was watched moving live through
+`major issues (5 to address)` → `minor issues (4)` → `(3)` → `(2)` → `(1)`,
+which is the derived verdict working in a real Studio.
+
+One claim's button was **disabled** with the message "The original passage could
+not be found in the current body (it may have been edited)" — and nothing had
+been edited. `extractArticleText` joins Portable Text spans with a **space**
+while the body and the component join them with **nothing**, so a paragraph
+carrying an inline link gains a phantom space at every span boundary in the view
+the fact-check reads: it stored `…chasm-august-2026 .` where the body holds
+`…chasm-august-2026.`. `passagePattern` turned that space into a required `\s+`,
+so the match could never succeed — on exactly the formatted paragraphs the
+component has special handling for, whose simplification path therefore never
+ran. Whitespace is now optional (`\s*`), and the matching moved to
+`src/lib/claim-passage.ts` so it is testable and cannot drift from the button's
+enabled state. Fixing `join(' ')` instead would be more principled but changes
+the text feeding the article embeddings; this is a display-time match, not a
+stored value.
+
+Re-tested against the same document: the button enabled, the insert ran, and the
+paragraph went from three spans with a link mark to **one plain span with no
+marks** — the simplified path firing, exactly as the toast warns.
+
 **A fourth defect, found only by running it.** The first live Deep Dive after
 the F3 fix produced *no* placeholders at all. The audit-mode voice pass had a
 2,048-token ceiling and the response measured 1,942 — it was being cut off
@@ -623,7 +650,7 @@ disk at runtime — every sibling is bundled through an `import` — so on Verce
 most likely still returns `""`, and the miss is logged once per process. Verify
 by generating one draft on the live site and searching the function log.
 
-1,293 tests green (up 45). Manual restamped; §6, §7a, §8 and §12 describe the
+1,306 tests green (up 58). Manual restamped; §6, §7a, §8 and §12 describe the
 new behaviour.
 
 ### August 21, 2026 — Web Push live, and a live article corrected

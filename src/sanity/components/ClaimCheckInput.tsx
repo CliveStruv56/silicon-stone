@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from 'react'
 import { Button, Card, Flex, Stack, Text, useToast } from '@sanity/ui'
 import { CheckmarkIcon, CopyIcon } from '@sanity/icons'
 import { useDocumentOperation, useFormValue, type ObjectInputProps } from 'sanity'
+import { blockTextOf, findPassageBlock, passagePattern } from '@/lib/claim-passage'
 
 /**
  * Custom input for a fact-check claim. Renders the standard fields, then an
@@ -32,20 +33,6 @@ interface PortableBlock {
   children?: PortableSpan[]
 }
 
-function escapeRegExp(s: string): string {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-}
-
-/**
- * The stored passage is whitespace-normalised (claim extraction reads a
- * squashed text view of the article), so match any whitespace run flexibly.
- */
-function passagePattern(text: string): RegExp | null {
-  const trimmed = text.trim()
-  if (!trimmed) return null
-  return new RegExp(escapeRegExp(trimmed).replace(/\s+/g, '\\s+'))
-}
-
 export function ClaimCheckInput(props: ObjectInputProps) {
   const value = props.value as ClaimValue | undefined
   const toast = useToast()
@@ -62,17 +49,10 @@ export function ClaimCheckInput(props: ObjectInputProps) {
 
   // Check up front whether the original passage is still present in the body,
   // so the button state tells the editor before they click.
-  const located = useMemo(() => {
-    if (!canLocate || !Array.isArray(body)) return false
-    const pattern = passagePattern(value!.originalText!)
-    if (!pattern) return false
-    return body.some(
-      (block) =>
-        block._type === 'block' &&
-        Array.isArray(block.children) &&
-        pattern.test(block.children.map((c) => c.text ?? '').join('')),
-    )
-  }, [body, canLocate, value])
+  const located = useMemo(
+    () => (canLocate ? !!findPassageBlock(body, value?.originalText) : false),
+    [body, canLocate, value],
+  )
 
   const handleCopy = useCallback(() => {
     if (!revision) return
@@ -88,12 +68,7 @@ export function ClaimCheckInput(props: ObjectInputProps) {
     if (!pattern) return
     setBusy(true)
     try {
-      const targetBlock = body.find(
-        (block) =>
-          block._type === 'block' &&
-          Array.isArray(block.children) &&
-          pattern.test(block.children.map((c) => c.text ?? '').join('')),
-      )
+      const targetBlock = findPassageBlock(body, value.originalText) as PortableBlock | null
       if (!targetBlock?._key || !targetBlock.children) {
         toast.push({
           status: 'warning',
@@ -119,7 +94,7 @@ export function ClaimCheckInput(props: ObjectInputProps) {
         // The passage spans multiple formatted segments — rebuild the
         // paragraph as one plain span. Correct words beat preserved styling.
         simplified = true
-        const blockText = targetBlock.children.map((c) => c.text ?? '').join('')
+        const blockText = blockTextOf(targetBlock)
         newChildren = [
           {
             _type: 'span',

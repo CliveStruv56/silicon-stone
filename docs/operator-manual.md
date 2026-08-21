@@ -779,7 +779,15 @@ list the same page twice under different tracking parameters.
   body and marks the claim as applied. Nothing is published until you press Publish.
 
   > If the paragraph had inline formatting — links or bold — inserting rebuilds it
-  > as plain text and warns you. Give those a quick check.
+  > as plain text and warns you. Give those a quick check: the link is gone, not
+  > just restyled.
+
+  **If the button is greyed out**, the original passage could not be found in the
+  body — normally because you have since edited that paragraph. Use *Copy
+  revision* and apply it by hand. Until 21 August 2026 this also happened on any
+  paragraph containing a link, for a reason that had nothing to do with editing:
+  the fact-check reads a text view that inserts a space at every span boundary,
+  and the match demanded a space the body did not have.
 
 ---
 
