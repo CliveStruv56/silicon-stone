@@ -3,7 +3,7 @@
 A set of tasks to work through in order. Each one is self-contained: what it
 proves, what it costs, what to do, and what you should see.
 
-**Written 20 August 2026**, against commit `1720361d`. Companion to
+**Written 20 August 2026**, against commit `f5dc9a89`. Companion to
 [`operator-manual.md`](operator-manual.md) — the manual says how the system
 works, this says how to prove it still does.
 
