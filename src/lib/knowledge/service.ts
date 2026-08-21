@@ -28,6 +28,7 @@ import {
   keyedReference,
   keyedReferences,
   knowledgeReviewUrl,
+  stableKey,
 } from './ids'
 import {
   createDocument,
@@ -125,6 +126,20 @@ export interface KnowledgeSuccess {
 export type KnowledgeResult = KnowledgeSuccess | KnowledgeFailure
 
 const NO_DUPLICATE: DuplicateOutcome = { duplicate: false, ambiguous: false, matches: [] }
+
+/**
+ * Drops keys whose value is `undefined`.
+ *
+ * Provenance objects are assembled from optional fields, and writing an
+ * explicit `undefined` into a Sanity document leaves a key that reads as "we
+ * looked and found nothing" rather than "we did not look". The distinction is
+ * the whole point of a provenance record.
+ */
+function definedOnly<T extends object>(value: T): Record<string, unknown> {
+  return Object.fromEntries(
+    Object.entries(value).filter(([, v]) => v !== undefined && v !== null),
+  )
+}
 
 function fail(
   code: KnowledgeErrorCode,
@@ -484,6 +499,36 @@ export async function createResearchRun(
   return write(deps, document, { duplicate, status: value.status, events: [] })
 }
 
+/**
+ * One source exactly as the search returned it, for `selectedSources`.
+ *
+ * A literal record, not a reference: this is what the run *found*, and it must
+ * read the same in a year even if the same URL is later captured, corrected or
+ * rejected as a `knowledgeSource`. `publisher` and `score` are optional because
+ * the drafting path's own `ResearchSource` has neither, and an absent field is
+ * honest where a guessed one is not.
+ */
+export interface ResearchRunSource {
+  title?: string
+  url?: string
+  publisher?: string
+  publishedDate?: string
+  snippet?: string
+  score?: number
+}
+
+/** What was in force when the run ran. Every field optional: a caller records
+ * what it actually knows, and nothing here may be inferred. */
+export interface ResearchRunModelSnapshot {
+  model?: string
+  embeddingModel?: string
+  providerVersion?: string
+  rulesVersion?: string
+  promptTokens?: number
+  completionTokens?: number
+  costUsd?: number
+}
+
 export interface ResearchRunUpdate {
   documentId: string
   status: ResearchRunStatus
@@ -491,6 +536,9 @@ export interface ResearchRunUpdate {
   deepReport?: string
   keywords?: string[]
   error?: string
+  /** What the run selected. Written once, on the call that completes the run. */
+  selectedSources?: readonly ResearchRunSource[]
+  modelSnapshot?: ResearchRunModelSnapshot
 }
 
 /**
@@ -534,6 +582,20 @@ export async function updateResearchRun(
   if (update.deepReport) fields.deepReport = update.deepReport
   if (update.keywords?.length) fields.keywords = update.keywords
   if (update.error) fields.error = update.error
+  if (update.selectedSources?.length) {
+    fields.selectedSources = update.selectedSources.map((source, index) => ({
+      _type: 'selectedSource',
+      // Keyed on the URL where there is one, so re-recording the same result
+      // set produces a byte-identical array. Index only as a last resort, for
+      // a source with no locator at all.
+      _key: stableKey('selectedSource', source.url || `#${index}`),
+      ...definedOnly(source),
+    }))
+  }
+  if (update.modelSnapshot) {
+    const snapshot = definedOnly(update.modelSnapshot)
+    if (Object.keys(snapshot).length > 0) fields.modelSnapshot = snapshot
+  }
 
   try {
     await patchDocument(deps.client, update.documentId, fields)
@@ -549,6 +611,133 @@ export async function updateResearchRun(
     created: false,
     duplicate: NO_DUPLICATE,
     reviewUrl: knowledgeReviewUrl(update.documentId),
+    events: [],
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Recording what a run generated
+ * ------------------------------------------------------------------ */
+
+/** One retrieved record, mirroring `retrievalSnapshots[].entries` in the
+ * schema. Structural on purpose: the drafting path's own type satisfies it
+ * without the domain having to import from a `server-only` module. */
+export interface RunRetrievalEntry {
+  recordId: string
+  score?: number
+  title?: string
+  locator?: string
+}
+
+export interface RunRetrievalSnapshot {
+  lane: string
+  indexName?: string
+  namespace?: string
+  corpusVersion?: string
+  scoreFloor?: number
+  laneStatus?: string
+  entries?: readonly RunRetrievalEntry[]
+}
+
+export interface RecordRunGenerationInput {
+  runId: string
+  /** The article the run produced. */
+  articleId: string
+  /** What each lane returned while drafting it. */
+  retrievalSnapshots?: readonly RunRetrievalSnapshot[]
+}
+
+/**
+ * Records that a run produced an article, and what retrieval fed it.
+ *
+ * The second operation in this domain that touches an existing record, and it
+ * follows `linkSourcesToItem`'s shape deliberately:
+ *
+ *  - **Additive only.** Article references are merged, never replaced, and
+ *    retrieval snapshots are merged on a key derived from the article and the
+ *    lane. A retried draft therefore rewrites its own entry rather than adding
+ *    a second copy of the same fact, and never disturbs another article's.
+ *  - **Nothing else moves.** `articles` and `retrievalSnapshots`, and neither
+ *    the run's status, its reuse verdict, nor anything it found.
+ *  - **No status gate.** Unlike a review verdict, this is not a judgement — the
+ *    article exists and came from this run, and that stays true even if the
+ *    run's own completion was never recorded. Refusing here would discard
+ *    lineage precisely when something had already gone wrong.
+ *
+ * Retrieval belongs to the *generation*, not to the run: one run can produce
+ * more than one draft, and each sees whatever the indexes held at that moment.
+ * That is why the key includes the article id.
+ */
+export async function recordRunGeneration(
+  deps: KnowledgeServiceDeps,
+  input: RecordRunGenerationInput,
+): Promise<KnowledgeResult> {
+  const run = await getDocument<{
+    _id: string
+    _type: string
+    status?: string
+    articles?: Array<{ _ref?: string } | null>
+    retrievalSnapshots?: Array<{ _key?: string } | null>
+  }>(deps.client, input.runId)
+
+  if (!run) return fail('not_found', `No research run at ${input.runId}.`)
+  if (run._type !== 'researchRun') {
+    return fail('unresolved_reference', `${input.runId} is a ${run._type}, not a researchRun.`)
+  }
+
+  const referenceFailure = await resolveReferences(deps.client, [
+    { field: 'articleId', ids: [input.articleId], expectedType: 'article' },
+  ])
+  if (referenceFailure) return referenceFailure
+
+  const existingArticles = (run.articles ?? [])
+    .map((reference) => reference?._ref)
+    .filter((ref): ref is string => Boolean(ref))
+  // Existing first, so the merge never reorders what was already there.
+  const articles = keyedReferences([...existingArticles, input.articleId])
+
+  const incoming = (input.retrievalSnapshots ?? []).map((snapshot) => ({
+    _type: 'retrievalSnapshot',
+    _key: stableKey('retrievalSnapshot', input.articleId, snapshot.lane),
+    ...definedOnly({
+      lane: snapshot.lane,
+      indexName: snapshot.indexName,
+      namespace: snapshot.namespace,
+      corpusVersion: snapshot.corpusVersion,
+      scoreFloor: snapshot.scoreFloor,
+      laneStatus: snapshot.laneStatus,
+    }),
+    entries: (snapshot.entries ?? []).map((entry) => ({
+      _type: 'retrievalEntry',
+      _key: stableKey('retrievalEntry', entry.recordId),
+      ...definedOnly(entry),
+    })),
+  }))
+
+  const replaced = new Set(incoming.map((snapshot) => snapshot._key))
+  const retained = (run.retrievalSnapshots ?? []).filter(
+    (snapshot): snapshot is { _key?: string } =>
+      Boolean(snapshot) && !replaced.has(snapshot?._key ?? ''),
+  )
+  const retrievalSnapshots = [...retained, ...incoming]
+
+  const fields: Record<string, unknown> = { articles }
+  if (incoming.length > 0) fields.retrievalSnapshots = retrievalSnapshots
+
+  try {
+    await patchDocument(deps.client, input.runId, fields)
+  } catch (error) {
+    return fail('write_failed', writeMessage(error))
+  }
+
+  return {
+    ok: true,
+    documentId: input.runId,
+    documentType: 'researchRun',
+    status: run.status ?? 'unknown',
+    created: false,
+    duplicate: NO_DUPLICATE,
+    reviewUrl: knowledgeReviewUrl(input.runId),
     events: [],
   }
 }

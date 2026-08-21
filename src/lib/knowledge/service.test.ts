@@ -7,6 +7,7 @@ import {
   captureSource,
   createResearchRun,
   linkSourcesToItem,
+  recordRunGeneration,
   updateResearchRun,
   type KnowledgeServiceDeps,
 } from './service'
@@ -509,6 +510,175 @@ describe('research runs', () => {
     const result = await updateResearchRun(h.deps, { documentId: 'researchRun.nope', status: 'running' })
     expect(result.ok).toBe(false)
     if (!result.ok) expect(result.code).toBe('not_found')
+  })
+
+  it('records what the run selected, keyed on the source URL', async () => {
+    const h = harness({
+      'researchRun.live': { _id: 'researchRun.live', _type: 'researchRun', status: 'running' },
+    })
+    const result = await updateResearchRun(h.deps, {
+      documentId: 'researchRun.live',
+      status: 'completed',
+      summary: 'Two sources.',
+      selectedSources: [
+        { title: 'A', url: 'https://example.com/a', publishedDate: '2026-05-01' },
+        { title: 'B', url: 'https://example.com/b' },
+      ],
+      modelSnapshot: { model: 'claude-x', costUsd: 0.42 },
+    })
+    expect(result.ok).toBe(true)
+    const doc = h.documents['researchRun.live']
+    const sources = doc.selectedSources as Array<Record<string, unknown>>
+    expect(sources).toHaveLength(2)
+    expect(sources[0]._type).toBe('selectedSource')
+    expect(sources[0].title).toBe('A')
+    // Deterministic, so recording the same result set twice is a no-op rather
+    // than a second copy.
+    expect(sources[0]._key).toBe(sources[0]._key)
+    expect(new Set(sources.map((source) => source._key)).size).toBe(2)
+    expect(doc.modelSnapshot).toEqual({ model: 'claude-x', costUsd: 0.42 })
+  })
+
+  it('writes no key an absent value would fill', async () => {
+    // A provenance object assembled from optional fields must not carry keys
+    // for what nobody knew: "looked and found nothing" and "did not look" are
+    // different facts and the record has to keep them apart.
+    const h = harness({
+      'researchRun.live': { _id: 'researchRun.live', _type: 'researchRun', status: 'running' },
+    })
+    await updateResearchRun(h.deps, {
+      documentId: 'researchRun.live',
+      status: 'completed',
+      summary: 'One source.',
+      selectedSources: [{ title: 'A', url: 'https://example.com/a', publisher: undefined }],
+      modelSnapshot: { model: undefined },
+    })
+    const doc = h.documents['researchRun.live']
+    const source = (doc.selectedSources as Array<Record<string, unknown>>)[0]
+    expect('publisher' in source).toBe(false)
+    // An entirely empty snapshot is not written at all.
+    expect('modelSnapshot' in doc).toBe(false)
+  })
+})
+
+describe('recordRunGeneration', () => {
+  const world = () => ({
+    'researchRun.one': {
+      _id: 'researchRun.one',
+      _type: 'researchRun',
+      status: 'completed',
+      reuseStatus: 'pending',
+    },
+    'article.a': { _id: 'article.a', _type: 'article' },
+    'article.b': { _id: 'article.b', _type: 'article' },
+  })
+
+  const lane = (name: string, recordId: string) => ({
+    lane: name,
+    indexName: 'idx',
+    scoreFloor: 0.37,
+    laneStatus: 'ok',
+    entries: [{ recordId, score: 0.5, title: 'T' }],
+  })
+
+  it('links the article and keeps what retrieval returned', async () => {
+    const h = harness(world())
+    const result = await recordRunGeneration(h.deps, {
+      runId: 'researchRun.one',
+      articleId: 'article.a',
+      retrievalSnapshots: [lane('prior_articles', 'article.z')],
+    })
+    expect(result.ok).toBe(true)
+    const doc = h.documents['researchRun.one']
+    expect((doc.articles as Array<{ _ref: string }>).map((r) => r._ref)).toEqual(['article.a'])
+    const snapshots = doc.retrievalSnapshots as Array<Record<string, unknown>>
+    expect(snapshots).toHaveLength(1)
+    expect(snapshots[0].lane).toBe('prior_articles')
+    expect((snapshots[0].entries as unknown[])).toHaveLength(1)
+  })
+
+  it('is idempotent — a retried draft rewrites its own entry, not a second copy', async () => {
+    const h = harness(world())
+    const input = {
+      runId: 'researchRun.one',
+      articleId: 'article.a',
+      retrievalSnapshots: [lane('prior_articles', 'article.z')],
+    }
+    await recordRunGeneration(h.deps, input)
+    await recordRunGeneration(h.deps, input)
+    const doc = h.documents['researchRun.one']
+    expect(doc.articles).toHaveLength(1)
+    expect(doc.retrievalSnapshots).toHaveLength(1)
+  })
+
+  it('keeps a second article\'s retrieval alongside the first\'s', async () => {
+    // One run can produce more than one draft, and each saw whatever the
+    // indexes held at that moment. Keying on the article is what stops the
+    // second overwriting the first.
+    const h = harness(world())
+    await recordRunGeneration(h.deps, {
+      runId: 'researchRun.one',
+      articleId: 'article.a',
+      retrievalSnapshots: [lane('prior_articles', 'article.z')],
+    })
+    await recordRunGeneration(h.deps, {
+      runId: 'researchRun.one',
+      articleId: 'article.b',
+      retrievalSnapshots: [lane('prior_articles', 'article.y')],
+    })
+    const doc = h.documents['researchRun.one']
+    expect((doc.articles as Array<{ _ref: string }>).map((r) => r._ref)).toEqual([
+      'article.a',
+      'article.b',
+    ])
+    expect(doc.retrievalSnapshots).toHaveLength(2)
+  })
+
+  it('moves nothing but the two lineage fields', async () => {
+    const h = harness(world())
+    await recordRunGeneration(h.deps, {
+      runId: 'researchRun.one',
+      articleId: 'article.a',
+      retrievalSnapshots: [lane('regulatory', 'chunk-1')],
+    })
+    expect(Object.keys(h.patched[0].fields).sort()).toEqual(['articles', 'retrievalSnapshots'])
+  })
+
+  it('refuses an article that does not exist', async () => {
+    const h = harness(world())
+    const result = await recordRunGeneration(h.deps, {
+      runId: 'researchRun.one',
+      articleId: 'article.nope',
+    })
+    expect(result.ok).toBe(false)
+    if (result.ok) return
+    expect(result.code).toBe('unresolved_reference')
+    expect(h.patched).toHaveLength(0)
+  })
+
+  it('refuses a run that is not a run', async () => {
+    const h = harness({ ...world(), 'knowledgeItem.x': { _id: 'knowledgeItem.x', _type: 'knowledgeItem' } })
+    const result = await recordRunGeneration(h.deps, {
+      runId: 'knowledgeItem.x',
+      articleId: 'article.a',
+    })
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.code).toBe('unresolved_reference')
+  })
+
+  it('records lineage even for a run whose completion was never recorded', async () => {
+    // Not a judgement: the article exists and came from this run. Refusing
+    // here would discard lineage exactly when something had already gone wrong.
+    const h = harness({
+      'researchRun.stuck': { _id: 'researchRun.stuck', _type: 'researchRun', status: 'running' },
+      'article.a': { _id: 'article.a', _type: 'article' },
+    })
+    const result = await recordRunGeneration(h.deps, {
+      runId: 'researchRun.stuck',
+      articleId: 'article.a',
+    })
+    expect(result.ok).toBe(true)
+    expect(h.documents['researchRun.stuck'].status).toBe('running')
   })
 })
 
