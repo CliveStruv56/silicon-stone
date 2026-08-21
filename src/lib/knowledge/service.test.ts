@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { KnowledgeClient, KnowledgePatch } from './repository'
 import {
+  applyIndexTransition,
   applyReviewTransition,
   captureKnowledgeItem,
   captureSource,
@@ -713,7 +714,131 @@ describe('recordRunGeneration', () => {
   })
 })
 
+describe('applyIndexTransition', () => {
+  const world = (indexState: Record<string, unknown> | null = null) => ({
+    'knowledgeItem.a': {
+      _id: 'knowledgeItem.a',
+      _type: 'knowledgeItem',
+      reviewStatus: 'ready',
+      ...(indexState ? { indexState } : {}),
+    },
+  })
+
+  it('treats an absent index state as not_eligible, which is the schema default', () => {
+    // What a record written before this field existed looks like.
+    const h = harness(world())
+    return applyIndexTransition(h.deps, { documentId: 'knowledgeItem.a', to: 'pending' }).then(
+      (result) => {
+        expect(result.ok).toBe(true)
+        expect(h.patched[0].fields['indexState.status']).toBe('pending')
+      },
+    )
+  })
+
+  it('refuses a self-transition, because a no-op is not a transition', async () => {
+    // The machine forbids indexed → indexed on purpose: re-indexing changed
+    // content is indexed → pending → indexed, and a caller that wants a
+    // self-transition has not decided whether anything changed.
+    const h = harness(world({ status: 'indexed' }))
+    const result = await applyIndexTransition(h.deps, {
+      documentId: 'knowledgeItem.a',
+      to: 'indexed',
+    })
+    expect(result.ok).toBe(false)
+    if (result.ok) return
+    expect(result.code).toBe('transition_refused')
+    expect(h.patched).toHaveLength(0)
+  })
+
+  it('stamps the evidence when it reaches indexed, and clears a stale error', async () => {
+    // A state and the evidence for it must not be writable apart. An indexed
+    // record still carrying the message from a failure two attempts ago reads
+    // as currently broken.
+    const h = harness(world({ status: 'pending', lastError: 'the previous attempt' }))
+    await applyIndexTransition(h.deps, {
+      documentId: 'knowledgeItem.a',
+      to: 'indexed',
+      canonicalHash: 'sha256:abc',
+      indexedHash: 'sha256:abc',
+      embeddingModel: 'text-embedding-3-small',
+      indexVersion: '2026-08-21',
+    })
+    const fields = h.patched[0].fields
+    expect(fields['indexState.indexedHash']).toBe('sha256:abc')
+    expect(fields['indexState.embeddingModel']).toBe('text-embedding-3-small')
+    expect(fields['indexState.indexedAt']).toBe('2026-08-18T12:00:00.000Z')
+    expect(fields['indexState.lastError']).toBeNull()
+  })
+
+  it('counts attempts and demands a reason on error', async () => {
+    const h = harness(world({ status: 'pending', attempts: 2 }))
+    const refused = await applyIndexTransition(h.deps, {
+      documentId: 'knowledgeItem.a',
+      to: 'error',
+      lastError: '   ',
+    })
+    expect(refused.ok).toBe(false)
+    if (!refused.ok) expect(refused.code).toBe('validation_failed')
+    expect(h.patched).toHaveLength(0)
+
+    await applyIndexTransition(h.deps, {
+      documentId: 'knowledgeItem.a',
+      to: 'error',
+      lastError: 'the embedding call failed',
+    })
+    expect(h.patched[0].fields['indexState.attempts']).toBe(3)
+    expect(h.patched[0].fields['indexState.lastError']).toBe('the embedding call failed')
+  })
+
+  it('forgets the indexed hash when eligibility is withdrawn', async () => {
+    // The vector is gone or going. Saying otherwise would make reconciliation
+    // believe the index holds something it does not.
+    const h = harness(world({ status: 'indexed', indexedHash: 'sha256:abc' }))
+    await applyIndexTransition(h.deps, { documentId: 'knowledgeItem.a', to: 'not_eligible' })
+    expect(h.patched[0].fields['indexState.indexedHash']).toBeNull()
+    expect(h.patched[0].fields['indexState.indexedAt']).toBeNull()
+  })
+
+  it('reports a missing document', async () => {
+    const h = harness()
+    const result = await applyIndexTransition(h.deps, { documentId: 'nope.x', to: 'pending' })
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.code).toBe('not_found')
+  })
+})
+
 describe('applyReviewTransition', () => {
+  it('marks the record pending in the same patch as the ready verdict', async () => {
+    // Wave 3, decision 2. One write: eligible and known to be unindexed. A
+    // process that dies between the verdict and the embedding then leaves
+    // something reconciliation can find, rather than a `ready` record nothing
+    // will ever look at again.
+    const h = harness({
+      'knowledgeItem.a': { _id: 'knowledgeItem.a', _type: 'knowledgeItem', reviewStatus: 'inbox' },
+    })
+    const result = await applyReviewTransition(h.deps, { documentId: 'knowledgeItem.a', to: 'ready' })
+    expect(result.ok).toBe(true)
+    expect(h.patched[0].fields.reviewStatus).toBe('ready')
+    expect(h.patched[0].fields['indexState.status']).toBe('pending')
+  })
+
+  it('does not re-open an already-indexed record on re-approval', async () => {
+    // indexed → pending is a legal move, so this would be allowed and wrong.
+    // Nothing about the text changed, so the index is not stale; the indexer
+    // decides that by comparing hashes. Pre-empting it here would re-embed
+    // every record every time somebody pulled one back for a second look.
+    const h = harness({
+      'knowledgeItem.a': {
+        _id: 'knowledgeItem.a',
+        _type: 'knowledgeItem',
+        reviewStatus: 'inbox',
+        indexState: { status: 'indexed' },
+      },
+    })
+    await applyReviewTransition(h.deps, { documentId: 'knowledgeItem.a', to: 'ready' })
+    expect('indexState.status' in h.patched[0].fields).toBe(false)
+  })
+
   it('approves an inbox record and proposes index evaluation without indexing', async () => {
     const h = harness({
       'knowledgeItem.a': {
@@ -736,8 +861,18 @@ describe('applyReviewTransition', () => {
         reason: 'The record became ready, so its index eligibility should be recalculated.',
       },
     ])
-    // An intent, not an action: nothing here touches an index.
-    expect(h.patched[0].fields).toEqual({ reviewStatus: 'ready' })
+    // WAVE 1 ASSERTED `{ reviewStatus: 'ready' }` here, with the comment "an
+    // intent, not an action: nothing here touches an index". Wave 3 changed
+    // that deliberately (decision 2): the record is marked `pending` in the
+    // same patch, so it is eligible and known to be unindexed in one write.
+    //
+    // What has NOT changed is the thing that comment was protecting — the
+    // patch still touches no index. `pending` is a claim about this document,
+    // not about Pinecone, and the intent is still what asks for the work.
+    expect(h.patched[0].fields).toEqual({
+      reviewStatus: 'ready',
+      'indexState.status': 'pending',
+    })
   })
 
   it('withdraws index eligibility immediately when a record stops being ready', async () => {

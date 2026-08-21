@@ -46,10 +46,11 @@ import {
   parseSourceCaptureInput,
   type KnowledgeValidationError,
 } from './schema'
-import { researchRunTransitions, reviewTransitions } from './transitions'
+import { indexTransitions, researchRunTransitions, reviewTransitions } from './transitions'
 import {
   DEFAULT_CAPTURE_BRAND_TAG,
   legacySourceStatusFor,
+  type KnowledgeIndexStatus,
   type KnowledgeReviewStatus,
   type ResearchRunStatus,
 } from './types'
@@ -618,6 +619,111 @@ export async function updateResearchRun(
 }
 
 /* ------------------------------------------------------------------ *
+ * Index state
+ * ------------------------------------------------------------------ */
+
+export interface IndexTransitionInput {
+  documentId: string
+  to: KnowledgeIndexStatus
+  /** Hash of what would be embedded now. Recorded on the way into `pending`. */
+  canonicalHash?: string
+  /** Hash of what the index actually holds. Recorded on reaching `indexed`. */
+  indexedHash?: string
+  embeddingModel?: string
+  indexVersion?: string
+  /** Required on `error`, so a failed record always says why. */
+  lastError?: string
+}
+
+/**
+ * Moves a record's index state, through the guard.
+ *
+ * The machine is wave 1's and it is deliberately strict: `pending → pending`
+ * and `indexed → indexed` are both refused as "a no-op is not a transition".
+ * That is not an obstacle to work around — re-indexing changed content is
+ * `indexed → pending → indexed`, and a caller that finds itself wanting a
+ * self-transition is a caller that has not decided whether anything changed.
+ *
+ * Field bookkeeping is done here rather than by callers so that a state and the
+ * evidence for it cannot be written apart: reaching `indexed` always stamps the
+ * hash, model, version and time and clears the last error; reaching `error`
+ * always records the message, the attempt time and the count.
+ */
+export async function applyIndexTransition(
+  deps: KnowledgeServiceDeps,
+  input: IndexTransitionInput,
+): Promise<KnowledgeResult> {
+  const existing = await getDocument<{
+    _id: string
+    _type: string
+    indexState?: { status?: string; attempts?: number } | null
+  }>(deps.client, input.documentId)
+
+  if (!existing) return fail('not_found', `No document at ${input.documentId}.`)
+
+  // Absent means the schema's own `initialValue`, which is what a record
+  // written before this field existed looks like.
+  const from = existing.indexState?.status ?? 'not_eligible'
+  const transition = indexTransitions.check(from, input.to)
+  if (!transition.allowed) {
+    return fail('transition_refused', `Index state: ${transition.reason}`)
+  }
+
+  if (input.to === 'error' && !input.lastError?.trim()) {
+    return fail('validation_failed', 'An errored record must record what went wrong.', {
+      errors: [
+        { field: 'lastError', code: 'required', message: 'An errored record must record what went wrong.' },
+      ],
+    })
+  }
+
+  const at = clock(deps)
+  const fields: Record<string, unknown> = { 'indexState.status': input.to }
+
+  if (input.canonicalHash) fields['indexState.canonicalHash'] = input.canonicalHash
+
+  if (input.to === 'indexed') {
+    fields['indexState.indexedHash'] = input.indexedHash ?? input.canonicalHash
+    fields['indexState.indexedAt'] = at
+    if (input.embeddingModel) fields['indexState.embeddingModel'] = input.embeddingModel
+    if (input.indexVersion) fields['indexState.indexVersion'] = input.indexVersion
+    // Cleared, not left standing: an indexed record carrying the message from a
+    // failure two attempts ago reads as currently broken.
+    fields['indexState.lastError'] = null
+  }
+
+  if (input.to === 'error') {
+    fields['indexState.lastError'] = input.lastError
+    fields['indexState.lastAttemptAt'] = at
+    fields['indexState.attempts'] = (existing.indexState?.attempts ?? 0) + 1
+  }
+
+  if (input.to === 'not_eligible') {
+    // The vector is gone or going; saying otherwise would make reconciliation
+    // believe the index holds something it does not.
+    fields['indexState.indexedHash'] = null
+    fields['indexState.indexedAt'] = null
+  }
+
+  try {
+    await patchDocument(deps.client, input.documentId, fields)
+  } catch (error) {
+    return fail('write_failed', writeMessage(error))
+  }
+
+  return {
+    ok: true,
+    documentId: input.documentId,
+    documentType: existing._type,
+    status: input.to,
+    created: false,
+    duplicate: NO_DUPLICATE,
+    reviewUrl: knowledgeReviewUrl(input.documentId),
+    events: [],
+  }
+}
+
+/* ------------------------------------------------------------------ *
  * Recording what a run generated
  * ------------------------------------------------------------------ */
 
@@ -906,6 +1012,7 @@ export async function applyReviewTransition(
     _type: string
     reviewStatus?: string
     status?: string
+    indexState?: { status?: string } | null
   }>(deps.client, input.documentId)
 
   if (!existing) {
@@ -958,6 +1065,14 @@ export async function applyReviewTransition(
   // proposes re-evaluation. The asymmetry is deliberate — removal is safe to
   // do eagerly, addition is not.
   if (input.to !== 'ready') fields['indexState.status'] = 'not_eligible'
+  // Gaining `ready` marks the record `pending` in the SAME patch as the verdict
+  // (wave 3, decision 2). The record is then eligible and known to be
+  // unindexed, in one write — so a process that dies between the verdict and
+  // the embedding leaves something reconciliation can find, rather than a
+  // `ready` record nothing will ever look at again.
+  if (input.to === 'ready' && effectiveIndexStatus(existing) !== 'indexed') {
+    fields['indexState.status'] = 'pending'
+  }
 
   try {
     await patchDocument(deps.client, input.documentId, fields)
@@ -984,6 +1099,19 @@ export async function applyReviewTransition(
           ]
         : [],
   }
+}
+
+/**
+ * The record's index status, defaulting to the schema's own `not_eligible`.
+ *
+ * `indexed → pending` is a legal move, so marking an already-indexed record
+ * pending on re-approval would be *allowed* — and wrong. Nothing about the text
+ * changed, so the index is not stale; the indexer decides that by comparing
+ * hashes, and pre-empting it here would re-embed every record every time
+ * somebody pulled it back for a second look.
+ */
+function effectiveIndexStatus(document: { indexState?: { status?: string } | null }): string {
+  return document.indexState?.status ?? 'not_eligible'
 }
 
 /** The current review status, reading a pre-foundation document through its

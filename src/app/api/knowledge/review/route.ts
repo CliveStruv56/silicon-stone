@@ -3,6 +3,8 @@ import { isAuthenticatedAdmin } from '@/lib/admin-auth'
 import { getClientIp } from '@/lib/rate-limit'
 import { checkDurableRateLimit } from '@/lib/durable-rate-limit'
 import { applyReviewTransition } from '@/lib/knowledge/service'
+import { knowledgeFeatureEnabled } from '@/lib/knowledge/features'
+import { indexRecord } from '@/lib/knowledge/indexer'
 import { knowledgeClient } from '@/lib/knowledge/sanity-client'
 import { statusForKnowledgeError } from '@/lib/knowledge/ingest-status'
 import { KNOWLEDGE_REVIEW_STATUSES, type KnowledgeReviewStatus } from '@/lib/knowledge/types'
@@ -103,5 +105,25 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  return NextResponse.json({ ok: true, documentId, status: to })
+  // The intent wave 1 recorded and nothing consumed. Acting on it here rather
+  // than through a fourth Sanity webhook is wave 3, decision 2: a review is a
+  // human action, so a failure can be reported to the person who caused it,
+  // where a webhook would be a fourth dashboard-only configuration that fails
+  // silently.
+  //
+  // Behind the flag, and after the verdict is already written. `indexRecord`
+  // returns rather than throws, and the record is already `pending`, so a
+  // failure here costs the vector and never the review — `knowledge:sync`
+  // repairs it. `indexing` is reported back so a reviewer can see what
+  // happened without going to look.
+  let indexing: string | undefined
+  if (knowledgeFeatureEnabled('autoIndex')) {
+    const outcome = await indexRecord({ client: knowledgeClient() }, { documentId })
+    indexing = outcome.action
+    if (outcome.action === 'failed') {
+      console.error(`Knowledge indexing failed for ${documentId}: ${outcome.reason}`)
+    }
+  }
+
+  return NextResponse.json({ ok: true, documentId, status: to, ...(indexing ? { indexing } : {}) })
 }

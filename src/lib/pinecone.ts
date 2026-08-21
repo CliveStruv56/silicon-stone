@@ -47,6 +47,39 @@ export function getRegulatoryNamespace(): string | undefined {
   return process.env.PINECONE_REGULATORY_NAMESPACE || undefined
 }
 
+/**
+ * Editorial memory — reviewed knowledge items and sources, for drafting at
+ * /create. Wave 3 of the knowledge programme.
+ *
+ * A SEPARATE index rather than a namespace on the article index, and the
+ * reason is a script rather than a theory: `src/scripts/sync-pinecone.ts`
+ * enumerates the article index and deletes **every id it does not find in
+ * Sanity's article list**. A knowledge namespace would survive that today only
+ * incidentally, because `listPaginated` on the bare index handle reads the
+ * default namespace — an SDK default the script never mentions. One
+ * `index.namespace(...)` added there and the editorial corpus is gone.
+ *
+ * The blast radius of a rebuild script must not include another lane's
+ * records, and that safety has to be structural. It also keeps
+ * `articles:verify-index`'s counts unambiguous; the regulatory lane already
+ * learned that a shared total hides records stranded by a re-chunk.
+ *
+ * EDITORIAL LANE ONLY, on the same terms as the regulatory index: material here
+ * is captured commentary a human approved, never an authority for anything the
+ * Compliance Checker renders.
+ */
+export function getKnowledgePineconeIndex() {
+  const indexName = process.env.PINECONE_KNOWLEDGE_INDEX_NAME
+  if (!indexName) throw new Error('PINECONE_KNOWLEDGE_INDEX_NAME is not set')
+  return getClient().index(indexName)
+}
+
+/** Whether editorial memory has a store at all. Callers degrade rather than
+ * throw: a lane with no index is a lane that reports `skipped`. */
+export function knowledgeIndexConfigured(): boolean {
+  return Boolean(process.env.PINECONE_KNOWLEDGE_INDEX_NAME)
+}
+
 export type PineconeArticleMetadata = {
   title: string
   slug: string

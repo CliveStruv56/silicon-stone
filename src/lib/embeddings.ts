@@ -15,10 +15,20 @@ function getClient(): OpenAI {
 export const EMBEDDING_MODEL = 'text-embedding-3-small'
 export const EMBEDDING_DIMENSIONS = 1024
 
-// text-embedding-3-* accept ~8191 tokens. Cap input well under that (~6k tokens)
-// so a long article can't hard-fail the embed call (and silently leave the
-// article unindexed via the vectorize webhook).
-const MAX_EMBEDDING_CHARS = 24_000
+/**
+ * text-embedding-3-* accept ~8191 tokens. Cap input well under that (~6k tokens)
+ * so a long article can't hard-fail the embed call (and silently leave the
+ * article unindexed via the vectorize webhook).
+ *
+ * **Input longer than this is silently truncated below.** That is the right
+ * trade for the article lane — a partially embedded article still finds its
+ * neighbours — and the wrong one for editorial memory, where a source indexed
+ * as its first 24,000 characters would be a document the corpus misrepresents
+ * with nothing to show for it. Exported so the knowledge indexer can refuse at
+ * exactly this boundary instead of guessing a second number that must agree
+ * with this one.
+ */
+export const MAX_EMBEDDING_CHARS = 24_000
 
 export async function generateEmbedding(text: string): Promise<number[]> {
   const input = text.length > MAX_EMBEDDING_CHARS ? text.slice(0, MAX_EMBEDDING_CHARS) : text
