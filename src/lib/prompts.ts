@@ -363,6 +363,12 @@ export interface VoiceEditResult {
     content: string;
     /** Markdown hand-back: tells removed, house-style fixes, and the [AUTHOR: …] list. */
     editSummary: string;
+    /**
+     * Audit mode only: the `[AUTHOR: …]` placeholders this pass would have
+     * inserted if it were rewriting. The caller appends them to the body — see
+     * `appendAuthorSpecifics` in draft-pipeline.ts for why they cannot stay here.
+     */
+    authorSpecifics?: string[];
 }
 
 /** Deep Dives audit-only (too long to rewrite economically); every other format gets a full rewrite. */
@@ -422,8 +428,10 @@ The full edited article in markdown. Preserve the author's heading structure, fr
 ===EDIT SUMMARY===
 The edit summary in the exact structure given above.`
         : `This is an AUDIT pass. Do NOT rewrite the article — leave the prose to the author. Identify every AI tell, house-style breach, and place where a concrete specific is missing.
-Return plain text in EXACTLY this layout — the marker line verbatim, nothing before it, no JSON, no code fences:
+Return plain text in EXACTLY this layout — both marker lines verbatim, nothing before the first, no JSON, no code fences:
 
+===AUTHOR SPECIFICS===
+One line per specific only the author can supply, each written as a complete [AUTHOR: …] placeholder and nothing else. Name the section of the article it belongs to inside the placeholder. Write no lines at all if the draft needs none.
 ===EDIT SUMMARY===
 The edit summary in the exact structure given above, listing concrete locations (quote the offending phrase) so the author can act without re-reading the whole draft.`;
 
@@ -463,6 +471,25 @@ Return the JSON object now.`;
  * the Pass-1 draft. In `audit` mode the returned `content` is the original body
  * unchanged and only `editSummary` is populated.
  */
+/** Every `[AUTHOR: …]` placeholder in `text`, deduplicated, order preserved. */
+function placeholdersIn(text: string): string[] {
+    return [...new Set((text.match(/\[AUTHOR:[^\]]{0,300}\]/gi) ?? []).map((p) => p.trim()))];
+}
+
+/**
+ * The audit pass's author specifics, read from its own section where it wrote
+ * one and recovered from the edit summary where it did not.
+ *
+ * The fallback matters: the summary's "⚠ Author specifics needed" section is a
+ * long-standing part of the contract, and a model that fills that in but skips
+ * the new marker must not silently produce a draft with nothing for the publish
+ * guard to catch — which is the failure this whole section exists to close.
+ */
+export function parseAuthorSpecifics(tail: string, editSummary: string): string[] {
+    const declared = placeholdersIn(tail);
+    return declared.length > 0 ? declared : placeholdersIn(editSummary);
+}
+
 export async function runVoiceEditPass(
     title: string,
     body: string,
@@ -473,21 +500,44 @@ export async function runVoiceEditPass(
     try {
         const { systemPrompt, userPrompt } = await buildVoiceEditPrompt(title, body, mode);
         // Editing is conservative (0.3); generous token budget so a full rewrite is not truncated.
-        raw = await callClaude(systemPrompt, userPrompt, 0.3, mode === 'rewrite' ? 8192 : 2048);
+        // 4096 for the audit, not 2048. A Deep Dive audit of a 4,000-word piece
+        // measured 1,942 tokens against the old cap and was cut off mid-sentence
+        // — silently, because a truncated response still parses. It lost the
+        // trailing "Author specifics needed" section every time, which is the
+        // one part of the notes the publish guard depends on.
+        raw = await callClaude(systemPrompt, userPrompt, 0.3, mode === 'rewrite' ? 8192 : 4096);
 
         // Parse the delimiter format (see buildVoiceEditPrompt). The summary
         // always trails ===EDIT SUMMARY===; in rewrite mode the edited body sits
         // between ===EDITED ARTICLE=== and that marker.
         const SUMMARY_MARKER = '===EDIT SUMMARY===';
         const ARTICLE_MARKER = '===EDITED ARTICLE===';
+        const SPECIFICS_MARKER = '===AUTHOR SPECIFICS===';
         const summaryIdx = raw.indexOf(SUMMARY_MARKER);
         if (summaryIdx === -1) throw new Error("voice-edit response missing the ===EDIT SUMMARY=== marker");
 
-        const editSummary = raw.slice(summaryIdx + SUMMARY_MARKER.length).trim();
+        // The specifics block is asked for BEFORE the summary (see
+        // buildVoiceEditPrompt) so truncation costs prose rather than the
+        // placeholders the publish guard depends on. Accept it on either side
+        // regardless: the model's ordering is not something to bet a guard on.
+        const specificsIdx = raw.indexOf(SPECIFICS_MARKER);
+        const specificsBefore = specificsIdx !== -1 && specificsIdx < summaryIdx;
+
+        const editSummary = raw
+            .slice(
+                summaryIdx + SUMMARY_MARKER.length,
+                specificsBefore || specificsIdx === -1 ? undefined : specificsIdx,
+            )
+            .trim();
         if (!editSummary) throw new Error("voice-edit response had an empty edit summary");
 
         if (mode === 'audit') {
-            return { content: body, editSummary };
+            const specifics = specificsIdx === -1
+                ? ''
+                : specificsBefore
+                    ? raw.slice(specificsIdx + SPECIFICS_MARKER.length, summaryIdx)
+                    : raw.slice(specificsIdx + SPECIFICS_MARKER.length);
+            return { content: body, editSummary, authorSpecifics: parseAuthorSpecifics(specifics, editSummary) };
         }
 
         const articleIdx = raw.indexOf(ARTICLE_MARKER);

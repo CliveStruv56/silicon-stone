@@ -159,11 +159,13 @@ export async function finalizeDraft({
 }: FinalizeDraftInput) {
     // Pass 3 — humanising voice edit (Deep Dives audit-only, others rewritten).
     let voiceEditNotes: string | undefined;
+    let authorSpecifics: string[] = [];
     try {
         const edit = await runVoiceEditPass(draft.title, draft.content, format);
         if (edit) {
             draft.content = edit.content;
             voiceEditNotes = edit.editSummary;
+            authorSpecifics = edit.authorSpecifics ?? [];
         }
     } catch (err) {
         console.error(`[${logPrefix}] Voice edit pass failed:`, err);
@@ -216,6 +218,13 @@ export async function finalizeDraft({
         console.error(`[${logPrefix}] Quotation audit failed:`, err);
     }
 
+    // LAST, so nothing above audits or summarises the scaffold: the metadata
+    // pass, the image prompts and the quotation audit all read draft.content.
+    if (authorSpecifics.length > 0) {
+        draft.content = appendAuthorSpecifics(draft.content, authorSpecifics);
+        console.info(`[${logPrefix}] appended ${authorSpecifics.length} author placeholder(s) to the body`);
+    }
+
     return createArticleInSanity({
         title: draft.title,
         slug: slugify(draft.title),
@@ -239,6 +248,42 @@ export async function finalizeDraft({
             ? { citationSnapshots: researchSources.map(toSnapshot) }
             : {}),
     });
+}
+
+export const AUTHOR_SPECIFICS_HEADING = '## ⚠ Author specifics needed'
+
+/**
+ * Put the audit pass's author specifics in the BODY, where the publish guard
+ * can see them.
+ *
+ * Deep Dives are the one format whose voice pass audits rather than rewrites —
+ * too long to rewrite economically — so it never inserts `[AUTHOR: …]` markers
+ * into the prose the way every other format's pass does. It writes them up in
+ * Voice Edit Notes instead, and `publish-preflight` deliberately does not scan
+ * that field, because it *lists* placeholders and scanning it would block every
+ * voice-passed article forever. The result was that the publish blocker could
+ * not fire at all on the longest, most claim-dense format: a Deep Dive with
+ * three unresolved verification tasks offered "Publish anyway" (21 Aug 2026).
+ *
+ * The body is the only place a marker self-clears, because it is the only one
+ * the author edits — which is exactly why the rewrite formats work. So the
+ * markers go here, under a heading the author deletes with the last of them.
+ */
+export function appendAuthorSpecifics(body: string, specifics: string[]): string {
+    if (specifics.length === 0) return body
+    // Never double-append: finalizeDraft can run again over an existing body.
+    if (body.includes(AUTHOR_SPECIFICS_HEADING)) return body
+
+    return [
+        body.trimEnd(),
+        '',
+        AUTHOR_SPECIFICS_HEADING,
+        '',
+        'Delete each line as you resolve it, then delete this heading. Publishing is blocked until they are gone.',
+        '',
+        ...specifics.map((s) => `- ${s}`),
+        '',
+    ].join('\n')
 }
 
 /**
