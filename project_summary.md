@@ -641,16 +641,44 @@ same shape: 12 with evidence and source URLs, 4 revisions, 6 citations appended
 from `CITATION:` lines. Both the evidence and the revisions contain nested
 double quotes — the exact payload that used to end the JSON string early.
 
-**Also fixed, from the same run:** `getContentFocus()` read
-`knowledge/company/content-focus.md`, which had never existed, so the
-"Current Content Focus Areas" block was omitted from every draft prompt on every
-path while `docs/content-focus-areas.md` sat unread in the repo. Copied into
-place. **The production half is open**: it is the only prompt input read from
-disk at runtime — every sibling is bundled through an `import` — so on Vercel it
-most likely still returns `""`, and the miss is logged once per process. Verify
-by generating one draft on the live site and searching the function log.
+**Also fixed, from the same run: the editorial steer had never reached a
+prompt.** `getContentFocus()` read `knowledge/company/content-focus.md`, which
+had never existed, so the "Current Content Focus Areas" block was omitted from
+every draft prompt on every path while `docs/content-focus-areas.md` sat unread
+in the repo. The file was copied into place — and that fixed local runs only.
+It read from disk at runtime through a path built from `process.cwd()`, which
+Next's file tracing cannot resolve, so the file was never included in the
+serverless bundle and the read would have failed on Vercel every time. Two
+compounding failures, both silent, and the miss logged once per process into
+logs nobody reads.
 
-1,306 tests green (up 58). Manual restamped; §6, §7a, §8 and §12 describe the
+**The repo had already diagnosed this and stopped one step short.**
+`scripts/gen-style-rules.mjs` exists because of exactly this trap, and its
+header cited `getContentFocus` *by name* as the example of the failure — the
+house-style and AI-tells rules were bundled, and the content focus was left as
+the known-broken holdout. It is now generated the same way, into
+`src/lib/content-focus.generated.ts`, and `getContentFocus()` returns the
+bundled constant. An absent source is announced at build time rather than
+discovered never; it stays optional, because omitting the section is a
+legitimate state and failing the build over it is not.
+
+Five assertions guard it (`content-focus.test.ts`), each mutation-tested to fail
+when what it guards is broken: bundled and non-empty, recognisably the right
+document, no padding whitespace, no drift from the markdown source, and no
+`readFile` in the accessor. Note `next dev` does not run `prebuild`, so editing
+the markdown locally needs `npm run gen:style` to take effect — equally true of
+the house-style rules.
+
+Checked before fixing: the latest production deploy was READY at the right
+commit, but grouping its runtime logs by request path returned an empty table —
+no traffic, so the code path had never executed there and no log line existed to
+read either way. `next.config.ts` carries no `outputFileTracingIncludes`, and
+the only sibling runtime reader (`listContentFiles`) reads a `content/`
+directory that does not exist in the repo at all, behind a bare `catch {}`. So
+the prediction was well founded and unobservable without spending a production
+draft to confirm a defect already documented in the repo.
+
+1,311 tests green (up 63). Manual restamped; §6, §7a, §8 and §12 describe the
 new behaviour.
 
 ### August 21, 2026 — Web Push live, and a live article corrected

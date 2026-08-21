@@ -5,6 +5,7 @@ import icpJson from '../../context/core/icp.json';
 import voiceDnaJson from '../../context/core/voice-dna.json';
 import businessProfileJson from '../../context/core/business-profile.json';
 import { HOUSE_STYLE_RULES, AI_TELLS_RULES } from './style-rules.generated';
+import { CONTENT_FOCUS } from './content-focus.generated';
 import { STYLE_GUARDRAIL } from './style-guardrail';
 
 const ROOT = process.env.AI_WRITER_ROOT || process.cwd();
@@ -104,30 +105,27 @@ export function getAITells(): string {
     return AI_TELLS_RULES;
 }
 
-let contentFocusMissWarned = false;
-
 /**
- * Optional editorial steer for the draft prompt. Returns "" when the file is
- * absent — callers MUST treat "" as "omit the section", not "emit an empty
- * header" (see buildDraftPrompt). The miss is logged once per process: this
- * silently returned "" for a file that does not exist, so every generated
- * prompt carried a dangling "Current Content Focus Areas:" heading with
- * nothing under it and nothing in the logs to say so.
+ * Optional editorial steer for the draft prompt. Returns "" when there is none —
+ * callers MUST treat "" as "omit the section", not "emit an empty header"
+ * (see buildDraftPrompt).
+ *
+ * BUNDLED, not read from disk, for the same reason as the style rules above.
+ * This used to `fs.readFile` a path built from process.cwd(), which Next's file
+ * tracing cannot resolve — so the file was never included in the serverless
+ * bundle and the read failed on Vercel every time, returning "" while working
+ * perfectly in local development. It also read a file that did not exist at all
+ * until 21 August 2026. Both failures were invisible: the miss was logged once
+ * per process, into logs nobody was reading.
+ *
+ * The source is knowledge/company/content-focus.md; scripts/gen-style-rules.mjs
+ * turns it into the module imported here, and announces an empty one at build
+ * time. Note that `next dev` does not run prebuild — after editing the markdown,
+ * run `npm run gen:style` to see the change locally. That is equally true of the
+ * house-style rules.
  */
-export async function getContentFocus(): Promise<string> {
-    const fullPath = nodePath.join(ROOT, 'knowledge/company/content-focus.md');
-    try {
-        return await fs.readFile(fullPath, 'utf-8');
-    } catch {
-        if (!contentFocusMissWarned) {
-            contentFocusMissWarned = true;
-            console.warn(
-                `[prompts] No content-focus file at ${fullPath} — the "Current Content Focus Areas" ` +
-                `section will be omitted from draft prompts. Create it to steer topic selection.`,
-            );
-        }
-        return "";
-    }
+export function getContentFocus(): string {
+    return CONTENT_FOCUS;
 }
 
 export interface ContentFile {

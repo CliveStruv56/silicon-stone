@@ -303,6 +303,14 @@ Behind that one press, four model passes run in this order:
 3. **Metadata / SEO** — title, description, categories, tier.
 4. **Image prompts** — two suggestions for what the cover image should depict.
 
+> **What steers the draft, besides your brief.** The prompt carries the house
+> style, the AI-tells reference, the voice DNA, the persona, and the editorial
+> focus areas from `knowledge/company/content-focus.md`. All of them are
+> compiled into the build rather than read from disk at run time, because a
+> runtime file read works locally and silently returns nothing on Vercel. If you
+> edit any of those markdown sources, run `npm run gen:style` — `npm run dev`
+> alone will not pick the change up.
+
 **The voice edit deliberately runs before the metadata pass**, so the SEO metadata
 describes the edited article rather than the raw draft.
 
