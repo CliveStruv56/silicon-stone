@@ -1,0 +1,4873 @@
+[
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "name",
+        "type": "slug"
+      }
+    ],
+    "name": "media.tag",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "options": {
+          "source": "title",
+          "maxLength": 64
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "to": [
+          {
+            "type": "author"
+          }
+        ],
+        "name": "author",
+        "type": "reference"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "fields": [
+          {
+            "validation": [
+              {
+                "rules": [
+                  {
+                    "flag": "presence",
+                    "constraint": "required"
+                  }
+                ],
+                "level": "error"
+              }
+            ],
+            "name": "alt",
+            "type": "string",
+            "title": "Alternative Text"
+          }
+        ],
+        "name": "mainImage",
+        "type": "image"
+      },
+      {
+        "description": "AI-suggested prompts describing what the main image should depict. Click \"Suggest two prompts\" to generate two options from the current article, then copy one into your image agent (which applies the house style).",
+        "fields": [
+          {
+            "of": [
+              {
+                "rows": 3,
+                "type": "text"
+              }
+            ],
+            "name": "prompts",
+            "type": "array"
+          },
+          {
+            "readOnly": true,
+            "name": "generatedAt",
+            "type": "datetime"
+          },
+          {
+            "readOnly": true,
+            "name": "model",
+            "type": "string"
+          }
+        ],
+        "name": "imagePrompts",
+        "type": "object",
+        "title": "Image generation prompts"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 1
+              }
+            ],
+            "level": "error",
+            "message": "Tag the article — this drives the end-of-article gate, not just navigation."
+          }
+        ],
+        "description": "At least one is required. Categories are not just navigation — they decide what the end-of-article gate offers: a product upsell when one claims the topic, otherwise whatever the category asks for (see \"Default end-of-article gate\" on the Category). An untagged article silently falls back to a newsletter ask.",
+        "of": [
+          {
+            "to": [
+              {
+                "type": "category"
+              }
+            ],
+            "type": "reference",
+            "title": "Reference to category"
+          }
+        ],
+        "name": "categories",
+        "type": "array"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Compliance Clara (Legal/Compliance)",
+              "value": "clara"
+            },
+            {
+              "title": "Industrial Ian (Operations/Supply Chain)",
+              "value": "ian"
+            },
+            {
+              "title": "Sovereign Sofia (Policy/Analysis)",
+              "value": "sofia"
+            },
+            {
+              "title": "Global Citizen (General Public)",
+              "value": "citizen"
+            },
+            {
+              "title": "Transatlantic Troy (Founder/CEO, US–EU Market Entry)",
+              "value": "troy"
+            }
+          ]
+        },
+        "description": "Which decision-makers is this most relevant for?",
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "personas",
+        "type": "array",
+        "title": "Target Personas"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Signal (Breaking Analysis)",
+              "value": "signal"
+            },
+            {
+              "title": "Deep Dive (Long-form)",
+              "value": "deepdive"
+            },
+            {
+              "title": "Tool Guide",
+              "value": "guide"
+            },
+            {
+              "title": "YouTube Script",
+              "value": "youtube"
+            }
+          ],
+          "layout": "radio"
+        },
+        "initialValue": "signal",
+        "name": "contentType",
+        "type": "string"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Pulse (30s scan)",
+              "value": "pulse"
+            },
+            {
+              "title": "Briefing (5min read)",
+              "value": "briefing"
+            },
+            {
+              "title": "Audit (deep analysis)",
+              "value": "audit"
+            }
+          ],
+          "layout": "radio"
+        },
+        "description": "Reading speed tier for tiered content experience",
+        "name": "intelligenceTier",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "min",
+                "constraint": 1
+              },
+              {
+                "flag": "max",
+                "constraint": 10
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Significance rating 1-10 for urgency display",
+        "name": "impactScore",
+        "type": "number"
+      },
+      {
+        "rows": 2,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "max",
+                "constraint": 160
+              }
+            ],
+            "level": "warning",
+            "message": "Keep Stone Truth under 160 characters"
+          }
+        ],
+        "description": "One-sentence \"bottom line\" summary (max 160 chars)",
+        "name": "stoneTruth",
+        "type": "text"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Supply Chain × Scenario Modelling",
+              "value": "supply-chain-scenario-modelling"
+            },
+            {
+              "title": "Supply Chain × Long-Memory Filter",
+              "value": "supply-chain-long-memory-filter"
+            },
+            {
+              "title": "Policy × Scenario Modelling",
+              "value": "policy-scenario-modelling"
+            },
+            {
+              "title": "Policy × Long-Memory Filter",
+              "value": "policy-long-memory-filter"
+            },
+            {
+              "title": "Talent × Scenario Modelling",
+              "value": "talent-scenario-modelling"
+            },
+            {
+              "title": "Talent × Long-Memory Filter",
+              "value": "talent-long-memory-filter"
+            }
+          ]
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "supply-chain-scenario-modelling",
+                  "supply-chain-long-memory-filter",
+                  "policy-scenario-modelling",
+                  "policy-long-memory-filter",
+                  "talent-scenario-modelling",
+                  "talent-long-memory-filter"
+                ]
+              },
+              {
+                "flag": "max",
+                "constraint": 6
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Cells of the 3×2 Forensic Technopolitics matrix that this piece visibly applies. Pulses usually use 1 cell; Briefings 2–4 cells; Audits are eligible for all 6 but should only claim cells the body actually uses.",
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "methodologyPillars",
+        "type": "array",
+        "title": "Methodology Audit (3×2 matrix cells)"
+      },
+      {
+        "description": "Key takeaways for decision-makers (3-5 bullets)",
+        "of": [
+          {
+            "type": "text"
+          }
+        ],
+        "name": "actionableInsights",
+        "type": "array",
+        "title": "What to do next"
+      },
+      {
+        "options": {
+          "collapsible": true,
+          "collapsed": true
+        },
+        "description": "The conversion surface shown after the article body (P3-1). The body is never blocked — this only appends below it. Auto = commerce upsell if a product maps to this topic, otherwise the newsletter. Choose a specific mode to override.",
+        "fields": [
+          {
+            "options": {
+              "list": [
+                {
+                  "title": "Auto (product upsell if mapped, else newsletter)",
+                  "value": "auto"
+                },
+                {
+                  "title": "Newsletter / email capture",
+                  "value": "email"
+                },
+                {
+                  "title": "Commerce (product upsell / unlock)",
+                  "value": "commerce"
+                },
+                {
+                  "title": "Lead (book a call)",
+                  "value": "lead"
+                },
+                {
+                  "title": "None",
+                  "value": "none"
+                }
+              ],
+              "layout": "radio"
+            },
+            "initialValue": "auto",
+            "name": "mode",
+            "type": "string"
+          },
+          {
+            "description": "Overrides the automatic topic → product mapping. Leave blank to auto-resolve from categories.",
+            "to": [
+              {
+                "type": "product"
+              }
+            ],
+            "hidden": "conditional",
+            "name": "product",
+            "type": "reference",
+            "title": "Product (commerce mode)"
+          },
+          {
+            "description": "Where the \"book a call\" CTA points. Defaults to /advisory#contact.",
+            "hidden": "conditional",
+            "name": "href",
+            "type": "string",
+            "title": "Link target (lead mode)"
+          },
+          {
+            "description": "Optional. Overrides the default headline for the chosen mode.",
+            "name": "headline",
+            "type": "string",
+            "title": "Headline override"
+          },
+          {
+            "rows": 2,
+            "description": "Optional. Overrides the default supporting copy for the chosen mode.",
+            "name": "body",
+            "type": "text",
+            "title": "Body override"
+          },
+          {
+            "name": "ctaLabel",
+            "type": "string",
+            "title": "CTA label override"
+          }
+        ],
+        "name": "gate",
+        "type": "object",
+        "title": "End-of-article gate"
+      },
+      {
+        "initialValue": true,
+        "description": "Show the Atlantic Drift email capture partway through the article, after the reader has scrolled past the value (P3-2). Never an entry wall; suppressed per-device once dismissed or subscribed. On by default.",
+        "name": "inReadCapture",
+        "type": "boolean",
+        "title": "In-read newsletter capture"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "max",
+                "constraint": 3
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Precomputed semantic neighbours. Updated by the vectorize webhook so public article renders do not call embedding/search providers.",
+        "of": [
+          {
+            "to": [
+              {
+                "type": "article"
+              }
+            ],
+            "type": "reference",
+            "title": "Reference to article"
+          }
+        ],
+        "name": "relatedArticles",
+        "type": "array"
+      },
+      {
+        "name": "publishedAt",
+        "type": "datetime"
+      },
+      {
+        "description": "Set this only when you materially revise a piece after publishing. Shows a visible \"Updated\" date and feeds dateModified in structured data. Leave blank for the original publication and for minor/SEO-only tweaks.",
+        "name": "updatedAt",
+        "type": "datetime"
+      },
+      {
+        "rows": 3,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "max",
+                "constraint": 200
+              }
+            ],
+            "level": "warning",
+            "message": "Keep excerpts under 200 characters"
+          }
+        ],
+        "description": "Short summary for cards and SEO (max 200 characters)",
+        "name": "excerpt",
+        "type": "text"
+      },
+      {
+        "of": [
+          {
+            "marks": {
+              "annotations": [
+                {
+                  "fields": [
+                    {
+                      "options": {
+                        "disableNew": true
+                      },
+                      "validation": [
+                        {
+                          "rules": [
+                            {
+                              "flag": "presence",
+                              "constraint": "required"
+                            }
+                          ],
+                          "level": "error"
+                        }
+                      ],
+                      "to": [
+                        {
+                          "type": "glossaryTerm"
+                        }
+                      ],
+                      "name": "term",
+                      "type": "reference"
+                    }
+                  ],
+                  "name": "glossaryTerm",
+                  "type": "object",
+                  "title": "Glossary term"
+                },
+                {
+                  "fields": [
+                    {
+                      "validation": [
+                        {
+                          "rules": [
+                            {
+                              "flag": "uri",
+                              "constraint": {
+                                "options": {
+                                  "scheme": [
+                                    "/^http$/",
+                                    "/^https$/",
+                                    "/^mailto$/"
+                                  ],
+                                  "allowRelative": false,
+                                  "relativeOnly": false,
+                                  "allowCredentials": false
+                                }
+                              }
+                            }
+                          ],
+                          "level": "error"
+                        }
+                      ],
+                      "name": "href",
+                      "type": "url",
+                      "title": "URL"
+                    },
+                    {
+                      "initialValue": false,
+                      "name": "openInNewTab",
+                      "type": "boolean",
+                      "title": "Open in new tab"
+                    }
+                  ],
+                  "name": "link",
+                  "type": "object"
+                }
+              ],
+              "decorators": [
+                {
+                  "value": "strong",
+                  "title": "Strong"
+                },
+                {
+                  "value": "em",
+                  "title": "Emphasis"
+                },
+                {
+                  "value": "code",
+                  "title": "Code"
+                }
+              ]
+            },
+            "lists": [
+              {
+                "value": "bullet",
+                "title": "Bulleted list"
+              },
+              {
+                "value": "number",
+                "title": "Numbered list"
+              }
+            ],
+            "styles": [
+              {
+                "value": "normal",
+                "title": "Normal"
+              },
+              {
+                "value": "h1",
+                "title": "Heading 1"
+              },
+              {
+                "value": "h2",
+                "title": "Heading 2"
+              },
+              {
+                "value": "h3",
+                "title": "Heading 3"
+              },
+              {
+                "value": "h4",
+                "title": "Heading 4"
+              },
+              {
+                "value": "h5",
+                "title": "Heading 5"
+              },
+              {
+                "value": "h6",
+                "title": "Heading 6"
+              },
+              {
+                "value": "blockquote",
+                "title": "Quote"
+              }
+            ],
+            "of": [],
+            "type": "block"
+          },
+          {
+            "options": {
+              "hotspot": true
+            },
+            "fields": [
+              {
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "name": "alt",
+                "type": "string",
+                "title": "Alternative Text"
+              },
+              {
+                "name": "caption",
+                "type": "string"
+              }
+            ],
+            "type": "image"
+          }
+        ],
+        "name": "body",
+        "type": "array"
+      },
+      {
+        "description": "Primary sources cited in this piece. Renders as the \"Sources\" list and feeds Article structured data (schema.org citation). Prefer primary sources — official filings, regulators, named reporting. Authored by hand: where the draft came from research, \"Add from research\" below brings the candidates in for you to keep or delete.",
+        "of": [
+          {
+            "fields": [
+              {
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "name": "title",
+                "type": "string"
+              },
+              {
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      },
+                      {
+                        "flag": "uri",
+                        "constraint": {
+                          "options": {
+                            "scheme": [
+                              "/^http$/",
+                              "/^https$/"
+                            ],
+                            "allowRelative": false,
+                            "relativeOnly": false,
+                            "allowCredentials": false
+                          }
+                        }
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "name": "url",
+                "type": "url",
+                "title": "URL"
+              },
+              {
+                "description": "e.g. European Commission, Reuters, FT",
+                "name": "publisher",
+                "type": "string"
+              }
+            ],
+            "type": "object",
+            "name": "citation"
+          }
+        ],
+        "name": "citations",
+        "type": "array",
+        "title": "Sources / Citations"
+      },
+      {
+        "description": "The investigation this article came out of. Internal — never published.",
+        "to": [
+          {
+            "type": "researchRun"
+          }
+        ],
+        "name": "researchRun",
+        "type": "reference"
+      },
+      {
+        "description": "Derived thinking this article was built from — an outline, a set of observations. Internal — never published.",
+        "of": [
+          {
+            "to": [
+              {
+                "type": "knowledgeItem"
+              }
+            ],
+            "type": "reference",
+            "title": "Reference to knowledge item"
+          }
+        ],
+        "name": "knowledgeItems",
+        "type": "array"
+      },
+      {
+        "description": "The evidence records behind this article. Distinct from the public \"Sources / Citations\" list above, which is what the reader sees and stays authored by hand. Internal — never published.",
+        "of": [
+          {
+            "to": [
+              {
+                "type": "knowledgeSource"
+              }
+            ],
+            "type": "reference",
+            "title": "Reference to knowledge source"
+          }
+        ],
+        "name": "knowledgeSources",
+        "type": "array",
+        "title": "Canonical Sources"
+      },
+      {
+        "description": "Earlier articles the prior-coverage retrieval surfaced while drafting this one. Internal — never published.",
+        "of": [
+          {
+            "to": [
+              {
+                "type": "article"
+              }
+            ],
+            "type": "reference",
+            "title": "Reference to article"
+          }
+        ],
+        "name": "priorCoverage",
+        "type": "array"
+      },
+      {
+        "description": "What was cited at generation time, recorded as it stood then. A snapshot does not follow its source: if the source is later corrected or superseded, this still says what this article was actually written from. Internal — never published.",
+        "of": [
+          {
+            "fields": [
+              {
+                "name": "title",
+                "type": "string"
+              },
+              {
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "uri",
+                        "constraint": {
+                          "options": {
+                            "scheme": [
+                              "/^http$/",
+                              "/^https$/"
+                            ],
+                            "allowRelative": false,
+                            "relativeOnly": false,
+                            "allowCredentials": false
+                          }
+                        }
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "name": "url",
+                "type": "url",
+                "title": "URL"
+              },
+              {
+                "name": "publisher",
+                "type": "string"
+              },
+              {
+                "description": "A string, not a date — upstream often gives only a year, or nothing.",
+                "name": "publishedDate",
+                "type": "string",
+                "title": "Publication Date"
+              },
+              {
+                "description": "Page, section or Article, where the citation points at part of a document.",
+                "name": "locator",
+                "type": "string"
+              },
+              {
+                "description": "The knowledgeSource this citation resolved to, where it resolved to one.",
+                "to": [
+                  {
+                    "type": "knowledgeSource"
+                  }
+                ],
+                "name": "source",
+                "type": "reference",
+                "title": "Canonical Source"
+              }
+            ],
+            "type": "object",
+            "name": "citationSnapshot"
+          }
+        ],
+        "readOnly": true,
+        "name": "citationSnapshots",
+        "type": "array"
+      },
+      {
+        "options": {
+          "collapsible": true,
+          "collapsed": true
+        },
+        "description": "What was in force when this article was generated — models, rule versions, and the retrieval record IDs actually used. Written by the pipeline so a draft can be explained later rather than re-guessed. Internal — never published.",
+        "fields": [
+          {
+            "name": "generatedAt",
+            "type": "datetime"
+          },
+          {
+            "name": "model",
+            "type": "string",
+            "title": "Drafting Model"
+          },
+          {
+            "name": "embeddingModel",
+            "type": "string"
+          },
+          {
+            "name": "rulesVersion",
+            "type": "string",
+            "title": "Rules / Prompt Version"
+          },
+          {
+            "name": "rulePackVersion",
+            "type": "string"
+          },
+          {
+            "description": "The IDs each retrieval lane returned, in the order they were given to the model.",
+            "of": [
+              {
+                "type": "string"
+              }
+            ],
+            "name": "retrievalRecordIds",
+            "type": "array",
+            "title": "Retrieval Record IDs"
+          },
+          {
+            "rows": 3,
+            "name": "notes",
+            "type": "text"
+          }
+        ],
+        "readOnly": true,
+        "name": "generationSnapshot",
+        "type": "object"
+      },
+      {
+        "fields": [
+          {
+            "description": "Override the default title for search engines",
+            "name": "metaTitle",
+            "type": "string"
+          },
+          {
+            "rows": 3,
+            "validation": [
+              {
+                "rules": [
+                  {
+                    "flag": "max",
+                    "constraint": 160
+                  }
+                ],
+                "level": "warning",
+                "message": "Keep meta descriptions under 160 characters"
+              }
+            ],
+            "name": "metaDescription",
+            "type": "text"
+          }
+        ],
+        "name": "seo",
+        "type": "object",
+        "title": "SEO"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "AI-Generated",
+              "value": "generated"
+            },
+            {
+              "title": "Imported & Reworked",
+              "value": "imported"
+            },
+            {
+              "title": "Manual",
+              "value": "manual"
+            }
+          ]
+        },
+        "description": "How this article entered the system.",
+        "name": "source",
+        "type": "string"
+      },
+      {
+        "rows": 12,
+        "description": "Original text an imported article was reworked from. Reference only — never published.",
+        "name": "sourceMaterial",
+        "type": "text",
+        "title": "Original Source Material"
+      },
+      {
+        "rows": 12,
+        "description": "Auto-generated by the Pass-3 voice edit: AI tells removed, house-style corrections, and the list of [AUTHOR: …] specifics still needed. Resolve every [AUTHOR: …] placeholder in the body before publishing. Editorial reference — never published.",
+        "readOnly": true,
+        "name": "voiceEditNotes",
+        "type": "text"
+      },
+      {
+        "rows": 10,
+        "description": "Every statutory quotation in the body, string-matched against the verbatim legal text the drafting model was given. UNMATCHED means the quotation is not in that text — it was invented, recalled from memory, or taken from a provision the retrieval did not return; check it against the primary source before publishing. UNCOVERED means no statutory text was retrieved for this draft, so the quotation could not be checked at all. Advisory: exact matching cannot always tell an elided or bracketed quotation from a fabricated one.",
+        "readOnly": true,
+        "name": "quotationAudit",
+        "type": "text"
+      },
+      {
+        "rows": 6,
+        "description": "What the pre-publish checks said about this article AFTER it went live, run server-side by the publish webhook. The dialog in Studio runs in the browser, so anything that publishes another way — a script, the CLI, the Sanity dashboard, an MCP with a write token — never meets it. This is the backstop that does. Empty is the normal state: it is only written when something is wrong, and it clears itself once fixed and republished.",
+        "readOnly": true,
+        "name": "publishAudit",
+        "type": "text"
+      },
+      {
+        "options": {
+          "collapsible": true,
+          "collapsed": false
+        },
+        "description": "Machine-generated verification report from the \"Run fact-check\" document action. Each claim is checked against fresh web searches of primary sources. Advisory only — never blocks publishing. Edit a Suggested Revision if needed, then use \"Insert into article\" on the claim to apply it to the body.",
+        "fields": [
+          {
+            "options": {
+              "list": [
+                {
+                  "title": "Running",
+                  "value": "running"
+                },
+                {
+                  "title": "Completed",
+                  "value": "completed"
+                },
+                {
+                  "title": "Failed",
+                  "value": "failed"
+                }
+              ]
+            },
+            "readOnly": true,
+            "name": "status",
+            "type": "string"
+          },
+          {
+            "readOnly": true,
+            "name": "requestedAt",
+            "type": "datetime"
+          },
+          {
+            "readOnly": true,
+            "name": "completedAt",
+            "type": "datetime"
+          },
+          {
+            "description": "Claude model that produced this report.",
+            "readOnly": true,
+            "name": "model",
+            "type": "string"
+          },
+          {
+            "rows": 2,
+            "readOnly": true,
+            "name": "error",
+            "type": "text"
+          },
+          {
+            "options": {
+              "list": [
+                {
+                  "title": "Clean",
+                  "value": "clean"
+                },
+                {
+                  "title": "Minor issues",
+                  "value": "minor-issues"
+                },
+                {
+                  "title": "Major issues",
+                  "value": "major-issues"
+                },
+                {
+                  "title": "Mostly unverifiable",
+                  "value": "unverifiable"
+                }
+              ]
+            },
+            "readOnly": true,
+            "name": "overallVerdict",
+            "type": "string"
+          },
+          {
+            "rows": 4,
+            "readOnly": true,
+            "name": "summary",
+            "type": "text"
+          },
+          {
+            "fields": [
+              {
+                "name": "total",
+                "type": "number"
+              },
+              {
+                "name": "accurate",
+                "type": "number"
+              },
+              {
+                "name": "inaccurate",
+                "type": "number"
+              },
+              {
+                "name": "outdated",
+                "type": "number"
+              },
+              {
+                "name": "needsContext",
+                "type": "number"
+              },
+              {
+                "name": "unverifiable",
+                "type": "number"
+              }
+            ],
+            "readOnly": true,
+            "name": "counts",
+            "type": "object",
+            "title": "Verdict Counts"
+          },
+          {
+            "of": [
+              {
+                "fields": [
+                  {
+                    "rows": 2,
+                    "readOnly": true,
+                    "name": "claim",
+                    "type": "text"
+                  },
+                  {
+                    "description": "Verbatim fragment from the body — search for it to find the claim.",
+                    "readOnly": true,
+                    "name": "locationHint",
+                    "type": "string"
+                  },
+                  {
+                    "rows": 3,
+                    "description": "The exact passage from the article this claim came from — used by \"Insert into article\" to find and replace it.",
+                    "readOnly": true,
+                    "name": "originalText",
+                    "type": "text"
+                  },
+                  {
+                    "options": {
+                      "list": [
+                        {
+                          "title": "Accurate",
+                          "value": "accurate"
+                        },
+                        {
+                          "title": "Inaccurate",
+                          "value": "inaccurate"
+                        },
+                        {
+                          "title": "Outdated",
+                          "value": "outdated"
+                        },
+                        {
+                          "title": "Needs context",
+                          "value": "needs-context"
+                        },
+                        {
+                          "title": "Unverifiable",
+                          "value": "unverifiable"
+                        }
+                      ]
+                    },
+                    "readOnly": true,
+                    "name": "verdict",
+                    "type": "string"
+                  },
+                  {
+                    "options": {
+                      "list": [
+                        "high",
+                        "medium",
+                        "low"
+                      ]
+                    },
+                    "readOnly": true,
+                    "name": "confidence",
+                    "type": "string"
+                  },
+                  {
+                    "rows": 3,
+                    "readOnly": true,
+                    "name": "evidence",
+                    "type": "text"
+                  },
+                  {
+                    "of": [
+                      {
+                        "validation": [
+                          {
+                            "rules": [
+                              {
+                                "flag": "uri",
+                                "constraint": {
+                                  "options": {
+                                    "scheme": [
+                                      "/^http$/",
+                                      "/^https$/"
+                                    ],
+                                    "allowRelative": false,
+                                    "relativeOnly": false,
+                                    "allowCredentials": false
+                                  }
+                                }
+                              }
+                            ],
+                            "level": "error"
+                          }
+                        ],
+                        "type": "url"
+                      }
+                    ],
+                    "readOnly": true,
+                    "name": "sourceUrls",
+                    "type": "array",
+                    "title": "Source URLs"
+                  },
+                  {
+                    "rows": 3,
+                    "description": "Proposed corrected wording. Edit it here if needed, then click \"Insert into article\" below to replace the original passage in the body.",
+                    "name": "suggestedRevision",
+                    "type": "text"
+                  },
+                  {
+                    "description": "Set automatically when the revision is inserted into the body.",
+                    "readOnly": true,
+                    "name": "applied",
+                    "type": "boolean"
+                  }
+                ],
+                "type": "object",
+                "name": "claimCheck"
+              }
+            ],
+            "name": "claims",
+            "type": "array"
+          }
+        ],
+        "name": "factCheck",
+        "type": "object"
+      }
+    ],
+    "name": "article",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "options": {
+          "source": "name",
+          "maxLength": 64
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "name": "image",
+        "type": "image"
+      },
+      {
+        "description": "e.g. \"Founder & Editor\" — shown in the byline and as jobTitle in Person schema.",
+        "name": "role",
+        "type": "string"
+      },
+      {
+        "rows": 4,
+        "description": "Short biography for the author page and Person structured data (E-E-A-T).",
+        "name": "bio",
+        "type": "text"
+      },
+      {
+        "description": "Public profile URLs that identify this author — LinkedIn, X/Twitter, Substack, personal site, ORCID. Feeds the Person schema \"sameAs\" for entity disambiguation.",
+        "of": [
+          {
+            "validation": [
+              {
+                "rules": [
+                  {
+                    "flag": "uri",
+                    "constraint": {
+                      "options": {
+                        "scheme": [
+                          "/^http$/",
+                          "/^https$/"
+                        ],
+                        "allowRelative": false,
+                        "relativeOnly": false,
+                        "allowCredentials": false
+                      }
+                    }
+                  }
+                ],
+                "level": "error"
+              }
+            ],
+            "type": "url"
+          }
+        ],
+        "name": "sameAs",
+        "type": "array",
+        "title": "Profile links (sameAs)"
+      }
+    ],
+    "name": "author",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "options": {
+          "source": "title",
+          "maxLength": 96
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "rows": 3,
+        "name": "description",
+        "type": "text"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Newsletter / email capture (default)",
+              "value": "email"
+            },
+            {
+              "title": "Lead — book a call",
+              "value": "lead"
+            },
+            {
+              "title": "None — no gate at all",
+              "value": "none"
+            }
+          ],
+          "layout": "radio"
+        },
+        "description": "What an article in this category should close on when its own gate is \"Auto\" and no product maps to its topics. Without this the fallback is the newsletter, which is a second email ask on a piece that has nothing to sell. Only consulted for the Auto fallback: an explicit gate on the article always wins, and so does a real product match.",
+        "name": "defaultGateMode",
+        "type": "string",
+        "title": "Default end-of-article gate"
+      }
+    ],
+    "name": "category",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "options": {
+          "source": "name",
+          "maxLength": 96
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Toolkit",
+              "value": "toolkit"
+            },
+            {
+              "title": "Checklist",
+              "value": "checklist"
+            },
+            {
+              "title": "Sector Report",
+              "value": "report"
+            },
+            {
+              "title": "Intelligence Series",
+              "value": "series"
+            },
+            {
+              "title": "Advisory",
+              "value": "advisory"
+            }
+          ],
+          "layout": "radio"
+        },
+        "initialValue": "toolkit",
+        "name": "kind",
+        "type": "string"
+      },
+      {
+        "description": "Display string, e.g. \"£24\", \"From £79\".",
+        "name": "priceLabel",
+        "type": "string",
+        "title": "Price label"
+      },
+      {
+        "rows": 3,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "max",
+                "constraint": 240
+              }
+            ],
+            "level": "warning",
+            "message": "Keep the blurb tight — under 240 characters."
+          }
+        ],
+        "description": "One or two lines pitched at a reader who just finished an article. Used in the upsell / commerce gate.",
+        "name": "blurb",
+        "type": "text"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "regex",
+                "constraint": {
+                  "pattern": "/^\\/[\\w\\-/]*$/",
+                  "name": "path",
+                  "invert": false
+                }
+              }
+            ],
+            "level": "error",
+            "message": "Must be a root-relative path like /products/ai-act-toolkit"
+          }
+        ],
+        "description": "Internal link to the product page, e.g. /products/ai-act-toolkit. Used as the \"learn more\" / fallback CTA target.",
+        "name": "productPath",
+        "type": "string",
+        "title": "Product page path"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "uri",
+                "constraint": {
+                  "options": {
+                    "scheme": [
+                      "/^http$/",
+                      "/^https$/"
+                    ],
+                    "allowRelative": false,
+                    "relativeOnly": false,
+                    "allowCredentials": false
+                  }
+                }
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Optional. When set, the gate CTA opens this checkout directly. Leave blank to link to the product page instead.",
+        "name": "checkoutUrl",
+        "type": "url",
+        "title": "Lemon Squeezy checkout URL"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Download delivery (Model A)",
+              "value": "download"
+            },
+            {
+              "title": "On-site unlock (Model B)",
+              "value": "unlock"
+            }
+          ],
+          "layout": "radio"
+        },
+        "initialValue": "download",
+        "description": "Download = buy → emailed/downloadable artefact (Model A). Unlock = on-site preview then licence-key unlock (Model B).",
+        "name": "deliveryModel",
+        "type": "string",
+        "title": "Delivery model"
+      },
+      {
+        "description": "Numeric LS variant ID. Required for on-site unlock (Model B) licence-key validation; optional otherwise.",
+        "name": "lemonVariantId",
+        "type": "string",
+        "title": "Lemon Squeezy variant ID"
+      },
+      {
+        "description": "Categories this product is relevant to. Drives the automatic article → product upsell mapping.",
+        "of": [
+          {
+            "to": [
+              {
+                "type": "category"
+              }
+            ],
+            "type": "reference",
+            "title": "Reference to category"
+          }
+        ],
+        "name": "topics",
+        "type": "array"
+      },
+      {
+        "description": "Optional short label, e.g. \"Quick Start\", \"Flagship\".",
+        "name": "badge",
+        "type": "string"
+      },
+      {
+        "initialValue": false,
+        "description": "Use this product as the fallback upsell when an article has no topic match. Set on exactly one product.",
+        "name": "isDefault",
+        "type": "boolean",
+        "title": "Default upsell"
+      }
+    ],
+    "name": "product",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "e.g. Industrial Ian",
+        "name": "name",
+        "type": "string",
+        "title": "Persona Name"
+      },
+      {
+        "description": "e.g. Operations Director",
+        "name": "role",
+        "type": "string"
+      },
+      {
+        "options": {
+          "source": "name",
+          "maxLength": 96
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "rows": 3,
+        "description": "What keeps them up at night?",
+        "name": "painPoints",
+        "type": "text"
+      },
+      {
+        "description": "What kind of content do they want?",
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "contentNeeds",
+        "type": "array"
+      },
+      {
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "organizationTypes",
+        "type": "array"
+      },
+      {
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "keyConcerns",
+        "type": "array"
+      }
+    ],
+    "name": "persona",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "options": {
+          "hotspot": true
+        },
+        "description": "The large background image shown on the homepage.",
+        "name": "heroImage",
+        "type": "image",
+        "title": "Homepage Hero Image"
+      },
+      {
+        "description": "Optional override for the main headline.",
+        "name": "heroTitle",
+        "type": "string"
+      },
+      {
+        "rows": 3,
+        "description": "Optional override for the subheadline description.",
+        "name": "heroDescription",
+        "type": "text"
+      },
+      {
+        "options": {
+          "collapsible": true,
+          "collapsed": true
+        },
+        "description": "Structural-analysis briefing on the homepage. Leave fields blank to fall back to the locked redesign copy in COPY.md.",
+        "fields": [
+          {
+            "initialValue": true,
+            "name": "enabled",
+            "type": "boolean",
+            "title": "Render this section"
+          },
+          {
+            "name": "eyebrow",
+            "type": "string",
+            "title": "Eyebrow badge"
+          },
+          {
+            "name": "h2",
+            "type": "string",
+            "title": "Section heading"
+          },
+          {
+            "name": "subhead",
+            "type": "string",
+            "title": "Subhead (silicon-amber)"
+          },
+          {
+            "rows": 5,
+            "name": "intro",
+            "type": "text",
+            "title": "Intro paragraph"
+          },
+          {
+            "fields": [
+              {
+                "name": "tag",
+                "type": "string"
+              },
+              {
+                "name": "title",
+                "type": "string"
+              },
+              {
+                "name": "descriptor",
+                "type": "string"
+              },
+              {
+                "name": "voice",
+                "type": "string",
+                "title": "Voice quote (one sentence in smart quotes)"
+              },
+              {
+                "description": "Each bullet is a short rich-text paragraph. Use Strong on the consequence clause for Stance 01.",
+                "of": [
+                  {
+                    "marks": {
+                      "annotations": [],
+                      "decorators": [
+                        {
+                          "value": "strong",
+                          "title": "Strong"
+                        },
+                        {
+                          "value": "em",
+                          "title": "Emphasis"
+                        }
+                      ]
+                    },
+                    "styles": [
+                      {
+                        "value": "normal",
+                        "title": "Normal"
+                      }
+                    ],
+                    "of": [],
+                    "type": "block"
+                  }
+                ],
+                "name": "bullets",
+                "type": "array",
+                "title": "Bullets (5 expected)"
+              }
+            ],
+            "name": "stance01",
+            "type": "object",
+            "title": "Stance 01 — left column (Model-Dependent)"
+          },
+          {
+            "fields": [
+              {
+                "name": "tag",
+                "type": "string"
+              },
+              {
+                "name": "title",
+                "type": "string"
+              },
+              {
+                "name": "descriptor",
+                "type": "string"
+              },
+              {
+                "name": "voice",
+                "type": "string",
+                "title": "Voice quote (one sentence in smart quotes)"
+              },
+              {
+                "description": "Each bullet is a short rich-text paragraph. Use Emphasis on the consequence clause for Stance 02.",
+                "of": [
+                  {
+                    "marks": {
+                      "annotations": [],
+                      "decorators": [
+                        {
+                          "value": "strong",
+                          "title": "Strong"
+                        },
+                        {
+                          "value": "em",
+                          "title": "Emphasis"
+                        }
+                      ]
+                    },
+                    "styles": [
+                      {
+                        "value": "normal",
+                        "title": "Normal"
+                      }
+                    ],
+                    "of": [],
+                    "type": "block"
+                  }
+                ],
+                "name": "bullets",
+                "type": "array",
+                "title": "Bullets (5 expected)"
+              }
+            ],
+            "name": "stance02",
+            "type": "object",
+            "title": "Stance 02 — right column (Orchestration-Side)"
+          },
+          {
+            "fields": [
+              {
+                "initialValue": "Stone Truth",
+                "name": "label",
+                "type": "string"
+              },
+              {
+                "description": "Use Emphasis on the quotable second sentence.",
+                "of": [
+                  {
+                    "marks": {
+                      "annotations": [],
+                      "decorators": [
+                        {
+                          "value": "strong",
+                          "title": "Strong"
+                        },
+                        {
+                          "value": "em",
+                          "title": "Emphasis"
+                        }
+                      ]
+                    },
+                    "styles": [
+                      {
+                        "value": "normal",
+                        "title": "Normal"
+                      }
+                    ],
+                    "of": [],
+                    "type": "block"
+                  }
+                ],
+                "name": "body",
+                "type": "array",
+                "title": "Body (rich text)"
+              }
+            ],
+            "name": "stoneTruth",
+            "type": "object",
+            "title": "Stone Truth callout"
+          }
+        ],
+        "name": "orchestrationBattleground",
+        "type": "object",
+        "title": "Orchestration Battleground (Homepage §2)"
+      }
+    ],
+    "name": "siteSettings",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "options": {
+          "source": "title",
+          "maxLength": 96
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "description": "3–5 alternate titles following title-formulas.json patterns",
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "titleOptions",
+        "type": "array",
+        "title": "Title Candidates"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "The Stone Briefing (Tuesday, analysis)",
+              "value": "stone-briefing"
+            },
+            {
+              "title": "The Silicon Move (Friday, applied)",
+              "value": "silicon-move"
+            },
+            {
+              "title": "Stone Truth Short (60s)",
+              "value": "shorts"
+            }
+          ],
+          "layout": "radio"
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "stone-briefing",
+                  "silicon-move",
+                  "shorts"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "pillar",
+        "type": "string",
+        "title": "Content Pillar"
+      },
+      {
+        "description": "Links a Friday Silicon Move to its Tuesday Stone Briefing and vice versa",
+        "to": [
+          {
+            "type": "youtubeScript"
+          }
+        ],
+        "name": "pairedScript",
+        "type": "reference"
+      },
+      {
+        "description": "Articles this script draws its analysis from",
+        "of": [
+          {
+            "to": [
+              {
+                "type": "article"
+              }
+            ],
+            "type": "reference",
+            "title": "Reference to article"
+          }
+        ],
+        "name": "sourceArticles",
+        "type": "array"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Compliance Clara (Legal/Compliance)",
+              "value": "clara"
+            },
+            {
+              "title": "Industrial Ian (Operations/Supply Chain)",
+              "value": "ian"
+            },
+            {
+              "title": "Sovereign Sofia (Policy/Analysis)",
+              "value": "sofia"
+            },
+            {
+              "title": "Global Citizen (General Public)",
+              "value": "citizen"
+            },
+            {
+              "title": "Transatlantic Troy (Founder/CEO, US–EU Market Entry)",
+              "value": "troy"
+            }
+          ]
+        },
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "personas",
+        "type": "array",
+        "title": "Target Personas"
+      },
+      {
+        "rows": 2,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Provocative opening line. No intro, no logo, no fluff.",
+        "name": "hook",
+        "type": "text",
+        "title": "Hook (0–5s)"
+      },
+      {
+        "rows": 3,
+        "description": "Why this matters to the viewer's career or organisation",
+        "name": "stakes",
+        "type": "text",
+        "title": "Stakes (5–15s)"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Supply Chain × Scenario Modelling",
+              "value": "supply-chain-scenario-modelling"
+            },
+            {
+              "title": "Supply Chain × Long-Memory Filter",
+              "value": "supply-chain-long-memory-filter"
+            },
+            {
+              "title": "Policy × Scenario Modelling",
+              "value": "policy-scenario-modelling"
+            },
+            {
+              "title": "Policy × Long-Memory Filter",
+              "value": "policy-long-memory-filter"
+            },
+            {
+              "title": "Talent × Scenario Modelling",
+              "value": "talent-scenario-modelling"
+            },
+            {
+              "title": "Talent × Long-Memory Filter",
+              "value": "talent-long-memory-filter"
+            }
+          ]
+        },
+        "description": "Which cells of the Forensic Technopolitics 3 × 2 matrix are applied (3 forensic domains × 2 analytical methods). Match the article-level methodologyPillars vocabulary.",
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "methodologyChecklist",
+        "type": "array",
+        "title": "Methodology Checklist (15–30s)"
+      },
+      {
+        "description": "The substantive body of the video",
+        "of": [
+          {
+            "marks": {
+              "annotations": [
+                {
+                  "fields": [
+                    {
+                      "validation": [
+                        {
+                          "rules": [
+                            {
+                              "flag": "uri",
+                              "constraint": {
+                                "options": {
+                                  "scheme": [
+                                    "/^http$/",
+                                    "/^https$/",
+                                    "/^mailto$/"
+                                  ],
+                                  "allowRelative": false,
+                                  "relativeOnly": false,
+                                  "allowCredentials": false
+                                }
+                              }
+                            }
+                          ],
+                          "level": "error"
+                        }
+                      ],
+                      "name": "href",
+                      "type": "url",
+                      "title": "URL"
+                    }
+                  ],
+                  "name": "link",
+                  "type": "object"
+                }
+              ],
+              "decorators": [
+                {
+                  "value": "strong",
+                  "title": "Strong"
+                },
+                {
+                  "value": "em",
+                  "title": "Emphasis"
+                },
+                {
+                  "value": "code",
+                  "title": "Code"
+                }
+              ]
+            },
+            "lists": [
+              {
+                "value": "bullet",
+                "title": "Bulleted list"
+              },
+              {
+                "value": "number",
+                "title": "Numbered list"
+              }
+            ],
+            "styles": [
+              {
+                "value": "normal",
+                "title": "Normal"
+              },
+              {
+                "value": "h1",
+                "title": "Heading 1"
+              },
+              {
+                "value": "h2",
+                "title": "Heading 2"
+              },
+              {
+                "value": "h3",
+                "title": "Heading 3"
+              },
+              {
+                "value": "h4",
+                "title": "Heading 4"
+              },
+              {
+                "value": "h5",
+                "title": "Heading 5"
+              },
+              {
+                "value": "h6",
+                "title": "Heading 6"
+              },
+              {
+                "value": "blockquote",
+                "title": "Quote"
+              }
+            ],
+            "of": [],
+            "type": "block"
+          }
+        ],
+        "name": "scriptBody",
+        "type": "array",
+        "title": "Core Analysis Script"
+      },
+      {
+        "rows": 3,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "max",
+                "constraint": 280
+              }
+            ],
+            "level": "warning",
+            "message": "Keep Stone Truth under 280 characters"
+          }
+        ],
+        "description": "The bottom-line verdict. Clear, quotable, one sentence max.",
+        "name": "stoneTruth",
+        "type": "text",
+        "title": "Stone Truth (final ~60s)"
+      },
+      {
+        "description": "One CTA per video. Never more.",
+        "fields": [
+          {
+            "options": {
+              "list": [
+                {
+                  "title": "Free Lead Magnet",
+                  "value": "lead-magnet"
+                },
+                {
+                  "title": "Paid PDF (Intelligence Series)",
+                  "value": "paid-pdf"
+                },
+                {
+                  "title": "Career Product",
+                  "value": "career-product"
+                },
+                {
+                  "title": "Membership",
+                  "value": "membership"
+                },
+                {
+                  "title": "Related Video",
+                  "value": "related-video"
+                }
+              ]
+            },
+            "name": "kind",
+            "type": "string"
+          },
+          {
+            "description": "Product funnel id, video id, or URL",
+            "name": "target",
+            "type": "string"
+          },
+          {
+            "rows": 2,
+            "name": "copy",
+            "type": "text",
+            "title": "On-Camera Copy"
+          }
+        ],
+        "name": "cta",
+        "type": "object",
+        "title": "Call to Action"
+      },
+      {
+        "description": "Which digital product this video drives toward (id from product-funnels.json)",
+        "name": "productFunnel",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "min",
+                "constraint": 1
+              },
+              {
+                "flag": "max",
+                "constraint": 60
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "targetDurationMinutes",
+        "type": "number",
+        "title": "Target Duration (minutes)"
+      },
+      {
+        "rows": 2,
+        "description": "Max 3 words of on-thumbnail text. Stone palette + Silicon cyan.",
+        "name": "thumbnailBrief",
+        "type": "text"
+      },
+      {
+        "of": [
+          {
+            "type": "text"
+          }
+        ],
+        "name": "bRollNotes",
+        "type": "array",
+        "title": "B-Roll Notes"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Idea",
+              "value": "idea"
+            },
+            {
+              "title": "Scripted",
+              "value": "scripted"
+            },
+            {
+              "title": "Filmed",
+              "value": "filmed"
+            },
+            {
+              "title": "Edited",
+              "value": "edited"
+            },
+            {
+              "title": "Published",
+              "value": "published"
+            }
+          ],
+          "layout": "radio"
+        },
+        "initialValue": "idea",
+        "name": "productionStatus",
+        "type": "string"
+      },
+      {
+        "description": "Target publish date (Tuesday or Friday per cadence)",
+        "name": "scheduledFor",
+        "type": "datetime"
+      },
+      {
+        "name": "publishedAt",
+        "type": "datetime"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "uri",
+                "constraint": {
+                  "options": {
+                    "scheme": [
+                      "/^http$/",
+                      "/^https$/"
+                    ],
+                    "allowRelative": false,
+                    "relativeOnly": false,
+                    "allowCredentials": false
+                  }
+                }
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "youtubeUrl",
+        "type": "url",
+        "title": "YouTube URL"
+      },
+      {
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "tags",
+        "type": "array"
+      },
+      {
+        "fields": [
+          {
+            "name": "metaTitle",
+            "type": "string"
+          },
+          {
+            "rows": 3,
+            "validation": [
+              {
+                "rules": [
+                  {
+                    "flag": "max",
+                    "constraint": 160
+                  }
+                ],
+                "level": "warning",
+                "message": "Keep meta descriptions under 160 characters"
+              }
+            ],
+            "name": "metaDescription",
+            "type": "text"
+          }
+        ],
+        "name": "seo",
+        "type": "object",
+        "title": "SEO"
+      }
+    ],
+    "name": "youtubeScript",
+    "type": "document",
+    "title": "YouTube Script"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Name of this library folder, e.g. \"Semiconductor B-roll\".",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "options": {
+          "source": "title",
+          "maxLength": 96
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "rows": 3,
+        "name": "description",
+        "type": "text"
+      }
+    ],
+    "name": "assetCollection",
+    "type": "document",
+    "title": "Image Collection"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "fields": [
+          {
+            "name": "alt",
+            "type": "string",
+            "title": "Alternative Text"
+          }
+        ],
+        "name": "image",
+        "type": "image"
+      },
+      {
+        "description": "Which library folder this image belongs to.",
+        "to": [
+          {
+            "type": "assetCollection"
+          }
+        ],
+        "name": "collection",
+        "type": "reference"
+      },
+      {
+        "options": {
+          "layout": "tags"
+        },
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "tags",
+        "type": "array"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "AI-Generated",
+              "value": "ai-generated"
+            },
+            {
+              "title": "Stock / Licensed",
+              "value": "stock"
+            },
+            {
+              "title": "Screenshot",
+              "value": "screenshot"
+            },
+            {
+              "title": "Original / Owned",
+              "value": "original"
+            },
+            {
+              "title": "Other",
+              "value": "other"
+            }
+          ]
+        },
+        "description": "Where this image came from.",
+        "name": "source",
+        "type": "string"
+      },
+      {
+        "name": "credit",
+        "type": "string",
+        "title": "Credit / Attribution"
+      },
+      {
+        "rows": 3,
+        "name": "notes",
+        "type": "text"
+      },
+      {
+        "name": "addedAt",
+        "type": "datetime"
+      }
+    ],
+    "name": "libraryImage",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "regex",
+                "constraint": {
+                  "pattern": "/^[a-z0-9]+(?:-[a-z0-9]+)*$/",
+                  "name": "lower-case kebab-case",
+                  "invert": false
+                }
+              },
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Stable lower-case kebab-case ID. Required on records that predate the knowledge foundation, because a legacy knowledgeCandidate refers to those by this string. Anything captured or created since is referred to by reference instead, and may leave this empty.",
+        "name": "sourceId",
+        "type": "string",
+        "title": "Source ID"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "URL",
+              "value": "url"
+            },
+            {
+              "title": "PDF",
+              "value": "pdf"
+            },
+            {
+              "title": "Image",
+              "value": "image"
+            },
+            {
+              "title": "Note",
+              "value": "note"
+            },
+            {
+              "title": "Published Article",
+              "value": "published_article"
+            }
+          ],
+          "layout": "radio"
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "url",
+                  "pdf",
+                  "image",
+                  "note",
+                  "published_article"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "sourceType",
+        "type": "string"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Silicon & Stone",
+              "value": "silicon-and-stone"
+            },
+            {
+              "title": "Waymark Path",
+              "value": "waymark-path"
+            },
+            {
+              "title": "Shared",
+              "value": "shared"
+            }
+          ]
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "silicon-and-stone",
+                  "waymark-path",
+                  "shared"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 1
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "brandTags",
+        "type": "array"
+      },
+      {
+        "description": "Legacy free-text tags. Kept because existing documents carry them; prefer the Topics references below for anything new.",
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "topicTags",
+        "type": "array",
+        "title": "Topic Tags (free text)"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "uri",
+                "constraint": {
+                  "options": {
+                    "scheme": [
+                      "/^http$/",
+                      "/^https$/"
+                    ],
+                    "allowRelative": false,
+                    "relativeOnly": false,
+                    "allowCredentials": false
+                  }
+                }
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "originalUrl",
+        "type": "url",
+        "title": "Original URL"
+      },
+      {
+        "description": "Durable Sanity copy for PDF, image, or note uploads.",
+        "name": "asset",
+        "type": "file",
+        "title": "Uploaded Original"
+      },
+      {
+        "rows": 16,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Raw extracted text for local processing and later evidence indexing.",
+        "name": "extractedText",
+        "type": "text"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "regex",
+                "constraint": {
+                  "pattern": "/^sha256:[a-f0-9]{64}$/",
+                  "name": "sha256:<64 lower-case hex characters>",
+                  "invert": false
+                }
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "SHA-256 hash of the captured source content.",
+        "name": "contentHash",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "capturedAt",
+        "type": "datetime"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Pending local review",
+              "value": "pending"
+            },
+            {
+              "title": "Processed (reviewed)",
+              "value": "processed"
+            },
+            {
+              "title": "Error",
+              "value": "error"
+            }
+          ],
+          "layout": "radio"
+        },
+        "initialValue": "pending",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "pending",
+                  "processed",
+                  "error"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "The pre-foundation status field. Kept readable and unrewritten until the cutover wave: read it together with Review Status, not instead of it. Legacy \"processed\" means reviewed, \"pending\" means inbox, and \"error\" means a capture or extraction problem — never an editorial rejection.",
+        "name": "status",
+        "type": "string",
+        "title": "Status (legacy)"
+      },
+      {
+        "description": "Legacy field from the retired local-vault filing pass. No longer written.",
+        "name": "manifestId",
+        "type": "string",
+        "title": "Manifest ID (legacy)"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "value": "inbox",
+              "title": "Inbox (unreviewed)"
+            },
+            {
+              "value": "ready",
+              "title": "Ready (reviewed and approved)"
+            },
+            {
+              "value": "rejected",
+              "title": "Rejected"
+            },
+            {
+              "value": "superseded",
+              "title": "Superseded"
+            }
+          ],
+          "layout": "radio"
+        },
+        "initialValue": "inbox",
+        "description": "The editorial verdict, separate from the legacy status field and from extraction. Only `ready` sources are eligible for editorial memory.",
+        "name": "reviewStatus",
+        "type": "string"
+      },
+      {
+        "description": "Internal grouping by topic reference. Coexists with the legacy free-text tags above.",
+        "of": [
+          {
+            "to": [
+              {
+                "type": "knowledgeTopic"
+              }
+            ],
+            "type": "reference",
+            "title": "Reference to knowledge topic"
+          }
+        ],
+        "name": "topics",
+        "type": "array"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "value": "primary_statute",
+              "title": "Primary statute (labelled, not authoritative here)"
+            },
+            {
+              "value": "regulator_guidance",
+              "title": "Regulator guidance"
+            },
+            {
+              "value": "official_publication",
+              "title": "Official publication"
+            },
+            {
+              "value": "standards_body",
+              "title": "Standards body"
+            },
+            {
+              "value": "academic",
+              "title": "Academic"
+            },
+            {
+              "value": "industry_report",
+              "title": "Industry report"
+            },
+            {
+              "value": "news",
+              "title": "News"
+            },
+            {
+              "value": "vendor_material",
+              "title": "Vendor material"
+            },
+            {
+              "value": "commentary",
+              "title": "Commentary"
+            },
+            {
+              "value": "internal_note",
+              "title": "Internal note"
+            },
+            {
+              "value": "other",
+              "title": "Other"
+            }
+          ]
+        },
+        "description": "What this is, editorially. `primary_statute` labels a captured statute honestly — it does NOT make the record authoritative for the compliance checker, which reads only the pinned Git rule pack.",
+        "name": "sourceClass",
+        "type": "string"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "value": "authoritative",
+              "title": "Authoritative"
+            },
+            {
+              "value": "corroborated",
+              "title": "Corroborated"
+            },
+            {
+              "value": "indicative",
+              "title": "Indicative"
+            },
+            {
+              "value": "unverified",
+              "title": "Unverified"
+            }
+          ],
+          "layout": "radio"
+        },
+        "description": "How far this has been verified — a separate question from what kind of thing it is.",
+        "name": "trustTier",
+        "type": "string"
+      },
+      {
+        "name": "publisher",
+        "type": "string"
+      },
+      {
+        "name": "author",
+        "type": "string"
+      },
+      {
+        "description": "A string, not a date: upstream frequently gives \"2024\", \"March 2024\" or nothing at all, and coercing that into a datetime invents a precision the source never had.",
+        "name": "publishedDate",
+        "type": "string",
+        "title": "Publication Date"
+      },
+      {
+        "description": "BCP-47 tag, e.g. en, en-GB, de.",
+        "name": "language",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "uri",
+                "constraint": {
+                  "options": {
+                    "scheme": [
+                      "/^http$/",
+                      "/^https$/"
+                    ],
+                    "allowRelative": false,
+                    "relativeOnly": false,
+                    "allowCredentials": false
+                  }
+                }
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "The normalised form of the original URL — tracking parameters and fragment removed. Duplicate detection matches on this, so two captures of the same page from different links resolve to one source.",
+        "readOnly": true,
+        "name": "canonicalUrl",
+        "type": "url",
+        "title": "Canonical URL"
+      },
+      {
+        "options": {
+          "collapsible": true,
+          "collapsed": true
+        },
+        "description": "Which system this arrived through, under what identity, and with what external reference. Provenance, never authorization.",
+        "fields": [
+          {
+            "options": {
+              "list": [
+                {
+                  "value": "admin_ui",
+                  "title": "Admin UI"
+                },
+                {
+                  "value": "chatgpt",
+                  "title": "ChatGPT"
+                },
+                {
+                  "value": "claude",
+                  "title": "Claude"
+                },
+                {
+                  "value": "codex",
+                  "title": "Codex"
+                },
+                {
+                  "value": "exa",
+                  "title": "Exa"
+                },
+                {
+                  "value": "inoreader",
+                  "title": "Inoreader"
+                },
+                {
+                  "value": "api",
+                  "title": "API"
+                },
+                {
+                  "value": "migration",
+                  "title": "Migration"
+                },
+                {
+                  "value": "unknown",
+                  "title": "Unknown"
+                }
+              ]
+            },
+            "initialValue": "unknown",
+            "name": "sourceSystem",
+            "type": "string"
+          },
+          {
+            "description": "The originating system's own identifier, used for deduplication.",
+            "name": "externalId",
+            "type": "string",
+            "title": "External ID"
+          },
+          {
+            "description": "Thread identifier for chat-originated capture.",
+            "name": "conversationId",
+            "type": "string",
+            "title": "Conversation ID"
+          },
+          {
+            "name": "capturedBy",
+            "type": "string"
+          },
+          {
+            "description": "Caller-supplied key that makes a repeated capture return the first record rather than creating a second.",
+            "name": "idempotencyKey",
+            "type": "string"
+          }
+        ],
+        "name": "provenance",
+        "type": "object"
+      },
+      {
+        "description": "The source that replaced this one — a later consolidation, a corrected report. Set with Review Status = superseded; the old record stays readable so articles that cited it keep their meaning.",
+        "to": [
+          {
+            "type": "knowledgeSource"
+          }
+        ],
+        "name": "supersededBy",
+        "type": "reference"
+      },
+      {
+        "options": {
+          "collapsible": true,
+          "collapsed": true
+        },
+        "description": "Whether text had to be fetched, and how it went. Independent of both the review verdict and the index state — a failed fetch is not a rejection.",
+        "fields": [
+          {
+            "options": {
+              "list": [
+                {
+                  "value": "not_required",
+                  "title": "Not required (text arrived with the source)"
+                },
+                {
+                  "value": "queued",
+                  "title": "Queued"
+                },
+                {
+                  "value": "processing",
+                  "title": "Processing"
+                },
+                {
+                  "value": "succeeded",
+                  "title": "Succeeded"
+                },
+                {
+                  "value": "failed",
+                  "title": "Failed"
+                }
+              ],
+              "layout": "radio"
+            },
+            "initialValue": "not_required",
+            "name": "status",
+            "type": "string"
+          },
+          {
+            "description": "How the text was obtained — e.g. html-readability, pdf-text, manual-paste.",
+            "name": "method",
+            "type": "string"
+          },
+          {
+            "name": "methodVersion",
+            "type": "string"
+          },
+          {
+            "readOnly": true,
+            "name": "startedAt",
+            "type": "datetime"
+          },
+          {
+            "readOnly": true,
+            "name": "completedAt",
+            "type": "datetime"
+          },
+          {
+            "rows": 2,
+            "readOnly": true,
+            "name": "lastError",
+            "type": "text"
+          },
+          {
+            "readOnly": true,
+            "name": "attempts",
+            "type": "number"
+          }
+        ],
+        "name": "extractionState",
+        "type": "object"
+      },
+      {
+        "options": {
+          "collapsible": true,
+          "collapsed": true
+        },
+        "description": "Whether this source is in editorial memory, and whether what is there is current.",
+        "fields": [
+          {
+            "options": {
+              "list": [
+                {
+                  "value": "not_eligible",
+                  "title": "Not eligible"
+                },
+                {
+                  "value": "pending",
+                  "title": "Pending (queued or stale)"
+                },
+                {
+                  "value": "indexed",
+                  "title": "Indexed"
+                },
+                {
+                  "value": "error",
+                  "title": "Error"
+                }
+              ],
+              "layout": "radio"
+            },
+            "initialValue": "not_eligible",
+            "name": "status",
+            "type": "string"
+          },
+          {
+            "description": "Hash of what this document currently says.",
+            "readOnly": true,
+            "name": "canonicalHash",
+            "type": "string",
+            "title": "Canonical Content Hash"
+          },
+          {
+            "description": "Hash of what is actually in the index. A difference means the index is stale.",
+            "readOnly": true,
+            "name": "indexedHash",
+            "type": "string",
+            "title": "Indexed Content Hash"
+          },
+          {
+            "readOnly": true,
+            "name": "indexedAt",
+            "type": "datetime"
+          },
+          {
+            "readOnly": true,
+            "name": "embeddingModel",
+            "type": "string"
+          },
+          {
+            "readOnly": true,
+            "name": "indexVersion",
+            "type": "string",
+            "title": "Index / Schema Version"
+          },
+          {
+            "rows": 2,
+            "readOnly": true,
+            "name": "lastError",
+            "type": "text"
+          },
+          {
+            "readOnly": true,
+            "name": "lastAttemptAt",
+            "type": "datetime"
+          },
+          {
+            "readOnly": true,
+            "name": "attempts",
+            "type": "number"
+          }
+        ],
+        "name": "indexState",
+        "type": "object"
+      }
+    ],
+    "name": "knowledgeSource",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "max",
+                "constraint": 300
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "value": "idea",
+              "title": "Idea"
+            },
+            {
+              "value": "observation",
+              "title": "Observation"
+            },
+            {
+              "value": "conversation_extract",
+              "title": "Conversation extract"
+            },
+            {
+              "value": "article_foundation",
+              "title": "Article foundation"
+            },
+            {
+              "value": "outline",
+              "title": "Outline"
+            },
+            {
+              "value": "synthesis",
+              "title": "Synthesis"
+            },
+            {
+              "value": "claim",
+              "title": "Claim"
+            },
+            {
+              "value": "question",
+              "title": "Question"
+            },
+            {
+              "value": "note",
+              "title": "Note"
+            }
+          ]
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "idea",
+                  "observation",
+                  "conversation_extract",
+                  "article_foundation",
+                  "outline",
+                  "synthesis",
+                  "claim",
+                  "question",
+                  "note"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "What sort of thinking this is. Fixed list — a new kind is a schema decision, not an ad-hoc label.",
+        "name": "kind",
+        "type": "string"
+      },
+      {
+        "rows": 3,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "max",
+                "constraint": 2000
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "One or two sentences. This is what an inbox list and a retrieval result show.",
+        "name": "summary",
+        "type": "text"
+      },
+      {
+        "rows": 20,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "The item in full. Plain text rather than Portable Text on purpose: this is captured material to be reviewed and retrieved, not published copy, and a block editor would invite editing it into something its provenance no longer describes.",
+        "name": "body",
+        "type": "text"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "value": "inbox",
+              "title": "Inbox (unreviewed)"
+            },
+            {
+              "value": "ready",
+              "title": "Ready (reviewed and approved)"
+            },
+            {
+              "value": "rejected",
+              "title": "Rejected"
+            },
+            {
+              "value": "superseded",
+              "title": "Superseded"
+            }
+          ],
+          "layout": "radio"
+        },
+        "initialValue": "inbox",
+        "description": "Inbox until a human says otherwise. Only `ready` items are eligible for editorial memory; nothing that is captured, generated or migrated may enter as ready.",
+        "name": "reviewStatus",
+        "type": "string"
+      },
+      {
+        "description": "Internal grouping. Not the public article category taxonomy.",
+        "of": [
+          {
+            "to": [
+              {
+                "type": "knowledgeTopic"
+              }
+            ],
+            "type": "reference",
+            "title": "Reference to knowledge topic"
+          }
+        ],
+        "name": "topics",
+        "type": "array"
+      },
+      {
+        "description": "The evidence this item rests on. References, not string IDs — a reference cannot point at a document that was never created, which string IDs demonstrably could.",
+        "of": [
+          {
+            "to": [
+              {
+                "type": "knowledgeSource"
+              }
+            ],
+            "type": "reference",
+            "title": "Reference to knowledge source"
+          }
+        ],
+        "name": "sources",
+        "type": "array"
+      },
+      {
+        "description": "The investigation this item came out of, where there was one.",
+        "to": [
+          {
+            "type": "researchRun"
+          }
+        ],
+        "name": "researchRun",
+        "type": "reference"
+      },
+      {
+        "description": "Earlier items this one was built on — an outline from a set of observations, a synthesis from several claims.",
+        "of": [
+          {
+            "to": [
+              {
+                "type": "knowledgeItem"
+              }
+            ],
+            "type": "reference",
+            "title": "Reference to knowledge item"
+          }
+        ],
+        "name": "derivedFrom",
+        "type": "array"
+      },
+      {
+        "description": "The item that replaced this one. Set together with reviewStatus = superseded; a superseded record stays readable so older articles keep their meaning.",
+        "to": [
+          {
+            "type": "knowledgeItem"
+          }
+        ],
+        "name": "supersededBy",
+        "type": "reference"
+      },
+      {
+        "description": "Published or drafted articles this item fed. Written by the pipeline, kept so lineage reads in both directions.",
+        "of": [
+          {
+            "to": [
+              {
+                "type": "article"
+              }
+            ],
+            "type": "reference",
+            "title": "Reference to article"
+          }
+        ],
+        "name": "articles",
+        "type": "array",
+        "title": "Resulting Articles"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "value": "article_seed",
+              "title": "Article seed"
+            },
+            {
+              "value": "research_input",
+              "title": "Research input"
+            },
+            {
+              "value": "reference_only",
+              "title": "Reference only"
+            },
+            {
+              "value": "internal_only",
+              "title": "Internal only"
+            }
+          ]
+        },
+        "description": "What this is for. Editorial signal, not access control.",
+        "name": "intendedUse",
+        "type": "string"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "value": "normal",
+              "title": "Normal"
+            },
+            {
+              "value": "private",
+              "title": "Private (never retrieved)"
+            },
+            {
+              "value": "confidential",
+              "title": "Confidential (never retrieved)"
+            }
+          ],
+          "layout": "radio"
+        },
+        "initialValue": "normal",
+        "description": "Retrieval policy. Anything other than `normal` is ineligible for editorial memory — the enforcement is in the eligibility calculation, not in this label.",
+        "name": "sensitivity",
+        "type": "string"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "value": "low",
+              "title": "Low"
+            },
+            {
+              "value": "medium",
+              "title": "Medium"
+            },
+            {
+              "value": "high",
+              "title": "High"
+            }
+          ],
+          "layout": "radio"
+        },
+        "description": "Categorical, never a percentage — a number would imply a calibration nothing here performs.",
+        "name": "confidence",
+        "type": "string"
+      },
+      {
+        "rows": 4,
+        "description": "Why this was kept, rejected, or is worth returning to. Internal — never published.",
+        "name": "editorNotes",
+        "type": "text"
+      },
+      {
+        "options": {
+          "collapsible": true,
+          "collapsed": true
+        },
+        "description": "Which system this arrived through, and under what identity. Recorded so an item can be traced back to the conversation that produced it; it confers no trust.",
+        "fields": [
+          {
+            "options": {
+              "list": [
+                {
+                  "value": "admin_ui",
+                  "title": "Admin UI"
+                },
+                {
+                  "value": "chatgpt",
+                  "title": "ChatGPT"
+                },
+                {
+                  "value": "claude",
+                  "title": "Claude"
+                },
+                {
+                  "value": "codex",
+                  "title": "Codex"
+                },
+                {
+                  "value": "exa",
+                  "title": "Exa"
+                },
+                {
+                  "value": "inoreader",
+                  "title": "Inoreader"
+                },
+                {
+                  "value": "api",
+                  "title": "API"
+                },
+                {
+                  "value": "migration",
+                  "title": "Migration"
+                },
+                {
+                  "value": "unknown",
+                  "title": "Unknown"
+                }
+              ]
+            },
+            "initialValue": "unknown",
+            "name": "sourceSystem",
+            "type": "string"
+          },
+          {
+            "description": "The originating system's own identifier, used for deduplication.",
+            "name": "externalId",
+            "type": "string",
+            "title": "External ID"
+          },
+          {
+            "description": "Thread identifier for chat-originated capture.",
+            "name": "conversationId",
+            "type": "string",
+            "title": "Conversation ID"
+          },
+          {
+            "name": "capturedBy",
+            "type": "string"
+          },
+          {
+            "name": "capturedAt",
+            "type": "datetime"
+          },
+          {
+            "description": "Caller-supplied key that makes a repeated capture return the first record rather than creating a second.",
+            "name": "idempotencyKey",
+            "type": "string"
+          }
+        ],
+        "name": "provenance",
+        "type": "object"
+      },
+      {
+        "description": "SHA-256 of the normalised body. Used for duplicate detection and index-drift comparison.",
+        "readOnly": true,
+        "name": "contentHash",
+        "type": "string"
+      },
+      {
+        "options": {
+          "collapsible": true,
+          "collapsed": true
+        },
+        "description": "Whether this item is in editorial memory, and whether what is there is current. Set by the indexer; a record is never indexed as a side effect of being saved.",
+        "fields": [
+          {
+            "options": {
+              "list": [
+                {
+                  "value": "not_eligible",
+                  "title": "Not eligible"
+                },
+                {
+                  "value": "pending",
+                  "title": "Pending (queued or stale)"
+                },
+                {
+                  "value": "indexed",
+                  "title": "Indexed"
+                },
+                {
+                  "value": "error",
+                  "title": "Error"
+                }
+              ],
+              "layout": "radio"
+            },
+            "initialValue": "not_eligible",
+            "name": "status",
+            "type": "string"
+          },
+          {
+            "description": "Hash of what this document currently says.",
+            "readOnly": true,
+            "name": "canonicalHash",
+            "type": "string",
+            "title": "Canonical Content Hash"
+          },
+          {
+            "description": "Hash of what is actually in the index. A difference means the index is stale.",
+            "readOnly": true,
+            "name": "indexedHash",
+            "type": "string",
+            "title": "Indexed Content Hash"
+          },
+          {
+            "readOnly": true,
+            "name": "indexedAt",
+            "type": "datetime"
+          },
+          {
+            "readOnly": true,
+            "name": "embeddingModel",
+            "type": "string"
+          },
+          {
+            "readOnly": true,
+            "name": "indexVersion",
+            "type": "string",
+            "title": "Index / Schema Version"
+          },
+          {
+            "rows": 2,
+            "readOnly": true,
+            "name": "lastError",
+            "type": "text"
+          },
+          {
+            "readOnly": true,
+            "name": "lastAttemptAt",
+            "type": "datetime"
+          },
+          {
+            "readOnly": true,
+            "name": "attempts",
+            "type": "number"
+          }
+        ],
+        "name": "indexState",
+        "type": "object"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Silicon & Stone",
+              "value": "silicon-and-stone"
+            },
+            {
+              "title": "Waymark Path",
+              "value": "waymark-path"
+            },
+            {
+              "title": "Shared",
+              "value": "shared"
+            }
+          ]
+        },
+        "description": "Which brand this belongs to. Optional here, unlike on the legacy types, because most items are captured before anyone has decided.",
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "brandTags",
+        "type": "array"
+      },
+      {
+        "description": "The `candidateId` of the knowledgeCandidate this item was copied from. Written only by the migration; the copy has to be traceable to what it replaced.",
+        "readOnly": true,
+        "name": "legacyCandidateId",
+        "type": "string",
+        "title": "Legacy Candidate ID"
+      },
+      {
+        "description": "The original candidate document, which the migration copies rather than moves — it stays readable until the cutover wave retires it.",
+        "to": [
+          {
+            "type": "knowledgeCandidate"
+          }
+        ],
+        "readOnly": true,
+        "name": "legacyCandidate",
+        "type": "reference"
+      }
+    ],
+    "name": "knowledgeItem",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "options": {
+          "source": "title",
+          "maxLength": 96
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Stable handle. Referenced by capture adapters, so renaming one breaks their mapping.",
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "description": "Other names the same topic travels under. Capture adapters match on these, which is what lets an external system say \"EU AI Act\" and land on the same topic as \"AI Act\".",
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "aliases",
+        "type": "array"
+      },
+      {
+        "rows": 3,
+        "description": "What belongs under this topic, and what does not.",
+        "name": "description",
+        "type": "text"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "to": [
+          {
+            "type": "knowledgeTopic"
+          }
+        ],
+        "name": "parent",
+        "type": "reference",
+        "title": "Parent Topic"
+      },
+      {
+        "description": "Optional mapping to the public publishing taxonomy. Leave empty when this topic has no public counterpart — categories are not being replaced.",
+        "to": [
+          {
+            "type": "category"
+          }
+        ],
+        "name": "articleCategory",
+        "type": "reference",
+        "title": "Public Article Category"
+      },
+      {
+        "initialValue": false,
+        "description": "A retired topic stays readable so old records keep their meaning; it is simply no longer offered when classifying something new.",
+        "name": "retired",
+        "type": "boolean"
+      }
+    ],
+    "name": "knowledgeTopic",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "max",
+                "constraint": 2000
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "query",
+        "type": "string"
+      },
+      {
+        "rows": 6,
+        "description": "The fuller instruction a deep run was given, where there was one.",
+        "name": "brief",
+        "type": "text"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "value": "fast",
+              "title": "Fast (standard search)"
+            },
+            {
+              "value": "deep",
+              "title": "Deep research"
+            },
+            {
+              "value": "inoreader",
+              "title": "Inoreader ingestion"
+            }
+          ],
+          "layout": "radio"
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "fast",
+                  "deep",
+                  "inoreader"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "mode",
+        "type": "string"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "value": "exa",
+              "title": "Exa"
+            },
+            {
+              "value": "inoreader",
+              "title": "Inoreader"
+            },
+            {
+              "value": "manual",
+              "title": "Manual"
+            },
+            {
+              "value": "other",
+              "title": "Other"
+            }
+          ]
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "exa",
+                  "inoreader",
+                  "manual",
+                  "other"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "provider",
+        "type": "string"
+      },
+      {
+        "description": "The provider's own identifier for the job. The link back to transient Redis state while it still exists, and the key that stops one job being recorded twice.",
+        "name": "jobId",
+        "type": "string",
+        "title": "Provider Job ID"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "value": "queued",
+              "title": "Queued"
+            },
+            {
+              "value": "running",
+              "title": "Running"
+            },
+            {
+              "value": "completed",
+              "title": "Completed"
+            },
+            {
+              "value": "failed",
+              "title": "Failed"
+            },
+            {
+              "value": "cancelled",
+              "title": "Cancelled"
+            }
+          ],
+          "layout": "radio"
+        },
+        "initialValue": "queued",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "queued",
+                  "running",
+                  "completed",
+                  "failed",
+                  "cancelled"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "rows": 3,
+        "description": "Why a failed run failed. Kept — a failed investigation is evidence too.",
+        "name": "error",
+        "type": "text"
+      },
+      {
+        "name": "requestedAt",
+        "type": "datetime"
+      },
+      {
+        "name": "startedAt",
+        "type": "datetime"
+      },
+      {
+        "name": "completedAt",
+        "type": "datetime"
+      },
+      {
+        "description": "The run this one re-attempts. A completed run is final, so a rerun is a new document pointing back here rather than an overwrite.",
+        "to": [
+          {
+            "type": "researchRun"
+          }
+        ],
+        "name": "retryOf",
+        "type": "reference"
+      },
+      {
+        "rows": 10,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "summary",
+        "type": "text",
+        "title": "Result Summary"
+      },
+      {
+        "description": "The research pass's own vocabulary, kept because the drafting prompts consume it.",
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "keywords",
+        "type": "array"
+      },
+      {
+        "rows": 24,
+        "description": "The full deep-research report, where the mode produced one.",
+        "name": "deepReport",
+        "type": "text"
+      },
+      {
+        "description": "What the provider returned, exactly as it returned it. This is a snapshot, not lineage: it stays truthful even if the canonical source below is later edited, superseded or rejected.",
+        "of": [
+          {
+            "fields": [
+              {
+                "name": "title",
+                "type": "string"
+              },
+              {
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "uri",
+                        "constraint": {
+                          "options": {
+                            "scheme": [
+                              "/^http$/",
+                              "/^https$/"
+                            ],
+                            "allowRelative": false,
+                            "relativeOnly": false,
+                            "allowCredentials": false
+                          }
+                        }
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "name": "url",
+                "type": "url",
+                "title": "URL"
+              },
+              {
+                "name": "publisher",
+                "type": "string"
+              },
+              {
+                "name": "publishedDate",
+                "type": "string"
+              },
+              {
+                "rows": 3,
+                "name": "snippet",
+                "type": "text"
+              },
+              {
+                "name": "score",
+                "type": "number"
+              }
+            ],
+            "type": "object",
+            "name": "selectedSource"
+          }
+        ],
+        "name": "selectedSources",
+        "type": "array",
+        "title": "Selected Sources (as returned)"
+      },
+      {
+        "description": "The `knowledgeSource` documents created from this run. The durable half of the pair above.",
+        "of": [
+          {
+            "to": [
+              {
+                "type": "knowledgeSource"
+              }
+            ],
+            "type": "reference",
+            "title": "Reference to knowledge source"
+          }
+        ],
+        "name": "sources",
+        "type": "array",
+        "title": "Canonical Sources"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "value": "pending",
+              "title": "Pending review"
+            },
+            {
+              "value": "approved",
+              "title": "Approved for reuse"
+            },
+            {
+              "value": "excluded",
+              "title": "Excluded"
+            }
+          ],
+          "layout": "radio"
+        },
+        "initialValue": "pending",
+        "description": "Whether curated output from this run may be indexed into editorial memory. Starts pending: a raw research run is never automatically reusable, however good it looks.",
+        "name": "reuseStatus",
+        "type": "string"
+      },
+      {
+        "description": "What each retrieval lane actually returned, with IDs and scores. The three lanes fail independently, so a snapshot records which lane it came from — an empty regulatory lane and a missing regulatory lane are different facts.",
+        "of": [
+          {
+            "fields": [
+              {
+                "options": {
+                  "list": [
+                    {
+                      "value": "prior_articles",
+                      "title": "Prior articles"
+                    },
+                    {
+                      "value": "editorial_memory",
+                      "title": "Editorial memory"
+                    },
+                    {
+                      "value": "regulatory",
+                      "title": "Regulatory"
+                    }
+                  ]
+                },
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "valid",
+                        "constraint": [
+                          "prior_articles",
+                          "editorial_memory",
+                          "regulatory"
+                        ]
+                      },
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "name": "lane",
+                "type": "string"
+              },
+              {
+                "name": "indexName",
+                "type": "string",
+                "title": "Index"
+              },
+              {
+                "name": "namespace",
+                "type": "string"
+              },
+              {
+                "name": "corpusVersion",
+                "type": "string",
+                "title": "Corpus / Pack Version"
+              },
+              {
+                "name": "scoreFloor",
+                "type": "number"
+              },
+              {
+                "options": {
+                  "list": [
+                    {
+                      "title": "Returned results",
+                      "value": "ok"
+                    },
+                    {
+                      "title": "Returned nothing",
+                      "value": "empty"
+                    },
+                    {
+                      "title": "Failed",
+                      "value": "failed"
+                    },
+                    {
+                      "title": "Skipped / disabled",
+                      "value": "skipped"
+                    }
+                  ]
+                },
+                "description": "Whether this lane returned, returned nothing, or failed. A weak lane must degrade visibly rather than silently.",
+                "name": "laneStatus",
+                "type": "string"
+              },
+              {
+                "of": [
+                  {
+                    "fields": [
+                      {
+                        "validation": [
+                          {
+                            "rules": [
+                              {
+                                "flag": "presence",
+                                "constraint": "required"
+                              }
+                            ],
+                            "level": "error"
+                          }
+                        ],
+                        "name": "recordId",
+                        "type": "string",
+                        "title": "Record ID"
+                      },
+                      {
+                        "name": "score",
+                        "type": "number"
+                      },
+                      {
+                        "name": "title",
+                        "type": "string"
+                      },
+                      {
+                        "name": "locator",
+                        "type": "string"
+                      }
+                    ],
+                    "type": "object",
+                    "name": "retrievalEntry"
+                  }
+                ],
+                "name": "entries",
+                "type": "array"
+              }
+            ],
+            "type": "object",
+            "name": "retrievalSnapshot"
+          }
+        ],
+        "name": "retrievalSnapshots",
+        "type": "array"
+      },
+      {
+        "options": {
+          "collapsible": true,
+          "collapsed": true
+        },
+        "description": "What was in force when this run happened, so its output can be explained later rather than re-guessed.",
+        "fields": [
+          {
+            "name": "model",
+            "type": "string"
+          },
+          {
+            "name": "embeddingModel",
+            "type": "string"
+          },
+          {
+            "name": "providerVersion",
+            "type": "string"
+          },
+          {
+            "name": "rulesVersion",
+            "type": "string",
+            "title": "Rules / Prompt Version"
+          },
+          {
+            "name": "promptTokens",
+            "type": "number"
+          },
+          {
+            "name": "completionTokens",
+            "type": "number"
+          },
+          {
+            "name": "costUsd",
+            "type": "number",
+            "title": "Cost (USD)"
+          }
+        ],
+        "name": "modelSnapshot",
+        "type": "object",
+        "title": "Model / Rule Versions"
+      },
+      {
+        "description": "Internal grouping for this investigation.",
+        "of": [
+          {
+            "to": [
+              {
+                "type": "knowledgeTopic"
+              }
+            ],
+            "type": "reference",
+            "title": "Reference to knowledge topic"
+          }
+        ],
+        "name": "topics",
+        "type": "array"
+      },
+      {
+        "of": [
+          {
+            "to": [
+              {
+                "type": "knowledgeItem"
+              }
+            ],
+            "type": "reference",
+            "title": "Reference to knowledge item"
+          }
+        ],
+        "name": "knowledgeItems",
+        "type": "array",
+        "title": "Resulting Knowledge Items"
+      },
+      {
+        "description": "Articles this run produced. A weak reference: the article is a draft when the link is written, and may never be published at all.",
+        "of": [
+          {
+            "weak": true,
+            "to": [
+              {
+                "type": "article"
+              }
+            ],
+            "type": "reference",
+            "title": "Reference to article"
+          }
+        ],
+        "name": "articles",
+        "type": "array",
+        "title": "Resulting Articles"
+      }
+    ],
+    "name": "researchRun",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "regex",
+                "constraint": {
+                  "pattern": "/^[a-z0-9]+(?:-[a-z0-9]+)*$/",
+                  "name": "lower-case kebab-case",
+                  "invert": false
+                }
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Stable lower-case kebab-case ID for reviewed local filing.",
+        "name": "candidateId",
+        "type": "string",
+        "title": "Candidate ID"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "rows": 16,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Portal-generated answer awaiting reviewed local filing.",
+        "name": "answer",
+        "type": "text",
+        "title": "Proposed Synthesis"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 1
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Source manifests that must be checked during local filing.",
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "sourceIds",
+        "type": "array",
+        "title": "Source IDs"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Silicon & Stone",
+              "value": "silicon-and-stone"
+            },
+            {
+              "title": "Waymark Path",
+              "value": "waymark-path"
+            },
+            {
+              "title": "Shared",
+              "value": "shared"
+            }
+          ]
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "silicon-and-stone",
+                  "waymark-path",
+                  "shared"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 1
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "brandTags",
+        "type": "array"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "createdAt",
+        "type": "datetime"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Pending local review",
+              "value": "pending"
+            },
+            {
+              "title": "Filed (reviewed)",
+              "value": "filed"
+            },
+            {
+              "title": "Rejected",
+              "value": "rejected"
+            }
+          ],
+          "layout": "radio"
+        },
+        "initialValue": "pending",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "pending",
+                  "filed",
+                  "rejected"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "status",
+        "type": "string"
+      }
+    ],
+    "name": "knowledgeCandidate",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "name",
+        "type": "string",
+        "title": "Canonical name"
+      },
+      {
+        "options": {
+          "source": "name",
+          "maxLength": 96
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "description": "For example, GPAI. Leave blank for ordinary terms.",
+        "name": "acronym",
+        "type": "string",
+        "title": "Acronym or initialism"
+      },
+      {
+        "description": "Use when it differs from the canonical display name.",
+        "name": "fullName",
+        "type": "string",
+        "title": "Expanded or official name"
+      },
+      {
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "aliases",
+        "type": "array",
+        "title": "Aliases and alternative spellings"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "value": "acronym",
+              "title": "Acronym"
+            },
+            {
+              "value": "organisation",
+              "title": "Organisation"
+            },
+            {
+              "value": "law-policy",
+              "title": "Law or policy"
+            },
+            {
+              "value": "programme",
+              "title": "Programme"
+            },
+            {
+              "value": "company-product-model",
+              "title": "Company, product or model"
+            },
+            {
+              "value": "technique",
+              "title": "Technique"
+            },
+            {
+              "value": "technical-term",
+              "title": "Technical term"
+            },
+            {
+              "value": "role-title",
+              "title": "Role or title"
+            }
+          ]
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "acronym",
+                  "organisation",
+                  "law-policy",
+                  "programme",
+                  "company-product-model",
+                  "technique",
+                  "technical-term",
+                  "role-title"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "kind",
+        "type": "string",
+        "title": "Type"
+      },
+      {
+        "rows": 3,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "max",
+                "constraint": 240
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "One plain-language sentence. Maximum 240 characters.",
+        "name": "definition",
+        "type": "text",
+        "title": "Short definition"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "uri",
+                "constraint": {
+                  "options": {
+                    "scheme": [
+                      "/^http$/",
+                      "/^https$/"
+                    ],
+                    "allowRelative": false,
+                    "relativeOnly": false,
+                    "allowCredentials": false
+                  }
+                }
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "sourceUrl",
+        "type": "url",
+        "title": "Official or primary source"
+      },
+      {
+        "name": "reviewedAt",
+        "type": "date",
+        "title": "Last reviewed"
+      },
+      {
+        "of": [
+          {
+            "options": {
+              "disableNew": true
+            },
+            "to": [
+              {
+                "type": "glossaryTerm"
+              }
+            ],
+            "type": "reference",
+            "title": "Reference to glossary term"
+          }
+        ],
+        "name": "relatedTerms",
+        "type": "array",
+        "title": "Related terms"
+      }
+    ],
+    "name": "glossaryTerm",
+    "type": "document"
+  }
+]

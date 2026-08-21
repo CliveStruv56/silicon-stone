@@ -248,6 +248,31 @@ hand, deliberately: these are what the model was handed, not sources anyone has
 checked. When you are ready, the Sources field carries an **"Add N from
 research"** button that brings them in for you to keep or delete (§8).
 
+### The run itself is now recorded (21 August 2026)
+
+Every `/create` research run becomes a **Research Run** document in Studio, under
+**Knowledge**. It is written the moment you press the button, before anything is
+known about how it goes, so a run that fails or that you abandon still leaves a
+record — which is the point: an Exa run that returned nothing is worth knowing
+about the next time you try the same topic.
+
+What a completed run holds: the topic and brief you typed, the sources the search
+selected as they came back, the summary and keywords, a Deep Dive's full report,
+and which model ran. Once you draft from it, the run also records **which article
+it produced** and what the two retrieval lanes returned while writing it.
+
+Two things it deliberately does *not* mean:
+
+- **A completed run is not a reusable one.** Every run lands at
+  `reuseStatus: pending`. Marking it `approved` is your judgement, not the
+  system's.
+- **It is not the reader-facing Sources list**, and it is not the Citation
+  Snapshots either. Those are on the article; this is the investigation.
+
+Only `/create` writes one. `/import`, the Claude Code path and hand-written
+articles have no research run, and their Provenance block stays empty on
+purpose — blank means *there was none*, not *we do not know*.
+
 ### If research fails
 
 You get a browser alert: **"Failed to gather intelligence."** followed by the

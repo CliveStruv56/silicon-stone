@@ -2,7 +2,7 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-08-21
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (78 prerendered pages), 1,333 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (78 prerendered pages), 1,356 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, **Guide**, YouTube Script, Research Only), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
@@ -527,6 +527,73 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 21, 2026 — Wave 2: an article can say what it was written from
+
+`docs/siliconstone-knowledge-wave-02-brief.md` had a contract and no code. It
+has code now, for `/create` only. A research run is a durable record, and a
+generated article carries the run it came from, the prior coverage it was shown,
+and a snapshot of what was in force when it was written.
+
+**The three questions the brief said not to guess were answered by the owner:**
+every started run is persisted (opened *before* the outcome is known — a run
+that dies mid-flight is the one most worth having); only `/create` gets lineage;
+nothing is backfilled.
+
+**Four things worth not undoing.**
+
+*Provenance never costs the writer their work.* Every operation in
+`research-provenance.ts` is wrapped and logs; none can throw into the pipeline.
+That is the rule the quotation audit and the metadata pass already follow.
+
+*The trust boundary.* `createDraftFromResearch` receives the whole
+`ResearchResult` **from the browser**. Provenance written from a round-tripped
+payload is provenance a client can forge, so what the record says is written
+server-side at the moment it happened and the browser carries only an opaque
+`runId`.
+
+*References follow their targets; snapshots must not.* `citationSnapshots` and
+`generationSnapshot` answer *what was this actually written from* — the question
+a correction asks — and are written once, never patched. A guard walks the tree
+and fails if anything patches one.
+
+*Retrieval belongs to the generation, not the run.* `retrievalSnapshots` sits on
+the run but is keyed by article **and** lane, so one run producing two drafts
+keeps both and a retried draft rewrites its own entry.
+
+**Three defects the suite could not see, all found by writing to real Sanity.**
+This is the part to carry forward.
+
+- The article id handed to the domain **did not exist yet**: `/create` strips
+  `drafts.` before returning the id, because the client needs the published one
+  for the fact-check, and that stripped id was also what the lineage call got.
+- The article was **invisible to its own existence check**. On the pinned
+  `apiVersion` the client answers from the *published* perspective, so
+  `*[_id in $ids]` cannot see a `drafts.*` document. One caller now opts into
+  `{ perspective: 'raw' }`; the capture paths keep the published default.
+- **A published run cannot strongly reference a draft article.** Sanity rejects
+  the mutation. The back-reference is weak in the schema *and* `_weak: true` on
+  the value — the schema flag governs Studio, the API reads the marker on the
+  reference, and neither alone is enough.
+
+All three passed every unit test. A stubbed client has no perspective and
+enforces no reference integrity, so the harness said *fine* to two things the
+API refuses. And one guard was wrong on the first attempt — the "run opened
+before the search" check used `indexOf`, found the deep branch's call, and
+passed however the fast path was ordered. That is the second vacuous check this
+repo has caught by mutation-testing its own guards, both today.
+
+Verified live end to end, then torn down: 6 documents removed, back to 26
+articles and 0 runs. `npm run test:cleanup` was taught about research runs in
+the process — a run has no `title` (its label is `query`), so it was invisible
+to the teardown, and a surviving run still references the article, which is
+enough for Sanity to refuse the article's delete.
+
+1,356 tests green. Schema manifest redeployed for the weak reference.
+
+**Not done:** `ss-draft-local` records no run (it does real Exa research and
+already writes citation snapshots, but the CLI does not call the domain
+service); `knowledgeItems[]` on a run stays empty; no backfill.
 
 ### August 21, 2026 — The knowledge inbox, actually looked at
 
@@ -5829,6 +5896,33 @@ was a decision, not a repair, and the reasoning is worth keeping. See §9.
 | ~~**The MCP capture tools discard their own error messages.**~~ **Fixed.** `knowledge-tools.ts` renders `${e.field} (${e.code})` and drops `e.message`, so a source captured with no URL and no text answers `Problems: _ (required)` — naming a field called `_` — when the validator carries *"Provide a URL, the source text, or declare that extraction is expected."* for exactly that case. | `src/lib/mcp/knowledge-tools.ts:224` | The message is carried; a whole-payload failure (field `_`) prints the sentence alone. Two tests pin it. |
 | ~~**`ss-draft-local`'s payload template loses provenance.**~~ **Fixed.** `save` reads `researchSources` at the top level; the template at step 3 nests sources under `research.sources`, which is what the draft prompt reads. Follow the template and the draft is written with **no citation snapshots at all**, silently — 0 following the template, 8 once the field was added. The requirement is documented 150 lines later under "Notes / caveats". | `.agent/skills/ss-draft-local/SKILL.md` | `researchSources` is now in the Step 7 template, and `save` warns on stderr when it is absent. |
 | ~~**A hand-made article can publish into invisibility.**~~ **Fixed in four places — the fourth found in the browser.** `/intelligence` lists only articles with `defined(intelligenceTier)`, and nothing on the hand-made path sets one. A tierless article publishes cleanly, is live at `/analysis/<slug>`, is indexed and reaches the sitemap — and never appears where a reader browses. Categories are required at error level; the tier is not, and no guard mentions it. | `src/app/(website)/intelligence/page.tsx` (the `BRIEFINGS_QUERY`) and `src/lib/publish-preflight.ts` | **Neither alone.** The feed stops filtering on the tier — a published article that cannot be browsed is never correct — and the preflight *warns*, because an untiered article is a legitimate editorial choice (the dashboard has always counted an "Untiered" bucket). The schema keeps the field optional. The query exists in **four** copies, the fourth being `backend/main.py`, which is what production actually answers from; all four are fixed and guarded by `src/lib/briefings-query.test.ts` plus manual check 17. Verified live on production. |
+
+### Priority 0d — Knowledge system: where the programme stands
+
+Seven waves (`docs/siliconstone-knowledge-llm-master-spec.md` §10). **Read the
+per-wave brief before touching a wave**; each records decisions that must not be
+re-guessed.
+
+| Wave | State |
+|---|---|
+| 0–1 — contracts, schemas, domain service | **Done 2026-08-19.** |
+| 2 — provenance | **Done 2026-08-21** for `/create`. Runs are durable; articles carry lineage. See §9 and the brief's "What was built". |
+| 3 — editorial memory | Not started. Event-driven indexing, eligibility/reconciliation, a third retrieval lane. `KNOWLEDGE_AUTO_INDEX_ENABLED` and `KNOWLEDGE_DRAFT_RETRIEVAL_ENABLED` exist and are off. |
+| 4 — frictionless capture | **4a done 2026-08-20** (universal endpoint + hosted MCP, six tools). The `/knowledge` cockpit and URL/PDF extraction are not built. |
+| 5 — conversation integration | Claude reached in 4a. **ChatGPT is parked**, on a plan gate rather than an engineering one — Business is the first tier that can write. |
+| 6 — cutover | Not started. Owns any backfill; wave 2 deliberately did none. |
+
+**The gap a reader will notice first**: an idea still cannot become an article.
+There is no promote action, `/create` cannot be seeded from a knowledge item, and
+the `Intended Use → Article seed` value changes nothing. The workflow is reading
+the item and retyping its substance into `/create`. Wave 2 built the *downstream*
+half of lineage — an article now knows what it came from — and the upstream half
+is unbuilt.
+
+**Two smaller residuals**, both recorded rather than hidden: `ss-draft-local`
+does real Exa research and writes citation snapshots but records no research run,
+and `researchRun.knowledgeItems[]` stays empty because nothing derives items from
+a run yet.
 
 ### Priority 1 — Content (the actual bottleneck)
 

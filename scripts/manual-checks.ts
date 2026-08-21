@@ -233,6 +233,29 @@ check('an untiered article is listed, and the preflight warns about it', () => {
   manualStates('No intelligence tier set', 'the missing-tier preflight warning')
 })
 
+check('a research run is recorded, and only from /create', () => {
+  // Two facts the manual states about wave 2's record, both read from code.
+  const service = source('src/lib/knowledge/service.ts')
+  assert.match(
+    service,
+    /reuseStatus: 'pending'/,
+    'a created research run no longer defaults to pending; the manual §4 says a completed run is not thereby reusable',
+  )
+  manualStates('`reuseStatus: pending`', 'that a completed run is not automatically reusable')
+
+  // The provenance module is the only way a run gets written, and exactly one
+  // route may import it. A second importer would mean /import or the local
+  // draft path acquiring lineage, which the manual promises it does not.
+  const importers = ['src/app/(admin)/create/actions.ts', 'src/app/(admin)/import/actions.ts']
+    .filter((file) => source(file).includes('research-provenance'))
+  assert.deepEqual(
+    importers,
+    ['src/app/(admin)/create/actions.ts'],
+    `research-provenance is imported by ${importers.length} route(s); the manual §4 says only /create writes a run.`,
+  )
+  manualStates('Only `/create` writes one', 'which paths record a research run')
+})
+
 check('the manual lists every MCP tool, and no more', () => {
   const tools = [...source('src/lib/mcp/knowledge-tools.ts').matchAll(/name: '([a-z_]+)'/g)]
     .map((m) => m[1])

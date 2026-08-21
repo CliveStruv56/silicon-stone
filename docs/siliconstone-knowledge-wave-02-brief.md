@@ -3,8 +3,10 @@
 **Project:** `silicon-and-stone-web`
 **Written:** 2026-08-20 · **Baseline:** `573ff212`
 **Governing spec:** `siliconstone-knowledge-llm-master-spec.md` §10, wave 2
-**Status:** **contract only. No code exists.** Nothing in this document has been
-built, and it deliberately does not say how to build it.
+**Status:** **implemented for `/create`, 2026-08-21 (`8ec10cba`).** The contract
+below is unchanged and still governs; what was actually built, the three answered
+questions and the three defects the suite could not see are in
+[What was built](#what-was-built--2026-08-21-8ec10cba) at the end.
 
 Read `knowledge-system-foundation.md` first — it describes the schemas and the
 domain service this wave consumes. This brief exists so the next session starts
@@ -239,6 +241,93 @@ drives, and a client that stops polling loses the result even though the backend
 finished. That is the concrete form of "research must survive job expiry": the
 run record has to be updated at that moment, server-side, before the result is
 returned to a browser that may never come back.
+
+## What was built — 2026-08-21, `8ec10cba`
+
+**Status: implemented for `/create`.** The three open questions were answered by
+the owner and are recorded here so nobody re-opens them by accident:
+
+1. **Every started run is persisted**, opened before the outcome is known. A run
+   that dies mid-flight is the one most worth having a record of, and there is
+   no way to write one if the record only appears on success. `reuseStatus`
+   still lands at `pending`, so a completed run is not thereby reusable.
+2. **Only `/create` gets lineage.** `/import` and hand-written articles keep an
+   empty provenance block, because a blank reads as *there was none* — true —
+   where a synthesised one would say *we do not know* about work that never
+   happened. `article.source` already tells the two apart.
+3. **Nothing is backfilled.** The 26 existing articles predate all of it. Wave 6
+   owns cutover.
+
+Plus one the brief raised without listing: `suggestedContext.keywords` is
+persisted because the schema has a field; `pain_points` stays transient, because
+inventing a field for it is schema work this wave is not.
+
+### The shape
+
+| Where | What it now holds |
+|---|---|
+| `researchRun` | `query`, `brief`, `mode`, `provider`, `jobId`, status and timestamps, `summary`, `keywords`, `deepReport`, `selectedSources[]`, `modelSnapshot`, `retrievalSnapshots[]`, `articles[]` |
+| `article` | `researchRun`, `priorCoverage[]`, `generationSnapshot`, and `citationSnapshots[]` (which already worked) |
+
+`retrievalSnapshots` lives on the run but is keyed by **article and lane**, so
+one run producing two drafts keeps both, and a retried draft rewrites its own
+entry rather than adding a second copy of the same fact.
+
+Deliberately left unwritten, because no honest value exists: `rulesVersion` (the
+bundled style rules carry no version), `rulePackVersion` (the rule pack is the
+Compliance Checker's lane, which drafting never reads), and `publisher` / `score`
+on `selectedSources` (`ResearchSource` has neither).
+
+### Three defects the suite could not see
+
+Recorded because each is a trap the next wave can fall into.
+
+- **The article id handed to the domain did not exist yet.**
+  `createDraftFromResearch` strips `drafts.` before returning the id — the client
+  needs the published one for the fact-check — and that stripped id was also what
+  the lineage call received. Two ids now, named apart.
+- **The article was invisible to its own existence check.** On the pinned
+  `apiVersion` the client answers from the *published* perspective, so
+  `*[_id in $ids]` cannot see a `drafts.*` document at all. `KnowledgeClient.fetch`
+  takes an opt-in `{ perspective: 'raw' }` and **exactly one caller passes it**.
+  The capture paths keep the published default, where a draft satisfying a
+  reference check would be a surprise.
+- **A published run cannot strongly reference a draft article.** Sanity rejects
+  the mutation outright. `researchRun.articles` is now weak in the schema *and*
+  `_weak: true` on the value — the schema flag governs Studio, the mutation API
+  reads the marker on the reference, and neither alone is enough.
+
+All three passed every unit test. A stubbed client has no perspective and
+enforces no reference integrity, so the harness said *fine* to two things the API
+refuses. **Probe the running app** is not a nicety in this programme.
+
+One guard was also wrong on the first attempt: the "run opened before the search"
+check used `indexOf`, which found the deep branch's call and therefore passed
+however the fast path was ordered. `lastIndexOf` fixes it. That is the second
+vacuous check this repo has caught by mutation-testing its own guards.
+
+### Verification
+
+`src/lib/research-provenance.test.ts` holds the wave's invariants at source
+level, because `research-provenance.ts` imports `server-only` and cannot be
+imported under vitest. Twelve checks, each verified by breaking what it guards.
+`knowledge/service.test.ts` covers the domain behaviour.
+
+Live: a run opened, completed with two selected sources and a model snapshot, an
+article written with all three lineage parts, the two linked, and
+`researchRun->query` dereferencing from the article — then torn down, back to 26
+articles and 0 runs. `npm run test:cleanup` was taught about research runs in the
+process: a run has no `title` (its label is `query`), so it was invisible to the
+teardown, and a surviving run still references the article, which is enough for
+Sanity to refuse the article's delete.
+
+### Not done
+
+- **`ss-draft-local` records no run.** It runs real Exa research and already
+  writes `citationSnapshots`, but the CLI does not call the domain service.
+- **`knowledgeItems[]` on the run** stays empty; nothing derives items from a run
+  yet.
+- **No backfill**, per decision 3.
 
 ## Related
 
