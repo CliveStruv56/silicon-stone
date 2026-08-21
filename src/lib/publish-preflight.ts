@@ -20,6 +20,8 @@
  * bundle.
  */
 
+import { liveVerdict, type VerdictClaim } from './fact-check-verdict'
+
 export type PreflightSeverity = 'blocker' | 'warning'
 
 export type PreflightIssue = {
@@ -45,7 +47,7 @@ export type PreflightDocument = {
   stoneTruth?: string
   actionableInsights?: unknown
   citations?: unknown
-  factCheck?: { status?: string; overallVerdict?: string }
+  factCheck?: { status?: string; overallVerdict?: string; claims?: VerdictClaim[] | null }
   /** Rendered report from the quotation audit; see src/lib/quotation-audit.ts. */
   quotationAudit?: string
 }
@@ -143,7 +145,10 @@ export function preflightArticle(doc: PreflightDocument): PreflightIssue[] {
   }
 
   const status = doc.factCheck?.status
-  const verdict = doc.factCheck?.overallVerdict
+  // Derived, not read: overallVerdict is frozen at the end of the run and does
+  // not move when the editor applies a revision. See fact-check-verdict.ts.
+  const live = liveVerdict(doc.factCheck ?? {})
+  const verdict = live.verdict
 
   if (status !== 'completed') {
     issues.push({
@@ -160,14 +165,32 @@ export function preflightArticle(doc: PreflightDocument): PreflightIssue[] {
         'searches of primary sources. It is advisory, and there are pieces that do ' +
         'not need it — but this one has not been checked.',
     })
-  } else if (verdict === 'major-issues') {
+  } else if (verdict === 'major-issues' && (!live.derived || live.outstanding > 0)) {
     issues.push({
       id: 'fact-check-major-issues',
       severity: 'warning',
-      title: 'The fact-check found major issues',
+      title: !live.derived
+        ? 'The fact-check found major issues'
+        : live.outstanding === 1
+          ? 'The fact-check found major issues — 1 claim still to address'
+          : `The fact-check found major issues — ${live.outstanding} claims still to address`,
       detail:
         'At least one claim was contradicted by the evidence. Open the Fact Check ' +
         'panel, apply the suggested revisions, and re-run before publishing.',
+    })
+  } else if (live.addressed) {
+    // Not adverse any more, but not confirmed either: the revisions were
+    // inserted by hand and nothing has checked the new wording against
+    // evidence. Saying nothing here would let a stale clean-looking report
+    // stand in for one.
+    issues.push({
+      id: 'fact-check-stale',
+      severity: 'warning',
+      title: 'The fact-check predates your revisions',
+      detail:
+        `All ${live.applied} flagged claim${live.applied === 1 ? '' : 's'} have been addressed, ` +
+        'but the report describes the article as it was before those edits. Nothing ' +
+        'has verified the new wording. Re-run the fact-check to confirm it.',
     })
   }
 
