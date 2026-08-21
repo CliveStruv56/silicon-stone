@@ -33,8 +33,30 @@ export interface KnowledgePatch {
  * stub implementing four methods is a believable test double, whereas a stub
  * implementing the whole client is a second implementation with its own bugs.
  */
+/**
+ * Query options. Exactly one, and it exists for exactly one reason.
+ *
+ * On the pinned `apiVersion` the Sanity client answers from the **published**
+ * perspective by default, so `*[_id in $ids]` cannot see a `drafts.*` document
+ * at all. Every capture path writes published records and is right to keep that
+ * default — a draft copy satisfying a reference check would be a surprise. The
+ * one caller that must see drafts is article lineage: `/create` never
+ * publishes, so at the moment a run is linked to the article it produced, the
+ * article exists ONLY as a draft.
+ *
+ * Opt in per call, never globally. Found by probing production; a stubbed
+ * client has no perspective and answers either way.
+ */
+export interface KnowledgeFetchOptions {
+  perspective?: 'raw'
+}
+
 export interface KnowledgeClient {
-  fetch<T>(query: string, params?: Record<string, unknown>): Promise<T>
+  fetch<T>(
+    query: string,
+    params?: Record<string, unknown>,
+    options?: KnowledgeFetchOptions,
+  ): Promise<T>
   create(document: Record<string, unknown>): Promise<{ _id: string }>
   createOrReplace(document: Record<string, unknown>): Promise<{ _id: string }>
   patch(id: string): KnowledgePatch
@@ -246,12 +268,14 @@ export async function findDuplicate(
 export async function resolveExistingDocuments(
   client: KnowledgeClient,
   documentIds: readonly string[],
+  options?: KnowledgeFetchOptions,
 ): Promise<Map<string, string>> {
   const unique = [...new Set(documentIds.filter(Boolean))]
   if (unique.length === 0) return new Map()
   const rows = await client.fetch<{ _id: string; _type: string }[] | null>(
     `*[_id in $documentIds]{ _id, _type }`,
     { documentIds: unique },
+    options,
   )
   const found = new Map<string, string>()
   for (const row of rows ?? []) {

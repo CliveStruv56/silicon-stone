@@ -2,7 +2,7 @@ import 'server-only'
 
 import { writeClient } from '@/lib/sanity'
 
-import type { KnowledgeClient, KnowledgePatch } from './repository'
+import type { KnowledgeClient, KnowledgeFetchOptions, KnowledgePatch } from './repository'
 
 /**
  * Wires the real Sanity client into the knowledge repository.
@@ -22,8 +22,16 @@ import type { KnowledgeClient, KnowledgePatch } from './repository'
  */
 export function knowledgeClient(): KnowledgeClient {
   return {
-    fetch<T>(query: string, params: Record<string, unknown> = {}): Promise<T> {
-      return writeClient.fetch<T>(query, params)
+    fetch<T>(
+      query: string,
+      params: Record<string, unknown> = {},
+      options?: KnowledgeFetchOptions,
+    ): Promise<T> {
+      // `perspective` is passed through only when a caller asks for it. The
+      // default stays published, which is what every capture path wants.
+      return options?.perspective
+        ? writeClient.fetch<T>(query, params, { perspective: options.perspective })
+        : writeClient.fetch<T>(query, params)
     },
     async create(document: Record<string, unknown>) {
       const result = await writeClient.create(

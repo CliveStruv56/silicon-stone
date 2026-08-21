@@ -121,6 +121,38 @@ describe('the trust boundary', () => {
   })
 })
 
+describe('what only a live write could teach', () => {
+  // Both of these passed every unit test and failed against real Sanity. A
+  // stubbed client has no perspective and enforces no reference integrity, so
+  // the harness answered "fine" to two things the API refuses. They are
+  // guarded at source because that is the only place a test can see them.
+  const SERVICE = 'src/lib/knowledge/service.ts'
+  const RUN_SCHEMA = 'src/sanity/schemaTypes/researchRun.ts'
+
+  it('resolves the article with the raw perspective, and only the article', () => {
+    // /create never publishes, so the article exists solely as `drafts.<uuid>`
+    // — and on the pinned apiVersion the default published perspective cannot
+    // see it. The check refused every real draft while passing every stub.
+    const source = read(SERVICE)
+    expect(source).toMatch(/articleId[\s\S]{0,200}perspective: 'raw'/)
+    // Exactly one opt-in. The capture paths keep the published default, where a
+    // draft satisfying a reference check would be a surprise.
+    expect(source.match(/perspective: 'raw'/g) ?? []).toHaveLength(1)
+  })
+
+  it('writes the article back-reference weak, in the value and in the schema', () => {
+    // A run is a published document; the article it produced is a draft.
+    // Sanity refuses a strong reference from published to non-existent, so the
+    // mutation failed outright — "references non-existent document". The
+    // schema flag governs Studio; the API reads the marker on the value, so
+    // both are needed and neither alone is enough.
+    // Matched on the code shape, not the string: a comment mentioning
+    // `_weak: true` would otherwise satisfy this guard forever.
+    expect(read(SERVICE)).toMatch(/\.\.\.reference,\s*_weak: true/)
+    expect(read(RUN_SCHEMA)).toMatch(/name: 'articles'[\s\S]{0,900}weak: true/)
+  })
+})
+
 describe('references follow their targets; snapshots must not', () => {
   it('keeps both snapshot fields read-only in Studio', () => {
     // citationSnapshots and generationSnapshot answer "what was this actually

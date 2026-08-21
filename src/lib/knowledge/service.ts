@@ -38,6 +38,7 @@ import {
   resolveExistingDocuments,
   type DuplicateOutcome,
   type KnowledgeClient,
+  type KnowledgeFetchOptions,
 } from './repository'
 import {
   parseKnowledgeItemCaptureInput,
@@ -171,11 +172,12 @@ interface ReferenceRequest {
 async function resolveReferences(
   client: KnowledgeClient,
   requests: readonly ReferenceRequest[],
+  options?: KnowledgeFetchOptions,
 ): Promise<KnowledgeFailure | null> {
   const all = requests.flatMap((request) => request.ids)
   if (all.length === 0) return null
 
-  const found = await resolveExistingDocuments(client, all)
+  const found = await resolveExistingDocuments(client, all, options)
   const problems: string[] = []
 
   for (const request of requests) {
@@ -685,16 +687,33 @@ export async function recordRunGeneration(
     return fail('unresolved_reference', `${input.runId} is a ${run._type}, not a researchRun.`)
   }
 
-  const referenceFailure = await resolveReferences(deps.client, [
-    { field: 'articleId', ids: [input.articleId], expectedType: 'article' },
-  ])
+  // `raw`, and only here. /create never publishes, so at this moment the
+  // article exists solely as `drafts.<uuid>` — and on the pinned apiVersion the
+  // default published perspective cannot see it, so the check refused every
+  // real draft while passing every stubbed one. The capture paths keep the
+  // published default, where a draft satisfying a reference would be wrong.
+  const referenceFailure = await resolveReferences(
+    deps.client,
+    [{ field: 'articleId', ids: [input.articleId], expectedType: 'article' }],
+    { perspective: 'raw' },
+  )
   if (referenceFailure) return referenceFailure
 
   const existingArticles = (run.articles ?? [])
     .map((reference) => reference?._ref)
     .filter((ref): ref is string => Boolean(ref))
   // Existing first, so the merge never reorders what was already there.
-  const articles = keyedReferences([...existingArticles, input.articleId])
+  //
+  // `_weak` on the value, not only `weak: true` in the schema: the schema flag
+  // governs Studio, while the mutation API reads the marker on the reference
+  // itself and rejects a strong reference to a document the published dataset
+  // does not hold. A run is published; the article it produced is a draft. Get
+  // this wrong and every real generation fails on write — "references
+  // non-existent document" — while every stubbed one passes.
+  const articles = keyedReferences([...existingArticles, input.articleId]).map((reference) => ({
+    ...reference,
+    _weak: true,
+  }))
 
   const incoming = (input.retrievalSnapshots ?? []).map((snapshot) => ({
     _type: 'retrievalSnapshot',

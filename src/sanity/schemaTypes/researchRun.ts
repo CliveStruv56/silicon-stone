@@ -311,8 +311,18 @@ export const researchRun = defineType({
       group: 'lineage',
       name: 'articles',
       title: 'Resulting Articles',
+      description:
+        'Articles this run produced. A weak reference: the article is a draft when the link is written, and may never be published at all.',
       type: 'array',
-      of: [defineArrayMember({ type: 'reference', to: [{ type: 'article' }] })],
+      // WEAK, and it has to be. A run is a published document; the article it
+      // produced is a draft, because nothing in /create publishes. Sanity
+      // refuses a strong reference from a published document to one that does
+      // not exist in the published dataset — "references non-existent document"
+      // — so a strong reference here failed every real generation while passing
+      // every test. It is also the honest shape: the run produced that draft
+      // whether or not anyone ever publishes it, and deleting an abandoned
+      // draft must not be blocked by the record of where it came from.
+      of: [defineArrayMember({ type: 'reference', weak: true, to: [{ type: 'article' }] })],
     }),
   ],
   preview: {
