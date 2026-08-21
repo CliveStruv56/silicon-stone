@@ -60,9 +60,15 @@ interface Doc {
 
 async function findTestDocs(): Promise<Doc[]> {
   // Both halves of a draft/published pair match, and both need removing.
+  //
+  // A `researchRun` has no `title` — its human label is `query`, which carries
+  // the topic the operator typed and therefore the prefix. Matching on title
+  // alone left every test run behind, and a surviving run still references the
+  // article, which is enough for Sanity to refuse the article's delete.
   return client.fetch<Doc[]>(
-    `*[_type in ["article", "knowledgeItem", "knowledgeSource"] && title match $prefix]{
-       _id, _type, title, publishedAt
+    `*[_type in ["article", "knowledgeItem", "knowledgeSource", "researchRun"]
+        && coalesce(title, query) match $prefix]{
+       _id, _type, "title": coalesce(title, query), publishedAt
      } | order(_type asc, title asc)`,
     { prefix: `${TEST_PREFIX}*` },
   )
@@ -136,7 +142,15 @@ async function main(): Promise<void> {
     for (const refId of referencing) {
       await client
         .patch(refId)
-        .unset([`relatedArticles[_ref=="${d._id}"]`])
+        // Every array path that can point at an article. Unsetting a path that
+        // does not exist is a no-op, so listing them all is cheaper than
+        // asking each referrer what shape it is. `researchRun.articles` is
+        // wave 2's addition and is the one a test run holds.
+        .unset([
+          `relatedArticles[_ref=="${d._id}"]`,
+          `articles[_ref=="${d._id}"]`,
+          `priorCoverage[_ref=="${d._id}"]`,
+        ])
         .commit()
       console.log(`   Unlinked ${d.title ?? d._id} from ${refId}`)
     }
@@ -152,7 +166,11 @@ async function main(): Promise<void> {
   }
   await tx.commit({ visibility: 'async' })
 
-  console.log(`   Deleted ${docs.length} document(s) (${articles.length} article(s), ${knowledge.length} knowledge record(s)).`)
+  const runs = docs.filter((d) => d._type === 'researchRun')
+  console.log(
+    `   Deleted ${docs.length} document(s) (${articles.length} article(s), ` +
+      `${knowledge.length - runs.length} knowledge record(s), ${runs.length} research run(s)).`,
+  )
   console.log('\n   Now reconcile and confirm you are back where you started:')
   console.log('     npm run articles:sync')
   console.log('     npm run articles:verify-index\n')

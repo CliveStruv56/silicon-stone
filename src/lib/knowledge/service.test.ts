@@ -666,6 +666,37 @@ describe('recordRunGeneration', () => {
     if (!result.ok) expect(result.code).toBe('unresolved_reference')
   })
 
+  it('accepts a draft-only article and stores the published reference', async () => {
+    // Nothing in /create publishes, so at the moment lineage is recorded the
+    // article exists ONLY as `drafts.<uuid>`. Passing the stripped published id
+    // asks this to reference a document that will not exist until an editor
+    // presses Publish, and the reference check refuses exactly that. The stored
+    // reference is still the published id, which is where the article lands.
+    const h = harness({
+      'researchRun.one': { _id: 'researchRun.one', _type: 'researchRun', status: 'completed' },
+      'drafts.article.a': { _id: 'drafts.article.a', _type: 'article' },
+    })
+    const result = await recordRunGeneration(h.deps, {
+      runId: 'researchRun.one',
+      articleId: 'drafts.article.a',
+    })
+    expect(result.ok).toBe(true)
+    const refs = h.documents['researchRun.one'].articles as Array<{ _ref: string }>
+    expect(refs.map((r) => r._ref)).toEqual(['article.a'])
+  })
+
+  it('still refuses an article id that resolves to nothing at all', async () => {
+    const h = harness({
+      'researchRun.one': { _id: 'researchRun.one', _type: 'researchRun', status: 'completed' },
+    })
+    const result = await recordRunGeneration(h.deps, {
+      runId: 'researchRun.one',
+      articleId: 'drafts.article.ghost',
+    })
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.code).toBe('unresolved_reference')
+  })
+
   it('records lineage even for a run whose completion was never recorded', async () => {
     // Not a judgement: the article exists and came from this run. Refusing
     // here would discard lineage exactly when something had already gone wrong.

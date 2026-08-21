@@ -263,14 +263,24 @@ export async function createDraftFromResearch(
             logPrefix: "/create",
         });
 
-        articleId = String(created?._id ?? "").replace(/^drafts\./, "");
+        // TWO ids, and the difference matters. `createdId` is what Sanity
+        // actually holds — `drafts.<uuid>`, because nothing here publishes —
+        // and it is the only one that resolves to a document right now.
+        // `articleId` is the published id the client needs for the fact-check.
+        // Handing the stripped one to the domain asks it to reference a
+        // document that will not exist until someone presses Publish, and its
+        // reference check refuses exactly that.
+        const createdId = String(created?._id ?? "");
+        articleId = createdId.replace(/^drafts\./, "");
 
         // The other half of the link, and the last thing to happen: the run
         // learns which article it produced and what retrieval fed it. After the
         // write, so a failure here costs the back-reference and not the draft.
+        // The stored reference is normalised to the published id, which is
+        // where the article lands when the editor publishes it.
         await recordGeneration({
             runId: runId ?? null,
-            articleId,
+            articleId: createdId,
             retrieval: draftContext.retrieval,
         });
 

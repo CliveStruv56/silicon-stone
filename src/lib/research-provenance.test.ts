@@ -91,6 +91,17 @@ describe('the trust boundary', () => {
     expect(source).not.toMatch(/completeResearchRun\(\s*\{[^}]*researchResult/)
   })
 
+  it('hands the domain the id Sanity actually holds, not the published one', () => {
+    // Nothing in /create publishes. At the moment lineage is recorded the
+    // article exists only as `drafts.<uuid>`, so the stripped published id
+    // resolves to no document at all and the domain's reference check refuses
+    // it — silently, because provenance never throws into the pipeline. Every
+    // generated draft would have gone unlinked and nothing would have said so.
+    const source = read(CREATE_ACTIONS)
+    expect(source).toMatch(/recordGeneration\(\{[\s\S]{0,200}articleId: createdId/)
+    expect(source).not.toMatch(/recordGeneration\(\{[\s\S]{0,200}articleId,/)
+  })
+
   it('records a run that failed, having opened it before the outcome was known', () => {
     const source = read(CREATE_ACTIONS)
     expect(source).toContain('await openResearchRun(')
