@@ -36,16 +36,20 @@ obsolete, so the job is consolidation rather than a fifth document.
 **The long-standing P0 is resolved as of 2026-08-20: the production Kit API key is now a valid v4 key** (36 chars, `kit_` prefix), verified the same day with a read-only `GET /v4/account` returning 200 for account "SIlicon and Stone". The funnel no longer terminates in a failed POST. It has **not** been proven end to end — nobody has run a live `POST /api/subscribe`, because that puts a real subscriber on the list — so the parts are verified and the whole path is not. The same verification found three things behind it, all open: `CONVERTKIT_FORM_ID` points at a form named **"Mills form"** while one named "Newsletter site" also exists; two tag env vars still hold literal placeholder strings; and **none of the ~18 launch tags exist in Kit at all** (the account has two tags), so subscribes succeed but arrive untagged. The Kit sending address is also unverified. Beyond that: Lemon Squeezy store not yet created, 9 drafts unpublished, and 7 of 12 published articles still lack cover images. Go-live sequence lives in `LAUNCH.md`; defects and debt in §10.
 
 **The 21 August 2026 session ran the article-flows test specification end to
-end and repaired everything it found.** All eleven tasks; **fourteen defects
+end and repaired everything it found.** All eleven tasks; **fifteen defects
 found, fourteen fixed**; suite 1,248 → **1,333**. The last three — the MCP
 tools' swallowed error messages, `ss-draft-local`'s lost provenance, and the
 hand-made article that published into invisibility — were held open as
 Priority 0c and closed the same day; the third was a decision (warn, do not
-block) and its reasoning is in §9. Two of the fourteen were not in the spec at all — one was
-reported by the owner using the tool, one surfaced only because a fix that was
-already written and unit-tested failed on its first live run — which is the
-argument for running the spec against real model output rather than trusting
-green tests. Evidence and reasoning: the **Article Pipeline Audit** artifact
+block) and its reasoning is in §9. **Three of the fifteen were not in the spec
+at all**: one was reported by the owner using the tool, one surfaced because a
+fix that was already written and unit-tested failed on its first live run, and
+the fifteenth because a fix that passed its own new guard was checked in a
+browser anyway and turned out not to work in production. That is the argument
+for running the spec against real output rather than trusting green tests. The
+one thing still open is a **watch item, not a defect**: a Pulse that drafted at
+282 words against a 100–140 budget, which is model adherence and needs a few
+more samples before the prompt is touched. Evidence and reasoning: the **Article Pipeline Audit** artifact
 (ask the owner for the link; it is private to their account).
 
 ---
@@ -57,7 +61,7 @@ green tests. Evidence and reasoning: the **Article Pipeline Audit** artifact
 | Read | For |
 |---|---|
 | **`docs/operator-manual.md`** | How the publication is actually run — research, drafting, the guards, publishing, knowledge capture. Written for the operator. **Replaces `authoring-guide.md`, `article-generation-guide.md` and `editorial-aios-manual.md`, all now pointer stubs.** |
-| **`docs/test-spec-article-flows.md`** | Eleven costed tasks proving every creation path still works, with `npm run test:cleanup` to undo them. **All eleven run 2026-08-21** — fourteen defects found, all fourteen fixed (the last three under §11 Priority 0c), one watch item. Re-run after any pipeline or guard change. |
+| **`docs/test-spec-article-flows.md`** | Eleven costed tasks proving every creation path still works, with `npm run test:cleanup` to undo them. **All eleven run 2026-08-21** — fifteen defects found, fourteen fixed (the last three under §11 Priority 0c, the fifteenth found in a browser afterwards), one watch item. Re-run after any pipeline or guard change. |
 | `§11` below | What to do next. **Priority 0c is empty** — the three defects it held were closed on 2026-08-21; the entry survives for the reasoning behind the third. |
 | `CLAUDE.md` | The invariants. Nothing may contradict it. |
 | `LAUNCH.md` | Owner setup: Kit, Lemon Squeezy, **and the Sanity webhooks** — three of them, configured only in the Sanity dashboard and recorded nowhere else. |
@@ -5764,9 +5768,11 @@ recipients** — see the VAPID row in Priority 2. It can never notify again.
 ### Priority 0b — The test specification has been run end to end
 
 `docs/test-spec-article-flows.md`, eleven tasks. **All eleven were run on
-2026-08-21** and the spec was corrected wherever that run made it wrong, so it
-is current at `ce037c64`. Between them the tasks found **fourteen defects, ten
-fixed** — see §9 for the day, and the artifact for the evidence.
+2026-08-21** and the spec was corrected wherever that run made it wrong. Between
+them the tasks found **fourteen defects**; a fifteenth surfaced when the fix for
+one of them was checked in a browser. **Fourteen are fixed**; the one left is a
+watch item, not a defect (a Pulse that drafted at double its word budget, which
+is model adherence). See §9 for the day, and the artifact for the evidence.
 
 Re-run it after any change to the drafting pipeline, the guards or the publish
 chain. It ends with `npm run test:cleanup`, which now actually removes vectors.
