@@ -245,6 +245,7 @@ All draft-generating formats use Claude at temperature 0.4. Drafts are created d
 | `/api/auth/callback/inoreader` | OAuth callback for Inoreader (state-validated) |
 | `/api/subscribe` | POST email to Kit form (optional tag param for tool leads; rate-limited) |
 | `/api/contact` | POST contact form to Kit with custom fields (rate-limited) |
+| `/api/push/{subscribe,unsubscribe,topics,send,stats}` | Web Push (P3-6). `send` and `stats` are admin-gated in the route — `/api/push/*` is not on the middleware matcher. `stats` reports subscriber counts per topic, never the subscription records |
 
 ### SEO / metadata surface routes
 
@@ -558,6 +559,25 @@ quotation-audit passes, so none of them reads the scaffold. Falls back to
 recovering `[AUTHOR: …]` tokens from the edit summary when the model skips the
 new marker, which is what the observed run actually did.
 
+**Push subscriber counts are visible for the first time.** Nothing in the app
+reported them, so the question "is push worth maintaining" could not be answered
+at all — and the Upstash console was unreachable too, because the Redis
+credentials are marked **Sensitive** in Vercel and `vercel env pull` returns the
+literal string `[SENSITIVE]` for them. Correct posture; it left the number
+genuinely unobtainable. `GET /api/push/stats` now reports it, admin-gated on the
+same writer session as `/api/push/send` (`/api/push/*` is not on the middleware
+matcher, so the gate is in the route, as it is there).
+
+Two properties worth keeping. It returns **counts, never subscriptions** —
+`countTopicSubscriptions()` uses `SCARD` per topic rather than reading records
+that carry device endpoints and encryption keys, and a test asserts the response
+contains no `endpoint`, `p256dh` or `auth`. And **`configured` separates the two
+zeroes**: "nobody has subscribed" and "there is no store to ask" render
+identically, and only one is a fact about the audience. `canSend` is reported
+separately again, because the VAPID keys are a different gate.
+
+Answered on production: **0 on both topics, `configured: true`, `canSend: true`.**
+
 **The claim controls, tested — and a fifth defect.** "Insert into article" works:
 the claim rows are collapsed previews and the control only mounts once an item
 is opened, after which editing the Suggested Revision and inserting puts *the
@@ -678,8 +698,8 @@ directory that does not exist in the repo at all, behind a bare `catch {}`. So
 the prediction was well founded and unobservable without spending a production
 draft to confirm a defect already documented in the repo.
 
-1,311 tests green (up 63). Manual restamped; §6, §7a, §8 and §12 describe the
-new behaviour.
+1,317 tests green (up 69). Manual restamped; §6, §7a, §8, §10 and §12 describe
+the new behaviour, and §3's route table gains the push endpoints.
 
 ### August 21, 2026 — Web Push live, and a live article corrected
 
@@ -5613,7 +5633,7 @@ changes broke, and it ends with `npm run test:cleanup`.
 | Task | Description |
 |------|-------------|
 | **Inoreader redirect URI** | Update the dev portal to the production callback so research OAuth works outside localhost. |
-| ~~**VAPID keys for Web Push**~~ — **done 2026-08-21** | Keys are set on production and verified (an authenticated probe of `/api/push/send` reaches body validation rather than the 503 config gate). Publishing an Audit-tier article now notifies automatically via `/api/on-publish`. Residual: no reader has ever been able to subscribe before today, so the audience starts at zero, and no notification has yet been observed arriving on a real device. |
+| ~~**VAPID keys for Web Push**~~ — **done 2026-08-21** | Keys are set on production and verified (an authenticated probe of `/api/push/send` reaches body validation rather than the 503 config gate). Publishing an Audit-tier article now notifies automatically via `/api/on-publish`. Residual, now measured rather than assumed: `/api/push/stats` reports **0 subscribers on both topics** with `configured: true`, so that is the store answering rather than a missing store — publishing *The Same Money, Counted Three Times* sent to nobody and consumed its one-shot marker for no recipients. Nothing is broken: the public VAPID key is what the *browser* needs to create a subscription, so there has never been a window in which anyone could. To prove the chain, subscribe a device on the live site, then publish the next Audit-tier piece or POST `/api/push/send`. |
 | **Confirm Plausible goal names** | Phase 3 + `LAUNCH.md` §3 events must exist by exact name (with spaces) to register. |
 
 ### Priority 2a — Compliance Checker v2 (Phases 0–8 built, release not taken)
