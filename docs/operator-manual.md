@@ -56,7 +56,7 @@ first use.
 | Kit sending address | **Unverified** | You cannot reliably send until this is done. |
 | Broadcast / "email this article" | **Does not exist** | There is no route. Sending is manual, in Kit. |
 | Substack | **Manual only** | No integration of any kind. |
-| Web Push | **Wired, needs keys** | Publishing an **Audit-tier** article now notifies the "New Audit-tier Deep Dives" subscribers — once `VAPID_PRIVATE_KEY` and `NEXT_PUBLIC_VAPID_PUBLIC_KEY` are set. Until then it answers 503 and nobody is notified. The deadline-alerts topic is still manual. |
+| Web Push | **Live** (21 Aug 2026) | VAPID keys are configured on production, verified. Publishing an **Audit-tier** article notifies the "New Audit-tier Deep Dives" subscribers, once per article ever. Nothing fires for other tiers, and the AI Act deadline topic is still sent by hand. Subscriber numbers start from zero — nobody could subscribe before the keys existed. |
 | Lemon Squeezy / checkout | **No store** | `NEXT_PUBLIC_PRE_LAUNCH` defaults true, which suppresses every checkout link. Product gates link to the product page instead. |
 | Compliance Checker v2 | **Dark** | v1 is what every visitor gets. See §13. |
 | ChatGPT knowledge capture | **Blocked** | Not an engineering problem — it needs a Business-tier seat. See §11. |
@@ -574,6 +574,33 @@ it never blocks anything.
 run, so you get a completed report with an "unverifiable" verdict. That is a
 different thing from a clean one.
 
+### ⚠ Re-running does not carry forward what the last run found
+
+**Which claims get checked is decided fresh each time, by a model reading the
+article.** Two runs over the same unchanged text will not extract the same list.
+A claim flagged as inaccurate in one run can simply be *absent* from the next —
+not cleared, not re-checked, just not picked up.
+
+So **a claim disappearing from the report is not evidence it was fixed.** Only
+the run that flagged it knows it was ever a problem, and a later report replaces
+the earlier one wholesale.
+
+Observed on 21 August 2026: a BIS quotation flagged `unverifiable` with high
+confidence in one run was not extracted at all by the next, on identical text.
+Had the first report not been read, the problem would have vanished silently.
+
+Two practical consequences:
+
+- **Act on a flagged claim while you can see it.** Do not re-run hoping for a
+  cleaner report — you may get one without having fixed anything.
+- **Keep a note of what you resolved**, because the report will not remember.
+
+The counts are trustworthy *within* one run: the verdict, the counts and the
+claim list are all written from the same result set in a single patch. Older
+reports may not be — one from 10 August claimed 18 claims checked while storing
+8. If a report's counts and claim list disagree, it predates the current code:
+re-run it rather than trusting either number.
+
 ### 7c. Publish preflight
 
 Runs when you click Publish in Studio. On a clean draft you never see it — it
@@ -966,6 +993,10 @@ This should now be rare — a lapsed admin session is renewed from your Sanity l
 automatically. Seeing it means the renewal itself failed: either Studio's own
 session has gone (reload Studio and sign in) or the site could not reach Sanity.
 The `/login` access code still works as a fallback and opens in a new tab. See §2.
+
+### A claim I fixed has vanished from the fact-check report
+Nothing carried it forward. Extraction is non-deterministic — see §7b. Absence
+is not resolution, and a report never remembers what an earlier one found.
 
 ### "Your Sanity account cannot run this"
 Your Sanity account is not an administrator of the project, and site tools are

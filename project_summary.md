@@ -1,7 +1,7 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-08-20
+> Last Updated: 2026-08-21
 > Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (78 prerendered pages), 1,076 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, **Guide**, YouTube Script, Research Only), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
@@ -38,6 +38,27 @@ obsolete, so the job is consolidation rather than a fifth document.
 ---
 
 ## Quick Context for New Sessions
+
+### Start here, in this order
+
+| Read | For |
+|---|---|
+| **`docs/operator-manual.md`** | How the publication is actually run — research, drafting, the guards, publishing, knowledge capture. Written for the operator. **Replaces `authoring-guide.md`, `article-generation-guide.md` and `editorial-aios-manual.md`, all now pointer stubs.** |
+| **`docs/test-spec-article-flows.md`** | Eleven costed tasks proving every creation path still works, with `npm run test:cleanup` to undo them. |
+| `§11` below | What to do next. Priorities 0a and 0b are the immediate ones. |
+| `CLAUDE.md` | The invariants. Nothing may contradict it. |
+| `LAUNCH.md` | Owner setup: Kit, Lemon Squeezy, **and the Sanity webhooks** — three of them, configured only in the Sanity dashboard and recorded nowhere else. |
+
+**Guards that will fail the build if you drift:** `npm run test:manual` (the
+operator manual against the code), `rulepack-check`, `reg:check`,
+`test:checker-v2`, `test:sanity-prices`, `test:security`. All in `prebuild`.
+A failure is a real signal — fix the code or fix the check's anchor, never
+loosen it to green.
+
+**Four ways an article gets created**, and they are not equal: `/create`,
+`/import` (paste from elsewhere), `ss-draft-local` (Claude Code, Max plan), and
+by hand in Studio. The last gets no guards at all beyond the publish dialog.
+Manual §5 has the table.
 
 This is the **Silicon & Stone intelligence portal** — a Next.js 15 + Sanity CMS platform for "Forensic Technopolitics" analysis. It combines a public website, admin research/authoring tools, digital product sales pages, and an embedded CMS Studio.
 
@@ -488,6 +509,51 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 21, 2026 — Web Push live, and a live article corrected
+
+**VAPID keys are configured on production and verified.** Probed by sending an
+authenticated request to `/api/push/send` with a deliberately incomplete body:
+it reached body validation (400) rather than the config gate (503), which it
+could only do with keys present — and nothing was sent to anyone. Publishing an
+Audit-tier article now notifies automatically. The audience starts at zero,
+because nobody could subscribe before the keys existed: the public key is needed
+*in the browser* to create a subscription, not only on the server to send one.
+
+**The `/api/on-publish` webhook is configured and working**, verified from
+Sanity's own delivery log. Three deliveries, all 200, and the sequence is the
+loop guard doing its job in production: `recorded warnings` (2029ms) →
+`unchanged` (484ms) → `unchanged` (253ms). It writes once, the write re-fires
+the webhook, the re-run computes the same text and stops.
+
+Its first real catch: **"GPAI Enforcement Activates 2 August"** is live with no
+fact-check and no sources, now recorded on the document rather than having
+flashed past in a dismissed dialog.
+
+**"The Same Money, Counted Three Times" corrected — as a draft.** Live, with a
+`major-issues` verdict. Re-running the fact-check produced a consistent report
+(18 claims stored, 18 counted) where the old one had claimed 18 while storing 8
+— a stale artefact, not a live bug; the current code writes counts and claims
+from one result set in one patch.
+
+Six evidence-backed corrections applied to a **draft**, live article untouched:
+Nvidia's $250bn guarantee (reworked to ~$105bn by mid-August); Oracle's free
+cash flow (the −$24bn was S&P's *prior FY27 forecast*, not FY26 actual);
+Alphabet's $98bn (that is total other income, and $94.1bn is the SpaceX holding,
+not the gain); and **three separate places putting words in the BIS's mouth** —
+'shadow borrowing' is Bloomberg's headline phrase, the "four pressure points"
+framing is not in the report, and the "similarly disruptive" quotation could not
+be found in the evidence at all. Three further items left for a human: see §11
+Priority 0a.
+
+**A real limit of the fact-check, now documented.** Claim extraction is
+**non-deterministic** — which claims get checked is decided fresh by a model each
+run. The BIS "similarly disruptive" quotation was flagged `unverifiable` at high
+confidence in one run and **not extracted at all** by the next, on identical
+text. Had the first report not been read, the problem would have vanished
+silently. So a claim disappearing from a report is not evidence it was fixed, and
+re-running can produce a cleaner verdict without anything having been fixed.
+Manual §7b and §12 say so.
 
 ### August 21, 2026 — Tier 3: the publish webhook, and the first thing it caught
 
@@ -5330,8 +5396,36 @@ ordered go-live sequence, the 14 Kit tag→env mappings, the Lemon Squeezy produ
 duplicate that checklist here — this section only records what is *not* covered
 there.
 
-The one-line status: **blocked at step 1 of 9** — the invalid Kit v4 API key.
-Nothing downstream matters until email capture works.
+The one-line status: **step 1 of 9 is done** (the Kit v4 key was fixed
+2026-08-20 and verified against Kit's own API). The next blocking decision is
+**which Kit form** — `CONVERTKIT_FORM_ID` points at a form named "Mills form"
+while one named "Newsletter site" also exists, and every subscriber the site has
+ever created went into whichever it is. That is one decision, no engineering,
+and it is the highest-value open item on this page.
+
+After it: create the 14 Kit tags (none exist yet), then the Lemon Squeezy store.
+
+### Priority 0a — Finish the article correction started 2026-08-21
+
+`a808564a-…` **"The Same Money, Counted Three Times"** is live and carries a
+`major-issues` fact-check. A corrected **draft** exists with six evidence-backed
+fixes applied; the live article is untouched. Open it in Studio, resolve the
+three items below, publish.
+
+| Left for a human | Why |
+|---|---|
+| Claim 16 — Meta/Amazon depreciation | Flagged inaccurate, but the checker's own evidence contradicts itself and it offered no revision |
+| Claim 18 — the Barclays/Scott Schulte quotation | Unverifiable from the evidence. A named person's words; the author knows the source |
+| *"The BIS said so directly."* in the 2006/SIV paragraph | Now sits beside softened BIS material. Judgement call |
+
+Publishing it will also fire the first real push notification (Audit tier, keys
+now live) — worth watching to confirm the chain end to end.
+
+### Priority 0b — Run the test specification
+
+`docs/test-spec-article-flows.md`, eleven tasks, costed. Nothing in it has been
+run by the owner yet. It is the fastest way to find what these two days of
+changes broke, and it ends with `npm run test:cleanup`.
 
 ### Priority 1 — Content (the actual bottleneck)
 
@@ -5348,7 +5442,7 @@ Nothing downstream matters until email capture works.
 | Task | Description |
 |------|-------------|
 | **Inoreader redirect URI** | Update the dev portal to the production callback so research OAuth works outside localhost. |
-| **VAPID keys for Web Push** | `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` — Phase 3 push is code-complete but cannot send until these are set and verified on a real device. |
+| ~~**VAPID keys for Web Push**~~ — **done 2026-08-21** | Keys are set on production and verified (an authenticated probe of `/api/push/send` reaches body validation rather than the 503 config gate). Publishing an Audit-tier article now notifies automatically via `/api/on-publish`. Residual: no reader has ever been able to subscribe before today, so the audience starts at zero, and no notification has yet been observed arriving on a real device. |
 | **Confirm Plausible goal names** | Phase 3 + `LAUNCH.md` §3 events must exist by exact name (with spaces) to register. |
 
 ### Priority 2a — Compliance Checker v2 (Phases 0–8 built, release not taken)

@@ -1,9 +1,18 @@
 # Editorial AIOS Inbox
 
+> **Partly superseded.** The knowledge system was rebuilt in waves 0–1 and 4a
+> (19–20 August 2026). For how to capture and review knowledge today, see
+> **[`operator-manual.md`](operator-manual.md) §11**. What survives here is the
+> evidence-index detail and the vault-retirement record; the Studio navigation
+> and document types described below have moved on — `knowledgeCandidate` is
+> legacy, and `knowledgeItem` (which this document predates) is its replacement.
+
 The AIOS inbox is additive. It does not change the existing `article` schema,
 draft-generation path, publishing workflow, or article-level Pinecone index.
 
-For the full user-facing walkthrough, see [Editorial AIOS User Manual](./editorial-aios-manual.md).
+For the full user-facing walkthrough, see
+[the operator's manual](./operator-manual.md) §11. (`editorial-aios-manual.md`
+is retired and now only explains what it got wrong.)
 
 ## Sanity Documents
 
@@ -12,7 +21,8 @@ For the full user-facing walkthrough, see [Editorial AIOS User Manual](./editori
 - `knowledgeCandidate`: portal-generated synthesis awaiting reviewed local
   filing.
 
-Both appear in the embedded Sanity Studio under **Knowledge Inbox**.
+Both appear in the embedded Sanity Studio under **Knowledge** (renamed from
+"Knowledge Inbox"; `knowledgeCandidate` now sits under *Legacy (pre-foundation)*).
 
 ## Local Vault Workflow (retired)
 
