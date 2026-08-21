@@ -11,7 +11,7 @@ auto-memory in `MEMORY.md`.
 replaced four overlapping guides that had gone stale together and then
 **contradicted each other on eight points of fact**, with nothing failing to
 say so. `scripts/manual-checks.ts` (`npm run test:manual`, in `prebuild` and
-CI) is what stops that recurring: 18 checks that read a value out of the code
+CI) is what stops that recurring: 19 checks that read a value out of the code
 and assert the manual still states it.
 
 Two rules when it fails:

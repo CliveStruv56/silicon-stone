@@ -256,6 +256,42 @@ check('a research run is recorded, and only from /create', () => {
   manualStates('Only `/create` writes one', 'which paths record a research run')
 })
 
+check('editorial memory needs two switches, and the manual says so', () => {
+  // Wave 3, decisions 5 and 6. Both facts are read from code first.
+  const features = source('src/lib/knowledge/features.ts')
+  assert.match(
+    features,
+    /autoIndex: 'KNOWLEDGE_AUTO_INDEX_ENABLED'/,
+    'the auto-index flag was renamed; the manual §11 names it',
+  )
+  manualStates('`KNOWLEDGE_AUTO_INDEX_ENABLED`', 'the flag that gates indexing on review')
+
+  // The lane must define no default floor. A comment mentioning one does not
+  // count — strip comments before looking, or the lane's own explanation of
+  // why it has none satisfies the check.
+  const laneCode = source('src/lib/knowledge/retrieve.ts')
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/^\s*\/\/.*$/gm, '')
+  assert.equal(
+    (laneCode.match(/SCORE_FLOOR\s*=\s*0?\.\d+/g) ?? []).length,
+    0,
+    'the retrieval lane now hard-codes a score floor; the manual says it needs one nobody has measured',
+  )
+  // Needles must fit inside ONE wrapped line of the manual. Two attempts at
+  // this check failed on a phrase that spanned a line break — a guard failing
+  // on the formatting rather than the fact is a guard nobody trusts.
+  manualStates('**Drafting does not consult it yet.**', 'that the drafting lane is off')
+  manualStates('needs a score floor', 'that the lane is not calibrated')
+
+  // Only `normal` is retrievable, and the manual tells a reviewer that.
+  assert.match(
+    source('src/lib/knowledge/eligibility.ts'),
+    /sensitivity !== 'normal'/,
+    'the sensitivity gate moved; the manual §11 promises Private and Confidential are refused',
+  )
+  manualStates('Only `normal` sensitivity is ever indexed', 'the sensitivity rule')
+})
+
 check('the manual lists every MCP tool, and no more', () => {
   const tools = [...source('src/lib/mcp/knowledge-tools.ts').matchAll(/name: '([a-z_]+)'/g)]
     .map((m) => m[1])

@@ -2,7 +2,7 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-08-21
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (78 prerendered pages), 1,356 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (78 prerendered pages), 1,387 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, **Guide**, YouTube Script, Research Only), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
@@ -527,6 +527,64 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 21, 2026 — Wave 3: editorial memory, built dark
+
+Wave 1 left a nine-rule index state machine, nine `indexState` fields and an
+`index_evaluation_requested` intent, all with zero callers. Wave 3 connects them.
+`docs/siliconstone-knowledge-wave-03-brief.md` holds the contract, the six
+owner decisions and what was built.
+
+**Eligibility is a pure domain calculation**, and every verdict carries a reason
+including the eligible ones — a record missing from the corpus has to be
+explicable, since "not indexed" looks the same whether policy excluded it, the
+text was empty, or the indexer never ran. Absent `sensitivity` reads as `normal`
+(a source has no such field; an item's schema declares that default), and
+anything actually set and not normal is refused. **Size is not an eligibility
+question**: too large to embed is *eligible and unindexable*, which is `error`,
+not `not_eligible`.
+
+**Decision 2's shape, wired.** `pending` is written in the same patch as the
+`ready` verdict, so a process dying between the verdict and the embedding leaves
+something reconciliation can find rather than a `ready` record nothing will look
+at again. The review route acts on the intent it used to discard, behind
+`KNOWLEDGE_AUTO_INDEX_ENABLED`, after the verdict is written — a failure costs
+the vector, never the review. An already-indexed record is *not* re-opened on
+re-approval, which the machine would have allowed and which would re-embed
+everything each time somebody took a second look.
+
+**`generateEmbedding` silently truncates at 24,000 characters** — right for
+articles, wrong here, where a source stored as its first 24,000 characters is a
+document misrepresented with nothing on the record to show for it. The constant
+is now exported and shared, and the indexer refuses at exactly that boundary
+rather than carrying a second number that has to agree.
+
+**`knowledge:sync` finds a drift neither existing script could**: a record whose
+`canonicalHash` no longer matches its `indexedHash` is stale but present — the
+vector is there, the counts agree, the text is wrong.
+
+**The lane ships dark, and needs two switches.** The flag says it may run;
+`KNOWLEDGE_SCORE_FLOOR` says what counts as a match, and no default exists
+anywhere in the code. `PRIOR_COVERAGE_SCORE_FLOOR = 0.37` was measured over 15
+articles; editorial memory has two records. `knowledge:calibrate` repeats that
+experiment and **refuses to split the difference when the bands overlap** —
+which is a real answer, not a failure to compute.
+
+**Two guards were wrong on the first attempt, both to prose satisfying a check.**
+The "no hard-coded floor" guard read the raw file and failed on the lane's own
+docblock citing the article floor while explaining why this lane has none. That
+is the third vacuous-guard class this repo has caught in two days — `indexOf`
+finding the wrong call site, a regex matching `env['X']` but not
+`process.env.X`, and now a comment. All three found by breaking the guard on
+purpose.
+
+One wave-1 test was changed rather than deleted: it asserted the `ready` patch
+touched nothing else, and the comment now records what it was protecting and why
+that still holds.
+
+1,387 tests green. **Nothing is provisioned and nothing has been indexed** — the
+mechanism is the deliverable, and with 0 ready items and 2 ready sources there
+are two documents waiting for it.
 
 ### August 21, 2026 — Wave 2: an article can say what it was written from
 
@@ -5907,7 +5965,7 @@ re-guessed.
 |---|---|
 | 0–1 — contracts, schemas, domain service | **Done 2026-08-19.** |
 | 2 — provenance | **Done 2026-08-21** for `/create`. Runs are durable; articles carry lineage. See §9 and the brief's "What was built". |
-| 3 — editorial memory | **Briefed and decided 2026-08-21, not built** — `docs/siliconstone-knowledge-wave-03-brief.md`. Wave 1 left the whole index state machine, the nine `indexState` fields and the `index_evaluation_requested` intent unconsumed, so this is mostly connecting what exists. **All six questions answered**, two of them deferrals: a fourth Pinecone index (not a namespace — `articles:sync` deletes every id it does not recognise); indexing inline on the review transition plus a reconciler, no fourth webhook; one vector per record with a budget that errors rather than truncates; research-run indexing deferred; `normal` sensitivity only; and **the retrieval lane ships dark** — two records cannot calibrate a floor, so none is claimed. |
+| 3 — editorial memory | **Built dark 2026-08-21** — `docs/siliconstone-knowledge-wave-03-brief.md`. Eligibility, the index state machine driven, inline indexing on the review transition, `knowledge:sync` reconciliation, and a third retrieval lane. **Nothing is provisioned**: `PINECONE_KNOWLEDGE_INDEX_NAME` is unset, so all three are no-ops that say so. The lane needs two switches — the flag *and* a measured `KNOWLEDGE_SCORE_FLOOR`, which does not exist by default. Wave 1's state machine and intent are now consumed. **All six questions answered**, two of them deferrals: a fourth Pinecone index (not a namespace — `articles:sync` deletes every id it does not recognise); indexing inline on the review transition plus a reconciler, no fourth webhook; one vector per record with a budget that errors rather than truncates; research-run indexing deferred; `normal` sensitivity only; and the retrieval lane ships dark — two records cannot calibrate a floor, so none is claimed. |
 | 4 — frictionless capture | **4a done 2026-08-20** (universal endpoint + hosted MCP, six tools). The `/knowledge` cockpit and URL/PDF extraction are not built. |
 | 5 — conversation integration | Claude reached in 4a. **ChatGPT is parked**, on a plan gate rather than an engineering one — Business is the first tier that can write. |
 | 6 — cutover | Not started. Owns any backfill; wave 2 deliberately did none. |

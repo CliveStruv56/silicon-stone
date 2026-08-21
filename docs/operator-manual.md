@@ -1064,6 +1064,31 @@ And on search:
 
 ---
 
+### What happens when you mark a record ready (21 August 2026)
+
+Pressing **Mark ready** does one more thing than it used to. The record is
+marked for indexing in the same write as the verdict, and — if editorial memory
+has been switched on — it is embedded into its own vector store so future drafts
+can consult it.
+
+Three things worth knowing:
+
+- **It is off by default.** `KNOWLEDGE_AUTO_INDEX_ENABLED` gates the indexing,
+  and nothing is indexed while it is unset. Your review works exactly as before.
+- **Indexing can never cost you your verdict.** If the embedding fails, the
+  review still succeeds and the record is left saying so — status `error` with
+  the reason. `npm run knowledge:sync` comes back for it.
+- **Only `normal` sensitivity is ever indexed.** A record marked *Private* or
+  *Confidential* is refused, and so is anything not reviewed, anything whose
+  extraction has not finished, and anything with no text.
+
+**Drafting does not consult it yet.** That is a separate switch again, and it
+also needs a score floor — a measured number saying what counts as a match.
+Nobody has measured one, because the corpus is two records and the method needs
+a corpus. Until then the lane reports `skipped` and `/create` retrieves exactly
+what it did before.
+
+
 ## 12. When it goes wrong
 
 Symptom first.

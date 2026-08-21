@@ -3,10 +3,12 @@
 **Project:** `silicon-and-stone-web`
 **Written:** 2026-08-21 · **Baseline:** `f819e597`
 **Governing spec:** `siliconstone-knowledge-llm-master-spec.md` §10, wave 3
-**Status:** **decisions taken, no code exists.** The six open questions were
-answered by the owner on 2026-08-21 and are recorded below under
-[Decisions](#decisions--answered-by-the-owner-2026-08-21); nothing has been
-built, and this document still does not say how to build it.
+**Status:** **built 2026-08-21 (`4cbdc475`) — the mechanism ships, the lane
+ships dark, nothing is provisioned.** The six questions were answered by the
+owner and are recorded under
+[Decisions](#decisions--answered-by-the-owner-2026-08-21); what was actually
+built is at the end under
+[What was built](#what-was-built--2026-08-21-4cbdc475).
 
 Read `knowledge-system-foundation.md` for the schemas and the domain service,
 and `siliconstone-knowledge-wave-02-brief.md` — particularly its *What was
@@ -360,6 +362,124 @@ diff.
 - **Walk the UI.** Wave 4a's three capture defects were found by opening a
   record in Studio. Wave 3 writes `readOnly` fields a reviewer will read; open
   one and look at it.
+
+## What was built — 2026-08-21, `4cbdc475`
+
+**Status: the mechanism ships; the lane ships dark.** Everything below is behind
+switches that are off, and nothing is provisioned — see *What is not done*.
+
+### Eligibility (`knowledge/eligibility.ts`)
+
+A pure function, because `§6` puts the calculation in the domain's list. Every
+verdict carries a reason **including the eligible ones**: a record that is not in
+the corpus has to be explicable without reading the implementation, since "not
+indexed" is the same observation whether policy excluded it, the text was empty,
+or the indexer never ran.
+
+Four judgements, each with a test:
+
+- A pre-foundation source is read through its legacy `status`. One of the two
+  currently-eligible records is eligible only that way.
+- **Absent `sensitivity` is `normal`.** A source has no such field at all, so no
+  policy was ever expressed for one, and an item's schema carries
+  `initialValue: 'normal'`. Failing closed on absence would silently exclude
+  every record captured before the field existed. Anything actually set and not
+  `normal` is refused.
+- Extraction that is `queued`, `processing` or `failed` means the text is not
+  settled.
+- **Size is not judged here.** Too large to embed is *eligible and unindexable*,
+  which is `error`, not `not_eligible`. Policy and mechanism are different
+  failures and the machine already tells them apart.
+
+`canonicalIndexHash` hashes the text that would be embedded, and is deliberately
+not the capture `contentHash` — dedupe and staleness are different questions. The
+field order inside `embeddableText` is fixed because that hash is what "changed"
+means; reordering it would make every record look stale exactly once.
+
+### The machine, driven (`applyIndexTransition`, `knowledge/indexer.ts`)
+
+The transition does its own field bookkeeping, so a state and the evidence for it
+cannot be written apart: `indexed` always stamps hash, model, version and time
+and clears a stale error; `error` always records the message, time and count;
+losing eligibility forgets the indexed hash, because saying otherwise would make
+reconciliation believe the index holds something it does not.
+
+The refusal of self-transitions is kept rather than worked around.
+
+`indexRecord` returns and never throws. Over the embedding budget is an `error`
+naming the limit, checked **before** the call — `generateEmbedding` slices
+silently, which is right for articles and wrong for a corpus where a source
+stored as its first 24,000 characters is a document misrepresented with nothing
+on the record to show for it. `MAX_EMBEDDING_CHARS` is now exported and shared so
+the two numbers cannot drift.
+
+### The trigger (decision 2)
+
+`pending` is written in the **same patch** as the `ready` verdict, so the record
+is eligible and known to be unindexed in one write: a process that dies between
+the verdict and the embedding leaves something reconciliation can find, rather
+than a `ready` record nothing will look at again. The review route then acts on
+the intent it used to discard, behind `KNOWLEDGE_AUTO_INDEX_ENABLED`, after the
+verdict is written. A failure costs the vector, never the review.
+
+An already-`indexed` record is **not** re-opened on re-approval. `indexed →
+pending` is a legal move, so this would be allowed and wrong: nothing about the
+text changed, and pre-empting the hash comparison would re-embed every record
+each time somebody pulled one back for a second look.
+
+### Reconciliation (`knowledge:sync`)
+
+Dry run by default. Finds a drift neither `articles:sync` nor
+`articles:verify-index` could: a record whose `canonicalHash` no longer matches
+its `indexedHash` is **stale but present** — vector there, counts agreeing, text
+wrong. Also re-indexes on an `indexVersion` bump, and deletes orphans by
+enumerated id rather than by filter, so a surprise is a no-op instead of a wipe.
+
+### The lane, dark (`knowledge/retrieve.ts`)
+
+Returns wave 2's `RetrievalLaneSnapshot`, so provenance covers it unchanged and
+`laneStatus` keeps *switched off* apart from *found nothing*. Embeds the topic
+alone, matching prior coverage.
+
+**Two switches, and the second is decision 5 made real.** The flag says the lane
+may run; `KNOWLEDGE_SCORE_FLOOR` says what counts as a match, and **no default
+exists anywhere in the code**. Turning the flag on is deliberately not enough.
+`knowledge:calibrate` repeats the experiment that produced 0.37 rather than
+describing it, and **refuses to split the difference when the bands overlap** —
+something you do not write about scoring as well as something you do means there
+is no honest floor yet, which is a real outcome rather than a failure to compute.
+
+The lane's block is fenced like every other retrieved block: a human approving
+material makes it trustworthy as *thinking*, not as instructions.
+
+### Two guards were wrong on the first attempt
+
+Both caught by mutation-testing, and both the same failure: **prose satisfying a
+check**. The "no hard-coded floor" guard read the raw file and failed on the
+lane's own docblock, which cites `PRIOR_COVERAGE_SCORE_FLOOR = 0.37` while
+explaining why editorial memory has none; it now strips comments first. Earlier
+waves lost a check to `indexOf` finding the wrong call site and to a regex
+matching `env['X']` but not `process.env.X`. Prose must not be able to satisfy a
+guard, and must not be able to break one either.
+
+### One wave-1 test changed rather than deleted
+
+It asserted the `ready` patch was exactly `{ reviewStatus: 'ready' }`, commented
+*"an intent, not an action: nothing here touches an index"*. The assertion is now
+the two-field patch, and the comment records what the original was protecting and
+why it still holds — `pending` is a claim about the document, not about Pinecone.
+
+### What is not done
+
+- **Nothing is provisioned.** `PINECONE_KNOWLEDGE_INDEX_NAME` is unset, so the
+  indexer, the reconciler and the lane are all no-ops that say so. Create it with
+  `npm run knowledge:verify-index -- --create`.
+- **Nothing has been indexed**, and with 0 ready items and 2 ready sources there
+  are two documents to index when it is. The mechanism is the deliverable.
+- **No live probe yet**, which by this programme's own record is where the
+  defects are. Wave 2 shipped three past a green suite.
+- Chunking, research-run indexing, and any calibrated floor — deferred by
+  decisions 3, 4 and 5.
 
 ## Related
 
