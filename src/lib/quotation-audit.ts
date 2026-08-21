@@ -128,27 +128,72 @@ function quoteIsSupported(quote: string, statutoryText: string): boolean {
   )
 }
 
+/**
+ * A blockquote opening with a bold label is house furniture, not a quotation —
+ * `> **Stone Truth:** …`, `> **Forensic Summary**: …`. The voice edit actively
+ * converts the Stone Truth into this form, so on a regulatory piece it was
+ * reported `unmatched` on every draft that used the house convention.
+ */
+const LABELLED_CALLOUT = /^\*\*[^*\n]{1,60}\*\*\s*:?/
+
+/**
+ * The span sits inside an unresolved author placeholder — an instruction to a
+ * human, which the reader never sees and no corpus can contain.
+ */
+const PLACEHOLDER_REGION = /\[AUTHOR:[^\]]*\]?/gi
+
+/**
+ * Statute states; it does not ask. A quoted question is the author's own
+ * rhetorical framing — two appeared in one Deep Dive, both attributed to an
+ * instrument the paragraph merely mentioned.
+ */
+function isQuestion(span: string): boolean {
+  return span.trimEnd().endsWith('?')
+}
+
+/**
+ * A cited work's title rather than statutory prose. Consolidated text is
+ * ordinary sentence-case prose, so a span that is mostly capitalised and does
+ * not end a sentence is a headline — an article this piece cross-references, or
+ * a source in the reference list.
+ */
+function looksLikeTitle(span: string): boolean {
+  const trimmed = span.trim().replace(/[,;]$/, '')
+  if (/[.!]$/.test(trimmed)) return false
+
+  const words = trimmed.split(/\s+/).filter((w) => /[a-z]/i.test(w))
+  if (words.length < 3) return false
+
+  const capitalised = words.filter((w) => /^[A-Z]/.test(w)).length
+  return capitalised / words.length >= 0.7
+}
+
 function collectQuotedSpans(paragraph: string): string[] {
   const spans: string[] = []
 
-  for (const match of paragraph.matchAll(QUOTED_SPANS)) {
+  // Placeholders are instructions to a human; anything quoted inside one is
+  // the author's own note, so blank them before looking for quotations.
+  const searchable = paragraph.replace(PLACEHOLDER_REGION, ' ')
+
+  for (const match of searchable.matchAll(QUOTED_SPANS)) {
     spans.push(match[1].trim())
   }
 
   // A blockquote carries no quotation marks; the whole line is the quotation.
-  const blockquoted = paragraph
+  const blockquoted = searchable
     .split('\n')
     .map((line) => BLOCKQUOTE_LINE.exec(line)?.[1]?.trim())
     .filter((line): line is string => !!line)
     .join(' ')
     .trim()
 
-  // Only when it is not already captured by quote marks inside the blockquote.
-  if (blockquoted && !spans.some((span) => blockquoted.includes(span))) {
+  // Only when it is not already captured by quote marks inside the blockquote,
+  // and never when it is a labelled house callout.
+  if (blockquoted && !LABELLED_CALLOUT.test(blockquoted) && !spans.some((span) => blockquoted.includes(span))) {
     spans.push(blockquoted)
   }
 
-  return spans
+  return spans.filter((span) => !isQuestion(span) && !looksLikeTitle(span))
 }
 
 function buildSummary(audit: Omit<QuotationAudit, 'summary'>): string {

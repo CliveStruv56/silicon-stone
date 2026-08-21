@@ -194,3 +194,79 @@ describe('the audit is wired into the draft pipeline', () => {
     expect(createActions).toMatch(/regulatoryCorpus: draftContext\.regulatoryCorpus/)
   })
 })
+
+/**
+ * Precision. Every span below was reported `unmatched` by a real Deep Dive on
+ * 21 August 2026 — eight checked, one verified, seven not found, and six of
+ * those seven were not quotations of statute at all. A guard whose warnings are
+ * six-sevenths noise is one the writer learns to click through, which is the
+ * failure CLAUDE.md warns about. The seventh is the genuine catch and must
+ * survive every filter here.
+ */
+describe('auditQuotations — things that are not statutory quotations', () => {
+  const audit = (body: string) => auditQuotations(body, SUPPLIED)
+
+  it('ignores the house Stone Truth callout', () => {
+    const body = `Some analysis of Article 6 and Annex III.
+
+> **Stone Truth:** The Article 64(10) fine exemption is real. It is also the most dangerous sentence in the regulation for open-source foundations, because it has been read as a reason not to build operational capacity.`
+
+    expect(audit(body).checked).toBe(0)
+  })
+
+  it('ignores a Forensic Summary callout, whose label carries the colon outside the bold', () => {
+    const body = `> **Forensic Summary**: Regulation (EU) 2024/2847 entered into force on 10 December 2024. Its Article 14 incident-reporting obligations activated on 11 September 2026, creating an immediate operational exposure.`
+
+    expect(audit(body).checked).toBe(0)
+  })
+
+  it('still audits a blockquote that is a real quotation rather than a labelled callout', () => {
+    const body = `Article 6(3) is explicit.
+
+> An AI system referred to in Annex III shall not be considered to be high-risk where it does not pose a significant risk of harm to the health, safety or fundamental rights of natural persons, including by not materially influencing the outcome of decision making.`
+
+    const result = audit(body)
+    expect(result.checked).toBe(1)
+    expect(result.verified).toBe(1)
+  })
+
+  it('ignores a rhetorical question the author asked in their own prose', () => {
+    const body = `The AI Act creates a structural tension for these organisations. The question was always "does this organisation operate critical infrastructure and therefore fall within scope?" and it no longer is.`
+
+    expect(audit(body).checked).toBe(0)
+  })
+
+  it('ignores the title of an article this piece cross-references', () => {
+    const body = `The regulation sits within a broader pattern, as set out under Article 6 elsewhere. As noted in our prior coverage of "Brussels Has Five Tools to Fight Washington's Tech Aggression — Only One Is a Rulebook," the direction of travel is consistent.`
+
+    expect(audit(body).checked).toBe(0)
+  })
+
+  it('ignores a source title in a reference list', () => {
+    const body = `- Open Source Security Foundation, "Open Infrastructure Is Not Free, Part II," May 2026, on Article 6 obligations: https://openssf.org/blog/2026/05/06/open-infrastructure-is-not-free-part-ii/`
+
+    expect(audit(body).checked).toBe(0)
+  })
+
+  it('ignores a quotation inside an unresolved author placeholder', () => {
+    const body = `This needs a cross-reference under Article 6. [AUTHOR: insert cross-reference link to "EU AI Act: What 2 August 2026 Actually Requires" once that piece is published]`
+
+    expect(audit(body).checked).toBe(0)
+  })
+
+  it('still catches the genuine unmatched quotation among all of them', () => {
+    const body = `> **Stone Truth:** The exemption is real but narrower than most foundations assume.
+
+Article 6 of the regulation requires stewards to "put in place and document in a verifiable manner a cybersecurity policy appropriate to the risk."
+
+The question was always "does this organisation operate critical infrastructure?" and it no longer is.
+
+- Reference, "Open Infrastructure Is Not Free, Part II," on Article 6: https://openssf.org/blog/x`
+
+    const result = audit(body)
+    expect(result.checked).toBe(1)
+    expect(result.unmatched).toBe(1)
+    expect(result.quotations[0].quote).toContain('put in place and document in a verifiable manner')
+    expect(formatQuotationAudit(result)).toContain('[UNMATCHED]')
+  })
+})
