@@ -50,6 +50,35 @@ function readFlag(name: string, env: EnvSource): boolean {
 }
 
 /**
+ * The env var editorial memory's measured score floor is written into.
+ *
+ * It lives here, beside the flags, because it is a second switch rather than a
+ * setting: the retrieval lane will not run without it, so
+ * `KNOWLEDGE_DRAFT_RETRIEVAL_ENABLED=true` alone does nothing (wave 3,
+ * decision 5). There is no default anywhere — `PRIOR_COVERAGE_SCORE_FLOOR` was
+ * measured over 15 articles and editorial memory cannot reproduce that
+ * experiment against two records, so the number has to be earned with
+ * `npm run knowledge:calibrate` rather than guessed.
+ */
+export const KNOWLEDGE_SCORE_FLOOR_ENV = 'KNOWLEDGE_SCORE_FLOOR'
+
+/**
+ * The measured floor, or null when nobody has measured one.
+ *
+ * Rejects a value outside (0, 1) rather than coercing it: a cosine floor of 37
+ * is a typo for 0.37, and silently treating it as "nothing ever matches" would
+ * look exactly like an empty corpus — the one thing this lane must not be
+ * confusable with.
+ */
+export function configuredScoreFloor(env: EnvSource = process.env): number | null {
+  const raw = env[KNOWLEDGE_SCORE_FLOOR_ENV]
+  if (typeof raw !== 'string' || raw.trim() === '') return null
+  const value = Number(raw)
+  if (!Number.isFinite(value) || value <= 0 || value >= 1) return null
+  return value
+}
+
+/**
  * Reads one control. `env` is injectable so tests and scripts can evaluate a
  * hypothetical environment without mutating the real one.
  */

@@ -43,6 +43,13 @@ export interface DraftPromptInput {
     /** Pre-formatted "prior coverage" lines from the Pinecone article index. */
     priorCoverage?: string;
     /**
+     * Reviewed knowledge items and sources — the publication's own approved
+     * thinking, from editorial memory (wave 3). Absent unless that lane is both
+     * enabled and calibrated, which by default it is not, so this block is
+     * normally omitted entirely.
+     */
+    editorialMemory?: string;
+    /**
      * Pre-formatted verbatim passages from the regulatory corpus index
      * (src/lib/regulatory). EDITORIAL INPUT ONLY — material for the writer to
      * quote and cite. It is never an authority for anything the Compliance
@@ -76,7 +83,7 @@ export interface DraftPromptInput {
 export async function buildDraftPrompt(
     input: DraftPromptInput,
 ): Promise<{ systemPrompt: string; userPrompt: string }> {
-    const { topic, personaKey, format, research, priorCoverage, regulatoryCorpus, deepReport, sourceMaterial, brief } = input;
+    const { topic, personaKey, format, research, priorCoverage, editorialMemory, regulatoryCorpus, deepReport, sourceMaterial, brief } = input;
 
     const [persona, voice, profile, contentFocus] = await Promise.all([
         getSanityPersona(personaKey),
@@ -181,6 +188,10 @@ ${fenceUntrusted(regulatoryCorpus)}
         : '';
 
     const priorCoverageBlock = priorCoverage ? `\n${fenceUntrusted(priorCoverage)}\n` : '';
+    // Fenced like every other retrieved block: this is captured material, and
+    // the fact that a human approved it makes it trustworthy as *thinking*, not
+    // as instructions.
+    const editorialMemoryBlock = editorialMemory ? `\n${fenceUntrusted(editorialMemory)}\n` : '';
 
     const sourceBlock = sourceMaterial
         ? `
@@ -204,7 +215,7 @@ ${brief.trim()}`
 
     const userPrompt = `=== TOPIC ===
 ${topic}
-${researchBlock}${deepReportBlock}${regulatoryBlock}${priorCoverageBlock}${sourceBlock}
+${researchBlock}${deepReportBlock}${regulatoryBlock}${priorCoverageBlock}${editorialMemoryBlock}${sourceBlock}
 === YOUR TASK ===
 ${task}${briefBlock}`;
 

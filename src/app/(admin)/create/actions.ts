@@ -212,6 +212,7 @@ export async function createDraftFromResearch(
                 keywords: researchResult.suggestedContext.keywords,
             },
             priorCoverage: draftContext.priorCoverage,
+            editorialMemory: draftContext.editorialMemory,
             regulatoryCorpus: draftContext.regulatoryCorpus,
             deepReport: researchResult.deepReport,
             brief: brief.trim().slice(0, MAX_BRIEF_LENGTH) || undefined,

@@ -1,8 +1,10 @@
 import 'server-only'
 
 /**
- * The single retrieval step for drafting: prior coverage from the article index
- * plus primary statutory text from the regulatory corpus.
+ * The single retrieval step for drafting: prior coverage from the article index,
+ * primary statutory text from the regulatory corpus, and — when it is switched
+ * on and calibrated, which by default it is not — the publication's own
+ * reviewed notes from editorial memory.
  *
  * This exists because the prior-coverage block was duplicated between
  * src/app/(admin)/create/actions.ts and scripts/local-draft/pipeline.ts, and the
@@ -10,8 +12,8 @@ import 'server-only'
  * warned). Adding a second lane to two call sites would have doubled that.
  * scripts/regulatory-index-checks.ts asserts neither call site re-implements it.
  *
- * The two lanes fail independently — Pinecone being down for one must not cost
- * the other — and NOTHING here throws: a retrieval problem degrades the draft,
+ * The lanes fail independently — Pinecone being down for one must not cost
+ * the others — and NOTHING here throws: a retrieval problem degrades the draft,
  * it does not fail the request. But every outcome is reported in `notes`,
  * including the no-op paths, because a lane that never fires is otherwise
  * indistinguishable from one that is broken.
@@ -20,6 +22,7 @@ import 'server-only'
 import { generateEmbedding } from './embeddings'
 import { searchSimilar } from './pinecone'
 import { retrieveRegulatoryContext } from './regulatory/retrieve'
+import { retrieveEditorialMemory } from './knowledge/retrieve'
 import type { RetrievalLane } from './knowledge/types'
 
 export const PRIOR_COVERAGE_TOP_K = 5
@@ -96,6 +99,12 @@ export interface DraftContextInput {
 export interface DraftContext {
   priorCoverage?: string
   regulatoryCorpus?: string
+  /**
+   * Reviewed knowledge items and sources — the publication's own approved
+   * thinking. Undefined unless the lane is both enabled and calibrated, which
+   * it is not by default; see `knowledge/retrieve.ts`.
+   */
+  editorialMemory?: string
   /** Human-readable trace of what fired and what did not. Always populated. */
   notes: string[]
   /**
@@ -197,9 +206,13 @@ async function gatherPriorCoverage(topic: string): Promise<PriorCoverageResult> 
 export async function gatherDraftContext(input: DraftContextInput): Promise<DraftContext> {
   const notes: string[] = []
 
-  const [prior, regulatory] = await Promise.allSettled([
+  // Three lanes now, and they still fail independently — one being down must
+  // not cost the others. Editorial memory is switched off by default and
+  // reports `skipped` rather than running (wave 3, decision 5).
+  const [prior, regulatory, editorial] = await Promise.allSettled([
     gatherPriorCoverage(input.topic),
     retrieveRegulatoryContext(input),
+    retrieveEditorialMemory({ topic: input.topic }),
   ])
 
   const retrieval: RetrievalLaneSnapshot[] = []
@@ -236,7 +249,24 @@ export async function gatherDraftContext(input: DraftContextInput): Promise<Draf
     else console.info(note)
   }
 
-  return { priorCoverage, regulatoryCorpus, notes, retrieval, priorCoverageArticleIds }
+  let editorialMemory: string | undefined
+  if (editorial.status === 'fulfilled') {
+    editorialMemory = editorial.value.block ?? undefined
+    notes.push(...editorial.value.notes)
+    retrieval.push(editorial.value.snapshot)
+  } else {
+    notes.push(`[editorial-memory] FAILED: ${errorText(editorial.reason)}`)
+    retrieval.push(inertLane('editorial_memory', 'failed'))
+  }
+
+  return {
+    priorCoverage,
+    regulatoryCorpus,
+    editorialMemory,
+    notes,
+    retrieval,
+    priorCoverageArticleIds,
+  }
 }
 
 function errorText(reason: unknown): string {
