@@ -3,8 +3,9 @@
 How an article gets researched, drafted, edited, checked, published, and captured
 back into knowledge. Written for the person running the publication.
 
-**Verified against commit `c885065f`, 21 August 2026.** Every claim here was
-checked against the code on that date. Where something could not be checked by
+**Verified against commit `387f7b9c`, 21 August 2026.** It also describes three
+guard fixes made the same day and not yet committed — see §6, §7a and §12. Every
+claim here was checked against the code on that date. Where something could not be checked by
 reading code, it is listed in [Appendix D — What has not been verified](#appendix-d--what-has-not-been-verified).
 If you are reading this months later, the header is the first thing to distrust.
 
@@ -442,9 +443,20 @@ style (UK English, smart quotes, the em-dash cap, no hype words, take a position
 rather than hedge), and — most importantly — **demands concrete specifics**.
 
 - **Pulse, Signal, Guide and YouTube are rewritten** in place.
-- **Deep Dives get an audit-only pass.** The body is untouched; you get notes
+- **Deep Dives get an audit-only pass.** The prose is untouched; you get notes
   telling you what to fix. Rewriting 3,000+ words is not worth the cost and
-  latency, so you do it from the notes.
+  latency, so you do the editing from the notes.
+
+> **On a Deep Dive the placeholders are appended, not woven in.** Because the
+> audit pass does not rewrite, it cannot drop an `[AUTHOR: …]` marker at the
+> sentence that needs it. Instead the specifics it identified are added to the
+> **end of the body** under a heading, *⚠ Author specifics needed*. Resolve each
+> one in the prose where it belongs, delete its line, and delete the heading with
+> the last of them. Until you do, publishing is blocked (§9).
+>
+> This was added on 21 August 2026. Before it, a Deep Dive's outstanding work
+> existed only in the notes — which the publish guard does not read — so the one
+> blocker in the system could not fire on the longest, most claim-dense format.
 
 ### The `[AUTHOR: …]` convention
 
@@ -539,6 +551,18 @@ verdict tells you the corpus lane did not fire.
 
 **Known false positives:** an elision the splitter missed, an editorial insertion
 in square brackets, and quotations of a *recital* (the corpus holds none).
+
+**What it deliberately does not audit** (since 21 August 2026). A Deep Dive
+returned eight "quotations", of which six were not quotations of statute at all —
+the piece's own Stone Truth callout, its Forensic Summary, two article titles it
+cross-referenced, and two rhetorical questions in its own prose. Five classes are
+now excluded: a blockquote opening with a **bold label** (the house callout
+convention, which the voice edit itself produces), anything inside an unresolved
+`[AUTHOR: …]` placeholder, a quoted span ending in a question mark (statute
+states, it does not ask), a mostly-capitalised span that does not end a sentence
+(a headline, not a provision), and a reference-list entry's title. If a genuine
+quotation ever falls into one of those shapes it will be missed — which is why
+this remains advisory and you remain the last control.
 
 The field only appears when at least one quotation was checked. On the Claude Code
 path it never runs at all.
@@ -736,6 +760,18 @@ list the same page twice under different tracking parameters.
 
 - **A badge** on the document: *Fact-check running* / *failed* / *clean* / *minor
   issues* / *major issues* / *unverifiable*.
+
+  **The badge follows what you have addressed** (since 21 August 2026). It counts
+  the claims still outstanding, so it reads *"major issues (2 to address)"* and
+  drops to *minor issues* as you insert revisions. Address the last one and it
+  becomes **"N revisions applied"** — deliberately *not* "clean", because
+  inserting a suggested revision does not verify the new sentence against
+  anything. Only a fresh run can say clean. The publish dialog says the same
+  thing in its own words: *"The fact-check predates your revisions."*
+
+  > Before this, the verdict was frozen at the moment the run finished. An editor
+  > who worked through every flagged claim still saw *major issues* with no way to
+  > clear it short of paying for another run.
 - **"Run fact-check"** — the action described in §7b. It disables itself and reads
   *"Fact-check running…"* while one is in flight.
 - **"Insert into article"** — on each claim in the report. Edit the suggested
@@ -987,6 +1023,17 @@ warns.
 **Recovery is time-based: wait 10 minutes.** After that the system treats the run
 as crashed and lets you start a fresh one, which overwrites the stuck status. There
 is nothing to clear by hand.
+
+### The fact-check badge says "failed" with a message about JSON
+You are on a build from before 21 August 2026. The checker used to ask the model
+for JSON, and the sentences it copies out of your article routinely quote statute
+— so they contain quotation marks, which ended the JSON string early and killed
+the run with something like *Expected ',' or '}' after property value in JSON at
+position 3184*. It struck the statute-quoting articles hardest, which are the ones
+that most need checking. Both halves of the checker now use a line-based format
+that needs no escaping. If a run still cannot be read you get **"The fact-checker
+could not read its own output — it did not use the expected format. Run the
+fact-check again."**, and re-running is the right response.
 
 ### "Admin session expired" in Studio
 This should now be rare — a lapsed admin session is renewed from your Sanity login

@@ -510,6 +510,122 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 21, 2026 — The test spec run against `/create`, and the three guards it found broken
+
+Tasks 1–5 of `docs/test-spec-article-flows.md` run end to end: three drafts
+generated (Pulse, Signal, Deep Dive) and removed, teardown verified back to 16
+vectors / 16 published. Findings and evidence are written up as an artifact;
+what follows is what changed in the code.
+
+**The fact-check could not read its own output on statute-quoting articles.**
+The extraction prompt asks for the containing sentence copied *exactly verbatim*
+because it drives find-and-replace. On this publication that sentence routinely
+quotes statute, so it carries its own quotation marks — which the model emitted
+unescaped inside a JSON string value, ending the string early. `JSON.parse` died
+at position 3184, then 2892, then 3157 on the same Signal: content-dependent, not
+truncation, and a retry does not help. There was no repair and no retry anyway,
+so one bad response killed the run and put a raw parser offset in the operator's
+badge. **Both halves of the checker now use the line-prefixed format the voice
+pass already adopted for this exact reason** — `===CLAIM===` / `===RESULT===`
+blocks, nothing to escape. The verification pass mattered as much as extraction:
+its per-batch catch downgraded five claims at a time to `unverifiable`, so a
+parse failure there looked like weak evidence rather than a broken check.
+
+**The quotation audit was six-sevenths noise.** A Deep Dive reported 8 checked,
+1 verified, 7 not found — and six of the seven were not quotations of statute:
+the piece's own Stone Truth callout (which the voice edit *converts* into a
+blockquote), its Forensic Summary, two cross-referenced article titles, and two
+rhetorical questions in its own prose. `collectQuotedSpans` treated any
+blockquote as a quotation and `claimsStatute` fires on any paragraph naming an
+Article, which on a regulatory publication is nearly all of them. Five classes
+are now excluded — labelled callouts, spans inside `[AUTHOR: …]`, questions,
+title-case headlines, reference-list titles — and a test built from all seven of
+the real spans holds the genuine Article 24(1) catch through every filter.
+
+**The publish blocker could not fire on a Deep Dive.** `deep_dive` is the only
+format whose voice pass audits rather than rewrites, so it never puts
+`[AUTHOR: …]` markers in the body; it describes the missing specifics in Voice
+Edit Notes, which `publish-preflight` deliberately does not scan (that field
+*lists* placeholders, so scanning it would block every voice-passed article
+forever). Measured on the generated Deep Dive: `bodyHasPlaceholder: false`,
+three unresolved verification tasks in the notes, and the dialog offering
+"Publish anyway". The Pulse and Signal from the same run both blocked correctly.
+The audit pass now returns its specifics in an `===AUTHOR SPECIFICS===` section
+and the pipeline appends them to the **end of the body** under a deletable
+heading — the body being the only place a marker self-clears, because it is the
+only one the author edits. Appended last, after the metadata, image-prompt and
+quotation-audit passes, so none of them reads the scaffold. Falls back to
+recovering `[AUTHOR: …]` tokens from the edit summary when the model skips the
+new marker, which is what the observed run actually did.
+
+**A fourth defect, found only by running it.** The first live Deep Dive after
+the F3 fix produced *no* placeholders at all. The audit-mode voice pass had a
+2,048-token ceiling and the response measured 1,942 — it was being cut off
+mid-sentence, silently, because a truncated response still parses. It lost the
+trailing "Author specifics needed" section every time, which is the one part of
+the notes anything depends on. Every Deep Dive had been affected; the earlier
+observed run was truncated too. The budget is now 4,096, and the
+`===AUTHOR SPECIFICS===` block is asked for **before** the summary so truncation
+costs prose rather than the guard. The parser accepts it on either side.
+
+**All three fixes are verified against live model output.** A Signal on CRA
+Article 14 extracted 12 claims where the old JSON path had failed twice on the
+same shape (12 with evidence and source URLs, 4 revisions, 6 citations appended
+from `CITATION:` lines; both the evidence and the revisions contain nested
+double quotes). A Deep Dive on EU Data Act switching then logged
+`appended 7 author placeholder(s) to the body`, all seven from the new marker
+rather than the fallback, and its publish dialog read **"Not ready to publish"**
+with no "Publish anyway" — the blocker firing on that format for the first time.
+Its quotation audit read **4 checked, 2 verified, 2 unmatched**, and both
+unmatched were genuine statutory fragments, against 8 checked / 1 verified /
+7 unmatched with six false positives before. Its fact-check completed on the
+18-claim audit-tier path, and the publish warning read "5 claims still to
+address", which is the derived count doing its job.
+
+**One limit worth recording:** on that run the audit's own verdict prose said
+"resolve the twelve author-specific placeholders" while the marker block listed
+seven. The guard now catches seven where it caught none, but the marker list can
+under-count what the prose identified — the notes remain worth reading.
+
+**Two things found by using it, fixed the same day.** The fact-check badge is
+now derived rather than stored: `overallVerdict` is written once when the run
+completes, and applying a suggested revision sets `claims[…].applied` and
+patches the body without recomputing it — so an editor who worked through every
+flagged claim still saw "major issues" with no way to clear it short of paying
+for another run. `src/lib/fact-check-verdict.ts` recomputes over the claims
+still outstanding and is shared by the pipeline, the badge and the publish
+dialog so they cannot drift. A fully addressed report reads **"N revisions
+applied"**, never "clean" — an inserted revision has not been verified against
+anything — and the publish dialog swaps its adverse warning for
+`fact-check-stale`. It fails closed: an adverse stored verdict with no claims to
+explain it still warns.
+
+**The Publish button's two mechanisms, confirmed distinct.** `withPublishPreflight`
+spreads `...original` and never sets `disabled`, so greying out is entirely
+Sanity's: schema validation errors (`title`, `slug`, `author.name` and
+`categories.min(1)`, the last at error level), nothing to publish, a publish in
+flight, or insufficient permissions. A preflight **blocker** does not disable
+anything — the button stays clickable and the dialog offers only "Back to the
+draft". Two different failures that look the same from the outside.
+
+**The new prompt contracts are verified against a live model.** A Signal on CRA
+Article 14 extracted 12 claims where the old JSON path had failed twice on the
+same shape: 12 with evidence and source URLs, 4 revisions, 6 citations appended
+from `CITATION:` lines. Both the evidence and the revisions contain nested
+double quotes — the exact payload that used to end the JSON string early.
+
+**Also fixed, from the same run:** `getContentFocus()` read
+`knowledge/company/content-focus.md`, which had never existed, so the
+"Current Content Focus Areas" block was omitted from every draft prompt on every
+path while `docs/content-focus-areas.md` sat unread in the repo. Copied into
+place. **The production half is open**: it is the only prompt input read from
+disk at runtime — every sibling is bundled through an `import` — so on Vercel it
+most likely still returns `""`, and the miss is logged once per process. Verify
+by generating one draft on the live site and searching the function log.
+
+1,293 tests green (up 45). Manual restamped; §6, §7a, §8 and §12 describe the
+new behaviour.
+
 ### August 21, 2026 — Web Push live, and a live article corrected
 
 **VAPID keys are configured on production and verified.** Probed by sending an
