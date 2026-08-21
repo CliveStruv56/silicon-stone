@@ -3,8 +3,10 @@
 **Project:** `silicon-and-stone-web`
 **Written:** 2026-08-21 · **Baseline:** `f819e597`
 **Governing spec:** `siliconstone-knowledge-llm-master-spec.md` §10, wave 3
-**Status:** **contract only. No code exists.** Nothing in this document has been
-built, and it deliberately does not say how to build it.
+**Status:** **decisions taken, no code exists.** The six open questions were
+answered by the owner on 2026-08-21 and are recorded below under
+[Decisions](#decisions--answered-by-the-owner-2026-08-21); nothing has been
+built, and this document still does not say how to build it.
 
 Read `knowledge-system-foundation.md` for the schemas and the domain service,
 and `siliconstone-knowledge-wave-02-brief.md` — particularly its *What was
@@ -81,7 +83,7 @@ is that later wave for the second one.
 **Where they currently go to die:** `src/app/api/knowledge/review/route.ts`
 calls `applyReviewTransition` and returns `{ ok, documentId, status }`. The
 `events` array on the result is discarded without being read. That is one line
-away from being the trigger, and whether it *should* be is question 2 below.
+away from being the trigger, and decision 2 says it should be.
 
 ### The flags — `src/lib/knowledge/features.ts`
 
@@ -103,8 +105,8 @@ a lane whose absence cannot be told from its silence.
 ### What is actually in the store, as of 2026-08-21
 
 **2 sources eligible, 0 items, 0 records with any index state.** That is the
-whole corpus. See question 5 — it is not a footnote, it decides whether a score
-floor can be calibrated at all.
+whole corpus. See decision 5 — it is not a footnote, it is why the
+retrieval lane ships switched off.
 
 ## The four parts to connect
 
@@ -138,7 +140,7 @@ Read `LAUNCH.md` §"Sanity webhooks" before proposing a fourth one. Three exist,
 **all configured only in the Sanity dashboard, recorded nowhere in this repo,
 and silent when missing** — a fresh environment publishes articles that are
 never indexed and nothing fails. Adding a fourth adds a fourth thing that can be
-absent without symptom. That is a real cost, and it is question 2.
+absent without symptom. That is a real cost, and decision 2 declines to pay it.
 
 Whatever triggers it, the writer has to move the state machine, record
 `embeddingModel` and `indexVersion` (so a model change is detectable rather than
@@ -217,47 +219,116 @@ None of this is wave 3, and none of it should be pulled in because it is nearby:
 - ChatGPT (parked on a plan gate, not an engineering one).
 - Anything touching the fact-check, quotation-audit or publish-preflight guards.
 
-## Open questions — for the owner, not to be guessed
+## Decisions — answered by the owner, 2026-08-21
 
-1. **Which store?** A fourth Pinecone index, or a namespace on an existing one.
-   Three indexes already exist — articles, regulatory, evidence — and the
-   regulatory accessor's own comment records why *it* is separate rather than a
-   namespace: index-level embed config is not scoped by namespace, and a separate
-   accessor is something a static check can assert the Compliance Checker never
-   imports. Both reasons may or may not apply here.
+All six, accepted as recommended. Recorded here so nobody re-opens one by
+accident; the reasoning is kept because in two places it is the reasoning, not
+the answer, that would be lost.
 
-2. **What triggers indexing?** Three shapes, and they are not equally safe:
-   inline on the review transition (simplest; makes a Studio review action depend
-   on OpenAI and Pinecone being up); a fourth Sanity webhook (matches
-   `/api/vectorize`, and adds a fourth dashboard-only configuration that fails
-   silently); or a scheduled reconciler that reads `indexState` and needs no
-   event at all (slowest to reflect a review, and the only one that cannot be
-   silently missing).
+### 1. A fourth Pinecone index — `PINECONE_KNOWLEDGE_INDEX_NAME`
 
-3. **Does an approved research run get indexed?** `§7` lists "explicitly
-   approved reusable research summaries" as eligible. Wave 2 made `reuseStatus`
-   real and nothing has ever set `approved`. Indexing a research summary means
-   the drafting model can be handed a previous run's synthesis — which is
-   editorial memory in its most literal form, and also the most direct route to a
-   model quoting its own earlier output back to itself.
+Not a namespace on the article index, **and the first answer was the other
+one.** A namespace looked right: same embedding model, the same 1024 dimensions,
+no integrated `embed` config on `silicon-and-stone-articles`, and namespaces
+isolate queries so `searchSimilar` could not reach it.
 
-4. **What is the unit of a vector?** A knowledge item is short and is plausibly
-   one vector. A `knowledgeSource` carries `extractedText` up to 2 MB and
-   plainly is not. Chunking it means a chunking policy, a citation header
-   convention like the regulatory corpus's, and a per-record count that
-   reconciliation has to check — the regulatory lane's own experience is that a
-   namespace total cannot catch records stranded by a re-chunk.
+Then `src/scripts/sync-pinecone.ts`. Its orphan pass enumerates the index with
+`index.listPaginated(...)` and deletes **every id not in Sanity's article
+list**. That runs against the default namespace today, so a knowledge namespace
+would survive — *incidentally*, by an SDK default the script never mentions. One
+`index.namespace(...)` added later and `articles:sync` silently eats the
+editorial corpus.
 
-5. **What does the lane do while the corpus is two records?** The floor cannot
-   be calibrated, so the honest options are: ship indexing with the retrieval
-   flag off until there is enough to calibrate against; ship the lane with a
-   deliberately conservative floor and say in the brief that it is a guess; or
-   defer the lane to a later wave and make wave 3 indexing-and-reconciliation
-   only. This is the question that most changes the shape of the work.
+The blast radius of a rebuild script must not include another lane's records,
+and that safety has to be structural rather than accidental. A separate index
+also keeps `articles:verify-index`'s counts unambiguous — the regulatory lane
+already learned that a shared total hides records stranded by a re-chunk.
 
-6. **Is `private` retrievable?** `sensitivity` has three values and `§7` says
-   only that records "whose policy forbids retrieval" are ineligible — it does
-   not say which. `confidential` is obvious; `private` is a judgement.
+Provision it the way the other two were: **no integrated `embed` config**, with
+a `knowledge:verify-index` check that asserts it. That trap has been paid for
+once already.
+
+### 2. Inline on the review transition, plus a reconciler. No fourth webhook.
+
+The `index_evaluation_requested` intent already exists at exactly that point,
+and `src/app/api/knowledge/review/route.ts` discards it one line from where it
+would be used.
+
+A review is a human action, so a failure can be **reported to the person who
+caused it**. A webhook cannot do that, and a fourth webhook is a fourth
+dashboard-only configuration that fails silently — the failure mode `LAUNCH.md`
+warns about at length.
+
+The shape that makes inline safe, and it is not optional:
+
+1. Patch `indexState.status = 'pending'` in the **same** patch that sets
+   `ready`. The record is now eligible and known to be unindexed.
+2. *Then* embed and upsert. If OpenAI or Pinecone is down, the record stays
+   `pending` with `lastError` and `attempts` recorded — and **the review still
+   succeeds**. Indexing must never cost a reviewer their verdict.
+3. `npm run knowledge:sync` sweeps `pending` and `error` and repairs, mirroring
+   `articles:sync`.
+
+Step 3 is what makes the eventual consistency honest rather than hopeful.
+
+### 3. Approved research runs are NOT indexed — deferred, with the reason
+
+`§7` permits it. Wave 3 declines it, for two reasons. Nothing has ever set
+`reuseStatus: approved`, so there is no corpus to evaluate and no way to tell
+whether it helps. And a research summary is raw model synthesis that a human
+waved through: indexing it is the shortest path to a drafting model being handed
+its own earlier output as evidence. Revisit with a brief of its own.
+
+### 4. One vector per record, with a budget that fails loudly
+
+A knowledge item is short; one vector is right. A `knowledgeSource` carries
+`extractedText` up to 2 MB and is not.
+
+Chunking means a chunking policy, citation headers like the regulatory corpus's,
+and per-record reconciliation — a wave's worth of work. So: one vector per
+record, and a source over the character budget goes to **`error`, naming the
+limit**, never silently truncated. Indexing the first few kilobytes and treating
+it as the document is the kind of quiet wrongness this system is built to
+refuse. When a real oversized source appears, chunking earns its own brief.
+
+### 5. Indexing and reconciliation ship. The lane ships dark.
+
+This narrows the wave, and deliberately.
+
+Build the lane, return the `RetrievalLaneSnapshot` shape, and leave
+`KNOWLEDGE_DRAFT_RETRIEVAL_ENABLED` **off**. **Claim no calibrated floor.**
+`PRIOR_COVERAGE_SCORE_FLOOR = 0.37` came from a documented experiment over 15
+articles — three on-topic queries at 0.421 / 0.533 / 0.687, four off-topic
+topping out at 0.318, floor at the midpoint. Two records cannot produce that.
+
+Add `npm run knowledge:calibrate` to run the same experiment, and do not switch
+the lane on below roughly **15 records** — the sample the article floor came
+from. A number invented now and labelled "calibrated" outlives everyone's memory
+of it having been a guess.
+
+### 6. Only `normal` is eligible. `private` is not retrievable.
+
+Fail closed. Excluding `private` costs a smaller corpus; including it risks
+material a drafting model quotes into a published article. Widening later is a
+policy change; un-publishing a quote is not.
+
+## What the wave is, after those decisions
+
+Smaller than the brief above assumed, and two of the six are deferrals rather
+than builds — which is worth seeing now rather than halfway through.
+
+**In:** a fourth index with a verify check; eligibility as a domain calculation
+reading `reviewStatus` (with the legacy fallback), `extractionState.status` and
+`sensitivity`; the index state machine actually driven; inline indexing on the
+review transition behind `KNOWLEDGE_AUTO_INDEX_ENABLED`; `knowledge:sync`
+reconciliation including the `canonicalHash` / `indexedHash` staleness check;
+the third retrieval lane, built and dark; `knowledge:calibrate`.
+
+**Out, with reasons recorded:** chunking, research-run indexing, any floor
+claimed as calibrated, and the retrieval lane being switched on.
+
+**The honest consequence**: with 0 ready items and 2 ready sources, wave 3
+indexes two documents. The mechanism is the deliverable, not the corpus.
 
 ## Before implementing
 
