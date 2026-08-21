@@ -570,8 +570,28 @@ none requires a tier. A seventeenth manual check ties the two halves together:
 if the filter returns or the preflight warning is deleted, `npm run test:manual`
 fails, because §5 of the manual promises both. Both halves mutation-tested.
 
+**Then a browser check found the fourth copy of the query.** Production still
+served **twelve** articles where the SSR HTML carried sixteen: the four untiered
+ones rendered, then vanished on hydration. `/api/briefings` proxies to the
+FastAPI service whenever `BACKEND_API_URL` is set — which in production it is —
+and `backend/main.py` holds the same GROQ in Python, still filtering on the
+tier. Three TypeScript copies agreed with each other and with a passing guard,
+and the answer the reader got came from none of them.
+
+The Python copy is fixed and `briefings-query.test.ts` now covers all **four**,
+matching the triple-quoted literal as well as the backtick one. Mutation-tested
+against the Python file specifically. **The visible fix needs a Railway
+redeploy** — Vercel and Railway deploy independently, so until the backend ships
+the feed still answers twelve.
+
+Worth keeping: the guard was written the day it was needed and still missed the
+copy that mattered, because it only knew how to read TypeScript. The browser is
+what caught it — as with the nav-button defect in Phase 4 of the checker, and
+the markdown asterisks in the finding cards.
+
 Manual §5 and §7c restamped, the test spec's Tasks 7 and 8 rewritten, 1,333 tests
-green (up 6). **Priority 0c is now empty.**
+green (up 6). **Priority 0c is empty; the Railway redeploy is the one thing
+left, and it is a deploy rather than a change.**
 
 ### August 21, 2026 — The test spec run against `/create`, and the eight defects it found
 
@@ -5757,7 +5777,7 @@ was a decision, not a repair, and the reasoning is worth keeping. See §9.
 |---|---|---|
 | ~~**The MCP capture tools discard their own error messages.**~~ **Fixed.** `knowledge-tools.ts` renders `${e.field} (${e.code})` and drops `e.message`, so a source captured with no URL and no text answers `Problems: _ (required)` — naming a field called `_` — when the validator carries *"Provide a URL, the source text, or declare that extraction is expected."* for exactly that case. | `src/lib/mcp/knowledge-tools.ts:224` | The message is carried; a whole-payload failure (field `_`) prints the sentence alone. Two tests pin it. |
 | ~~**`ss-draft-local`'s payload template loses provenance.**~~ **Fixed.** `save` reads `researchSources` at the top level; the template at step 3 nests sources under `research.sources`, which is what the draft prompt reads. Follow the template and the draft is written with **no citation snapshots at all**, silently — 0 following the template, 8 once the field was added. The requirement is documented 150 lines later under "Notes / caveats". | `.agent/skills/ss-draft-local/SKILL.md` | `researchSources` is now in the Step 7 template, and `save` warns on stderr when it is absent. |
-| ~~**A hand-made article can publish into invisibility.**~~ **Fixed — and the decision is recorded.** `/intelligence` lists only articles with `defined(intelligenceTier)`, and nothing on the hand-made path sets one. A tierless article publishes cleanly, is live at `/analysis/<slug>`, is indexed and reaches the sitemap — and never appears where a reader browses. Categories are required at error level; the tier is not, and no guard mentions it. | `src/app/(website)/intelligence/page.tsx` (the `BRIEFINGS_QUERY`) and `src/lib/publish-preflight.ts` | **Neither alone.** The feed stops filtering on the tier — a published article that cannot be browsed is never correct — and the preflight *warns*, because an untiered article is a legitimate editorial choice (the dashboard has always counted an "Untiered" bucket). The schema keeps the field optional. Guarded by `src/lib/briefings-query.test.ts` and manual check 17. |
+| ~~**A hand-made article can publish into invisibility.**~~ **Fixed in four places — the fourth found in the browser.** `/intelligence` lists only articles with `defined(intelligenceTier)`, and nothing on the hand-made path sets one. A tierless article publishes cleanly, is live at `/analysis/<slug>`, is indexed and reaches the sitemap — and never appears where a reader browses. Categories are required at error level; the tier is not, and no guard mentions it. | `src/app/(website)/intelligence/page.tsx` (the `BRIEFINGS_QUERY`) and `src/lib/publish-preflight.ts` | **Neither alone.** The feed stops filtering on the tier — a published article that cannot be browsed is never correct — and the preflight *warns*, because an untiered article is a legitimate editorial choice (the dashboard has always counted an "Untiered" bucket). The schema keeps the field optional. The query exists in **four** copies, the fourth being `backend/main.py`, which is what production actually answers from; all four are fixed and guarded by `src/lib/briefings-query.test.ts` plus manual check 17. **Needs a Railway redeploy to be visible.** |
 
 ### Priority 1 — Content (the actual bottleneck)
 

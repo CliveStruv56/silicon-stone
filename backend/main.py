@@ -35,7 +35,14 @@ SANITY_CATEGORIES_QUERY = """*[_type == "category"] | order(title asc) {
   "slug": slug.current
 }"""
 
-SANITY_BRIEFINGS_QUERY = """*[_type == "article" && !(_id in path("drafts.**")) && defined(intelligenceTier) && defined(slug.current)]
+# The fourth copy of the /intelligence feed query, and the one that actually
+# answers in production: /api/briefings proxies here whenever BACKEND_API_URL
+# is set. It must not require defined(intelligenceTier) — the Next copies
+# dropped that filter on 2026-08-21 because nothing on the hand-made Studio
+# path sets a tier, and a tierless article was published but unbrowsable.
+# While this copy disagreed, the four untiered articles rendered in the SSR
+# HTML and vanished the moment the client refreshed from here.
+SANITY_BRIEFINGS_QUERY = """*[_type == "article" && !(_id in path("drafts.**")) && defined(slug.current)]
 | order(coalesce(impactScore, 5) desc, publishedAt desc) [0...20] {
   _id,
   title,

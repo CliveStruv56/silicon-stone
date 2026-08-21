@@ -288,7 +288,10 @@ blocker has nothing to find. **On this path the checks are yours.**
    article could publish successfully, be live at `/analysis/<slug>`, be indexed
    in Pinecone and enter the sitemap while never appearing anywhere a reader
    browses. The feed no longer filters on the tier and the preflight warns when
-   it is unset. Categories remain required at error level; the tier is a
+   it is unset. **On production, check it a few seconds after load, not on
+   first paint:** the same query lives in four places, and the Railway backend
+   `/api/briefings` proxies to is the one the client refreshes from. If untiered
+   articles appear and then disappear, the backend has not been redeployed. Categories remain required at error level; the tier is a
    warning, not a blocker — set it unless you mean the piece to sit outside the
    tiers.
 
