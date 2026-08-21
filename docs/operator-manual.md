@@ -857,6 +857,24 @@ the Audit tier notifies everyone subscribed to "New Audit-tier Deep Dives". Once
 per article, ever — a later typo fix does not re-notify. Nothing fires for other
 tiers, and the AI Act deadline topic remains something you send by hand.
 
+### How many people are subscribed
+
+**`/api/push/stats`**, signed in as the writer. It returns a count per topic and
+nothing else — never the subscriptions themselves, which hold device endpoints
+and encryption keys.
+
+```json
+{ "configured": true, "canSend": true, "total": 0,
+  "topics": [ { "id": "audit-deep-dives", "label": "New Audit-tier Deep Dives",
+                "subscribers": 0 } ] }
+```
+
+Read `configured` before the numbers. `false` means there is no Redis store to
+ask, so the zeroes are structural rather than measured — the two look identical
+otherwise, and only one of them is a fact about your audience. `canSend` is a
+separate gate: the VAPID keys, without which nothing is ever sent no matter how
+many subscribers exist.
+
 ### ⚠ Distribution is manual
 
 Nothing announces the article. Specifically:

@@ -86,6 +86,31 @@ export async function getSubscriptionTopics(endpoint: string): Promise<PushTopic
 }
 
 /** All subscription records opted into a topic. */
+/**
+ * How many devices are subscribed to each topic.
+ *
+ * SCARD per topic rather than reading the records: a count is all the operator
+ * needs, and the subscription records carry the push endpoints and keys, which
+ * are the sensitive part of this store and have no business being fetched to
+ * produce a number.
+ *
+ * Returns zeroes when the store is not configured, so a caller can render the
+ * page without special-casing an unconfigured environment — `pushStoreConfigured()`
+ * is what distinguishes "nobody has subscribed" from "there is nowhere to look".
+ */
+export async function countTopicSubscriptions(): Promise<Record<PushTopicId, number>> {
+  const redis = getRedis()
+  const counts = Object.fromEntries(PUSH_TOPIC_IDS.map((t) => [t, 0])) as Record<PushTopicId, number>
+  if (!redis) return counts
+
+  await Promise.all(
+    PUSH_TOPIC_IDS.map(async (topic) => {
+      counts[topic] = (await redis.scard(`${TOPIC_PREFIX}${topic}`)) ?? 0
+    }),
+  )
+  return counts
+}
+
 export async function listTopicSubscriptions(
   topic: PushTopicId,
 ): Promise<PushSubscriptionRecord[]> {
