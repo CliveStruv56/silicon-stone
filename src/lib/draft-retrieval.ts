@@ -20,8 +20,47 @@ import 'server-only'
 import { generateEmbedding } from './embeddings'
 import { searchSimilar } from './pinecone'
 import { retrieveRegulatoryContext } from './regulatory/retrieve'
+import type { RetrievalLane } from './knowledge/types'
 
 export const PRIOR_COVERAGE_TOP_K = 5
+
+/**
+ * One retrieved record, shaped for `researchRun.retrievalSnapshots[].entries`.
+ *
+ * Wave 2 (provenance). These types exist so a generated article can answer
+ * *what was this written from* — they add nothing to what is retrieved and
+ * change nothing about what reaches the prompt. The block and the notes are
+ * still the whole of what the drafting path consumes; this is the same
+ * information, kept instead of discarded.
+ */
+export interface RetrievalEntry {
+  /** For the prior-coverage lane this is the Sanity article `_id` — the article
+   * index keys every vector by document id, so a reference can be built from it
+   * without a second lookup. */
+  recordId: string
+  score?: number
+  title?: string
+  locator?: string
+}
+
+export type RetrievalLaneStatus = 'ok' | 'empty' | 'failed' | 'skipped'
+
+/**
+ * What one lane did. `laneStatus` is the point of it: an empty lane and a
+ * missing lane are different facts, and the schema says so too. A lane that
+ * never fires is otherwise indistinguishable from one that is broken — the same
+ * reasoning that put `notes` here in the first place, kept in a form a machine
+ * can read a year later.
+ */
+export interface RetrievalLaneSnapshot {
+  lane: RetrievalLane
+  indexName?: string
+  namespace?: string
+  corpusVersion?: string
+  scoreFloor?: number
+  laneStatus: RetrievalLaneStatus
+  entries: RetrievalEntry[]
+}
 
 /**
  * Below this cosine score an article is not really related to the topic.
@@ -59,11 +98,38 @@ export interface DraftContext {
   regulatoryCorpus?: string
   /** Human-readable trace of what fired and what did not. Always populated. */
   notes: string[]
+  /**
+   * The same trace, structured, for the provenance record (wave 2). Always
+   * populated with one snapshot per lane, including the lanes that did nothing
+   * — a skipped lane is a fact worth keeping.
+   */
+  retrieval: RetrievalLaneSnapshot[]
+  /**
+   * Sanity `_id`s of the prior articles that cleared the floor and reached the
+   * prompt, for `article.priorCoverage[]`. Only the ones actually injected: an
+   * article the model was never shown is not prior coverage of anything.
+   */
+  priorCoverageArticleIds: string[]
 }
 
-async function gatherPriorCoverage(topic: string): Promise<{ block?: string; note: string }> {
-  if (!process.env.PINECONE_INDEX_NAME) {
-    return { note: '[prior-coverage] skipped — PINECONE_INDEX_NAME is not set' }
+interface PriorCoverageResult {
+  block?: string
+  note: string
+  snapshot: RetrievalLaneSnapshot
+}
+
+/** A lane that did nothing, with the reason recorded rather than implied. */
+function inertLane(lane: RetrievalLane, laneStatus: RetrievalLaneStatus): RetrievalLaneSnapshot {
+  return { lane, laneStatus, entries: [] }
+}
+
+async function gatherPriorCoverage(topic: string): Promise<PriorCoverageResult> {
+  const indexName = process.env.PINECONE_INDEX_NAME
+  if (!indexName) {
+    return {
+      note: '[prior-coverage] skipped — PINECONE_INDEX_NAME is not set',
+      snapshot: inertLane('prior_articles', 'skipped'),
+    }
   }
 
   // Embeds the topic alone, deliberately, while the regulatory lane composes a
@@ -75,18 +141,39 @@ async function gatherPriorCoverage(topic: string): Promise<{ block?: string; not
   const vector = await generateEmbedding(topic)
   const similar = await searchSimilar(vector, PRIOR_COVERAGE_TOP_K)
 
+  // The lane ran, so every outcome below carries the index and the floor that
+  // was applied — the two facts you need to reread a snapshot later and know
+  // whether a different answer today means the corpus changed or the rules did.
+  const lane = (laneStatus: RetrievalLaneStatus, entries: RetrievalEntry[]): RetrievalLaneSnapshot => ({
+    lane: 'prior_articles',
+    indexName,
+    scoreFloor: PRIOR_COVERAGE_SCORE_FLOOR,
+    laneStatus,
+    entries,
+  })
+
+  const toEntry = (result: (typeof similar)[number]): RetrievalEntry => ({
+    recordId: result.id,
+    score: result.score,
+    title: result.metadata.title,
+    locator: `/analysis/${result.metadata.slug}`,
+  })
+
   if (similar.length === 0) {
-    return { note: '[prior-coverage] 0 related articles' }
+    return { note: '[prior-coverage] 0 related articles', snapshot: lane('empty', []) }
   }
 
   const related = similar.filter((result) => result.score >= PRIOR_COVERAGE_SCORE_FLOOR)
   const topScore = similar[0].score.toFixed(3)
 
   if (related.length === 0) {
+    // `empty`, not `ok`: nothing reached the prompt. The hits are still recorded
+    // — the near-misses are what a later recalibration of the floor asks about.
     return {
       note:
         `[prior-coverage] ${similar.length} hit(s) but topScore=${topScore} below floor ` +
         `${PRIOR_COVERAGE_SCORE_FLOOR} — no block injected`,
+      snapshot: lane('empty', similar.map(toEntry)),
     }
   }
 
@@ -103,6 +190,7 @@ async function gatherPriorCoverage(topic: string): Promise<{ block?: string; not
     note:
       `[prior-coverage] ${related.length} of ${similar.length} article(s) above floor ` +
       `${PRIOR_COVERAGE_SCORE_FLOOR}, topScore=${topScore}`,
+    snapshot: lane('ok', related.map(toEntry)),
   }
 }
 
@@ -114,20 +202,33 @@ export async function gatherDraftContext(input: DraftContextInput): Promise<Draf
     retrieveRegulatoryContext(input),
   ])
 
+  const retrieval: RetrievalLaneSnapshot[] = []
+
   let priorCoverage: string | undefined
+  let priorCoverageArticleIds: string[] = []
   if (prior.status === 'fulfilled') {
     priorCoverage = prior.value.block
     notes.push(prior.value.note)
+    retrieval.push(prior.value.snapshot)
+    // Only what was injected. `snapshot.entries` deliberately also holds the
+    // below-floor near-misses, which are evidence about the floor rather than
+    // prior coverage of this article.
+    if (prior.value.block) {
+      priorCoverageArticleIds = prior.value.snapshot.entries.map((entry) => entry.recordId)
+    }
   } else {
     notes.push(`[prior-coverage] FAILED: ${errorText(prior.reason)}`)
+    retrieval.push(inertLane('prior_articles', 'failed'))
   }
 
   let regulatoryCorpus: string | undefined
   if (regulatory.status === 'fulfilled') {
     regulatoryCorpus = regulatory.value.block ?? undefined
     notes.push(...regulatory.value.notes)
+    retrieval.push(regulatory.value.snapshot)
   } else {
     notes.push(`[regulatory] FAILED: ${errorText(regulatory.reason)}`)
+    retrieval.push(inertLane('regulatory', 'failed'))
   }
 
   for (const note of notes) {
@@ -135,7 +236,7 @@ export async function gatherDraftContext(input: DraftContextInput): Promise<Draf
     else console.info(note)
   }
 
-  return { priorCoverage, regulatoryCorpus, notes }
+  return { priorCoverage, regulatoryCorpus, notes, retrieval, priorCoverageArticleIds }
 }
 
 function errorText(reason: unknown): string {

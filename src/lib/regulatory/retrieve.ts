@@ -16,8 +16,10 @@ import 'server-only'
  */
 
 import { generateEmbedding } from '../embeddings'
+import { getRegulatoryNamespace } from '../pinecone'
 import { searchRegulatory } from './index-client'
 import { looksRegulatory } from './gate'
+import type { RetrievalEntry, RetrievalLaneSnapshot, RetrievalLaneStatus } from '../draft-retrieval'
 import {
   formatRegulatoryBlock,
   diversifyHits,
@@ -46,6 +48,24 @@ export interface RegulatoryRetrievalInput {
 export interface RegulatoryRetrievalResult {
   block: string | null
   notes: string[]
+  /**
+   * The same outcome, structured, for the provenance record (wave 2). Every
+   * return path carries one — including the paths that decline to produce a
+   * block, because "the gate missed" and "the lane is broken" must not read the
+   * same a year later.
+   *
+   * `corpusVersion` is the CELEX of the instruments actually selected, which is
+   * the pinned consolidation and therefore the only version claim this lane can
+   * make honestly. It is read off the chunk metadata rather than the manifest
+   * on disk: a runtime `readFile` of a repo file is unreliable on Vercel, which
+   * is the trap `getContentFocus` fell into.
+   */
+  snapshot: RetrievalLaneSnapshot
+}
+
+/** A regulatory lane that produced nothing, with the reason kept. */
+function inert(laneStatus: RetrievalLaneStatus): RetrievalLaneSnapshot {
+  return { lane: 'regulatory', laneStatus, entries: [] }
 }
 
 /**
@@ -75,12 +95,12 @@ export async function retrieveRegulatoryContext(
 
   if (process.env.REGULATORY_RETRIEVAL_DISABLED === '1') {
     notes.push('[regulatory] disabled by REGULATORY_RETRIEVAL_DISABLED=1')
-    return { block: null, notes }
+    return { block: null, notes, snapshot: inert('skipped') }
   }
 
   if (!process.env.PINECONE_REGULATORY_INDEX_NAME) {
     notes.push('[regulatory] skipped — PINECONE_REGULATORY_INDEX_NAME is not set')
-    return { block: null, notes }
+    return { block: null, notes, snapshot: inert('skipped') }
   }
 
   const gate = looksRegulatory(
@@ -92,8 +112,10 @@ export async function retrieveRegulatoryContext(
   )
 
   if (!gate.hit) {
+    // `skipped`, not `empty`: the gate declined to search at all, so nothing
+    // about the corpus was established either way.
     notes.push('[regulatory] gate=miss — topic does not look regulation-adjacent, no block injected')
-    return { block: null, notes }
+    return { block: null, notes, snapshot: inert('skipped') }
   }
 
   const query = composeRegulatoryQuery(input)
@@ -121,7 +143,7 @@ export async function retrieveRegulatoryContext(
       `[regulatory] gate=hit matched=${JSON.stringify(gate.matched)} ${routingNote} ` +
         'but 0 hits — is the corpus ingested?',
     )
-    return { block: null, notes }
+    return { block: null, notes, snapshot: inert('empty') }
   }
 
   // A topic that named an instrument's subject matter but used no legal
@@ -137,7 +159,10 @@ export async function retrieveRegulatoryContext(
         `${floor === REGULATORY_TOPIC_ONLY_SCORE_FLOOR ? ' (topic-only gate hit)' : ''}` +
         ' — no block injected',
     )
-    return { block: null, notes }
+    // The below-floor hits are kept: they are the evidence a later
+    // recalibration of the floor would want, and discarding them would leave
+    // "searched and found nothing" looking like "searched and found weak".
+    return { block: null, notes, snapshot: laneOf('empty', hits, floor) }
   }
 
   const selected = diversifyHits(
@@ -153,5 +178,30 @@ export async function retrieveRegulatoryContext(
       `cited=${JSON.stringify(selected.map((hit) => hit.metadata.citation))}`,
   )
 
-  return { block, notes }
+  return { block, notes, snapshot: laneOf('ok', selected, floor) }
+}
+
+/** Hits as a lane snapshot. Index and namespace come from the env the query
+ * actually used, so a snapshot names the store it was read from. */
+function laneOf(
+  laneStatus: RetrievalLaneStatus,
+  hits: Array<{ id: string; score: number; metadata: { citation: string; corpusId: string; celex: string } }>,
+  scoreFloor: number,
+): RetrievalLaneSnapshot {
+  const entries: RetrievalEntry[] = hits.map((hit) => ({
+    recordId: hit.id,
+    score: hit.score,
+    title: hit.metadata.citation,
+    locator: hit.metadata.corpusId,
+  }))
+  const celexes = [...new Set(hits.map((hit) => hit.metadata.celex).filter(Boolean))]
+  return {
+    lane: 'regulatory',
+    indexName: process.env.PINECONE_REGULATORY_INDEX_NAME,
+    namespace: getRegulatoryNamespace(),
+    ...(celexes.length ? { corpusVersion: celexes.join(', ') } : {}),
+    scoreFloor,
+    laneStatus,
+    entries,
+  }
 }
