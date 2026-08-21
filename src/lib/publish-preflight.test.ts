@@ -14,6 +14,7 @@ import {
 function cleanArticle(overrides: Partial<PreflightDocument> = {}): PreflightDocument {
   return {
     contentType: 'signal',
+    intelligenceTier: 'briefing',
     body: [
       {
         _type: 'block',
@@ -197,6 +198,21 @@ describe('preflightArticle', () => {
   it('does not warn about sources on a YouTube script or an untyped draft', () => {
     expect(preflightArticle(cleanArticle({ contentType: 'youtube', citations: [] }))).toEqual([])
     expect(preflightArticle(cleanArticle({ contentType: undefined, citations: [] }))).toEqual([])
+  })
+
+  it('warns when no intelligence tier is set, and does not block', () => {
+    // Nothing on the hand-made Studio path sets a tier. The article is still
+    // listed, but it carries no badge and the tier filter cannot reach it.
+    const issues = preflightArticle(cleanArticle({ intelligenceTier: undefined }))
+    expect(issues.map((i) => i.id)).toEqual(['no-intelligence-tier'])
+    expect(issues[0].severity).toBe('warning')
+    expect(hasBlocker(issues)).toBe(false)
+  })
+
+  it('says nothing about the tier once one is set', () => {
+    for (const tier of ['pulse', 'briefing', 'audit']) {
+      expect(preflightArticle(cleanArticle({ intelligenceTier: tier }))).toEqual([])
+    }
   })
 
   it('reports blockers and warnings together, blocker first', () => {

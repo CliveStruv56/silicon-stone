@@ -210,6 +210,29 @@ check('the publish preflight still has exactly one blocker', () => {
   )
 })
 
+check('an untiered article is listed, and the preflight warns about it', () => {
+  // Two halves of one fix. The feed used to require defined(intelligenceTier),
+  // and nothing on the hand-made path sets one, so an article could publish
+  // live-but-unbrowsable. If the filter comes back the manual's §5 becomes a
+  // lie in the reader's favour, which is the worst direction for it to be wrong.
+  const feed = extract(
+    'src/app/(website)/intelligence/page.tsx',
+    /BRIEFINGS_QUERY = `\s*(\*\[[^\]]*\])/,
+    'the /intelligence feed query',
+  )
+  assert.ok(
+    !feed.includes('defined(intelligenceTier)'),
+    'the /intelligence feed filters on intelligenceTier again — an untiered article ' +
+      'publishes into invisibility, and the manual §5 says it does not.',
+  )
+  assert.match(
+    source('src/lib/publish-preflight.ts'),
+    /id: 'no-intelligence-tier'/,
+    'the missing-tier preflight warning is gone; the manual §5 and §7c still promise it',
+  )
+  manualStates('No intelligence tier set', 'the missing-tier preflight warning')
+})
+
 check('the manual lists every MCP tool, and no more', () => {
   const tools = [...source('src/lib/mcp/knowledge-tools.ts').matchAll(/name: '([a-z_]+)'/g)]
     .map((m) => m[1])

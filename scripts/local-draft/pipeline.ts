@@ -314,6 +314,16 @@ async function cmdSave(flags: Flags): Promise<void> {
     warn(`Quotation audit failed: ${errMsg(e)}`)
   }
 
+  // `researchSources` is top-level in the payload while the research JSON nests
+  // the same array under `research.sources`, so it is easy to lose in the copy.
+  // Losing it costs the draft every citation snapshot, and nothing else says so.
+  if (!d.researchSources?.length) {
+    warn(
+      'No researchSources in the payload — saving with no citationSnapshots. ' +
+        'Copy research.sources to the top-level researchSources field to keep provenance.',
+    )
+  }
+
   const result = (await createArticleInSanity({
     title: d.title,
     slug: d.slug || slugify(d.title),

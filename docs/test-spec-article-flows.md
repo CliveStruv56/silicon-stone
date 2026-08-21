@@ -272,20 +272,25 @@ not, and that surprised the person who wrote this.
 3. Press **Publish**.
 
 **Expected — and this is the finding to internalise:** you get warnings ("No
-fact-check has been run", "No sources listed") **and the placeholder IS caught**,
-because the preflight scans the body regardless of origin.
+fact-check has been run", "No sources listed", "No intelligence tier set")
+**and the placeholder IS caught**, because the preflight scans the body
+regardless of origin.
 
 **But** now delete the placeholder and publish again: it goes through with no
 voice edit, no quotation audit, no fact-check, no provenance and no `source`.
 Nothing generated a placeholder for you, so on a real hand-written article the
 blocker has nothing to find. **On this path the checks are yours.**
 
-4. **Check `/intelligence`.** The article will *not* be there, and this is the
-   finding: the listing requires `defined(intelligenceTier)`, nothing on this
-   path sets one, and no guard mentions it. So a hand-made article can publish
-   successfully, be live at `/analysis/<slug>`, be indexed in Pinecone and enter
-   the sitemap while never appearing anywhere a reader browses. Categories are
-   required at error level; the tier is not.
+4. **Check `/intelligence`.** The article **will** be there — untiered, with no
+   PULSE / BRIEFING / AUDIT badge, and invisible to the tier filter. Until
+   21 August 2026 it was not: the listing required `defined(intelligenceTier)`,
+   nothing on this path sets one, and no guard mentioned it, so a hand-made
+   article could publish successfully, be live at `/analysis/<slug>`, be indexed
+   in Pinecone and enter the sitemap while never appearing anywhere a reader
+   browses. The feed no longer filters on the tier and the preflight warns when
+   it is unset. Categories remain required at error level; the tier is a
+   warning, not a blocker — set it unless you mean the piece to sit outside the
+   tiers.
 
 5. **Unpublish it** from `/content` when done.
 
@@ -311,12 +316,14 @@ The skill runs: `research` → you synthesise → `draft-prompt` → you write �
 - `save` prints a draft id and a Studio link.
 - In Studio: a normal draft, `source` = **AI-Generated**.
 - **Quotation Audit is populated** — this path gets it as of 20 August 2026.
-- **Citation Snapshots populated** — but only if you passed `researchSources` at
-  the **top level** of the payload. The skill's payload template nests the
-  sources under `research.sources`, which is what the draft prompt reads; `save`
-  reads `researchSources`. Follow the template alone and the draft is written
-  with no provenance at all, silently. Confirmed 21 August 2026: 0 snapshots
-  following the template, 8 once the field was added.
+- **Citation Snapshots populated** — from `researchSources` at the **top level**
+  of the payload. This is the one field whose home differs between steps: the
+  research JSON nests the same array under `research.sources`, which is what the
+  draft prompt reads. Following the template alone once wrote the draft with no
+  provenance at all, silently (confirmed 21 August 2026: 0 snapshots following
+  the template, 8 once the field was added). Fixed the same day — the Step 7
+  template now carries `researchSources`, and `save` warns on stderr when it is
+  absent. If you see that warning, the copy was missed.
 - **No fact-check** — run it from the document menu.
 
 **Test the failure mode that matters:** skip the `draft-prompt` step (go straight

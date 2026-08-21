@@ -463,9 +463,12 @@ export const ARTICLES_BY_TIER_QUERY = defineQuery(`
   }
 `)
 
-// Briefings - All tiered content for the intelligence portal
+// Briefings — every published article for the intelligence portal, tiered or
+// not. The tier drives the badge and the tier filter; it is not a condition of
+// being listed. Two inline copies of this exist ((website)/intelligence/page.tsx
+// and api/briefings/route.ts); change all three together.
 export const BRIEFINGS_QUERY = defineQuery(`
-  *[_type == "article" && !(_id in path("drafts.**")) && defined(intelligenceTier) && defined(slug.current)]
+  *[_type == "article" && !(_id in path("drafts.**")) && defined(slug.current)]
   | order(coalesce(impactScore, 5) desc, publishedAt desc) {
     _id,
     title,

@@ -235,6 +235,21 @@ describe('capture behaviour', () => {
     const result = await toolNamed('capture_knowledge_item').run({ kind: 'note' }, d)
     expect(result.isError).toBe(true)
     expect(result.content[0].text).toContain('title')
+    expect(result.content[0].text).toContain('title is required.')
+    expect(d.created).toHaveLength(0)
+  })
+
+  it('carries the authored message for a whole-payload failure', async () => {
+    // A source with no URL, no text and no declared extraction fails against
+    // the payload rather than a field, so the field is `_`. Reporting only
+    // `_ (required)` names nothing the model can change; the sentence does.
+    const d = deps()
+    const result = await toolNamed('capture_source').run({ title: 'x', sourceKind: 'article' }, d)
+    expect(result.isError).toBe(true)
+    expect(result.content[0].text).toContain(
+      'Provide a URL, the source text, or declare that extraction is expected.',
+    )
+    expect(result.content[0].text).not.toContain('_ (required)')
     expect(d.created).toHaveLength(0)
   })
 

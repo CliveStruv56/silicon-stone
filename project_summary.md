@@ -2,7 +2,7 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-08-21
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (78 prerendered pages), 1,327 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (78 prerendered pages), 1,333 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, **Guide**, YouTube Script, Research Only), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
@@ -36,10 +36,12 @@ obsolete, so the job is consolidation rather than a fifth document.
 **The long-standing P0 is resolved as of 2026-08-20: the production Kit API key is now a valid v4 key** (36 chars, `kit_` prefix), verified the same day with a read-only `GET /v4/account` returning 200 for account "SIlicon and Stone". The funnel no longer terminates in a failed POST. It has **not** been proven end to end — nobody has run a live `POST /api/subscribe`, because that puts a real subscriber on the list — so the parts are verified and the whole path is not. The same verification found three things behind it, all open: `CONVERTKIT_FORM_ID` points at a form named **"Mills form"** while one named "Newsletter site" also exists; two tag env vars still hold literal placeholder strings; and **none of the ~18 launch tags exist in Kit at all** (the account has two tags), so subscribes succeed but arrive untagged. The Kit sending address is also unverified. Beyond that: Lemon Squeezy store not yet created, 9 drafts unpublished, and 7 of 12 published articles still lack cover images. Go-live sequence lives in `LAUNCH.md`; defects and debt in §10.
 
 **The 21 August 2026 session ran the article-flows test specification end to
-end and repaired most of what it found.** All eleven tasks; **fourteen defects
-found, ten fixed** across thirteen commits (`387f7b9c → c033acb6`); suite
-1,248 → **1,327**. The three left open are in §11 Priority 0c with the file and
-the fix for each. Two of the fourteen were not in the spec at all — one was
+end and repaired everything it found.** All eleven tasks; **fourteen defects
+found, fourteen fixed**; suite 1,248 → **1,333**. The last three — the MCP
+tools' swallowed error messages, `ss-draft-local`'s lost provenance, and the
+hand-made article that published into invisibility — were held open as
+Priority 0c and closed the same day; the third was a decision (warn, do not
+block) and its reasoning is in §9. Two of the fourteen were not in the spec at all — one was
 reported by the owner using the tool, one surfaced only because a fix that was
 already written and unit-tested failed on its first live run — which is the
 argument for running the spec against real model output rather than trusting
@@ -55,8 +57,8 @@ green tests. Evidence and reasoning: the **Article Pipeline Audit** artifact
 | Read | For |
 |---|---|
 | **`docs/operator-manual.md`** | How the publication is actually run — research, drafting, the guards, publishing, knowledge capture. Written for the operator. **Replaces `authoring-guide.md`, `article-generation-guide.md` and `editorial-aios-manual.md`, all now pointer stubs.** |
-| **`docs/test-spec-article-flows.md`** | Eleven costed tasks proving every creation path still works, with `npm run test:cleanup` to undo them. **All eleven run 2026-08-21** — fourteen defects found, ten fixed, three open (§11 Priority 0c), one watch item. Re-run after any pipeline or guard change. |
-| `§11` below | What to do next. **Priority 0c** lists three known defects left unfixed, with the file and the fix for each. |
+| **`docs/test-spec-article-flows.md`** | Eleven costed tasks proving every creation path still works, with `npm run test:cleanup` to undo them. **All eleven run 2026-08-21** — fourteen defects found, all fourteen fixed (the last three under §11 Priority 0c), one watch item. Re-run after any pipeline or guard change. |
+| `§11` below | What to do next. **Priority 0c is empty** — the three defects it held were closed on 2026-08-21; the entry survives for the reasoning behind the third. |
 | `CLAUDE.md` | The invariants. Nothing may contradict it. |
 | `LAUNCH.md` | Owner setup: Kit, Lemon Squeezy, **and the Sanity webhooks** — three of them, configured only in the Sanity dashboard and recorded nowhere else. |
 
@@ -522,6 +524,55 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 21, 2026 — Priority 0c closed: the three defects the spec run left open
+
+All three fixed, and each got a guard so it cannot come back quietly.
+
+**The MCP capture tools now say what is wrong.** `knowledge-tools.ts` rendered
+`${e.field} (${e.code})` and dropped `e.message`, so a source captured with no
+URL and no text answered `Problems: _ (required)` — naming a field called `_`
+— while the validator carried *"Provide a URL, the source text, or declare that
+extraction is expected."* for exactly that case. Every authored validation
+message in the capture path was unreachable, not just that one. The message is
+now carried; the field and code stay where they identify which input to change,
+and a whole-payload failure (field `_`) prints the sentence alone. Two tests:
+the authored sentence reaches the caller, and `_ (required)` does not.
+
+**`ss-draft-local`'s payload template carries `researchSources`.** The field is
+top-level in `save.json` while the research JSON nests the same array under
+`research.sources`, so following the template alone wrote the draft with no
+citation snapshots at all, silently — the requirement was documented 150 lines
+further down under "Notes / caveats". It is now in the Step 7 template where the
+operator builds the payload, and `save` warns on stderr when the array is
+missing, so a lost copy announces itself rather than showing up as an empty
+Sources list weeks later.
+
+**A hand-made article no longer publishes into invisibility — and the decision
+was not to block it.** `/intelligence` listed only articles with
+`defined(intelligenceTier)`, and nothing on the Studio path sets one, so a
+tierless article published cleanly, went live at `/analysis/<slug>`, was indexed
+and reached the sitemap while never appearing where a reader browses. The choice
+recorded in Priority 0c was "require the tier in the schema, or warn for it in
+the preflight". Neither alone: **the feed stops filtering on the tier, and the
+preflight warns.** The reasoning is the one already written into
+`publish-preflight.ts` — a blocker is for what is never correct, and an untiered
+article is a legitimate editorial choice (the analytics dashboard has counted an
+"Untiered" bucket all along). What is never correct is a published article that
+cannot be browsed. So the tier now costs the badge, the tier filter and the
+Audit-tier push, not the listing. `IntelligenceFeed` already tolerated a missing
+tier at every point — the badge is guarded, the filter counts only tiered pieces,
+`getTierStyles` has a default — so only the query had to move.
+
+Three copies of that query exist (the SSR page, the API route the client
+refreshes to, and the exported one in `queries.ts`); all three changed together,
+and `src/lib/briefings-query.test.ts` now asserts they stay identical and that
+none requires a tier. A seventeenth manual check ties the two halves together:
+if the filter returns or the preflight warning is deleted, `npm run test:manual`
+fails, because §5 of the manual promises both. Both halves mutation-tested.
+
+Manual §5 and §7c restamped, the test spec's Tasks 7 and 8 rewritten, 1,333 tests
+green (up 6). **Priority 0c is now empty.**
+
 ### August 21, 2026 — The test spec run against `/create`, and the eight defects it found
 
 Tasks 1–5 of `docs/test-spec-article-flows.md` run end to end, then every fix
@@ -766,7 +817,7 @@ defects. Three are fixed in `ce037c64`:
   verified against the live index. Guarded statically, because exercising it
   needs a live index and a published article.
 
-Three are recorded and **not** fixed — see §11 Priority 0c.
+Three were recorded and held open as §11 Priority 0c, then fixed the same day.
 
 **What the publish chain proved** (Task 10, all five checks): index 16 → 17, the
 vector present with a matching id, one related article written back,
@@ -774,7 +825,7 @@ vector present with a matching id, one related article written back,
 and no push (correctly — not Audit tier). Adding a citation then made the audit
 recompute and drop that line, which is the "it clears when you fix it" half.
 
-1,327 tests green (up 79). Manual restamped; §5, §6, §7a, §8, §10, §12 and
+1,333 tests green (up 79). Manual restamped; §5, §6, §7a, §8, §10, §12 and
 Appendix D describe the new behaviour, and §3's route table gains the push
 endpoints.
 
@@ -5697,17 +5748,16 @@ fixed** — see §9 for the day, and the artifact for the evidence.
 Re-run it after any change to the drafting pipeline, the guards or the publish
 chain. It ends with `npm run test:cleanup`, which now actually removes vectors.
 
-### Priority 0c — Three defects found and deliberately not fixed
+### ~~Priority 0c — Three defects found and deliberately not fixed~~ — all three closed 2026-08-21
 
-Recorded on 2026-08-21 with the evidence in §9. None is urgent; all three are
-small and well understood, and each is written down here rather than left in a
-transcript.
+Recorded on 2026-08-21 and fixed the same day; the entry stays because the third
+was a decision, not a repair, and the reasoning is worth keeping. See §9.
 
-| Defect | Where | What to do |
+| Defect | Where | What was done |
 |---|---|---|
-| **The MCP capture tools discard their own error messages.** `knowledge-tools.ts` renders `${e.field} (${e.code})` and drops `e.message`, so a source captured with no URL and no text answers `Problems: _ (required)` — naming a field called `_` — when the validator carries *"Provide a URL, the source text, or declare that extraction is expected."* for exactly that case. | `src/lib/mcp/knowledge-tools.ts:224` | Include the message. One line. Every authored validation message in the capture path is currently unreachable, not just this one. |
-| **`ss-draft-local`'s payload template loses provenance.** `save` reads `researchSources` at the top level; the template at step 3 nests sources under `research.sources`, which is what the draft prompt reads. Follow the template and the draft is written with **no citation snapshots at all**, silently — 0 following the template, 8 once the field was added. The requirement is documented 150 lines later under "Notes / caveats". | `.agent/skills/ss-draft-local/SKILL.md` | Put `researchSources` in the payload template where the operator builds it. |
-| **A hand-made article can publish into invisibility.** `/intelligence` lists only articles with `defined(intelligenceTier)`, and nothing on the hand-made path sets one. A tierless article publishes cleanly, is live at `/analysis/<slug>`, is indexed and reaches the sitemap — and never appears where a reader browses. Categories are required at error level; the tier is not, and no guard mentions it. | `src/app/(website)/intelligence/page.tsx` (the `BRIEFINGS_QUERY`) and `src/lib/publish-preflight.ts` | Decide: require the tier in the schema, or warn for it in the preflight. The manual §5 and the test spec now both say it out loud, so this is a real choice rather than a gap. |
+| ~~**The MCP capture tools discard their own error messages.**~~ **Fixed.** `knowledge-tools.ts` renders `${e.field} (${e.code})` and drops `e.message`, so a source captured with no URL and no text answers `Problems: _ (required)` — naming a field called `_` — when the validator carries *"Provide a URL, the source text, or declare that extraction is expected."* for exactly that case. | `src/lib/mcp/knowledge-tools.ts:224` | The message is carried; a whole-payload failure (field `_`) prints the sentence alone. Two tests pin it. |
+| ~~**`ss-draft-local`'s payload template loses provenance.**~~ **Fixed.** `save` reads `researchSources` at the top level; the template at step 3 nests sources under `research.sources`, which is what the draft prompt reads. Follow the template and the draft is written with **no citation snapshots at all**, silently — 0 following the template, 8 once the field was added. The requirement is documented 150 lines later under "Notes / caveats". | `.agent/skills/ss-draft-local/SKILL.md` | `researchSources` is now in the Step 7 template, and `save` warns on stderr when it is absent. |
+| ~~**A hand-made article can publish into invisibility.**~~ **Fixed — and the decision is recorded.** `/intelligence` lists only articles with `defined(intelligenceTier)`, and nothing on the hand-made path sets one. A tierless article publishes cleanly, is live at `/analysis/<slug>`, is indexed and reaches the sitemap — and never appears where a reader browses. Categories are required at error level; the tier is not, and no guard mentions it. | `src/app/(website)/intelligence/page.tsx` (the `BRIEFINGS_QUERY`) and `src/lib/publish-preflight.ts` | **Neither alone.** The feed stops filtering on the tier — a published article that cannot be browsed is never correct — and the preflight *warns*, because an untiered article is a legitimate editorial choice (the dashboard has always counted an "Untiered" bucket). The schema keeps the field optional. Guarded by `src/lib/briefings-query.test.ts` and manual check 17. |
 
 ### Priority 1 — Content (the actual bottleneck)
 

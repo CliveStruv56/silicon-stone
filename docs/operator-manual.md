@@ -401,17 +401,20 @@ it is the weakest path in the system:
 - No quotation audit, no Citation Snapshots, no automatic fact-check.
 - `source` is left unset unless you pick one.
 
-**It can also publish into invisibility.** `/intelligence` lists only articles
-with an **Intelligence Tier** set, and nothing on this path sets one. A
-hand-made article with no tier publishes cleanly, is live at its own URL, is
-indexed and reaches the sitemap — and never appears on the intelligence hub.
-Categories are required and will block Publish; the tier is not, and nothing
-warns you. Set it yourself. (Confirmed by publishing one, 21 August 2026.)
+**Nothing here sets an Intelligence Tier**, and this path used to publish into
+invisibility because of it: `/intelligence` listed only articles with a tier, so
+a hand-made one went live at its own URL, was indexed, reached the sitemap — and
+never appeared on the intelligence hub. Fixed 21 August 2026 (found by
+publishing one). The feed no longer filters on the tier, so an untiered article
+is listed; what it loses is the PULSE / BRIEFING / AUDIT badge, the tier filter,
+and — for Audit — the push notification on publish. The preflight now says so as
+a **warning**, "No intelligence tier set". Categories remain the harder rule:
+they are required and will block Publish.
 
 **The consequence is worth stating plainly: the publish preflight's only blocker
 cannot fire on this path.** Nothing generated placeholders, so there are none to
-catch. You will see two warnings — "No fact-check has been run" and "No sources
-listed" — and "Publish anyway" is available.
+catch. You will see three warnings — "No fact-check has been run", "No sources
+listed" and "No intelligence tier set" — and "Publish anyway" is available.
 
 If you write by hand, the checks are yours: run **Run fact-check** from the
 document menu, and add sources yourself.
@@ -650,6 +653,7 @@ opens the standard publish path silently.
 | Fact-check missing, still running, or failed | Warning |
 | Fact-check found major issues | Warning |
 | Statutory quotations not in the source text | Warning |
+| No intelligence tier set | Warning |
 | No sources listed | Warning |
 
 **Exactly one thing blocks publication: an unresolved placeholder.** The reasoning,

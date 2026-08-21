@@ -34,6 +34,10 @@ const block = (text: string) => ({
 /** A published article with nothing wrong with it. */
 const clean: PreflightDocument = {
   contentType: 'signal',
+  // ARTICLE_QUERY selects intelligenceTier, so the route's document carries it
+  // and a tiered article is clean. An untiered one earns a warning here too —
+  // the webhook is the only record of a publish that did not go through Studio.
+  intelligenceTier: 'briefing',
   body: [block('An ordinary paragraph with nothing to flag.')],
   citations: [{ title: 'A source', url: 'https://example.com/a' }],
   factCheck: { status: 'completed', overallVerdict: 'clean' },

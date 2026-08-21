@@ -42,6 +42,7 @@ export type PreflightBlock = {
 
 export type PreflightDocument = {
   contentType?: string
+  intelligenceTier?: string
   body?: unknown
   excerpt?: string
   stoneTruth?: string
@@ -212,6 +213,25 @@ export function preflightArticle(doc: PreflightDocument): PreflightIssue[] {
         'model was given, and were not found in it. Open the Quotation Audit ' +
         'panel and check each against the primary source. An invented Article ' +
         'number is a correction; an invented quotation is a retraction.',
+    })
+  }
+
+  // Only the generated paths set a tier; nothing on the hand-made Studio path
+  // does. /intelligence no longer hides an untiered article (it did until
+  // 2026-08-21, which published one straight into invisibility), but the piece
+  // still carries no tier badge and cannot be reached by the tier filter. That
+  // is an editorial choice an author is entitled to make on a one-off, so this
+  // confirms rather than blocks — the schema keeps the field optional.
+  if (!doc.intelligenceTier) {
+    issues.push({
+      id: 'no-intelligence-tier',
+      severity: 'warning',
+      title: 'No intelligence tier set',
+      detail:
+        'The article will be listed on /intelligence, but with no PULSE / BRIEFING / ' +
+        'AUDIT badge, and the tier filter will not find it. Only Audit tier triggers ' +
+        'a push notification on publish. Set the tier under Content unless you mean ' +
+        'this piece to sit outside the tiers.',
     })
   }
 

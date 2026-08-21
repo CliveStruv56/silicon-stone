@@ -7,8 +7,16 @@ import { getPersonaParam, getTierParam, getTopicParam } from './filters'
 // matches what the client refreshes to (F13). Rendering the list (with
 // /analysis/* links) in the SSR HTML makes the hub crawlable and link-bearing
 // to bots and no-JS visitors, instead of an empty "Loading intelligence…" shell.
+//
+// It does NOT require `defined(intelligenceTier)`. It did until 2026-08-21, and
+// because nothing on the hand-made Studio path sets a tier, an article could
+// publish cleanly, go live at /analysis/<slug>, reach the sitemap and the RSS
+// feed — and never appear where a reader browses. The tier is an optional
+// editorial field (the analytics dashboard counts an "Untiered" bucket), so its
+// absence must cost the badge and the tier filter, not the article. Publishing
+// one now raises a preflight warning instead; see src/lib/publish-preflight.ts.
 const BRIEFINGS_QUERY = `
-  *[_type == "article" && !(_id in path("drafts.**")) && defined(intelligenceTier) && defined(slug.current)]
+  *[_type == "article" && !(_id in path("drafts.**")) && defined(slug.current)]
   | order(coalesce(impactScore, 5) desc, publishedAt desc) [0...20] {
     _id,
     title,

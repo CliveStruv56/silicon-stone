@@ -2,8 +2,12 @@ import { NextResponse } from 'next/server'
 import { client } from '@/sanity/lib/client'
 import { urlFor } from '@/sanity/lib/image'
 
+// Kept in step with the SSR copy in (website)/intelligence/page.tsx — the
+// client refreshes to this, so a filter here that is not there makes articles
+// appear on load and vanish on refresh. Neither requires a tier: see the note
+// on that copy for why an untiered article must still be browsable.
 const BRIEFINGS_QUERY = `
-  *[_type == "article" && !(_id in path("drafts.**")) && defined(intelligenceTier) && defined(slug.current)]
+  *[_type == "article" && !(_id in path("drafts.**")) && defined(slug.current)]
   | order(coalesce(impactScore, 5) desc, publishedAt desc) [0...20] {
     _id,
     title,

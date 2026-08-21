@@ -158,9 +158,16 @@ Assemble `.local-draft/save.json` and write it:
   "categorySlugs": ["..."],
   "intelligenceTier": "...",
   "methodologyPillars": ["..."],
-  "voiceEditNotes": "<edit summary>"
+  "voiceEditNotes": "<edit summary>",
+  "researchSources": [ /* copy research.research.sources verbatim: {title,url,snippet,publishedDate?} */ ]
 }
 ```
+
+**`researchSources` is top-level here, and it is not optional in practice.** It
+is the same array you nested under `research.sources` at Step 2 — `save` reads
+it at the top level, so following the shape of `research.json` writes the draft
+with no `citationSnapshots` at all and says nothing about it. Copy the array
+across. `save` warns on stderr if it is missing.
 
 ```
 npm run draft:local -- save --in .local-draft/save.json
@@ -189,8 +196,9 @@ payload. Skip the `draft-prompt` step and the audit has nothing to check
 against and reports `UNCOVERED`, which is not a pass.
 
 It also records the research sources on the article's internal
-`citationSnapshots` when `save` is given `researchSources` — provenance only,
-never the reader-facing Sources list.
+`citationSnapshots` when `save` is given `researchSources` (see Step 7 — the
+field is top-level in `save.json`, not nested under `research`) — provenance
+only, never the reader-facing Sources list.
 
 ## Notes / caveats
 

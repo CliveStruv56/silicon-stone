@@ -220,8 +220,14 @@ async function runCapture(
         `This matches more than one existing record (${ids.join(', ')}). Someone needs to reconcile them before it can be saved.`,
       )
     }
+    // The authored message is the only part a model can act on: the field name
+    // alone says nothing, and for a whole-payload failure the field is `_`,
+    // which names nothing at all. Carry the message; keep the field and code
+    // where they identify which input to change.
     const detail = errors?.length
-      ? ` Problems: ${errors.map((e) => `${e.field} (${e.code})`).join(', ')}.`
+      ? ` Problems: ${errors
+          .map((e) => (e.field === '_' ? e.message : `${e.field} (${e.code}): ${e.message}`))
+          .join(' ')}`
       : ''
     return toolError(`${message}${detail}`)
   }
