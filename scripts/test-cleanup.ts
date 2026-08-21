@@ -78,9 +78,15 @@ async function deleteVectors(ids: string[]): Promise<number> {
   if (ids.length === 0) return 0
 
   const index = new Pinecone({ apiKey }).index(indexName)
-  // deleteMany on ids that were never indexed is a no-op, not an error, so
-  // this is safe for drafts that never got published.
-  await index.deleteMany(ids)
+  // `{ ids }`, not a bare array. The bare-array form returns "Invalid request."
+  // from the SDK, which surfaced as `❌ Cleanup failed: Invalid request.` before
+  // a single document was removed — and left the operator to delete by hand,
+  // which strands the vector this function exists to remove first. The working
+  // shape is the one src/scripts/sync-pinecone.ts has always used.
+  //
+  // Deleting ids that were never indexed is a no-op, not an error, so this is
+  // safe for drafts that never got published.
+  await index.deleteMany({ ids })
   return ids.length
 }
 

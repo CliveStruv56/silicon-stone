@@ -134,7 +134,24 @@ function quoteIsSupported(quote: string, statutoryText: string): boolean {
  * converts the Stone Truth into this form, so on a regulatory piece it was
  * reported `unmatched` on every draft that used the house convention.
  */
-const LABELLED_CALLOUT = /^\*\*[^*\n]{1,60}\*\*\s*:?/
+const LABELLED_CALLOUT = /^\*{2,3}[^*\n]{1,60}:?\*{2,}\s*:?/
+
+/**
+ * Markdown emphasis the author wrapped round a quotation, stripped before
+ * matching.
+ *
+ * A writer who italicises a statutory quote — which house style encourages for
+ * a set-piece quotation — produced a captured span of
+ * `*Before placing on the market…*`, and those asterisks are not in the corpus,
+ * so a character-perfect quotation reported UNMATCHED. Observed 21 August 2026
+ * on a locally drafted Signal quoting Article 49(2) verbatim.
+ *
+ * Statute does not contain asterisks, so removing them cannot make a false
+ * quotation match; it can only stop a true one from failing.
+ */
+function stripEmphasis(span: string): string {
+  return span.replace(/\*+/g, '').trim()
+}
 
 /**
  * The span sits inside an unresolved author placeholder — an instruction to a
@@ -176,7 +193,7 @@ function collectQuotedSpans(paragraph: string): string[] {
   const searchable = paragraph.replace(PLACEHOLDER_REGION, ' ')
 
   for (const match of searchable.matchAll(QUOTED_SPANS)) {
-    spans.push(match[1].trim())
+    spans.push(stripEmphasis(match[1]))
   }
 
   // A blockquote carries no quotation marks; the whole line is the quotation.
@@ -187,10 +204,15 @@ function collectQuotedSpans(paragraph: string): string[] {
     .join(' ')
     .trim()
 
+  // LABELLED_CALLOUT is tested against the RAW blockquote: the label is made of
+  // the very asterisks stripEmphasis removes, so stripping first would hide it.
+  const blockquoteIsCallout = LABELLED_CALLOUT.test(blockquoted)
+  const blockquoteText = stripEmphasis(blockquoted)
+
   // Only when it is not already captured by quote marks inside the blockquote,
   // and never when it is a labelled house callout.
-  if (blockquoted && !LABELLED_CALLOUT.test(blockquoted) && !spans.some((span) => blockquoted.includes(span))) {
-    spans.push(blockquoted)
+  if (blockquoteText && !blockquoteIsCallout && !spans.some((span) => blockquoteText.includes(span))) {
+    spans.push(blockquoteText)
   }
 
   return spans.filter((span) => !isQuestion(span) && !looksLikeTitle(span))

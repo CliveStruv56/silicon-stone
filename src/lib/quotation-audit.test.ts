@@ -270,3 +270,60 @@ The question was always "does this organisation operate critical infrastructure?
     expect(formatQuotationAudit(result)).toContain('[UNMATCHED]')
   })
 })
+
+/**
+ * Both spans below are the real output of a locally drafted Signal on
+ * 21 August 2026 (Task 8 of the test spec), which reported
+ * "2 statutory quotations checked, 0 verified, 2 NOT FOUND" on an article whose
+ * one statutory quotation was character-perfect.
+ */
+describe('auditQuotations — markdown emphasis and the callout label', () => {
+  const ART49 =
+    'Before placing on the market or putting into service an AI system for which the provider has concluded that it is not high-risk according to Article 6(3), that provider or, where applicable, the authorised representative shall register themselves and that system in the EU database referred to in Article 71.'
+  const SUPPLIED_49 = `## Regulation (EU) 2024/1689 (AI Act)
+
+[cite as: EU AI Act, Article 49(1-2)]
+2. ${ART49}`
+
+  it('verifies a quotation the author italicised', () => {
+    const body = `The underlying provision is not ambiguous. Article 49(2) provides that "*${ART49}*"`
+    const result = auditQuotations(body, SUPPLIED_49)
+    expect(result.checked).toBe(1)
+    expect(result.verified).toBe(1)
+  })
+
+  it('verifies one the author bolded, and reports it without the markup', () => {
+    const body = `Article 49(2) provides that "**${ART49}**"`
+    const result = auditQuotations(body, SUPPLIED_49)
+    expect(result.verified).toBe(1)
+    expect(result.quotations[0].quote.startsWith('Before placing')).toBe(true)
+    expect(result.quotations[0].quote).not.toContain('*')
+  })
+
+  it('still fails a quotation that is not in the supplied text', () => {
+    const body = `Article 49(2) provides that "*Providers shall notify the Commission within seven days of becoming aware of the defect.*"`
+    expect(auditQuotations(body, SUPPLIED_49).unmatched).toBe(1)
+  })
+
+  it('ignores the Stone Truth callout in its bold-italic house form', () => {
+    // What the style guide actually produces: *** to open, ** to close.
+    const body = `Some analysis of Article 6 and Annex III.
+
+> ***Stone Truth:** Article 6(3) is not an exit from the regime. It is a cheaper entrance, and it is the only route that requires you to publish your own conclusion before anyone has tested it.*`
+    expect(auditQuotations(body, SUPPLIED_49).checked).toBe(0)
+  })
+
+  it('ignores the plain-bold and colon-outside forms too', () => {
+    const bold = `Article 6 analysis.\n\n> **Stone Truth:** The exemption is narrower than it reads.  It is also more exposed than it reads.`
+    const outside = `Article 6 analysis.\n\n> **Forensic Summary**: Regulation (EU) 2024/2847 entered into force on 10 December 2024 and applies in stages thereafter.`
+    expect(auditQuotations(bold, SUPPLIED_49).checked).toBe(0)
+    expect(auditQuotations(outside, SUPPLIED_49).checked).toBe(0)
+  })
+
+  it('an italicised blockquote that is a real quotation still audits', () => {
+    const body = `Article 49(2) is explicit.\n\n> *${ART49}*`
+    const result = auditQuotations(body, SUPPLIED_49)
+    expect(result.checked).toBe(1)
+    expect(result.verified).toBe(1)
+  })
+})
