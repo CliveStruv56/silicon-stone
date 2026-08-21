@@ -182,6 +182,64 @@ deliberately breaking it** — one check there matched `env['X']` but not
 app**, not only the suite: the routes import `server-only` and cannot be unit
 tested, and the one real leak found in wave 4a was found by curl.
 
+## Exploration pass — done 2026-08-21, at `1821d4bd`
+
+The brief above asked for this and named what it had not read. Findings, in the
+order they change the plan.
+
+**One claim above is now stale.** The article provenance group is not six unused
+fields — `citationSnapshots` has had a caller since 20 August. `finalizeDraft`
+maps `researchSources` through `toSnapshot()` and passes them to
+`createArticleInSanity`, so `/create` and `ss-draft-local` both write it.
+Confirmed live during the 21 August test-spec run (8, 8 and 13 snapshots across
+three drafts). **No article carries one right now** — all 26 predate the change
+or were removed in teardown — so the data is empty while the path is not. The
+half that already works is the *snapshot* half, which is the half that must
+never move; the reference half is what has no caller.
+
+**`updateResearchRun` cannot write what this wave needs.** Its update shape is
+`{ status, summary, deepReport, keywords, error }`. There is no path through it
+for `selectedSources`, `retrievalSnapshots`, `modelSnapshot` or the `articles`
+back-reference — every field the wave exists to fill. This is a domain-service
+change, not only wiring.
+
+**The `jobId` is not the only missing handle; for a standard run there is no
+handle at all.** `startResearch` returns either `{ mode: 'result', result }` or
+`{ mode: 'job', jobId }`, and the browser holds the only reference to either.
+Persisting a run means creating it server-side inside `startResearch` and
+returning an opaque `runId` alongside, then threading that id through
+`pollResearchJob` and `createDraftFromResearch`. Three server-action signatures
+and `create-form.tsx`.
+
+**Which makes the trust boundary the thing to get right.**
+`createDraftFromResearch` receives the whole `ResearchResult` *from the browser*.
+That is already true for drafting and is not this wave's problem — but it would
+become one if the run record were written from the same payload. A run recorded
+at `startResearch` time, from what the server actually did, and identified
+afterwards only by an opaque id, cannot be edited by a client. Provenance
+written from a round-tripped payload is provenance the browser can forge.
+
+**`DraftContext` discards exactly what the wave needs, and no more.**
+`gatherPriorCoverage` holds `similar[]` — `score`, `metadata.title`,
+`metadata.slug`, `metadata.excerpt` and the record id — and returns a prose block
+plus one note string. The regulatory lane does the same. Filling
+`priorCoverage[]` and `generationSnapshot.retrievalRecordIds[]` needs those
+entries returned alongside the block. Additive to a return type; nothing about
+what is retrieved changes, and `PRIOR_COVERAGE_SCORE_FLOOR` is not touched.
+
+**`createArticleInSanity` is the funnel, and that is the hazard.** `/create`,
+`/import` and the local-draft `save` all land there. Lineage must be passed by
+the caller that has it, never derived inside the funnel — otherwise an imported
+article acquires a provenance block describing a run that never happened.
+
+**The deep-job loop, since the brief flagged it.** `pollResearchJob` calls
+`getDeepResearchJob`, and on `completed` synthesises the report *inside the
+poll*. So the moment a run becomes recordable is inside a poll the client
+drives, and a client that stops polling loses the result even though the backend
+finished. That is the concrete form of "research must survive job expiry": the
+run record has to be updated at that moment, server-side, before the result is
+returned to a browser that may never come back.
+
 ## Related
 
 - `knowledge-system-foundation.md` — the schemas, statuses and domain service.
