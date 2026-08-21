@@ -33,10 +33,17 @@ export function CreateForm({ initialPersonas, initialFormat = "signal" }: Create
 
     const [isResearching, setIsResearching] = useState(false);
     const [researchResult, setResearchResult] = useState<ResearchResult | null>(null);
+    /**
+     * The provenance record for this investigation (wave 2). Opaque — the
+     * browser only carries it back so the draft can be linked to the run that
+     * produced it. Everything the record SAYS is written server-side from what
+     * the server did, so holding it here gives the client no way to shape it.
+     */
+    const [runId, setRunId] = useState<string | undefined>(undefined);
 
     const [isGenerating, setIsGenerating] = useState(false);
 
-    async function pollDeepJob(jobId: string): Promise<ResearchResult> {
+    async function pollDeepJob(jobId: string, run?: string): Promise<ResearchResult> {
         // Deep research runs as a Railway background job. Poll from the browser
         // via a short server action so no single request hits a serverless timeout.
         const startedAt = Date.now();
@@ -44,7 +51,7 @@ export function CreateForm({ initialPersonas, initialFormat = "signal" }: Create
         const INTERVAL_MS = 4000;
         while (Date.now() - startedAt < TIMEOUT_MS) {
             await new Promise((r) => setTimeout(r, INTERVAL_MS));
-            const res = await pollResearchJob(jobId, topic, brief);
+            const res = await pollResearchJob(jobId, topic, brief, run);
             if (res.status === "completed" && res.result) return res.result;
             if (res.status === "failed") throw new Error(res.error || "Deep research failed");
         }
@@ -56,14 +63,16 @@ export function CreateForm({ initialPersonas, initialFormat = "signal" }: Create
 
         setIsResearching(true);
         setResearchResult(null);
+        setRunId(undefined);
         try {
             // Deep Dive uses Exa's agentic Research API (slower, multi-step) and runs
             // as a Railway background job when configured; every other format uses the
             // fast recency-biased web search and returns inline.
             const started = await startResearch(topic, format === "deep_dive", brief);
             if (started.mode === "error") throw new Error(started.error);
+            setRunId(started.runId);
             const result = started.mode === "job"
-                ? await pollDeepJob(started.jobId)
+                ? await pollDeepJob(started.jobId, started.runId)
                 : started.result;
             setResearchResult(result);
         } catch (error) {
@@ -117,7 +126,7 @@ export function CreateForm({ initialPersonas, initialFormat = "signal" }: Create
             // On failure it returns { error } — a specific message naming the
             // API/credential at fault. (The action intentionally does not
             // redirect() itself; that threw a spurious error on the client.)
-            const result = await createDraftFromResearch(researchResult, format as "pulse" | "signal" | "deep_dive" | "guide" | "youtube", personaSlug, topic, brief);
+            const result = await createDraftFromResearch(researchResult, format as "pulse" | "signal" | "deep_dive" | "guide" | "youtube", personaSlug, topic, brief, runId);
             if ("error" in result) {
                 alert(result.error);
                 setIsGenerating(false);

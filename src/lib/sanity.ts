@@ -6,6 +6,7 @@ import { CATEGORIES_QUERY } from '../sanity/lib/queries';
 import { markdownToPortableText, stripAuthoringPreamble } from './markdown-to-portable-text';
 import { CLAUDE_MODEL } from './anthropic';
 import { normalizeUrl } from './citations';
+import { keyedReferences, reference } from './knowledge/ids';
 
 const token = process.env.SANITY_API_WRITE_TOKEN;
 
@@ -48,6 +49,34 @@ export interface ArticleData {
      * with the "Add from research" control on the Sources field.
      */
     citationSnapshots?: ResearchSnapshot[];
+    /**
+     * Article lineage — wave 2. Passed by the caller that actually has it, never
+     * derived here: this function is the single funnel for /create, /import and
+     * the local-draft `save`, and deriving lineage inside it would give an
+     * imported article a provenance block describing a run that never happened.
+     *
+     * `researchRunId` and `priorCoverageArticleIds` are references and follow
+     * their targets; `generationSnapshot` is a snapshot and must read the same
+     * in a year. That split is why the article schema separates them, and it is
+     * the constraint most easily lost by treating provenance as one blob.
+     */
+    researchRunId?: string;
+    /** Sanity `_id`s of the earlier articles the prior-coverage lane injected. */
+    priorCoverageArticleIds?: string[];
+    generationSnapshot?: GenerationSnapshot;
+}
+
+/** What was in force when this draft was generated. Every field optional, and
+ * an absent one means nobody knew — not that the answer was nothing. */
+export interface GenerationSnapshot {
+    generatedAt?: string;
+    model?: string;
+    embeddingModel?: string;
+    rulesVersion?: string;
+    rulePackVersion?: string;
+    /** Every record id retrieval returned, across all lanes. */
+    retrievalRecordIds?: string[];
+    notes?: string;
 }
 
 /** One source as the research pass returned it, for `citationSnapshots`. */
@@ -192,6 +221,21 @@ export async function createArticleInSanity(data: ArticleData) {
             generatedAt: new Date().toISOString(),
             model: CLAUDE_MODEL,
         };
+    }
+    if (data.researchRunId) {
+        doc.researchRun = reference(data.researchRunId);
+    }
+    if (data.priorCoverageArticleIds && data.priorCoverageArticleIds.length > 0) {
+        // The knowledge module's own helpers: keys derived from the target, so
+        // regenerating a draft produces a byte-identical array instead of one
+        // that merely looks changed.
+        doc.priorCoverage = keyedReferences(data.priorCoverageArticleIds);
+    }
+    if (data.generationSnapshot) {
+        const snapshot = Object.fromEntries(
+            Object.entries(data.generationSnapshot).filter(([, v]) => v !== undefined),
+        );
+        if (Object.keys(snapshot).length > 0) doc.generationSnapshot = snapshot;
     }
     if (data.citationSnapshots && data.citationSnapshots.length > 0) {
         // Everything the model was handed, deduped by URL but not filtered:

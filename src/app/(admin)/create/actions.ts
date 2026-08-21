@@ -2,7 +2,7 @@
 
 import { performResearch as researchPipeline, synthesizeDeepReport, buildDeepInstructions } from "@/lib/research";
 import { isBackendConfigured, startDeepResearchJob, getDeepResearchJob, type DeepJobStatus } from "@/lib/research-backend";
-import { callClaude } from "@/lib/anthropic";
+import { callClaude, CLAUDE_MODEL } from "@/lib/anthropic";
 import { buildDraftPrompt, type DraftFormat } from "@/lib/prompts";
 import { parseDraftPayload, finalizeDraft } from "@/lib/draft-pipeline";
 import { requireAdmin } from "@/lib/auth";
@@ -10,14 +10,28 @@ import { ResearchResult } from "@/types/research";
 import { gatherDraftContext } from "@/lib/draft-retrieval";
 import { checkDurableRateLimit } from "@/lib/durable-rate-limit";
 import { getServerActionClientIp } from "@/lib/rate-limit";
+import {
+    openResearchRun,
+    completeResearchRun,
+    failResearchRun,
+    recordGeneration,
+} from "@/lib/research-provenance";
+import { EMBEDDING_MODEL } from "@/lib/embeddings";
 
 const MAX_TOPIC_LENGTH = 300
 const MAX_BRIEF_LENGTH = 2000
 
+/**
+ * `runId` is the provenance record for this investigation (wave 2). It is
+ * opaque to the browser and is the ONLY thing the client hands back: the run is
+ * written server-side from what the server actually did, so nothing a client
+ * posts can edit what the record says. It is optional throughout — a run that
+ * could not be recorded costs provenance, never research.
+ */
 export type StartResearchResponse =
-    | { mode: "result"; result: ResearchResult }
-    | { mode: "job"; jobId: string }
-    | { mode: "error"; error: string };
+    | { mode: "result"; result: ResearchResult; runId?: string }
+    | { mode: "job"; jobId: string; runId?: string }
+    | { mode: "error"; error: string; runId?: string };
 
 /**
  * Entry point for the /create form. Deep Dives run on the Railway backend as a
@@ -41,19 +55,30 @@ export async function startResearch(topic: string, deep: boolean, brief: string 
             return { mode: "error", error: `Too many deep research starts. Try again in ${rateLimit.retryAfter} seconds.` }
         }
     }
+    // Opened before the outcome is known, deliberately: a run that dies
+    // mid-flight is exactly the one worth having a record of, and there is no
+    // way to write one if the record only appears on success. Never throws.
+    let runId: string | null = null;
     try {
         if (deep && isBackendConfigured()) {
             const jobId = await startDeepResearchJob(normalizedTopic, buildDeepInstructions(normalizedTopic, normalizedBrief));
-            return { mode: "job", jobId };
+            // The job handle is also the run's idempotency key, so it is opened
+            // after the job exists rather than before.
+            runId = await openResearchRun({ topic: normalizedTopic, brief: normalizedBrief, deep: true, jobId });
+            return { mode: "job", jobId, ...(runId ? { runId } : {}) };
         }
+        runId = await openResearchRun({ topic: normalizedTopic, brief: normalizedBrief, deep });
         const result = await researchPipeline(normalizedTopic, undefined, { deep, brief: normalizedBrief });
-        return { mode: "result", result };
+        // Closed here, server-side, from what this function actually received.
+        await completeResearchRun({ runId, result });
+        return { mode: "result", result, ...(runId ? { runId } : {}) };
     } catch (error) {
         // Returned, not thrown: Next.js redacts thrown Server Action errors in
         // production, which is what reduced an upstream 410 to "check the logs".
         console.error("Error starting research:", error);
         const detail = error instanceof Error ? error.message : String(error);
-        return { mode: "error", error: `Failed to gather intelligence: ${detail}` };
+        await failResearchRun(runId, detail);
+        return { mode: "error", error: `Failed to gather intelligence: ${detail}`, ...(runId ? { runId } : {}) };
     }
 }
 
@@ -62,20 +87,33 @@ export async function pollResearchJob(
     jobId: string,
     topic: string,
     brief: string = "",
+    runId?: string,
 ): Promise<{ status: DeepJobStatus["status"]; result?: ResearchResult; error?: string }> {
     await requireAdmin();
+    const run = runId ?? null;
     try {
         const job = await getDeepResearchJob(jobId);
         if (job.status === "completed" && job.report) {
             const result = await synthesizeDeepReport(topic, job.report, brief.trim().slice(0, MAX_BRIEF_LENGTH));
+            // Recorded HERE, before the result is handed to a browser that may
+            // never come back. This poll is the only moment the report exists
+            // in this process — the backend's copy ages out, and a client that
+            // stops polling loses it. That is the concrete form of "research
+            // must survive job expiry".
+            await completeResearchRun({ runId: run, result, costUsd: job.costDollars });
             return { status: "completed", result };
         }
         if (job.status === "failed") {
-            return { status: "failed", error: job.error ?? "Deep research failed" };
+            const detail = job.error ?? "Deep research failed";
+            await failResearchRun(run, detail);
+            return { status: "failed", error: detail };
         }
         return { status: job.status };
     } catch (error) {
         console.error("Error polling research job:", error);
+        // The poll failing is not the job failing — the backend may still be
+        // working — so the run is left alone rather than marked failed on the
+        // strength of one bad round trip.
         return { status: "failed", error: "Failed to poll research job." };
     }
 }
@@ -136,7 +174,8 @@ export async function createDraftFromResearch(
     format: DraftFormat,
     personaSlug: string,
     topic: string = "",
-    brief: string = ""
+    brief: string = "",
+    runId?: string
 ): Promise<CreateDraftResult> {
     let stage = "initialising";
     let articleId = "";
@@ -200,10 +239,40 @@ export async function createDraftFromResearch(
             // Provenance only — recorded on citationSnapshots, never on the
             // reader-facing Sources list. Promote in Studio.
             researchSources: researchResult.sources,
+            // Article lineage (wave 2). Only this path supplies it: /import has
+            // no run and a hand-written article has no pipeline.
+            lineage: {
+                ...(runId ? { researchRunId: runId } : {}),
+                priorCoverageArticleIds: draftContext.priorCoverageArticleIds,
+                generationSnapshot: {
+                    generatedAt: new Date().toISOString(),
+                    model: CLAUDE_MODEL,
+                    embeddingModel: EMBEDDING_MODEL,
+                    // Every id both lanes returned, including the ones that did
+                    // not clear a floor: what the retrieval step saw, not what
+                    // survived it. `rulesVersion` and `rulePackVersion` are left
+                    // unset — the bundled style rules carry no version, and the
+                    // rule pack belongs to the Compliance Checker's lane, which
+                    // this drafting path never reads.
+                    retrievalRecordIds: draftContext.retrieval.flatMap((lane) =>
+                        lane.entries.map((entry) => entry.recordId),
+                    ),
+                    notes: draftContext.notes.join("\n"),
+                },
+            },
             logPrefix: "/create",
         });
 
         articleId = String(created?._id ?? "").replace(/^drafts\./, "");
+
+        // The other half of the link, and the last thing to happen: the run
+        // learns which article it produced and what retrieval fed it. After the
+        // write, so a failure here costs the back-reference and not the draft.
+        await recordGeneration({
+            runId: runId ?? null,
+            articleId,
+            retrieval: draftContext.retrieval,
+        });
 
     } catch (error) {
         // Log the raw error server-side (visible in Vercel logs) and return a

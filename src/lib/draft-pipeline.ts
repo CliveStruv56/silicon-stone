@@ -1,7 +1,7 @@
 import 'server-only';
 import { extractArticleMetadata, runVoiceEditPass, type DraftFormat } from './prompts';
 import { buildImagePrompts } from './image-prompts';
-import { createArticleInSanity, listSanityCategories } from './sanity';
+import { createArticleInSanity, listSanityCategories, type GenerationSnapshot } from './sanity';
 import { slugify } from './utils';
 import { auditQuotations, formatQuotationAudit } from './quotation-audit';
 import type { ResearchSource } from '@/types/research';
@@ -137,6 +137,18 @@ export interface FinalizeDraftInput {
      * in Studio. Imported articles have none.
      */
     researchSources?: ResearchSource[];
+    /**
+     * Article lineage — wave 2, and **only `/create` supplies it.** `/import`
+     * has no research run and a hand-written article has no pipeline, so both
+     * leave the provenance block empty on purpose: a blank reads as "there was
+     * none", which is true, where a synthesised one would say "we do not know"
+     * about work that never happened.
+     */
+    lineage?: {
+        researchRunId?: string;
+        priorCoverageArticleIds?: string[];
+        generationSnapshot?: GenerationSnapshot;
+    };
     /** Log label, e.g. "/create" or "/import". */
     logPrefix?: string;
 }
@@ -155,6 +167,7 @@ export async function finalizeDraft({
     sourceMaterial,
     regulatoryCorpus,
     researchSources,
+    lineage,
     logPrefix = 'draft',
 }: FinalizeDraftInput) {
     // Pass 3 — humanising voice edit (Deep Dives audit-only, others rewritten).
@@ -247,6 +260,11 @@ export async function finalizeDraft({
         ...(researchSources?.length
             ? { citationSnapshots: researchSources.map(toSnapshot) }
             : {}),
+        ...(lineage?.researchRunId ? { researchRunId: lineage.researchRunId } : {}),
+        ...(lineage?.priorCoverageArticleIds?.length
+            ? { priorCoverageArticleIds: lineage.priorCoverageArticleIds }
+            : {}),
+        ...(lineage?.generationSnapshot ? { generationSnapshot: lineage.generationSnapshot } : {}),
     });
 }
 
