@@ -43,7 +43,20 @@ async function main() {
   const indexName = process.env.PINECONE_INDEX_NAME
   if (!indexName) throw new Error('PINECONE_INDEX_NAME not set')
 
-  const index = pinecone.index(indexName)
+  // EXPLICIT default namespace, not the bare index handle.
+  //
+  // The orphan pass below deletes every id it does not find in Sanity's article
+  // list. On the bare handle that reads the default namespace by an SDK default
+  // this script never stated — so any other namespace in this index survived by
+  // accident rather than by design, and one `.namespace(...)` added here would
+  // have deleted somebody else's corpus.
+  //
+  // That is not hypothetical. The retired `silicon-and-stone` index holds 277
+  // records in an `ideas` namespace belonging to an unrelated pipeline, which is
+  // exactly the case verify-article-index.ts warns "must not be assumed safe to
+  // delete". Saying which namespace this script owns makes the safety
+  // structural instead of incidental.
+  const index = pinecone.index(indexName).namespace('')
 
   const articles = await sanity.fetch(`
     *[_type == "article" && !(_id in path("drafts.**")) && defined(slug.current)] {
