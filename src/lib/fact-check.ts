@@ -3,9 +3,9 @@ import crypto from 'crypto';
 import { callClaude, CLAUDE_MODEL } from './anthropic';
 import { searchExa } from './exa';
 import { extractArticleText } from './embeddings';
-import { extractJsonObject } from './draft-pipeline';
 import { writeClient } from './sanity';
 import { buildCitationMembers, type CitationMember } from './citations';
+import { verdictFor, type FactCheckVerdict } from './fact-check-verdict';
 
 /**
  * On-demand fact-check pipeline, triggered from the Studio "Run fact-check"
@@ -150,6 +150,71 @@ function asConfidence(value: unknown): Confidence {
   return CONFIDENCES.includes(value as Confidence) ? (value as Confidence) : 'low';
 }
 
+/**
+ * Split one `===MARKER===` block into its `KEY: value` fields.
+ *
+ * A key may repeat (several CITATION lines) and a value may wrap across lines
+ * (a verbatim sentence), so each occurrence starts a new entry and any
+ * unprefixed line continues the entry it follows.
+ */
+function parseFields(chunk: string, field: RegExp): Record<string, string[]> {
+  const out: Record<string, string[]> = {};
+  let current: string | null = null;
+
+  for (const line of chunk.split('\n')) {
+    const match = field.exec(line);
+    if (match) {
+      current = match[1];
+      (out[current] ??= []).push(line.slice(match[0].length));
+    } else if (current && out[current]?.length) {
+      out[current][out[current].length - 1] += `\n${line}`;
+    }
+  }
+  return out;
+}
+
+/** Blocks introduced by `marker`, each parsed into its fields. */
+function parseBlocks(raw: string, marker: RegExp, field: RegExp): Record<string, string[]>[] {
+  return raw.split(marker).slice(1).map((chunk) => parseFields(chunk, field));
+}
+
+const CLAIM_BLOCK = /^===CLAIM===\s*$/m;
+const CLAIM_FIELD = /^(CLAIM|LOCATION|ORIGINAL|QUERY):\s?/;
+
+/**
+ * Delimiter-based claim extraction (NOT JSON), for the reason
+ * `buildVoiceEditPrompt` already documents about the voice pass.
+ *
+ * The prompt asks for `originalText` copied EXACTLY verbatim, because it is
+ * used for find-and-replace. On this publication the copied sentence routinely
+ * quotes statute, so it contains its own double quotation marks — which the
+ * model then emitted unescaped inside a JSON string value:
+ *
+ *   "locationHint": "Under Article 26(7), deployers who are employers "shall
+ *    inform workers' representatives…
+ *
+ * The string terminates at that inner quote and `JSON.parse` dies on the next
+ * word. Observed three times on one article at three different offsets (3184,
+ * 2892, 3157), so it is content-dependent rather than truncation, and a retry
+ * does not fix it. There is no escaping problem in a line-prefixed format, so
+ * this asks for one. Keep it that way: the articles most likely to break JSON
+ * are the statute-quoting ones that most need checking.
+ */
+export function parseExtractedClaims(raw: string, cap: number): ExtractedClaim[] {
+  return parseBlocks(raw, CLAIM_BLOCK, CLAIM_FIELD)
+    .map((fields) => {
+      const read = (key: string) => (fields[key]?.[0] ?? '').trim();
+      return {
+        claim: read('CLAIM'),
+        locationHint: read('LOCATION'),
+        originalText: read('ORIGINAL'),
+        searchQuery: read('QUERY'),
+      };
+    })
+    .filter((c) => c.claim && c.searchQuery)
+    .slice(0, cap);
+}
+
 async function extractClaims(article: FactCheckArticle, today: string): Promise<ExtractedClaim[]> {
   const cap = CLAIM_CAPS[article.intelligenceTier ?? '']
     ?? (article.contentType === 'deepdive' ? CLAIM_CAPS.audit : DEFAULT_CLAIM_CAP);
@@ -159,28 +224,33 @@ async function extractClaims(article: FactCheckArticle, today: string): Promise<
 
 Extract ONLY claims that are checkable against external sources: statistics and figures, dates and time scales, direct quotes, named events, regulatory or legal facts, and concrete attributions ("X said/announced/fined Y"). Skip opinion, analysis, predictions, and the publication's own framing.
 
-Respond with a single JSON object only — no prose, no code fences:
-{"claims": [{"claim": "<the factual claim, self-contained>", "locationHint": "<short verbatim fragment copied from the article text where the claim appears>", "originalText": "<the COMPLETE sentence(s) containing this claim, copied EXACTLY verbatim from the article text — this is used for find-and-replace, so it must match character-for-character>", "searchQuery": "<the best web search query to find a PRIMARY source for this claim>"}]}
+Return plain text only — no JSON, no code fences. Repeat this block once per claim, with the marker line verbatim on its own line:
 
-Order claims by how damaging they would be if wrong. Return at most ${cap} claims. If the article contains no checkable claims, return {"claims": []}.`;
+===CLAIM===
+CLAIM: the factual claim, self-contained, on one line
+LOCATION: a short verbatim fragment copied from the article where the claim appears
+ORIGINAL: the COMPLETE sentence(s) containing this claim, copied EXACTLY verbatim from the article text — this is used for find-and-replace, so it must match character-for-character. Quotation marks, em-dashes and apostrophes are copied as they appear; nothing needs escaping.
+QUERY: the best web search query to find a PRIMARY source for this claim
+
+Order claims by how damaging they would be if wrong. Return at most ${cap} blocks. If the article contains no checkable claims, return nothing at all.`;
 
   const user = `Today's date is ${today}. Extract the checkable factual claims from this article:\n\n---\n${text}\n---`;
 
   const raw = await callClaude(system, user, 0.2, 4096);
-  const parsed = JSON.parse(extractJsonObject(raw)) as { claims?: unknown };
-  if (!Array.isArray(parsed.claims)) {
-    throw new Error('Claim extraction returned an unexpected payload (missing claims array).');
+
+  // No ===CLAIM=== marker at all is ambiguous between "nothing checkable here"
+  // and "the model ignored the contract". Treat a substantial response with no
+  // markers as the latter, so a broken extraction never reads as a clean article.
+  if (!raw.includes('===CLAIM===')) {
+    if (raw.trim().length > 200) {
+      throw new Error(
+        'The fact-checker could not read its own output — it did not use the expected format. Run the fact-check again.',
+      );
+    }
+    return [];
   }
-  return parsed.claims
-    .filter((c): c is Record<string, unknown> => !!c && typeof c === 'object')
-    .map((c) => ({
-      claim: typeof c.claim === 'string' ? c.claim.trim() : '',
-      locationHint: typeof c.locationHint === 'string' ? c.locationHint.trim() : '',
-      originalText: typeof c.originalText === 'string' ? c.originalText.trim() : '',
-      searchQuery: typeof c.searchQuery === 'string' ? c.searchQuery.trim() : '',
-    }))
-    .filter((c) => c.claim && c.searchQuery)
-    .slice(0, cap);
+
+  return parseExtractedClaims(raw, cap);
 }
 
 async function gatherEvidence(claims: ExtractedClaim[]): Promise<(EvidenceItem[] | null)[]> {
@@ -228,10 +298,20 @@ async function verifyBatch(
 
 Verdicts: "accurate" (evidence confirms it), "inaccurate" (evidence contradicts it), "outdated" (was true, evidence shows newer figures/events supersede it), "needs-context" (true but misleading as stated — could be better explained), "unverifiable" (evidence neither confirms nor refutes).
 
-Respond with a single JSON object only — no prose, no code fences:
-{"results": [{"claim_index": <number>, "verdict": "<verdict>", "confidence": "high"|"medium"|"low", "evidence": "<1-3 sentence justification citing the specific evidence>", "sourceUrls": ["<urls of the evidence items you relied on>"], "suggestedRevision": "<corrected or better-explained wording — ONLY when verdict is not accurate, otherwise omit>", "suggestedCitations": [{"title": "<source title>", "url": "<url>", "publisher": "<organisation>"}]}]}
+Return plain text only — no JSON, no code fences. Repeat this block once per claim, in order, with the marker line verbatim on its own line:
 
-suggestedCitations: ONLY when the verdict is "accurate", and only PRIMARY sources (official filings, regulators, institutional publications, original named reporting — never blogs, vendor content, or aggregators) that genuinely support the claim — usually 0 or 1 per claim. Claims that are not accurate must have an empty suggestedCitations array. Return one result per claim, in order.`;
+===RESULT===
+INDEX: the claim number you were given
+VERDICT: one of accurate | inaccurate | outdated | needs-context | unverifiable
+CONFIDENCE: high | medium | low
+EVIDENCE: 1-3 sentence justification citing the specific evidence
+SOURCE: url of an evidence item you relied on (repeat this line per url, or omit)
+REVISION: corrected or better-explained wording — ONLY when the verdict is not accurate, otherwise omit the line
+CITATION: title | url | publisher (repeat per citation, or omit)
+
+Quotation marks, em-dashes and apostrophes are written as they appear; nothing needs escaping.
+
+CITATION: ONLY when the verdict is "accurate", and only PRIMARY sources (official filings, regulators, institutional publications, original named reporting — never blogs, vendor content, or aggregators) that genuinely support the claim — usually 0 or 1 per claim. Claims that are not accurate must have no CITATION line.`;
 
   const user = batch
     .map(({ claim, evidence }, i) => {
@@ -248,50 +328,76 @@ suggestedCitations: ONLY when the verdict is "accurate", and only PRIMARY source
     .join('\n\n');
 
   const raw = await callClaude(system, user, 0.2, 4096);
-  const parsed = JSON.parse(extractJsonObject(raw)) as { results?: unknown };
-  if (!Array.isArray(parsed.results)) {
-    throw new Error('Verification returned an unexpected payload (missing results array).');
+  const rows = parseVerificationResults(raw);
+  if (rows.length === 0) {
+    throw new Error('Verification returned no readable results.');
   }
 
   return batch.map(({ claim }, i) => {
-    const row = (parsed.results as Record<string, unknown>[]).find(
-      (r) => !!r && typeof r === 'object' && r.claim_index === i,
-    );
+    const row = rows.find((r) => r.index === i);
     if (!row) return unverifiableResult(claim, 'The verifier returned no result for this claim.');
-    const suggestedCitations = Array.isArray(row.suggestedCitations)
-      ? (row.suggestedCitations as Record<string, unknown>[])
-          .filter((c) => !!c && typeof c.url === 'string' && typeof c.title === 'string')
-          .map((c) => ({
-            title: (c.title as string).trim(),
-            url: (c.url as string).trim(),
-            publisher: typeof c.publisher === 'string' ? c.publisher.trim() : undefined,
-          }))
-      : [];
     return {
       claim: claim.claim,
       locationHint: claim.locationHint,
       originalText: claim.originalText,
       verdict: asVerdict(row.verdict),
       confidence: asConfidence(row.confidence),
-      evidence: typeof row.evidence === 'string' ? row.evidence.trim() : '',
-      sourceUrls: Array.isArray(row.sourceUrls)
-        ? (row.sourceUrls as unknown[]).filter((u): u is string => typeof u === 'string').slice(0, 5)
-        : [],
-      suggestedRevision:
-        typeof row.suggestedRevision === 'string' && row.suggestedRevision.trim()
-          ? row.suggestedRevision.trim()
-          : undefined,
-      suggestedCitations,
+      evidence: row.evidence,
+      sourceUrls: row.sourceUrls.slice(0, 5),
+      suggestedRevision: row.suggestedRevision,
+      suggestedCitations: row.suggestedCitations,
     };
   });
 }
 
-function overallVerdict(results: ClaimResult[]): 'clean' | 'minor-issues' | 'major-issues' | 'unverifiable' {
-  if (results.some((r) => r.verdict === 'inaccurate')) return 'major-issues';
-  if (results.some((r) => r.verdict === 'outdated' || r.verdict === 'needs-context')) return 'minor-issues';
-  const unverifiable = results.filter((r) => r.verdict === 'unverifiable').length;
-  if (results.length > 0 && unverifiable > results.length / 2) return 'unverifiable';
-  return 'clean';
+const RESULT_BLOCK = /^===RESULT===\s*$/m;
+const RESULT_FIELD = /^(INDEX|VERDICT|CONFIDENCE|EVIDENCE|SOURCE|REVISION|CITATION):\s?/;
+
+export type ParsedVerification = {
+  index: number;
+  verdict: string;
+  confidence: string;
+  evidence: string;
+  sourceUrls: string[];
+  suggestedRevision?: string;
+  suggestedCitations: { title: string; url: string; publisher?: string }[];
+};
+
+/** See `parseExtractedClaims` for why this is not JSON. */
+export function parseVerificationResults(raw: string): ParsedVerification[] {
+  const out: ParsedVerification[] = [];
+
+  for (const fields of parseBlocks(raw, RESULT_BLOCK, RESULT_FIELD)) {
+    const first = (key: string) => (fields[key]?.[0] ?? '').trim();
+    const index = Number.parseInt(first('INDEX'), 10);
+    if (!Number.isInteger(index)) continue;
+
+    const revision = first('REVISION');
+    out.push({
+      index,
+      verdict: first('VERDICT').toLowerCase(),
+      confidence: first('CONFIDENCE').toLowerCase(),
+      evidence: first('EVIDENCE'),
+      sourceUrls: (fields.SOURCE ?? []).map((u) => u.trim()).filter(Boolean),
+      suggestedRevision: revision || undefined,
+      // `title | url | publisher`; the url is the only part worth failing over.
+      suggestedCitations: (fields.CITATION ?? [])
+        .map((line) => line.split('|').map((part) => part.trim()))
+        .filter((parts) => parts.length >= 2 && parts[0] && parts[1])
+        .map(([title, url, publisher]) => ({ title, url, publisher: publisher || undefined })),
+    });
+  }
+
+  return out;
+}
+
+/**
+ * Precedence lives in `fact-check-verdict.ts`, which the Studio badge and the
+ * publish dialog also read — a fresh run and a re-read of the same claims must
+ * not be able to disagree.
+ */
+function overallVerdict(results: ClaimResult[]): FactCheckVerdict {
+  return verdictFor(results);
 }
 
 function buildSummary(results: ClaimResult[], verdict: string): string {
