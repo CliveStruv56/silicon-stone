@@ -3,7 +3,7 @@
 A set of tasks to work through in order. Each one is self-contained: what it
 proves, what it costs, what to do, and what you should see.
 
-**Written 20 August 2026, current at 21 August**, against commit `2fd85a34`. Companion to
+**Written 20 August 2026, current at 21 August**, against commit `ce037c64`. Companion to
 [`operator-manual.md`](operator-manual.md) — the manual says how the system
 works, this says how to prove it still does.
 
@@ -235,12 +235,17 @@ be refused with *"Too many deep research starts. Try again in N seconds."*
   was no statutory text to check your quotation against. `UNCOVERED` is not a
   pass — verify the quotation yourself.
 
-**Also test the refusals** (each should be a red "Import failed" panel):
-- Submit with no persona → *"Select a target persona."*
-- Paste under 200 characters → *"Provide the article — upload a file or paste at
-  least a couple of paragraphs."*
-- Upload a `.pdf` → *"Unsupported file type. Upload a .docx, .md, .markdown, or
-  .txt file."*
+**Also test the refusals.** Two of the three are app-level panels; the first is
+not, and that surprised the person who wrote this.
+- Paste under 200 characters → a red panel: *"Provide the article — upload a file
+  or paste at least a couple of paragraphs."*
+- Upload a `.pdf` → a red panel: *"Unsupported file type. Upload a .docx, .md,
+  .markdown, or .txt file."*
+- Submit with no persona → **the browser refuses first**, with its own bubble
+  reading *"Please select one of these options."* The persona radios are
+  `required`, so the form never reaches the server action and its
+  *"Select a target persona."* message is defence in depth you cannot see.
+  Confirmed 21 August 2026.
 
 ---
 
@@ -275,7 +280,14 @@ voice edit, no quotation audit, no fact-check, no provenance and no `source`.
 Nothing generated a placeholder for you, so on a real hand-written article the
 blocker has nothing to find. **On this path the checks are yours.**
 
-4. **Unpublish it** from `/content` when done.
+4. **Check `/intelligence`.** The article will *not* be there, and this is the
+   finding: the listing requires `defined(intelligenceTier)`, nothing on this
+   path sets one, and no guard mentions it. So a hand-made article can publish
+   successfully, be live at `/analysis/<slug>`, be indexed in Pinecone and enter
+   the sitemap while never appearing anywhere a reader browses. Categories are
+   required at error level; the tier is not.
+
+5. **Unpublish it** from `/content` when done.
 
 ---
 
@@ -299,7 +311,12 @@ The skill runs: `research` → you synthesise → `draft-prompt` → you write �
 - `save` prints a draft id and a Studio link.
 - In Studio: a normal draft, `source` = **AI-Generated**.
 - **Quotation Audit is populated** — this path gets it as of 20 August 2026.
-- **Citation Snapshots populated** if the research step ran.
+- **Citation Snapshots populated** — but only if you passed `researchSources` at
+  the **top level** of the payload. The skill's payload template nests the
+  sources under `research.sources`, which is what the draft prompt reads; `save`
+  reads `researchSources`. Follow the template alone and the draft is written
+  with no provenance at all, silently. Confirmed 21 August 2026: 0 snapshots
+  following the template, 8 once the field was added.
 - **No fact-check** — run it from the document menu.
 
 **Test the failure mode that matters:** skip the `draft-prompt` step (go straight

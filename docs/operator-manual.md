@@ -3,7 +3,7 @@
 How an article gets researched, drafted, edited, checked, published, and captured
 back into knowledge. Written for the person running the publication.
 
-**Verified against commit `2fd85a34`, 21 August 2026.** Every claim here was
+**Verified against commit `ce037c64`, 21 August 2026.** Every claim here was
 checked against the code on that date. Where something could not be checked by
 reading code, it is listed in [Appendix D — What has not been verified](#appendix-d--what-has-not-been-verified).
 If you are reading this months later, the header is the first thing to distrust.
@@ -400,6 +400,13 @@ it is the weakest path in the system:
 - No voice edit, so no house-style pass and **no `[AUTHOR: …]` placeholders**.
 - No quotation audit, no Citation Snapshots, no automatic fact-check.
 - `source` is left unset unless you pick one.
+
+**It can also publish into invisibility.** `/intelligence` lists only articles
+with an **Intelligence Tier** set, and nothing on this path sets one. A
+hand-made article with no tier publishes cleanly, is live at its own URL, is
+indexed and reaches the sitemap — and never appears on the intelligence hub.
+Categories are required and will block Publish; the tier is not, and nothing
+warns you. Set it yourself. (Confirmed by publishing one, 21 August 2026.)
 
 **The consequence is worth stating plainly: the publish preflight's only blocker
 cannot fire on this path.** Nothing generated placeholders, so there are none to
