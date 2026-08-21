@@ -3,9 +3,8 @@
 How an article gets researched, drafted, edited, checked, published, and captured
 back into knowledge. Written for the person running the publication.
 
-**Verified against commit `387f7b9c`, 21 August 2026.** It also describes three
-guard fixes made the same day and not yet committed — see §6, §7a and §12. Every
-claim here was checked against the code on that date. Where something could not be checked by
+**Verified against commit `2fd85a34`, 21 August 2026.** Every claim here was
+checked against the code on that date. Where something could not be checked by
 reading code, it is listed in [Appendix D — What has not been verified](#appendix-d--what-has-not-been-verified).
 If you are reading this months later, the header is the first thing to distrust.
 
@@ -1248,12 +1247,6 @@ honest about the gap rather than writing around it.
 
 Not confirmed by running it:
 
-- **Rendered Studio labels and layout.** Field names and dialog wording are quoted
-  from the source that renders them, so they are right — but panel ordering,
-  collapsed states, and how a long report actually reads on screen were not seen.
-- **A complete `/create` run.** No draft was generated for this document. Pass
-  timing, how the Deep Dive wait actually feels, and whether any pass commonly fails
-  in practice are unconfirmed.
 - **The MCP capture round-trip.** Tool contracts and error codes are read from
   source; no capture was performed against production.
 - **Whether the Inoreader lane is ever live.** The `/research` page reads a token
@@ -1261,22 +1254,31 @@ Not confirmed by running it:
 - **Which Deep Dive path production takes.** Whether the research backend is
   configured — and therefore whether Deep Dives run as a polled job or as an
   in-process fallback — was not checked against the live environment.
-- **Citation Snapshots end to end.** The dedupe and shaping are unit-tested and
-  the wiring typechecks, but no article has been generated through `/create`
-  since, so no snapshot has been *observed* on a real draft — and the
-  "Add N from research" button in §8 has not been clicked in Studio. The first
-  article you draft will settle both in one go.
-- **The Audit-tier push notification (§10), end to end.** The webhook was
-  exercised against real published articles and both halves behaved — but this
-  machine has no Upstash, and the send **deliberately refuses without it**,
-  because the one-shot marker that stops a re-publish notifying twice lives
-  there. So the send itself, and the marker, are unverified. Production has
-  Upstash; it needs the VAPID keys, which do not exist yet.
+- **The Audit-tier push notification (§10), end to end.** Narrowed, not closed.
+  `/api/push/stats` reports **0 subscribers on both topics with
+  `configured: true`** — the store answered, so that is a measured zero, and
+  publishing an Audit-tier article on 21 August sent to nobody while consuming
+  its one-shot marker. Nothing is broken: the public VAPID key is what the
+  *browser* needs to create a subscription, so there has never been a window in
+  which anyone could. What remains untested is the send itself and the marker,
+  and only a real subscriber can settle them — subscribe a device, then publish
+  the next Audit-tier piece or POST `/api/push/send`.
 - **The non-administrator refusal in §2.** Both ends are unit-tested — a
   non-admin role is refused, and the client is held to *not* sending that person
   to `/login` — but it has not been exercised with a real non-administrator
   Sanity account, because there isn't one on this project. The four lines wiring
   those two together in the route are the untested seam.
 
-Each line is something one real run would settle. When you next take an article
-from `/create` to publish, note anything that differs and correct this document.
+**Settled on 21 August 2026, and struck from this list.** A run of
+`docs/test-spec-article-flows.md` generated seven drafts across Pulse, Signal and
+Deep Dive and removed them again, so: a complete `/create` run is no longer
+hypothetical (research 21–22s on the fast lane, 212–280s agentic for a Deep Dive;
+the four passes 71s to 259s); Citation Snapshots were observed on every draft and
+the **"Add N from research"** button in §8 was clicked in a real Studio, including
+delete-and-reoffer; and Studio's rendered labels, dialogs and claim controls were
+driven rather than read. That run found eight defects, seven now fixed — see
+`project_summary.md` §9.
+
+Each remaining line is something one real run would settle. When you next take an
+article from `/create` to publish, note anything that differs and correct this
+document.

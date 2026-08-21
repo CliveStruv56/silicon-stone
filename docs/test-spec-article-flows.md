@@ -3,7 +3,7 @@
 A set of tasks to work through in order. Each one is self-contained: what it
 proves, what it costs, what to do, and what you should see.
 
-**Written 20 August 2026, current at 21 August**, against commit `c885065f`. Companion to
+**Written 20 August 2026, current at 21 August**, against commit `2fd85a34`. Companion to
 [`operator-manual.md`](operator-manual.md) — the manual says how the system
 works, this says how to prove it still does.
 
@@ -163,7 +163,12 @@ Same as Task 3, format **Signal**. Prefix the title `TEST — `.
 3. Press **"Insert into article"**. Confirm the body changes and the claim is
    marked applied.
 4. If the paragraph had a link or bold text, confirm you get the warning that
-   formatting was simplified — and check that paragraph.
+   formatting was simplified — and check that paragraph. The link is flattened,
+   not restyled.
+5. **Watch the badge count down** (since 21 August 2026). It reads
+   *major issues (N to address)* and drops a grade as you apply the inaccurate
+   ones. With every flagged claim addressed it reads **"N revisions applied"** —
+   deliberately not *clean*, because inserting a revision verifies nothing.
 
 **Watch for:** the badge stuck on *Fact-check running*. Recovery is time-based —
 wait 10 minutes, then run it again from the document menu.
@@ -185,8 +190,17 @@ the expensive one.**
   browser at 12 — so a genuine failure normally arrives as a clean error first.
 - Body 3,000+ words. Content Type **Deep Dive**.
 - **Voice Edit Notes read as an audit, not a rewrite.** Deep Dives are too long
-  to rewrite economically, so the pass tells you what to fix and leaves the body
+  to rewrite economically, so the pass tells you what to fix and leaves the prose
   alone. This is the one format where you do the editing from the notes.
+- **The author specifics are appended to the END of the body** (since 21 August
+  2026), under a heading *⚠ Author specifics needed*, each written as an
+  `[AUTHOR: …]` placeholder. The audit pass cannot drop a marker at the sentence
+  that needs it, so it lists them where the guard can see them.
+- **Press Publish: you should get "Not ready to publish"**, no "Publish anyway".
+  Before this change a Deep Dive could not raise the blocker at all — the
+  outstanding work lived only in the notes, which the preflight does not scan.
+  Resolve each item in the prose where it belongs, delete its line, delete the
+  heading, and the block clears.
 - A fact-check starts automatically.
 
 **Also test the limit:** start three Deep Dives within an hour. The fourth should
