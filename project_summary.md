@@ -5907,7 +5907,7 @@ re-guessed.
 |---|---|
 | 0–1 — contracts, schemas, domain service | **Done 2026-08-19.** |
 | 2 — provenance | **Done 2026-08-21** for `/create`. Runs are durable; articles carry lineage. See §9 and the brief's "What was built". |
-| 3 — editorial memory | Not started. Event-driven indexing, eligibility/reconciliation, a third retrieval lane. `KNOWLEDGE_AUTO_INDEX_ENABLED` and `KNOWLEDGE_DRAFT_RETRIEVAL_ENABLED` exist and are off. |
+| 3 — editorial memory | **Briefed 2026-08-21, not built** — `docs/siliconstone-knowledge-wave-03-brief.md`. Event-driven indexing, eligibility/reconciliation, a third retrieval lane. Wave 1 left the whole index state machine, the nine `indexState` fields and the `index_evaluation_requested` intent unconsumed, so this is mostly connecting what exists. **Six open questions for the owner**, and question 5 is the one that changes the shape of the work: the editorial corpus is two records, so a score floor cannot be calibrated the way `PRIOR_COVERAGE_SCORE_FLOOR` was. |
 | 4 — frictionless capture | **4a done 2026-08-20** (universal endpoint + hosted MCP, six tools). The `/knowledge` cockpit and URL/PDF extraction are not built. |
 | 5 — conversation integration | Claude reached in 4a. **ChatGPT is parked**, on a plan gate rather than an engineering one — Business is the first tier that can write. |
 | 6 — cutover | Not started. Owns any backfill; wave 2 deliberately did none. |
