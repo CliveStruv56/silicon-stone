@@ -528,6 +528,48 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 21, 2026 — The knowledge inbox, actually looked at
+
+The one outstanding data repair in the knowledge system turned out to be two
+different things, and only one of them was still broken.
+
+**The dangling `sourceIds` were already repaired.** The record has been carried
+as outstanding since Wave 4a: `knowledgeCandidate.43006085`'s two string source
+IDs resolve to nothing, one of them containing literal spaces. Both sources now
+exist and `knowledgeItem.51ecac19…` holds real references to each, resolving to
+the GOV.UK AI-security release and the MIT Technology Review sovereignty piece.
+That was done on 20 August; the note saying otherwise was stale. Worth recording
+*why* the IDs never matched: the readable one,
+`mit-technology-review-insights-edb-2026-05-ai-data-sovereignty-report`, simply
+was not the source's `sourceId`, which is `mittr-2026-05-14-ai-sovereignty`. Two
+plausible slugs for one document is the whole argument for references over
+strings.
+
+**The candidates keep their broken strings, deliberately.** §11 of the master
+spec says candidates are copied into items, not rewritten or moved, and the item
+supersedes them. Repairing legacy strings nobody reads would be tidying, not
+fixing.
+
+**What was actually stuck: a repair sitting in a draft nobody published.** The
+GOV.UK source read `reviewStatus: ready` with its required `brandTags` in a
+draft, while the published record still read `inbox`. So the Knowledge inbox
+showed a reviewed source as unreviewed, and the Studio review actions were
+disabled the entire time — *correctly*, because `reviewActions.tsx` refuses to
+act while a draft shadows the published document, the verdict being written to
+the published record. Publishing the draft completed it; the source now reads
+**ready** with no draft.
+
+The general shape is worth keeping: **nothing surfaces "this record has an
+unpublished verdict."** From the inbox, a repair left in a draft and a repair
+never attempted look identical. When a knowledge record looks stuck, check for a
+draft before concluding the work was not done.
+
+Nothing else in the store needs a write. The legacy MIT source carries
+`originalUrl` but no `canonicalUrl`, which is handled on purpose —
+`repository.ts` matches on both, precisely because every pre-wave source has
+only the former. The remaining `inbox` item is a human review decision, not a
+repair.
+
 ### August 21, 2026 — Priority 0c closed: the three defects the spec run left open
 
 All three fixed, and each got a guard so it cannot come back quietly.
