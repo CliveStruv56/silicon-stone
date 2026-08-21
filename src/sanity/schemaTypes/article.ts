@@ -597,6 +597,21 @@ export const article = defineType({
     }),
     defineField({
       group: 'factCheck',
+      name: 'publishAudit',
+      title: 'Publish Audit',
+      description:
+        'What the pre-publish checks said about this article AFTER it went live, ' +
+        'run server-side by the publish webhook. The dialog in Studio runs in the ' +
+        'browser, so anything that publishes another way — a script, the CLI, the ' +
+        'Sanity dashboard, an MCP with a write token — never meets it. This is the ' +
+        'backstop that does. Empty is the normal state: it is only written when ' +
+        'something is wrong, and it clears itself once fixed and republished.',
+      type: 'text',
+      rows: 6,
+      readOnly: true,
+    }),
+    defineField({
+      group: 'factCheck',
       name: 'factCheck',
       title: 'Fact Check',
       description:

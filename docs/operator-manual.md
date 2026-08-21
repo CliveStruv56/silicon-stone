@@ -56,7 +56,7 @@ first use.
 | Kit sending address | **Unverified** | You cannot reliably send until this is done. |
 | Broadcast / "email this article" | **Does not exist** | There is no route. Sending is manual, in Kit. |
 | Substack | **Manual only** | No integration of any kind. |
-| Web Push | **Live but unfired** | Two topics exist and readers can subscribe. Nothing sends on publish, and there is no UI to send — only an admin API endpoint with no caller. |
+| Web Push | **Wired, needs keys** | Publishing an **Audit-tier** article now notifies the "New Audit-tier Deep Dives" subscribers — once `VAPID_PRIVATE_KEY` and `NEXT_PUBLIC_VAPID_PUBLIC_KEY` are set. Until then it answers 503 and nobody is notified. The deadline-alerts topic is still manual. |
 | Lemon Squeezy / checkout | **No store** | `NEXT_PUBLIC_PRE_LAUNCH` defaults true, which suppresses every checkout link. Product gates link to the product page instead. |
 | Compliance Checker v2 | **Dark** | v1 is what every visitor gets. See §13. |
 | ChatGPT knowledge capture | **Blocked** | Not an engineering problem — it needs a Business-tier seat. See §11. |
@@ -762,14 +762,30 @@ Anything you typed into Related Articles by hand gets overwritten here.
 invalidated so the new piece appears. The sitemap and RSS feed rebuild on their own
 schedule.
 
+**The publish audit.** The pre-publish checks run again, server-side. The dialog
+you saw in Studio runs in your browser, so anything publishing another way — a
+script, the CLI, the Sanity dashboard, an MCP holding a write token — never meets
+it. This is the backstop that does.
+
+If it finds nothing, it writes nothing: an empty **Publish Audit** field (Fact
+Check tab) is the normal state. If it finds something, the field says what, and
+it clears itself once you fix the article and republish. It does **not**
+unpublish anything — silently reversing a deliberate publish is worse than a live
+article carrying a warning.
+
+**A push notification, for Audit-tier articles only.** Publishing something at
+the Audit tier notifies everyone subscribed to "New Audit-tier Deep Dives". Once
+per article, ever — a later typo fix does not re-notify. Nothing fires for other
+tiers, and the AI Act deadline topic remains something you send by hand.
+
 ### ⚠ Distribution is manual
 
 Nothing announces the article. Specifically:
 
 - **No newsletter is sent.** There is no broadcast endpoint in the codebase at all.
   You send it from Kit by hand.
-- **No push notification fires**, despite readers being able to subscribe to two
-  topics. The send endpoint exists but has no caller and no interface.
+- **Push fires only for Audit-tier articles**, and only once VAPID keys are set
+  (see `LAUNCH.md`). Nothing announces a Pulse, a Signal or a Guide.
 - **Substack is entirely manual.** There is no integration.
 
 The intended human sequence is: publish on the site first with its own canonical
@@ -1138,6 +1154,12 @@ Not confirmed by running it:
   since, so no snapshot has been *observed* on a real draft — and the
   "Add N from research" button in §8 has not been clicked in Studio. The first
   article you draft will settle both in one go.
+- **The Audit-tier push notification (§10), end to end.** The webhook was
+  exercised against real published articles and both halves behaved — but this
+  machine has no Upstash, and the send **deliberately refuses without it**,
+  because the one-shot marker that stops a re-publish notifying twice lives
+  there. So the send itself, and the marker, are unverified. Production has
+  Upstash; it needs the VAPID keys, which do not exist yet.
 - **The non-administrator refusal in §2.** Both ends are unit-tested — a
   non-admin role is refused, and the client is held to *not* sending that person
   to `/login` — but it has not been exercised with a real non-administrator

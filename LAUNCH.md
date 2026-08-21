@@ -215,6 +215,42 @@ one extra click between a reader and a payment.
       toolkit's topics. Kept for the rule, which still holds: an article only
       gets a commerce gate if its `categories` intersect a product's `topics`.
 
+### Sanity webhooks — the config that lives nowhere in this repo
+
+**Three webhooks make the site work, and all three exist only in the Sanity
+dashboard.** Nothing in the repo provisions or verifies them, and nothing fails
+if they are missing — a fresh environment publishes articles that are never
+indexed, never audited and never announced, silently. This section is the only
+record.
+
+Sanity project → **API → Webhooks**. For each: `POST`, dataset `production`,
+trigger on **create / update / publish**, filter `_type == "article"`, and a
+projection that **must** include `_id` and `_type`.
+
+| URL | Auth | What it does | Symptom if missing |
+|---|---|---|---|
+| `/api/vectorize` | header `x-sanity-webhook-secret` = `SANITY_WEBHOOK_SECRET` | Embeds the article, writes back Related Articles | No semantic search hit, no related articles, no prior-coverage on future drafts |
+| `/api/on-publish` | same header, same secret | Runs the pre-publish checks server-side and records anything wrong; sends the Audit-tier push | Nothing catches a publish made outside Studio; no push ever fires |
+| `/api/revalidate` | `next-sanity` **signature** (`SANITY_REVALIDATE_SECRET`) | Invalidates the home page, `/intelligence` and the article page | New articles do not appear until the next deploy |
+
+- [ ] All three created, with the secret set in Vercel.
+- [ ] ⚠ **The projection includes `_type`.** A payload without it is the
+      *delete* shape: `/api/vectorize` will treat every delivery as a request to
+      remove that article's vector.
+- [ ] Verify by publishing one article and checking Sanity's own delivery log —
+      that log is the only place a 401/429/503 from these routes ever surfaces.
+
+### Web Push — VAPID keys
+
+- [ ] `npx web-push generate-vapid-keys`
+- [ ] Set `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` and
+      `VAPID_SUBJECT` (a `mailto:` you own) in Vercel.
+- [ ] Until these exist, `/api/push/send` and the publish notification both
+      answer 503 and no reader is ever notified, whatever they subscribed to.
+- [ ] Upstash must also be configured: without it the publish notification
+      **deliberately refuses to send**, because the one-shot marker that stops
+      a re-publish notifying twice lives there.
+
 ### Lemon Squeezy — webhook
 
 - [ ] Settings → Webhooks → URL

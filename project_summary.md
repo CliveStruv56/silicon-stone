@@ -489,6 +489,65 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 21, 2026 — Tier 3: the publish webhook, and the first thing it caught
+
+`/api/on-publish` — one webhook doing the two publish-time jobs Tier 3 called
+for. Deliberately one and not two: every extra webhook is another thing
+configured only in the Sanity dashboard with no record in this repo, which the
+test-spec work had just identified as the largest fresh-environment gap.
+
+**1. The pre-publish checks, server-side.** The Studio dialog runs in the
+browser, so a script, the CLI, the Sanity dashboard or an MCP with a write token
+never meets it. The webhook re-runs `preflightArticle()` and records anything
+wrong on a new read-only `publishAudit` field. It does **not** unpublish:
+silently reversing a deliberate publish is worse than a live article carrying a
+warning.
+
+**It caught something on its first real run.** Fired at the existing published
+catalogue, it found *"The Same Money, Counted Three Times"* is **live with a
+fact-check verdict of `major-issues`**, and a second article live with no
+fact-check and no sources. Both fields left in place — they are accurate, and
+that is what the field is for.
+
+**2. The Audit-tier push notification.** Publishing at the Audit tier notifies
+the "New Audit-tier Deep Dives" subscribers — the topic has existed since
+Phase 3 with nothing ever sending to it. Gated on `intelligenceTier === 'audit'`
+and guarded by a one-shot Redis marker, because a push is not idempotent the way
+a vector upsert is: every later edit re-fires the webhook, so without the marker
+a typo fix would re-notify everyone. A failed send **releases** the marker, or a
+transient failure would mean nobody is ever told about that article.
+
+**Loop safety, which is the whole design constraint.** Writing to the article
+re-fires this webhook plus `/api/vectorize` and `/api/revalidate`. Two things
+stop it: a clean article is never written to at all, so the common case costs
+nothing; and a re-run computes the identical audit text and skips the write.
+Verified live — first fire `recorded warnings`, second fire `unchanged`.
+
+**A defect found by testing rather than by review.** The first invocation hung
+for **15 minutes** on an unbounded Sanity read before the socket gave up, and
+returned 500. A webhook that hangs is worse than one that fails, because Sanity
+retries a failure but the hung invocation burns the whole function first. Both
+clients now carry a 15s timeout, the route a 60s `maxDuration`, and the read is
+wrapped to answer 503 — which is what Sanity's redelivery is for.
+
+**The config gap is now written down.** `LAUNCH.md` gains a "Sanity webhooks"
+section listing all three, their auth (two share a custom header, `/api/revalidate`
+uses a signature), and the warning that a projection omitting `_type` turns every
+`/api/vectorize` delivery into a **delete**. Plus a VAPID section: without those
+keys nothing is ever sent, and without Upstash the notification deliberately
+refuses to send rather than risk sending twice.
+
+**Not done, and not attempted: the Kit broadcast.** It is a 1–2 day feature
+build, it needs a Portable Text → email-safe HTML renderer that does not exist,
+and it is blocked regardless on the Kit sending address being unverified. Left
+out deliberately rather than half-built.
+
+**Honestly unverified:** the push send itself. This machine has no Upstash, and
+the code refuses to send without it, so the marker and the send are untested.
+Recorded in the manual's Appendix D rather than glossed.
+
+1,248 tests green.
+
 ### August 20, 2026 — A test spec for the article flows, and the paths it exposed
 
 `docs/test-spec-article-flows.md` — eleven tasks covering every way an article

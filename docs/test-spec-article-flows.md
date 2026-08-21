@@ -452,6 +452,17 @@ npx sanity documents query '*[_type=="article" && slug.current=="<slug>"][0]{"re
 > no other article scores above the 0.37 floor. On a small catalogue that is
 > common. Checking only (c) cannot tell a working webhook from a dead one.
 
+**(d) The publish audit ran.** Check the **Publish Audit** field on the Fact
+Check tab. **Empty is the pass** — it is only written when something is wrong.
+To prove it is actually running rather than silently absent, publish something
+with a known warning (no citations) and confirm the field fills in; then fix it,
+republish, and confirm it clears.
+
+**(e) The push notification**, only if the article is **Audit** tier and VAPID
+keys are configured. Nothing fires for other tiers. It fires **once per article
+ever**, so a later edit will not re-notify — that is the intended behaviour, not
+a failure.
+
 4. Confirm the article is live at `/analysis/<slug>` and appears on
    `/intelligence`.
 
