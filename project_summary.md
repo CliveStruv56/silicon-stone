@@ -44,7 +44,7 @@ obsolete, so the job is consolidation rather than a fifth document.
 | Read | For |
 |---|---|
 | **`docs/operator-manual.md`** | How the publication is actually run — research, drafting, the guards, publishing, knowledge capture. Written for the operator. **Replaces `authoring-guide.md`, `article-generation-guide.md` and `editorial-aios-manual.md`, all now pointer stubs.** |
-| **`docs/test-spec-article-flows.md`** | Eleven costed tasks proving every creation path still works, with `npm run test:cleanup` to undo them. |
+| **`docs/test-spec-article-flows.md`** | Eleven costed tasks proving every creation path still works, with `npm run test:cleanup` to undo them. **Tasks 1–5 run 2026-08-21; 6–11 outstanding.** |
 | `§11` below | What to do next. Priorities 0a and 0b are the immediate ones. |
 | `CLAUDE.md` | The invariants. Nothing may contradict it. |
 | `LAUNCH.md` | Owner setup: Kit, Lemon Squeezy, **and the Sanity webhooks** — three of them, configured only in the Sanity dashboard and recorded nowhere else. |
@@ -511,12 +511,18 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
-### August 21, 2026 — The test spec run against `/create`, and the three guards it found broken
+### August 21, 2026 — The test spec run against `/create`, and the eight defects it found
 
-Tasks 1–5 of `docs/test-spec-article-flows.md` run end to end: three drafts
-generated (Pulse, Signal, Deep Dive) and removed, teardown verified back to 16
-vectors / 16 published. Findings and evidence are written up as an artifact;
-what follows is what changed in the code.
+Tasks 1–5 of `docs/test-spec-article-flows.md` run end to end, then every fix
+re-run against live model output: **seven drafts generated and removed** across
+Pulse, Signal and Deep Dive, teardown verified back to 10 drafts / 16 published
+/ 16 vectors. Eight defects, seven fixed. Findings and evidence are written up
+as an artifact; what follows is what changed in the code.
+
+**Two of the eight were not in the spec at all**, and that is the transferable
+part. The badge that could never clear came from the owner using the tool. The
+2,048-token truncation eating every Deep Dive's audit notes surfaced only
+because a fix already written and unit-tested failed on its first real run.
 
 **The fact-check could not read its own output on statute-quoting articles.**
 The extraction prompt asks for the containing sentence copied *exactly verbatim*
@@ -698,8 +704,34 @@ directory that does not exist in the repo at all, behind a bare `catch {}`. So
 the prediction was well founded and unobservable without spending a production
 draft to confirm a defect already documented in the repo.
 
-1,317 tests green (up 69). Manual restamped; §6, §7a, §8, §10 and §12 describe
-the new behaviour, and §3's route table gains the push endpoints.
+**The manual and the test spec are stamped at `2fd85a34`, and a stamp asserts
+currency — so what today made stale moved with the date rather than after it.**
+The manual's header had gone false, saying three guard fixes were "not yet
+committed" when they were. **The test spec was wrong about Deep Dives**: Task 5
+still said the audit pass "leaves the body alone" and that the notes are where
+you do the editing, which would have had a tester assert the old behaviour. It
+now describes the appended `[AUTHOR: …]` placeholders and the "Not ready to
+publish" dialog, and says what clears it. Task 4 gains the badge counting down
+as revisions are applied, and that an inline link is flattened rather than
+restyled.
+
+**Appendix D lost three entries and narrowed a fourth.** A complete `/create`
+run, Citation Snapshots observed on a real draft, and rendered Studio labels and
+layout are no longer unverified — seven drafts were generated and removed, the
+snapshots were on all of them, and the "Add N from research" button and the
+claim controls were driven in a real Studio. What replaces them carries the
+timings (21–22s fast-lane research, 212–280s agentic, the four passes 71s to
+259s), so the next reader inherits a measurement rather than a gap. The
+Audit-tier push entry is **narrowed, not struck**: a measured zero settles who
+was notified, but the send itself and the one-shot marker still need a real
+subscriber, and the entry now asks for exactly that. Five entries remain, all
+genuinely open: the MCP capture round-trip, whether the Inoreader lane is ever
+live, which Deep Dive path production takes, the push send with a subscriber,
+and the non-administrator refusal.
+
+1,317 tests green (up 69). Manual restamped; §6, §7a, §8, §10, §12 and
+Appendix D describe the new behaviour, and §3's route table gains the push
+endpoints.
 
 ### August 21, 2026 — Web Push live, and a live article corrected
 
@@ -5612,11 +5644,17 @@ three items below, publish.
 Publishing it will also fire the first real push notification (Audit tier, keys
 now live) — worth watching to confirm the chain end to end.
 
-### Priority 0b — Run the test specification
+### Priority 0b — Run the rest of the test specification
 
-`docs/test-spec-article-flows.md`, eleven tasks, costed. Nothing in it has been
-run by the owner yet. It is the fastest way to find what these two days of
-changes broke, and it ends with `npm run test:cleanup`.
+`docs/test-spec-article-flows.md`, eleven tasks, costed. **Tasks 1–5 were run on
+2026-08-21** — preflight, Research Only, Pulse, Signal, Deep Dive — and found
+eight defects, seven now fixed (§9). The spec was corrected where that run made
+it wrong, so it is current at `2fd85a34`.
+
+**Tasks 6–11 have not been run**: `/import`, the hand-made Studio path and its
+publish guard, `ss-draft-local`, MCP capture, the publish chain, and teardown.
+Task 7 in particular is the one that proves the weakest path behaves — and
+`/import` is the path no guard covers well. Each ends with `npm run test:cleanup`.
 
 ### Priority 1 — Content (the actual bottleneck)
 
