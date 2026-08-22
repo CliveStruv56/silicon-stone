@@ -456,6 +456,38 @@ A new **AI Act** consolidation is not a simple re-fetch: `reg:check` asserts its
 move with it and every pinned citation be re-verified. `reg:drift` says so in
 its output rather than implying all six are equal work.
 
+## Editorial memory (the knowledge lane — dark)
+
+`PINECONE_KNOWLEDGE_INDEX_NAME` names the fourth index, added by wave 3 of the
+knowledge programme (`docs/siliconstone-knowledge-wave-03-brief.md`). It holds
+one OpenAI vector per **reviewed** `knowledgeItem` / `knowledgeSource`.
+
+- **Two switches, and the second is the point.**
+  `KNOWLEDGE_AUTO_INDEX_ENABLED` gates indexing on review;
+  `KNOWLEDGE_DRAFT_RETRIEVAL_ENABLED` gates the drafting lane — and the lane
+  *also* needs `KNOWLEDGE_SCORE_FLOOR`, a measured number. **No default floor
+  exists in the code and none may be added.** `PRIOR_COVERAGE_SCORE_FLOOR = 0.37`
+  was measured over 15 articles; this corpus is two records. Earn the number with
+  `npm run knowledge:calibrate` or leave the lane off.
+- **Only `normal` sensitivity is ever indexed**, and only reviewed records with
+  settled extraction. The calculation is `knowledge/eligibility.ts` and every
+  verdict carries a reason, including the eligible ones.
+- **The writer and the reconciler must agree what "up to date" means.** Both
+  compare the content hash **and** `KNOWLEDGE_INDEX_VERSION`; comparing the hash
+  alone made `knowledge:sync` print a plan that `indexRecord` then declined to
+  carry out.
+- **Nothing is truncated silently.** `generateEmbedding` slices at
+  `MAX_EMBEDDING_CHARS`, which is right for articles and wrong here, so the
+  indexer refuses at that boundary with an `error` naming the limit.
+- `npm run knowledge:verify-index` asserts the index has **no integrated `embed`
+  config**, for the reason the article lane learned the hard way.
+
+**Pinecone is at its five-index limit.** Four are this app's (articles,
+regulatory, evidence, knowledge). The fifth, `silicon-and-stone`, is the retired
+integrated-embed index and **must not be deleted**: besides stale article vectors
+it holds an `ideas` namespace written daily by an external story-idea agent that
+lives nowhere in this repo.
+
 ## Article vectors (the other Pinecone lane)
 
 `PINECONE_INDEX_NAME` names the index behind semantic search, related articles

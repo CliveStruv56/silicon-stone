@@ -479,10 +479,12 @@ project was at its five-index limit. Of the five, `quickstart-skills` was an MCP
 tutorial artefact (9 records, `example-namespace`, no reference anywhere) and was
 deleted with the owner's approval. The other candidate — the retired
 `silicon-and-stone` — turned out to hold 15 stale article vectors **and 277
-records in an `ideas` namespace belonging to an unrelated pipeline**. That is
-exactly what `verify-article-index.ts` warns "must not be assumed safe to
-delete", and it is why the original index "became impossible to recreate". It was
-left alone. It also made the hazard behind decision 1 concrete rather than
+records in an `ideas` namespace, written daily by an external story-idea agent**
+(Exa plus an Inoreader aggregate, which emails the owner a shortlist he picks
+from by hand; nothing in this repo touches it). That is exactly what
+`verify-article-index.ts` warns "must not be assumed safe to delete", and it is
+why the original index "became impossible to recreate". It was left alone, and
+it is still being written to. It also made the hazard behind decision 1 concrete rather than
 theoretical, so `sync-pinecone.ts` now names the namespace it owns instead of
 relying on an SDK default it never stated.
 
@@ -516,6 +518,13 @@ topScore 0.492.
   for when the corpus is worth calibrating against.
 - **The corpus is two records**, one of which is a GOV.UK press release. The
   mechanism is the deliverable.
+- **The obvious corpus is next door and is not eligible.** The `ideas` namespace
+  holds 277 scored, categorised, sourced story ideas in the site's own taxonomy —
+  exactly what a lane with two records needs, and exactly what would make a floor
+  measurable. But 267 of them are unreviewed `New`, and wave 3's whole
+  eligibility rule is that unreviewed material never reaches a drafting model.
+  Importing them is a wave of its own, and the first question is what review
+  means for an idea nobody has read.
 - **Inline indexing on review has not been exercised through the route** — the
   same code path was driven directly by `knowledge:sync`, and the wiring is
   guarded at source, but no one has pressed **Mark ready** with
