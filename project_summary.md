@@ -6203,10 +6203,30 @@ one expression, that neither writer decides for itself, and that the Studio stam
 patches the draft and awaits it; `publish-preflight.test.ts` gains the
 composition order. Suite 1,406 → **1,418**. Build clean.
 
-**One thing not done: no live Studio publish has been made since the change.**
-The stamp is guarded at source and the backstop is straightforward, but this repo
-has now had three defects that only a browser walk-through found. The next real
-publish is the proof; check `publishedAt` on it.
+**Proved on production, both halves, 2026-08-22.** A scratch article
+(`TEST — publishedAt stamp verification`) was created, published through the live
+Studio and removed again.
+
+- **The Studio stamp**, proved directly rather than inferred: Puppeteer captured
+  the outgoing mutation — `patch drafts.test-published-at-stamp set
+  publishedAt: 2026-08-22T21:41:58.181Z` — and the published document carried
+  exactly that value, so the publish copied it over as designed. The end state
+  alone would not have shown which writer did it, since the backstop produces a
+  similar-looking date a moment later.
+- **The backstop, unaided.** `publishedAt` was unset on the published document;
+  **within three seconds it was back**, stamped `21:43:48.154Z` by
+  `/api/on-publish` firing on the write, with no manual trigger. A manual POST a
+  moment after an earlier unset returned `publishedAt: "unchanged"`, which is the
+  loop-safety property in evidence: the stamp's own write re-fires the webhook,
+  which then finds the field present and does nothing.
+
+**One thing the cleanup taught.** `npm run test:cleanup` removed the document and
+its vector, and `articles:verify-index` then reported **17 vectors against 16
+articles** — a `/api/vectorize` webhook already in flight had re-created the
+scratch vector after the delete. `npm run articles:sync` found and removed the
+orphan, which is precisely what the cleanup script's closing instruction says to
+run. This is the first time that instruction has demonstrably mattered; do not
+treat it as optional. Back to 16 published, 0 without a date, 16 vectors.
 
 ### Priority 1 — Content
 
