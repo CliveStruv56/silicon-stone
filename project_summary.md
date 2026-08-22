@@ -2,7 +2,7 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-08-22
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (78 prerendered pages), 1,397 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (78 prerendered pages), 1,406 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, **Guide**, YouTube Script, Research Only), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
@@ -58,9 +58,10 @@ article a way to say what it was written from. **Wave 3 (editorial memory)** mad
 reviewed knowledge indexable and gave drafting a third retrieval lane — built,
 provisioned, and deliberately **dark**: no score floor has been measured, because
 two records cannot produce the experiment that measured the article lane's. Suite
-1,248 → **1,397**. Between them the two waves shipped **five defects that a fully
+1,248 → **1,406**. Between them the two waves shipped **seven defects that a fully
 green suite did not catch**, every one found by running the thing against real
-Sanity or a real index. That pattern is now the most reliable fact in this
+Sanity, a real index, or — for the last two, on 2026-08-22 — a real button in
+Studio. That pattern is now the most reliable fact in this
 handoff: *the tests are necessary and they are not sufficient.*
 
 **If you are starting fresh, read these four in this order:** `CLAUDE.md` (the
@@ -546,6 +547,64 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 22, 2026 — Somebody pressed the button, and a rejected record kept its vector
+
+§11 listed *"press **Mark ready** with `KNOWLEDGE_AUTO_INDEX_ENABLED=true`"* as a
+ten-minute job — the only wave-3 path never exercised through the UI. It was ten
+minutes, and it found two defects. Detail is in the wave-3 brief under
+**Pressed — 2026-08-22**.
+
+**The happy path worked first time**, which is worth saying: verdict and
+`pending` in one patch, the embedding and upsert inline, `indexing: "indexed"` on
+the response, the record `indexed` in Sanity with hash, model, version and time,
+the index at three records and `knowledge:sync` agreeing.
+
+**Then the same button was pressed the other way.** *Return to inbox* left the
+vector in Pinecone, and nothing in the system would ever have removed it. Three
+components each did exactly what they say:
+
+- `applyReviewTransition` withdraws eligibility **eagerly** — `not_eligible` is
+  written in the same patch as the verdict, before Pinecone is touched. That is
+  deliberate and documented.
+- `indexRecord` saw `not_eligible` and returned `unchanged` without deleting.
+- `knowledge:sync` said the same, and its orphan set holds every non-`remove`
+  entry, so it printed **"3 record(s) · 3 vector(s) · 0 to index · 0 to remove ·
+  0 orphan(s)"** over an un-approved record's live vector.
+
+The document was self-contradictory — `status: not_eligible` beside an
+`indexedHash` and `indexedAt` from four minutes earlier — and that contradiction
+is the fix. **`not_eligible` is not evidence the vector is gone; `indexedHash`
+is.** `applyIndexTransition` clears those fields on the way into `not_eligible`
+because by then the vector *is* gone; the eager review patch leaves them standing
+because it is not. Both the writer and the reconciler now read the hash, and a
+new `forgetIndexedVector()` clears the evidence after a real deletion without a
+self-transition, which the machine still refuses.
+
+Severity, stated plainly because the dark lane hides it: the single promise
+editorial memory makes is that **unreviewed material never reaches a drafting
+model**, and rejecting a record did not remove it from the corpus. Nothing
+downstream would have caught it — the vector metadata carries no review status,
+so there is no query-time trust filter, and `knowledge:sync` was the only
+backstop.
+
+**The second defect was the toast.** The review route returns `indexing`
+specifically *"so a reviewer can see what happened without going to look"*, and
+the Studio action discarded the body: a failed embedding would have reported as a
+flat green "Marked ready" with the reason only in a server log. The toast now
+carries the outcome, and a failure is a warning naming `knowledge:sync` as the
+repair.
+
+This is the **third** time in this programme that the component printing the plan
+was not the component deciding, and the fifth defect wave 3 has shipped past a
+green suite. Every one was found by running the thing.
+
+Suite 1,397 → **1,406**. Six new guards, each mutation-tested. The corpus is now
+**three records**; the item is `ready` because pressing the button is what was
+asked for, and one click returns it to the inbox.
+`KNOWLEDGE_AUTO_INDEX_ENABLED` is set in local `.env.local` only — **it is not
+set on production**, so the Studio button the owner actually uses still writes the
+verdict and no vector until that is decided.
+
 ### August 22, 2026 — What the `ideas` namespace turned out to be
 
 Provisioning wave 3's index meant freeing a Pinecone slot, which meant looking at
@@ -659,8 +718,10 @@ counts agreed**, which is the drift neither existing script could see;
 `sensitivity: private` removing the vector and nulling the indexed hash;
 restoring it re-indexing; and the lane through all four gate states.
 
-1,397 tests green. **The corpus is two records and the lane is still dark** — no
-floor has been measured, and two records cannot produce the experiment.
+1,406 tests green. **The corpus is three records and the lane is still dark** —
+no floor has been measured, and three records cannot produce the experiment. The
+review path was exercised through Studio on 2026-08-22; see the entry at the top
+of this section for the two defects that found.
 
 ### August 21, 2026 — Wave 2: an article can say what it was written from
 
@@ -6041,7 +6102,7 @@ re-guessed.
 |---|---|
 | 0–1 — contracts, schemas, domain service | **Done 2026-08-19.** |
 | 2 — provenance | **Done 2026-08-21** for `/create`. Runs are durable; articles carry lineage. See §9 and the brief's "What was built". |
-| 3 — editorial memory | **Built, provisioned and probed 2026-08-21** — `docs/siliconstone-knowledge-wave-03-brief.md`. Eligibility, the index state machine driven, inline indexing on the review transition, `knowledge:sync` reconciliation, and a third retrieval lane. **Provisioned and probed 2026-08-21**: `silicon-and-stone-knowledge` holds the two eligible records. The lane needs two switches — the flag *and* a measured `KNOWLEDGE_SCORE_FLOOR`, which does not exist by default. Wave 1's state machine and intent are now consumed. **All six questions answered**, two of them deferrals: a fourth Pinecone index (not a namespace — `articles:sync` deletes every id it does not recognise); indexing inline on the review transition plus a reconciler, no fourth webhook; one vector per record with a budget that errors rather than truncates; research-run indexing deferred; `normal` sensitivity only; and the retrieval lane ships dark — two records cannot calibrate a floor, so none is claimed. |
+| 3 — editorial memory | **Built, provisioned and probed 2026-08-21** — `docs/siliconstone-knowledge-wave-03-brief.md`. Eligibility, the index state machine driven, inline indexing on the review transition, `knowledge:sync` reconciliation, and a third retrieval lane. **Provisioned and probed 2026-08-21, and the review path pressed through Studio 2026-08-22** (two more defects — §9): `silicon-and-stone-knowledge` holds the three eligible records. The lane needs two switches — the flag *and* a measured `KNOWLEDGE_SCORE_FLOOR`, which does not exist by default. Wave 1's state machine and intent are now consumed. **All six questions answered**, two of them deferrals: a fourth Pinecone index (not a namespace — `articles:sync` deletes every id it does not recognise); indexing inline on the review transition plus a reconciler, no fourth webhook; one vector per record with a budget that errors rather than truncates; research-run indexing deferred; `normal` sensitivity only; and the retrieval lane ships dark — two records cannot calibrate a floor, so none is claimed. |
 | 4 — frictionless capture | **4a done 2026-08-20** (universal endpoint + hosted MCP, six tools). The `/knowledge` cockpit and URL/PDF extraction are not built. |
 | 5 — conversation integration | Claude reached in 4a. **ChatGPT is parked**, on a plan gate rather than an engineering one — Business is the first tier that can write. |
 | 6 — cutover | Not started. Owns any backfill; wave 2 deliberately did none. |
@@ -6063,13 +6124,13 @@ order of value:
 
 | | |
 |---|---|
-| **Nothing.** The lane is dark and the corpus is two records. Leave it and come back when there is knowledge worth retrieving | The honest default. Wave 3's mechanism works and costs nothing switched off. |
-| **Press Mark ready with `KNOWLEDGE_AUTO_INDEX_ENABLED=true`** | Ten minutes. The only wave-3 path never exercised through the UI — the same code was driven by `knowledge:sync`, and the route wiring is guarded at source, but nobody has pressed the button. |
+| **Nothing.** The lane is dark and the corpus is three records. Leave it and come back when there is knowledge worth retrieving | The honest default. Wave 3's mechanism works and costs nothing switched off. |
+| ~~**Press Mark ready with `KNOWLEDGE_AUTO_INDEX_ENABLED=true`**~~ **— done 2026-08-22** | It was ten minutes and it found two defects, one of them the promise the lane exists to make: a rejected record kept its vector and nothing would have removed it. Both fixed; see §9. **Open decision left behind:** whether to set `KNOWLEDGE_AUTO_INDEX_ENABLED` on production. It is local-only today, so the Studio button the owner uses writes the verdict and no vector, and `knowledge:sync` is what would catch up. |
 | **Decide what to do about the `ideas` corpus** (§9, 22 Aug) | 277 scored ideas next door, ineligible because unreviewed. The design question is what review means for an idea, not how to import one. |
 | **The upstream half of lineage** — an idea becoming an article | The gap above. Not briefed. |
 | **Wave 6 (cutover)** or the `/knowledge` cockpit | Both unbriefed; neither is blocking anything. |
 
-**Do not** calibrate a score floor against two records, and do not add a default
+**Do not** calibrate a score floor against three records, and do not add a default
 one to make the lane run. That is decision 5 and the code enforces it.
 
 ### Priority 1 — Content (the actual bottleneck)

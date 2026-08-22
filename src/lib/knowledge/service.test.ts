@@ -7,6 +7,7 @@ import {
   captureKnowledgeItem,
   captureSource,
   createResearchRun,
+  forgetIndexedVector,
   linkSourcesToItem,
   recordRunGeneration,
   updateResearchRun,
@@ -807,6 +808,33 @@ describe('applyIndexTransition', () => {
   })
 })
 
+describe('forgetIndexedVector', () => {
+  it('clears only the evidence, and moves nothing', async () => {
+    // Called after the indexer has actually deleted a vector from a record
+    // whose status was already `not_eligible` — the shape the review route
+    // always produces. The machine refuses `not_eligible → not_eligible`, so
+    // there is no transition to make; what is left to correct is the record's
+    // claim that the index still holds its text.
+    const h = harness({
+      'knowledgeSource.a': {
+        _id: 'knowledgeSource.a',
+        _type: 'knowledgeSource',
+        indexState: { status: 'not_eligible', indexedHash: 'sha256:abc' },
+      },
+    })
+    const result = await forgetIndexedVector(h.deps, {
+      documentId: 'knowledgeSource.a',
+      documentType: 'knowledgeSource',
+    })
+    expect(result.ok).toBe(true)
+    if (result.ok) expect(result.documentType).toBe('knowledgeSource')
+    expect(h.patched[0].fields).toEqual({
+      'indexState.indexedHash': null,
+      'indexState.indexedAt': null,
+    })
+  })
+})
+
 describe('applyReviewTransition', () => {
   it('marks the record pending in the same patch as the ready verdict', async () => {
     // Wave 3, decision 2. One write: eligible and known to be unindexed. A
@@ -889,6 +917,29 @@ describe('applyReviewTransition', () => {
     })
     expect(result.ok).toBe(true)
     expect(h.patched[0].fields['indexState.status']).toBe('not_eligible')
+  })
+
+  it('leaves the indexed hash standing, because the vector is still there', async () => {
+    // The one place where writing `not_eligible` must NOT clear the evidence.
+    // `applyIndexTransition` clears it because by then the vector is gone; here
+    // the patch runs before anything touches Pinecone, and `indexedHash` is the
+    // only remaining signal that a removal is outstanding. Clearing it made an
+    // un-approved record's vector invisible to both the indexer and
+    // `knowledge:sync`, so nothing ever removed it — found by pressing Return
+    // to inbox in Studio on 2026-08-22, past a green suite.
+    const h = harness({
+      'knowledgeItem.a': {
+        _id: 'knowledgeItem.a',
+        _type: 'knowledgeItem',
+        reviewStatus: 'ready',
+        indexState: { status: 'indexed', indexedHash: 'sha256:abc' },
+      },
+    })
+    await applyReviewTransition(h.deps, { documentId: 'knowledgeItem.a', to: 'rejected' })
+    expect(h.patched[0].fields).toEqual({
+      reviewStatus: 'rejected',
+      'indexState.status': 'not_eligible',
+    })
   })
 
   it('reviews a pre-foundation source through its legacy status', async () => {

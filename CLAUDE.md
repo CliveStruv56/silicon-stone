@@ -467,7 +467,7 @@ one OpenAI vector per **reviewed** `knowledgeItem` / `knowledgeSource`.
   `KNOWLEDGE_DRAFT_RETRIEVAL_ENABLED` gates the drafting lane — and the lane
   *also* needs `KNOWLEDGE_SCORE_FLOOR`, a measured number. **No default floor
   exists in the code and none may be added.** `PRIOR_COVERAGE_SCORE_FLOOR = 0.37`
-  was measured over 15 articles; this corpus is two records. Earn the number with
+  was measured over 15 articles; this corpus is three records. Earn the number with
   `npm run knowledge:calibrate` or leave the lane off.
 - **Only `normal` sensitivity is ever indexed**, and only reviewed records with
   settled extraction. The calculation is `knowledge/eligibility.ts` and every
@@ -476,9 +476,26 @@ one OpenAI vector per **reviewed** `knowledgeItem` / `knowledgeSource`.
   compare the content hash **and** `KNOWLEDGE_INDEX_VERSION`; comparing the hash
   alone made `knowledge:sync` print a plan that `indexRecord` then declined to
   carry out.
+- **`not_eligible` is not evidence the vector is gone; `indexedHash` is.**
+  `applyReviewTransition` withdraws eligibility eagerly — the status is written
+  in the same patch as the verdict, before anything touches Pinecone — so on the
+  review route the record *always* says `not_eligible` by the time the indexer
+  sees it. Reading the status alone, the indexer returned `unchanged` and
+  `knowledge:sync` reported "0 to remove · 0 orphan(s)" while an un-approved
+  record's vector sat in the index with nothing left that would ever remove it.
+  Both sides now read `indexedHash`, which is the record's own claim that the
+  index holds its text and is what a completed withdrawal clears. **Do not
+  clear it in the review patch**: it is the only signal that a removal is
+  outstanding. Once the vector is actually deleted, `forgetIndexedVector()`
+  clears the two evidence fields without a self-transition, which the machine
+  still refuses.
 - **Nothing is truncated silently.** `generateEmbedding` slices at
   `MAX_EMBEDDING_CHARS`, which is right for articles and wrong here, so the
   indexer refuses at that boundary with an `error` naming the limit.
+- **The review action tells the reviewer what the index did.** `/api/knowledge/review`
+  returns `indexing`, and the Studio toast renders it. Dropping it reported a
+  failed embedding as an unqualified success with the reason only in a server
+  log.
 - `npm run knowledge:verify-index` asserts the index has **no integrated `embed`
   config**, for the reason the article lane learned the hard way.
 

@@ -35,7 +35,7 @@ import {
   type IndexCandidate,
 } from './eligibility'
 import { getDocument } from './repository'
-import { applyIndexTransition, type KnowledgeServiceDeps } from './service'
+import { applyIndexTransition, forgetIndexedVector, type KnowledgeServiceDeps } from './service'
 
 /**
  * Bumped when the metadata shape or the text composition changes in a way that
@@ -112,7 +112,18 @@ export async function indexRecord(
 
   // ---- not eligible: make sure the index does not hold it -----------------
   if (!verdict.eligible) {
-    if (current === 'not_eligible') {
+    // `not_eligible` on its own is NOT evidence the vector is gone.
+    // `applyReviewTransition` writes that status in the same patch as the
+    // verdict, before anything touches Pinecone — so on the review route this
+    // is always what the record says by the time we get here. Returning
+    // `unchanged` on the status alone meant a rejected or returned-to-inbox
+    // record kept its vector, and `knowledge:sync` agreed nothing was wrong,
+    // so nothing would ever have removed it. Found by pressing the button.
+    //
+    // `indexedHash` is the record's own claim that the index holds its text,
+    // and it is what a completed withdrawal clears. Read that instead.
+    const claimsIndexed = Boolean(doc.indexState?.indexedHash)
+    if (current === 'not_eligible' && !claimsIndexed) {
       return { action: 'unchanged', documentId, reason: verdict.reason }
     }
     try {
@@ -124,7 +135,13 @@ export async function indexRecord(
       // that still says indexed.
       return { action: 'failed', documentId, reason: `Could not remove the vector: ${errorText(error)}` }
     }
-    await applyIndexTransition(deps, { documentId, to: 'not_eligible' })
+    if (current === 'not_eligible') {
+      // The status is already right; only the evidence is stale. The machine
+      // refuses `not_eligible → not_eligible` and that refusal is kept.
+      await forgetIndexedVector(deps, { documentId, documentType: String(doc._type ?? '') })
+    } else {
+      await applyIndexTransition(deps, { documentId, to: 'not_eligible' })
+    }
     return { action: 'removed', documentId, reason: verdict.reason }
   }
 

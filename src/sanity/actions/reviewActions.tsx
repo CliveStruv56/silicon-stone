@@ -87,6 +87,20 @@ const VERDICTS: Array<{
   },
 ]
 
+/**
+ * What the route's `indexing` field means, in a reviewer's words.
+ *
+ * Only present when `KNOWLEDGE_AUTO_INDEX_ENABLED` is on; the key is absent
+ * otherwise and the toast then says nothing about an index, which is correct —
+ * a lane that is switched off has no outcome to report.
+ */
+const INDEXING_OUTCOMES: Record<string, string> = {
+  indexed: 'Added to editorial memory.',
+  removed: 'Removed from editorial memory.',
+  unchanged: 'Editorial memory unchanged.',
+  failed: 'Editorial memory was not updated — run npm run knowledge:sync to repair it.',
+}
+
 function makeAction(verdict: (typeof VERDICTS)[number]): DocumentActionComponent {
   const Action: DocumentActionComponent = (props) => {
     const toast = useToast()
@@ -121,7 +135,20 @@ function makeAction(verdict: (typeof VERDICTS)[number]): DocumentActionComponent
             }
             toast.push({ status: 'error', title: failure.title, description: failure.description })
           } else if (res.ok) {
-            toast.push({ status: 'success', title: `Marked ${verdict.to}` })
+            // The route returns `indexing` so the reviewer can see what
+            // editorial memory did without going to look, and this used to
+            // throw it away: a failed embedding reported as an unqualified
+            // success, with the reason only in a server log nobody was
+            // reading. A failure is a warning rather than an error — the
+            // verdict itself was written, and `knowledge:sync` repairs the
+            // vector.
+            const body = (await res.json().catch(() => ({}))) as { indexing?: string }
+            const outcome = INDEXING_OUTCOMES[body.indexing ?? '']
+            toast.push({
+              status: body.indexing === 'failed' ? 'warning' : 'success',
+              title: `Marked ${verdict.to}`,
+              ...(outcome ? { description: outcome } : {}),
+            })
           } else {
             let message = `Could not update (${res.status})`
             try {

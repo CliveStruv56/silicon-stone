@@ -723,6 +723,48 @@ export async function applyIndexTransition(
   }
 }
 
+/**
+ * Forgets the record's claim that the index holds its text, without moving the
+ * machine.
+ *
+ * There is exactly one caller and one reason for it. `applyReviewTransition`
+ * withdraws eligibility eagerly — it writes `indexState.status = 'not_eligible'`
+ * in the same patch as the verdict, before anything has touched Pinecone — so
+ * the vector outlives the status by however long the removal takes, and by
+ * forever if the removal never runs. `indexedHash` is what says the vector is
+ * still out there, which is why the eager patch deliberately leaves it standing
+ * and why `applyIndexTransition` clears it on the way into `not_eligible`.
+ *
+ * Once the indexer has actually deleted the vector, the status is already
+ * right and only the evidence is stale. The machine refuses
+ * `not_eligible → not_eligible`, and that refusal is kept rather than worked
+ * around: this writes the two evidence fields and nothing else.
+ */
+export async function forgetIndexedVector(
+  deps: KnowledgeServiceDeps,
+  input: { documentId: string; documentType: string },
+): Promise<KnowledgeResult> {
+  const { documentId, documentType } = input
+  try {
+    await patchDocument(deps.client, documentId, {
+      'indexState.indexedHash': null,
+      'indexState.indexedAt': null,
+    })
+  } catch (error) {
+    return fail('write_failed', writeMessage(error))
+  }
+  return {
+    ok: true,
+    documentId,
+    documentType,
+    status: 'not_eligible',
+    created: false,
+    duplicate: NO_DUPLICATE,
+    reviewUrl: knowledgeReviewUrl(documentId),
+    events: [],
+  }
+}
+
 /* ------------------------------------------------------------------ *
  * Recording what a run generated
  * ------------------------------------------------------------------ */
@@ -1064,6 +1106,16 @@ export async function applyReviewTransition(
   // Losing `ready` withdraws index eligibility immediately; regaining it only
   // proposes re-evaluation. The asymmetry is deliberate — removal is safe to
   // do eagerly, addition is not.
+  //
+  // Only the status. `indexedHash` and `indexedAt` are left standing on
+  // purpose, and that is not the same omission `applyIndexTransition` corrects
+  // when *it* reaches `not_eligible`: there the vector is already gone, here it
+  // is still in Pinecone. Those two fields are the only remaining evidence that
+  // it is, so both the indexer and `knowledge:sync` read them to decide whether
+  // a `not_eligible` record still has a vector to remove. Clearing them here
+  // would make an un-approved record's vector invisible to everything that
+  // could delete it — which is exactly the defect a live Return-to-inbox found
+  // on 2026-08-22.
   if (input.to !== 'ready') fields['indexState.status'] = 'not_eligible'
   // Gaining `ready` marks the record `pending` in the SAME patch as the verdict
   // (wave 3, decision 2). The record is then eligible and known to be

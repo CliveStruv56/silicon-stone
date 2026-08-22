@@ -52,6 +52,54 @@ describe('the writer and the reconciler mean the same thing by "up to date"', ()
   })
 })
 
+describe('a withdrawn record loses its vector', () => {
+  // The fourth defect this programme has shipped past a green suite, and the
+  // first found by pressing a button in Studio. `applyReviewTransition` writes
+  // `indexState.status = 'not_eligible'` in the same patch as the verdict,
+  // before anything touches Pinecone — so on the review route the status is
+  // ALWAYS `not_eligible` by the time the indexer runs. Both the writer and the
+  // reconciler read that status as "the vector is gone", so a record returned
+  // to the inbox kept its vector, `knowledge:sync` reported
+  // "0 to remove · 0 orphan(s)", and nothing would ever have removed it.
+  //
+  // `indexedHash` is the record's own claim that the index holds its text, and
+  // a completed withdrawal is what clears it. Both sides must read it.
+
+  it('the indexer does not read not_eligible as proof the vector is gone', () => {
+    const source = code(INDEXER)
+    expect(source).toContain('indexedHash')
+    expect(source).toMatch(/current === 'not_eligible' && !claimsIndexed/)
+  })
+
+  it('the indexer corrects the evidence without a self-transition', () => {
+    // `not_eligible → not_eligible` is refused by the machine, and that refusal
+    // is kept rather than worked around: once the vector is deleted the status
+    // is already right and only the two evidence fields are stale.
+    const source = code(INDEXER)
+    expect(source).toContain('forgetIndexedVector(deps,')
+    // And the evidence is forgotten only after the vector is actually gone.
+    // The other order loses the one signal that a removal is outstanding, on
+    // exactly the run where the delete failed.
+    const remove = source.indexOf('deleteOne({ id: documentId })')
+    const forget = source.indexOf('forgetIndexedVector(deps,')
+    expect(remove).toBeGreaterThan(-1)
+    expect(forget).toBeGreaterThan(remove)
+  })
+
+  it('the reconciler applies the same rule', () => {
+    // The recurring failure in this lane is two components disagreeing about
+    // what a state means. If the indexer reads the hash and sync reads the
+    // status, sync goes on reporting nothing to do over a live vector.
+    const source = code(SYNC)
+    expect(source).toMatch(/claimsIndexed = Boolean\(row\.indexState\?\.indexedHash\)/)
+    expect(source).toMatch(/state === 'not_eligible' && !claimsIndexed/)
+  })
+
+  it('a planned removal is not also counted as an orphan', () => {
+    expect(code(SYNC)).toMatch(/!shouldHold\.has\(id\) && !planned\.has\(id\)/)
+  })
+})
+
 describe('what the model is shown', () => {
   it('builds the snippet from the record’s own prose', () => {
     // Built from the composed embeddable text, every block entry opened by

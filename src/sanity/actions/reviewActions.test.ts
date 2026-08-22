@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest'
+import * as fs from 'node:fs'
+import * as path from 'node:path'
 import { reviewTransitions } from '@/lib/knowledge/transitions'
 
 /**
@@ -50,6 +52,33 @@ describe('which verdicts the actions offer', () => {
     // version would only ever produce an error.
     for (const s of ['inbox', 'ready', 'rejected'] as Status[]) {
       expect(offered(s)).not.toContain('superseded')
+    }
+  })
+})
+
+describe('what the reviewer is told about editorial memory', () => {
+  // `/api/knowledge/review` returns `indexing` specifically "so a reviewer can
+  // see what happened without going to look", and the action threw it away: a
+  // failed embedding arrived as an unqualified green "Marked ready", with the
+  // reason only in a server log. Found by pressing the button, not by a test.
+  const source = fs.readFileSync(
+    path.join(process.cwd(), 'src/sanity/actions/reviewActions.tsx'),
+    'utf-8',
+  )
+
+  it('reads the indexing outcome out of the response', () => {
+    expect(source).toContain('body.indexing')
+  })
+
+  it('says something different when the index was not updated', () => {
+    expect(source).toMatch(/body\.indexing === 'failed' \? 'warning' : 'success'/)
+  })
+
+  it('has a phrase for every outcome the indexer can return', () => {
+    // The indexer's four actions. A missing key renders no description at all,
+    // which is the silence this test exists to stop.
+    for (const action of ['indexed', 'removed', 'unchanged', 'failed']) {
+      expect(source).toMatch(new RegExp(`^\\s*${action}: '`, 'm'))
     }
   })
 })

@@ -84,7 +84,16 @@ function verdictFor(row: Row, indexVersion: string): { verdict: Verdict; why: st
   const state = row.indexState?.status ?? 'not_eligible'
 
   if (!eligibility.eligible) {
-    return state === 'not_eligible'
+    // The status alone does not settle it. `applyReviewTransition` writes
+    // `not_eligible` in the same patch as the verdict, before the vector is
+    // touched, so a record withdrawn through Studio says `not_eligible` while
+    // Pinecone still holds it. `indexedHash` is the record's own claim that it
+    // does, and a completed withdrawal clears it — so an ineligible record
+    // still carrying one has a removal outstanding, whatever its status says.
+    // Reading the status alone made this reconciler report "0 to remove · 0
+    // orphan(s)" over a live vector for an un-approved record.
+    const claimsIndexed = Boolean(row.indexState?.indexedHash)
+    return state === 'not_eligible' && !claimsIndexed
       ? { verdict: 'ok', why: eligibility.reason }
       : { verdict: 'remove', why: eligibility.reason }
   }
@@ -144,7 +153,12 @@ async function main(): Promise<void> {
   const shouldHold = new Set(
     plan.filter((entry) => entry.verdict !== 'remove').map((entry) => String(entry.row._id)),
   )
-  const orphans = live.filter((id) => !shouldHold.has(id))
+  // A planned removal is not an orphan. Both lines would delete the same
+  // vector, which is harmless, but counting it twice reads as two problems and
+  // now happens on the ordinary path — every record withdrawn through Studio
+  // is a `remove` with a live vector.
+  const planned = new Set(toRemove.map((entry) => String(entry.row._id)))
+  const orphans = live.filter((id) => !shouldHold.has(id) && !planned.has(id))
 
   console.log(
     `\n   ${rows.length} record(s) · ${live.length} vector(s) · ` +

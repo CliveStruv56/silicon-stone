@@ -3,12 +3,14 @@
 **Project:** `silicon-and-stone-web`
 **Written:** 2026-08-21 · **Baseline:** `f819e597`
 **Governing spec:** `siliconstone-knowledge-llm-master-spec.md` §10, wave 3
-**Status:** **built and provisioned 2026-08-21 (`e0bf7465`) — two records
-indexed; the retrieval lane is still dark and uncalibrated.** The six questions were answered by the
+**Status:** **built and provisioned 2026-08-21 (`e0bf7465`); the review path
+exercised through Studio 2026-08-22 — three records indexed, and the retrieval
+lane is still dark and uncalibrated.** The six questions were answered by the
 owner and are recorded under
 [Decisions](#decisions--answered-by-the-owner-2026-08-21); what was actually
 built is at the end under
-[What was built](#what-was-built--2026-08-21-4cbdc475).
+[What was built](#what-was-built--2026-08-21-4cbdc475), and what pressing the
+button found is under [Pressed](#pressed--2026-08-22).
 
 Read `knowledge-system-foundation.md` for the schemas and the domain service,
 and `siliconstone-knowledge-wave-02-brief.md` — particularly its *What was
@@ -525,12 +527,82 @@ topScore 0.492.
   eligibility rule is that unreviewed material never reaches a drafting model.
   Importing them is a wave of its own, and the first question is what review
   means for an idea nobody has read.
-- **Inline indexing on review has not been exercised through the route** — the
-  same code path was driven directly by `knowledge:sync`, and the wiring is
-  guarded at source, but no one has pressed **Mark ready** with
-  `KNOWLEDGE_AUTO_INDEX_ENABLED` on.
+- ~~**Inline indexing on review has not been exercised through the route**~~ —
+  **done 2026-08-22, and it found two more defects.** See
+  [Pressed](#pressed--2026-08-22) below.
 - Chunking, research-run indexing and a calibrated floor — deferred by decisions
   3, 4 and 5.
+
+## Pressed — 2026-08-22
+
+Somebody pressed **Mark ready** in Studio with `KNOWLEDGE_AUTO_INDEX_ENABLED=true`.
+The path worked first time: the verdict and `pending` in one patch, then the
+embedding and the upsert inline, `indexing: "indexed"` on the response, the
+record `indexed` in Sanity with hash, model, version and time, the index at
+three records and `knowledge:sync` agreeing there was nothing to do.
+
+**Then the same button was pressed the other way, and two defects fell out.**
+Fourth and fifth for this wave, both past a green suite, both invisible to
+anything short of using the thing.
+
+### `not_eligible` was read as proof the vector was gone
+
+**Return to inbox left the vector in Pinecone, and nothing would ever have
+removed it.** Three components, each behaving exactly as written:
+
+- `applyReviewTransition` withdraws eligibility eagerly — it writes
+  `indexState.status = 'not_eligible'` in the same patch as the verdict, before
+  anything touches Pinecone. That asymmetry is deliberate and is documented
+  above.
+- `indexRecord` then found `current === 'not_eligible'` and returned
+  `unchanged` **without calling `deleteOne`** — its early return read the status
+  as meaning the index does not hold the record.
+- `knowledge:sync`'s `verdictFor` returned `ok` for the same reason, and its
+  `shouldHold` set includes every non-`remove` entry, so the live vector was not
+  an orphan either. The reconciler printed **"3 record(s) · 3 vector(s) · 0 to
+  index · 0 to remove · 0 orphan(s)"** over an un-approved record's vector.
+
+The document said both things at once: `status: not_eligible` beside an
+`indexedHash` and an `indexedAt` from four minutes earlier. That contradiction
+is the fix. `applyIndexTransition` clears those two fields on the way into
+`not_eligible` *because by then the vector is gone*; the eager review patch
+leaves them standing *because it is not*. So `indexedHash` — not the status — is
+the record's claim that the index still holds its text, and both the writer and
+the reconciler now read it. Once the vector is actually deleted,
+`forgetIndexedVector()` clears the evidence and nothing else; the machine's
+refusal of `not_eligible → not_eligible` is kept rather than worked around.
+
+The severity is worth stating plainly, because the lane being dark hides it: the
+one promise editorial memory makes is that **unreviewed material never reaches a
+drafting model**, and rejecting a record did not take it out of the corpus.
+There is no query-time trust filter to fall back on — the vector metadata
+carries no review status — so `knowledge:sync` was the only backstop, and it was
+blind in exactly this case.
+
+This is the third time in this programme that **the component printing the plan
+was not the component deciding**. It is worth treating as the house failure mode.
+
+### The toast threw away what the route went to the trouble of returning
+
+`/api/knowledge/review` returns `indexing` with the comment *"reported back so a
+reviewer can see what happened without going to look"*, and `reviewActions.tsx`
+discarded the body and pushed a flat green `Marked ready`. A failed embedding
+would have reported as an unqualified success, with the reason only in a server
+log nobody is reading. The toast now carries the outcome, and a failure is a
+warning naming `knowledge:sync` as the repair.
+
+### What was verified, in order
+
+Mark ready → `indexed`, 3 vectors, sync quiet. Return to inbox → vector stranded,
+sync blind (the defect). Fix. Sync now plans the removal, `--write` removes it,
+2 vectors, evidence nulled, re-run quiet. Mark ready → `indexed` again with the
+toast reading *"Added to editorial memory."* Return to inbox → `indexing:
+"removed"` inline, *"Removed from editorial memory."*, 2 vectors. Mark ready →
+3 vectors, sync quiet. Suite 1,397 → **1,406**; six new guards, every one
+mutation-tested.
+
+**The corpus is now three records** — the item is `ready` because pressing the
+button is what was asked for, and one click returns it to the inbox.
 
 ## Related
 
