@@ -526,7 +526,9 @@ topScore 0.492.
   measurable. But 267 of them are unreviewed `New`, and wave 3's whole
   eligibility rule is that unreviewed material never reaches a drafting model.
   Importing them is a wave of its own, and the first question is what review
-  means for an idea nobody has read.
+  means for an idea nobody has read. **Briefed 2026-08-22:**
+  `siliconstone-knowledge-ideas-corpus-brief.md` — which, having measured the
+  corpus, recommends *not* putting ideas in a retrieval lane at all.
 - ~~**Inline indexing on review has not been exercised through the route**~~ —
   **done 2026-08-22, and it found two more defects.** See
   [Pressed](#pressed--2026-08-22) below.
