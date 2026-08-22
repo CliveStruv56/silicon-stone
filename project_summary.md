@@ -6145,12 +6145,59 @@ order of value:
 **Do not** calibrate a score floor against three records, and do not add a default
 one to make the lane run. That is decision 5 and the code enforces it.
 
-### Priority 1 — Content (the actual bottleneck)
+### Priority 0e — Publishing writes no date, and the feeds disagree about it
+
+**Found 2026-08-22 while scoping pipeline efficiency. Not yet fixed; no code
+written.** Same family as the `intelligenceTier` defect closed on 2026-08-21 — an
+article publishes cleanly and is then wrong everywhere downstream, with nothing
+failing.
+
+| Measured on production | |
+|---|---|
+| Published articles | **16** |
+| …with no `publishedAt` | **10** |
+| …with no cover image | **8** |
+| …with no `intelligenceTier` | **4** |
+
+**Nothing sets `publishedAt`.** `src/lib/sanity.ts:191` omits it deliberately at
+draft time, with the comment `// publisedAt removed to keep as draft` (the typo is
+in the source). That is right. What is missing is the other half: neither
+`/api/on-publish`, nor the Studio publish action, nor the preflight ever writes it
+when the article is actually published. The six articles that have a date have it
+because somebody typed one into Studio.
+
+**And the queries do not agree about what to do then.** Some order by
+`publishedAt desc`; others by `coalesce(publishedAt, _updatedAt) desc`;
+`src/lib/sanity.ts:332` coalesces to `_createdAt` instead. So the same article
+sorts differently depending on which view is rendering it, and the coalescing
+ones disagree with each other about what date to substitute. Somebody clearly met
+this before and patched the query in front of them rather than the cause.
+
+`publishedAt` is not only ordering: it feeds `src/lib/seo.ts` (schema.org
+`datePublished`), the sitemap and the offline store. A wrong or absent date is a
+wrong date in structured data.
+
+The fix is two-sided and neither half is sufficient alone — the lesson the
+`intelligenceTier` repair already taught, where four copies of one query had to
+move together:
+
+1. **Write the date when the article is published**, once, in the publish path,
+   and never overwrite an existing one (a republish is not a new publication).
+2. **Make every query agree** on what to do about a legacy null, then remove the
+   disagreement rather than adding another coalesce. `backend/main.py` holds its
+   own copy of these queries and is what production answers from — check all
+   four, as `src/lib/briefings-query.test.ts` and manual check 17 now force for
+   the tier.
+
+Pre-launch is the cheap moment to do this: 10 records to backfill, and no reader
+has seen a wrong date yet.
+
+### Priority 1 — Content
 
 | Task | Description |
 |------|-------------|
-| **Cover images for 7 published articles** | Live-site quality issue; see §10. Studio has image-prompt suggestions + media library. |
-| **Publish or kill the 9 drafts** | Several are time-sensitive (GPAI enforcement, Chips Act mid-point) and decay with every week. |
+| **Cover images for 8 published articles** | Measured 2026-08-22: 8 of 16 published articles have neither `mainImage` nor `coverImage`. Studio has image-prompt suggestions + media library, but the generate-and-upload loop is still manual and is the largest per-article cost after drafting. |
+| **Publish or kill the 10 drafts** | **Not a decay problem — the site has not launched**, so cadence measures nothing. They matter as pipeline exercise: each one that goes through the guards and out is a test of the path, which is how every defect in this programme has been found. |
 | ~~**Decide whether `lead` should ever be automatic**~~ — shipped 2026-08-15 | `category.defaultGateMode` now routes it, and `article.categories` is required at error level so Studio blocks Publish on an untagged piece. A new article inherits the right gate from its categories with no per-article config. Residual: Studio validation does not apply to API writes, so `/create` can still leave a draft untagged — it is caught at publish, not at creation. See §9. |
 | ~~**Wire `article.gate` explicitly where `auto` guesses wrong**~~ | Done for the four articles `auto` could not serve — see the 2026-08-15 §9 entry. Remaining case is `commerce` overrides where the topic match picks the wrong product; none observed yet, since only the Toolkit currently claims any topics. |
 | **Atlantic Drift Briefing PDF** | Outline exists; required before YouTube launch. |

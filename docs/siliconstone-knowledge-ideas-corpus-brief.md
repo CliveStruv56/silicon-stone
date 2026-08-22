@@ -70,19 +70,26 @@ question 2.
 
 ## Four facts that should govern the design
 
-### 1. The supply and demand are inverted, by two orders of magnitude
+### 1. The manual step is transcription, not selection
 
-**277 ideas in 41 days. 16 published articles in seven months, one of them since
-January.**
+**Corrected 2026-08-22 after the owner read the first draft of this brief.** It
+originally argued from publishing frequency — 277 ideas against one article since
+January. **That argument is void: the site has not launched**, so cadence,
+subscriber counts and the size of the drafts folder measure nothing. Any
+reasoning in this document that rests on them is wrong and has been removed.
 
-The publication is not short of ideas. It is short of *articles*. Any design that
-adds 277 records to a queue somebody has to read — plus roughly six a day,
-indefinitely — converts a resource into a debt, and does it at a moment when the
-existing inbox holds three records and the drafts folder holds ten unpublished
-pieces, several of them decaying.
+The real friction is narrower and more concrete. Ideas reach this environment
+**only because the owner types them in by hand.** The external agent emails a
+shortlist; a topic is chosen; its substance is then retyped into `/create`'s
+*Topic* and *Brief* fields. Everything downstream — research, five model calls,
+the guards, the draft — is already automated. The single human transcription step
+sits at the very front, and it is re-keying text that already exists in a
+structured form.
 
-This is the fact most likely to be lost if the work is scoped as "import the
-ideas."
+That is the cost worth removing, and it is a per-article cost rather than a
+backlog. It also means the queue objection to importing everything is real but
+secondary: 277 inbox records would still need reading, and reading them is not
+what is slow.
 
 ### 2. An idea is perishable; editorial memory is for durable thinking
 
@@ -182,21 +189,35 @@ makes the ones that matter invisible.
 ### B — A seeding path, not a memory path
 
 Ideas never become knowledge records and never enter a retrieval lane. Instead
-they become the thing they already almost are: a prefilled `/create`. A picker
-lists them by date and score, and choosing one lands `topic`, `brief`, `format`
-and categories in the form. Only the resulting **article** enters a corpus — via
-the article lane, which has existed since 2026-08-15 and needs nothing built.
+they become the thing they already almost are: a prefilled `/create`. Only the
+resulting **article** enters a corpus — via the article lane, which has existed
+since 2026-08-15 and needs nothing built.
 
-*Costs.* Small. A read-only view over the namespace, `searchParams` seeding on
-`/create` (which today seeds from nothing), and a decision about whether the
-article records which idea it came from. No import, no migration, no new
-eligibility rule, no second trust model.
+**Two ways to feed it, and the cheaper one is also the more faithful.**
+
+- **B1 — paste (recommended).** An *Idea* box at the top of `/create`. The owner
+  pastes the idea text out of the email exactly as he does today, and the form
+  derives *Topic* from the leading headline clause, *Brief* from the remainder,
+  and offers the categories its `slug` names. Every field stays editable. **The
+  two systems stay disconnected**, which is what they are today by the owner's own
+  description, and it works for an idea from any source — the email, a notebook,
+  a conversation — not only this agent.
+- **B2 — read the namespace.** A picker listing the ideas by date and score,
+  seeding the same fields. Strictly more convenient and strictly more coupling:
+  it makes this repo a reader of an external agent's private store, which then
+  has to keep its shape. It also inherits the daily flow question (5) whether or
+  not anyone wants it.
+
+*Costs.* B1 is a text box, a deterministic split, and `searchParams` seeding on
+`/create` (which today seeds from nothing). No import, no migration, no new
+eligibility rule, no second trust model, no model call — the split should be
+deterministic and correctable rather than another billed inference.
 
 *Risks.* Almost none to the trust model — nothing unreviewed reaches a model as
 *evidence*; it reaches a human as a *prompt*, which is what it already does by
-email today, only faster. The real risk is different in kind: it makes drafting
-easier without making publishing easier, and publishing is where the ten drafts
-are stuck.
+email today, only with the re-keying removed. The honest limitation is scope: it
+speeds the entrance to the pipeline and does nothing for what happens after the
+draft exists.
 
 ### C — A fourth lane with its own trust rules
 
@@ -218,25 +239,32 @@ to avoid.
 
 ### The recommendation
 
-**B, and A only for a deliberately small, hand-picked set.**
+**B1, and A only for a deliberately small, hand-picked set.**
 
-B matches the data's shape, matches the actual bottleneck, and asks nothing of the
-trust model. If ideas should also be *remembered* — and there is a real argument
-that a good idea nobody used is worth finding again in six months — then a handful
-of them can go through the ordinary inbox as `kind: 'idea'` items, reviewed one at
-a time like everything else, which is A at a scale a person can carry.
+B1 removes the one manual step that actually exists — retyping — while leaving the
+two systems as disconnected as they are today. It asks nothing of the trust model
+and needs no decision about the 277: they stay where they are, and the ones that
+become articles arrive one at a time, by hand, exactly as now but without the
+keyboard.
+
+If ideas should also be *remembered* — and there is a real argument that a good
+idea nobody used is worth finding again in six months — then a handful can go
+through the ordinary inbox as `kind: 'idea'` items, reviewed one at a time like
+everything else. That is A at a scale a person can carry.
 
 What should not happen is 277 records entering the system in one movement because
 they exist.
 
-## The one thing that is genuinely urgent, and it is not this
+## What this is worth, stated without the frequency argument
 
-Ten drafts are unpublished, several time-sensitive. Sixteen articles are
-published and seven lack cover images. One article has gone out since January.
-This brief describes an opportunity; those describe a stalled pipeline. If the
-question is *"what fixes the publication side"*, the answer is the drafts, and the
-ideas corpus is a way of making the *next* draft cheaper — which only pays once
-the current ones ship.
+Removing the transcription step saves a few minutes and one act of re-keying per
+article. That is worth having, and it is not the largest thing in the way of an
+efficient pipeline — see `project_summary.md` §11 for the publish-metadata
+defects found alongside this brief, which cost nothing per article and corrupt
+every article silently.
+
+Sequence it accordingly: this is a convenience at the front of a pipeline whose
+back end has correctness gaps. Fix what is wrong before making the entry faster.
 
 ## Explicitly out of scope
 
@@ -259,6 +287,11 @@ the current ones ship.
 
 ## Decisions only the owner can make
 
+**B1 needs none of these answered.** That is most of its appeal: pasting an idea
+into a form decides nothing about the 277, the sources, the daily flow or what
+`Consolidated` meant. The questions below become live the moment anything is
+imported or read automatically.
+
 1. **What is this for?** A faster route from idea to draft (design B), or a
    searchable memory of ideas already had (design A)? They lead to different
    builds and the answer is not derivable from the data.
@@ -275,7 +308,8 @@ the current ones ship.
    repo *pulls* from the namespace on a schedule, or the external agent *pushes*
    through `/api/knowledge/capture` — which it could already do today, since wave
    4a shipped that endpoint and the MCP tools with it. The second is better in
-   every way except that it means changing an agent you did not write.
+   every way except that it means changing an agent you did not write. **Under B1
+   the answer is "nothing": the flow stays in your inbox, where it is now.**
 6. **What happens to the free-text sources?** `knowledgeSource` records with no
    URL and no text (and therefore permanently ineligible themselves), unstructured
    text carried on the item, or dropped. Fact 3 says there is no cheap answer.
@@ -285,11 +319,12 @@ the current ones ship.
 
 ## What "done" would look like
 
-For **B**: an idea can be chosen from a list and `/create` opens with `topic`,
-`brief`, `format` and categories filled in; the operator can still edit every
-field; the generated article's provenance records which idea it came from; and
-nothing about eligibility, indexing or retrieval has changed. Verified by drafting
-one real article from one real idea and reading its lineage.
+For **B1**: an idea pasted into `/create` fills *Topic*, *Brief* and the offered
+categories; every field stays editable; the derivation is deterministic and needs
+no model call; the article's provenance records that it was seeded from a pasted
+idea and keeps the original text; and nothing about eligibility, indexing or
+retrieval has changed. Verified by drafting one real article from one real idea
+and reading its lineage.
 
 For **A**: `npm run knowledge:import-ideas` is dry-run by default, idempotent,
 reports what it could not resolve, creates nothing as `ready`, and a re-run is a
