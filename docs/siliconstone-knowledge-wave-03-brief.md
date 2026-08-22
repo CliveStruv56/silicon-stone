@@ -3,8 +3,8 @@
 **Project:** `silicon-and-stone-web`
 **Written:** 2026-08-21 · **Baseline:** `f819e597`
 **Governing spec:** `siliconstone-knowledge-llm-master-spec.md` §10, wave 3
-**Status:** **built 2026-08-21 (`4cbdc475`) — the mechanism ships, the lane
-ships dark, nothing is provisioned.** The six questions were answered by the
+**Status:** **built and provisioned 2026-08-21 (`e0bf7465`) — two records
+indexed; the retrieval lane is still dark and uncalibrated.** The six questions were answered by the
 owner and are recorded under
 [Decisions](#decisions--answered-by-the-owner-2026-08-21); what was actually
 built is at the end under
@@ -469,17 +469,59 @@ It asserted the `ready` patch was exactly `{ reviewStatus: 'ready' }`, commented
 the two-field patch, and the comment records what the original was protecting and
 why it still holds — `pending` is a claim about the document, not about Pinecone.
 
+### Provisioned and probed — 2026-08-21
+
+`silicon-and-stone-knowledge` exists, verified `embed=absent`, and holds the two
+eligible records.
+
+**Creating it needed a slot, and finding one found something.** The Pinecone
+project was at its five-index limit. Of the five, `quickstart-skills` was an MCP
+tutorial artefact (9 records, `example-namespace`, no reference anywhere) and was
+deleted with the owner's approval. The other candidate — the retired
+`silicon-and-stone` — turned out to hold 15 stale article vectors **and 277
+records in an `ideas` namespace belonging to an unrelated pipeline**. That is
+exactly what `verify-article-index.ts` warns "must not be assumed safe to
+delete", and it is why the original index "became impossible to recreate". It was
+left alone. It also made the hazard behind decision 1 concrete rather than
+theoretical, so `sync-pinecone.ts` now names the namespace it owns instead of
+relying on an SDK default it never stated.
+
+**The probe found two defects, both past a green suite.** Third wave running.
+
+- **The writer and the reconciler disagreed about "up to date".**
+  `knowledge:sync` re-indexes on an `indexVersion` bump — that is what the
+  version is for — while `indexRecord`'s short-circuit compared the content hash
+  alone. A bump changes the metadata, not the text, so the hash still matched:
+  sync printed *"2 to index"*, then the indexer returned `unchanged` for both and
+  the plan was silently not carried out. **The component that printed the plan
+  was not the component that decided.**
+- **The snippet repeated the title and carried raw newlines**, because it was cut
+  from the composed embeddable text. Every block entry opened by printing back
+  the title the block had just named. Found by reading the block.
+
+What was verified live: the inbox item refused with a readable reason; both
+sources indexed, including the one eligible only through its legacy
+`status: processed`; a re-run reporting up to date; a corrupted `indexedHash`
+caught as *the text changed since it was indexed* while the vector was still
+present and the counts still agreed — the drift neither existing script could
+see; `sensitivity: private` removing the vector and nulling `indexedHash`;
+restoring it re-indexing; the version bump re-indexing everything; and the lane
+through all four gate states, ending with a block injected at floor 0.3,
+topScore 0.492.
+
 ### What is not done
 
-- **Nothing is provisioned.** `PINECONE_KNOWLEDGE_INDEX_NAME` is unset, so the
-  indexer, the reconciler and the lane are all no-ops that say so. Create it with
-  `npm run knowledge:verify-index -- --create`.
-- **Nothing has been indexed**, and with 0 ready items and 2 ready sources there
-  are two documents to index when it is. The mechanism is the deliverable.
-- **No live probe yet**, which by this programme's own record is where the
-  defects are. Wave 2 shipped three past a green suite.
-- Chunking, research-run indexing, and any calibrated floor — deferred by
-  decisions 3, 4 and 5.
+- **The lane is still dark**, and correctly so: no floor has been measured. Two
+  records cannot produce the experiment. `npm run knowledge:calibrate` is there
+  for when the corpus is worth calibrating against.
+- **The corpus is two records**, one of which is a GOV.UK press release. The
+  mechanism is the deliverable.
+- **Inline indexing on review has not been exercised through the route** — the
+  same code path was driven directly by `knowledge:sync`, and the wiring is
+  guarded at source, but no one has pressed **Mark ready** with
+  `KNOWLEDGE_AUTO_INDEX_ENABLED` on.
+- Chunking, research-run indexing and a calibrated floor — deferred by decisions
+  3, 4 and 5.
 
 ## Related
 
