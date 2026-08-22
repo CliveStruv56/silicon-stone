@@ -83,6 +83,22 @@ export function embeddableText(doc: IndexCandidate): string {
  * index actually holds. They answer different questions, and a record can
  * legitimately change one without the other.
  */
+/**
+ * The record's own prose, without the title and publisher `embeddableText`
+ * prepends, collapsed to one line.
+ *
+ * For the vector, composing title + publisher + body is right — they are signal.
+ * For the snippet a reader and a drafting model see, they are noise: the block
+ * already names the record, so a snippet built from the composed text opens by
+ * repeating the title back, and its newlines break the one-line-per-record
+ * shape the block promises. Found by looking at what the lane actually
+ * produced, not by a test.
+ */
+export function snippetText(doc: IndexCandidate): string {
+  const body = doc._type === 'knowledgeSource' ? doc.extractedText : doc.body
+  return (body ?? '').replace(/\s+/g, ' ').trim()
+}
+
 export function canonicalIndexHash(doc: IndexCandidate): string {
   return normalizedContentHash(embeddableText(doc))
 }

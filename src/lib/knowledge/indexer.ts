@@ -31,6 +31,7 @@ import {
   canonicalIndexHash,
   embeddableText,
   indexEligibility,
+  snippetText,
   type IndexCandidate,
 } from './eligibility'
 import { getDocument } from './repository'
@@ -41,7 +42,7 @@ import { applyIndexTransition, type KnowledgeServiceDeps } from './service'
  * makes existing vectors wrong rather than merely old. Reconciliation compares
  * it, so a bump is how a re-index of everything is asked for.
  */
-export const KNOWLEDGE_INDEX_VERSION = '2026-08-21'
+export const KNOWLEDGE_INDEX_VERSION = '2026-08-21b'
 
 export type IndexOutcome =
   | { action: 'indexed'; documentId: string }
@@ -54,13 +55,13 @@ export type IndexOutcome =
  * the document, which is the thing a reviewer should be reading anyway. */
 const SNIPPET_CHARS = 400
 
-function metadataFor(doc: IndexCandidate, text: string): Record<string, string> {
+function metadataFor(doc: IndexCandidate): Record<string, string> {
   return {
     documentId: String(doc._id ?? ''),
     documentType: String(doc._type ?? ''),
     title: (doc.title ?? '').slice(0, 200),
     ...(doc.publisher ? { publisher: doc.publisher.slice(0, 200) } : {}),
-    snippet: text.slice(0, SNIPPET_CHARS),
+    snippet: snippetText(doc).slice(0, SNIPPET_CHARS),
     indexVersion: KNOWLEDGE_INDEX_VERSION,
   }
 }
@@ -72,7 +73,9 @@ function errorText(error: unknown): string {
 export interface IndexRecordInput {
   documentId: string
   /** Pass the document when the caller already has it, to save a read. */
-  document?: IndexCandidate & { indexState?: { status?: string; indexedHash?: string } | null }
+  document?: IndexCandidate & {
+    indexState?: { status?: string; indexedHash?: string; indexVersion?: string } | null
+  }
 }
 
 /**
@@ -97,10 +100,11 @@ export async function indexRecord(
 
   const doc =
     input.document ??
-    (await getDocument<IndexCandidate & { indexState?: { status?: string; indexedHash?: string } }>(
-      deps.client,
-      documentId,
-    ))
+    (await getDocument<
+      IndexCandidate & {
+        indexState?: { status?: string; indexedHash?: string; indexVersion?: string }
+      }
+    >(deps.client, documentId))
   if (!doc) return { action: 'failed', documentId, reason: 'The document does not exist.' }
 
   const current = doc.indexState?.status ?? 'not_eligible'
@@ -128,7 +132,17 @@ export async function indexRecord(
   const text = embeddableText(doc)
   const canonicalHash = canonicalIndexHash(doc)
 
-  if (current === 'indexed' && doc.indexState?.indexedHash === canonicalHash) {
+  // "Already current" is BOTH halves: the same text AND the same index version.
+  //
+  // Comparing the hash alone was wrong, and wrong in the worst shape. A version
+  // bump changes the metadata or the composition rather than the text, so the
+  // hash still matches — `knowledge:sync` correctly planned "2 to index", then
+  // this returned `unchanged` for both and the plan was silently not carried
+  // out. The reconciler and the indexer have to mean the same thing by up to
+  // date, or the one that prints a plan is not the one that decides.
+  const sameText = doc.indexState?.indexedHash === canonicalHash
+  const sameVersion = doc.indexState?.indexVersion === KNOWLEDGE_INDEX_VERSION
+  if (current === 'indexed' && sameText && sameVersion) {
     return { action: 'unchanged', documentId, reason: 'The index already holds this text.' }
   }
 
@@ -156,7 +170,7 @@ export async function indexRecord(
     // and /api/vectorize use, and the same one whose bare-array twin broke the
     // test teardown for weeks before anyone noticed.
     await getKnowledgePineconeIndex().upsert({
-      records: [{ id: documentId, values, metadata: metadataFor(doc, text) }],
+      records: [{ id: documentId, values, metadata: metadataFor(doc) }],
     })
   } catch (error) {
     const reason = errorText(error)

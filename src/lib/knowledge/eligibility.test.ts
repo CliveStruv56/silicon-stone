@@ -4,6 +4,7 @@ import {
   canonicalIndexHash,
   embeddableText,
   indexEligibility,
+  snippetText,
   INDEXABLE_TYPES,
   type IndexCandidate,
 } from './eligibility'
@@ -111,6 +112,32 @@ describe('indexEligibility', () => {
     // `not_eligible`. Policy and mechanism are different failures.
     const huge = source({ extractedText: 'x'.repeat(5_000_000) })
     expect(indexEligibility(huge).eligible).toBe(true)
+  })
+})
+
+describe('snippetText', () => {
+  // Found by reading what the lane actually put in front of the model, not by a
+  // test. The snippet was built from the composed embeddable text, so every
+  // block entry opened by repeating the title the block had just printed, and
+  // the record's newlines broke the one-line-per-record shape.
+  it('leaves out the title and publisher the block already prints', () => {
+    expect(snippetText(item())).toBe('The item in full.')
+    expect(snippetText(source())).toBe('The UK and Australia will deepen cooperation.')
+  })
+
+  it('collapses whitespace to one line', () => {
+    expect(snippetText(item({ body: 'One.\n\nTwo.\n   Three.' }))).toBe('One. Two. Three.')
+  })
+
+  it('is empty rather than undefined when there is no prose', () => {
+    expect(snippetText(item({ body: null }))).toBe('')
+  })
+
+  it('is not what gets embedded', () => {
+    // The vector still gets title and publisher — they are signal. Only the
+    // human-facing snippet drops them.
+    expect(embeddableText(source())).toContain('GOV.UK')
+    expect(snippetText(source())).not.toContain('GOV.UK')
   })
 })
 
