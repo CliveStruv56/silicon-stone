@@ -604,6 +604,16 @@ mutation-tested.
 **The corpus is now three records** — the item is `ready` because pressing the
 button is what was asked for, and one click returns it to the inbox.
 
+**Then the flag went on in production**, at the owner's instruction, and it took
+two variables rather than one: `PINECONE_KNOWLEDGE_INDEX_NAME` was not on
+production at all, and a missing store is `unchanged` rather than an error — so
+the flag alone would have produced a green *"Editorial memory unchanged."* over a
+record nothing had indexed. Both are Non-sensitive so the values can be read
+back. The same two presses were then made against siliconandstone.com/studio and
+behaved identically, which is the whole path — Studio, session exchange, route,
+embedding, Pinecone — verified where it actually runs. The **retrieval** lane is
+untouched and still dark; that is the switch that matters.
+
 ## Related
 
 - `siliconstone-knowledge-wave-02-brief.md` — provenance, and the retrieval

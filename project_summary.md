@@ -611,6 +611,12 @@ in Vercel, so a wrong value can only be re-done, never diagnosed, and that has
 cost a round of debugging on this project before. An index name is not a secret;
 the API key beside it still is.
 
+**Verified on the live site, not merely configured.** Return to inbox at
+siliconandstone.com/studio nulled the record's `indexedHash` and `indexedAt` and
+took the index to two — which only the fixed removal path can do — and Mark ready
+returned `indexing: "indexed"`, the toast *"Added to editorial memory."*, three
+vectors and a quiet `knowledge:sync`. The whole round trip is on production.
+
 ### August 22, 2026 — What the `ideas` namespace turned out to be
 
 Provisioning wave 3's index meant freeing a Pinecone slot, which meant looking at
