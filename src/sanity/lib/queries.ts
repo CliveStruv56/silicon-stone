@@ -2,7 +2,7 @@ import { defineQuery } from 'next-sanity'
 
 // Articles
 export const ARTICLES_QUERY = defineQuery(`
-  *[_type == "article" && defined(slug.current)] | order(publishedAt desc) [0...10] {
+  *[_type == "article" && defined(slug.current)] | order(coalesce(publishedAt, _updatedAt) desc) [0...10] {
     _id,
     title,
     "slug": slug.current,
@@ -275,7 +275,7 @@ export const CATEGORY_QUERY = defineQuery(`
 `)
 
 export const ARTICLES_BY_CATEGORY_QUERY = defineQuery(`
-  *[_type == "article" && $categoryId in categories[]._ref] | order(publishedAt desc) {
+  *[_type == "article" && $categoryId in categories[]._ref] | order(coalesce(publishedAt, _updatedAt) desc) {
     _id,
     title,
     "slug": slug.current,
@@ -382,7 +382,7 @@ export const SEARCH_ARTICLES_QUERY = defineQuery(`
     title match $query + "*" ||
     excerpt match $query + "*" ||
     pt::text(body) match $query + "*"
-  )] | order(publishedAt desc) [0...20] {
+  )] | order(coalesce(publishedAt, _updatedAt) desc) [0...20] {
     _id,
     title,
     "slug": slug.current,
@@ -444,7 +444,7 @@ export const CONTENT_STATS_QUERY = defineQuery(`{
 // Intelligence Portal - Tiered Content
 export const ARTICLES_BY_TIER_QUERY = defineQuery(`
   *[_type == "article" && !(_id in path("drafts.**")) && intelligenceTier == $tier && defined(slug.current)]
-  | order(coalesce(impactScore, 5) desc, publishedAt desc) [0...$limit] {
+  | order(coalesce(impactScore, 5) desc, coalesce(publishedAt, _updatedAt) desc) [0...$limit] {
     _id,
     title,
     "slug": slug.current,
@@ -469,7 +469,7 @@ export const ARTICLES_BY_TIER_QUERY = defineQuery(`
 // and api/briefings/route.ts); change all three together.
 export const BRIEFINGS_QUERY = defineQuery(`
   *[_type == "article" && !(_id in path("drafts.**")) && defined(slug.current)]
-  | order(coalesce(impactScore, 5) desc, publishedAt desc) {
+  | order(coalesce(impactScore, 5) desc, coalesce(publishedAt, _updatedAt) desc) {
     _id,
     title,
     "slug": slug.current,

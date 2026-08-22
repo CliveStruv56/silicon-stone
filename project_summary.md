@@ -6145,52 +6145,68 @@ order of value:
 **Do not** calibrate a score floor against three records, and do not add a default
 one to make the lane run. That is decision 5 and the code enforces it.
 
-### Priority 0e — Publishing writes no date, and the feeds disagree about it
+### ~~Priority 0e — Publishing writes no date, and the feeds disagree about it~~ — fixed 2026-08-22
 
-**Found 2026-08-22 while scoping pipeline efficiency. Not yet fixed; no code
-written.** Same family as the `intelligenceTier` defect closed on 2026-08-21 — an
-article publishes cleanly and is then wrong everywhere downstream, with nothing
-failing.
+Found and fixed the same day. Same family as the `intelligenceTier` defect closed
+on 2026-08-21 — publishes cleanly, wrong everywhere downstream, nothing fails.
 
-| Measured on production | |
-|---|---|
-| Published articles | **16** |
-| …with no `publishedAt` | **10** |
-| …with no cover image | **8** |
-| …with no `intelligenceTier` | **4** |
+**What was wrong.** `src/lib/sanity.ts` omits `publishedAt` when the generator
+writes a draft, with the comment `// publisedAt removed to keep as draft` (typo
+in the source). That is right. The other half was missing: nothing filled it in
+when the article was actually published — not the Studio publish action, not
+`/api/on-publish`, not the preflight. **Ten of sixteen published articles had no
+date**, and the six that did had one because somebody typed it into Studio. It
+feeds feed ordering, `schema.org` `datePublished` via `src/lib/seo.ts`, the
+sitemap and the offline store.
 
-**Nothing sets `publishedAt`.** `src/lib/sanity.ts:191` omits it deliberately at
-draft time, with the comment `// publisedAt removed to keep as draft` (the typo is
-in the source). That is right. What is missing is the other half: neither
-`/api/on-publish`, nor the Studio publish action, nor the preflight ever writes it
-when the article is actually published. The six articles that have a date have it
-because somebody typed one into Studio.
+And the queries had drifted into **three different answers** about the
+consequence — bare `publishedAt desc` in five places, `coalesce(publishedAt,
+_updatedAt)` in five, and a `coalesce(publishedAt, _createdAt)` projection in
+`src/lib/sanity.ts` — so the same article sorted differently depending on which
+view rendered it. Somebody had met the null before and patched the query in front
+of them rather than the cause.
 
-**And the queries do not agree about what to do then.** Some order by
-`publishedAt desc`; others by `coalesce(publishedAt, _updatedAt) desc`;
-`src/lib/sanity.ts:332` coalesces to `_createdAt` instead. So the same article
-sorts differently depending on which view is rendering it, and the coalescing
-ones disagree with each other about what date to substitute. Somebody clearly met
-this before and patched the query in front of them rather than the cause.
+**The fix, in four parts.**
 
-`publishedAt` is not only ordering: it feeds `src/lib/seo.ts` (schema.org
-`datePublished`), the sitemap and the offline store. A wrong or absent date is a
-wrong date in structured data.
+- **One rule, in `src/lib/published-at.ts`.** Stamp when absent; **never
+  overwrite** — re-publishing is not re-publication, and every edit re-fires the
+  publish webhook, so an overwriting rule would walk the date forward on every
+  save. A blank string counts as absent.
+- **Two writers, both asking that rule.** `withPublishStamp` patches the *draft*
+  before Studio publishes it (publishing copies `drafts.X` over `X`, so a patch
+  to the published document would be overwritten by the publish that triggered
+  it; the commit is awaited, or the race loses the date on a fast connection and
+  keeps it on a slow one). `/api/on-publish` stamps as a backstop for anything
+  that never touched Studio — a script, the CLI, the dashboard, an MCP with a
+  write token, which is the same set of callers its audit half exists for. The
+  backstop is a no-op whenever Studio did its job, and it logs a warning when it
+  fires, because it firing means something else did not.
+- **Composed preflight-outermost**: `withPublishPreflight(withPublishStamp(action))`,
+  so nothing is stamped on a publish the operator then cancels in the guard's
+  dialog.
+- **Eleven query sites standardised** on `coalesce(publishedAt, _updatedAt)`,
+  including `backend/main.py`, which production answers from. `_updatedAt` rather
+  than `_createdAt` **because of the failure mode, not accuracy**: a dateless
+  article falling back to `_updatedAt` surfaces at the top of the feed where
+  somebody notices it, where `_createdAt` buries it at its drafting date. A net
+  should be loud.
 
-The fix is two-sided and neither half is sufficient alone — the lesson the
-`intelligenceTier` repair already taught, where four copies of one query had to
-move together:
+**Backfilled.** `npm run articles:backfill-published-at` (dry-run by default,
+one transaction, re-run is a verified no-op) dated the ten from `_createdAt` —
+deliberately *not* the queries' fallback, because backfilling ten historical
+articles is about preserving chronology and four of them share one `_updatedAt`
+from the day of a bulk edit. **16 published, 0 without a date.**
 
-1. **Write the date when the article is published**, once, in the publish path,
-   and never overwrite an existing one (a republish is not a new publication).
-2. **Make every query agree** on what to do about a legacy null, then remove the
-   disagreement rather than adding another coalesce. `backend/main.py` holds its
-   own copy of these queries and is what production answers from — check all
-   four, as `src/lib/briefings-query.test.ts` and manual check 17 now force for
-   the tier.
+**Guards, all six mutation-tested.** `published-at.test.ts` for the rule;
+`published-at-query.test.ts` asserts every ordering across five files uses the
+one expression, that neither writer decides for itself, and that the Studio stamp
+patches the draft and awaits it; `publish-preflight.test.ts` gains the
+composition order. Suite 1,406 → **1,418**. Build clean.
 
-Pre-launch is the cheap moment to do this: 10 records to backfill, and no reader
-has seen a wrong date yet.
+**One thing not done: no live Studio publish has been made since the change.**
+The stamp is guarded at source and the backstop is straightforward, but this repo
+has now had three defects that only a browser walk-through found. The next real
+publish is the proof; check `publishedAt` on it.
 
 ### Priority 1 — Content
 

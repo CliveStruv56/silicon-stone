@@ -5,13 +5,14 @@ import { apiVersion, dataset, projectId } from '@/sanity/env'
 import { getClientIp } from '@/lib/rate-limit'
 import { checkDurableRateLimit } from '@/lib/durable-rate-limit'
 import { preflightArticle, hasBlocker, type PreflightDocument } from '@/lib/publish-preflight'
+import { publishedAtPatch } from '@/lib/published-at'
 import { sendToTopic, pushSendConfigured } from '@/lib/push/send'
 import { getRedis } from '@/lib/redis'
 
 /**
  * Publish-time side effects that are not indexing.
  *
- * Two jobs, deliberately in one route: both fire on exactly the same event, and
+ * Three jobs, deliberately in one route: all fire on exactly the same event, and
  * each extra webhook is another thing configured only in the Sanity dashboard
  * with no record in this repo. One is enough.
  *
@@ -23,17 +24,27 @@ import { getRedis } from '@/lib/redis'
  *      unpublish anything, because silently reversing a deliberate publish is
  *      worse than a live article with a warning on it.
  *
- *   2. **The Audit-tier deep-dive push notification.** Readers can subscribe to
+ *   2. **The publication date, as a backstop.** The Studio publish action
+ *      stamps `publishedAt` on the draft, which covers every publish a person
+ *      makes. This covers the ones nobody makes — a script, the CLI, the Sanity
+ *      dashboard, an MCP holding a write token — which is the same set of
+ *      callers job 1 exists for. It stamps only when the field is absent; the
+ *      rule is in `src/lib/published-at.ts` so the two writers cannot disagree,
+ *      and it is a no-op whenever Studio did its job.
+ *
+ *   3. **The Audit-tier deep-dive push notification.** Readers can subscribe to
  *      "New Audit-tier Deep Dives" and, until now, nothing ever sent one.
  *
- * The two are independent: either can fail without touching the other, and
- * neither failure is reported as an error to Sanity, because a retry would not
- * help and would re-run the half that worked.
+ * The three are independent: any can fail without touching the others, and no
+ * failure is reported as an error to Sanity, because a retry would not help and
+ * would re-run the parts that worked.
  *
  * **Loop safety.** Writing to the article re-fires this webhook, along with
  * /api/vectorize and /api/revalidate. Two things stop that being a loop:
  * a clean article is never written to at all (the common case costs nothing),
  * and a re-run computes the same audit text and skips the identical write. The
+ * date stamp is self-limiting for the same reason: it writes only when the
+ * field is absent, so the write it triggers cannot trigger another. The
  * push half is guarded separately by a one-shot key, so a re-publish or a later
  * edit never notifies twice. /api/vectorize learned this lesson the hard way —
  * see its write-back guard.
@@ -91,11 +102,13 @@ interface PublishedArticle extends PreflightDocument {
   intelligenceTier?: string
   contentType?: string
   publishAudit?: string
+  publishedAt?: string | null
 }
 
 const ARTICLE_QUERY = `*[_id == $id && !(_id in path("drafts.**"))][0]{
   _id, title, slug, contentType, intelligenceTier, excerpt, stoneTruth,
-  actionableInsights, body, citations, quotationAudit, factCheck, publishAudit
+  actionableInsights, body, citations, quotationAudit, factCheck, publishAudit,
+  publishedAt
 }`
 
 /** The audit text, or null when there is nothing to say. Deterministic — no timestamp. */
@@ -195,7 +208,29 @@ export async function POST(request: NextRequest) {
   }
   if (!doc) return NextResponse.json({ skipped: true, reason: 'not found or not published' })
 
-  // --- 1. The audit -------------------------------------------------------
+  // --- 1. The publication date -------------------------------------------
+  // Before the audit, because both patch the same document and this one is the
+  // cheaper decision: absent or not, no computation. `publishedAtPatch` never
+  // overwrites, so a re-publish and every later edit are no-ops.
+  let stamped = 'unchanged'
+  try {
+    const patch = publishedAtPatch(doc, new Date())
+    if (patch) {
+      await writeClient.patch(_id).set(patch).commit()
+      stamped = patch.publishedAt
+      console.warn(
+        `[on-publish] ${_id} was published with no publishedAt — stamped ${patch.publishedAt}. ` +
+          `Something published this outside Studio, or the Studio stamp failed.`,
+      )
+    }
+  } catch (error) {
+    // Recoverable by npm run articles:backfill-published-at. Never fail the
+    // webhook for it: Sanity would retry and re-run the halves that worked.
+    console.error('[on-publish] could not stamp publishedAt:', error)
+    stamped = 'failed'
+  }
+
+  // --- 2. The audit -------------------------------------------------------
   let audit = 'unchanged'
   try {
     const text = auditText(doc)
@@ -216,7 +251,7 @@ export async function POST(request: NextRequest) {
     audit = 'failed'
   }
 
-  // --- 2. The notification ------------------------------------------------
+  // --- 3. The notification ------------------------------------------------
   let push = 'skipped'
   try {
     push = await notifyOnce(doc)
@@ -225,6 +260,6 @@ export async function POST(request: NextRequest) {
     push = 'failed'
   }
 
-  console.info(`[on-publish] ${_id} — audit: ${audit}; push: ${push}`)
-  return NextResponse.json({ ok: true, id: _id, audit, push })
+  console.info(`[on-publish] ${_id} — date: ${stamped}; audit: ${audit}; push: ${push}`)
+  return NextResponse.json({ ok: true, id: _id, publishedAt: stamped, audit, push })
 }

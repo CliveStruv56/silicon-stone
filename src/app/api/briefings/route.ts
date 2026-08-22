@@ -8,7 +8,7 @@ import { urlFor } from '@/sanity/lib/image'
 // on that copy for why an untiered article must still be browsable.
 const BRIEFINGS_QUERY = `
   *[_type == "article" && !(_id in path("drafts.**")) && defined(slug.current)]
-  | order(coalesce(impactScore, 5) desc, publishedAt desc) [0...20] {
+  | order(coalesce(impactScore, 5) desc, coalesce(publishedAt, _updatedAt) desc) [0...20] {
     _id,
     title,
     "slug": slug.current,

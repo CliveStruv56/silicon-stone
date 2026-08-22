@@ -247,6 +247,19 @@ describe('the guard is actually wired into the Studio', () => {
   })
 
   it('wraps the publish action for articles rather than appending a new one', () => {
-    expect(config).toMatch(/action\.action === 'publish' \? withPublishPreflight\(action\)/)
+    // Matched loosely on purpose. The literal used to be
+    // `withPublishPreflight(action)`, and this assertion failed the day
+    // withPublishStamp was composed inside it — correctly, because it could not
+    // tell a second wrapper from the guard being unwired. What it is protecting
+    // is that the publish action is *transformed* rather than left alone and a
+    // new action appended beside it.
+    expect(config).toMatch(/action\.action === 'publish'\s*\?\s*withPublishPreflight\(/)
+  })
+
+  it('keeps the preflight outermost, so nothing happens on a cancelled publish', () => {
+    // withPublishStamp writes publishedAt before handing on to Studio's own
+    // publish. Composed the other way round it would stamp a date on an article
+    // the operator then backed out of in the guard's dialog.
+    expect(config).toMatch(/withPublishPreflight\(withPublishStamp\(action\)\)/)
   })
 })

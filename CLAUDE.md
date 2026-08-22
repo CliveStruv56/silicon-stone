@@ -564,6 +564,26 @@ human, none blocks generation.
   lists the outstanding placeholders, so scanning it would block every
   voice-passed article forever. There is a test for that.
 
+## Publication dates (load-bearing — do not break)
+
+Every price has one source; so does every publication date. `publishedAt` is
+written **only** through `publishedAtPatch()` in `src/lib/published-at.ts`, by
+two callers that both ask it: `withPublishStamp` (Studio, patches the *draft*
+before the publish copies it over) and `/api/on-publish` (the backstop for
+anything that never touched Studio). Nothing wrote it at all until 2026-08-22,
+so ten of sixteen published articles had no date and nothing failed.
+
+- **Never overwrite an existing date.** Re-publishing is not re-publication, and
+  every edit re-fires the publish webhook.
+- **Every article feed orders by `coalesce(publishedAt, _updatedAt)`** — all
+  eleven sites, `backend/main.py` included, which is what production answers
+  from. Bare `publishedAt desc` sinks a dateless article past the end of a
+  `[0...10]` slice: published and unbrowsable, the `intelligenceTier` failure
+  again. `published-at-query.test.ts` fails on any other expression.
+- **The backfill used `_createdAt` and that is deliberately different** from the
+  queries' fallback. Chronology for ten historical articles, loudness for a
+  future regression. Do not harmonise them.
+
 ## Pricing (load-bearing — do not break)
 
 Every price the site shows comes from `src/lib/offering.ts`. `AMOUNTS` is the

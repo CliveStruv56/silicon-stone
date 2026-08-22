@@ -43,7 +43,7 @@ SANITY_CATEGORIES_QUERY = """*[_type == "category"] | order(title asc) {
 # While this copy disagreed, the four untiered articles rendered in the SSR
 # HTML and vanished the moment the client refreshed from here.
 SANITY_BRIEFINGS_QUERY = """*[_type == "article" && !(_id in path("drafts.**")) && defined(slug.current)]
-| order(coalesce(impactScore, 5) desc, publishedAt desc) [0...20] {
+| order(coalesce(impactScore, 5) desc, coalesce(publishedAt, _updatedAt) desc) [0...20] {
   _id,
   title,
   "slug": slug.current,

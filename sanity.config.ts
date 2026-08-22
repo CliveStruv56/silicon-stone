@@ -15,6 +15,7 @@ import {schema} from './src/sanity/schemaTypes'
 import {structure} from './src/sanity/structure'
 import {FactCheckAction} from './src/sanity/actions/factCheckAction'
 import {withPublishPreflight} from './src/sanity/actions/publishPreflight'
+import {withPublishStamp} from './src/sanity/actions/publishStamp'
 import {factCheckBadge} from './src/sanity/badges/factCheckBadge'
 import {ReviewActions} from './src/sanity/actions/reviewActions'
 
@@ -31,6 +32,9 @@ export default defineConfig({
     // keyboard shortcut; it blocks on an unresolved [AUTHOR: …] placeholder and
     // asks for confirmation on a missing or adverse fact-check. See
     // src/lib/publish-preflight.ts.
+    // Publishing also stamps publishedAt when the article has none — nothing
+    // used to, so ten of sixteen published articles carried no date. See
+    // src/lib/published-at.ts.
     // Per-type dispatch. Articles get the publish guard and the fact-check;
     // knowledge records get the editorial verdicts, which route through
     // applyReviewTransition() rather than letting the Review Status radio
@@ -39,7 +43,11 @@ export default defineConfig({
       if (ctx.schemaType === 'article') {
         return [
           ...prev.map((action) =>
-            action.action === 'publish' ? withPublishPreflight(action) : action,
+            // Preflight outermost: nothing is stamped on a publish the
+            // operator cancels in its dialog.
+            action.action === 'publish'
+              ? withPublishPreflight(withPublishStamp(action))
+              : action,
           ),
           FactCheckAction,
         ]

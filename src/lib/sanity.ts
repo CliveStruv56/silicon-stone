@@ -325,11 +325,11 @@ export async function listSanityArticles(): Promise<SanityArticle[]> {
 export async function listPublishedArticles(): Promise<SanityArticle[]> {
     if (!token) return [];
     // Filter out drafts explicitly since we are using a token
-    const query = `*[_type == "article" && !(_id in path("drafts.**"))] | order(publishedAt desc, _createdAt desc) {
+    const query = `*[_type == "article" && !(_id in path("drafts.**"))] | order(coalesce(publishedAt, _updatedAt) desc) {
         _id,
         title,
         slug,
-        "publishedAt": coalesce(publishedAt, _createdAt),
+        "publishedAt": coalesce(publishedAt, _updatedAt),
         excerpt,
         contentType,
         mainImage {

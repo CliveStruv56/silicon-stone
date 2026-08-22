@@ -17,7 +17,7 @@ import { getPersonaParam, getTierParam, getTopicParam } from './filters'
 // one now raises a preflight warning instead; see src/lib/publish-preflight.ts.
 const BRIEFINGS_QUERY = `
   *[_type == "article" && !(_id in path("drafts.**")) && defined(slug.current)]
-  | order(coalesce(impactScore, 5) desc, publishedAt desc) [0...20] {
+  | order(coalesce(impactScore, 5) desc, coalesce(publishedAt, _updatedAt) desc) [0...20] {
     _id,
     title,
     "slug": slug.current,
