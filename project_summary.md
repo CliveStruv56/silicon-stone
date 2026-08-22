@@ -601,9 +601,15 @@ green suite. Every one was found by running the thing.
 Suite 1,397 → **1,406**. Six new guards, each mutation-tested. The corpus is now
 **three records**; the item is `ready` because pressing the button is what was
 asked for, and one click returns it to the inbox.
-`KNOWLEDGE_AUTO_INDEX_ENABLED` is set in local `.env.local` only — **it is not
-set on production**, so the Studio button the owner actually uses still writes the
-verdict and no vector until that is decided.
+**The flag was then set on production**, the same day and at the owner's
+instruction. That needed **two** variables, not one: `PINECONE_KNOWLEDGE_INDEX_NAME`
+was not on production at all, so `KNOWLEDGE_AUTO_INDEX_ENABLED` alone would have
+produced `unchanged` with the reason *"editorial memory has no store"* — a green
+toast reading "Editorial memory unchanged." over a record that was never indexed.
+Both are set **Non-sensitive**, deliberately: sensitive variables are write-only
+in Vercel, so a wrong value can only be re-done, never diagnosed, and that has
+cost a round of debugging on this project before. An index name is not a secret;
+the API key beside it still is.
 
 ### August 22, 2026 — What the `ideas` namespace turned out to be
 
@@ -6125,7 +6131,7 @@ order of value:
 | | |
 |---|---|
 | **Nothing.** The lane is dark and the corpus is three records. Leave it and come back when there is knowledge worth retrieving | The honest default. Wave 3's mechanism works and costs nothing switched off. |
-| ~~**Press Mark ready with `KNOWLEDGE_AUTO_INDEX_ENABLED=true`**~~ **— done 2026-08-22** | It was ten minutes and it found two defects, one of them the promise the lane exists to make: a rejected record kept its vector and nothing would have removed it. Both fixed; see §9. **Open decision left behind:** whether to set `KNOWLEDGE_AUTO_INDEX_ENABLED` on production. It is local-only today, so the Studio button the owner uses writes the verdict and no vector, and `knowledge:sync` is what would catch up. |
+| ~~**Press Mark ready with `KNOWLEDGE_AUTO_INDEX_ENABLED=true`**~~ **— done 2026-08-22** | It was ten minutes and it found two defects, one of them the promise the lane exists to make: a rejected record kept its vector and nothing would have removed it. Both fixed; see §9. **The flag is now live on production**, along with `PINECONE_KNOWLEDGE_INDEX_NAME`, which was missing there and without which the flag does nothing. Indexing on review is therefore on for the Studio the owner actually uses; the *retrieval* lane remains dark and uncalibrated, which is the switch that matters. |
 | **Decide what to do about the `ideas` corpus** (§9, 22 Aug) | 277 scored ideas next door, ineligible because unreviewed. The design question is what review means for an idea, not how to import one. |
 | **The upstream half of lineage** — an idea becoming an article | The gap above. Not briefed. |
 | **Wave 6 (cutover)** or the `/knowledge` cockpit | Both unbriefed; neither is blocking anything. |

@@ -463,7 +463,10 @@ knowledge programme (`docs/siliconstone-knowledge-wave-03-brief.md`). It holds
 one OpenAI vector per **reviewed** `knowledgeItem` / `knowledgeSource`.
 
 - **Two switches, and the second is the point.**
-  `KNOWLEDGE_AUTO_INDEX_ENABLED` gates indexing on review;
+  `KNOWLEDGE_AUTO_INDEX_ENABLED` gates indexing on review (**on in production
+  since 2026-08-22**, together with `PINECONE_KNOWLEDGE_INDEX_NAME` — the flag
+  does nothing without a store, and reports `unchanged` rather than failing if
+  the name is absent);
   `KNOWLEDGE_DRAFT_RETRIEVAL_ENABLED` gates the drafting lane — and the lane
   *also* needs `KNOWLEDGE_SCORE_FLOOR`, a measured number. **No default floor
   exists in the code and none may be added.** `PRIOR_COVERAGE_SCORE_FLOOR = 0.37`
