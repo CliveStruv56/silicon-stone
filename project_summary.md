@@ -2,7 +2,7 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-08-21
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (78 prerendered pages), 1,387 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (78 prerendered pages), 1,397 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, **Guide**, YouTube Script, Research Only), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
@@ -582,9 +582,33 @@ One wave-1 test was changed rather than deleted: it asserted the `ready` patch
 touched nothing else, and the comment now records what it was protecting and why
 that still holds.
 
-1,387 tests green. **Nothing is provisioned and nothing has been indexed** — the
-mechanism is the deliverable, and with 0 ready items and 2 ready sources there
-are two documents waiting for it.
+**Provisioned and probed the same day**, and the probe found two more defects
+past a green suite — the third wave running. `knowledge:sync` printed *"2 to
+index"* and then the indexer returned `unchanged` for both, because the
+reconciler re-indexes on an `indexVersion` bump while the indexer compared only
+the content hash: the component printing the plan was not the component
+deciding. And the snippet the drafting model would see repeated the title and
+carried raw newlines, because it was cut from the composed embeddable text.
+Both fixed, both mutation-tested.
+
+**Freeing an index slot found something worth knowing.** Pinecone was at its
+five-index limit. `quickstart-skills` was an MCP tutorial artefact and was
+deleted with approval; the other candidate, the retired `silicon-and-stone`,
+holds 15 stale article vectors **and 277 records in an `ideas` namespace
+belonging to an unrelated pipeline** — exactly what `verify-article-index.ts`
+warns must not be assumed safe to delete. Left alone. It also made decision 1's
+hazard concrete, so `sync-pinecone.ts` now names the namespace it owns rather
+than relying on an SDK default it never stated.
+
+Verified live: the inbox item refused with a readable reason; both sources
+indexed, including the one eligible only through its legacy `status: processed`;
+a corrupted `indexedHash` caught as stale **while the vector was present and the
+counts agreed**, which is the drift neither existing script could see;
+`sensitivity: private` removing the vector and nulling the indexed hash;
+restoring it re-indexing; and the lane through all four gate states.
+
+1,397 tests green. **The corpus is two records and the lane is still dark** — no
+floor has been measured, and two records cannot produce the experiment.
 
 ### August 21, 2026 — Wave 2: an article can say what it was written from
 
@@ -5965,7 +5989,7 @@ re-guessed.
 |---|---|
 | 0–1 — contracts, schemas, domain service | **Done 2026-08-19.** |
 | 2 — provenance | **Done 2026-08-21** for `/create`. Runs are durable; articles carry lineage. See §9 and the brief's "What was built". |
-| 3 — editorial memory | **Built dark 2026-08-21** — `docs/siliconstone-knowledge-wave-03-brief.md`. Eligibility, the index state machine driven, inline indexing on the review transition, `knowledge:sync` reconciliation, and a third retrieval lane. **Nothing is provisioned**: `PINECONE_KNOWLEDGE_INDEX_NAME` is unset, so all three are no-ops that say so. The lane needs two switches — the flag *and* a measured `KNOWLEDGE_SCORE_FLOOR`, which does not exist by default. Wave 1's state machine and intent are now consumed. **All six questions answered**, two of them deferrals: a fourth Pinecone index (not a namespace — `articles:sync` deletes every id it does not recognise); indexing inline on the review transition plus a reconciler, no fourth webhook; one vector per record with a budget that errors rather than truncates; research-run indexing deferred; `normal` sensitivity only; and the retrieval lane ships dark — two records cannot calibrate a floor, so none is claimed. |
+| 3 — editorial memory | **Built dark 2026-08-21** — `docs/siliconstone-knowledge-wave-03-brief.md`. Eligibility, the index state machine driven, inline indexing on the review transition, `knowledge:sync` reconciliation, and a third retrieval lane. **Provisioned and probed 2026-08-21**: `silicon-and-stone-knowledge` holds the two eligible records. The lane needs two switches — the flag *and* a measured `KNOWLEDGE_SCORE_FLOOR`, which does not exist by default. Wave 1's state machine and intent are now consumed. **All six questions answered**, two of them deferrals: a fourth Pinecone index (not a namespace — `articles:sync` deletes every id it does not recognise); indexing inline on the review transition plus a reconciler, no fourth webhook; one vector per record with a budget that errors rather than truncates; research-run indexing deferred; `normal` sensitivity only; and the retrieval lane ships dark — two records cannot calibrate a floor, so none is claimed. |
 | 4 — frictionless capture | **4a done 2026-08-20** (universal endpoint + hosted MCP, six tools). The `/knowledge` cockpit and URL/PDF extraction are not built. |
 | 5 — conversation integration | Claude reached in 4a. **ChatGPT is parked**, on a plan gate rather than an engineering one — Business is the first tier that can write. |
 | 6 — cutover | Not started. Owns any backfill; wave 2 deliberately did none. |
