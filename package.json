@@ -21,6 +21,7 @@
     "articles:verify-index": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/verify-article-index.ts",
     "articles:draft-status": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/draft-status.ts",
     "articles:backfill-published-at": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/backfill-published-at.ts",
+    "articles:image-prompts": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/image-prompts-backfill.ts",
     "knowledge:verify-index": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/verify-knowledge-index.ts",
     "knowledge:sync": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/knowledge-sync.ts",
     "knowledge:calibrate": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/knowledge-calibrate.ts",

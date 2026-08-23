@@ -569,6 +569,64 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 23, 2026 — Fourteen articles could not start the image loop
+
+The cover-image gap is the largest remaining manual step per article, and §11
+called it the most valuable work not in this repo. Scoping the automation turned
+up a prerequisite nobody had noticed.
+
+**`/create` has generated two image prompts as pass 4 of 4 since the feature
+landed. The back catalogue predates it.** Measured against production: of the
+**eight** published articles with no `mainImage`, **all eight** carried zero
+prompts, as did six of the nine image-less drafts. Only five articles in the whole
+dataset had any. So "make generate-and-upload one button" was the wrong first
+move — for fourteen articles there was no prompt to press the button *with*, and
+the operator's loop started at *read the article and invent a prompt*, which is
+the expensive part.
+
+**`npm run articles:image-prompts`** (dry run by default, `-- --write` to apply)
+closes it. It reuses `resolveImagePromptTarget` and `generateImagePrompts`
+unchanged rather than restating any of the generation: the system prompt in
+`src/lib/image-prompts.ts` is **the only written record of the house illustration
+style anywhere in the repo**, and a second copy is how that starts to drift. It
+skips anything with a cover or with prompts, so a re-run is a no-op — verified.
+
+**14 of 14 done, in two passes.** Twelve succeeded first time; two failed with
+*"Image-prompt model did not return valid JSON"* and **both succeeded on the
+retry with the same input**, so the failure is intermittent rather than
+content-dependent — which is worth saying, because the last JSON-parse failure in
+this codebase (the fact-check, 21 August) looked similar and was **not**
+intermittent: it was statute quotations breaking the string every single time.
+This one is a different animal and does not warrant the same fix.
+
+It does leave a small live defect recorded rather than repaired: `parsePrompts`
+has **no retry**, so `/api/image-prompts` answers 502 and the Studio button shows
+an error on a rate observed here at 2 in 14. The manual now tells the operator to
+press it again. Fixing it properly is a change to shared generation code and was
+not in scope for this piece.
+
+**Automation was deliberately not built.** The owner's call: take the prompts
+into Hyper Agent by hand and upload the results manually until the prompts prove
+themselves worth automating around. The plan for the rest — a draft-only delivery
+path, and either a Studio button or a wave-4a-style machine lane depending on
+whether Hyper Agent can be called programmatically — is written up and parked.
+
+**Two corrections found while checking.** There is no `coverImage` field;
+`mainImage` is the only one, and this document said otherwise. And **missing
+covers do not degrade social cards** — `analysis/[slug]/opengraph-image.tsx`
+renders a branded card from title and Stone Truth and deliberately ignores
+`mainImage`. The visible cost is the in-site placeholder and the absent article
+hero, which is smaller than the handoff implied.
+
+One thing left undone on purpose: `src/lib/sanity.ts:218-224` still rebuilds the
+`imagePrompts` object inline instead of calling `imagePromptsField()`. They agree
+today. Deduplicating them would make `sanity.ts` import `image-prompts.ts`, which
+already imports `sanity.ts` — a circular import, and not worth introducing for
+four lines. The fix is to move the helper into a module that depends on neither.
+
+Suite 1,446 green, unchanged — the script is exercised against production rather
+than mocked, which is the only test of it that would have meant anything.
+
 ### August 23, 2026 — The Notion back office, seven days behind
 
 The Command Center's Journal stopped on **16 August**. Everything since — the
@@ -6627,7 +6685,7 @@ treat it as optional. Back to 16 published, 0 without a date, 16 vectors.
 
 | Task | Description |
 |------|-------------|
-| **Cover images for 8 published articles** | Measured 2026-08-22: 8 of 16 published articles have neither `mainImage` nor `coverImage`. Studio has image-prompt suggestions + media library, but the generate-and-upload loop is still manual and is the largest per-article cost after drafting. |
+| **Cover images for 8 published articles** | Measured 2026-08-22: 8 of 16 published articles have no `mainImage`. (There is no `coverImage` field — that was a slip in this document, corrected 2026-08-23.) Studio has image-prompt suggestions + media library, but the generate-and-upload loop is still manual and is the largest per-article cost after drafting. |
 | **Publish or kill the 10 drafts** | **Not a decay problem — the site has not launched**, so cadence measures nothing. They matter as pipeline exercise: each one that goes through the guards and out is a test of the path, which is how every defect in this programme has been found. |
 | ~~**Decide whether `lead` should ever be automatic**~~ — shipped 2026-08-15 | `category.defaultGateMode` now routes it, and `article.categories` is required at error level so Studio blocks Publish on an untagged piece. A new article inherits the right gate from its categories with no per-article config. Residual: Studio validation does not apply to API writes, so `/create` can still leave a draft untagged — it is caught at publish, not at creation. See §9. |
 | ~~**Wire `article.gate` explicitly where `auto` guesses wrong**~~ | Done for the four articles `auto` could not serve — see the 2026-08-15 §9 entry. Remaining case is `commerce` overrides where the topic match picks the wrong product; none observed yet, since only the Toolkit currently claims any topics. |

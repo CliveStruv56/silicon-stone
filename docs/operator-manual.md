@@ -787,6 +787,20 @@ read the article and describe **what the cover image should depict** — deliber
 not style, colour, medium or camera, because the house style belongs to whatever
 image tool you run next. Copy a prompt and take it there.
 
+Every article generated through `/create` gets its two prompts automatically, as
+the last pass before the draft is saved. **The back catalogue did not** — the
+feature post-dates it, and on 2026-08-23 fourteen articles needing a cover had no
+prompts at all, so the loop for those started at "read it and invent one" rather
+than at "copy". `npm run articles:image-prompts` fills that gap: it reports which
+articles need a cover and have no prompts, and `-- --write` generates them. It
+skips anything that already has a cover or already has prompts, so a re-run is a
+no-op and a failed one can simply be run again.
+
+The model occasionally returns malformed output and there is no retry — two of
+the first fourteen failed and both succeeded on the next run. If **"Suggest two
+prompts"** shows an error in Studio, press it again before concluding anything is
+broken.
+
 ### Sources: "Add N from research"
 
 Where the draft came from research, the **Sources / Citations** field shows how
