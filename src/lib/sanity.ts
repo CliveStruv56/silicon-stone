@@ -220,6 +220,11 @@ export async function createArticleInSanity(data: ArticleData) {
     if (data.voiceEditNotes) doc.voiceEditNotes = data.voiceEditNotes;
     if (data.quotationAudit) doc.quotationAudit = data.quotationAudit;
     if (data.imagePrompts && data.imagePrompts.length > 0) {
+        // Built inline rather than by calling imagePromptsField() from
+        // ./image-prompts — that module imports writeClient from this one, so
+        // importing its value half back would close a runtime cycle. The
+        // `satisfies` is what stops the two shapes drifting apart instead: add a
+        // field to imagePromptsField() and this literal stops compiling.
         doc.imagePrompts = {
             prompts: data.imagePrompts,
             generatedAt: new Date().toISOString(),
