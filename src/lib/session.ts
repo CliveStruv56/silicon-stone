@@ -1,3 +1,37 @@
+/**
+ * The admin session: a signed, stateless token in an httpOnly cookie.
+ *
+ * REVOCATION — read this before assuming there is any.
+ * ----------------------------------------------------
+ * There is no session store, no denylist, and **nothing that can cancel one
+ * individual session**. The token is self-contained: if the signature verifies
+ * and `exp` has not passed, it is accepted. `logout()` deletes the cookie from
+ * the *browser* and nothing more — the token it was holding stays valid for the
+ * rest of its life, so a copy taken beforehand still works.
+ *
+ * **The kill switch is rotating `SESSION_SECRET`.** Every token in existence was
+ * signed with it, so changing it invalidates all of them at once. That is the
+ * whole revocation mechanism, and it is deliberate rather than missing: there is
+ * exactly one admin account, so "revoke that session" and "revoke every session"
+ * are the same operation. Adding a `jti` denylist would put a database on the
+ * hot path of every request to solve a problem with one user.
+ *
+ * Two consequences worth knowing:
+ *
+ * - **An active session never ages out.** `src/middleware.ts` re-issues the
+ *   token on every authenticated request (sliding renewal), so the 24 hours
+ *   below is 24 hours *from last use*, not from login. Someone holding a stolen
+ *   cookie and using it keeps it alive indefinitely.
+ * - **`jti` is not revocation infrastructure.** It is generated on every issue
+ *   and checked for presence on every verify, but it is never stored and never
+ *   compared against anything. It exists so two tokens minted in the same second
+ *   are not byte-identical. Do not read it as evidence that sessions can be
+ *   individually cancelled — they cannot.
+ *
+ * Reviewed and accepted 2026-08-23. Revisit if a second admin account is ever
+ * added, at which point "log everyone out" stops being an acceptable answer to
+ * "log that person out".
+ */
 export const SESSION_COOKIE_NAME = 'ai-writer-auth'
 export const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 // 24 hours
 
@@ -77,6 +111,7 @@ async function sign(data: string): Promise<string> {
 }
 
 export async function issueSession(): Promise<string> {
+    // Uniqueness only — nothing stores or checks this. See the note at the top.
     const jti = globalThis.crypto.randomUUID()
     const now = Math.floor(Date.now() / 1000)
     const header = base64UrlEncode(JSON.stringify({ alg: ALG, typ: 'JWT' }))

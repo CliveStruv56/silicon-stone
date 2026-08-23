@@ -65,6 +65,14 @@ export async function verifyPassword(_prevState: LoginState, formData: FormData)
     }
 }
 
+/**
+ * Clears the cookie from this browser — and that is genuinely all it does.
+ *
+ * The token itself stays valid until it expires; nothing server-side records
+ * that it was surrendered. If you need a session to actually stop working
+ * (a stolen cookie, a lost laptop), rotate `SESSION_SECRET`, which invalidates
+ * every token at once. See the note at the top of src/lib/session.ts.
+ */
 export async function logout() {
     const cookieStore = await cookies()
     cookieStore.delete(SESSION_COOKIE_NAME)
