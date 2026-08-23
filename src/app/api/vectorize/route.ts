@@ -9,6 +9,17 @@ import { checkDurableRateLimit } from '@/lib/durable-rate-limit'
 import { PRIOR_COVERAGE_SCORE_FLOOR } from '@/lib/draft-retrieval'
 import { SANITY_TIMEOUT_MS } from '@/lib/timeouts'
 
+/**
+ * Generous on purpose. The route reads only `_id` and `_type`, but the
+ * *projection* that decides what Sanity actually sends lives in the Sanity
+ * dashboard and nothing in this repo can verify it — LAUNCH.md records it as a
+ * documented requirement, not an enforced one. A tight cap here would turn a
+ * whole-document projection into a silent publishing outage, visible only in
+ * Sanity's own delivery log. This still refuses anything that is not plausibly
+ * one article.
+ */
+const MAX_BODY_BYTES = 1_000_000
+
 const sanity = createClient({
   projectId,
   dataset,
@@ -60,9 +71,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  const declared = Number(req.headers.get('content-length') || 0)
+  if (declared > MAX_BODY_BYTES) {
+    return NextResponse.json({ error: 'Request too large' }, { status: 413 })
+  }
+
   let body: Record<string, unknown>
   try {
-    body = await req.json()
+    const raw = await req.text()
+    if (raw.length > MAX_BODY_BYTES) {
+      return NextResponse.json({ error: 'Request too large' }, { status: 413 })
+    }
+    body = JSON.parse(raw)
   } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }

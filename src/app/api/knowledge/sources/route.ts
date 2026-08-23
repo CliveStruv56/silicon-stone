@@ -20,6 +20,16 @@ import { normalizeCanonicalUrl } from '@/lib/knowledge/normalize'
 
 const MAX_UPLOAD_BYTES = 15 * 1024 * 1024
 
+/**
+ * Ceiling on the whole multipart body, checked before it is read.
+ *
+ * `MAX_UPLOAD_BYTES` below is a check on the *file part*, and it happens after
+ * `req.formData()` has already buffered the entire request into memory — so a
+ * 500 MB body was fully materialised before anything measured it. This bound
+ * comes first. It is the file limit plus room for the text fields around it.
+ */
+const MAX_BODY_BYTES = MAX_UPLOAD_BYTES + 2 * 1024 * 1024
+
 function parseCommaSeparated(value: FormDataEntryValue | null) {
   return String(value ?? '')
     .split(',')
@@ -54,7 +64,24 @@ export async function POST(req: NextRequest) {
   const unauthorized = await requireKnowledgeAdmin()
   if (unauthorized) return unauthorized
 
-  const formData = await req.formData()
+  // content-length is a claim rather than a measurement, but it is the only
+  // measurement available *before* formData() buffers the body — and buffering
+  // is the thing being defended against, so a claim checked early is worth more
+  // here than a fact checked late. The per-file check below still runs.
+  const declared = Number(req.headers.get('content-length') || 0)
+  if (declared > MAX_BODY_BYTES) {
+    return NextResponse.json({ error: 'Request too large' }, { status: 413 })
+  }
+
+  // A malformed multipart body throws here. It used to throw straight out of
+  // the route as an unhandled 500 with a stack behind it.
+  let formData: FormData
+  try {
+    formData = await req.formData()
+  } catch {
+    return NextResponse.json({ error: 'Invalid form data.' }, { status: 400 })
+  }
+
   const sourceId = String(formData.get('sourceId') ?? '').trim()
   const title = String(formData.get('title') ?? '').trim()
   const sourceType = String(formData.get('sourceType') ?? '') as KnowledgeSourceType

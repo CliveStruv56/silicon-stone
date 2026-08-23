@@ -11,9 +11,25 @@ import { KNOWLEDGE_BRAND_TAGS, type KnowledgeBrandTag } from '@/lib/knowledge-in
 // reconciling them. Only the ID minting is centralised here.
 import { canonicalDocumentId } from '@/lib/knowledge/ids'
 
+/**
+ * Transport ceiling. Admin-gated, but the gate is one shared password and this
+ * route writes a Sanity document per call with nothing bounding what it writes.
+ */
+const MAX_BODY_BYTES = 200_000
+/** A headline. */
+const MAX_TITLE_CHARS = 500
+/** A proposed synthesis — a few paragraphs, generously. */
+const MAX_ANSWER_CHARS = 20_000
+/** Source IDs and brand tags: short identifiers, and few of them. */
+const MAX_ARRAY_ENTRIES = 50
+const MAX_ENTRY_CHARS = 200
+
 function parseStringArray(value: unknown) {
   if (!Array.isArray(value)) return []
-  return value.map((item) => String(item).trim()).filter(Boolean)
+  return value
+    .slice(0, MAX_ARRAY_ENTRIES)
+    .map((item) => String(item).trim().slice(0, MAX_ENTRY_CHARS))
+    .filter(Boolean)
 }
 
 async function requireKnowledgeAdmin() {
@@ -42,15 +58,34 @@ export async function POST(req: NextRequest) {
   const unauthorized = await requireKnowledgeAdmin()
   if (unauthorized) return unauthorized
 
+  const declared = Number(req.headers.get('content-length') || 0)
+  if (declared > MAX_BODY_BYTES) {
+    return NextResponse.json({ error: 'Request too large' }, { status: 413 })
+  }
+
+  let raw: string
+  try {
+    raw = await req.text()
+  } catch {
+    return NextResponse.json({ error: 'Invalid request body.' }, { status: 400 })
+  }
+  // Again on what arrived: content-length is a claim, and a chunked request
+  // need not send one at all.
+  if (raw.length > MAX_BODY_BYTES) {
+    return NextResponse.json({ error: 'Request too large' }, { status: 413 })
+  }
+
   let payload: Record<string, unknown>
   try {
-    payload = await req.json()
+    payload = JSON.parse(raw)
   } catch {
     return NextResponse.json({ error: 'Invalid JSON.' }, { status: 400 })
   }
 
-  const title = String(payload.title ?? '').trim()
-  const answer = String(payload.answer ?? '').trim()
+  // Truncated rather than rejected: these are typed into a form by the admin
+  // who is already logged in, and the ceilings sit far above any real entry.
+  const title = String(payload.title ?? '').trim().slice(0, MAX_TITLE_CHARS)
+  const answer = String(payload.answer ?? '').trim().slice(0, MAX_ANSWER_CHARS)
   const sourceIds = parseStringArray(payload.sourceIds)
   const brandTags = parseStringArray(payload.brandTags) as KnowledgeBrandTag[]
 

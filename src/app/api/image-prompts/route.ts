@@ -7,6 +7,9 @@ import { resolveImagePromptTarget, generateImagePrompts } from '@/lib/image-prom
 // One Claude call (~5–15s). 60s gives ample headroom without after()/polling.
 export const maxDuration = 60
 
+/** One document id. Nothing legitimate here is large. */
+const MAX_BODY_BYTES = 4_000
+
 export async function POST(req: NextRequest) {
   // Rate-limit first so the paid Claude call can't be driven unboundedly even
   // by an authenticated session.
@@ -32,9 +35,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized — log in at /login first' }, { status: 401 })
   }
 
+  const declared = Number(req.headers.get('content-length') || 0)
+  if (declared > MAX_BODY_BYTES) {
+    return NextResponse.json({ error: 'Request too large' }, { status: 413 })
+  }
+
   let body: Record<string, unknown>
   try {
-    body = await req.json()
+    const raw = await req.text()
+    if (raw.length > MAX_BODY_BYTES) {
+      return NextResponse.json({ error: 'Request too large' }, { status: 413 })
+    }
+    body = JSON.parse(raw)
   } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }

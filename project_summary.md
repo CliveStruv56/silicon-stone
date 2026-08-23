@@ -569,6 +569,56 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 23, 2026 — Two push routes with no ceiling, and five bodies nobody bounded
+
+`/api/push/unsubscribe` deleted any subscription whose endpoint you named, with
+no proof of possession and **no rate limit at all**; `/api/push/topics` is the
+matching read oracle, confirming an endpoint exists and listing what it holds,
+also unlimited. There cannot be proof of possession here — there are no accounts
+and the endpoint *is* the identity — so what stands in for it is that a push
+endpoint is a long, high-entropy FCM or Mozilla URL. The exposure is one that
+leaked through a log, a referrer or a shared device, and the rate limit is what
+stops that single leak becoming a sweep. Both now share one `pushEndpoint`
+bucket, because probing an endpoint and wiping it are one attack in two steps.
+
+**`checkDurableRateLimit` now never throws, and that is a contract rather than a
+tidy-up.** `/api/push/subscribe` wrapped it in a `try/catch` reasoned as
+"rate-limit store down: allow through rather than block opt-in" — but that case
+was *already* handled inside the function, which degrades to the in-memory
+limiter. The catch could therefore never do the thing it was written for; all it
+could actually do was convert an unexpected failure into an unlimited endpoint.
+`getLimiter` moved inside the try as part of the same change, because building
+the Redis client on malformed credentials was the one path out that was not
+covered. Every caller can now write a bare `await` with no swallow.
+
+**The body-cap guard found five routes, where the audit had named three.**
+`/api/mcp` had no ceiling at all while the domain beneath it allows a 2,000,000
+character extract; `/api/knowledge/sources` checked its 15 MB file limit only
+*after* `formData()` had buffered the entire request into memory, and threw an
+unhandled 500 on a malformed body; `/api/knowledge/candidates` bounded neither
+the body nor the fields. Writing the check then flagged `/api/fact-check`,
+`/api/image-prompts`, `/api/knowledge/review`, `/api/on-publish` and
+`/api/vectorize` — four of which read a whole unbounded body to pull one document
+id out of it.
+
+The MCP fix is the only structural one: the body is read and bounded *before* the
+handler sees it, and every consumer downstream is handed the same bounded copy.
+That was verified against a running server rather than the type-checker —
+`initialize` and `tools/list` both still work through the rebuilt request, and a
+600 KB body is refused with and without a `content-length` header.
+
+**The two webhook caps are deliberately loose (1 MB).** Those routes read only
+`_id` and `_type`, but the projection deciding what Sanity actually sends lives
+in the Sanity dashboard, and nothing in this repo can verify it — LAUNCH.md
+records it as a documented requirement, not an enforced one. A tight cap would
+turn a whole-document projection into a silent publishing outage visible only in
+Sanity's delivery log.
+
+The guard's predicate is "reads the *request* body", not "accepts POST":
+`/api/studio-session` is a POST taking its whole input from the Authorization
+header, and `/api/briefings` calls `.json()` on an upstream *response*. Both were
+false positives worth ruling out precisely rather than exempting by name.
+
 ### August 23, 2026 — One call in the whole codebase had a timeout
 
 `sanity-identity.ts` was the only bounded outbound call on the server. Everything

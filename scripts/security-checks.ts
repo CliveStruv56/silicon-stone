@@ -281,6 +281,35 @@ async function main() {
     }
   }
 
+  // Every route that accepts a body caps it before reading it. Three did not:
+  // /api/mcp had no ceiling at all while the domain below it allows a 2,000,000
+  // character extract; /api/knowledge/sources checked the 15MB file limit only
+  // *after* formData() had buffered the whole request into memory; and
+  // /api/knowledge/candidates bounded neither the body nor the fields in it.
+  const BODY_CAP_EXEMPT = new Set([
+    // Signature-verified by next-sanity/webhook, with its own cap constant.
+    'src/app/(website)/api/revalidate/route.ts',
+  ])
+  const routeFiles = execFileSync('git', ['ls-files', 'src/app'], { encoding: 'utf8' })
+    .split('\n')
+    .filter((file) => file.endsWith('/route.ts'))
+  for (const file of routeFiles) {
+    if (!fs.existsSync(file) || BODY_CAP_EXEMPT.has(file)) continue
+    const source = fs.readFileSync(file, 'utf-8')
+    // The predicate is "reads the *request* body", not "accepts POST":
+    // /api/studio-session is a POST taking its whole input from the
+    // Authorization header, and /api/briefings calls .json() on an upstream
+    // *response*. Matching the conventional receiver names is what separates
+    // them; a route that aliases the request to something else is outside this
+    // check, which is a reason to keep to the convention.
+    if (!/\b(req|request)\.(json|text|formData|arrayBuffer)\(\)/.test(source)) continue
+    assert.match(
+      source,
+      /MAX_BODY_BYTES|MAX_REVALIDATE_BODY_BYTES/,
+      `${file} accepts a body with no ceiling — cap content-length before reading it`,
+    )
+  }
+
   const workflowSource = fs.readFileSync('.github/workflows/check.yml', 'utf-8')
   assert.match(workflowSource, /npm run test:security/)
   assert.match(workflowSource, /npm run test:style-rules/)

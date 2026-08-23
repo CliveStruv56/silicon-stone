@@ -60,6 +60,17 @@ export const maxDuration = 60
 /** Bound every upstream read. See maxDuration above. */
 const SANITY_TIMEOUT_MS = 15_000
 
+/**
+ * Generous on purpose. The route reads only `_id` and `_type`, but the
+ * *projection* that decides what Sanity actually sends lives in the Sanity
+ * dashboard and nothing in this repo can verify it — LAUNCH.md records it as a
+ * documented requirement, not an enforced one. A tight cap here would turn a
+ * whole-document projection into a silent publishing outage, visible only in
+ * Sanity's own delivery log. This still refuses anything that is not plausibly
+ * one article.
+ */
+const MAX_BODY_BYTES = 1_000_000
+
 /** How long a "we already notified for this article" marker lives. */
 const NOTIFIED_TTL_SECONDS = 60 * 60 * 24 * 90
 
@@ -183,9 +194,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  const declared = Number(request.headers.get('content-length') || 0)
+  if (declared > MAX_BODY_BYTES) {
+    return NextResponse.json({ error: 'Request too large' }, { status: 413 })
+  }
+
   let payload: { _id?: string; _type?: string }
   try {
-    payload = (await request.json()) as { _id?: string; _type?: string }
+    const raw = await request.text()
+    if (raw.length > MAX_BODY_BYTES) {
+      return NextResponse.json({ error: 'Request too large' }, { status: 413 })
+    }
+    payload = JSON.parse(raw) as { _id?: string; _type?: string }
   } catch {
     return NextResponse.json({ error: 'Expected a JSON body' }, { status: 400 })
   }

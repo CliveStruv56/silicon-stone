@@ -64,6 +64,12 @@ const configs = {
   // is verified. Comfortably above a person pasting conversation extracts all
   // day, far below a loop — and it is the only thing standing between a leaked
   // token and unbounded Sanity writes.
+  // Anything keyed on a Web Push endpoint: dropping a subscription, and reading
+  // back which topics it holds. One bucket for both, because they are one
+  // attack — a push endpoint leaked through a log, a referrer or a shared
+  // device, then either confirmed or wiped. Comfortably above the opt-in UI,
+  // which reads the topics once per page load.
+  pushEndpoint: { limit: 30, window: '15 m', prefix: 'sas:push-endpoint' },
   knowledgeCapture: { limit: 60, window: '15 m', prefix: 'sas:knowledge-capture' },
   // MCP tool invocations, keyed on the authenticated caller rather than the IP.
   // Higher than the capture ceiling because one conversation legitimately makes
@@ -142,11 +148,26 @@ function inMemoryFallback(key: DurableRateLimitKey, identifier: string): Durable
   return { ...result, degraded: true }
 }
 
+/**
+ * Never throws. That is the contract, and it is what lets callers write a bare
+ * `await checkDurableRateLimit(...)` with no try/catch — a `catch` around this
+ * cannot protect anything the function does not already handle (an unreachable
+ * Upstash degrades to the in-memory limiter below), so all it could ever do is
+ * turn an unexpected failure into *no rate limit at all*. `getLimiter` is inside
+ * the try for the same reason: building the Redis client can throw on malformed
+ * credentials, and that was the one path out of here that was not covered.
+ */
 export async function checkDurableRateLimit(
   key: DurableRateLimitKey,
   identifier: string,
 ): Promise<DurableRateLimitResult> {
-  const limiter = getLimiter(key)
+  let limiter: ReturnType<typeof getLimiter>
+  try {
+    limiter = getLimiter(key)
+  } catch (error) {
+    console.error('Durable rate limiter could not be built; falling back to in-memory:', error)
+    return inMemoryFallback(key, identifier)
+  }
   if (!limiter) {
     // Upstash not configured — degrade gracefully rather than failing closed
     // (which would brick login and the public forms).

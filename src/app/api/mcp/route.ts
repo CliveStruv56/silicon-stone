@@ -37,6 +37,21 @@ export const runtime = 'nodejs'
 export const maxDuration = 60
 
 /**
+ * Transport ceiling on the JSON-RPC envelope.
+ *
+ * This route had none at all: it went from the auth guard straight into
+ * `withMcpAuth(buildHandler(...))`, and the domain's own
+ * `KNOWLEDGE_LIMITS.extractedText` allows 2,000,000 characters — so one
+ * `capture_source` call could push roughly two megabytes into Sanity, with the
+ * envelope around it unbounded on top. `/api/knowledge/capture` had the 200 KB
+ * cap this needs; the difference was that nobody wrote it here.
+ *
+ * Deliberately larger than that route's, because a JSON-RPC batch legitimately
+ * carries several captures where the REST endpoint carries one.
+ */
+const MAX_BODY_BYTES = 500_000
+
+/**
  * Browser origins permitted to call this.
  *
  * Empty on purpose. The 2026-07-28 spec requires servers to validate `Origin`
@@ -136,8 +151,33 @@ async function handle(request: Request): Promise<Response> {
     )
   }
 
+  // Read and bound the body BEFORE the handler sees it, then hand every
+  // downstream consumer the same bounded copy. content-length is checked first
+  // because it is free, and again on what actually arrived because it is a
+  // claim rather than a measurement — a chunked request need not send one.
+  const declared = Number(request.headers.get('content-length') || 0)
+  if (declared > MAX_BODY_BYTES) {
+    return Response.json({ error: 'Request too large' }, { status: 413 })
+  }
+  let raw: string
+  try {
+    raw = await request.text()
+  } catch {
+    return Response.json({ error: 'Invalid request body' }, { status: 400 })
+  }
+  if (raw.length > MAX_BODY_BYTES) {
+    return Response.json({ error: 'Request too large' }, { status: 413 })
+  }
+  // Only POST reaches handle() — GET and DELETE are 405/404 below — so there is
+  // always a body to re-attach and no bodyless-method case to guard.
+  const bounded = new Request(request.url, {
+    method: request.method,
+    headers: request.headers,
+    body: raw,
+  })
+
   const authed = withMcpAuth(
-    buildHandler(request),
+    buildHandler(bounded),
     async (_req, bearerToken) => {
       const outcome = verifyIngestRequest(
         bearerToken ? `Bearer ${bearerToken}` : request.headers.get('authorization'),
@@ -152,7 +192,7 @@ async function handle(request: Request): Promise<Response> {
     { required: true },
   )
 
-  return authed(request)
+  return authed(bounded)
 }
 
 export const POST = handle

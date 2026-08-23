@@ -21,17 +21,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Push not configured' }, { status: 503 })
   }
 
-  const ip = getClientIp(request)
-  try {
-    const rateLimit = await checkDurableRateLimit('subscribe', ip)
-    if (!rateLimit.allowed) {
-      return NextResponse.json(
-        { error: 'Too many requests' },
-        { status: 429, headers: { 'Retry-After': String(rateLimit.retryAfter) } },
-      )
-    }
-  } catch {
-    // Rate-limit store down: allow through rather than block opt-in.
+  // The try/catch that used to wrap this was aimed at "rate-limit store down:
+  // allow through rather than block opt-in" — but that case is already handled
+  // inside checkDurableRateLimit, which degrades to the in-memory limiter and
+  // never throws. All the catch could actually do was turn an unexpected
+  // failure into an unlimited endpoint.
+  const rateLimit = await checkDurableRateLimit('subscribe', getClientIp(request))
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: 'Too many requests' },
+      { status: 429, headers: { 'Retry-After': String(rateLimit.retryAfter) } },
+    )
   }
 
   const raw = await request.text()
