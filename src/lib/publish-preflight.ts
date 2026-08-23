@@ -267,7 +267,11 @@ export function preflightArticle(doc: PreflightDocument): PreflightIssue[] {
       detail:
         'This piece has an empty Sources list, so the published article cites ' +
         'nothing and its structured data carries no citation. House style asks for ' +
-        'primary sources wherever a claim rests on one.',
+        'primary sources wherever a claim rests on one.\n\n' +
+        'If it came from /create, the research sources are already on the document: ' +
+        'open the Sources field and press "Add from research", then delete the ones ' +
+        'the piece does not actually rest on. The gathering is automatic; which ' +
+        'sources a reader sees is not.',
     })
   }
 

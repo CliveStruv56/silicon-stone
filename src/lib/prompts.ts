@@ -228,8 +228,10 @@ type SanityPersona = NonNullable<Awaited<ReturnType<typeof getSanityPersona>>>;
 function getFormatTask(format: DraftFormat, persona: SanityPersona, voice: VoiceDNA): string {
     switch (format) {
         case 'pulse':
-            return `Write a "Pulse" intelligence scan (100–140 words) for ${persona.role}.
+            return `Write a "Pulse" intelligence scan (250–300 words) for ${persona.role}.
 The "content" must be a genuine 30-second scan — state what shifted, why it matters, and one watchpoint only. Do not expand it into a briefing.
+
+LENGTH IS A HARD CONSTRAINT, and the one most often missed. 300 words is the ceiling, not a target to approach from above. Before you return, count the words in "content": if it exceeds 300, cut — do not summarise the cut material elsewhere. A Pulse that runs long is not a better Pulse, it is a Signal that nobody asked for.
 
 Markdown structure for "content":
 # [Headline: Specific and factual]

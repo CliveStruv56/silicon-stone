@@ -547,6 +547,49 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 23, 2026 — The Pulse budget moved, and the citation fix already existed
+
+**Two things asked for; the first turned out to be built already.**
+
+**"Seed citations from the research snapshots" is `CitationsInput`, shipped.** The
+Sources field carries an **"Add from research"** button that copies the
+`citationSnapshots` into the public list for the editor to prune, and its
+docblock describes the exact problem reported here — *"almost every generated
+draft arrived with an empty Sources list and the warning fired every time, which
+trains an editor to click past the dialog that also carries the placeholder
+blocker."* Its answer is deliberate and better than an automatic write: **the
+machine gathers, the human decides what a reader sees.** Auto-seeding would have
+removed that decision and put all eight research results in front of readers as
+though the piece rested on them.
+
+So the change is one line of copy rather than a mechanism: the *"No sources
+listed"* warning now names the control. A guard that states a problem without its
+one-click remedy is one an editor learns to click past — and this one shares a
+dialog with the placeholder blocker, so training that reflex is expensive.
+
+**The Pulse budget is now 250–300 words**, up from 100–140, at the owner's
+request. Four places had to move together and `npm run test:manual` is what makes
+that true rather than hoped: the prompt, the manual's format table, the manual's
+appendix table, and `auto-fact-check.ts`'s docblock, which cites the length as
+its reason for not fact-checking Pulses. Mutation-tested — moving the prompt
+alone fails the build with *"Pulse's word target moved. Update the manual and
+this guard."*
+
+**No prompt can hard-limit a model**, and it would be dishonest to imply
+otherwise: `max_tokens` is the only true ceiling and it truncates mid-sentence,
+which would break the delimiter parse outright. What has changed is that the
+constraint is now stated as a ceiling with an explicit instruction to count and
+cut before returning, and — more usefully — **drift is now visible**.
+`npm run articles:draft-status` prints a word count for every draft and flags any
+badged `pulse` that runs over 300. It keys on `intelligenceTier` rather than
+format, because Pulse and Signal share `contentType: 'signal'`, and because a
+piece *badged* Pulse owes the reader a 30-second scan whichever generator made
+it.
+
+For calibration, the two Pulses on record: 194 words under the old 100–140 budget
+(40% over) and 429 under the same budget (200% over). The variance is the point —
+one sample tells you nothing.
+
 ### August 23, 2026 — The creation pipeline, run end to end on production
 
 **Everything from idea to draft works.** Verified against the live site, not

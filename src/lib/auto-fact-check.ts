@@ -9,7 +9,7 @@ import type { DraftFormat } from './prompts'
  * and until now the check ran only when an author remembered to press the
  * button. The format with the most claims had the least protection.
  *
- * Pulse, Guide and YouTube Script are excluded deliberately. A Pulse is 100–140
+ * Pulse, Guide and YouTube Script are excluded deliberately. A Pulse is 250–300
  * words built on one verified shift; a Guide explains a tool. Checking them
  * would spend Exa and model budget on pieces whose claim count barely reaches
  * the extraction floor, and a report that is nearly always empty is one nobody

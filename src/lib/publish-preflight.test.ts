@@ -249,6 +249,16 @@ describe('preflightArticle', () => {
     }
   })
 
+  it('points at the control that fixes it rather than only naming the problem', () => {
+    // The remedy already exists — CitationsInput's "Add from research" copies the
+    // provenance snapshots into the public list for the editor to prune. A
+    // warning that names a problem without naming its one-click fix is a warning
+    // an editor learns to click past, and this one shares a dialog with the
+    // placeholder blocker.
+    const issue = preflightArticle(cleanArticle({ contentType: 'signal', citations: [] }))[0]
+    expect(issue.detail).toContain('Add from research')
+  })
+
   it('does not warn about sources on a YouTube script or an untyped draft', () => {
     expect(preflightArticle(cleanArticle({ contentType: 'youtube', citations: [] }))).toEqual([])
     expect(preflightArticle(cleanArticle({ contentType: undefined, citations: [] }))).toEqual([])

@@ -114,7 +114,7 @@ check('the drafted word counts match the prompt builder', () => {
   // Each is the length the model is actually told to write to. Two previous
   // guides disagreed on Signal, and both were wrong in different directions.
   const lengths: Array<[RegExp, string, string]> = [
-    [/"Pulse" intelligence scan \(100–140 words\)/, '100–140 words', 'Pulse'],
+    [/"Pulse" intelligence scan \(250–300 words\)/, '250–300 words', 'Pulse'],
     [/"Signal" analysis piece \(800–1,200 words\)/, '800–1,200 words', 'Signal'],
     [/"Deep Dive" forensic report \(3,000\+ words\)/, '3,000+ words', 'Deep Dive'],
     [/"Guide" \(500–2,000 words\)/, '500–2,000 words', 'Guide'],

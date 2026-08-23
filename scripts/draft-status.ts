@@ -57,7 +57,31 @@ type Draft = PreflightDocument & {
   slug?: string
   hasImage?: boolean
   categoryCount?: number
+  /** The body as plain text; counted rather than stored as a number so the
+   * query stays a projection and the rule lives here. */
+  words?: string
   _createdAt?: string
+}
+
+function wordCount(draft: Draft): number {
+  return draft.words ? draft.words.trim().split(/\s+/).filter(Boolean).length : 0
+}
+
+/**
+ * What each format is supposed to run to, so drift is visible rather than
+ * discovered two months later.
+ *
+ * Only the tier is on the document — Pulse and Signal are both stored as
+ * `contentType: 'signal'` — so this keys on `intelligenceTier`, which is what
+ * the reader's badge says. A piece badged Pulse is a 30-second scan whichever
+ * generator made it, so the budget applies either way.
+ *
+ * The numbers are the prompts' own, and `npm run test:manual` holds those to the
+ * operator manual. A Pulse drafted at 429 words against a then-100–140 budget is
+ * what put this here (2026-08-23); the budget moved to 250–300 the same day.
+ */
+const TIER_WORD_CEILING: Record<string, number> = {
+  pulse: 300,
 }
 
 /** Conditions Studio itself enforces, which the preflight deliberately does not.
@@ -78,6 +102,7 @@ async function main(): Promise<void> {
        "slug": slug.current,
        "hasImage": defined(mainImage),
        "categoryCount": count(categories),
+       "words": pt::text(body),
        _createdAt
      } | order(_createdAt asc)`,
   )
@@ -101,8 +126,15 @@ async function main(): Promise<void> {
     console.log(
       `                ${draft._createdAt?.slice(0, 10) ?? '?'} · ` +
         `${draft.contentType ?? 'no format'} · ${draft.intelligenceTier ?? 'no tier'} · ` +
-        `${draft.citations?.length ?? 0} source(s) · image ${draft.hasImage ? 'yes' : 'no'}`,
+        `${draft.citations?.length ?? 0} source(s) · image ${draft.hasImage ? 'yes' : 'no'} · ` +
+        `${wordCount(draft)} words`,
     )
+    const ceiling = draft.intelligenceTier ? TIER_WORD_CEILING[draft.intelligenceTier] : undefined
+    if (ceiling && wordCount(draft) > ceiling) {
+      console.log(
+        `                [length] ${wordCount(draft)} words, badged ${draft.intelligenceTier} — the budget is ${ceiling}`,
+      )
+    }
     if (inert.length) {
       console.log(`                [STUDIO] Publish is disabled until it has: ${inert.join(', ')}`)
     }

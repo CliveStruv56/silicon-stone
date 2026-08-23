@@ -138,7 +138,7 @@ the rest of the admin area. Nothing about that changed.
 
 | Format | Length target | Stored as `contentType` | Voice pass | Auto fact-check |
 |---|---|---|---|---|
-| **Pulse** — 30-second scan | 100–140 words | `signal` | Rewrite | No |
+| **Pulse** — 30-second scan | 250–300 words | `signal` | Rewrite | No |
 | **Signal** — rapid analysis | 800–1,200 words | `signal` | Rewrite | **Yes** |
 | **Deep Dive** — forensic report | 3,000+ words | `deepdive` | **Audit only** | **Yes** |
 | **Guide** — how-to | 500–2,000 words | `guide` | Rewrite | No |
@@ -150,7 +150,7 @@ the rest of the admin area. Nothing about that changed.
 This is the single most confusing thing in the system, and it caused a
 contradiction between two previous guides.
 
-- **Pulse the *format*** drafts **100–140 words**. It is what you pick on `/create`.
+- **Pulse the *format*** drafts **250–300 words**. It is what you pick on `/create`.
 - **`pulse` the *intelligence tier*** is a reading-speed label meaning "a
   30-second scan, under about 600 words". It is one of three tiers — `pulse`,
   `briefing`, `audit` — chosen by the metadata pass and shown to readers.
@@ -1212,7 +1212,7 @@ read the AI Act rule pack section of `CLAUDE.md` before touching anything under
 
 | Format | Words | `contentType` | Tier | Voice pass | Auto fact-check |
 |---|---|---|---|---|---|
-| Pulse | 100–140 | `signal` | forced `pulse` | rewrite | no |
+| Pulse | 250–300 | `signal` | forced `pulse` | rewrite | no |
 | Signal | 800–1,200 | `signal` | model's choice | rewrite | yes |
 | Deep Dive | 3,000+ | `deepdive` | model's choice | audit only | yes |
 | Guide | 500–2,000 | `guide` | model's choice | rewrite | no |
