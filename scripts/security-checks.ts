@@ -310,6 +310,43 @@ async function main() {
     )
   }
 
+  // Every route that checks for an admin is also behind the middleware.
+  //
+  // Each of these checks in-band already, so this is defence in depth rather
+  // than a hole — but it is the arrangement src/lib/auth.ts describes, and it
+  // had been applied to five routes and skipped on five others with nothing
+  // recording which was deliberate.
+  const MIDDLEWARE_EXEMPT = new Map([
+    [
+      'src/app/api/auth/callback/inoreader/route.ts',
+      "OAuth landing: a browser navigation that must end at a page, and the middleware answers /api/ with 401 JSON. It checks in-band and redirects to /login instead.",
+    ],
+  ])
+  const middlewareSource = fs.readFileSync('src/middleware.ts', 'utf-8')
+  const matcherBlock = middlewareSource.slice(middlewareSource.indexOf('matcher: ['))
+  assert.notEqual(matcherBlock, '', 'the middleware matcher is gone — this check has gone blind')
+  for (const file of execFileSync('git', ['ls-files', 'src/app/api'], { encoding: 'utf8' })
+    .split('\n')
+    .filter((f) => f.endsWith('/route.ts'))) {
+    if (!fs.existsSync(file) || MIDDLEWARE_EXEMPT.has(file)) continue
+    const source = fs.readFileSync(file, 'utf-8')
+    if (!/\b(isAuthenticatedAdmin|requireAdmin)\(/.test(source)) continue
+    const routePath = file.replace(/^src\/app/, '').replace(/\/route\.ts$/, '')
+    assert.equal(
+      matcherBlock.includes(`'${routePath}'`) || matcherBlock.includes(`'${routePath}/:path*'`),
+      true,
+      `${routePath} checks for an admin but is not in the middleware matcher (add it, or exempt it with a reason)`,
+    )
+  }
+
+  // …and the middleware answers an API path with 401 rather than a redirect,
+  // because Studio's session bridge retries a 401 and nothing else.
+  assert.match(
+    middlewareSource,
+    /pathname\.startsWith\('\/api\/'\)[\s\S]{0,200}status: 401/,
+    'the middleware must answer an unauthenticated /api/ path with 401, not a login redirect',
+  )
+
   const workflowSource = fs.readFileSync('.github/workflows/check.yml', 'utf-8')
   assert.match(workflowSource, /npm run test:security/)
   assert.match(workflowSource, /npm run test:style-rules/)

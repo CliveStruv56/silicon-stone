@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getClientIp } from '@/lib/rate-limit'
 import { checkDurableRateLimit } from '@/lib/durable-rate-limit'
 import { MAX_DESCRIPTION_CHARS, extractProposals, intakeConfigured } from '@/lib/intake/extract'
+import { checkMonthlyBudget } from '@/lib/model-budget'
 
 /**
  * Agentic intake for the Compliance Checker.
@@ -27,6 +28,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { error: 'Too many requests' },
       { status: 429, headers: { 'Retry-After': String(rateLimit.retryAfter) } },
+    )
+  }
+
+  // Both report routes check this and intake did not — yet intake is the *only*
+  // metered model call on a free, keyless, ungated tool, so the per-IP ceiling
+  // above is the only thing standing in front of it and IP rotation defeats
+  // that. The budget ceiling is the one bound rotation cannot get past.
+  const budget = await checkMonthlyBudget()
+  if (!budget.allowed) {
+    console.error(`Intake blocked by monthly budget ceiling (${budget.reason}).`)
+    return NextResponse.json(
+      { error: 'Intake is not available right now', unavailable: true },
+      { status: 503 },
     )
   }
 

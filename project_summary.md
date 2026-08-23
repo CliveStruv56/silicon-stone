@@ -569,6 +569,76 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 23, 2026 — The low-severity tail, and the one line in it that was not low
+
+Eight smaller findings, closed together. The one worth reading about is the
+middleware, because fixing it naively would have broken Studio.
+
+**Five admin routes sat outside the middleware matcher** — `/api/fact-check`,
+`/api/image-prompts`, `/api/knowledge/review`, `/api/push/send`,
+`/api/push/stats`. Each checks in-band, so this was defence in depth rather than
+an open door; the problem was that the arrangement `src/lib/auth.ts` describes
+had been applied to five routes and skipped on five others with nothing
+recording which was deliberate.
+
+**Adding them required changing what the middleware returns first.** It
+redirected every unauthenticated request to `/login` — fine for a page, wrong for
+a fetch, and specifically *breaking* for Studio: `src/sanity/lib/studio-session.ts`
+retries **a 401** once and nothing else, so a 307 to an HTML login page would have
+left "Run fact-check" and "Suggest two prompts" failing on a status its retry
+cannot recognise. The middleware now answers an `/api/` path with 401 JSON and a
+page with the redirect. Verified against a running server: five API paths return
+`{"error":"Unauthorized"}` as `application/json`, `/admin` still 307s to `/login`,
+and the public routes are untouched.
+
+**`/api/auth/callback/inoreader` had no authentication at all** — and it is the
+step that plants a 30-day access token and a one-year refresh token. It is
+deliberately *not* in the matcher, because it is a browser navigation that should
+end at a page rather than a 401; it checks in-band and redirects to `/login`
+instead. That exemption is named, with its reason, in the guard below. Its CSRF
+state compare also moved from `!==` to a constant-time digest compare — small
+practical risk on a nonce, but `!==` on a token is a habit worth not having.
+
+**`/api/vectorize`'s secret compare early-returned on a length mismatch**, which
+is a timing oracle for the secret's length — while `ingest-auth.ts` names *that
+file* as the bad example and does it correctly. It now uses the same digest
+compare.
+
+**The in-memory rate-limit map had no ceiling.** `sweepExpired` only evicted
+*expired* entries and only above 5,000, so with enough distinct keys inside a
+fifteen-minute window it freed nothing, grew without limit, and made every
+request pay an O(n) scan — and this map is what the whole app degrades to
+whenever Upstash is unreachable, which is exactly when it should not be the slow
+path. It now evicts oldest-first above 20,000.
+
+**Two admin-gated vector searches spent an embedding and a Pinecone query per
+request with no rate limit, no query cap and no `try`/`catch`** — so an upstream
+failure was a bare 500. Both now share an `adminSearch` bucket.
+
+**`/api/tools/compliance-checker/intake` had no budget ceiling**, though both
+report routes have one — and intake is the *only* metered model call on a free,
+keyless, ungated tool. Its per-IP limit is defeated by IP rotation; the budget
+ceiling is the bound rotation cannot get past. ⚠ **`AI_MONTHLY_BUDGET_USD` is
+unset in Vercel, so the guard is a no-op everywhere until it is set.**
+
+Three renderer-level items: `hasCorpus` used `in`, which walks the prototype
+chain (`hasCorpus('constructor')` returned true — not exploitable, but not
+honest); the Portable Text link renderer trusted its href, so a hand-edit in
+Studio could have introduced `javascript:` where the markdown parser could not;
+and `/api/revalidate` returned `err.message` wholesale to a caller that has not
+yet proved its signature.
+
+Two new mutation-tested guards: every route calling `isAuthenticatedAdmin` or
+`requireAdmin` must be in the matcher or exempt *with a written reason*, and the
+middleware must answer `/api/` with 401.
+
+**Left alone on purpose:** `/api/knowledge/sources` still stores `originalUrl`
+without enforcing `normalizeCanonicalUrl`, so a `data:` or `file:` URL can be
+persisted. Nothing dereferences it, and a previous session recorded an explicit
+decision to leave the endpoint's accepted inputs unchanged until the capture
+wave. Reversing that silently would be worse than the finding. It becomes a live
+SSRF the day an extraction worker is added — that is when it must be closed.
+
 ### August 23, 2026 — Three dependency patches, and the one that had to be proved
 
 `npm audit --omit=dev` reported 23 findings, of which only three are reachable in

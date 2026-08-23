@@ -38,13 +38,19 @@ const writeSanity = createClient({
   timeout: SANITY_TIMEOUT_MS,
 })
 
-/** Constant-time secret comparison to avoid leaking the secret via timing. */
+/**
+ * Constant-time secret comparison over SHA-256 digests, so neither the length
+ * nor a shared prefix leaks.
+ *
+ * This used to early-return on a length mismatch, which is a timing oracle for
+ * the secret's length — and `src/lib/knowledge/ingest-auth.ts` names *this file*
+ * as the bad example while doing it correctly. Same shape as that module's
+ * `digestsMatch`, and as on-publish's dummy-compare.
+ */
 function secretMatches(provided: string | null, expected: string | undefined): boolean {
   if (!provided || !expected) return false
-  const a = Buffer.from(provided)
-  const b = Buffer.from(expected)
-  if (a.length !== b.length) return false
-  return crypto.timingSafeEqual(a, b)
+  const digest = (value: string) => crypto.createHash('sha256').update(value, 'utf8').digest()
+  return crypto.timingSafeEqual(digest(provided), digest(expected))
 }
 
 export async function POST(req: NextRequest) {

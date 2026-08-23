@@ -68,7 +68,10 @@ export function provisionLabel(key: string): string {
 }
 
 export function hasCorpus(article: string, version: string = PINNED_RULE_PACK_VERSION): boolean {
-  return article in getRulePack(version).manifest.corpus
+  // `in` walks the prototype chain, so hasCorpus('constructor') answered true.
+  // Not exploitable — the read that follows fails and is caught, and
+  // `dynamicParams = false` gates the page — but this is the honest check.
+  return Object.hasOwn(getRulePack(version).manifest.corpus, article)
 }
 
 /**

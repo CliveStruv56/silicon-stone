@@ -41,11 +41,35 @@ export async function getServerActionClientIp(): Promise<string> {
   return 'unknown'
 }
 
+/** Sweep threshold: below this the map is small enough not to care. */
+const SWEEP_AT = 5_000
+/** Hard ceiling. Above it, unexpired entries are evicted too. */
+const MAX_BUCKETS = 20_000
+
 function sweepExpired(now: number) {
   // Bound memory growth from key churn; only sweep once the map is sizeable.
-  if (buckets.size < 5000) return
+  if (buckets.size < SWEEP_AT) return
   for (const [key, bucket] of buckets) {
     if (bucket.resetAt <= now) buckets.delete(key)
+  }
+
+  // The sweep above frees nothing when every entry is still inside its window,
+  // and the windows here are up to fifteen minutes. So with enough distinct
+  // keys the map grew without limit and every request paid an O(n) scan — and
+  // this map is what the whole app degrades to whenever Upstash is unreachable,
+  // which is exactly when you least want it to be the slow path.
+  //
+  // Above the ceiling, evict oldest-first. A Map iterates in insertion order,
+  // so the front of it is the least recently *created* bucket — which is the
+  // closest thing to least-recently-used available without tracking access, and
+  // the cost of being wrong is one caller getting a fresh allowance rather than
+  // a lockout.
+  if (buckets.size <= MAX_BUCKETS) return
+  const excess = buckets.size - MAX_BUCKETS
+  let evicted = 0
+  for (const key of buckets.keys()) {
+    buckets.delete(key)
+    if (++evicted >= excess) break
   }
 }
 

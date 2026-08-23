@@ -40,7 +40,11 @@ export async function POST(req: NextRequest) {
             now: Date.now(),
         })
     } catch (err) {
-        console.error(err)
-        return new Response(err instanceof Error ? err.message : 'Unknown error', { status: 500 })
+        // Logged in full, returned as nothing. The caller here is unauthenticated
+        // until parseBody() has verified the signature, and this catch covers
+        // that verification too — so err.message could describe internals to
+        // someone who has not proved they may ask.
+        console.error('Revalidate webhook failed:', err)
+        return new Response('Revalidation failed', { status: 500 })
     }
 }

@@ -4,6 +4,13 @@ import { PortableTextComponents } from 'next-sanity'
 import { urlFor } from '@/sanity/lib/image'
 import { GlossaryPopover } from '@/components/glossary'
 
+/**
+ * Schemes an anchor may carry. Mirrors SAFE_LINK in markdown-to-portable-text.ts
+ * and the article schema's own rule; relative links are permitted because
+ * internal article links are written that way.
+ */
+const SAFE_HREF = /^(https?:\/\/|mailto:|\/)/i
+
 // Heading anchor id, stamped onto the block by buildToc (src/lib/article-toc.ts).
 // Undefined wherever the body was rendered without that pass — the heading then
 // renders exactly as it did before, with no id and no tab stop.
@@ -76,6 +83,14 @@ export const portableTextComponents: PortableTextComponents = {
     ),
     link: ({ children, value }) => {
       const href = value?.href || ''
+
+      // Validated here as well as in markdown-to-portable-text.ts, which is the
+      // only *writer* today. A hand-edit in Studio does not go through that
+      // path, so a `javascript:` href would otherwise reach an anchor tag with
+      // nothing between it and the reader. An unsafe href renders as plain
+      // text, exactly as the upstream parser already does.
+      if (!SAFE_HREF.test(href)) return <>{children}</>
+
       const isExternal = href.startsWith('http')
 
       if (isExternal) {

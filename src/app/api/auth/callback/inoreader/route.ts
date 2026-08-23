@@ -1,8 +1,35 @@
+import { createHash, timingSafeEqual } from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { exchangeCodeForToken } from '@/lib/inoreader';
+import { isAuthenticatedAdmin } from '@/lib/admin-auth';
 
+/**
+ * Constant-time over digests, so neither length nor a shared prefix leaks.
+ * The state is a CSRF nonce rather than a long-lived secret, so the practical
+ * risk was small — but `!==` on a token comparison is the habit worth not
+ * having, and the repo already does this correctly in three other places.
+ */
+function statesMatch(a: string, b: string): boolean {
+    const digest = (value: string) => createHash('sha256').update(value, 'utf8').digest();
+    return timingSafeEqual(digest(a), digest(b));
+}
+
+/**
+ * Inoreader's OAuth redirect lands here.
+ *
+ * It is deliberately NOT in the middleware matcher: the middleware answers an
+ * `/api/` path with 401 JSON, and this is a browser navigation that should end
+ * at a page. So the admin check lives in-band and redirects like the rest of
+ * this route does. Only an admin ever legitimately reaches it — it is the one
+ * step of the flow that plants a 30-day access token and a 1-year refresh
+ * token — and it had no authentication of any kind.
+ */
 export async function GET(request: NextRequest) {
+    if (!(await isAuthenticatedAdmin())) {
+        return NextResponse.redirect(new URL('/login', request.url));
+    }
+
     const searchParams = request.nextUrl.searchParams;
     const code = searchParams.get('code');
     const state = searchParams.get('state');
@@ -24,7 +51,7 @@ export async function GET(request: NextRequest) {
     const cookieStore = await cookies();
     const storedState = cookieStore.get('inoreader-oauth-state')?.value;
 
-    if (!storedState || storedState !== state) {
+    if (!storedState || !statesMatch(storedState, state)) {
         console.error('State mismatch - possible CSRF attack');
         return NextResponse.redirect(new URL('/research?error=invalid_state', request.url));
     }

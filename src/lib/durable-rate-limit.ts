@@ -64,6 +64,11 @@ const configs = {
   // is verified. Comfortably above a person pasting conversation extracts all
   // day, far below a loop — and it is the only thing standing between a leaked
   // token and unbounded Sanity writes.
+  // The two admin-gated vector searches (/api/search/semantic and
+  // /api/knowledge/evidence). Each spends one OpenAI embedding plus one
+  // Pinecone query per keystroke-driven request, and the gate in front of them
+  // is one shared password. High enough for a person typing into a search box.
+  adminSearch: { limit: 120, window: '15 m', prefix: 'sas:admin-search' },
   // Anything keyed on a Web Push endpoint: dropping a subscription, and reading
   // back which topics it holds. One bucket for both, because they are one
   // attack — a push endpoint leaked through a log, a referrer or a shared

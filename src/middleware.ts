@@ -19,6 +19,14 @@ export async function middleware(request: NextRequest) {
         '/api/knowledge/evidence',
         '/api/knowledge/candidates',
         '/api/search/semantic',
+        // Each of these already checks in-band, so this is defence in depth
+        // rather than a hole being closed — but it is exactly the arrangement
+        // src/lib/auth.ts describes, and it had been left half-applied.
+        '/api/fact-check',
+        '/api/image-prompts',
+        '/api/knowledge/review',
+        '/api/push/send',
+        '/api/push/stats',
     ]
 
     const isProtectedRoute = protectedPaths.some(path =>
@@ -31,6 +39,17 @@ export async function middleware(request: NextRequest) {
         const session = authCookie?.value ? await verifySession(authCookie.value) : null
 
         if (!session) {
+            // An API path gets 401 JSON, a page gets the login redirect.
+            //
+            // This distinction is load-bearing, not cosmetic. Studio's session
+            // bridge (src/sanity/lib/studio-session.ts) retries **a 401** once
+            // and nothing else, so redirecting /api/fact-check to an HTML login
+            // page would leave its buttons failing with a 307 the retry cannot
+            // recognise. It is also simply the right answer: a fetch that asked
+            // for JSON should not be handed a login page with `res.ok` true.
+            if (request.nextUrl.pathname.startsWith('/api/')) {
+                return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+            }
             const url = request.nextUrl.clone()
             url.pathname = '/login'
             return NextResponse.redirect(url)
@@ -77,5 +96,10 @@ export const config = {
         '/api/knowledge/evidence/:path*',
         '/api/knowledge/candidates/:path*',
         '/api/search/semantic',
+        '/api/fact-check',
+        '/api/image-prompts',
+        '/api/knowledge/review',
+        '/api/push/send',
+        '/api/push/stats',
     ],
 }
