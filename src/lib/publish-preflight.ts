@@ -179,6 +179,26 @@ export function preflightArticle(doc: PreflightDocument): PreflightIssue[] {
         'At least one claim was contradicted by the evidence. Open the Fact Check ' +
         'panel, apply the suggested revisions, and re-run before publishing.',
     })
+  } else if (live.correctedInaccurate > 0) {
+    // The case that used to fall between every branch. The verdict is no longer
+    // major because the contradicted claim was applied, and `addressed` is false
+    // because other claims are still outstanding — so nothing was said at all
+    // about an article carrying an unverified correction to a factual error.
+    // Deliberately louder than the stale-report warning and checked ahead of it:
+    // this one implies staleness and adds why it matters.
+    issues.push({
+      id: 'fact-check-corrected-not-rechecked',
+      severity: 'warning',
+      title:
+        live.correctedInaccurate === 1
+          ? 'A contradicted claim was revised but not re-checked'
+          : `${live.correctedInaccurate} contradicted claims were revised but not re-checked`,
+      detail:
+        'The evidence contradicted this claim, and the suggested revision has been ' +
+        'inserted — but nothing has verified the new wording. An applied revision ' +
+        'is a model’s proposal placed by hand, not a re-verified fact. Re-run the ' +
+        'fact-check before publishing, or satisfy yourself the new sentence is right.',
+    })
   } else if (live.addressed) {
     // Not adverse any more, but not confirmed either: the revisions were
     // inserted by hand and nothing has checked the new wording against

@@ -547,6 +547,45 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 23, 2026 — A patched claim nobody re-checked, and a draft that reported ready
+
+**Found by trying to publish, not by the suite.** Running the guards over all ten
+drafts to see which could ship turned up a draft reporting **READY** with a stored
+fact-check verdict of `major-issues`. That looked like a defect in the report and
+turned out to be a real gap in the guard.
+
+The chain, all three parts individually correct:
+
+- `overallVerdict` is frozen when a run completes, so `liveVerdict()` recomputes
+  from the claims — the right fix, made 2026-08-21, for an editor who had worked
+  through every flagged claim and still saw an adverse badge.
+- The recomputation drops an applied claim out of the set. On this draft twelve
+  claims included exactly one `inaccurate`, and **that was the one the editor had
+  applied**, so the verdict fell to `minor-issues`.
+- `minor-issues` is deliberately not warned on, and `addressed` (every flagged
+  claim resolved) was false because three `needs-context` claims were still
+  outstanding.
+
+**So no branch fired and the publish dialog said nothing at all** about an article
+whose one contradicted claim had been replaced with a model's suggested wording
+that nothing has verified. The module's own docblock states the principle being
+lost — *"An applied revision is not a re-verified claim"* — and enforced it only
+for the all-addressed case.
+
+`LiveVerdict` now carries `correctedInaccurate`, and the preflight warns on it
+ahead of the staleness warning, which it implies and improves on. Deliberately
+narrow: applying a revision to a `needs-context` claim adds a qualifier and stays
+silent, because a dialog that appears on nearly every publish is one an editor
+learns to route around.
+
+**Two of the ten drafts were carrying it** — the second had been reporting the
+vaguer "fact-check predates your revisions". Ready count went 2 → 1.
+
+Suite 1,431 → **1,440**. Both new guards mutation-tested. One existing assertion
+changed rather than deleted: it expected the staleness warning for a case that now
+produces the sharper one, and the comment records what it was protecting (that
+clearing the adverse verdict must not clear the warning) and that it still holds.
+
 ### August 23, 2026 — An idea can be pasted instead of retyped
 
 Design B1 from `docs/siliconstone-knowledge-ideas-corpus-brief.md`, built. A

@@ -156,6 +156,60 @@ describe('preflightArticle', () => {
     expect(issues[0].severity).toBe('warning')
   })
 
+  it('warns when a contradicted claim was revised but not re-checked', () => {
+    // Found on a real draft, 2026-08-23. One inaccurate claim applied, three
+    // needs-context claims outstanding: the recomputed verdict is minor-issues
+    // (not warned on, deliberately) and `addressed` is false (claims remain), so
+    // every branch fell through and the dialog said nothing about an article
+    // carrying an unverified correction to a factual error.
+    const issues = preflightArticle(
+      cleanArticle({
+        factCheck: {
+          status: 'completed',
+          overallVerdict: 'major-issues',
+          claims: [
+            { verdict: 'inaccurate', applied: true },
+            { verdict: 'needs-context' },
+            { verdict: 'needs-context' },
+          ],
+        },
+      }),
+    )
+    expect(issues.map((i) => i.id)).toContain('fact-check-corrected-not-rechecked')
+    expect(issues[0].severity).toBe('warning')
+  })
+
+  it('prefers that warning to the stale-report one, which it implies', () => {
+    // Every flagged claim addressed AND one of them contradicted: both branches
+    // are true, and the sharper message wins because it says why it matters.
+    const issues = preflightArticle(
+      cleanArticle({
+        factCheck: {
+          status: 'completed',
+          overallVerdict: 'major-issues',
+          claims: [{ verdict: 'inaccurate', applied: true }],
+        },
+      }),
+    )
+    expect(issues.map((i) => i.id)).toEqual(['fact-check-corrected-not-rechecked'])
+  })
+
+  it('still says nothing when the applied revision was to a lesser claim', () => {
+    // The noise test. Warning on every applied needs-context revision would put
+    // the dialog in front of the editor on nearly every publish, which is how a
+    // control gets routed around.
+    const issues = preflightArticle(
+      cleanArticle({
+        factCheck: {
+          status: 'completed',
+          overallVerdict: 'minor-issues',
+          claims: [{ verdict: 'needs-context', applied: true }, { verdict: 'accurate' }],
+        },
+      }),
+    )
+    expect(issues.map((i) => i.id)).toEqual(['fact-check-stale'])
+  })
+
   it('does not warn on clean or minor-issues verdicts', () => {
     // minor-issues is deliberately not warned on: outdated and needs-context
     // claims are routine editorial judgement, and warning on them would make

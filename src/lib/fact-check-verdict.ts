@@ -54,6 +54,24 @@ export type LiveVerdict = {
    */
   addressed: boolean
   /**
+   * Claims the evidence **contradicted** whose suggested revision has been
+   * inserted and which nothing has re-checked.
+   *
+   * Separate from `applied` because it is a different kind of fact. Applying a
+   * revision to a `needs-context` claim adds a qualifier; applying one to an
+   * `inaccurate` claim replaces a sentence the evidence said was wrong with a
+   * sentence a model proposed, and no search has been run against the new
+   * wording.
+   *
+   * It exists because that case could otherwise vanish from view entirely. The
+   * recomputed verdict drops from `major-issues` to whatever the remaining
+   * claims imply, and `addressed` is false while any other claim is still
+   * outstanding — so an article whose one contradicted claim was patched, with
+   * three `needs-context` claims left alone, matched no branch of the publish
+   * guard and published in silence. Found on a real draft, 2026-08-23.
+   */
+  correctedInaccurate: number
+  /**
    * True when the verdict was computed from claims, false when it is the stored
    * value because there were none to read.
    *
@@ -82,6 +100,7 @@ export function liveVerdict(factCheck: {
       applied: 0,
       outstanding: 0,
       addressed: false,
+      correctedInaccurate: 0,
       derived: false,
     }
   }
@@ -100,6 +119,8 @@ export function liveVerdict(factCheck: {
     applied,
     outstanding,
     addressed: applied > 0 && outstanding === 0,
+    correctedInaccurate: claims.filter((c) => c.verdict === 'inaccurate' && c.applied === true)
+      .length,
     derived: true,
   }
 }

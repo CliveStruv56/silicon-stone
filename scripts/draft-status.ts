@@ -108,6 +108,14 @@ async function main(): Promise<void> {
     }
     for (const issue of issues) {
       console.log(`                [${issue.severity === 'blocker' ? 'MUST FIX' : 'check'}] ${issue.title}`)
+      // The detail on a blocker is the actionable half — for a placeholder it
+      // is the exact text a human still owes a fact, which is the difference
+      // between "four drafts are blocked" and a list you can work through.
+      if (issue.severity === 'blocker') {
+        for (const line of issue.detail.split('\n')) {
+          if (line.trim()) console.log(`                         ${line.trim()}`)
+        }
+      }
     }
     console.log()
   }

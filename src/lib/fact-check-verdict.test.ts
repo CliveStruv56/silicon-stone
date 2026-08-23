@@ -103,11 +103,23 @@ describe('the publish dialog follows the same arithmetic', () => {
     expect(found?.title).toBe('The fact-check found major issues — 1 claim still to address')
   })
 
-  it('swaps the adverse warning for a staleness one once all are addressed', () => {
+  it('swaps the adverse warning for one about the unverified correction', () => {
+    // This assertion originally expected `fact-check-stale`, and what it was
+    // protecting was that clearing the adverse verdict must not clear the
+    // warning. That still holds; the message is now the sharper of the two,
+    // because the applied claim was one the evidence contradicted rather than
+    // merely one it wanted qualified. See the 2026-08-23 gap.
     const issues = preflightArticle(doc([claim('inaccurate', true), claim('accurate')]))
     expect(issues.find((i) => i.id === 'fact-check-major-issues')).toBeUndefined()
+    const warned = issues.find((i) => i.id === 'fact-check-corrected-not-rechecked')
+    expect(warned?.severity).toBe('warning')
+    expect(warned?.title).toBe('A contradicted claim was revised but not re-checked')
+    expect(warned?.detail).toContain('not a re-verified fact')
+  })
+
+  it('still reports plain staleness when the addressed claims were lesser ones', () => {
+    const issues = preflightArticle(doc([claim('needs-context', true), claim('accurate')]))
     const stale = issues.find((i) => i.id === 'fact-check-stale')
-    expect(stale?.severity).toBe('warning')
     expect(stale?.title).toBe('The fact-check predates your revisions')
     expect(stale?.detail).toContain('Nothing has verified the new wording')
   })
@@ -127,5 +139,75 @@ describe('the publish dialog follows the same arithmetic', () => {
     expect(issues.find((i) => i.id === 'fact-check-major-issues')?.title).toBe(
       'The fact-check found major issues',
     )
+  })
+})
+
+describe('a contradicted claim that was patched but not re-checked', () => {
+  /**
+   * The case that fell between every branch of the publish guard, found on a
+   * real draft on 2026-08-23: twelve claims, one `inaccurate`, three
+   * `needs-context`, and the editor had applied the revision to the inaccurate
+   * one and nothing else.
+   *
+   * The recomputed verdict drops to `minor-issues`, which the guard
+   * deliberately does not warn on, and `addressed` is false because three
+   * claims are still outstanding. So the dialog said nothing at all about an
+   * article carrying an unverified correction to a factual error.
+   */
+  const realShape = {
+    overallVerdict: 'major-issues',
+    claims: [
+      { verdict: 'accurate' },
+      { verdict: 'accurate' },
+      { verdict: 'accurate' },
+      { verdict: 'inaccurate', applied: true },
+      { verdict: 'needs-context' },
+      { verdict: 'needs-context' },
+      { verdict: 'needs-context' },
+      { verdict: 'unverifiable' },
+      { verdict: 'unverifiable' },
+      { verdict: 'unverifiable' },
+      { verdict: 'unverifiable' },
+      { verdict: 'unverifiable' },
+    ],
+  }
+
+  it('reports the correction, where the verdict and addressed both fall silent', () => {
+    const live = liveVerdict(realShape)
+    expect(live.verdict).toBe('minor-issues')
+    expect(live.addressed).toBe(false)
+    // The one signal that survives the other two going quiet.
+    expect(live.correctedInaccurate).toBe(1)
+  })
+
+  it('does not count a contradicted claim nobody has acted on', () => {
+    // Still outstanding: the major-issues branch covers it, and counting it
+    // here would double-report the same claim.
+    const live = liveVerdict({ claims: [{ verdict: 'inaccurate' }] })
+    expect(live.correctedInaccurate).toBe(0)
+    expect(live.verdict).toBe('major-issues')
+  })
+
+  it('does not count an applied revision to a lesser claim', () => {
+    // Applying a revision to needs-context adds a qualifier; applying one to an
+    // inaccurate claim replaces a sentence the evidence said was wrong.
+    const live = liveVerdict({ claims: [{ verdict: 'needs-context', applied: true }] })
+    expect(live.correctedInaccurate).toBe(0)
+    expect(live.addressed).toBe(true)
+  })
+
+  it('counts every contradicted claim that was patched', () => {
+    const live = liveVerdict({
+      claims: [
+        { verdict: 'inaccurate', applied: true },
+        { verdict: 'inaccurate', applied: true },
+        { verdict: 'needs-context' },
+      ],
+    })
+    expect(live.correctedInaccurate).toBe(2)
+  })
+
+  it('is zero when there are no claims to reason about', () => {
+    expect(liveVerdict({ overallVerdict: 'major-issues' }).correctedInaccurate).toBe(0)
   })
 })
