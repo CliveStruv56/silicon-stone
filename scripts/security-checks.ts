@@ -198,6 +198,29 @@ async function main() {
     }
   }
 
+  // Every metered call records its spend through scheduleUsage, which wraps the
+  // ledger POST in after(). The seven call sites used to fire it un-awaited and
+  // return; on Vercel the instance freezes when the response is sent, so those
+  // writes were dropped under exactly the load that makes spend worth tracking.
+  const usageSource = fs.readFileSync('src/lib/usage.ts', 'utf-8')
+  assert.match(
+    usageSource,
+    /export function scheduleUsage[\s\S]{0,600}?after\(run\)/,
+    'scheduleUsage must schedule the ledger write with after()',
+  )
+  const srcFiles = execFileSync('git', ['ls-files', 'src'], { encoding: 'utf8' })
+    .split('\n')
+    .filter((file) => file.endsWith('.ts') || file.endsWith('.tsx'))
+  for (const file of srcFiles) {
+    if (!fs.existsSync(file)) continue
+    if (file === 'src/lib/usage.ts') continue
+    assert.equal(
+      /\brecordUsage\s*\(/.test(fs.readFileSync(file, 'utf-8')),
+      false,
+      `${file} must record spend through scheduleUsage, not recordUsage directly`,
+    )
+  }
+
   const workflowSource = fs.readFileSync('.github/workflows/check.yml', 'utf-8')
   assert.match(workflowSource, /npm run test:security/)
   assert.match(workflowSource, /npm run test:style-rules/)

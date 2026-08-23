@@ -1,7 +1,7 @@
 import 'server-only'
 
 import Anthropic from '@anthropic-ai/sdk';
-import { recordUsage } from './usage';
+import { scheduleUsage } from './usage';
 
 // Default model is env-overridable so individual passes (e.g. the voice-edit
 // pass) can be routed to a stronger model without editing code. Keep the pricing
@@ -61,15 +61,17 @@ export async function callClaude(
             ],
         });
 
-        // Record token usage / cost for the analytics dashboard. Fire-and-forget
-        // so the ledger round-trip never adds latency to (or breaks) the caller.
-        void recordUsage({
+        // Record token usage / cost for the analytics dashboard. Scheduled with
+        // after(), so the ledger round-trip adds no latency to the caller and
+        // still completes once the response has been sent — an un-awaited POST
+        // does not, because Vercel freezes the instance at that moment.
+        scheduleUsage({
             service: "anthropic",
             model,
             operation: "messages",
             inputTokens: msg.usage?.input_tokens,
             outputTokens: msg.usage?.output_tokens,
-        }).catch(() => {});
+        });
 
         // Concatenate every text block. Indexing content[0] breaks when a
         // non-text block (e.g. a thinking block) leads the response.

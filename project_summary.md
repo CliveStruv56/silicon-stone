@@ -569,6 +569,27 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 23, 2026 — The spend ledger was dropping its writes under load
+
+Seven metered call sites wrote `void recordUsage({...}).catch(() => {})` and
+returned. On Vercel that is not fire-and-forget, it is fire-and-lose: the
+instance is frozen the moment the response is sent, so a POST to the Railway
+ledger that has not completed by then never completes. The ledger under-reported
+precisely under load — the one condition that makes tracking spend worth doing.
+
+`scheduleUsage()` in `src/lib/usage.ts` now wraps the write in `after()`, which
+keeps the instance alive for it and still adds no latency to the response. The
+fallback in it is load-bearing rather than defensive: `after()` **throws**
+outside a request scope (verified, not assumed), and this exact path runs from
+CLI scripts and from inside another `after()` callback in the fact-check
+pipeline. In both of those the process is already alive, so firing directly is
+the correct behaviour.
+
+`scripts/security-checks.ts` gained two assertions: that `scheduleUsage` still
+schedules with `after`, and that **no file in `src/` calls `recordUsage`
+directly**. Both were mutation-tested. The second is what stops the eighth call
+site being written the old way.
+
 ### August 23, 2026 — The fourth hole in the fence, and the payload nobody checked
 
 The audit named three unfenced slots in the draft prompt. Writing the test that

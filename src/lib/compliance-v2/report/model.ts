@@ -1,7 +1,7 @@
 import 'server-only'
 
 import Anthropic from '@anthropic-ai/sdk'
-import { recordUsage } from '@/lib/usage'
+import { scheduleUsage } from '@/lib/usage'
 import type { ProseModel } from './generate'
 import { proseToolSchema } from './schema'
 
@@ -79,13 +79,13 @@ export function proseModel(): ProseModel | undefined {
       messages: [{ role: 'user', content: prompt }],
     })
 
-    void recordUsage({
+    scheduleUsage({
       service: 'anthropic',
       model: PROSE_MODEL,
       operation: 'compliance-report-v2',
       inputTokens: message.usage?.input_tokens,
       outputTokens: message.usage?.output_tokens,
-    }).catch(() => {})
+    })
 
     const toolUse = message.content.find(
       (block): block is Anthropic.ToolUseBlock =>

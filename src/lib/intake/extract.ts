@@ -1,7 +1,7 @@
 import 'server-only'
 
 import Anthropic from '@anthropic-ai/sdk'
-import { recordUsage } from '@/lib/usage'
+import { scheduleUsage } from '@/lib/usage'
 import { assessmentQuestions } from '@/lib/ai-act-assessment'
 import { buildToolSchema, buildVocabulary, describeVocabulary } from './vocabulary'
 import { parseProposals, type ParseResult } from './parse'
@@ -90,13 +90,13 @@ export async function extractProposals(description: string): Promise<ExtractionR
     ],
   })
 
-  void recordUsage({
+  scheduleUsage({
     service: 'anthropic',
     model: INTAKE_MODEL,
     operation: 'compliance-intake',
     inputTokens: message.usage?.input_tokens,
     outputTokens: message.usage?.output_tokens,
-  }).catch(() => {})
+  })
 
   const toolUse = message.content.find(
     (block): block is Anthropic.ToolUseBlock => block.type === 'tool_use' && block.name === TOOL_NAME,

@@ -1,7 +1,7 @@
 import 'server-only'
 
 import Anthropic from '@anthropic-ai/sdk'
-import { recordUsage } from '@/lib/usage'
+import { scheduleUsage } from '@/lib/usage'
 import { RULE_PACK } from '@/lib/rulepack'
 import { coveredArticles, hasCorpus, readArticle, verifyCitation } from '@/lib/rulepack/corpus'
 import type { AssessmentResult } from '@/lib/ai-act-assessment'
@@ -343,13 +343,13 @@ export async function generateReport(facts: FixedFacts): Promise<GenerationOutco
     return { status: 'failed', reason: 'The report could not be generated. Try again shortly.' }
   }
 
-  void recordUsage({
+  scheduleUsage({
     service: 'anthropic',
     model: REPORT_MODEL,
     operation: 'compliance-report',
     inputTokens: message.usage?.input_tokens,
     outputTokens: message.usage?.output_tokens,
-  }).catch(() => {})
+  })
 
   const toolUse = message.content.find(
     (block): block is Anthropic.ToolUseBlock => block.type === 'tool_use' && block.name === TOOL_NAME,

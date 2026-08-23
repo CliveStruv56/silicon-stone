@@ -1,4 +1,5 @@
 import "server-only";
+import { after } from "next/server";
 import { computeTokenCost, hasRate } from "./pricing";
 
 /**
@@ -97,6 +98,38 @@ export async function recordUsage(input: RecordUsageInput): Promise<void> {
     } catch (err) {
         // Never let usage logging break the caller.
         console.warn("recordUsage failed (non-fatal):", err);
+    }
+}
+
+/**
+ * Record a usage event without making the caller wait for it.
+ *
+ * The seven call sites used to write `void recordUsage({...}).catch(() => {})`
+ * and return immediately. On Vercel that is a dropped write: the instance is
+ * frozen the moment the response is sent, so an un-awaited POST to Railway that
+ * has not finished by then never finishes at all. Under load — which is exactly
+ * when spend matters — the ledger under-reports, which is the one thing the
+ * ledger exists to prevent.
+ *
+ * `after()` is the platform's answer: the callback runs after the response is
+ * sent, with the instance deliberately kept alive for it. The fallback is not
+ * decoration — `after()` throws outside a request scope, and this same code
+ * path runs from CLI scripts (`articles:sync`) and from inside another
+ * `after()` callback (the fact-check pipeline). In both of those the process is
+ * already alive and firing directly is correct.
+ */
+export function scheduleUsage(input: RecordUsageInput): void {
+    // recordUsage never throws by contract; the catch is belt-and-braces so a
+    // future change there cannot surface as an unhandled rejection.
+    const run = () =>
+        recordUsage(input).catch((err) => {
+            console.warn("scheduleUsage: recording failed (non-fatal):", err);
+        });
+
+    try {
+        after(run);
+    } catch {
+        void run();
     }
 }
 

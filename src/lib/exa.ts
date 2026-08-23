@@ -1,6 +1,6 @@
 import 'server-only';
 import Exa from 'exa-js';
-import { recordUsage } from './usage';
+import { scheduleUsage } from './usage';
 
 const API_KEY = process.env.EXA_API_KEY;
 
@@ -49,15 +49,16 @@ export async function searchExa(query: string, options: ExaSearchOptions = {}) {
             },
         });
 
-        // Record cost for the analytics dashboard (non-fatal). Exa reports the
+        // Record cost for the analytics dashboard (non-fatal), scheduled with
+        // after() so it survives the response being sent. Exa reports the
         // per-request cost on the search response when available.
         const searchCost = (result as { costDollars?: { total?: number } }).costDollars?.total;
-        void recordUsage({
+        scheduleUsage({
             service: "exa",
             model: "exa-search",
             operation: "search",
             costDollars: searchCost ?? 0,
-        }).catch(() => {});
+        });
 
         return result.results;
     } catch (e) {
@@ -159,12 +160,12 @@ export async function deepResearchExa(instructions: string): Promise<DeepResearc
                 // in-process fallback path; when the Railway backend runs the job it
                 // records the event itself at completion, so the two never both fire
                 // for one job (research.ts picks one path or the other).
-                void recordUsage({
+                scheduleUsage({
                     service: "exa",
                     model: EXA_AGENT_USAGE_MODEL,
                     operation: "deep-research",
                     costDollars: costDollars ?? 0,
-                }).catch(() => {});
+                });
 
                 return { content: run.output?.text ?? "", costDollars };
             }

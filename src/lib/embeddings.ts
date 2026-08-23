@@ -1,6 +1,6 @@
 import 'server-only'
 import OpenAI from 'openai'
-import { recordUsage } from './usage'
+import { scheduleUsage } from './usage'
 
 let openaiClient: OpenAI | null = null
 
@@ -39,15 +39,15 @@ export async function generateEmbedding(text: string): Promise<number[]> {
     dimensions: EMBEDDING_DIMENSIONS,
   })
 
-  // Record token usage / cost for the analytics dashboard. Fire-and-forget so
-  // the ledger round-trip never adds latency to the caller.
+  // Record token usage / cost for the analytics dashboard, scheduled with
+  // after() so it survives the response being sent (see scheduleUsage).
   // Embeddings bill on input tokens only (prompt_tokens === total_tokens).
-  void recordUsage({
+  scheduleUsage({
     service: "openai",
     model: EMBEDDING_MODEL,
     operation: "embedding",
     inputTokens: response.usage?.prompt_tokens,
-  }).catch(() => {})
+  })
 
   const embedding = response.data?.[0]?.embedding
   if (!embedding) {
