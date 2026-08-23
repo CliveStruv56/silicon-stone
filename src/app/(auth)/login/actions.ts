@@ -24,7 +24,11 @@ function timingSafeEqual(a: string, b: string): boolean {
 }
 
 export async function verifyPassword(_prevState: LoginState, formData: FormData): Promise<LoginState> {
-    const password = formData.get('password') as string
+    // `formData.get` returns null for a missing field and a File for a file
+    // upload. Both used to reach Buffer.from() and throw a TypeError out of
+    // an auth handler — after the rate-limit slot had already been spent.
+    const submitted = formData.get('password')
+    const password = typeof submitted === 'string' ? submitted : ''
     const correctPassword = process.env.ADMIN_PASSWORD
     const ip = await getServerActionClientIp()
 

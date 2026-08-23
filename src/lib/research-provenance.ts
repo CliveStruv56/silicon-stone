@@ -21,6 +21,7 @@ import 'server-only'
  */
 
 import { CLAUDE_MODEL } from './anthropic'
+import { redactForLog } from './utils'
 import { knowledgeClient } from './knowledge/sanity-client'
 import {
   createResearchRun,
@@ -144,6 +145,33 @@ export async function completeResearchRun(input: CompleteRunInput): Promise<void
   }
 }
 
+/**
+ * Scrub an upstream error before it is persisted.
+ *
+ * `researchRun` documents are created published into a dataset that answers
+ * unauthenticated GROQ queries, so this field is world-readable. The strings
+ * reaching it embed the provider's own response body — `exa.ts` appends 200
+ * chars of it, `research-backend.ts` does the same — which can carry a key
+ * fragment, an internal hostname or an echoed request.
+ *
+ * Truncation alone was the whole defence. It is not one: a key at character 10
+ * survives a 2000-character slice intact.
+ */
+function redactProvenanceError(error: string): string {
+  const scrubbed = error
+    // Provider key shapes, before anything generic can partially match them.
+    .replace(/\b(sk-ant-|sk-proj-|sk-|pcsk_|xoxb-|ghp_)[A-Za-z0-9_-]{8,}/g, '$1***')
+    // Authorization headers echoed back in an error body.
+    .replace(/\b(Bearer|Basic|Token)\s+[A-Za-z0-9._~+/=-]{8,}/gi, '$1 ***')
+    // `key=`, `token=`, `secret=`, `password=` in a querystring or a dump.
+    .replace(/\b([A-Za-z_]*(?:key|token|secret|password))["']?\s*[:=]\s*["']?[A-Za-z0-9._~+/=-]{8,}/gi, '$1=***')
+    // Any remaining long opaque run — JWTs, hex digests, base64 blobs.
+    .replace(/\b[A-Za-z0-9_-]{40,}\b/g, '***')
+  // redactForLog also strips e-mail addresses; 500 chars is enough to name a
+  // failure without carrying a payload.
+  return redactForLog(scrubbed, 500)
+}
+
 /** Records that the run ended badly. An Exa run that returned nothing is worth
  * knowing about the next time the same topic is tried. */
 export async function failResearchRun(runId: string | null, error: string): Promise<void> {
@@ -152,7 +180,7 @@ export async function failResearchRun(runId: string | null, error: string): Prom
     const result = await updateResearchRun(deps(), {
       documentId: runId,
       status: 'failed',
-      error: error.slice(0, 2000),
+      error: redactProvenanceError(error),
     })
     report('recording the research failure', result)
   } catch (thrown) {

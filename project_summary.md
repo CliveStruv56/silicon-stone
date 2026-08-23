@@ -569,6 +569,77 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 23, 2026 — A security audit found the code sound and the configuration leaking
+
+A full pass over the five areas that matter: unauthenticated routes and server
+actions, environment leakage, input validation, error paths and resource leaks,
+and dependencies. The **application code came back in unusually good shape** —
+all nine server actions call `requireAdmin()` first, the session JWT pins `alg`
+and verifies the signature before parsing the header, GROQ injection, XSS, open
+redirect, SSRF and `JSON.parse` coverage are all clean, and no secret has ever
+been committed on any branch or reached the client bundle.
+
+**The exposure was almost entirely outside the TypeScript**, which is why no
+amount of code review had found it. Three findings need a console, not an
+editor, and are recorded here because they are not fixable by a commit:
+
+- **Sanity CORS allows `https://*.vercel.app` with `allowCredentials: true`.**
+  Anyone can deploy to that domain in a minute; the origin may then make
+  credentialed cross-origin calls to the production dataset. One link click by
+  a logged-in Studio user is a full CMS compromise. This is the single worst
+  finding in the audit.
+- **Fourteen high-value secrets are stored "Non-sensitive" in Vercel** —
+  `SESSION_SECRET`, `ADMIN_PASSWORD`, `SANITY_API_WRITE_TOKEN` among them —
+  so their values are readable in the dashboard and via `vercel env pull`.
+  `VAPID_PRIVATE_KEY` and `KNOWLEDGE_INGEST_TOKEN` are correctly Sensitive, so
+  the intent existed; it was never applied to the oldest vars.
+- **Those same secrets are scoped to Preview and Development too**, so every
+  preview deployment runs with the production write token and the production
+  admin password.
+
+Five code fixes shipped with this entry.
+
+**The prompt fence had three holes, and they were the three fields most derived
+from the open web.** `fenceUntrusted` exists so untrusted text cannot forge a
+`=== YOUR TASK ===` delimiter, and it was applied to `summary`, `deepReport`,
+`priorCoverage`, `sourceMaterial` and each source's title and snippet — but not
+to `s.url`, not to `painPoints`/`keywords`, and not to `topic`, which sits two
+lines above the real delimiter. A URL may legitimately contain `=`, and URLs
+come straight from Exa search results, which is precisely the content the fence
+was built for. All three now go through it.
+
+**`src/lib/anthropic.ts` held the API key with no `server-only`.** It builds the
+SDK client at module scope and exports the innocuous `CLAUDE_MODEL`; importing
+that one constant from a Client Component would have inlined the key. The bundle
+was clean, so this was a missing guardrail rather than a leak — but nothing
+enforced it across eight importers. `src/sanity/lib/live.ts` got the same
+treatment, holding a read token one directory from client-reachable code.
+`scripts/verify-draft-delimiter.mts` now documents the shim tsconfig it needs.
+
+**A failed research run wrote the provider's raw error into a world-readable
+document.** `researchRun` records are created published, and the dataset answers
+unauthenticated GROQ queries; `exa.ts` and `research-backend.ts` both append 200
+characters of the upstream response body. Truncation at 2,000 characters was the
+whole defence, and it is not one — a key at character 10 survives the slice
+intact. `redactProvenanceError` now strips provider key shapes, bearer tokens,
+`key=`/`secret=` pairs and long opaque runs before `redactForLog` takes the
+e-mail addresses. Zero such documents exist yet, so nothing leaked.
+
+**`/login` threw a `TypeError` on a POST with no password field.**
+`formData.get('password') as string` is a lie when the field is absent or
+arrives as a file; `Buffer.from(null)` throws, out of an auth handler, *after*
+the rate-limit slot had been spent.
+
+Everything else the audit found is written up with exact file locations and
+remediation steps, ordered by severity, in the plan file for this session. The
+larger items still open: knowledge documents are created published into the
+public dataset (so `sensitivity: confidential` is an application-level filter
+over a world-readable store), only one external call in the whole codebase has
+a timeout, `recordUsage` is fired as a floating promise that Vercel drops when
+the instance freezes, and the two Sanity webhooks use a static header secret
+where `revalidate/route.ts` already proves the HMAC path.
+
+
 ### August 23, 2026 — Fourteen articles could not start the image loop
 
 The cover-image gap is the largest remaining manual step per article, and §11

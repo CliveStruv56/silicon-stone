@@ -3,7 +3,11 @@
  * Runs the real round-trip: buildDraftPrompt -> callClaude -> parseDraftPayload.
  * Does NOT write to Sanity, so it leaves no stray draft to clean up.
  *
- *   node --env-file=.env.local --import tsx scripts/verify-draft-delimiter.mts
+ *   TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json \
+ *     node --env-file=.env.local --import tsx scripts/verify-draft-delimiter.mts
+ *
+ * The tsconfig is required: src/lib/anthropic.ts imports 'server-only', which
+ * throws under plain tsx. scripts/tsconfig.scripts.json maps it to a shim.
  */
 import { buildDraftPrompt } from "../src/lib/prompts";
 import { parseDraftPayload } from "../src/lib/draft-pipeline";

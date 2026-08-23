@@ -149,12 +149,12 @@ and never infer a date for a source marked "date unknown".
 ${research.sources
         .map(
             (s) =>
-                `- [${formatSourceDate(s.publishedDate)}] ${fenceUntrusted(s.title)}: ${fenceUntrusted(s.snippet)} (${s.url})`,
+                `- [${formatSourceDate(s.publishedDate)}] ${fenceUntrusted(s.title)}: ${fenceUntrusted(s.snippet)} (${fenceUntrusted(s.url)})`,
         )
         .join('\n')}
 
 === PAIN POINTS & KEYWORDS ===
-${[...research.painPoints, ...research.keywords].join(', ')}
+${[...research.painPoints, ...research.keywords].map(fenceUntrusted).join(', ')}
 `
         : '';
 
@@ -214,7 +214,7 @@ ${brief.trim()}`
         : '';
 
     const userPrompt = `=== TOPIC ===
-${topic}
+${fenceUntrusted(topic)}
 ${researchBlock}${deepReportBlock}${regulatoryBlock}${priorCoverageBlock}${editorialMemoryBlock}${sourceBlock}
 === YOUR TASK ===
 ${task}${briefBlock}`;
