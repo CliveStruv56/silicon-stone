@@ -547,6 +547,44 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 23, 2026 — The last four creation paths, and a contradictory prompt
+
+Deep Dive, `/import`, `ss-draft-local` and the hand-made Studio route, all run on
+production and torn down. **Every path in the test spec has now been exercised.**
+
+| Path | Result |
+|---|---|
+| **Deep Dive** | Research 124s, generation 296s. 4,515 words, `contentType: deepdive`, tier `audit`, **17 citation snapshots**. 18 claims fact-checked, 7 citations written. The audit-mode voice pass appended **7 `[AUTHOR: …]` placeholders** under "Author specifics needed" — each naming a section and the figure to verify — and the guard **BLOCKED** on them, which is the 21 August change working. |
+| **`/import`** | 112s. `source: imported`, 2,304 chars of verbatim original kept, **no research run and no citation snapshots** (correct — it does no research), fact-check started anyway. The short-input refusal read exactly as specified. |
+| **Hand-made in Studio** | The blocker fired on a hand-written body: *"Not ready to publish"*, the placeholder badged **Must fix**, and **no "Publish anyway"** — the preflight scans the body whatever its origin. With the placeholder removed the dialog became *"Publish this article?"* with warnings and a **Publish anyway**. Published, and **`publishedAt` was stamped** — today's fix proven on the one path that gets no other automation. The untiered article **did** appear in the Railway-served `/intelligence` feed, so the 21 August fix holds where it originally broke. |
+| **`ss-draft-local`** | The full seven-step flow. Exa research (8 dated sources), the site's own draft prompt including **verbatim Article 75(2a) from the pinned corpus**, my draft, the voice pass, metadata against the live category list, and a Sanity write carrying **8 citation snapshots** — the `researchSources` top-level field the skill warns is silently lost if you follow the nested shape. No research run and no fact-check, both documented residuals of that path. |
+
+**One real defect, found by reading a prompt rather than running it.**
+`buildVoiceEditPrompt` ended its user prompt with *"Return the JSON object now."*
+while its own system prompt said *"Return plain text in EXACTLY this layout — the
+two marker lines verbatim … no JSON, no code fences."* The line had been
+copy-pasted from `buildMetadataPrompt`, where it is correct.
+
+The failure is quiet, which is why it survived: a model obeying the **last**
+instruction returns JSON, `runVoiceEditPass` throws on the missing
+`===EDIT SUMMARY===` marker, catches, logs to a file and returns `null`. The
+draft then keeps its unedited body with no `voiceEditNotes` — and on a Deep Dive
+no "Author specifics needed" list, which is the one part of the notes the publish
+blocker depends on. Nothing reaches the operator. Fixed, with
+`prompt-contracts.test.ts` asserting each builder asks for the shape its own
+parser reads; mutation-tested.
+
+**And a second measurement correction, from using the tool on my own writing.**
+The locally-drafted Pulse was 296 words of prose, written to the prompt's
+instruction to *"count the words in content"* — and `articles:draft-status`
+flagged it at 319 against the 300 ceiling, because it was counting the four
+markdown headings too. Headings are structure, not prose. The counter now
+excludes them. A check that disagrees with the instruction it enforces trains
+people to ignore it.
+
+Suite 1,443 → **1,446**. Dataset back to 16 published, 10 drafts, 16 vectors,
+no residue.
+
 ### August 23, 2026 — Signal run end to end, and every guard did real work
 
 The format with the highest claim density, and the one whose fact-check verdict

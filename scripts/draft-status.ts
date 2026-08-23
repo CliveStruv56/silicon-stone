@@ -82,6 +82,12 @@ function wordCount(draft: Draft): number {
   const readable = draft.words
     .replace(/\[AUTHOR:[^\]]*\]?/g, ' ')
     .split('\n')
+    // Headings are structure, not prose, and the prompt tells the writer to
+    // count "the words in content" — which anyone reads as the sentences. A
+    // Pulse written to exactly 296 words of prose was flagged at 319 because
+    // its four headings were counted too. A check that disagrees with the
+    // instruction it enforces trains people to ignore it.
+    .filter((line) => !/^\s*#/.test(line))
     .filter((line) => !/^\s*(subject line|preview text|last reviewed)\s*:/i.test(line))
     .join('\n')
   return readable.trim().split(/\s+/).filter(Boolean).length

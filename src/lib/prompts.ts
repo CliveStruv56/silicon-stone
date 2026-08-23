@@ -473,7 +473,7 @@ ${title}
 DRAFT BODY:
 ${body}
 
-Return the JSON object now.`;
+Return the two marker lines and nothing else, exactly as the layout above specifies. No JSON, no code fences.`;
 
     return { systemPrompt, userPrompt };
 }
