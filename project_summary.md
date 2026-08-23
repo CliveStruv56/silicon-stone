@@ -569,6 +569,29 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 23, 2026 — Three dependency patches, and the one that had to be proved
+
+`npm audit --omit=dev` reported 23 findings, of which only three are reachable in
+the Vercel function runtime: `sharp`, `nanoid` and `ws`. The other twenty sit
+under the `sanity` CLI and export toolchain, which never executes there, and they
+resolve with the already-planned Next 16 / Sanity v5 upgrade. **`npm audit fix
+--force` must not be run**: it proposes `next@16`, `sanity@6` and `next-sanity@13`,
+every one of which `CLAUDE.md` forbids.
+
+Three `overrides` instead. `nanoid@^3.3.18` and `ws@^8.21.3` are ordinary
+patches. **`sharp@^0.35.3` is not** — `next@15.5.23` declares `sharp: ^0.34.3`,
+and npm's only offered fix for the four inherited libvips CVEs is `next@16`. The
+override contradicts a declared range on purpose, which meant it had to be proved
+rather than assumed: Next's image optimizer was pointed at a real Sanity asset
+and returns a correctly resized PNG (2816×1536 → 640×349, aspect preserved) on
+the plain path and a WebP on the browser `Accept` path. If that override ever
+moves, run that test again — a green build proves nothing here, because sharp is
+loaded at request time.
+
+23 findings down to 19, with every runtime-reachable one gone. The reasoning is
+recorded in `CLAUDE.md` beside the version ceilings it depends on, because that
+is where somebody will look before running an upgrade.
+
 ### August 23, 2026 — Two push routes with no ceiling, and five bodies nobody bounded
 
 `/api/push/unsubscribe` deleted any subscription whose endpoint you named, with

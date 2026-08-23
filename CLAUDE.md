@@ -63,6 +63,20 @@ React 19 bundle. Do NOT run a blind `npm update` / `npm install <pkg>@latest`:
   together.
 - The Sanity `apiVersion` is sourced from `NEXT_PUBLIC_SANITY_API_VERSION`
   (default `2026-01-13`); keep all clients/scripts on that single value.
+- **Three `overrides` exist for security patches, and one of them deliberately
+  contradicts a declared range.** `next@15.5.23` declares `sharp: ^0.34.3`, but
+  every `sharp` below `0.35.0` carries four inherited libvips CVEs and npm
+  offers only `next@16` as the fix — which `CLAUDE.md` forbids. So `sharp` is
+  overridden to `^0.35.3`, and that was verified rather than assumed: Next's
+  image optimizer was exercised against a real Sanity asset and returns a
+  correctly resized image on the plain path and a WebP on the browser `Accept`
+  path. `nanoid@^3.3.18` and `ws@^8.21.3` are ordinary patches. Re-verify the
+  image path if the `sharp` override moves again.
+- **Do NOT run `npm audit fix --force`.** It proposes `next@16`, `sanity@6` and
+  `next-sanity@13`, every one of which the ceilings above forbid. The remaining
+  audit findings all sit under the `sanity` CLI/export toolchain, which never
+  executes in the Vercel function runtime; they resolve with the planned
+  Next 16 / Sanity v5 upgrade.
 
 ## AI Act rule pack (load-bearing — do not break)
 
