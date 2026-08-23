@@ -125,6 +125,19 @@ export function imagePromptsField(prompts: string[]) {
 }
 
 /**
+ * The stored shape, for the one caller that cannot use the helper above.
+ *
+ * `createArticleInSanity` in `./sanity` builds this object inline rather than
+ * calling `imagePromptsField()`, because this module imports `writeClient` from
+ * that one and the reverse import would close a runtime cycle. A **type-only**
+ * import does not — it is erased at compile time — so the two shapes are held in
+ * agreement by `tsc` instead: add a field here and the inline literal there
+ * stops compiling. Keep it derived from the function rather than written out, or
+ * this becomes a third copy of the same thing.
+ */
+export type ImagePromptsField = ReturnType<typeof imagePromptsField>
+
+/**
  * Generate two prompts for an existing article and write them onto
  * imagePrompts (plus generation metadata). Returns the prompts so the caller
  * can echo them back to the client without waiting on live sync.

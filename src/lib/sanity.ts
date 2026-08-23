@@ -6,6 +6,10 @@ import { CATEGORIES_QUERY } from '../sanity/lib/queries';
 import { markdownToPortableText, stripAuthoringPreamble } from './markdown-to-portable-text';
 import { CLAUDE_MODEL } from './anthropic';
 import { normalizeUrl } from './citations';
+// Type-only, and it must stay that way: ./image-prompts imports writeClient from
+// this module, so a value import would close a runtime cycle. `import type` is
+// erased at compile time, which is what lets tsc police the shape below.
+import type { ImagePromptsField } from './image-prompts';
 import { keyedReferences, reference } from './knowledge/ids';
 
 const token = process.env.SANITY_API_WRITE_TOKEN;
@@ -220,7 +224,7 @@ export async function createArticleInSanity(data: ArticleData) {
             prompts: data.imagePrompts,
             generatedAt: new Date().toISOString(),
             model: CLAUDE_MODEL,
-        };
+        } satisfies ImagePromptsField;
     }
     if (data.researchRunId) {
         doc.researchRun = reference(data.researchRunId);

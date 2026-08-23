@@ -618,11 +618,22 @@ renders a branded card from title and Stone Truth and deliberately ignores
 `mainImage`. The visible cost is the in-site placeholder and the absent article
 hero, which is smaller than the handoff implied.
 
-One thing left undone on purpose: `src/lib/sanity.ts:218-224` still rebuilds the
-`imagePrompts` object inline instead of calling `imagePromptsField()`. They agree
-today. Deduplicating them would make `sanity.ts` import `image-prompts.ts`, which
-already imports `sanity.ts` — a circular import, and not worth introducing for
-four lines. The fix is to move the helper into a module that depends on neither.
+**The `imagePrompts` shape is now held in agreement by `tsc`, not by hope.**
+`src/lib/sanity.ts` builds the object inline rather than calling
+`imagePromptsField()`, because `image-prompts.ts` imports `writeClient` from it
+and the reverse import would close a runtime cycle. An earlier note here proposed
+extracting the helper into a third module; **that was the wrong fix** — it adds a
+file to the tree to delete four lines, and the risk it addresses is smaller than
+it looks (three fields, pinned by the Sanity schema object, with exactly two
+write sites both containing the string `imagePrompts`).
+
+The cheap fix covers the same failure mode. `ImagePromptsField` is exported as
+`ReturnType<typeof imagePromptsField>` and `sanity.ts` imports it **type-only** —
+erased at compile time, so no runtime cycle — and asserts the literal with
+`satisfies`. Mutation-tested: adding a field to the helper fails the build with
+*"Property 'promptVersion' is missing"* pointing at `sanity.ts`. The divergence it
+prevents is the silent one, where generator-written drafts lack a field that
+Studio-regenerated ones have.
 
 Suite 1,446 green, unchanged — the script is exercised against production rather
 than mocked, which is the only test of it that would have meant anything.
