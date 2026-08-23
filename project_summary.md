@@ -569,6 +569,49 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 23, 2026 — The Notion back office, seven days behind
+
+The Command Center's Journal stopped on **16 August**. Everything since — the
+typed result items, the whole of Compliance Checker v2, two rule-pack versions,
+four knowledge waves, the operator's manual, the Kit P0 closing, and the
+production runs that found sixteen defects — existed only in this file and in
+git. Notion is where the owner plans and remembers the work, so a seven-day gap
+there is a real one.
+
+Reconciled, in four places:
+
+- **Journal — seven entries added**, one per day 17–23 August, each written to
+  the existing house shape (*the thing worth remembering* first, then what
+  changed, then what is open) rather than as a changelog. All linked to the
+  project page.
+- **Tasks — three closed, two recounted, seven opened.** Closed: the Kit v4 key,
+  the VAPID keys, and `article.gate`. Recounted: 9 drafts → 10, and cover images
+  7 → 8 of 16. The seven new ones are the decisions this week produced and
+  nothing was tracking — which Kit form, counsel review of the 58 propositions,
+  usability testing, the retention/marketing terms, the Pulse citation warning,
+  the seven ideas-corpus questions, and the score-floor calibration (filed
+  **Someday**, deliberately).
+- **Documentation — two entries marked superseded, three created.** The two
+  retired guides now carry a banner naming what each got wrong; the operator's
+  manual, the v2 state and the knowledge programme are entries in their own
+  right. Each says *the repo is the source* and points at the file, because a
+  Notion copy of a guarded document is exactly the drift the guard exists to
+  prevent.
+- **Four canon pages re-reconciled** to 23 August: the project page's *Current
+  State*, the Platform Overview, the Project Map and the AI / Agent Instructions.
+
+**Two stale figures found by cross-checking rather than by reading.** §11 said
+counsel must review **52** propositions; the file has **58** (`grep -c` on
+`propositions.ts`). And `docs/article-generation-guide.md` — a retired pointer
+stub — still gave the Pulse format as 100–140 words, four days after the budget
+moved to 250–300. A stub is still a document somebody can land on from a link.
+Both corrected. `npm run test:manual` green.
+
+Also corrected in Notion, because they were wrong rather than merely old: the
+Project Map carried the Drift Retainer at **£3,500–5,000/mo**, which the
+15 August repricing moved to **from £2,000**, and the Platform Overview still
+described the Kit key as a live P0 blocking every lead capture on the site.
+
 ### August 23, 2026 — The last four creation paths, and a contradictory prompt
 
 Deep Dive, `/import`, `ss-draft-local` and the hand-made Studio route, all run on
@@ -6611,7 +6654,7 @@ opt-in beta all need a person:
 
 | Blocker | What it needs |
 |---------|---------------|
-| **Counsel review of the decision matrix** (§22.4) | Every one of the 52 propositions is `reviewStatus: 'internal'` — readings of the consolidated text by this project. The cards say "Not reviewed by counsel" on screen. This is the big one. |
+| **Counsel review of the decision matrix** (§22.4) | Every one of the 58 propositions is `reviewStatus: 'internal'` — readings of the consolidated text by this project. The cards say "Not reviewed by counsel" on screen. This is the big one. |
 | **Usability testing** (§17.5) | Completion testing with people who do not know legal terminology or their own turnover, balance sheet or group status. Machine checks cover keyboard, screen-reader labelling and mobile; comprehension they cannot. |
 | **Retention and marketing decisions** (§22.1, §22.2) | Release criterion 16 is *blocked*, not merely unchecked, until these are recorded. |
 

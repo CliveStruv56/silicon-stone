@@ -18,6 +18,7 @@ Two other errors, corrected in the manual:
   presented them as the values Studio accepts. Studio accepts `clara`. Both
   namespaces are real; Appendix A maps them.
 - It gave the Pulse format as "under ~600 words". That figure is the *intelligence
-  tier*, not the format. The Pulse format drafts **100–140 words**.
+  tier*, not the format. The Pulse format drafts **250–300 words** (raised from
+  100–140 on 23 August 2026).
 
 This file is kept as a pointer so existing links do not break.
