@@ -547,6 +547,40 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 23, 2026 — Signal run end to end, and every guard did real work
+
+The format with the highest claim density, and the one whose fact-check verdict
+logic changed the same morning. Run on production, cleaned up afterwards.
+
+**Research 64s → generation 136s → auto fact-check completed.** The draft came
+back at 1,225 reader-facing words (Signal's budget is 800–1,200), `contentType:
+signal`, tier `briefing`, `researchRun` linked, 8 citation snapshots.
+
+**What this one run exercised that nothing else had:**
+
+- **The auto fact-check fires from the browser and completes.** 12 claims — 7
+  accurate, 4 needs-context, 1 inaccurate — and it **wrote 6 citations** onto the
+  article, primary sources including Regulation (EU) 2026/1744 itself and two
+  Commission pages. That is the mechanism behind the Pulse finding: citations
+  arrive from the *fact-check*, so the formats that are not checked never get any.
+- **The corrected verdict arithmetic.** The guard reported *"major issues —
+  **5 claims still to address**"*, which is 1 inaccurate + 4 needs-context, none
+  applied. The count is the live one, not the frozen `overallVerdict`.
+- **The prior-coverage lane reaching the copy.** The draft closes by linking two
+  real published articles by slug, both correct. Retrieval is not just recorded
+  in provenance; it is visibly used.
+- **The quotation audit caught two.** *"2 statutory quotations are not in the
+  source text"* — the draft quoted statute that was not in the retrieved
+  regulatory block. Exactly what that guard exists for, on its first live outing
+  since it was built.
+
+None of those are failures. A Signal that arrives with one inaccurate claim, four
+needing context and two unverified quotations is a draft the guards have
+correctly refused to wave through — which is the system working as designed.
+
+**Every creation path in the test spec has now been run at least once** except
+Deep Dive, `/import`, `ss-draft-local` and the hand-made Studio route.
+
 ### August 23, 2026 — The budget holds, and the word count was measuring the wrong words
 
 **Verified by generating a second Pulse on production after the change: 297
