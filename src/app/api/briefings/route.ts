@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { client } from '@/sanity/lib/client'
 import { urlFor } from '@/sanity/lib/image'
+import { BACKEND_TIMEOUT_MS } from '@/lib/timeouts'
 
 // Kept in step with the SSR copy in (website)/intelligence/page.tsx — the
 // client refreshes to this, so a filter here that is not there makes articles
@@ -52,6 +53,9 @@ async function fetchRailwayBriefings() {
     const response = await fetch(`${backendApiUrl}/v1/briefings`, {
       headers: { Accept: 'application/json' },
       cache: 'no-store',
+      // Public route: an unbounded read here stalls the feed for every visitor
+      // for as long as Railway takes to not answer.
+      signal: AbortSignal.timeout(BACKEND_TIMEOUT_MS),
     })
 
     if (!response.ok) {

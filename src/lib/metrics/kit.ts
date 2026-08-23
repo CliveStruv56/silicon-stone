@@ -1,5 +1,7 @@
 import "server-only";
 
+import { KIT_TIMEOUT_MS } from "../timeouts";
+
 /**
  * Kit (ConvertKit) audience metrics for the analytics dashboard.
  *
@@ -60,6 +62,7 @@ export async function getKitStats(): Promise<KitStats> {
                 "X-Kit-Api-Key": KIT_API_KEY,
             },
             cache: "no-store",
+            signal: AbortSignal.timeout(KIT_TIMEOUT_MS),
         });
 
         if (!res.ok) {

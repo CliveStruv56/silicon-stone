@@ -3,6 +3,7 @@ import 'server-only'
 import { Ratelimit } from '@upstash/ratelimit'
 import { Redis } from '@upstash/redis'
 import { checkRateLimit } from './rate-limit'
+import { UPSTASH_TIMEOUT_MS, withTimeout } from './timeouts'
 
 export type DurableRateLimitResult = {
   allowed: boolean
@@ -153,7 +154,16 @@ export async function checkDurableRateLimit(
   }
 
   try {
-    const result = await limiter.limit(identifier || 'unknown')
+    // Bounded, because this sits on the hot path of nearly every route and the
+    // fallback below is *already* the answer when the shared store is
+    // unavailable. Waiting on a slow Upstash to learn what a local map could
+    // have said instantly would add that delay to every request on the site —
+    // a slow limiter is worse than a fast failure, uniquely here.
+    const result = await withTimeout(
+      limiter.limit(identifier || 'unknown'),
+      UPSTASH_TIMEOUT_MS,
+      'Upstash rate limit',
+    )
     const retryAfter = result.success
       ? 0
       : Math.max(1, Math.ceil((result.reset - Date.now()) / 1000))

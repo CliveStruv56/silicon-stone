@@ -2,6 +2,7 @@ import 'server-only'
 
 import Anthropic from '@anthropic-ai/sdk';
 import { scheduleUsage } from './usage';
+import { ANTHROPIC_TIMEOUT_MS } from './timeouts';
 
 // Default model is env-overridable so individual passes (e.g. the voice-edit
 // pass) can be routed to a stronger model without editing code. Keep the pricing
@@ -15,6 +16,13 @@ const API_KEY = process.env.ANTHROPIC_API_KEY ? process.env.ANTHROPIC_API_KEY.tr
 
 const anthropic = new Anthropic({
     apiKey: API_KEY,
+    // The SDK's own default is ten minutes — twice the 300-second ceiling any
+    // route here runs under, so it can never fire. See ANTHROPIC_TIMEOUT_MS.
+    timeout: ANTHROPIC_TIMEOUT_MS,
+    // Default is 2. With a real timeout in place, three attempts at the bound
+    // would exceed the function budget on their own; one retry still absorbs
+    // the 429s and 529s that retrying exists for.
+    maxRetries: 1,
 });
 
 export async function callClaude(

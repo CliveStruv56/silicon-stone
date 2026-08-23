@@ -360,8 +360,11 @@ check('the limits table matches the constants', () => {
   assert.match(source('src/lib/session.ts'), /SESSION_MAX_AGE_SECONDS = 60 \* 60 \* 24/, 'session lifetime changed')
   manualStates('| Admin session | 24 hours', 'the session lifetime')
 
-  assert.match(source('src/app/(admin)/create/actions.ts'), /MAX_TOPIC_LENGTH = 300/, 'topic cap changed')
-  assert.match(source('src/app/(admin)/create/actions.ts'), /MAX_BRIEF_LENGTH = 2000/, 'brief cap changed')
+  // Both caps moved to src/lib/research-input.ts when the client-supplied
+  // research payload gained validation: they were module-local to one server
+  // action, which is precisely why two other callers had no cap at all.
+  assert.match(source('src/lib/research-input.ts'), /MAX_TOPIC_LENGTH = 300\b/, 'topic cap changed')
+  assert.match(source('src/lib/research-input.ts'), /MAX_BRIEF_LENGTH = 2_000\b/, 'brief cap changed')
   manualStates('| Topic field | 300 characters |', 'the topic cap')
   manualStates('| Brief field | 2,000 characters |', 'the brief cap')
 

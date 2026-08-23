@@ -3,6 +3,7 @@ import { getClientIp } from "@/lib/rate-limit";
 import { checkDurableRateLimit } from "@/lib/durable-rate-limit";
 import { redactForLog } from "@/lib/utils";
 import { SUBSCRIBE_TAG_IDS } from "@/lib/kit";
+import { BACKEND_TIMEOUT_MS, KIT_TIMEOUT_MS } from "@/lib/timeouts";
 
 const KIT_API_KEY = process.env.CONVERTKIT_API_KEY || "";
 const KIT_FORM_ID = process.env.CONVERTKIT_FORM_ID || "";
@@ -55,6 +56,7 @@ async function proxySubscribe(body: { email: string; tag?: string; tags?: string
       headers: getBackendHeaders(),
       body: JSON.stringify(body),
       cache: "no-store",
+      signal: AbortSignal.timeout(BACKEND_TIMEOUT_MS),
     });
 
     const responseBody = await response.json().catch(() => ({}));
@@ -172,6 +174,7 @@ export async function POST(request: NextRequest) {
           "Content-Type": "application/json",
           "X-Kit-Api-Key": KIT_API_KEY,
         },
+        signal: AbortSignal.timeout(KIT_TIMEOUT_MS),
         body: JSON.stringify({ email_address: email }),
       }
     );
@@ -203,6 +206,7 @@ export async function POST(request: NextRequest) {
                 "Content-Type": "application/json",
                 "X-Kit-Api-Key": KIT_API_KEY,
               },
+              signal: AbortSignal.timeout(KIT_TIMEOUT_MS),
               body: JSON.stringify({}),
             }
           );

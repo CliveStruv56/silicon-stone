@@ -1,5 +1,7 @@
 import 'server-only'
 
+import { KIT_TIMEOUT_MS } from './timeouts'
+
 /**
  * Kit (ConvertKit) API v4 helpers. One Kit list/form site-wide; every audience
  * distinction is a tag, never a separate subscription. Tag IDs live in env
@@ -64,6 +66,7 @@ export async function ensureSubscriber(email: string): Promise<number | null> {
     headers: kitHeaders(),
     body: JSON.stringify({ email_address: email }),
     cache: 'no-store',
+    signal: AbortSignal.timeout(KIT_TIMEOUT_MS),
   })
   if (!res.ok) {
     console.error('Kit ensureSubscriber failed:', res.status)
@@ -82,6 +85,7 @@ export async function tagSubscriber(tagId: string, subscriberId: number): Promis
     headers: kitHeaders(),
     body: JSON.stringify({}),
     cache: 'no-store',
+    signal: AbortSignal.timeout(KIT_TIMEOUT_MS),
   })
   if (!res.ok) {
     console.error('Kit tagSubscriber failed:', res.status, 'tag', tagId)

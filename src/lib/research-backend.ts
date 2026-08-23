@@ -1,5 +1,7 @@
 import "server-only";
 
+import { BACKEND_START_TIMEOUT_MS, BACKEND_TIMEOUT_MS } from "./timeouts";
+
 /**
  * Thin client for the Railway logic backend's deep-research job endpoints.
  * Used only for Deep Dives, whose Exa Research runs for minutes and would time
@@ -40,6 +42,7 @@ export async function startDeepResearchJob(topic: string, instructions: string):
         // in April 2026 (410 RESEARCH_RETIRED).
         body: JSON.stringify({ topic, instructions }),
         cache: "no-store",
+        signal: AbortSignal.timeout(BACKEND_START_TIMEOUT_MS),
     });
 
     if (!res.ok) {
@@ -61,6 +64,7 @@ export async function getDeepResearchJob(jobId: string): Promise<DeepJobStatus> 
     const res = await fetch(`${BACKEND_API_URL}/v1/research/deep/${jobId}`, {
         headers: headers(),
         cache: "no-store",
+        signal: AbortSignal.timeout(BACKEND_TIMEOUT_MS),
     });
 
     if (!res.ok) {

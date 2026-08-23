@@ -221,6 +221,66 @@ async function main() {
     )
   }
 
+  // Every outbound call from server code is bounded. on-publish wrote down why
+  // once — "a webhook that hangs is worse than one that fails: Sanity retries a
+  // failure, but a hung invocation burns the whole function duration first" —
+  // and for a long time it was the only route that acted on it. A hung upstream
+  // does not merely fail; it spends the function's entire budget first, so the
+  // caller loses the work it had already done.
+  const OUTBOUND_EXEMPT = new Set([
+    // Defines withTimeout itself; has no fetch of its own.
+    'src/lib/timeouts.ts',
+  ])
+  const serverFiles = execFileSync('git', ['ls-files', 'src/lib', 'src/app/api'], { encoding: 'utf8' })
+    .split('\n')
+    .filter((file) => file.endsWith('.ts') && !file.endsWith('.test.ts'))
+  for (const file of serverFiles) {
+    if (!fs.existsSync(file) || OUTBOUND_EXEMPT.has(file)) continue
+    const source = fs.readFileSync(file, 'utf-8')
+    // Server code only. A module under src/lib that runs in the browser (the
+    // offline store, the push client) has no function budget to burn, and its
+    // fetches are the user's own network. The signal for "this is server code"
+    // is the server-only import, so a new server module that forgets one is
+    // outside this check — which is a reason to keep importing it, not a hole
+    // worth widening the check to guess at.
+    if (!file.startsWith('src/app/api/') && !source.includes('server-only')) continue
+    const lines = source.split('\n')
+    lines.forEach((line, i) => {
+      // Only outbound calls: a relative URL is the browser calling this app.
+      if (!/\bfetch\(/.test(line)) return
+      // A relative URL is the browser calling this app, not an outbound call.
+      if (/fetch\(['"`]\//.test(line)) return
+      // `client.fetch(...)` is a Sanity client, bounded where it is constructed
+      // — which the createClient check below is what actually enforces.
+      if (/\.fetch\(/.test(line)) return
+      const window = lines.slice(i, i + 12).join('\n')
+      assert.equal(
+        /signal:/.test(window),
+        true,
+        `${file}:${i + 1} makes an unbounded outbound call — pass AbortSignal.timeout(...) from src/lib/timeouts.ts`,
+      )
+    })
+  }
+
+  // …and every Sanity client carries the bound, since `client.fetch()` above is
+  // exempted on the strength of it.
+  for (const file of execFileSync('git', ['ls-files', 'src'], { encoding: 'utf8' })
+    .split('\n')
+    .filter((f) => f.endsWith('.ts') && !f.endsWith('.test.ts') && !f.startsWith('src/scripts/'))) {
+    if (!fs.existsSync(file)) continue
+    const source = fs.readFileSync(file, 'utf-8')
+    let from = source.indexOf('createClient({')
+    while (from !== -1) {
+      const block = source.slice(from, source.indexOf('})', from))
+      assert.match(
+        block,
+        /timeout:/,
+        `${file} builds a Sanity client with no timeout — an unbounded read blocked for 15 minutes in testing`,
+      )
+      from = source.indexOf('createClient({', from + 1)
+    }
+  }
+
   const workflowSource = fs.readFileSync('.github/workflows/check.yml', 'utf-8')
   assert.match(workflowSource, /npm run test:security/)
   assert.match(workflowSource, /npm run test:style-rules/)

@@ -6,6 +6,7 @@ import { CATEGORIES_QUERY } from '../sanity/lib/queries';
 import { markdownToPortableText, stripAuthoringPreamble } from './markdown-to-portable-text';
 import { CLAUDE_MODEL } from './anthropic';
 import { normalizeUrl } from './citations';
+import { SANITY_TIMEOUT_MS } from './timeouts';
 // Type-only, and it must stay that way: ./image-prompts imports writeClient from
 // this module, so a value import would close a runtime cycle. `import type` is
 // erased at compile time, which is what lets tsc police the shape below.
@@ -24,6 +25,9 @@ export const writeClient = createClient({
     useCdn: false, // We want fresh data for writing
     apiVersion,
     token,
+    // on-publish learned this the hard way: an unbounded Sanity read blocked
+    // for fifteen minutes in testing, burning the whole function duration.
+    timeout: SANITY_TIMEOUT_MS,
 });
 
 export interface ArticleData {

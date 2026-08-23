@@ -1,5 +1,7 @@
 import 'server-only'
 
+import { LEMONSQUEEZY_TIMEOUT_MS } from './timeouts'
+
 import { createHmac, timingSafeEqual } from 'node:crypto'
 import { getRedis } from '@/lib/redis'
 
@@ -116,6 +118,7 @@ async function licenseCall(
       },
       body: new URLSearchParams(body).toString(),
       cache: 'no-store',
+      signal: AbortSignal.timeout(LEMONSQUEEZY_TIMEOUT_MS),
     })
     const json = (await res.json().catch(() => ({}))) as Record<string, unknown>
     const meta = (json.license_key as Record<string, unknown>) || {}

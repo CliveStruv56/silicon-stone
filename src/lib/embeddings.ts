@@ -1,12 +1,13 @@
 import 'server-only'
 import OpenAI from 'openai'
 import { scheduleUsage } from './usage'
+import { OPENAI_TIMEOUT_MS } from './timeouts'
 
 let openaiClient: OpenAI | null = null
 
 function getClient(): OpenAI {
   if (!openaiClient) {
-    openaiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+    openaiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY, timeout: OPENAI_TIMEOUT_MS, maxRetries: 1 })
   }
   return openaiClient
 }

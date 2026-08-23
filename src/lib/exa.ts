@@ -1,6 +1,7 @@
 import 'server-only';
 import Exa from 'exa-js';
 import { scheduleUsage } from './usage';
+import { EXA_TIMEOUT_MS, withTimeout } from './timeouts';
 
 const API_KEY = process.env.EXA_API_KEY;
 
@@ -33,7 +34,7 @@ export async function searchExa(query: string, options: ExaSearchOptions = {}) {
         // RegularSearchOptions (numResults, type, category, startPublishedDate,
         // includeDomains…) at the top level; page-content options (text, highlights,
         // livecrawl) nested under `contents`.
-        const result = await exa.search(query, {
+        const result = await withTimeout(exa.search(query, {
             type: "auto",                          // Exa picks neural vs keyword per query
             useAutoprompt: true,
             numResults: Math.min(numResults, 10),  // Exa basic-plan ceiling
@@ -47,7 +48,7 @@ export async function searchExa(query: string, options: ExaSearchOptions = {}) {
                 livecrawl: "fallback",             // fetch the live page when the index copy is stale
                 highlights: { numSentences: 3, highlightsPerUrl: 1 },
             },
-        });
+        }), EXA_TIMEOUT_MS, 'Exa search');
 
         // Record cost for the analytics dashboard (non-fatal), scheduled with
         // after() so it survives the response being sent. Exa reports the
@@ -107,11 +108,12 @@ function agentError(run: ExaAgentRun): string | undefined {
     return typeof error === "object" ? (error.message ?? error.code) : error;
 }
 
-async function exaAgentFetch(path: string, init?: RequestInit): Promise<ExaAgentRun> {
+async function exaAgentFetch(path: string, init?: RequestInit, budgetMs = EXA_TIMEOUT_MS): Promise<ExaAgentRun> {
     const res = await fetch(`${EXA_AGENT_URL}${path}`, {
         ...init,
         headers: { "x-api-key": API_KEY as string, "Content-Type": "application/json" },
         cache: "no-store",
+        signal: AbortSignal.timeout(Math.max(1, budgetMs)),
     });
     if (!res.ok) {
         throw new Error(`Exa agent request failed: ${res.status} ${(await res.text()).slice(0, 200)}`);
@@ -152,7 +154,11 @@ export async function deepResearchExa(instructions: string): Promise<DeepResearc
         const deadline = Date.now() + 10 * 60 * 1000; // 10 min — see infra caveat in research.ts
         while (Date.now() < deadline) {
             await new Promise((r) => setTimeout(r, 3000));
-            const run = await exaAgentFetch(`/${created.id}`);
+            // The deadline is only ever *evaluated* between iterations, so an
+            // unbounded poll used to exceed it by however long one request hung.
+            // Each poll is given whatever is left of the ten minutes, capped at
+            // the ordinary Exa bound, which makes the deadline the real limit.
+            const run = await exaAgentFetch(`/${created.id}`, undefined, Math.min(EXA_TIMEOUT_MS, deadline - Date.now()));
 
             if (run.status === "completed") {
                 const costDollars = agentCost(run);

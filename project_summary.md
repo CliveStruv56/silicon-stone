@@ -569,6 +569,54 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 23, 2026 — One call in the whole codebase had a timeout
+
+`sanity-identity.ts` was the only bounded outbound call on the server. Everything
+else — Railway, Exa, Inoreader, Anthropic, OpenAI, Pinecone, Upstash, Kit, Lemon
+Squeezy and every Sanity client — waited as long as the upstream took. The reason
+is simply that nothing had yet failed *slowly*; `/api/on-publish` is where it had
+already happened and been written down:
+
+> "A webhook that hangs is worse than one that fails: Sanity retries a failure,
+> but a hung invocation burns the whole function duration first. Seen in testing
+> — an unbounded Sanity read blocked for 15 minutes."
+
+That lesson is now generalised in `src/lib/timeouts.ts`, and the numbers are
+chosen against **the function's own budget**, not against a guess at upstream
+latency. A bound longer than `maxDuration` can never fire, which is the trap the
+SDK defaults fall into: the Anthropic SDK waits ten minutes by default, and no
+route here is allowed to live past five. `ANTHROPIC_TIMEOUT_MS` is therefore
+150 s — half the budget of the drafting, fact-check and report routes — on the
+argument that a single call which has consumed half the function has already made
+the four after it impossible, so failing with a message the operator can read
+beats dying silently at the platform ceiling. `maxRetries` drops from 2 to 1 for
+the same arithmetic.
+
+Two numbers are deliberately unlike the rest. **Upstash gets 3 s**, because it
+sits on the hot path of nearly every route and the in-memory fallback is
+*already* the answer when the shared store is unreachable — waiting fifteen
+seconds to learn what a local map could say instantly would add that delay to
+every request on the site. **Exa's agent poll gets whatever is left of the
+ten-minute deadline**, capped at 60 s: that deadline was only ever evaluated
+*between* iterations, so one hung request used to overshoot it by however long it
+hung.
+
+`exa-js` is pinned at 2.2.0 and exposes no timeout, so `withTimeout()` bounds it
+instead — and the comment says plainly that this bounds *the caller's wait*, not
+the request, which is a weaker guarantee than a real signal. Pinecone takes no
+timeout option either but does take the `fetch` it calls, so the bound goes
+there.
+
+Two guards in `scripts/security-checks.ts`, both mutation-tested: no server file
+may make an outbound `fetch` without a `signal:` nearby, and no Sanity client may
+be constructed without a `timeout:`. The first is scoped to files importing
+`server-only` plus everything under `src/app/api/` — the offline store and the
+push client run in a browser, where there is no function budget to burn.
+
+`scripts/manual-checks.ts` failed on this change and was right to: the topic and
+brief caps moved to `research-input.ts`. The check was repointed at their new
+home rather than relaxed, and re-mutation-tested. The value never changed.
+
 ### August 23, 2026 — The spend ledger was dropping its writes under load
 
 Seven metered call sites wrote `void recordUsage({...}).catch(() => {})` and

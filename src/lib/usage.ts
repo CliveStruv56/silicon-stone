@@ -1,6 +1,7 @@
 import "server-only";
 import { after } from "next/server";
 import { computeTokenCost, hasRate } from "./pricing";
+import { BACKEND_TIMEOUT_MS } from "./timeouts";
 
 /**
  * API usage ledger client.
@@ -94,6 +95,7 @@ export async function recordUsage(input: RecordUsageInput): Promise<void> {
             headers: headers(),
             body: JSON.stringify(event),
             cache: "no-store",
+            signal: AbortSignal.timeout(BACKEND_TIMEOUT_MS),
         });
     } catch (err) {
         // Never let usage logging break the caller.
@@ -182,6 +184,7 @@ export async function getUsageSummary(period: UsagePeriod = "mtd"): Promise<Usag
         const res = await fetch(`${BACKEND_API_URL}/v1/usage/summary?period=${period}`, {
             headers: headers(),
             cache: "no-store",
+            signal: AbortSignal.timeout(BACKEND_TIMEOUT_MS),
         });
 
         if (!res.ok) return emptySummary(period);

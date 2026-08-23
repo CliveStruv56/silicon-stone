@@ -7,6 +7,7 @@ import { generateEmbedding, extractArticleText, buildArticleMetadata } from '@/l
 import { getClientIp } from '@/lib/rate-limit'
 import { checkDurableRateLimit } from '@/lib/durable-rate-limit'
 import { PRIOR_COVERAGE_SCORE_FLOOR } from '@/lib/draft-retrieval'
+import { SANITY_TIMEOUT_MS } from '@/lib/timeouts'
 
 const sanity = createClient({
   projectId,
@@ -14,6 +15,7 @@ const sanity = createClient({
   apiVersion,
   token: process.env.SANITY_API_READ_TOKEN,
   useCdn: false,
+  timeout: SANITY_TIMEOUT_MS,
 })
 
 const writeSanity = createClient({
@@ -22,6 +24,7 @@ const writeSanity = createClient({
   apiVersion,
   token: process.env.SANITY_API_WRITE_TOKEN,
   useCdn: false,
+  timeout: SANITY_TIMEOUT_MS,
 })
 
 /** Constant-time secret comparison to avoid leaking the secret via timing. */

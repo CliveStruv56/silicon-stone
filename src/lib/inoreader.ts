@@ -1,5 +1,7 @@
 import 'server-only';
 
+import { INOREADER_TIMEOUT_MS } from './timeouts';
+
 const API_BASE = 'https://www.inoreader.com/reader/api/0';
 const OAUTH_BASE = 'https://www.inoreader.com/oauth2';
 
@@ -54,7 +56,8 @@ export async function exchangeCodeForToken(code: string) {
     const res = await fetch(`${OAUTH_BASE}/token`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: body.toString()
+        body: body.toString(),
+        signal: AbortSignal.timeout(INOREADER_TIMEOUT_MS)
     });
 
     if (!res.ok) {
@@ -68,7 +71,8 @@ export async function getUserInfo(token: string) {
     const res = await fetch(`${API_BASE}/user-info`, {
         headers: {
             'Authorization': `Bearer ${token}`
-        }
+        },
+        signal: AbortSignal.timeout(INOREADER_TIMEOUT_MS)
     });
 
     if (!res.ok) {
@@ -95,7 +99,8 @@ export async function searchItems(token: string, query: string): Promise<Inoread
     const res = await fetch(url, {
         headers: {
             'Authorization': `Bearer ${token}`
-        }
+        },
+        signal: AbortSignal.timeout(INOREADER_TIMEOUT_MS)
     });
 
     if (!res.ok) {

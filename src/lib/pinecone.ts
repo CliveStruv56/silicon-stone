@@ -1,5 +1,6 @@
 import 'server-only'
 import { Pinecone } from '@pinecone-database/pinecone'
+import { PINECONE_TIMEOUT_MS } from './timeouts'
 
 let pineconeClient: Pinecone | null = null
 
@@ -7,6 +8,10 @@ function getClient(): Pinecone {
   if (!pineconeClient) {
     pineconeClient = new Pinecone({
       apiKey: process.env.PINECONE_API_KEY!,
+      // The SDK takes no timeout option; it does take the fetch it calls, so
+      // the bound is applied there. Every index operation goes through this.
+      fetchApi: (input, init) =>
+        fetch(input, { ...init, signal: init?.signal ?? AbortSignal.timeout(PINECONE_TIMEOUT_MS) }),
     })
   }
   return pineconeClient

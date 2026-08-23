@@ -2,6 +2,7 @@ import 'server-only'
 
 import Anthropic from '@anthropic-ai/sdk'
 import { scheduleUsage } from '@/lib/usage'
+import { ANTHROPIC_TIMEOUT_MS } from '@/lib/timeouts'
 import { assessmentQuestions } from '@/lib/ai-act-assessment'
 import { buildToolSchema, buildVocabulary, describeVocabulary } from './vocabulary'
 import { parseProposals, type ParseResult } from './parse'
@@ -67,7 +68,7 @@ export async function extractProposals(description: string): Promise<ExtractionR
   }
 
   const trimmed = description.normalize('NFC').slice(0, MAX_DESCRIPTION_CHARS)
-  const client = new Anthropic({ apiKey: API_KEY })
+  const client = new Anthropic({ apiKey: API_KEY, timeout: ANTHROPIC_TIMEOUT_MS, maxRetries: 1 })
 
   const message = await client.messages.create({
     model: INTAKE_MODEL,
