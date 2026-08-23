@@ -547,6 +547,41 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 23, 2026 — The budget holds, and the word count was measuring the wrong words
+
+**Verified by generating a second Pulse on production after the change: 297
+reader-facing words, inside 250–300.**
+
+Raw, the same draft counts **423** — almost identical to the 429 that started
+this. The number in the prompt moved by 150 and the output did not move at all,
+which looked at first like the constraint being ignored. It was not: **the count
+was wrong.**
+
+A raw count over the stored body includes two things no reader ever reads.
+`[AUTHOR: …]` markers are instructions to the author, often a full sentence each,
+and this draft carried three — about 80 words. The newsletter furniture
+(`Subject Line:`, `Preview Text:`) is another 60. Strip both and the prose is
+296 words, which is on budget.
+
+**The furniture was my own test artefact, and proving that mattered.** The
+write-time `stripAuthoringPreamble` removes it by matching the body's `# h1`
+against the title, and I had instructed the model to prefix the *title* with
+`TEST — ` for teardown — which the h1 did not carry, so the match failed and the
+furniture survived. Checked across all ten real drafts: every one whose h1 and
+title agree is clean. **The strip works**; only the two oldest drafts, written
+before it landed, carry furniture. That is what the render-time stripper in
+`analysis/[slug]/page.tsx` exists for, and its comment says so.
+
+`articles:draft-status` now counts reader-facing words — placeholders and
+furniture excluded — because a count that disagrees with the page is not worth
+printing. It nearly produced a confident wrong conclusion here: *"three times
+over budget"* against prose that was on budget.
+
+**What is honestly known about Pulse length**, all reader-facing: 194 words
+(June, under the old 100–140 budget) and 297 (today, under the new 250–300). Two
+points, both plausible, neither alarming. The earlier 282-word watch item was
+probably a raw count too and should be re-derived before it is used for anything.
+
 ### August 23, 2026 — The Pulse budget moved, and the citation fix already existed
 
 **Two things asked for; the first turned out to be built already.**
@@ -622,11 +657,14 @@ codebase warns produces routed-around controls. Three possible answers — give
 Pulse its own `contentType`, seed `citations` from `citationSnapshots`, or drop
 `signal` from the expected set — and they are editorial choices, not refactors.
 
-**2. Pulse ran to 429 words against a stated 100–140.** `auto-fact-check.ts`'s own
-docblock says *"A Pulse is 100–140 words built on one verified shift"*. The
-21 August watch item recorded 282. This run: **429**. Two samples, both far over
-and the second worse. That is no longer "needs more samples before touching the
-prompt".
+**2. Pulse ran to 429 words against a stated 100–140** — **overstated, corrected
+later the same day.** That was a raw count over the stored body, which includes
+`[AUTHOR: …]` instructions to the author (a full sentence each, removed before
+publication) and, on that draft, newsletter furniture. Measured as a reader reads
+it, the same shape of draft is ~296 words. The Pulse *was* over its 100–140
+budget — roughly twice, not three times — and the correction is recorded in the
+entry above. Counting text no reader sees is a measurement error, not a
+finding.
 
 **One defect found and fixed in the same run.** The first attempt pasted an idea
 prefixed `TEST — `, and the intake box split at that em-dash four characters in —

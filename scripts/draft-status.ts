@@ -63,8 +63,28 @@ type Draft = PreflightDocument & {
   _createdAt?: string
 }
 
+/**
+ * The words a reader will actually read.
+ *
+ * A raw count over the body is wrong in a way that matters, and it misled this
+ * check on its first run: `[AUTHOR: …]` markers are *instructions to the
+ * author*, often a full sentence each, and they are removed before anything is
+ * published. Counting them reported a Pulse at 423 words when the prose was
+ * 296 — the difference between "three times over budget" and "on budget".
+ *
+ * The newsletter furniture (`Subject Line:`, `Preview Text:`) is stripped at
+ * write time by `stripAuthoringPreamble`, so it should never be here; it is
+ * excluded anyway for the drafts written before that landed, and because a
+ * count that disagrees with the page a reader sees is not worth printing.
+ */
 function wordCount(draft: Draft): number {
-  return draft.words ? draft.words.trim().split(/\s+/).filter(Boolean).length : 0
+  if (!draft.words) return 0
+  const readable = draft.words
+    .replace(/\[AUTHOR:[^\]]*\]?/g, ' ')
+    .split('\n')
+    .filter((line) => !/^\s*(subject line|preview text|last reviewed)\s*:/i.test(line))
+    .join('\n')
+  return readable.trim().split(/\s+/).filter(Boolean).length
 }
 
 /**
