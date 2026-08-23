@@ -39,6 +39,19 @@ jobs:
           NEXT_PUBLIC_SANITY_PROJECT_ID: 3q59mpd7
           NEXT_PUBLIC_SANITY_DATASET: production
           SANITY_API_READ_TOKEN: ${{ secrets.SANITY_API_READ_TOKEN }}
+      # The internal document types must stay invisible to an anonymous caller.
+      # Type-level access control on the Sanity project is what enforces that,
+      # it lives in a console rather than in this repository, and nothing would
+      # otherwise say a word if it changed. Same reasoning as the check above
+      # for not being in `prebuild`: it needs the network, and a Sanity blip
+      # must not be able to fail a Vercel deploy. The token is optional but
+      # turns "returned nothing" into "has documents and still returned
+      # nothing", which is the difference between a check and a rubber stamp.
+      - run: npm run test:dataset-access
+        env:
+          NEXT_PUBLIC_SANITY_PROJECT_ID: 3q59mpd7
+          NEXT_PUBLIC_SANITY_DATASET: production
+          SANITY_API_READ_TOKEN: ${{ secrets.SANITY_API_READ_TOKEN }}
       # Catch server/client-boundary breakage that lint+typecheck miss —
       # otherwise it surfaces only as a failed Vercel deploy.
       - run: npm run build

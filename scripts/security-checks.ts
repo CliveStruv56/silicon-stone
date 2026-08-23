@@ -352,6 +352,8 @@ async function main() {
   assert.match(workflowSource, /npm run test:style-rules/)
   assert.match(workflowSource, /npm run test:knowledge-inbox/)
   assert.match(workflowSource, /npm run test:evidence-index/)
+  // The dataset-access probe is only worth having if it actually runs.
+  assert.match(workflowSource, /npm run test:dataset-access/)
 
   console.log('Security checks passed')
 }

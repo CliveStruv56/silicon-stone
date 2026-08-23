@@ -781,6 +781,64 @@ schedules with `after`, and that **no file in `src/` calls `recordUsage`
 directly**. Both were mutation-tested. The second is what stops the eighth call
 site being written the old way.
 
+### August 23, 2026 — The audit was wrong about the dataset, and the fix is a guard
+
+The audit's H2 said `sensitivity: confidential` was "an application-level filter
+over a world-readable store", and proposed rewriting the knowledge lane to create
+documents as `drafts.*`. **It was wrong**, and checking took one `curl`:
+
+| anonymous query, no token | result |
+|---|---|
+| `count(*[_type=="knowledgeItem"])` | `0` |
+| `count(*[_type=="article"])` | `16` |
+
+Authenticated, those knowledge types hold real records. **Type-level access
+control is configured on the Sanity project** — the seven types the public site
+renders answer anonymously, the ten internal ones (all four knowledge types plus
+`persona`, `libraryImage` and the Sanity system types) do not. The dataset's
+`aclMode` really is `public`, which is what the audit reasoned from; it simply is
+not the whole story.
+
+Building Option B on that premise would have been actively harmful. The seven
+`!(_id in path("drafts.**"))` filters in `read.ts` and `repository.ts` are there
+because the duplicate probes, the candidate listing and the source resolution all
+need to see published records. Draft-first creation would have broken
+deduplication — every capture would look new — to buy nothing.
+
+**The real defect was that nobody had written the control down.** It lives in a
+console, it is invisible from the repository, and if it were ever changed nothing
+would say so: knowledge items, personas and conversation extracts would quietly
+start answering the open internet.
+
+`npm run test:dataset-access` makes it an invariant instead. Two properties are
+the design:
+
+- **The positive control is asserted first and is fatal.** "The query returned
+  nothing" passes both when the data is protected and when the probe is broken —
+  a typo, a renamed type, a changed API version. So `article` must come back
+  readable; if it does not, the run exits non-zero saying it has verified
+  nothing, rather than reporting safety it never checked.
+- **"No documents" is not "protected".** With a read token the run reports
+  `PROTECTED` only where a type demonstrably has documents *and* anonymous access
+  still sees none. Everything else prints `unproven`. Today that is
+  `knowledgeTopic`, `researchRun` and `libraryImage` — and `researchRun` is the
+  one that matters, because whether the first one leaks is genuinely unknown
+  until one is written.
+
+Live output: `knowledgeItem`, `knowledgeSource`, `knowledgeCandidate` and
+`persona` all PROTECTED; three unproven and named as such. Mutation-tested both
+ways — a blind probe and a simulated exposure each exit 1.
+
+CI-blocking, not in `prebuild`, for the reason `test:sanity-prices` is not:
+it needs the network and a Sanity blip must not fail a deploy.
+`security-checks.ts` asserts the CI step exists, because a probe that does not
+run is worse than none.
+
+**Still open, and now recorded rather than assumed:** making the dataset private
+with a read token for the public site. That is the stronger control — it would
+not depend on a console setting staying put — but every public fetch path runs
+without a token today, so it is its own piece of work.
+
 ### August 23, 2026 — The prompt that reads the web first had no fence at all
 
 The audit found three unfenced slots in the *draft* prompt, and writing the test

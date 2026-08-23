@@ -470,6 +470,51 @@ A new **AI Act** consolidation is not a simple re-fetch: `reg:check` asserts its
 move with it and every pinned citation be re-verified. `reg:drift` says so in
 its output rather than implying all six are equal work.
 
+## Dataset access control (load-bearing, and it lives in a console)
+
+The `production` dataset's `aclMode` is **`public`**, but that is not the whole
+story and reading it as such produces a false finding. **Type-level access
+control is configured on the project**, and it already draws the line correctly:
+the seven types the public site renders (`article`, `author`, `category`,
+`glossaryTerm`, `product`, `sanity.imageAsset`, `siteSettings`) answer anonymous
+GROQ; the ten internal ones — all four knowledge types plus `persona`,
+`libraryImage` and the Sanity system types — do not.
+
+This matters because a security audit concluded the opposite. It reasoned from
+`aclMode: public` that `sensitivity: confidential` in
+`src/lib/knowledge/read.ts` was "an application-level filter over a
+world-readable store", and proposed rewriting the knowledge lane to create
+documents as `drafts.*`. That change would have broken deduplication — the seven
+`!(_id in path("drafts.**"))` filters in `read.ts` and `repository.ts` exist
+because the duplicate probes, the candidate listing and the source resolution
+all need to see published records — in exchange for no security gain whatever.
+
+**Verify before rewriting.** One `curl` with no token settles it.
+
+`npm run test:dataset-access` (`scripts/dataset-access-checks.ts`, CI-blocking)
+is what keeps this honest, and two properties are the whole design:
+
+- **The positive control is asserted first and is fatal.** "The query returned
+  nothing" passes for two different reasons — the data is protected, or the
+  probe is broken. So `article` MUST come back readable; if the public site's
+  own content cannot be seen anonymously, the run has proved nothing and exits
+  non-zero rather than reporting a clean bill of health.
+- **"No documents" is not "protected".** A type with nothing in it returns empty
+  either way. With `SANITY_API_READ_TOKEN` the run only reports `PROTECTED` when
+  a type demonstrably **has** documents and anonymous access still cannot see
+  them; everything else is reported `unproven` out loud. `researchRun` is the
+  live example — the type is empty, so whether the first one leaks is genuinely
+  unknown until one exists.
+
+Deliberately **not** in `prebuild`: it needs the network, and a Sanity blip must
+not fail a Vercel deploy. `scripts/security-checks.ts` asserts the CI step
+exists, because a probe that does not run is worse than none.
+
+**Still open:** making the dataset private and giving the public site a read
+token. That is the stronger control — it would not depend on a console setting
+staying put — but every public fetch path currently runs without a token, so it
+is its own piece of work rather than a side effect of something else.
+
 ## Editorial memory (the knowledge lane — dark)
 
 `PINECONE_KNOWLEDGE_INDEX_NAME` names the fourth index, added by wave 3 of the

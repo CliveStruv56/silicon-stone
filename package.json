@@ -47,6 +47,7 @@
     "glossary:annotate": "tsx scripts/annotate-glossary.ts",
     "fix:excerpts": "tsx scripts/fix-excerpts.ts",
     "test:knowledge-inbox": "tsx scripts/knowledge-inbox-checks.ts",
+    "test:dataset-access": "tsx scripts/dataset-access-checks.ts",
     "knowledge:migrate-candidates": "tsx scripts/migrate-knowledge-candidates.ts",
     "evidence:rebuild": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/rebuild-evidence-index.ts",
     "evidence:rebuild:dry": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/rebuild-evidence-index.ts --dry-run",
