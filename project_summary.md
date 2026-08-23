@@ -781,6 +781,49 @@ schedules with `after`, and that **no file in `src/` calls `recordUsage`
 directly**. Both were mutation-tested. The second is what stops the eighth call
 site being written the old way.
 
+### August 23, 2026 — The prompt that reads the web first had no fence at all
+
+The audit found three unfenced slots in the *draft* prompt, and writing the test
+for those found a fourth. Reviewing the fence's coverage then found something
+larger: **`synthesizeContext` in `src/lib/research.ts` had no fence, no
+delimiters and no security rule.** It is the pass that reads raw Exa output —
+titles, URLs, published dates and page snippets, straight off the open web —
+*before* anything else sees it. Fixing the draft prompt while leaving this open
+protected the second reader of the text and not the first.
+
+**Why it stayed invisible: `fenceUntrusted` was a private function inside
+`prompts.ts`.** The one prompt that needed it most lived in another file and had
+no way to reach it, so it grew its own conventions instead — `--- SECTION ---`
+markers, which the `=`-collapsing fence does not defend even if it had been
+applied. A second prompt inventing a second delimiter dialect is exactly how this
+recurs, so the fence now lives in `src/lib/prompt-fence.ts` alongside
+`UNTRUSTED_DATA_RULE`, and both prompts import it. A test forbids either file
+declaring its own copy.
+
+The synthesis prompt now uses the `=== SECTION ===` vocabulary the fence
+protects, carries the security rule, and puts its instruction under
+`=== YOUR TASK ===`. `searchContext` is fenced at the interpolation point rather
+than as it is assembled — deliberately, because it also carries the
+`--- SECTION ---` labels `performResearch` writes itself, and those must survive.
+The brief stays unfenced and outside the fenced region, because it is the admin's
+own instruction, exactly as in the draft prompt.
+
+**What the attack actually was**, since it is not the draft prompt's: there are
+no `===` delimiters to forge here, so the lever is content. A snippet that talks
+this pass into an attacker-chosen `summary` gets that summary carried forward
+into the article as ordinary research — correctly fenced downstream, and entirely
+wrong. `sourceIndexes` were already safe (rebuilt by number against the
+catalogue, never retyped by the model), which bounded it to poisoning rather than
+citation forgery.
+
+Verified two ways. A new test runs the **real** `registerSources` path with a
+forged delimiter in every attacker-controlled field, asserts the unfenced render
+still carries `=== YOUR TASK ===` — proving the test would have caught the old
+code — and that the fenced one carries no `==` at all while `[S1]` and the prose
+survive. Then the actual pipeline was run against live Exa and Claude: 8 sources
+gathered and selected, a coherent forensic summary, 10 keywords, 7 pain points.
+A restructured prompt is precisely the change a green suite cannot vouch for.
+
 ### August 23, 2026 — The fourth hole in the fence, and the payload nobody checked
 
 The audit named three unfenced slots in the draft prompt. Writing the test that

@@ -1,4 +1,5 @@
 import { callClaude } from "./anthropic";
+import { fenceUntrusted, UNTRUSTED_DATA_RULE } from "./prompt-fence";
 import { ResearchResult, ResearchSource } from "@/types/research";
 import { searchItems } from "./inoreader";
 import { logErrorToFile } from "@/lib/debug";
@@ -179,11 +180,17 @@ async function synthesizeContext(
     deepReport?: string,
     brief?: string
 ): Promise<ResearchResult> {
+    // TRUSTED, and deliberately not fenced: the brief comes from the admin who
+    // typed it, not from the web. It sits above the fenced data for the same
+    // reason it sits under YOUR TASK in the draft prompt — it is instruction,
+    // and the SECURITY rule only disclaims what is inside the === markers.
     const briefBlock = brief?.trim()
         ? `\n\n    The author's editorial brief (prioritise this angle when extracting the signal):\n    ${brief.trim()}\n`
         : '';
     const systemPrompt = `You are a Forensic Technopolitical Analyst.
     Your job is to synthesize raw search results into actionable intelligence.
+
+    ${UNTRUSTED_DATA_RULE}
 
     Output JSON ONLY with this structure:
     {
@@ -202,11 +209,27 @@ async function synthesizeContext(
     leave out is a source the piece will not carry, and a number that is not in
     the list below is discarded.`;
 
-    const userPrompt = `Analyze these search results for the topic: "${topic}".${briefBlock}
+    // This is the FIRST pass that reads raw Exa output — titles, URLs, published
+    // dates and page snippets, straight off the open web — and until now it was
+    // the only prompt in the codebase with no fence and no delimiters for a
+    // fence to defend. The draft prompt downstream fences its inputs, but by
+    // then the damage would already be done: a snippet that talks this pass into
+    // an attacker-chosen `summary` gets that summary carried into the article as
+    // ordinary research, correctly fenced and entirely wrong.
+    //
+    // `searchContext` is fenced here rather than as it is assembled, because it
+    // also carries the `--- SECTION ---` labels performResearch writes itself.
+    // Those survive (the fence only touches runs of `=`), which is why the outer
+    // structure below uses the `===` vocabulary instead: it is the one an
+    // attacker cannot forge.
+    const userPrompt = `=== TOPIC ===
+    ${fenceUntrusted(topic)}${briefBlock}
 
-    Search Results:
-    ${searchContext}
+    === SEARCH RESULTS ===
+    ${fenceUntrusted(searchContext)}
+    === END SEARCH RESULTS ===
 
+    === YOUR TASK ===
     Extract the key signal from the noise. Identify any new keywords or pain points that should be added to our knowledge base.`;
 
     let rawJson = "";

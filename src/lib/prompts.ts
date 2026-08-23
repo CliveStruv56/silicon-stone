@@ -5,23 +5,13 @@ import { logErrorToFile } from "./debug";
 import type { VoiceDNA } from "@/types/context";
 import { AMOUNTS, gbp } from "./offering";
 import { formatSourceDate } from "./research-sources";
+import { fenceUntrusted } from "./prompt-fence";
 
 /**
  * The five canonical Silicon & Stone draft formats. `research` is a separate
  * mode in the UI (gather intel without drafting) so it never reaches here.
  */
 export type DraftFormat = 'pulse' | 'signal' | 'deep_dive' | 'guide' | 'youtube';
-
-/**
- * Neutralise text from untrusted sources (scraped web pages, uploaded/pasted
- * articles, vector-store snippets) before interpolating it into a prompt, so it
- * cannot forge the "=== SECTION ===" delimiters and inject instructions. Runs of
- * '=' are collapsed so a hostile "=== YOUR TASK ===" line becomes inert "= … =".
- */
-function fenceUntrusted(text: string): string {
-    if (!text) return text;
-    return text.replace(/={2,}/g, '=');
-}
 
 export interface DraftResearch {
     summary: string;
