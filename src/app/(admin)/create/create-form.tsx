@@ -9,9 +9,10 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Zap, FileText, Search, BrainCircuit, ExternalLink, Activity, Video, BookOpen } from "lucide-react";
+import { Loader2, Zap, FileText, Search, BrainCircuit, ExternalLink, Activity, Video, BookOpen, ClipboardPaste } from "lucide-react";
 import { startResearch, pollResearchJob, createDraftFromResearch } from "./actions";
 import { shouldAutoFactCheck } from "@/lib/auto-fact-check";
+import { parseIdea } from "@/lib/idea-intake";
 import type { PersonaData } from "@/lib/sanity";
 
 import { ResearchResult, ResearchSource } from "@/types/research";
@@ -29,6 +30,10 @@ export function CreateForm({ initialPersonas, initialFormat = "signal" }: Create
     const [personaSlug, setPersonaSlug] = useState<string>(initialPersonas[0]?.slug.current || "");
     const [topic, setTopic] = useState("");
     const [brief, setBrief] = useState("");
+    // The idea intake. Kept separate from `brief` so pasting can be re-run and
+    // corrected without the operator having to reconstruct what they pasted.
+    const [ideaText, setIdeaText] = useState("");
+    const [ideaNotes, setIdeaNotes] = useState<string[]>([]);
     const BRIEF_MAX = 2000;
 
     const [isResearching, setIsResearching] = useState(false);
@@ -56,6 +61,26 @@ export function CreateForm({ initialPersonas, initialFormat = "signal" }: Create
             if (res.status === "failed") throw new Error(res.error || "Deep research failed");
         }
         throw new Error("Deep research timed out");
+    }
+
+    /**
+     * Fills Topic, Brief and (where the idea names one) Format from pasted text.
+     *
+     * Deliberately a rule rather than a model call: /create already spends most
+     * of its 300s budget on five sequential calls against a metered key, and
+     * everything this writes lands in editable fields, so a bad split costs a
+     * keystroke. src/lib/idea-intake.ts holds the rules and the reasoning.
+     */
+    function handleFillFromIdea() {
+        const parsed = parseIdea(ideaText);
+        if (!parsed.topic && !parsed.brief) {
+            setIdeaNotes(["Nothing to read in that — paste the idea text and try again."]);
+            return;
+        }
+        setTopic(parsed.topic);
+        setBrief(parsed.brief.slice(0, BRIEF_MAX));
+        if (parsed.format) setFormat(parsed.format);
+        setIdeaNotes(parsed.notes);
     }
 
     async function handleLaunchResearch() {
@@ -153,6 +178,39 @@ export function CreateForm({ initialPersonas, initialFormat = "signal" }: Create
                     <CardDescription>Configure the format, target persona, and primary topic.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
+
+                    {/* Step 0: Start from an idea (optional) */}
+                    <div className="space-y-3 rounded-lg border border-dashed border-muted-foreground/25 p-4">
+                        <Label className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                            <ClipboardPaste className="w-4 h-4" />
+                            Start from an idea
+                            <span className="text-[10px] font-normal normal-case tracking-normal text-muted-foreground/70">optional</span>
+                        </Label>
+                        <Textarea
+                            value={ideaText}
+                            onChange={(e) => setIdeaText(e.target.value)}
+                            placeholder={"Paste a story idea and this fills the topic and brief below. Labelled lines (Headline:, Format:, Sources:) are read where present; otherwise it splits the opening clause off the front. Everything it writes stays editable."}
+                            className="min-h-[100px] text-sm leading-relaxed"
+                        />
+                        <div className="flex items-start gap-3">
+                            <Button
+                                type="button"
+                                variant="secondary"
+                                onClick={handleFillFromIdea}
+                                disabled={!ideaText.trim()}
+                                className="shrink-0"
+                            >
+                                Fill topic and brief
+                            </Button>
+                            {ideaNotes.length > 0 && (
+                                <ul className="text-xs text-muted-foreground space-y-0.5 pt-2">
+                                    {ideaNotes.map((note) => (
+                                        <li key={note}>{note}</li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
+                    </div>
 
                     {/* Step 1: Format */}
                     <div className="space-y-3">

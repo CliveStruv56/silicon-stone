@@ -547,6 +547,45 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 23, 2026 — An idea can be pasted instead of retyped
+
+Design B1 from `docs/siliconstone-knowledge-ideas-corpus-brief.md`, built. A
+*Start from an idea* box at the top of `/create` takes the pasted text and fills
+*Primary Topic*, *Context / Brief* and — where the idea names one — the format.
+
+**It is a rule, not a model call.** `/create` already spends most of its 300-second
+budget on five sequential calls against a metered key, and a sixth to split one
+paragraph would cost real money and real latency to do something a rule does
+adequately. Unlike a model, a rule fails the same way twice, and everything it
+writes lands in editable fields, so a bad split costs a keystroke rather than a
+wrong article.
+
+`src/lib/idea-intake.ts` reads labelled lines where the idea has them
+(`Headline:`, `Format:`, `Sources:`) and otherwise splits the opening clause off
+the front, taking whichever boundary comes first — an em-dash or a sentence end —
+because both house styles appear in the material. **Nothing is dropped silently**:
+unplaceable text goes into the brief, the idea's own source line is kept as leads
+for the research pass, and `notes` says what it did so the operator sees the
+decision rather than inferring it. Agent-internal fields (`Score:`, `Slug:`,
+`Id:`) are the only things discarded.
+
+**Provenance comes free.** Wave 2 gave `researchRun` a `brief` field and links the
+article to its run, so because the idea's text *becomes* the brief, an article
+seeded this way already records what it was written from. No new field, no second
+mechanism.
+
+Thirteen tests, every fixture a verbatim record from the `ideas` namespace rather
+than invented input — a splitter tested against its own assumptions passes and
+then fails on the first real paste. Verified in the browser at `/create`: pasted
+the ASML export-control idea, and topic and brief split exactly as intended.
+
+**Also added: `npm run articles:draft-status`.** Read-only, and it runs the *same*
+`preflightArticle()` the publish dialog runs, so what it reports and what the
+dialog will say cannot drift. Studio can only tell you about the draft you have
+open; there was no view anywhere that said which of the waiting drafts are
+finished. Opening ten documents one at a time to find out was the manual step it
+removes.
+
 ### August 22, 2026 — Somebody pressed the button, and a rejected record kept its vector
 
 §11 listed *"press **Mark ready** with `KNOWLEDGE_AUTO_INDEX_ENABLED=true`"* as a

@@ -19,6 +19,7 @@
     "reg:probe": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/regulatory/probe-routed.ts",
     "reg:verify-index": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/regulatory/verify-index.ts",
     "articles:verify-index": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/verify-article-index.ts",
+    "articles:draft-status": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/draft-status.ts",
     "articles:backfill-published-at": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/backfill-published-at.ts",
     "knowledge:verify-index": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/verify-knowledge-index.ts",
     "knowledge:sync": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/knowledge-sync.ts",
