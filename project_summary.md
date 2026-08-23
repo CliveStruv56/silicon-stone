@@ -1,8 +1,8 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-08-22
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (78 prerendered pages), 1,406 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
+> Last Updated: 2026-08-23
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (78 prerendered pages), 1,446 tests green, 24 npm audit findings — all in the Sanity toolchain subtree or `sharp`, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, **Guide**, YouTube Script, Research Only), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
@@ -58,17 +58,39 @@ article a way to say what it was written from. **Wave 3 (editorial memory)** mad
 reviewed knowledge indexable and gave drafting a third retrieval lane — built,
 provisioned, and deliberately **dark**: no score floor has been measured, because
 two records cannot produce the experiment that measured the article lane's. Suite
-1,248 → **1,406**. Between them the two waves shipped **seven defects that a fully
-green suite did not catch**, every one found by running the thing against real
-Sanity, a real index, or — for the last two, on 2026-08-22 — a real button in
-Studio. That pattern is now the most reliable fact in this
-handoff: *the tests are necessary and they are not sufficient.*
+1,248 → **1,446**.
 
-**If you are starting fresh, read these four in this order:** `CLAUDE.md` (the
-invariants), this document's §11 (what to do next), then — only if you are
-touching the knowledge programme — `docs/siliconstone-knowledge-wave-03-brief.md`
-and its wave-2 sibling. Each brief ends with *What was built*, which is the
-honest version.
+**The 22–23 August sessions then proved the whole thing by running it.** Every
+creation path in the test spec was exercised on production — Pulse, Signal, Deep
+Dive, Research Only, `/import`, `ss-draft-local`, the hand-made Studio route and
+MCP capture from Claude — and each run is recorded in §9 with what it proved.
+`publishedAt`, which nothing had ever written, is now stamped on publish with a
+server-side backstop, and eleven query sites agree how to order by it. The idea
+that used to be retyped into `/create` can now be pasted.
+
+**Across the four days, sixteen defects reached production code that a fully
+green suite did not catch.** Every one was found by running the thing: against
+real Sanity, a real index, a real button in Studio, or a real article coming out
+of the generator. Three are worth carrying as habits rather than history — a word
+count that measured text no reader sees and nearly produced a confident wrong
+conclusion; a prompt that asked for JSON while its parser read markers, which
+would have failed silently forever; and a publish guard that reported READY on an
+article carrying an unverified correction to a claim the evidence had
+contradicted. *The tests are necessary and they are not sufficient* is the most
+reliable fact in this handoff.
+
+**If you are starting fresh, read these in this order:** `CLAUDE.md` (the
+invariants), this document's §11 — which now opens with where things actually
+stand and what is genuinely incomplete — then, only if you are touching the
+knowledge programme, `docs/siliconstone-knowledge-wave-03-brief.md` and its
+wave-2 sibling. Each brief ends with *What was built*, which is the honest
+version. `docs/siliconstone-knowledge-ideas-corpus-brief.md` is the newest and
+carries seven unanswered owner questions.
+
+**Two things are incomplete and neither is code**: the editorial-memory retrieval
+lane has no measured score floor (three records; the script advises fifteen), and
+two design decisions from the 23 August runs are recorded in §11 awaiting an
+answer.
 
 ---
 
@@ -6333,6 +6355,52 @@ left unset, being optional by design. | Resolved |
 ---
 
 ## 11. What's Next (Current Priorities)
+
+### Where this stands after 22–23 August
+
+**The article pipeline and the knowledge capture half are verified working.**
+Every creation path in `docs/test-spec-article-flows.md` has now been run on
+production at least once, most of them on 23 August: `/create` at Pulse, Signal
+and Deep Dive, Research Only, `/import`, `ss-draft-local`, the hand-made Studio
+route, and MCP capture from Claude. Each run is recorded in §9 with what it
+proved. **Nine defects were found and fixed across the two days**, every one by
+running the thing rather than by the suite — which now stands at 1,446 green.
+
+Three of those are worth carrying forward as habits rather than history: a raw
+word count measured text no reader sees and nearly produced a confident wrong
+conclusion; a prompt asked for JSON while its parser read markers, and would have
+failed silently; and a guard reported READY on an article carrying an unverified
+correction to a contradicted claim.
+
+**What is NOT complete, and neither gap is code:**
+
+1. **The editorial-memory retrieval lane is dark.** Indexing is live in
+   production and works in both directions. Nothing reads the index, because
+   `KNOWLEDGE_SCORE_FLOOR` has no measured value and the corpus is three records.
+   The mechanism is fully wired — every draft this week logged
+   `editorial_memory: skipped`, which is the lane saying *off*, not *empty*.
+   `knowledge-calibrate.ts` names its own threshold: **`ADVISED_MINIMUM_RECORDS = 15`**.
+   Sequence when there is material: mark records ready (they index on approval
+   now) → `npm run knowledge:calibrate` → set the floor and
+   `KNOWLEDGE_DRAFT_RETRIEVAL_ENABLED`. Do not invent a floor; the code refuses
+   to and so should you.
+2. **Two owner decisions from the 23 August runs**, both stated in §9:
+   - **Pulse can never carry a citation.** It is written as `contentType: signal`,
+     the guard expects citations for that type, citations are written *only* by
+     the fact-check, and Pulse is deliberately excluded from auto-fact-checking.
+     The warning fires on every Pulse. Three possible answers — a distinct
+     contentType for Pulse, seeding from `citationSnapshots`, or dropping
+     `signal` from `CITATION_EXPECTED_TYPES`. The remedy that already exists is
+     **"Add from research"** on the Sources field, which the warning now names.
+   - **The `ideas` corpus**, briefed at
+     `docs/siliconstone-knowledge-ideas-corpus-brief.md` with seven questions.
+     The brief recommends *against* importing, and the paste box built on
+     23 August already closes the practical workflow gap.
+
+**The single most valuable next piece of work is not in this repo**: cover
+images. Eight of sixteen published articles have none, and it is the largest
+remaining manual step per article. Studio suggests prompts; whether
+generate-and-upload can become one button is unscoped.
 
 ### Priority 0 — Go-live: see `LAUNCH.md`
 
