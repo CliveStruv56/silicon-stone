@@ -57,6 +57,29 @@ describe('splitting the prose', () => {
     )
   })
 
+  it('ignores a boundary inside the first few characters', () => {
+    // Found on the first real end-to-end run. A `TEST — ` prefix split at the
+    // em-dash four characters in, so the topic was the word "TEST" — and the
+    // topic is what the research agent searches for, so the run came back with
+    // cricket reports. Any short prefix does it: a byline, a date, a marker.
+    const parsed = parseIdea(
+      'TEST — EU cloud sovereignty tiers and the procurement lever: how the Cloud and AI Development Act would fence hyperscalers out of public-sector demand. Why now: the Commission unveiled the package on 3 June 2026.',
+    )
+    expect(parsed.topic).toBe(
+      'TEST — EU cloud sovereignty tiers and the procurement lever: how the Cloud and AI Development Act would fence hyperscalers out of public-sector demand',
+    )
+    expect(parsed.brief).toMatch(/^Why now:/)
+  })
+
+  it('still splits at an em-dash once past the minimum', () => {
+    // The rule must not swallow the real boundary while skipping the false one.
+    const parsed = parseIdea(
+      'Europe quietly drops its cloud sovereignty tier — and nobody in Brussels wants to say so out loud this week.',
+    )
+    expect(parsed.topic).toBe('Europe quietly drops its cloud sovereignty tier')
+    expect(parsed.brief).toMatch(/^and nobody in Brussels/)
+  })
+
   it('returns empty for empty input rather than throwing', () => {
     expect(parseIdea('')).toEqual({ topic: '', brief: '', notes: [] })
     expect(parseIdea('   \n\n  ')).toEqual({ topic: '', brief: '', notes: [] })

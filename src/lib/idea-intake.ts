@@ -51,6 +51,18 @@ const HEADLINE_WINDOW = 240
 /** A topic line long enough to be useless is worse than a truncated one. */
 const TOPIC_MAX = 180
 
+/**
+ * The shortest thing that can be a headline.
+ *
+ * Both boundary rules need it, and only the sentence rule had it. An em-dash
+ * four characters in — `TEST — the rest of the idea`, a prefix, a byline, a
+ * date stamp — produced a four-character topic and left everything else in the
+ * brief. That is not a cosmetic problem: the topic is what the research agent
+ * *searches for*, so the run went out looking for the word "TEST" and came back
+ * with cricket reports. Found on the first real end-to-end run, 2026-08-23.
+ */
+const MIN_HEADLINE = 20
+
 /** Labelled lines the ideas carry, mapped to what they mean here. */
 const LABELS: Record<string, 'topic' | 'brief' | 'format' | 'sources' | 'ignore'> = {
   headline: 'topic',
@@ -105,11 +117,13 @@ function tidy(raw: string): string {
  */
 function headlineBoundary(text: string): { at: number; skip: number } | null {
   const window = text.slice(0, HEADLINE_WINDOW)
-  const dash = window.search(/\s[—–]\s/)
-  // A sentence end, but not one inside "U.S." or a decimal, and not so early
-  // that the "headline" is a fragment.
-  const stop = window.slice(20).search(/[.:?!]\s+(?=[A-Z“"'(])/)
-  const stopAt = stop === -1 ? -1 : stop + 20
+  // Both rules skip the first MIN_HEADLINE characters: a boundary before that
+  // is a prefix or a stray mark, not the end of a headline.
+  const dashRel = window.slice(MIN_HEADLINE).search(/\s[—–]\s/)
+  const dash = dashRel === -1 ? -1 : dashRel + MIN_HEADLINE
+  // A sentence end, but not one inside "U.S." or a decimal.
+  const stopRel = window.slice(MIN_HEADLINE).search(/[.:?!]\s+(?=[A-Z“"'(])/)
+  const stopAt = stopRel === -1 ? -1 : stopRel + MIN_HEADLINE
 
   if (dash !== -1 && (stopAt === -1 || dash < stopAt)) return { at: dash, skip: 3 }
   if (stopAt !== -1) return { at: stopAt, skip: 1 }

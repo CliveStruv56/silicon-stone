@@ -547,6 +547,59 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 23, 2026 — The creation pipeline, run end to end on production
+
+**Everything from idea to draft works.** Verified against the live site, not
+locally, and cleaned up afterwards (`npm run test:cleanup`, plus two research
+runs deleted by hand — see the trap below).
+
+| Checked | Result |
+|---|---|
+| Anthropic, OpenAI, Exa, Sanity credentials | all 200; a real 1-token completion proves the Anthropic key has **credit**, which a models-list call does not |
+| Capture an idea from Claude (MCP) | item + source created, correct `reviewUrl` into Studio, **idempotency holds** (repeat returns `created: false`) |
+| The deliberately malformed capture | *"Provide a URL, the source text, or declare that extraction is expected."* — the Priority 0c fix holding; it used to say `Problems: _ (required)` |
+| Paste an idea into `/create` | topic and brief split correctly on production |
+| Research pass (Exa) | 8 sources, accurate on-topic forensic summary |
+| Pulse generation | draft in **92 seconds**, categories assigned, Stone Truth, slug, SEO |
+| Wave 2 provenance | `researchRun` linked, **8 `citationSnapshots`**, `generationSnapshot` (model + embedding model + time), and the run carries `query`, `brief`, `keywords`, `selectedSources` — the pasted idea *is* the brief, so lineage came free as designed |
+| The three retrieval lanes | `prior_articles` ok (5, floor 0.37), `regulatory` ok (6, floor 0.3), `editorial_memory` **skipped** — correctly distinguishing *switched off* from *found nothing* |
+
+**Two findings, both for the owner to decide rather than for me to change.**
+
+**1. Every Pulse warns "No sources listed", by construction.** A Pulse is written
+with `contentType: 'signal'`; `CITATION_EXPECTED_TYPES` is `{signal, deepdive,
+guide}`, so the guard expects citations. But `citations[]` is written **only by
+the fact-check** (`fact-check.ts:538`), and Pulse is deliberately excluded from
+auto-fact-checking. So a Pulse can never carry a citation unless somebody runs a
+check by hand, and the warning fires on every single one. Meanwhile the research
+selected **8 sources**, which sit in `citationSnapshots` — internal lineage that
+no reader ever sees. This is the pattern behind 6 of the 10 drafts showing
+"0 source(s)". A guard that always fires for a whole format is the thing this
+codebase warns produces routed-around controls. Three possible answers — give
+Pulse its own `contentType`, seed `citations` from `citationSnapshots`, or drop
+`signal` from the expected set — and they are editorial choices, not refactors.
+
+**2. Pulse ran to 429 words against a stated 100–140.** `auto-fact-check.ts`'s own
+docblock says *"A Pulse is 100–140 words built on one verified shift"*. The
+21 August watch item recorded 282. This run: **429**. Two samples, both far over
+and the second worse. That is no longer "needs more samples before touching the
+prompt".
+
+**One defect found and fixed in the same run.** The first attempt pasted an idea
+prefixed `TEST — `, and the intake box split at that em-dash four characters in —
+so the topic was the word *"TEST"*, and since **the topic is what the research
+agent searches for**, the run came back with cricket reports and NFL previews.
+Only the sentence rule had a minimum length; the dash rule had none. Both now
+skip the first 20 characters. Any short prefix would have done it — a byline, a
+date, a marker. Two tests, mutation-checked.
+
+**A trap worth knowing.** `test:cleanup` finds test documents by a `TEST — ` title
+prefix, and a research run is matched on its `query` — which is the topic. So the
+marker has to be in the topic for the run to be cleaned up, and must *not* be
+there or it poisons the search. The workaround used here: put the marker in the
+**brief** as a title instruction, then delete the run by hand. Two runs needed
+that today.
+
 ### August 23, 2026 — A patched claim nobody re-checked, and a draft that reported ready
 
 **Found by trying to publish, not by the suite.** Running the guards over all ten
