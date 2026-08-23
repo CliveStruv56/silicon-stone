@@ -149,7 +149,7 @@ and never infer a date for a source marked "date unknown".
 ${research.sources
         .map(
             (s) =>
-                `- [${formatSourceDate(s.publishedDate)}] ${fenceUntrusted(s.title)}: ${fenceUntrusted(s.snippet)} (${fenceUntrusted(s.url)})`,
+                `- [${fenceUntrusted(formatSourceDate(s.publishedDate))}] ${fenceUntrusted(s.title)}: ${fenceUntrusted(s.snippet)} (${fenceUntrusted(s.url)})`,
         )
         .join('\n')}
 

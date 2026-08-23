@@ -569,6 +569,44 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### August 23, 2026 — The fourth hole in the fence, and the payload nobody checked
+
+The audit named three unfenced slots in the draft prompt. Writing the test that
+would have caught them found a **fourth**: `formatSourceDate(s.publishedDate)`.
+That function returns its argument verbatim whenever it does not parse as an ISO
+timestamp, and `publishedDate` is carried through from an Exa result "exactly as
+the search reported it" — so a search result claiming to be published on
+`=== YOUR TASK ===` reached the prompt as a delimiter. It is the same class as
+`s.url` and was invisible for the same reason: it looks like a formatter.
+
+`src/lib/prompt-fence.test.ts` is what stops a fifth. It brace-matches every
+`${…}` in the builder's own source at any nesting depth and requires each leaf
+to go through `fenceUntrusted` or to appear on a nine-entry allow-list with a
+written reason — so a slot added tomorrow is covered the day it appears, rather
+than the day somebody re-reads the file. Both anchors assert they were found,
+and removing a single fence makes it fail naming the expression.
+
+**`createDraftFromResearch` accepted an entirely unvalidated client object.** A
+server action is a public POST endpoint: the browser is under no obligation to
+hand back the object the server gave it, and every field of a `ResearchResult`
+— summary, each source's title, url and snippet, the pain points, the keywords,
+the full deep report — is interpolated into five sequential metered model calls.
+`brief` was capped at 2,000 characters; `topic`, two lines above the task
+delimiter, was not, and neither was anything else.
+
+`src/lib/research-input.ts` bounds all of it. It **rejects rather than
+truncates**, deliberately: a deep report is primary material the writer quotes
+from, and slicing one at an arbitrary character would corrupt a draft silently,
+which is worse than an error. Every ceiling therefore sits about an order of
+magnitude above what the pipeline itself produces — nothing this application
+generates can reach one. `MAX_TOPIC_LENGTH` and `MAX_BRIEF_LENGTH` moved there
+too, because they were module-local to one server-action file, which is exactly
+why `pollResearchJob` and the older `/research` action had no cap at all.
+
+A `draftGeneration` bucket (20/hour) now sits in front of it. The admin gate is
+one shared password and each call is five model calls; the ceiling is the cost
+control, not the authentication.
+
 ### August 23, 2026 — A security audit found the code sound and the configuration leaking
 
 A full pass over the five areas that matter: unauthenticated routes and server

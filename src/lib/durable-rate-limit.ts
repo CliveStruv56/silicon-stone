@@ -41,6 +41,10 @@ const configs = {
   contact: { limit: 5, window: '15 m', prefix: 'sas:contact' },
   vectorize: { limit: 120, window: '1 m', prefix: 'sas:vectorize' },
   deepResearch: { limit: 3, window: '1 h', prefix: 'sas:deep-research' },
+  // Generating a draft is five sequential metered model calls, and the admin
+  // gate in front of it is one shared password. Well above a working day of
+  // real drafting — each run takes minutes — and far below a loop.
+  draftGeneration: { limit: 20, window: '1 h', prefix: 'sas:draft-generation' },
   factCheck: { limit: 10, window: '1 h', prefix: 'sas:fact-check' },
   imagePrompts: { limit: 30, window: '1 h', prefix: 'sas:image-prompts' },
   // Autosave for the compliance checker: one write per answer, so the ceiling

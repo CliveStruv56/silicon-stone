@@ -7,6 +7,7 @@ import { buildDraftPrompt, type DraftFormat } from "@/lib/prompts";
 import { parseDraftPayload, finalizeDraft } from "@/lib/draft-pipeline";
 import { requireAdmin } from "@/lib/auth";
 import { ResearchResult } from "@/types/research";
+import { parseResearchResult, ResearchInputError, MAX_TOPIC_LENGTH, MAX_BRIEF_LENGTH } from "@/lib/research-input";
 import { gatherDraftContext } from "@/lib/draft-retrieval";
 import { checkDurableRateLimit } from "@/lib/durable-rate-limit";
 import { getServerActionClientIp } from "@/lib/rate-limit";
@@ -17,9 +18,6 @@ import {
     recordGeneration,
 } from "@/lib/research-provenance";
 import { EMBEDDING_MODEL } from "@/lib/embeddings";
-
-const MAX_TOPIC_LENGTH = 300
-const MAX_BRIEF_LENGTH = 2000
 
 /**
  * `runId` is the provenance record for this investigation (wave 2). It is
@@ -94,7 +92,9 @@ export async function pollResearchJob(
     try {
         const job = await getDeepResearchJob(jobId);
         if (job.status === "completed" && job.report) {
-            const result = await synthesizeDeepReport(topic, job.report, brief.trim().slice(0, MAX_BRIEF_LENGTH));
+            // Clamped like startResearch's copy: both are client-supplied and
+            // both end up interpolated into the synthesis prompt.
+            const result = await synthesizeDeepReport(topic.trim().slice(0, MAX_TOPIC_LENGTH), job.report, brief.trim().slice(0, MAX_BRIEF_LENGTH));
             // Recorded HERE, before the result is handed to a browser that may
             // never come back. This poll is the only moment the report exists
             // in this process — the backend's copy ages out, and a client that
@@ -135,6 +135,10 @@ export type CreateDraftResult = { ok: true; articleId?: string } | { error: stri
  * threw (set progressively below).
  */
 function describeDraftError(error: unknown, stage: string): string {
+    // Already a precise, user-facing sentence naming the offending field —
+    // rewriting it as a generation failure would hide which one.
+    if (error instanceof ResearchInputError) return error.message;
+
     const raw = error instanceof Error ? error.message : String(error);
     const status = (error as { status?: number } | null)?.status;
 
@@ -179,8 +183,29 @@ export async function createDraftFromResearch(
 ): Promise<CreateDraftResult> {
     let stage = "initialising";
     let articleId = "";
+
+    // Outside the try, as in startResearch: a rate-limit rejection is a
+    // specific, actionable message and must not be rewritten into the generic
+    // failure below. Admin-gated, but the gate is one shared password and each
+    // call is five sequential metered model calls — the ceiling is the cost
+    // control, and it is far above a working day of legitimate drafting.
+    const draftIp = await getServerActionClientIp();
+    const draftLimit = await checkDurableRateLimit("draftGeneration", draftIp);
+    if (!draftLimit.allowed) {
+        return { error: `Too many draft generations. Try again in ${draftLimit.retryAfter} seconds.` };
+    }
+
     try {
         await requireAdmin();
+
+        // A server action is a public POST endpoint: the client is under no
+        // obligation to hand back the object the server gave it. Every field of
+        // this one reaches the Claude prompt, so it is bounded before it can
+        // cost a model call. `topic` is clamped rather than refused, the way
+        // startResearch already clamps it and `brief` — it is typed by a human.
+        stage = "validating the research payload";
+        const research = parseResearchResult(researchResult);
+        const normalizedTopic = topic.trim().slice(0, MAX_TOPIC_LENGTH);
 
         // Prior coverage (article index) + primary statutory text (regulatory
         // corpus), retrieved together. Both lanes fail independently and neither
@@ -189,10 +214,10 @@ export async function createDraftFromResearch(
         // outage silently produced un-RAGed drafts with nothing in the logs.
         stage = "retrieving prior coverage and regulatory context";
         const draftContext = await gatherDraftContext({
-            topic,
+            topic: normalizedTopic,
             brief,
-            keywords: researchResult.suggestedContext.keywords,
-            painPoints: researchResult.suggestedContext.pain_points,
+            keywords: research.suggestedContext.keywords,
+            painPoints: research.suggestedContext.pain_points,
             personaRole: personaSlug.replace(/-/g, " "),
         });
 
@@ -202,19 +227,19 @@ export async function createDraftFromResearch(
         // forensic report.
         stage = "building the prompt";
         const { systemPrompt, userPrompt } = await buildDraftPrompt({
-            topic,
+            topic: normalizedTopic,
             personaKey: personaSlug,
             format,
             research: {
-                summary: researchResult.summary,
-                sources: researchResult.sources,
-                painPoints: researchResult.suggestedContext.pain_points,
-                keywords: researchResult.suggestedContext.keywords,
+                summary: research.summary,
+                sources: research.sources,
+                painPoints: research.suggestedContext.pain_points,
+                keywords: research.suggestedContext.keywords,
             },
             priorCoverage: draftContext.priorCoverage,
             editorialMemory: draftContext.editorialMemory,
             regulatoryCorpus: draftContext.regulatoryCorpus,
-            deepReport: researchResult.deepReport,
+            deepReport: research.deepReport,
             brief: brief.trim().slice(0, MAX_BRIEF_LENGTH) || undefined,
         });
 
@@ -239,7 +264,7 @@ export async function createDraftFromResearch(
             regulatoryCorpus: draftContext.regulatoryCorpus,
             // Provenance only — recorded on citationSnapshots, never on the
             // reader-facing Sources list. Promote in Studio.
-            researchSources: researchResult.sources,
+            researchSources: research.sources,
             // Article lineage (wave 2). Only this path supplies it: /import has
             // no run and a hand-written article has no pipeline.
             lineage: {

@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { requireAdmin } from "@/lib/auth";
 import { finalizeDraft } from "@/lib/draft-pipeline";
 import { ResearchResult, ResearchSource } from "@/types/research";
+import { parseResearchResult, MAX_TOPIC_LENGTH } from "@/lib/research-input";
 
 type ResearchState =
     | { success: false; data: null; error?: string }
@@ -35,6 +36,18 @@ export async function createDraftFromResearch(summary: string, topic: string, so
 
     try {
         await requireAdmin();
+
+        // Same reasoning as /create's copy: these three arguments arrive from
+        // the browser, all three reach the prompt, and a server action will
+        // accept whatever is posted to it. Reusing the /create parser keeps one
+        // set of ceilings rather than two that can drift apart.
+        const research = parseResearchResult({
+            summary,
+            sources,
+            suggestedContext: { keywords: [], pain_points: [] },
+        });
+        const normalizedTopic = topic.trim().slice(0, MAX_TOPIC_LENGTH);
+
         const { callClaude } = await import("@/lib/anthropic");
         const { buildDraftPrompt } = await import("@/lib/prompts");
         const { parseDraftPayload } = await import("@/lib/draft-pipeline");
@@ -45,12 +58,12 @@ export async function createDraftFromResearch(summary: string, topic: string, so
         // wrote the material, which would invite the draft to self-reference third-party
         // pages as Silicon & Stone's own back catalogue.
         const { systemPrompt, userPrompt } = await buildDraftPrompt({
-            topic,
+            topic: normalizedTopic,
             personaKey: 'global-citizen',
             format: 'signal',
             research: {
-                summary,
-                sources,
+                summary: research.summary,
+                sources: research.sources,
                 painPoints: [],
                 keywords: [],
             },
@@ -63,7 +76,7 @@ export async function createDraftFromResearch(summary: string, topic: string, so
             format: 'signal',
             personaSlug: 'global-citizen',
             source: 'generated',
-            researchSources: sources,
+            researchSources: research.sources,
             logPrefix: '/research',
         });
 
