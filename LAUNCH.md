@@ -47,13 +47,20 @@ Vercel env change + redeploy — never a code edit.
 - ⏳ Everything in §0 below is owner setup that code cannot do (Kit tags,
   LS store, discount codes, booking URL, LinkedIn URL).
 
-- 🟠 **Three Kit findings from the 2026-08-20 verification, all still open.**
+- 🟠 **Three Kit findings from the 2026-08-20 verification. The first is now
+  closed; two remain open.**
   Read-only reconciliation of the live Kit account against production env:
-  1. **The form ID may be the wrong form.** `CONVERTKIT_FORM_ID = 9270944`
-     resolves to a form named **"Mills form"**. The account also holds
-     `9266701` named **"Newsletter site"**. Every subscriber the site creates
-     is posted to `/v4/forms/9270944/subscribers`, so if "Mills form" is a
-     leftover, every signup is landing in it. Confirm which is intended.
+  1. ~~**The form ID may be the wrong form.**~~ **Settled 2026-08-24: it is the
+     right form, and it is the only one.** `CONVERTKIT_FORM_ID = 9270944` was
+     named "Mills form", which read like a leftover from something unrelated;
+     the August audit also reported a `9266701` "Newsletter site", which no
+     longer exists in the account. With one form present, that form is the
+     site's, and a live enquiry has since been proven to land in it with every
+     custom field populated. **The owner renamed it "Silicon and Stone
+     Briefing".** Renaming does not change the form ID, so `9270944` stays
+     correct and nothing was redeployed. Do not create a second form: the
+     architecture is one form site-wide, and every audience distinction is a
+     tag.
   2. **Two env vars hold literal placeholder text**, not IDs:
      `CONVERTKIT_TOOL_LEAD_TAG_ID` = `your_tool_lead_tag_id` and
      `CONVERTKIT_WAYMARKPATH_TAG_ID` = `your_waymarkpath_tag_id`.
@@ -88,10 +95,10 @@ other eight):
 1. ~~Fix the P0 above: set a valid **Kit v4 API key**~~ — **done 2026-08-20.**
    Optional last step: one live `POST /api/subscribe` with a throwaway address,
    then delete the subscriber, to prove the whole path rather than its parts.
-2. Confirm `CONVERTKIT_FORM_ID` is the intended form (see the finding above —
-   it currently points at "Mills form", not "Newsletter site"), then create the
-   14 Kit tags and paste IDs into Vercel env (§0 Kit table). **The tags do not
-   exist in Kit yet**; creating them is the first half of this step.
+2. ~~Confirm `CONVERTKIT_FORM_ID` is the intended form~~ — **done 2026-08-24**,
+   it is the only form and is now named "Silicon and Stone Briefing". Remaining:
+   create the 14 Kit tags and paste IDs into Vercel env (§0 Kit table). **The
+   tags do not exist in Kit yet**; creating them is the whole of this step.
 3. Create the 3 LS products in test mode: files attached, redirect URLs to
    `/products/success?product={sku}`, checkout links + variant IDs into env (§0 LS).
 4. Configure the LS webhook with `order_created` + signing secret (§0 webhook).
@@ -107,11 +114,20 @@ other eight):
 
 ### Kit (ConvertKit)
 
-- [ ] One form only, site-wide: confirm `CONVERTKIT_FORM_ID` points at the
-      single briefing form. "Atlantic Drift" is a segment tag, not a second form.
-      **Verified 2026-08-20: it points at form `9270944` "Mills form", while a
-      form named "Newsletter site" (`9266701`) also exists.** Decide which is
-      right before launch — this is where every subscriber currently lands.
+- [x] **One form only, site-wide — settled 2026-08-24.**
+      `CONVERTKIT_FORM_ID = 9270944` is the account's only form, renamed by the
+      owner from "Mills form" to **"Silicon and Stone Briefing"**. The
+      `9266701` "Newsletter site" reported by the August audit no longer exists.
+      Renaming leaves the ID untouched, so no env change and no redeploy.
+      A live enquiry has been proven to land in it with all four custom fields
+      populated. "Atlantic Drift" is a segment tag, not a second form — **do not
+      create another form**; every audience distinction here is a tag.
+- [ ] Check that form's own settings before real traffic, since they apply to
+      every subscriber the site creates: double opt-in vs single (it decides
+      whether people are active immediately and what the welcome sequence
+      triggers on), the incentive/confirmation email (Kit's default carries Kit's
+      wording and branding), and any redirect — the site handles its own success
+      states, so one set here is redundant at best.
 - [ ] Create these tags in Kit and put each tag's numeric ID in the matching
       env var (Vercel, all environments). A missing ID never breaks subscribe —
       that tag is just skipped:

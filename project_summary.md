@@ -33,7 +33,7 @@ publication and the article-generation pipeline. Its contract is
 guides already exist and one of them (`editorial-aios-manual.md`) is partly
 obsolete, so the job is consolidation rather than a fifth document.
 
-**The long-standing P0 is resolved as of 2026-08-20: the production Kit API key is now a valid v4 key** (36 chars, `kit_` prefix), verified the same day with a read-only `GET /v4/account` returning 200 for account "SIlicon and Stone". The funnel no longer terminates in a failed POST. It has **not** been proven end to end — nobody has run a live `POST /api/subscribe`, because that puts a real subscriber on the list — so the parts are verified and the whole path is not. The same verification found three things behind it, all open: `CONVERTKIT_FORM_ID` points at a form named **"Mills form"** while one named "Newsletter site" also exists; two tag env vars still hold literal placeholder strings; and **none of the ~18 launch tags exist in Kit at all** (the account has two tags), so subscribes succeed but arrive untagged. The Kit sending address is also unverified. Beyond that: Lemon Squeezy store not yet created, 9 drafts unpublished, and 7 of 12 published articles still lack cover images. Go-live sequence lives in `LAUNCH.md`; defects and debt in §10.
+**The long-standing P0 is resolved as of 2026-08-20: the production Kit API key is now a valid v4 key** (36 chars, `kit_` prefix), verified the same day with a read-only `GET /v4/account` returning 200 for account "SIlicon and Stone". The funnel no longer terminates in a failed POST. It has **not** been proven end to end — nobody has run a live `POST /api/subscribe`, because that puts a real subscriber on the list — so the parts are verified and the whole path is not. The same verification found three things behind it, all open: `CONVERTKIT_FORM_ID` pointed at a form named **"Mills form"** (**closed 2026-08-24**: it is the account's only form, renamed "Silicon and Stone Briefing", ID unchanged); two tag env vars still hold literal placeholder strings; and **none of the ~18 launch tags exist in Kit at all** (the account has two tags), so subscribes succeed but arrive untagged. The Kit sending address is also unverified. Beyond that: Lemon Squeezy store not yet created, 9 drafts unpublished, and 7 of 12 published articles still lack cover images. Go-live sequence lives in `LAUNCH.md`; defects and debt in §10.
 
 **The 21 August 2026 session ran the article-flows test specification end to
 end and repaired everything it found.** All eleven tasks; **fifteen defects
@@ -2645,9 +2645,10 @@ last remaining step whenever the owner wants it.
 Reconciling the live Kit account against production env — still read-only —
 turned up three open problems the 401 had been masking, plus one unrelated:
 
-- **The form may be wrong.** `CONVERTKIT_FORM_ID = 9270944` resolves to a form
-  named **"Mills form"**; the account also holds `9266701` **"Newsletter
-  site"**. Every subscriber the site creates is posted to form 9270944.
+- ~~**The form may be wrong.**~~ **Closed 2026-08-24.** `9270944` is the
+  account's only form; the `9266701` "Newsletter site" this audit reported is
+  gone. Renamed by the owner from "Mills form" to **"Silicon and Stone
+  Briefing"** — the ID is unchanged, so no env edit and no redeploy.
 - **Two env vars hold placeholder text**: `CONVERTKIT_TOOL_LEAD_TAG_ID` and
   `CONVERTKIT_WAYMARKPATH_TAG_ID` are literally `your_..._tag_id`.
 - **Segmentation is off, and cannot be switched on by pasting IDs.**
@@ -6944,7 +6945,7 @@ discount codes, booking URL, LinkedIn URL). This table is for defects and debt.
 | Issue | Notes | Priority |
 |-------|-------|----------|
 | ~~**Kit API key invalid — nothing on the site can capture a lead**~~ — **fixed 2026-08-20** | The owner replaced the legacy v3 key with a v4 `kit_…` key. Verified read-only against Kit (`GET /v4/account` → 200, account "SIlicon and Stone"); the old key had sat in Vercel for 142 days. No redeploy needed — env is read at request time. **Not proven end to end**: no live `POST /api/subscribe` has been run, because it would put a real subscriber on the list. `SUBSCRIBE_VIA_BACKEND` is unset, so subscribe goes direct to Kit and the Vercel var is the one that matters. | Resolved |
-| Kit form ID may point at the wrong form | `CONVERTKIT_FORM_ID = 9270944` resolves to a form named **"Mills form"**. The account also holds `9266701` **"Newsletter site"**. `/api/subscribe` posts every subscriber to `/v4/forms/9270944/subscribers`, so if "Mills form" is a leftover or a test, that is where every signup on the site is landing. One decision in the Kit dashboard; no code change either way. | **High** |
+| ~~Kit form ID may point at the wrong form~~ — **CLOSED 2026-08-24** | `9270944` is the account's only form. The `9266701` "Newsletter site" named in the August audit no longer exists, so the question answered itself: one form means that form is the site's. Renamed by the owner from "Mills form" to **"Silicon and Stone Briefing"**; renaming leaves the ID alone, so no env change and no redeploy. A live enquiry has since been proven to land in it with all four custom fields populated. | ~~High~~ |
 | Kit segmentation is off — the tags do not exist | `src/lib/kit.ts` maps ~18 tags; production defines **four** Kit ID variables, two of which hold the literal placeholder strings `your_tool_lead_tag_id` and `your_waymarkpath_tag_id`; and the Kit account itself contains **two** tags ("New contact", "Imported March 31st, 2026"), neither a launch tag. So this is not a paste job — the tags must be created in Kit first (`LAUNCH.md` §0 table). Subscribes are unaffected: a missing ID is skipped by design, so leads simply arrive untagged and no segmentation happens. Blocks the EU Exposure / Atlantic Drift lead split. | **High** |
 | Kit sending address unverified | `clive.struver@gmail.com` has status `pending` and `from_name` set to the raw email address. API subscribes are unaffected; a broadcast cannot be sent from an unverified address, and a newsletter arriving from a gmail address with no from-name is a deliverability and presentation problem. Verify before the first send. | Medium |
 | 7 of 12 published articles have no cover image | Verified via GROQ 2026-08-05 — `mainImage` is undefined on `welcome-to-silicon-and-stone`, `atlantic-fault-lines-us-tech-policy-eu-autonomy`, `tariff-enforcement-collision`, `semiconductor-testing-bottleneck-ai-accelerators`, `korean-memory-fab-capacity-squeeze-2027`, `greenland-critical-minerals-transatlantic-scramble`, `open-source-sovereignty`. Placeholders render on the live site and in OG cards. The Studio has image-prompt suggestions + a media library to speed this up. | **High** |
@@ -7055,12 +7056,12 @@ ordered go-live sequence, the 14 Kit tag→env mappings, the Lemon Squeezy produ
 duplicate that checklist here — this section only records what is *not* covered
 there.
 
-The one-line status: **step 1 of 9 is done** (the Kit v4 key was fixed
-2026-08-20 and verified against Kit's own API). The next blocking decision is
-**which Kit form** — `CONVERTKIT_FORM_ID` points at a form named "Mills form"
-while one named "Newsletter site" also exists, and every subscriber the site has
-ever created went into whichever it is. That is one decision, no engineering,
-and it is the highest-value open item on this page.
+The one-line status: **steps 1 and 2 of 9 are done.** The Kit v4 key was fixed
+2026-08-20 and verified against Kit's own API, and the form question closed
+2026-08-24 — `9270944` is the account's only form, now named "Silicon and Stone
+Briefing", and a live enquiry has been proven to land in it with every custom
+field populated. The next open item is **the 14 Kit tags**, none of which exist
+yet: no engineering, but no segmentation until they do.
 
 After it: create the 14 Kit tags (none exist yet), then the Lemon Squeezy store.
 
