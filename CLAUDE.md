@@ -356,7 +356,8 @@ classification pairs — that is what stops a real divergence being waved throug
 in the one scenario nobody meant it to happen in. `npm run checker-v2:release`.
 
 One carve-out recorded rather than hidden: **no model call or email send is
-wired** — there is no mail sender, and §22.1's retention decision is open.
+wired** — `src/lib/email.ts` exists but sends enquiry notifications only, nothing here is
+connected to it, and §22.1's retention decision is open.
 
 One flow rule worth not undoing: **`isFinished` and `isLastQuestion` are
 different questions**, and the nav renders both buttons when both are true. The
@@ -622,6 +623,47 @@ human, none blocks generation.
   dialog claims. It deliberately does **not** scan `voiceEditNotes` — that field
   lists the outstanding placeholders, so scanning it would block every
   voice-passed article forever. There is a test for that.
+
+## Enquiry notifications (load-bearing — do not rewire onto one path)
+
+`/api/contact` writes an advisory enquiry into Kit custom fields and tags the
+subscriber. Until 2026-08-24 that was **all** it did — nobody was told, so a
+£2,500 Exposure Diagnostic enquiry sat in a `message` custom field until someone
+opened Kit. `src/lib/email.ts` now emails the owner through Resend.
+
+Four properties, each with a test:
+
+- **It fires on both storage paths.** The route proxies to Railway when
+  `BACKEND_API_URL` is set — which production does — and returns *before* the Kit
+  code. A notification wired into the Kit half would pass every unit test, look
+  right on a local run with no backend, and never send an email in production.
+  Every exit after validation goes through `withNotification()`, and
+  `contact-notification.test.ts` exercises the route with the proxy path active.
+  It is mutation-tested: reverting the proxy path to a bare `return` fails two
+  assertions.
+- **The email carries the whole enquiry, and `stored: false` changes the
+  subject.** When the Kit write fails the notification is the only surviving
+  record, so it must be complete enough to act on — and a failure that reads
+  identically to a success in an inbox list is a failure nobody acts on.
+- **It can never fail the request.** The enquiry is already saved by the time the
+  send is attempted. `notifyEnquiry` returns a status and never throws; the
+  route logs it. Missing env vars degrade to `unconfigured`, not an error — the
+  form ran without this for months and a half-configured environment must not
+  start 500ing a public form.
+- **Subjects are single-lined.** `normalizeField()` truncates but does not strip
+  newlines, and `company`/`interest` reach a mail Subject. `singleLine()` is
+  defence in depth, not the only guard, but a header is never legitimately
+  multi-line.
+
+Resend is called over plain `fetch`, not the `resend` package: `AbortSignal`
+gives a real bound the SDK does not expose, and the dependency ceilings above
+make a new runtime dependency a poor trade for fifteen lines of HTTP.
+`ENQUIRY_NOTIFY_FROM` must be on a domain verified in Resend — verification there
+is separate from Kit's DKIM, and the same domain needs both.
+
+**`backend/main.py` duplicates `/v1/contact` and does not notify.** Today that is
+harmless: the Next route notifies before proxying to it. Do not "simplify" by
+moving the notification into the backend without moving all of it.
 
 ## Publication dates (load-bearing — do not break)
 

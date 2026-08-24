@@ -276,6 +276,36 @@ LS supports discount codes natively (Store → Discounts → New discount):
       receives it with their files.
 - [ ] Test both codes apply cleanly in LS **test mode** checkout.
 
+### Resend — enquiry notifications
+
+Wired 2026-08-24. Before this, an advisory enquiry went into Kit custom fields
+and **nobody was emailed** — a £2,500 Exposure Diagnostic enquiry waited in a
+subscriber record until someone opened Kit. `/api/contact` now emails the owner
+the whole enquiry, on both the Railway-proxy and direct-to-Kit paths.
+
+Until these three are set the feature reports `unconfigured` and skips; the form
+itself is unaffected either way.
+
+- [ ] Create a Resend account and an API key → `RESEND_API_KEY` (**sensitive**).
+- [ ] Verify `siliconandstone.com` in Resend (Domains → Add). This is a
+      **separate** verification from Kit's DKIM — the same domain needs both, and
+      the records do not overlap.
+- [ ] `ENQUIRY_NOTIFY_FROM` — an address on that verified domain, with a display
+      name: `Silicon & Stone <briefing@siliconandstone.com>`. Resend rejects a
+      `from` on an unverified domain, which surfaces as `failed` in the logs and
+      no email.
+- [ ] `ENQUIRY_NOTIFY_TO` — where enquiries land. A real monitored inbox.
+- [ ] Verify: submit the `/advisory` form once. The email arrives with the whole
+      enquiry, its subject reads `Enquiry — <interest> — <company>`, and hitting
+      reply addresses the enquirer, not yourself.
+- [ ] Verify the failure signal: temporarily set `CONVERTKIT_API_KEY` to a bad
+      value, submit again, and confirm the subject is prefixed `[NOT SAVED]`.
+      That prefix is the only thing standing between a lost enquiry and a lost
+      enquiry nobody noticed.
+
+The same sender is what the Compliance Checker v2 report email will use when
+§22.1's retention decision is settled. Nothing else is wired to it yet.
+
 ### Booking + misc
 
 - [ ] Put the 25-minute-call calendar link (Cal.com/Calendly/etc.) in

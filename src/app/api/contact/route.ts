@@ -3,6 +3,8 @@ import { getClientIp } from "@/lib/rate-limit";
 import { checkDurableRateLimit } from "@/lib/durable-rate-limit";
 import { redactForLog } from "@/lib/utils";
 import { BACKEND_TIMEOUT_MS, KIT_TIMEOUT_MS } from "@/lib/timeouts";
+import { notifyEnquiry } from "@/lib/email";
+import type { Enquiry } from "@/lib/enquiry-notification";
 
 const KIT_API_KEY = process.env.CONVERTKIT_API_KEY || "";
 const KIT_FORM_ID = process.env.CONVERTKIT_FORM_ID || "";
@@ -85,7 +87,40 @@ async function proxyContact(body: {
   }
 }
 
+/**
+ * Email the owner, then return the response the visitor was always going to
+ * get. Every exit *after* validation goes through here, both the Railway proxy
+ * path and the direct-to-Kit one.
+ *
+ * That "both" is the whole point, and it is easy to get wrong: production has
+ * `BACKEND_API_URL` set, so `proxyContact()` handles the enquiry and returns
+ * before the Kit code below ever runs. A notification wired into the Kit path
+ * alone would be dead code in the only environment that matters.
+ *
+ * The response is passed through untouched. `notifyEnquiry` never throws, so a
+ * mail outage cannot turn a saved enquiry into an error page — but the outcome
+ * is logged, because a notification that silently stops arriving is the failure
+ * this whole change exists to end.
+ */
+async function withNotification(
+  enquiry: Enquiry,
+  response: NextResponse,
+): Promise<NextResponse> {
+  const status = await notifyEnquiry(
+    enquiry,
+    response.status < 400 ? "stored" : "failed",
+  );
+  if (status === "failed") {
+    console.error("[contact] enquiry saved but the notification did not send");
+  }
+  return response;
+}
+
 export async function POST(request: NextRequest) {
+  // Hoisted so the catch-all below can still notify: an enquiry that got as far
+  // as being valid is never dropped without someone being told.
+  let enquiry: Enquiry | null = null;
+
   try {
     const ip = getClientIp(request);
     let rateLimit;
@@ -161,16 +196,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const railwayResponse = await proxyContact({ name, email, company, interest, message });
+    enquiry = { name, email, company, interest, message };
+
+    const railwayResponse = await proxyContact(enquiry);
     if (railwayResponse) {
-      return railwayResponse;
+      return await withNotification(enquiry, railwayResponse);
     }
 
     if (!KIT_API_KEY || !KIT_FORM_ID) {
       console.error("Missing CONVERTKIT_API_KEY or CONVERTKIT_FORM_ID");
-      return NextResponse.json(
-        { error: "Contact service not configured" },
-        { status: 503 }
+      return await withNotification(
+        enquiry,
+        NextResponse.json(
+          { error: "Contact service not configured" },
+          { status: 503 }
+        )
       );
     }
 
@@ -200,9 +240,12 @@ export async function POST(request: NextRequest) {
     if (!createResponse.ok) {
       const errorText = await createResponse.text();
       console.error("ConvertKit create subscriber error:", createResponse.status, redactForLog(errorText));
-      return NextResponse.json(
-        { error: "Failed to send inquiry. Please try again." },
-        { status: 502 }
+      return await withNotification(
+        enquiry,
+        NextResponse.json(
+          { error: "Failed to send inquiry. Please try again." },
+          { status: 502 }
+        )
       );
     }
 
@@ -242,12 +285,15 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ success: true });
+    return await withNotification(enquiry, NextResponse.json({ success: true }));
   } catch (error) {
     console.error("Contact form error:", error);
-    return NextResponse.json(
+    const response = NextResponse.json(
       { error: "An unexpected error occurred" },
       { status: 500 }
     );
+    // A valid enquiry that died on an unexpected throw is the case most likely
+    // to be lost entirely, so it is the one least worth staying quiet about.
+    return enquiry ? await withNotification(enquiry, response) : response;
   }
 }

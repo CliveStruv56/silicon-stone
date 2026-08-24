@@ -1,14 +1,14 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-08-23
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (78 prerendered pages), 1,460 tests green, 19 npm audit findings — every one of them in the Sanity CLI/export subtree, which never executes in the function runtime, gated behind the Next 16 / Sanity v5 upgrade**
+> Last Updated: 2026-08-24
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (78 prerendered pages), 1,494 tests green, 19 npm audit findings — every one of them in the Sanity CLI/export subtree, which never executes in the function runtime, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, **Guide**, YouTube Script, Research Only), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
 **The AI Act Compliance Checker was rebuilt on 2026-08-10** (Stages 0–3 of the agentic build spec): the rule base is corrected and versioned at `v2026-08-10`, backed by a git-tracked rule pack carrying 19 Articles of verbatim consolidated statute; a conversational intake proposes answers the user confirms before the unchanged deterministic engine classifies; and the result screen now offers an email-gated written report whose every legal quotation is string-matched against that corpus before a reader sees it. The paid half of Stage 3 — the £39 Evidence Pack and the £39→£79 credit — is built dark behind a flag and blocked on the Lemon Squeezy store. A legal review of the report template, disclaimer and credit terms is an open item before it ships. **Reworked again on 2026-08-17**: result items are typed rather than bare strings, so the card (now "Recommended actions and applicable provisions") groups duties apart from concessions, support measures and enforcement information, each expandable to its legal basis and conditions; and `/tools/compliance-checker/provisions` serves the 19 pinned Articles as verbatim statute a reader can follow a citation into. **The vendor questions followed on 2026-08-18**, each now carrying its own Article anchor, a corpus link and a stated reason for asking — including, where the vendor owes you no answer, the fact that it does not. See §9 and §11.
 
-**A v2 rebuild of the Compliance Checker is in progress and is the largest thread of work in the repo.** Plan of record: `docs/# EU AI Act Compliance Checker v2 — Impl.md` (23 sections, 8 phases). **All eight phases are built** under `src/lib/compliance-v2/`, behind `NEXT_PUBLIC_COMPLIANCE_CHECKER_V2` + `?v2=1`; v1 is untouched and is what every user still gets. Its central move is removing the score from legal classification. Six v1 defects are documented in `docs/compliance-checker-v1-known-defects.md` and held as characterisation tests; three are fixed in v2. **Start here: `docs/compliance-checker-v2-state.md`** — one page on how to run it, what exists, what is deliberately not done, and which decisions are still open. Per-phase history is §9; CLAUDE.md carries the invariants. **What remains before release is not code**: counsel review of the 58 propositions (all `reviewStatus: 'internal'`), usability testing with non-specialists, and the retention and marketing decisions that release criterion 16 is blocked on. No model call or email send is wired, because no mail sender exists.
+**A v2 rebuild of the Compliance Checker is in progress and is the largest thread of work in the repo.** Plan of record: `docs/# EU AI Act Compliance Checker v2 — Impl.md` (23 sections, 8 phases). **All eight phases are built** under `src/lib/compliance-v2/`, behind `NEXT_PUBLIC_COMPLIANCE_CHECKER_V2` + `?v2=1`; v1 is untouched and is what every user still gets. Its central move is removing the score from legal classification. Six v1 defects are documented in `docs/compliance-checker-v1-known-defects.md` and held as characterisation tests; three are fixed in v2. **Start here: `docs/compliance-checker-v2-state.md`** — one page on how to run it, what exists, what is deliberately not done, and which decisions are still open. Per-phase history is §9; CLAUDE.md carries the invariants. **What remains before release is not code**: counsel review of the 58 propositions (all `reviewStatus: 'internal'`), usability testing with non-specialists, and the retention and marketing decisions that release criterion 16 is blocked on. No model call or email send is wired: a mail sender now exists (`src/lib/email.ts`, added 2026-08-24 for enquiry notifications), but the checker is not connected to it and §22.1's retention decision is still open.
 
 **A second large thread opened on 2026-08-19: the central knowledge system.** A
 seven-wave programme to make Sanity the canonical store for knowledge and
@@ -568,6 +568,55 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 24, 2026 — Somebody is finally told when an enquiry arrives
+
+`/api/contact` took an advisory enquiry, wrote it into Kit custom fields, tagged
+the subscriber, and told nobody. There is no mail sender anywhere in this project
+— no `resend`, `sendgrid`, `postmark` or `nodemailer` in `package.json` — so a
+£2,500 Exposure Diagnostic enquiry landed in a subscriber's `message` custom
+field and waited there until someone happened to open Kit. The Railway backend's
+`/v1/contact` did the same.
+
+Now the owner is emailed the whole enquiry through Resend. Three new files:
+`src/lib/enquiry-notification.ts` (pure, builds the message),
+`src/lib/email.ts` (`server-only`, sends it), and a route-level test.
+
+**The part that was easy to get wrong** is which path the notification hangs off.
+Production has `BACKEND_API_URL` set, so the route proxies to Railway and returns
+*before* the Kit code. A notification wired into the Kit half alone would have
+passed every unit test, looked correct on a local run with no backend configured,
+and never sent a single email in production — the "a frontend fix can be live and
+still wrong" shape this repo has hit before. Every exit after validation now goes
+through `withNotification()`, including the catch-all 500, and
+`contact-notification.test.ts` drives the real route with the proxy path active.
+Mutation-tested: reverting that one line to a bare `return` fails two assertions.
+
+Three other decisions worth keeping. The email carries the **whole** enquiry
+rather than a "you have a new enquiry" ping, because when the Kit write fails it
+is the only surviving copy. A failed write **prefixes the subject `[NOT SAVED]`**,
+because a failure that reads identically to a success in an inbox list is a
+failure nobody acts on. And nothing here can fail the request: the enquiry is
+already saved by the time the send is attempted, so `notifyEnquiry` returns a
+status and never throws, and missing env vars degrade to `unconfigured` rather
+than 500ing a public form.
+
+Resend is called over plain `fetch` rather than the `resend` package —
+`AbortSignal.timeout` gives a real bound the SDK does not expose, and the
+dependency ceilings in CLAUDE.md make a new runtime dependency a poor trade for
+fifteen lines of HTTP. **No dependency was added.**
+
+Verified beyond the suite: the route was exercised against a running dev server,
+which is what proves `server-only` still resolves at runtime — the unit tests
+mock it. 1,494 tests green (was 1,481), `tsc` clean, eslint clean,
+`test:security` and `test:manual` pass.
+
+**Owner setup outstanding**, and until it is done the feature reports
+`unconfigured` and skips: `RESEND_API_KEY`, `ENQUIRY_NOTIFY_FROM` (on a domain
+verified in Resend — separate from Kit's DKIM) and `ENQUIRY_NOTIFY_TO`. See
+LAUNCH.md § "Resend — enquiry notifications". The same sender is what the
+Compliance Checker v2 report email will use once §22.1's retention decision is
+settled; nothing else is wired to it.
 
 ### August 23, 2026 — The low-severity tail, and the one line in it that was not low
 

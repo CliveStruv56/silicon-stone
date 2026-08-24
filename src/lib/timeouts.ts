@@ -82,6 +82,16 @@ export const KIT_TIMEOUT_MS = 15_000
 export const LEMONSQUEEZY_TIMEOUT_MS = 15_000
 
 /**
+ * Resend, sending the enquiry notification.
+ *
+ * Tighter than the other JSON upstreams because of where it sits: on the public
+ * contact form, *after* the enquiry has already been saved. The visitor is
+ * waiting on a send whose failure changes nothing they can see — so the cost of
+ * waiting is real and the value of waiting longer is nil.
+ */
+export const RESEND_TIMEOUT_MS = 10_000
+
+/**
  * Bound a promise that has no cancellation of its own.
  *
  * Most upstreams here are reached through `fetch`, where `AbortSignal.timeout`
