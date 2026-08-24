@@ -47,6 +47,25 @@ async function proxyContact(body: {
   interest: string;
   message: string;
 }) {
+  // Contact goes DIRECT to Kit by default. The Railway proxy is opt-in via
+  // CONTACT_VIA_BACKEND=true only, exactly as subscribe has been since
+  // 2026-07-19 — and for exactly the same reason, found the hard way.
+  //
+  // Subscribe got this escape hatch when the backend's newsletter service was
+  // discovered unconfigured in production. Contact did not, so it kept
+  // proxying unconditionally to a `/v1/contact` that answers
+  // 503 "Newsletter service not configured" on every request: `_kit_env()` in
+  // `backend/main.py` raises when its CONVERTKIT_API_KEY or CONVERTKIT_FORM_ID
+  // is empty, and Railway's copies are separate from Vercel's. Newsletter
+  // signups worked throughout; every advisory and EU-exposure enquiry failed
+  // and was stored nowhere. Found 2026-08-24 by the enquiry notification, on
+  // its first live run.
+  //
+  // BACKEND_API_URL itself must stay set — it also powers usage tracking, deep
+  // research and briefings. Re-enable this only once the backend has Kit
+  // configured and a live enquiry has been proven end to end.
+  if (process.env.CONTACT_VIA_BACKEND !== "true") return null;
+
   const backendApiUrl = getBackendApiUrl();
   if (!backendApiUrl) return null;
 

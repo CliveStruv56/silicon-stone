@@ -4,12 +4,15 @@ import { NextRequest } from 'next/server'
 /**
  * The enquiry notification must fire on **both** storage paths.
  *
- * `/api/contact` has two: it proxies to the Railway backend when
- * `BACKEND_API_URL` is set and returns immediately, and only otherwise falls
- * through to writing Kit directly. Production has `BACKEND_API_URL` set — so a
- * notification wired into the Kit half alone would pass every unit test, look
- * correct on a local run with no backend configured, and never send a single
- * email in the only environment anybody cares about.
+ * `/api/contact` has two: it writes Kit directly by default, and proxies to the
+ * Railway backend when `CONTACT_VIA_BACKEND=true`, returning immediately.
+ *
+ * Until 2026-08-24 the proxy was unconditional whenever `BACKEND_API_URL` was
+ * set — which production does — so a notification wired into the Kit half alone
+ * would have passed every unit test, looked correct on a local run with no
+ * backend configured, and never sent a single email in the only environment
+ * anybody cares about. The flag now makes the direct path the default, but the
+ * proxy path still exists and still has to notify, so both are covered here.
  *
  * That is the exact shape of a defect this project has hit before: "a frontend
  * fix can be live and still wrong" because `backend/` duplicates the same work.
@@ -65,10 +68,11 @@ afterEach(() => {
   process.env = { ...ORIGINAL_ENV }
 })
 
-describe('the Railway proxy path — what production actually runs', () => {
+describe('the Railway proxy path — opt-in via CONTACT_VIA_BACKEND', () => {
   beforeEach(() => {
     process.env.BACKEND_API_URL = 'https://backend.test'
     process.env.BACKEND_API_KEY = 'shared-key'
+    process.env.CONTACT_VIA_BACKEND = 'true'
   })
 
   it('notifies even though the route returns before the Kit code', async () => {
@@ -159,10 +163,74 @@ describe('the direct-to-Kit path', () => {
   })
 })
 
+/**
+ * The regression that cost every advisory enquiry submitted before 2026-08-24.
+ *
+ * `BACKEND_API_URL` is set in production and must stay set — briefings, usage
+ * tracking and deep research all use it. What must NOT follow from that is
+ * contact proxying to a `/v1/contact` whose Kit credentials are empty, which is
+ * what returned 503 on every enquiry while newsletter signups worked fine.
+ */
+describe('the default path — direct to Kit even with a backend configured', () => {
+  beforeEach(() => {
+    process.env.BACKEND_API_URL = 'https://backend.test'
+    process.env.BACKEND_API_KEY = 'shared-key'
+    delete process.env.CONTACT_VIA_BACKEND
+    process.env.CONVERTKIT_API_KEY = 'kit_test_key'
+    process.env.CONVERTKIT_FORM_ID = '9270944'
+  })
+
+  it('never calls the backend unless the flag is exactly "true"', async () => {
+    const fetchMock = vi.fn(async () =>
+      new Response(JSON.stringify({ subscriber: { id: 42 } }), { status: 200 }),
+    )
+    vi.stubGlobal('fetch', fetchMock)
+
+    const { POST } = await loadRoute()
+    const response = await POST(request())
+
+    expect(response.status).toBe(200)
+    const called = fetchMock.mock.calls.map((c) => String((c as unknown[])[0]))
+    expect(called.some((u) => u.includes('backend.test'))).toBe(false)
+    expect(called.some((u) => u.includes('api.kit.com'))).toBe(true)
+  })
+
+  it('treats any other flag value as off', async () => {
+    for (const value of ['1', 'yes', 'TRUE', '']) {
+      process.env.CONTACT_VIA_BACKEND = value
+      const fetchMock = vi.fn(async () =>
+        new Response(JSON.stringify({ subscriber: { id: 42 } }), { status: 200 }),
+      )
+      vi.stubGlobal('fetch', fetchMock)
+
+      const { POST } = await loadRoute()
+      await POST(request())
+
+      const called = fetchMock.mock.calls.map((c) => String((c as unknown[])[0]))
+      expect(called.some((u) => u.includes('backend.test'))).toBe(false)
+    }
+  })
+
+  it('still notifies on the direct path', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () =>
+        new Response(JSON.stringify({ subscriber: { id: 42 } }), { status: 200 }),
+      ),
+    )
+
+    const { POST } = await loadRoute()
+    await POST(request())
+
+    expect(notifyEnquiry).toHaveBeenCalledWith(expect.anything(), 'stored')
+  })
+})
+
 describe('what is not an enquiry', () => {
   beforeEach(() => {
     process.env.BACKEND_API_URL = 'https://backend.test'
     process.env.BACKEND_API_KEY = 'shared-key'
+    process.env.CONTACT_VIA_BACKEND = 'true'
   })
 
   it('does not notify on a request rejected before validation', async () => {

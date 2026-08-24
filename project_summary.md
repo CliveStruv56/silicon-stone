@@ -2,7 +2,7 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-08-24
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (78 prerendered pages), 1,494 tests green, 19 npm audit findings — every one of them in the Sanity CLI/export subtree, which never executes in the function runtime, gated behind the Next 16 / Sanity v5 upgrade**
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (78 prerendered pages), 1,497 tests green, 19 npm audit findings — every one of them in the Sanity CLI/export subtree, which never executes in the function runtime, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, **Guide**, YouTube Script, Research Only), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
@@ -568,6 +568,43 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### August 24, 2026 — The notification's first live run found the contact form broken
+
+Verified end to end on production: the Resend wiring works, `[NOT SAVED]` landed
+in the inbox as designed. It landed because **the enquiry genuinely was not
+saved**.
+
+A real POST to `https://siliconandstone.com/api/contact` returned
+`503 {"detail":"Newsletter service not configured"}`. The `detail` key is
+FastAPI — that is **Railway** answering, not Next. `_kit_env()` in
+`backend/main.py:197` raises exactly that when its own `CONVERTKIT_API_KEY` or
+`CONVERTKIT_FORM_ID` is empty. Both names exist on the Railway service, so at
+least one is blank, and **Railway's copies are separate from Vercel's** — the
+2026-08-20 key swap never touched them.
+
+Subscribe was fine throughout: it has posted direct to Kit since 2026-07-19,
+when the backend's newsletter service was found unconfigured. Contact never got
+that escape hatch and kept proxying unconditionally whenever `BACKEND_API_URL`
+was set — which production does, because briefings, usage tracking and deep
+research need it. So **every advisory and EU-exposure enquiry submitted before
+today returned an error to the visitor and was stored nowhere.** How many were
+lost cannot be known; nothing recorded them. That is the argument for the
+notification, made by the notification.
+
+Fixed by mirroring subscribe exactly: contact posts direct to Kit unless
+`CONTACT_VIA_BACKEND=true`. Mutation-tested — deleting the flag check fails two
+assertions. Owner step outstanding: set real Kit credentials on the Railway
+service, and leave `CONTACT_VIA_BACKEND` unset until a live enquiry has been
+proven through the proxy. See LAUNCH.md § "Railway — the contact form was broken".
+
+Two things learned about `scripts/security-checks.ts`, both recorded in
+CLAUDE.md: it enumerates files with `git ls-files`, so a **new untracked module
+is invisible to it** — `email.ts` passed the outbound-bound check until it was
+committed, then failed. And its regex is literal, so the string `fetch(` inside a
+*comment* trips it. The bound was real both times; the guard could not see it.
+
+1,497 tests green, `tsc`/eslint clean, `test:security` and `test:manual` pass.
 
 ### August 24, 2026 — Somebody is finally told when an enquiry arrives
 

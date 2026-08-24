@@ -306,6 +306,37 @@ itself is unaffected either way.
 The same sender is what the Compliance Checker v2 report email will use when
 §22.1's retention decision is settled. Nothing else is wired to it yet.
 
+### Railway — the contact form was broken and is now bypassed
+
+Found 2026-08-24, by the enquiry notification on its first live run. A real POST
+to production returned
+`503 {"detail":"Newsletter service not configured"}` — the `detail` key is
+FastAPI, so that was **Railway** answering, not Next.
+
+`_kit_env()` in `backend/main.py` raises that 503 when its `CONVERTKIT_API_KEY`
+or `CONVERTKIT_FORM_ID` is empty. Both names exist on the Railway
+`silicon-stone` service, so at least one holds an empty string. **Railway's
+copies are separate from Vercel's** — the 2026-08-20 key swap was Vercel only.
+
+Newsletter subscribe was unaffected: it has posted direct to Kit since
+2026-07-19. Contact never got that escape hatch, so it proxied unconditionally.
+**Every advisory and EU-exposure enquiry submitted before 2026-08-24 returned an
+error to the visitor and was stored nowhere.** How many were lost is unknowable —
+nothing recorded them.
+
+Code fix shipped: contact now posts **direct to Kit** unless
+`CONTACT_VIA_BACKEND=true`, mirroring subscribe exactly.
+
+- [ ] Set a real `CONVERTKIT_API_KEY` and `CONVERTKIT_FORM_ID` on the Railway
+      `silicon-stone` service (Struver Stack project, production environment).
+      Use the same v4 key as Vercel and form `9270944`. Not urgent for the
+      website — the flag routes around it — but the backend also proxies
+      subscribe, and a blank credential on a live service is a trap waiting for
+      whoever flips a flag next.
+- [ ] Leave `CONTACT_VIA_BACKEND` **unset**. Only set it to `true` after the
+      Railway variables are fixed *and* a live enquiry has been proven end to
+      end through the proxy.
+
 ### Booking + misc
 
 - [ ] Put the 25-minute-call calendar link (Cal.com/Calendly/etc.) in

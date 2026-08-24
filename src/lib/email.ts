@@ -63,6 +63,21 @@ export async function notifyEnquiry(
 
   const { subject, text, replyTo } = buildEnquiryNotification(enquiry, outcome)
 
+  // Built before the call rather than inline, so `signal:` stays within twelve
+  // lines of the outbound call. `scripts/security-checks.ts` reads that window
+  // looking for the bound, and a payload long enough to push it out reads as
+  // unbounded to the guard even when it is not.
+  //
+  // `reply_to` is snake_case: Resend ignores unknown keys rather than
+  // rejecting them, so `replyTo` would silently send replies to ourselves.
+  const payload = JSON.stringify({
+    from: NOTIFY_FROM,
+    to: [NOTIFY_TO],
+    reply_to: replyTo,
+    subject,
+    text,
+  })
+
   try {
     const res = await fetch(RESEND_API, {
       method: 'POST',
@@ -70,13 +85,7 @@ export async function notifyEnquiry(
         Authorization: `Bearer ${API_KEY}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        from: NOTIFY_FROM,
-        to: [NOTIFY_TO],
-        reply_to: replyTo,
-        subject,
-        text,
-      }),
+      body: payload,
       cache: 'no-store',
       signal: AbortSignal.timeout(RESEND_TIMEOUT_MS),
     })

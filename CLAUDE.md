@@ -633,14 +633,14 @@ opened Kit. `src/lib/email.ts` now emails the owner through Resend.
 
 Four properties, each with a test:
 
-- **It fires on both storage paths.** The route proxies to Railway when
-  `BACKEND_API_URL` is set — which production does — and returns *before* the Kit
-  code. A notification wired into the Kit half would pass every unit test, look
-  right on a local run with no backend, and never send an email in production.
-  Every exit after validation goes through `withNotification()`, and
-  `contact-notification.test.ts` exercises the route with the proxy path active.
-  It is mutation-tested: reverting the proxy path to a bare `return` fails two
-  assertions.
+- **It fires on both storage paths.** Contact writes Kit directly by default and
+  proxies to Railway only when `CONTACT_VIA_BACKEND=true`, returning *before* the
+  Kit code when it does. A notification wired into the Kit half alone would pass
+  every unit test, look right on a local run, and — while the proxy was still
+  unconditional — never have sent an email in production. Every exit after
+  validation goes through `withNotification()`, including the catch-all 500, and
+  `contact-notification.test.ts` exercises both. Mutation-tested: reverting the
+  proxy path to a bare `return` fails two assertions.
 - **The email carries the whole enquiry, and `stored: false` changes the
   subject.** When the Kit write fails the notification is the only surviving
   record, so it must be complete enough to act on — and a failure that reads
@@ -661,9 +661,29 @@ make a new runtime dependency a poor trade for fifteen lines of HTTP.
 `ENQUIRY_NOTIFY_FROM` must be on a domain verified in Resend — verification there
 is separate from Kit's DKIM, and the same domain needs both.
 
-**`backend/main.py` duplicates `/v1/contact` and does not notify.** Today that is
-harmless: the Next route notifies before proxying to it. Do not "simplify" by
-moving the notification into the backend without moving all of it.
+**Contact goes direct to Kit by default, and that is a fix, not a preference.**
+Until 2026-08-24 the route proxied to Railway whenever `BACKEND_API_URL` was set,
+with no way to opt out — subscribe got that escape hatch on 2026-07-19 and
+contact did not. Railway's `_kit_env()` raises
+503 "Newsletter service not configured" when its own `CONVERTKIT_API_KEY` or
+`CONVERTKIT_FORM_ID` is empty, and Railway's copies are **separate from
+Vercel's**, so swapping the Kit key in Vercel on 2026-08-20 did not touch them.
+Result: newsletter signups worked throughout while **every** advisory and
+EU-exposure enquiry 503'd and was stored nowhere. The enquiry notification found
+it on its first live run. `BACKEND_API_URL` must stay set — briefings, usage
+tracking and deep research use it — so the gate is a flag, not the URL's absence.
+Re-enable `CONTACT_VIA_BACKEND=true` only once the backend has Kit configured and
+a live enquiry has been proven end to end.
+
+**`backend/main.py` duplicates `/v1/contact` and does not notify.** Harmless
+while the flag is off. Do not "simplify" by moving the notification into the
+backend without moving all of it.
+
+**`scripts/security-checks.ts` reads `git ls-files`, so an untracked new file is
+invisible to it.** A new server module passes the outbound-bound check until it
+is committed — the run where you would most want the answer is the one that
+cannot give it. Its regex is also literal: the string `fetch(` inside a *comment*
+trips the check. Both bit while adding `email.ts`.
 
 ## Publication dates (load-bearing — do not break)
 
