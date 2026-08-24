@@ -606,6 +606,28 @@ committed, then failed. And its regex is literal, so the string `fetch(` inside 
 
 1,497 tests green, `tsc`/eslint clean, `test:security` and `test:manual` pass.
 
+**Both halves verified on production the same day.** Before the fix, a live POST
+returned the Railway 503 and the notification arrived subject-prefixed
+`[NOT SAVED]` with the enquiry intact — the failure signal proving itself on an
+unplanned failure. After it, a live POST returned `{"success":true}` and the
+notification arrived clean. **And the Kit custom fields are confirmed present**:
+`company`, `interest`, `message` and `source` all populate on the subscriber.
+That had been an open question since the launch runbook was written — Kit drops
+custom fields that do not already exist, so an empty `message` would have meant
+every enquiry losing its body text even when the write succeeded. It does not.
+
+Railway's Kit variables were set by the owner the same day (a variable-change
+redeploy is recorded at 15:47 UTC) but **their values remain unverified**:
+Railway returns them redacted and every Kit-using endpoint sits behind
+`X-Backend-Api-Key`. Nothing depends on them while `CONTACT_VIA_BACKEND` is
+unset, which it should stay. LAUNCH.md carries the one-line curl that settles it.
+
+Incidental finding worth knowing before trusting a probe of that backend:
+`_require_backend_api_key()` is called *inside* each handler, so FastAPI's body
+validation runs first. A malformed payload answers `422` to an unauthenticated
+caller, before auth and before the rate limiter — which means a 422 from that
+endpoint says nothing about whether the credentials are right.
+
 ### August 24, 2026 — Somebody is finally told when an enquiry arrives
 
 `/api/contact` took an advisory enquiry, wrote it into Kit custom fields, tagged

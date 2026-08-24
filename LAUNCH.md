@@ -295,13 +295,19 @@ itself is unaffected either way.
       `from` on an unverified domain, which surfaces as `failed` in the logs and
       no email.
 - [ ] `ENQUIRY_NOTIFY_TO` — where enquiries land. A real monitored inbox.
-- [ ] Verify: submit the `/advisory` form once. The email arrives with the whole
-      enquiry, its subject reads `Enquiry — <interest> — <company>`, and hitting
-      reply addresses the enquirer, not yourself.
-- [ ] Verify the failure signal: temporarily set `CONVERTKIT_API_KEY` to a bad
-      value, submit again, and confirm the subject is prefixed `[NOT SAVED]`.
-      That prefix is the only thing standing between a lost enquiry and a lost
-      enquiry nobody noticed.
+- [x] **Verified end to end on production, 2026-08-24.** Both directions:
+      - The failure signal fired first, unplanned — the live test hit the
+        Railway 503 below and the email arrived subject-prefixed `[NOT SAVED]`
+        with the full enquiry intact. That prefix is the only thing standing
+        between a lost enquiry and a lost enquiry nobody noticed, and it earned
+        its place on day one.
+      - After the direct-to-Kit fix, a second live POST returned
+        `{"success":true}` and the email arrived **without** the prefix.
+- [x] **Kit custom fields confirmed present, 2026-08-24.** `company`,
+      `interest`, `message` and `source` all populated on the resulting
+      subscriber. Kit silently drops custom fields that do not already exist, so
+      an empty `message` would have meant every enquiry was losing its body
+      text. It is not. This closes the open question in the Kit section above.
 
 The same sender is what the Compliance Checker v2 report email will use when
 §22.1's retention decision is settled. Nothing else is wired to it yet.
@@ -327,12 +333,28 @@ nothing recorded them.
 Code fix shipped: contact now posts **direct to Kit** unless
 `CONTACT_VIA_BACKEND=true`, mirroring subscribe exactly.
 
-- [ ] Set a real `CONVERTKIT_API_KEY` and `CONVERTKIT_FORM_ID` on the Railway
-      `silicon-stone` service (Struver Stack project, production environment).
-      Use the same v4 key as Vercel and form `9270944`. Not urgent for the
-      website — the flag routes around it — but the backend also proxies
-      subscribe, and a blank credential on a live service is a trap waiting for
-      whoever flips a flag next.
+- [x] Owner set `CONVERTKIT_API_KEY` and `CONVERTKIT_FORM_ID` on the Railway
+      `silicon-stone` service (Struver Stack project, production), 2026-08-24 —
+      a variable-change redeploy of the same commit is recorded at 15:47 UTC.
+      **The values are unverified.** Railway returns them redacted, and every
+      Kit-using endpoint sits behind `X-Backend-Api-Key`, so nothing outside the
+      dashboard can tell "set correctly" from "set to something wrong". Not
+      urgent — the website no longer touches this endpoint — but the backend
+      also carries subscribe, so prove it before anything relies on it:
+
+      ```
+      curl -s -w "\nHTTP %{http_code}\n" -X POST \
+        https://silicon-stone-production.up.railway.app/v1/contact \
+        -H 'Content-Type: application/json' \
+        -H 'X-Backend-Api-Key: <the real key>' \
+        -d '{"name":"T","email":"t@example.com","company":"T","interest":"T","message":"T"}'
+      ```
+
+      `503 {"detail":"Newsletter service not configured"}` means still empty;
+      `200` means fixed, and has just created a Kit subscriber to delete. Keep
+      the JSON on one line — a wrapped shell line puts a literal newline inside
+      the string and FastAPI answers `422 json_invalid` without ever reaching
+      the Kit check.
 - [ ] Leave `CONTACT_VIA_BACKEND` **unset**. Only set it to `true` after the
       Railway variables are fixed *and* a live enquiry has been proven end to
       end through the proxy.
