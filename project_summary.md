@@ -626,6 +626,12 @@ in the Sanity dashboard must widen to `_type in ["article", "series"]`. Until it
 does, editing or reordering a series changes nothing a reader can see and nothing
 reports an error. Recorded in `LAUNCH.md`'s webhook table and in the manual.
 
+**Verified on production** (2026-09-04, deployment `6x8sfk95k`): both routes 200;
+the strip renders "Part 1 of 6" on an article with no intelligence tier at all;
+`isPartOf` is in the article JSON-LD; the series page carries its **own**
+canonical and title rather than inheriting `/intelligence`'s; both series entries
+are in the sitemap.
+
 Manual check 20 guards the two facts the operator's manual states about series
 (the two-part minimum, the Studio field label) and asserts no part-number field
 has appeared on `article`; all three mutations verified to fail.
