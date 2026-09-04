@@ -589,12 +589,21 @@ export function IntelligenceFeed({
           </div>
         </section>
 
-        {/* Series — placed directly under the hero, above the explainers, for
-            two reasons. It is a way of reading, so it belongs with
-            ThreeReadings and PersonaIntro rather than buried by them; and the
-            first article on this page sits ~1,700px down, so anything below
-            the explainers is past the point where a reader has committed to
-            the impact-ranked feed. Renders nothing when no series exist. */}
+        {/* Three Readings of Every Briefing — relocated from the homepage.
+
+            It comes FIRST of the two explainers, ahead of the series band.
+            The band sat above it for one day, on the argument that a reading
+            path belongs with the other reading modes and that height above the
+            feed is scarce. Both still hold — the band is still above the feed,
+            and still compact — but they were the wrong tie-break: how to read a
+            single briefing is what every reader needs, and a series is one
+            route through the archive that some will want. The more important
+            thing goes first. */}
+        <ThreeReadings className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-10 border-b border-border-subtle" />
+
+        {/* Series — the second way of reading, directly after the first, and
+            still above PersonaIntro and the feed. Renders nothing when no
+            series exist. */}
         {series && series.length > 0 && (
           <SeriesPromo
             series={series}
@@ -604,9 +613,6 @@ export function IntelligenceFeed({
             className="mx-auto max-w-7xl border-b border-border-subtle px-6 py-8 lg:px-8"
           />
         )}
-
-        {/* Three Readings of Every Briefing — relocated from the homepage */}
-        <ThreeReadings className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-10 border-b border-border-subtle" />
 
         {/* Persona Introduction — the cards are filter controls in their own
             right; the pill row below does the same job in compact form. */}

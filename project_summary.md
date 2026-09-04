@@ -632,14 +632,19 @@ disagree with the order the promos pick from). Three properties:
 - **The count is of slots.** `partCount` includes parts still in draft, because
   position *is* part number.
 
-**Placement, and the reason for each.** On `/intelligence` it sits directly under
-the hero, above the explainers: a series is a way of reading, so it belongs with
-`ThreeReadings` and `PersonaIntro` rather than beneath them — and measured at
-1440px the first article is ~1,700px down, so anything below the explainers is
-past the point where the reader has committed to the impact-ranked feed. On the
-homepage it follows the tier ladder, which is that page's answer to "how do I
-read this?" — and which had only ever answered it by *length*. A series answers
-it by *sequence*.
+**Placement, and the reason for each.** On `/intelligence` the band sits between
+the two explainers — after `ThreeReadings`, before `PersonaIntro` — and above the
+filters and the feed. It went in *above* `ThreeReadings` and was moved below it
+the same day, at the owner's instruction, on the right argument: **how to read a
+single briefing is what every reader needs; a series is one route through the
+archive that some will want.** The reasons for putting it high still hold — a
+series is a way of reading, so it belongs among the reading modes, and measured
+at 1440px the first article is ~1,700px down, so anything below the explainers is
+past the point where a reader has committed to the impact-ranked feed — but they
+were the wrong tie-break against importance. It is still above the feed and still
+compact. On the homepage it follows the tier ladder, which is that page's answer
+to "how do I read this?" — and which had only ever answered it by *length*. A
+series answers it by *sequence*.
 
 **The first cut was 389px and I had estimated 150.** On a page that already makes
 a reader scroll two screens for an article, that is a different trade than the
