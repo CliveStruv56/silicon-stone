@@ -27,10 +27,25 @@ export async function POST(req: NextRequest) {
         // Invalidate cached content surfaces. revalidateTag covers any
         // sanityFetch results tagged 'sanity'; revalidatePath covers the
         // statically-cached list/detail routes regardless of tagging.
+        //
+        // The _type branch matters: this used to treat ANY slug in the body as
+        // an article slug, which was harmless while only articles fired the
+        // webhook but would have revalidated /analysis/<series-slug> — a path
+        // that does not exist — the moment one did not.
+        //
+        // NOTE: the webhook's own filter lives in the Sanity dashboard, not in
+        // this repo (see LAUNCH.md). If it is still scoped to
+        // `_type == "article"`, editing a series fires nothing at all and its
+        // page sits stale with no error anywhere.
         revalidateTag('sanity')
         revalidatePath('/')
         revalidatePath('/intelligence')
-        if (body.slug?.current) {
+        if (body._type === 'series') {
+            revalidatePath('/intelligence/series')
+            if (body.slug?.current) {
+                revalidatePath(`/intelligence/series/${body.slug.current}`)
+            }
+        } else if (body.slug?.current) {
             revalidatePath(`/analysis/${body.slug.current}`)
         }
 

@@ -7,6 +7,7 @@ import {
   BookOpen,
   Users,
   Search,
+  Layers,
 } from 'lucide-react'
 import { Header, Footer } from '@/components/layout'
 import { ThemeToggle } from '@/components/layout/ThemeToggle'
@@ -21,6 +22,12 @@ export const metadata: Metadata = {
 }
 
 const sections = [
+  {
+    name: 'Series',
+    href: '/intelligence/series',
+    description: 'Reading paths — the analysis in the order the argument was built.',
+    icon: Layers,
+  },
   {
     name: 'Products',
     href: '/products',

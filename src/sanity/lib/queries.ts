@@ -107,6 +107,32 @@ export const ARTICLE_QUERY = defineQuery(`
       excerpt,
       contentType
     },
+    // Every series this article is a part of, each carrying its FULL ordered
+    // entry list. The part number and the prev/next pair are computed from that
+    // list in TypeScript (src/lib/series.ts), not in GROQ -- the whole array is
+    // needed to render either way, and nested parent-scope escapes in GROQ break
+    // silently.
+    //
+    // references() is the reference-index-accelerated form and the idiom already
+    // used in content/actions.ts and scripts/test-cleanup.ts. It matches a ref in
+    // ANY field, which is safe only because entries is the one field on series
+    // that can hold an ARTICLE id (categories points at category). If series ever
+    // gains a second article-typed reference field, switch this to the explicit
+    // form: ^._id in entries[]._ref
+    //
+    // NOTE: no backticks in comments inside these template literals -- one
+    // terminates the string and the whole file stops parsing.
+    "series": *[_type == "series" && defined(slug.current) && references(^._id)]{
+      _id,
+      title,
+      "slug": slug.current,
+      status,
+      "parts": entries[]{
+        _key,
+        "ref": _ref,
+        "article": @->{ _id, title, "slug": slug.current, intelligenceTier }
+      }
+    },
     citations[]{
       title,
       url,
@@ -248,6 +274,93 @@ export const OG_ARTICLE_QUERY = defineQuery(`
 `)
 
 // Sitemap — categories with last-modified
+// === SERIES ===
+//
+// A series is an ordered reading path across existing articles. The POSITION of
+// an entry is its part number — nothing types a number, so nothing can disagree.
+//
+// Both projections below use the positional form `entries[]{ ..., @->{...} }`
+// rather than the collapsing `entries[]->{...}`. That is deliberate and is the
+// single most important thing about these queries: the positional form returns
+// ONE element per entry, with `"article": null` where the reference does not
+// resolve (an entry pointing at a draft, or at a part that has been
+// unpublished). The collapsing form silently drops those elements, which would
+// renumber every part after the hole. Verified against the production dataset
+// with a real draft-only article.
+//
+// `_key` is projected because it is the only stable React key available when
+// `article` is null and there is no slug to fall back on.
+
+// One series and its full ordered part list.
+export const SERIES_QUERY = defineQuery(`
+  *[_type == "series" && slug.current == $slug][0]{
+    _id,
+    _updatedAt,
+    title,
+    "slug": slug.current,
+    standfirst,
+    status,
+    coverImage,
+    categories[]->{
+      _id,
+      title,
+      "slug": slug.current
+    },
+    personas,
+    seo {
+      metaTitle,
+      metaDescription
+    },
+    "parts": entries[]{
+      _key,
+      "ref": _ref,
+      "article": @->{
+        _id,
+        title,
+        "slug": slug.current,
+        excerpt,
+        stoneTruth,
+        intelligenceTier,
+        contentType,
+        publishedAt,
+        mainImage
+      }
+    }
+  }
+`)
+
+// The series index. Ordered manually, NOT by date: published-at-query.test.ts
+// requires every `order(...)` clause here that mentions publishedAt to use the
+// exact `coalesce(publishedAt, _updatedAt)` expression, and a series has no
+// publication date of its own to order by anyway.
+export const SERIES_INDEX_QUERY = defineQuery(`
+  *[_type == "series" && defined(slug.current)]
+  | order(featured desc, coalesce(displayOrder, 999) asc, title asc) {
+    _id,
+    title,
+    "slug": slug.current,
+    standfirst,
+    status,
+    coverImage,
+    featured,
+    categories[]->{
+      _id,
+      title,
+      "slug": slug.current
+    },
+    "partCount": count(entries),
+    "publishedCount": count(entries[@-> != null])
+  }
+`)
+
+// generateStaticParams + the sitemap.
+export const SERIES_SLUGS_QUERY = defineQuery(`
+  *[_type == "series" && defined(slug.current)]{
+    "slug": slug.current,
+    _updatedAt
+  }
+`)
+
 export const SITEMAP_CATEGORIES_QUERY = defineQuery(`
   *[_type == "category" && defined(slug.current)] {
     "slug": slug.current,

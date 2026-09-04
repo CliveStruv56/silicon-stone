@@ -15,7 +15,12 @@ interface PulseHeaderProps {
   className?: string
 }
 
-function getTierConfig(tier?: string) {
+/**
+ * Tier chip presentation. Exported so the series surfaces render the same chip
+ * rather than growing a third copy of this switch (IntelligenceFeed already
+ * has its own, for the feed's differently-shaped cards).
+ */
+export function getTierConfig(tier?: string | null) {
   switch (tier) {
     case 'pulse':
       return {

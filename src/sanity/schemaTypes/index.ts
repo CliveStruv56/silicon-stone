@@ -1,5 +1,6 @@
 import { type SchemaTypeDefinition } from 'sanity'
 import { article } from './article'
+import { series } from './series'
 import { author } from './author'
 import { category } from './category'
 import { product } from './product'
@@ -18,6 +19,7 @@ import { glossaryTerm } from './glossaryTerm'
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
     article,
+    series,
     author,
     category,
     product,

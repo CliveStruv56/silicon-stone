@@ -18,7 +18,7 @@ type Tab = {
 // user accounts (Phase 3 decision), so the fifth slot holds secondary nav.
 const TABS: Tab[] = [
   { name: "Home", href: "/", icon: Home },
-  { name: "Read", href: "/intelligence", icon: Newspaper, match: ["/analysis"] },
+  { name: "Read", href: "/intelligence", icon: Newspaper, match: ["/analysis", "/intelligence/series"] },
   { name: "Tools", href: "/tools", icon: Wrench },
   { name: "Saved", href: "/saved", icon: Bookmark },
   {

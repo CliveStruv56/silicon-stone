@@ -4,6 +4,7 @@ import {
   SITEMAP_ARTICLES_QUERY,
   SITEMAP_CATEGORIES_QUERY,
   AUTHOR_SLUGS_QUERY,
+  SERIES_SLUGS_QUERY,
 } from '@/sanity/lib/queries'
 import { absoluteUrl } from '@/lib/site'
 import { RULE_PACK } from '@/lib/rulepack'
@@ -24,6 +25,8 @@ const STATIC_ROUTES: Array<{
 }> = [
   { path: '/', changeFrequency: 'daily', priority: 1 },
   { path: '/intelligence', changeFrequency: 'daily', priority: 0.9 },
+  // The series library. Individual series are enumerated below, like articles.
+  { path: '/intelligence/series', changeFrequency: 'weekly', priority: 0.7 },
   { path: '/about', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/methodology', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/glossary', changeFrequency: 'weekly', priority: 0.7 },
@@ -60,7 +63,7 @@ const STATIC_ROUTES: Array<{
 ]
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [{ data: articles }, { data: categories }, { data: authors }] =
+  const [{ data: articles }, { data: categories }, { data: authors }, { data: seriesList }] =
     await Promise.all([
       sanityFetch({
         query: SITEMAP_ARTICLES_QUERY,
@@ -74,6 +77,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }),
       sanityFetch({
         query: AUTHOR_SLUGS_QUERY,
+        perspective: 'published',
+        stega: false,
+      }),
+      sanityFetch({
+        query: SERIES_SLUGS_QUERY,
         perspective: 'published',
         stega: false,
       }),
@@ -114,6 +122,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }))
 
+  // One entry per series. Ranked with the category pages rather than the
+  // articles: a series is a hub, and the parts it points at carry the substance.
+  const seriesEntries: MetadataRoute.Sitemap = (
+    (seriesList ?? []) as Array<{ slug: string; _updatedAt?: string | null }>
+  ).map((entry) => ({
+    url: absoluteUrl(`/intelligence/series/${entry.slug}`),
+    lastModified: entry._updatedAt || undefined,
+    changeFrequency: 'weekly',
+    priority: 0.6,
+  }))
+
   const categoryEntries: MetadataRoute.Sitemap = (
     (categories ?? []) as Array<{ slug: string; _updatedAt?: string | null }>
   ).map((category) => ({
@@ -135,6 +154,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...staticEntries,
     ...provisionEntries,
     ...articleEntries,
+    ...seriesEntries,
     ...categoryEntries,
     ...authorEntries,
   ]

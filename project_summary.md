@@ -2,7 +2,7 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-09-04
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (78 prerendered pages), 1,497 tests green, 19 npm audit findings — every one of them in the Sanity CLI/export subtree, which never executes in the function runtime, gated behind the Next 16 / Sanity v5 upgrade**
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (119 prerendered pages), 1,523 tests green, 19 npm audit findings — every one of them in the Sanity CLI/export subtree, which never executes in the function runtime, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, **Guide**, YouTube Script, Research Only), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
@@ -568,6 +568,67 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### September 4, 2026 — Series: the archive in the order the argument was built
+
+`/intelligence` ranks by impact score. It has never been able to say *read these
+five, in this order* — every organising field on `article` (`categories`,
+`intelligenceTier`, `contentType`, `personas`, `methodologyPillars`) is a facet,
+and a facet cannot express a sequence. The gap was visible in the prose: "Brussels
+Has Five Tools…" points back at two earlier pieces in a sentence, with an
+unresolved `[AUTHOR: confirm URLs for both pieces]` still in its voice-edit notes.
+
+**A series is a document, not a tag.** New `series` type
+(`src/sanity/schemaTypes/series.ts`) holding an ordered `entries` array;
+`/intelligence/series` and `/intelligence/series/[slug]`; a "Part N of M" strip
+and a Continue-the-series pair on `/analysis/[slug]`; `CreativeWorkSeries` +
+`hasPart` / `isPartOf` JSON-LD; sitemap and nav entries. Logic is a pure module
+(`src/lib/series.ts`, 19 tests). One live series seeded: **European Sovereignty
+vs Performance**, six parts.
+
+**The array position is the part number — nothing types one.** A `part: 3` on
+each article is the same fact in six places, free to disagree, needing a hand
+renumber on every insert; the same reasoning that gives prices and publication
+dates one source each. Reordering is a drag.
+
+Five decisions worth not undoing:
+
+- **`entries` holds WEAK references**, for the reason `researchRun.articles[]`
+  already documents. Strong ones would refuse to publish a series pointing at a
+  part still in draft, and would force `unpublishArticle` to sweep the entry —
+  which *collapses the array and renumbers every part after it*. Weak ones just
+  stop resolving, so the slot survives as "Part 4 — in preparation".
+- **Numbering counts every slot; linking skips the unresolved ones.** In a series
+  whose part 4 is a draft, part 3's "next" is part 5 and is *labelled* Part 5.
+  Publishing a late part never renumbers the ones after it.
+- **`rule.unique()` is not enough and a custom validator does the work.** It
+  compares array members with a key-count guard, and a reference to a draft
+  carries `_weak` / `_strengthenOnPublish` — so the counts differ, the comparison
+  short-circuits, and the duplicate goes undetected. That case is the normal one
+  here, not the exotic one.
+- **The four-copy feed query is untouched.** Selecting a series *navigates*
+  rather than filtering the feed, so no series field enters the projection that
+  lives in `intelligence/page.tsx`, `api/briefings/route.ts`, `queries.ts` **and
+  `backend/main.py`**. Nothing to keep in sync, nothing to redeploy on Railway.
+- **No `?series=` pin.** Reading searchParams would opt `/analysis/[slug]` out of
+  static rendering for every article, to serve an article-in-two-series case that
+  does not yet exist. The first series wins, deterministically.
+
+**Two things a browser walk-through caught that the suite did not.** The series
+strip had to sit *outside* the `hasIntelligenceFields` conditional — nested
+inside, series context would vanish on untiered articles, the same shape as the
+defect where an untiered article published into invisibility. And `<Gate>` has no
+top margin of its own, so the commerce card butted flush against the "next part"
+card and the upsell read as the last row of the series nav.
+
+**Still to do, and it is not in this repo:** the `/api/revalidate` webhook filter
+in the Sanity dashboard must widen to `_type in ["article", "series"]`. Until it
+does, editing or reordering a series changes nothing a reader can see and nothing
+reports an error. Recorded in `LAUNCH.md`'s webhook table and in the manual.
+
+Manual check 20 guards the two facts the operator's manual states about series
+(the two-part minimum, the Studio field label) and asserts no part-number field
+has appeared on `article`; all three mutations verified to fail.
 
 ### September 4, 2026 — Four engagements, four pages, one template
 

@@ -685,6 +685,56 @@ is committed — the run where you would most want the answer is the one that
 cannot give it. Its regex is also literal: the string `fetch(` inside a *comment*
 trips the check. Both bit while adding `email.ts`.
 
+## Article series (load-bearing — do not break)
+
+A `series` is an ordered reading path across published articles, rendered at
+`/intelligence/series[/slug]` with a "Part N of M" strip and a prev/next pair on
+`/analysis/[slug]`. One rule underpins all of it:
+
+**The position of an entry in `series.entries` IS its part number.** No part
+number is stored on an article, and none may be added — that is the `£`-literal
+and the `publishedAt` mistake in a third costume. `scripts/manual-checks.ts`
+check 20 asserts no `partNumber`/`seriesPart` field has appeared on `article`.
+
+Five consequences, each of which bit or would have:
+
+- **`entries` holds WEAK references.** Same lesson as `researchRun.articles[]`:
+  a strong reference from a published document to one that does not exist in the
+  published dataset is refused, so a series could not point at a part still in
+  draft. It also matters on the way out — with strong refs `unpublishArticle`
+  must sweep the entry, and `unset` on an array member **collapses it, renumbering
+  every part after**. Weak refs simply stop resolving and the slot survives.
+- **Numbering counts every slot; linking skips the unresolved ones.** The GROQ
+  uses the positional `entries[]{ _key, "ref": _ref, "article": @->{…} }`, never
+  the collapsing `entries[]->{…}` — the latter drops unresolved elements and
+  would renumber the parts after a hole. Verified against production with a real
+  draft-only article. This is the first `@->` in the repo.
+- **`rule.unique()` cannot catch duplicates here.** It compares array members
+  with a key-count guard before ignoring `_key`, and a Studio reference to a
+  draft carries `_weak` and `_strengthenOnPublish` — different key count, so the
+  comparison short-circuits. A custom `_ref` validator does the work.
+- **The `/intelligence` feed query is deliberately untouched.** Selecting a series
+  navigates to its page rather than filtering the feed (a series is ordered, the
+  feed is impact-ranked). That is what keeps this clear of the four-copy query in
+  `intelligence/page.tsx`, `api/briefings/route.ts`, `queries.ts` and
+  `backend/main.py`.
+- **There is no `?series=` pin, on purpose.** Reading searchParams in
+  `/analysis/[slug]` would opt every article out of static rendering to serve a
+  multi-membership case that does not exist yet. `resolveSeriesContext` takes the
+  first match; the pin belongs there if that ever changes.
+
+Two more things not to undo. **The series strip sits OUTSIDE the
+`hasIntelligenceFields` conditional** — nested inside it, series context vanishes
+on untiered articles, which is the shape of the defect where an untiered article
+published into invisibility. And **`SeriesNav` carries `mb-10` because `<Gate>`
+has no top margin**: without it the commerce card butts flush against the "next
+part" card and the upsell reads as part of the series nav. Both were found by
+walking the pages in a browser, not by the suite.
+
+**The revalidate webhook's filter must include `series`.** It lives in the Sanity
+dashboard, not this repo (see `LAUNCH.md`). Scoped to articles only, a series
+edit invalidates nothing and the page sits stale with no error anywhere.
+
 ## Publication dates (load-bearing — do not break)
 
 Every price has one source; so does every publication date. `publishedAt` is

@@ -430,6 +430,42 @@ check('the manual carries a verification stamp', () => {
   )
 })
 
+check('the series minimum and its field name match the schema', () => {
+  // Two facts the manual states about building a series, both read out of the
+  // schema. The minimum is the interesting one: it is the difference between
+  // "one article is not a series" being a rule and being an opinion.
+  const minimum = extract(
+    'src/sanity/schemaTypes/series.ts',
+    /\.min\((\d+)\)\s*\n\s*\.error\('A series needs at least/,
+    'the entries minimum on the series type',
+  )
+  assert.equal(
+    minimum,
+    '2',
+    `series.entries now requires a minimum of ${minimum}, not 2. The manual says ` +
+      '"A minimum of two parts." Update both, or neither.',
+  )
+  manualStates('A minimum of two parts.', 'the minimum number of parts in a series')
+
+  // The manual tells an editor to look for a field by its Studio label. A
+  // rename would leave them hunting for a field that is no longer called that.
+  const label = extract(
+    'src/sanity/schemaTypes/series.ts',
+    /name: 'entries',\s*\n\s*title: '([^']+)'/,
+    "the Studio title of series.entries",
+  )
+  manualStates(`**${label}**`, `the Studio label of the series parts field ("${label}")`)
+
+  // The whole design in one sentence. If a partNumber field ever appears on
+  // article, this claim becomes false and a reader would be told to look for a
+  // control that exists.
+  assert.ok(
+    !/name: 'partNumber'|name: 'seriesPart'/.test(source('src/sanity/schemaTypes/article.ts')),
+    'article now carries a part-number field. The manual says "There is no part ' +
+      'number to type, anywhere" — that is no longer true. Decide which is right.',
+  )
+})
+
 // ---------------------------------------------------------------------------
 
 function main(): void {

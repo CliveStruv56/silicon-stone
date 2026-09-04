@@ -25,6 +25,8 @@ export type SchemaArticle = {
     url: string
     publisher?: string | null
   }> | null
+  /** The reading path this article is a part of, when it is part of one. */
+  series?: { title: string; slug: string } | null
 }
 
 /** Strip markdown noise and clamp to a clean meta-description sentence. */
@@ -109,7 +111,90 @@ export function buildArticleSchema(a: SchemaArticle) {
           })),
         }
       : {}),
+    // The series is the author's argued reading order, so it is a genuine
+    // CreativeWorkSeries the article is part of — not merely "related".
+    // schema.org: isPartOf is the inverse of the hasPart emitted by
+    // buildSeriesSchema, and the two must name the same @id to pair up.
+    ...(a.series
+      ? {
+          isPartOf: {
+            '@type': 'CreativeWorkSeries',
+            '@id': absoluteUrl(`/intelligence/series/${a.series.slug}`),
+            name: a.series.title,
+            url: absoluteUrl(`/intelligence/series/${a.series.slug}`),
+          },
+        }
+      : {}),
     url,
+  }
+}
+
+export type SchemaSeries = {
+  title: string
+  slug: string
+  description?: string | null
+  imageUrl?: string | null
+  _updatedAt?: string | null
+  /**
+   * Only the parts that actually resolve to a published article. An entry held
+   * for a piece still in preparation is a real slot on the page — the reader is
+   * owed the shape of the series — but it is not a CreativeWork that exists, and
+   * asserting one to a search engine would be a claim about a URL that 404s.
+   */
+  parts: Array<{ title: string; slug: string; position: number }>
+}
+
+/**
+ * A series as a CreativeWorkSeries with hasPart, paired with the isPartOf that
+ * buildArticleSchema puts on each member.
+ *
+ * `position` is passed in rather than derived from the array index here,
+ * because the caller has already filtered out the unpublished slots and the
+ * position must remain the part's real number in the series — not its index
+ * among the published ones.
+ */
+export function buildSeriesSchema(s: SchemaSeries) {
+  const url = absoluteUrl(`/intelligence/series/${s.slug}`)
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CreativeWorkSeries',
+    '@id': url,
+    name: s.title,
+    ...(s.description ? { description: s.description } : {}),
+    ...(s.imageUrl ? { image: [s.imageUrl] } : {}),
+    ...(s._updatedAt ? { dateModified: s._updatedAt } : {}),
+    publisher: { '@id': `${SITE_URL}/#organization` },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+    ...(s.parts.length
+      ? {
+          hasPart: s.parts.map((part) => ({
+            '@type': 'Article',
+            position: part.position,
+            name: part.title,
+            url: absoluteUrl(`/analysis/${part.slug}`),
+          })),
+        }
+      : {}),
+    url,
+  }
+}
+
+/** Intelligence → Series → this series. */
+export function buildSeriesBreadcrumbSchema(s: { title: string; slug: string }) {
+  const items = [
+    { name: 'Intelligence', url: absoluteUrl('/intelligence') },
+    { name: 'Series', url: absoluteUrl('/intelligence/series') },
+    { name: s.title, url: absoluteUrl(`/intelligence/series/${s.slug}`) },
+  ]
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: item.url,
+    })),
   }
 }
 

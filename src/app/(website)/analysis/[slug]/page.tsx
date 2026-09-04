@@ -20,6 +20,9 @@ import {
 import { buildToc, MIN_TOC_ENTRIES } from '@/lib/article-toc'
 import { SaveButton, type SavePayload } from '@/components/article/SaveButton'
 import { RelatedArticles } from '@/components/article/RelatedArticles'
+import { SeriesStrip } from '@/components/series/SeriesStrip'
+import { SeriesNav } from '@/components/series/SeriesNav'
+import { SeriesProgressTracker } from '@/components/series/SeriesProgressTracker'
 import { GlossaryToggle } from '@/components/glossary'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { sanityFetch } from '@/sanity/lib/live'
@@ -34,6 +37,14 @@ import {
   type GateProduct,
 } from '@/lib/gate'
 import { formatDate } from '@/lib/format'
+import {
+  neighboursFor,
+  partNumberFor,
+  resolveSeriesContext,
+  totalParts,
+  type SeriesPart,
+  type SeriesRef,
+} from '@/lib/series'
 import { absoluteUrl } from '@/lib/site'
 import {
   buildArticleSchema,
@@ -260,6 +271,14 @@ export default async function ArticlePage({ params }: Props) {
   const primaryPersona = article.personas?.[0]
   const hasIntelligenceFields = article.intelligenceTier || article.impactScore || article.stoneTruth
 
+  // The reading path this article sits in, if any. An article may belong to
+  // more than one series; the first is used deterministically — see
+  // resolveSeriesContext for why there is no ?series= pin.
+  const series = resolveSeriesContext(article.series as SeriesRef[] | null)
+  const seriesParts = (series?.parts ?? []) as SeriesPart[]
+  const seriesPartNumber = series ? partNumberFor(seriesParts, article._id) : null
+  const seriesNeighbours = series ? neighboursFor(seriesParts, article._id) : { prev: null, next: null }
+
   // End-of-article gate (P3-1/P3-3): resolve mode + copy from Sanity, mapping
   // the article's topics to a product for the commerce/auto upsell. The
   // newsletter fallback reuses the persona-aware CTA copy.
@@ -377,6 +396,7 @@ export default async function ArticlePage({ params }: Props) {
       : null,
     categories: article.categories,
     citations: article.citations,
+    series: series ? { title: series.title, slug: series.slug } : null,
   }
 
   return (
@@ -391,6 +411,24 @@ export default async function ArticlePage({ params }: Props) {
       <main className="flex-1">
         {/* Article Header */}
         <article className="mx-auto max-w-4xl px-6 py-10 lg:px-8 lg:py-12">
+          {/*
+            Series context. Deliberately OUTSIDE the hasIntelligenceFields
+            conditional below: an article with no tier, impact score or Stone
+            Truth is still a legitimate part of a reading path, and hiding its
+            place in that path would repeat — in a smaller way — the defect
+            where an untiered article published into invisibility.
+          */}
+          {series && seriesPartNumber !== null && (
+            <>
+              <SeriesStrip
+                series={series}
+                partNumber={seriesPartNumber}
+                totalParts={totalParts(seriesParts)}
+              />
+              <SeriesProgressTracker seriesSlug={series.slug} partNumber={seriesPartNumber} />
+            </>
+          )}
+
           {/* Pulse Header - Intelligence Portal metadata */}
           {hasIntelligenceFields && (
             <PulseHeader
@@ -665,6 +703,17 @@ export default async function ArticlePage({ params }: Props) {
                 ))}
               </div>
             </div>
+          )}
+
+          {/* Continue the series — ABOVE the gate on purpose. A reader part-way
+              through a reading path should be offered the next part before a
+              commerce or newsletter ask, not after it. */}
+          {series && (
+            <SeriesNav
+              series={series}
+              prev={seriesNeighbours.prev}
+              next={seriesNeighbours.next}
+            />
           )}
 
           {/* End-of-article gate (P3-1): newsletter, product upsell, or lead —

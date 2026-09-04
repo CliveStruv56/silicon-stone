@@ -240,16 +240,32 @@ indexed, never audited and never announced, silently. This section is the only
 record.
 
 Sanity project → **API → Webhooks**. For each: `POST`, dataset `production`,
-trigger on **create / update / publish**, filter `_type == "article"`, and a
-projection that **must** include `_id` and `_type`.
+trigger on **create / update / publish**, and a projection that **must** include
+`_id` and `_type`.
+
+Filters differ, and the difference matters:
+
+| Webhook | Filter |
+|---|---|
+| `/api/vectorize`, `/api/on-publish` | `_type == "article"` — both act on articles only |
+| `/api/revalidate` | **`_type in ["article", "series"]`** |
+
+A **series** is a published document with its own page (`/intelligence/series/<slug>`),
+and that page is cached until `revalidateTag('sanity')` frees it. If the
+revalidate filter is left at `_type == "article"`, editing or reordering a series
+fires nothing at all: the page sits stale, indefinitely, with no error anywhere.
+The route already knows what to do with a `series` payload — the filter is the
+only thing standing between it and being asked.
 
 | URL | Auth | What it does | Symptom if missing |
 |---|---|---|---|
 | `/api/vectorize` | header `x-sanity-webhook-secret` = `SANITY_WEBHOOK_SECRET` | Embeds the article, writes back Related Articles | No semantic search hit, no related articles, no prior-coverage on future drafts |
 | `/api/on-publish` | same header, same secret | Runs the pre-publish checks server-side and records anything wrong; sends the Audit-tier push | Nothing catches a publish made outside Studio; no push ever fires |
-| `/api/revalidate` | `next-sanity` **signature** (`SANITY_REVALIDATE_SECRET`) | Invalidates the home page, `/intelligence` and the article page | New articles do not appear until the next deploy |
+| `/api/revalidate` | `next-sanity` **signature** (`SANITY_REVALIDATE_SECRET`) | Invalidates the home page, `/intelligence`, the article page, and — on a `series` payload — the series index and that series' page | New articles do not appear until the next deploy; series edits never appear at all |
 
 - [ ] All three created, with the secret set in Vercel.
+- [ ] ⚠ **`/api/revalidate` includes `series` in its filter.** See the table
+      above. This is the one filter that is not `_type == "article"`.
 - [ ] ⚠ **The projection includes `_type`.** A payload without it is the
       *delete* shape: `/api/vectorize` will treat every delivery as a request to
       remove that article's vector.

@@ -909,6 +909,51 @@ the Audit tier notifies everyone subscribed to "New Audit-tier Deep Dives". Once
 per article, ever — a later typo fix does not re-notify. Nothing fires for other
 tiers, and the AI Act deadline topic remains something you send by hand.
 
+### Building a series
+
+A **series** is an ordered reading path across articles you have already
+published — the same archive, in the order the argument was built rather than by
+impact score. `/intelligence` ranks; a series sequences. Each part stays a
+perfectly good standalone article.
+
+In Studio, open **Series** (it sits directly under Article) and press Create.
+Title, slug, and a **standfirst** — the standfirst is the *argument*, why these
+pieces belong in this order, not a summary of part one. Then drag articles into
+**Parts, in reading order**.
+
+**There is no part number to type, anywhere.** The position in that list *is* the
+part number. Insert a piece at the top and everything below renumbers itself;
+drag two rows to swap them and the site follows. A number typed on each article
+would be the same fact in six places, free to disagree — the mistake prices and
+publication dates each have a guard against.
+
+Three consequences worth knowing:
+
+- **A minimum of two parts.** One article is not a series, and Studio will not
+  let you save one.
+- **An article can only appear once.** Its position is its number, so it cannot
+  have two.
+- **You can add an article that is still a draft.** It holds its slot and the
+  site shows *"Part 4 — in preparation. This part is written but not yet
+  published. Its place in the order is held."* This is how you lay out a six-part
+  arc before writing the back half — and it is why publishing part 4 late never
+  renumbers parts 5 and 6 under a reader who has already bookmarked them.
+
+Set **Status** to *Complete* when the series is finished; until then the reader
+sees "In progress" and an honest "6 parts · 4 published".
+
+Once published, the series appears at `/intelligence/series`, each part carries a
+"Part N of M" strip at the top linking back, and a **Continue the series** pair
+sits above the end-of-article offer. That pair is not the same thing as **Related
+Intelligence** below it: Related is what the machine thinks is similar, the
+series pair is the order you chose.
+
+> ⚠ **A series edit only reaches the live site if the revalidate webhook is
+> configured for it.** That filter lives in the Sanity dashboard, not in this
+> repo — see the webhook table in `LAUNCH.md`. If it is still scoped to articles
+> only, reordering a series changes nothing a reader can see, and nothing
+> anywhere reports an error.
+
 ### How many people are subscribed
 
 **`/api/push/stats`**, signed in as the writer. It returns a count per topic and

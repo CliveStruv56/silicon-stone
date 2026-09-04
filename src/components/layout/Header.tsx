@@ -27,6 +27,9 @@ const primaryNavigation: NavItem[] = [
     href: '/intelligence',
     children: [
       { name: 'All intelligence', href: '/intelligence' },
+      // Ordered reading paths. The feed ranks by impact; a series is the same
+      // archive in the order the argument was built.
+      { name: 'Series', href: '/intelligence/series' },
       // The free email guide. It used to live at /atlantic-drift, which
       // collided with the *content category* of that name
       // (/analysis/category/atlantic-drift) and with the newsletter the brand

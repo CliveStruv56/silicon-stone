@@ -8,6 +8,7 @@ const LINKEDIN_URL = process.env.NEXT_PUBLIC_LINKEDIN_URL || 'https://www.linked
 const footerNavigation = {
   intelligence: [
     { name: 'All intelligence', href: '/intelligence' },
+    { name: 'Series', href: '/intelligence/series' },
     { name: 'Atlantic Drift', href: '/analysis/category/atlantic-drift' },
     { name: 'AI Act & Compliance', href: '/analysis/category/ai-act' },
     { name: 'Semiconductors', href: '/analysis/category/semiconductors' },
