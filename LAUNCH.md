@@ -12,10 +12,16 @@ Vercel env change + redeploy — never a code edit.
 
 - ✅ Deployed and verified live on siliconandstone.com: pre-launch CTAs
   (early-access capture, zero LS checkout links), toolkit price table,
-  90-day credit copy, guarantees, Ladder box, `/products/success` both SKU
+  90-day credit copy, Ladder box, `/products/success` both SKU
   variants, all §4 advisory changes (Exposure Diagnostic, founding rate,
   Baseline Month guarantee), unified subscribe copy, tool subscribe cards,
   footer LinkedIn placeholder.
+  > **Superseded 2026-09-04:** this line used to include "guarantees". Every
+  > refund promise was withdrawn that day — the 30-day money-back note under the
+  > product CTAs and the Exposure Diagnostic's revision-or-50%-refund clause —
+  > and `GuaranteeNote.tsx` was deleted with the `guaranteeNote` field, so the
+  > promise cannot come back by accident. The **Baseline Month guarantee** on the
+  > Drift Retainer is a different thing and deliberately survives.
 - ✅ **P0 RESOLVED 2026-08-20 — the Kit key is valid and capture works.**
   The owner swapped the key; verified the same day against Kit's own API with a
   read-only `GET /v4/account` (creates nothing, touches no list): **HTTP 200**,
@@ -413,7 +419,7 @@ pages on 2026-08-11. It was stale (four pages said 30 June, `/eu-exposure` said
       from a single constant so it cannot diverge again. Removed from:
       - `src/app/(website)/products/page.tsx` (hero, under the sub-heading)
       - `src/app/(website)/products/ai-audit-checklist/page.tsx` (under the first CTA)
-      - `src/app/(website)/products/ai-act-toolkit/page.tsx` (under the guarantee)
+      - `src/app/(website)/products/ai-act-toolkit/page.tsx` (under the price table — this said "under the guarantee" until 2026-09-04, when `GuaranteeNote` was deleted)
       - `src/app/(website)/advisory/page.tsx`
       - `src/app/(website)/eu-exposure/page.tsx`
 

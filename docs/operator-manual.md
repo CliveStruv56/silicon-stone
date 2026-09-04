@@ -52,6 +52,7 @@ first use.
 | Article vector index + related articles | **Live** | Fires automatically on publish. |
 | Knowledge capture over MCP | **Live**, behind one flag | Works from Claude Code and `curl`. See §11. |
 | Kit (ConvertKit) subscribe | **Live** | Subscribers arrive. |
+| Series (ordered reading paths) | **Live, half-configured** | You can build and publish one today (§10), and readers see it. But the Sanity **revalidate webhook is still filtered to `_type == "article"`**, so *editing or reordering* a published series changes nothing on the live site and nothing anywhere reports an error. Until that filter widens, treat a published series as fixed until the next deploy. |
 | Kit **tags** | **Not configured** | The account holds two tags; the code maps ~18. Subscribes succeed but arrive **untagged** — no segmentation. A missing tag ID is skipped by design, so nothing errors. |
 | Kit sending address | **Unverified** | You cannot reliably send until this is done. |
 | Broadcast / "email this article" | **Does not exist** | There is no route. Sending is manual, in Kit. |
@@ -730,8 +731,13 @@ Under **Content**, in order:
 1. **Site Settings** (singleton)
 2. **Image Library** — browse by collection, all images, manage collections
 3. **Knowledge** — see §11
-4. **Article · Author · Category · Product · Persona · YouTube Script ·
+4. **Article · Series · Author · Category · Product · Persona · YouTube Script ·
    Glossary Term**
+
+**Series** sits directly under Article because that is the order the types are
+registered in, not because anyone placed it there — the sidebar renders the
+remainder of the types in registration order. See §10 for what a series is and
+how to build one.
 
 ### The article's three tabs
 

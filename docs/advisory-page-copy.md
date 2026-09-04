@@ -1,5 +1,26 @@
 # Advisory Page — Finished Copy
 
+> # ⚠ SUPERSEDED — 4 September 2026. Do not build from this file.
+>
+> This was a build brief for a build that has since happened twice over. On
+> 2026-09-04 the four engagements each got **their own page**, assembled from
+> `EngagementHero` + `AtAGlance` + `WhereItLeads` + `AdvisoryPracticeBand` +
+> `EngagementContactForm` (`src/components/advisory/`), and the four-across tier
+> grid this document specifies was **deleted**. What is still true here is the
+> page intro (§"Page intro"), which matches `advisory/page.tsx` verbatim.
+>
+> Specifically obsolete: the Drift Retainer as a block on `/advisory` (it is
+> `/advisory/drift-retainer`); the "revised four-tier block"; every `[…](#contact)`
+> CTA (three of the four engagements now have their own form with a hard-coded
+> Kit `interest`); "Keep the three existing module cards" (there are five); the
+> `### Focused Diagnostic` heading (shipped as **The Exposure Diagnostic**); the
+> "designed as an on-ramp" framing, which was deliberately reversed; and the
+> `**Services**` hero badge, now `Advisory`.
+>
+> **For what the pages actually say, read the pages.** For prices, read
+> `src/lib/offering.ts`. For why they are shaped this way, read §9 of
+> `project_summary.md` (entries dated 2026-09-04).
+
 *Drop-in copy for the `/advisory` rebuild. UK English, house voice.*
 
 > **The prices below are the placeholders this copy was drafted against, and

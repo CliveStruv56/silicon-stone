@@ -2,11 +2,11 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-09-04
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (119 prerendered pages), 1,523 tests green, 19 npm audit findings — every one of them in the Sanity CLI/export subtree, which never executes in the function runtime, gated behind the Next 16 / Sanity v5 upgrade**
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (119 prerendered pages), 1,523 tests green, **29 npm audit findings (re-counted 2026-09-04, was 19 on 2026-08-23)** — every root advisory sits in build, CLI or dev-only tooling; see §2 for the caveat**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, **Guide**, YouTube Script, Research Only), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
-**The AI Act Compliance Checker was rebuilt on 2026-08-10** (Stages 0–3 of the agentic build spec): the rule base is corrected and versioned at `v2026-08-10`, backed by a git-tracked rule pack carrying 19 Articles of verbatim consolidated statute; a conversational intake proposes answers the user confirms before the unchanged deterministic engine classifies; and the result screen now offers an email-gated written report whose every legal quotation is string-matched against that corpus before a reader sees it. The paid half of Stage 3 — the £39 Evidence Pack and the £39→£79 credit — is built dark behind a flag and blocked on the Lemon Squeezy store. A legal review of the report template, disclaimer and credit terms is an open item before it ships. **Reworked again on 2026-08-17**: result items are typed rather than bare strings, so the card (now "Recommended actions and applicable provisions") groups duties apart from concessions, support measures and enforcement information, each expandable to its legal basis and conditions; and `/tools/compliance-checker/provisions` serves the 19 pinned Articles as verbatim statute a reader can follow a citation into. **The vendor questions followed on 2026-08-18**, each now carrying its own Article anchor, a corpus link and a stated reason for asking — including, where the vendor owes you no answer, the fact that it does not. See §9 and §11.
+**The AI Act Compliance Checker was rebuilt on 2026-08-10** (Stages 0–3 of the agentic build spec): the rule base is corrected and versioned at `v2026-08-10`, backed by a git-tracked rule pack carrying verbatim consolidated statute (19 Articles at the time; **28 corpus entries today** — 27 Articles plus Annex III, pack `2026-08-19b`); a conversational intake proposes answers the user confirms before the unchanged deterministic engine classifies; and the result screen now offers an email-gated written report whose every legal quotation is string-matched against that corpus before a reader sees it. The paid half of Stage 3 — the £39 Evidence Pack and the £39→£79 credit — is built dark behind a flag and blocked on the Lemon Squeezy store. A legal review of the report template, disclaimer and credit terms is an open item before it ships. **Reworked again on 2026-08-17**: result items are typed rather than bare strings, so the card (now "Recommended actions and applicable provisions") groups duties apart from concessions, support measures and enforcement information, each expandable to its legal basis and conditions; and `/tools/compliance-checker/provisions` serves the pinned corpus as verbatim statute a reader can follow a citation into (the index renders `coveredArticles().length`, so the count follows the pack rather than being written down). **The vendor questions followed on 2026-08-18**, each now carrying its own Article anchor, a corpus link and a stated reason for asking — including, where the vendor owes you no answer, the fact that it does not. See §9 and §11.
 
 **A v2 rebuild of the Compliance Checker is in progress and is the largest thread of work in the repo.** Plan of record: `docs/# EU AI Act Compliance Checker v2 — Impl.md` (23 sections, 8 phases). **All eight phases are built** under `src/lib/compliance-v2/`, behind `NEXT_PUBLIC_COMPLIANCE_CHECKER_V2` + `?v2=1`; v1 is untouched and is what every user still gets. Its central move is removing the score from legal classification. Six v1 defects are documented in `docs/compliance-checker-v1-known-defects.md` and held as characterisation tests; three are fixed in v2. **Start here: `docs/compliance-checker-v2-state.md`** — one page on how to run it, what exists, what is deliberately not done, and which decisions are still open. Per-phase history is §9; CLAUDE.md carries the invariants. **What remains before release is not code**: counsel review of the 58 propositions (all `reviewStatus: 'internal'`), usability testing with non-specialists, and the retention and marketing decisions that release criterion 16 is blocked on. No model call or email send is wired: a mail sender now exists (`src/lib/email.ts`, added 2026-08-24 for enquiry notifications), but the checker is not connected to it and §22.1's retention decision is still open.
 
@@ -121,8 +121,8 @@ Manual §5 has the table.
 This is the **Silicon & Stone intelligence portal** — a Next.js 15 + Sanity CMS platform for "Forensic Technopolitics" analysis. It combines a public website, admin research/authoring tools, digital product sales pages, and an embedded CMS Studio.
 
 **Key facts:**
-- Build passes cleanly (`npm run build` — 78 static pages, 0 errors)
-- `npm audit` baseline (2026-08-05): **24 findings — 1 critical, 13 high, 9 moderate, 1 low.** The old "13 moderate / uuid only" baseline was stale; the tree drifted while the repo was quiet. Next.js was bumped 15.5.18 → **15.5.21** (closes two HIGH Server Actions advisories: DoS + SSRF) and the `postcss` override was refreshed to `^8.5.23` (resolves 8.5.25, clearing both PostCSS path-traversal advisories). Everything remaining traces through `sanity@4` — `@sanity/cli` → `@sanity/runtime-cli` (adm-zip), `@sanity/export` (tar, critical), `@sanity/template-validator` (undici), `preferred-pm` (js-yaml) — i.e. Studio CLI/export tooling that is not reachable from any served route, plus `sharp` (libvips CVEs; needs ≥0.35 but Next 15.5 declares `^0.34.3`) and `ws` via `openai`/`exa-js`. **Do not run `npm audit fix --force`** — npm proposes `next@16`, which the Sanity v4 pin forbids. These clear together at the Next 16 / Sanity v5 upgrade.
+- Build passes cleanly (`npm run build` — **119 static pages**, 0 errors, verified 2026-09-04)
+- `npm audit` baseline (**re-counted 2026-09-04: 29 findings — 1 critical, 16 high, 11 moderate, 1 low**; it read 24 on 2026-08-05 and 19 on 2026-08-23, so it is drifting upward and both earlier figures are superseded). The root advisories are `tar`, `adm-zip`, `extract-zip` (Sanity export + the Puppeteer download step), `brace-expansion`, `browserslist`, `esbuild`, `js-yaml`, `@humanfs` (build, dev server, eslint, `gray-matter`), `undici`, `form-data`, `ip-address` (CLI and HTTP-client transitives), and `dompurify` / `@xmldom/xmldom` (Studio). **None is a Next.js or React advisory.** ⚠ The per-path reachability claim — that none of these executes in the Vercel function runtime — was last actually traced on 2026-08-23, when there were ten fewer; it deserves a fresh pass rather than a restatement. The old "13 moderate / uuid only" baseline was stale; the tree drifted while the repo was quiet. Next.js was bumped 15.5.18 → **15.5.21** (closes two HIGH Server Actions advisories: DoS + SSRF) and the `postcss` override was refreshed to `^8.5.23` (resolves 8.5.25, clearing both PostCSS path-traversal advisories). Everything remaining traces through `sanity@4` — `@sanity/cli` → `@sanity/runtime-cli` (adm-zip), `@sanity/export` (tar, critical), `@sanity/template-validator` (undici), `preferred-pm` (js-yaml) — i.e. Studio CLI/export tooling that is not reachable from any served route, plus `sharp` (libvips CVEs; needs ≥0.35 but Next 15.5 declares `^0.34.3`) and `ws` via `openai`/`exa-js`. **Do not run `npm audit fix --force`** — npm proposes `next@16`, which the Sanity v4 pin forbids. These clear together at the Next 16 / Sanity v5 upgrade.
 - All API integrations verified working: Anthropic, Exa.ai, Inoreader, Sanity, ConvertKit
 - Admin login: configured via `ADMIN_PASSWORD` in the deployment environment. Do not store the live password in project docs.
 - Inoreader connected as user `clive4`
@@ -250,12 +250,24 @@ All draft-generating formats use Claude at temperature 0.4. Drafts are created d
 |-------|--------|-------------|
 | `/` | ✅ | Landing page: hero (+ three-readings line), Read→Use→Buy→Engage spine, thesis, AI Act readiness strip, Intelligence Stream, tools grid, products band, advisory band, persona routing (6 tiles incl. Positional→`/waymarkpath`), WaymarkPath "Related" card, subscribe CTA |
 | `/intelligence` | ✅ | Intelligence hub (Phase B merge of `/briefings` + `/analysis` index): Three Readings panel, tier + persona + **topic** filters (`?tier=` `?persona=` `?topic=`), impact scores. 301s from `/briefings` and `/analysis` |
-| `/analysis/[slug]` | ✅ | Individual article pages (URLs deliberately kept — option 1a) |
+| `/intelligence/series` | ✅ | The series library — ordered reading paths across published articles (2026-09-04) |
+| `/intelligence/series/[slug]` | ✅ | One series: standfirst, ordered parts, resume-where-you-left-off. Prerendered from `SERIES_SLUGS_QUERY`; sets its **own** canonical and title, because the `/intelligence` layout hard-codes both |
+| `/analysis/[slug]` | ✅ | Individual article pages (URLs deliberately kept — option 1a). Carries the series strip and prev/next when the article is part of one |
 | `/analysis/category/[slug]` | ✅ | Category-filtered articles (kept) |
+| `/authors/[slug]` | ✅ | Author page with that author's articles |
+| `/glossary` | ✅ | Defined terms; `DefinedTermSet` JSON-LD |
 | `/methodology` | ✅ | Forensic Technopolitics 3×2 matrix + Three Readings panel |
-| `/advisory` | ✅ | (renamed from `/services`, 301) AI Governance and Technology Dependency Diagnostic, follow-on modules, advisory tiers, contact form (Kit) |
+| `/advisory` | ✅ | (renamed from `/services`, 301) The advisory **hub**: the four engagements as a chooser keyed on `Offering.question`, the 3×2 practice band (`#method`), follow-on modules, `#retainer` summary block, contact form (Kit). The four-across tier grid was **deleted** on 2026-09-04 when each engagement got its own page |
+| `/advisory/advisory-briefing` | ✅ | £450, one hour (2026-09-04) |
+| `/advisory/exposure-diagnostic` | ✅ | From £2,500 (2026-09-04) |
+| `/advisory/drift-retainer` | ✅ | From £2,000/mo (2026-09-04). `/advisory#retainer` still resolves — a summary block is kept on the hub under that id, and `engagement-pages.test.ts` guards it |
+| `/advisory/strategic-assessment` | ✅ | From £8,000 (2026-09-04) |
+| `/eu-exposure` | ✅ | Post-Omnibus Briefing — footer-only US-inbound front door |
+| `/us-executive-guide` | ✅ | Free lead-magnet guide (301 from `/atlantic-drift`) |
 | `/about` | ✅ | Credentials, principles, focus areas, Editorial Standards, products CTA |
 | `/search` | ✅ | Full-text article search |
+| `/saved` · `/offline` | ✅ | PWA: locally saved articles (IndexedDB) and the offline fallback directory |
+| `/more` | ✅ | PWA fifth tab — secondary nav (`robots: noindex`) |
 | `/tools` | ✅ | Interactive tools hub |
 | `/tools/compliance-checker` | ✅ | EU AI Act risk classification (email-gated; bridge → Toolkit) |
 | `/tools/supply-chain-mapper` | ✅ | Semiconductor supply chain visualization (email-gated; bridge → Advisory) |
@@ -265,14 +277,19 @@ All draft-generating formats use Claude at temperature 0.4. Drafts are created d
 | `/products/ai-act-toolkit` | ✅ | Sales page: £79/£149 pricing tiers |
 | `/products/ai-audit-checklist` | ✅ | Sales page: £24 gateway product |
 | `/products/sector-reports` | ✅ | (renamed from `/products/briefings`, 301) Coming Soon with email capture |
+| `/products/success` | ✅ | Post-checkout delivery page |
+| `/tools/compliance-checker/provisions[/[article]]` | ✅ | The pinned AI Act corpus, one statically prerendered page per provision |
+| `/tools/compliance-checker/report/[id]` | ✅ | A generated compliance report |
 | `/pricing` | ✅ | Every price on one page, rendered from `src/lib/offering.ts`; respects the launch flags |
-| `/waymarkpath` | ✅ | WaymarkPath companion-product page (career transition app) |
+| `/waymarkpath` | ✅ | WaymarkPath sister-product page (career transition app). Rebuilt 2026-09-04: a server component, content sourced from `src/lib/waymarkpath.ts`, sister-indigo palette, still a **waitlist** — the link stays internal because the app's own deploy is stale |
 | `/privacy` | ✅ | Privacy policy (GDPR, data collection, third-party services) |
 | `/terms` | ✅ | Terms of service (Scottish governing law) |
 
 **301 redirects** (`next.config.ts`, explicit `statusCode: 301`): `/analysis`→`/intelligence`, `/briefings`→`/intelligence`, `/services`→`/advisory`, `/products/briefings`→`/products/sector-reports`.
 
-**Navigation** (post-Phase A/B): primary Intelligence (single link) · Tools · Products (dropdown: Checklist, Toolkit, Sector Reports, All prices) · Advisory (dropdown: the four tiers, Post-Omnibus Briefing, Modules, All prices, Contact), separator, secondary Methodology · About, Search icon, Subscribe button (→ `/#subscribe`). Dropdown price notes are read from `src/lib/offering.ts`, not held as literals.
+**Navigation** (current as of 2026-09-04): primary Intelligence (dropdown: All intelligence, **Series**, US Executive's Guide) · Tools · Products (dropdown: Checklist, Toolkit, Sector Reports, **WaymarkPath** — flagged `sister`, rendered in indigo — All prices) · Advisory (dropdown: the four **engagement pages**, Post-Omnibus Briefing, **The 3×2 Method** → `/advisory#method`, Modules, All prices, Contact), separator, secondary Methodology · About, Search icon, Subscribe button (→ `/#subscribe`). Dropdown price notes and every engagement `href` are read from `src/lib/offering.ts`, not held as literals — which is why `engagement-pages.test.ts` asserts each `href` resolves to a real `page.tsx`.
+
+**301 redirects** also include `/atlantic-drift` → `/us-executive-guide`. Note that the four engagements were previously *fragments* on `/advisory`, and a fragment never reaches the server — so no redirect could have covered the split. That is why the hub keeps a live `#retainer` block.
 
 ### Admin Routes (`(admin)` group) — protected by `ADMIN_PASSWORD` + signed `SESSION_SECRET` cookie
 
@@ -295,7 +312,7 @@ All draft-generating formats use Claude at temperature 0.4. Drafts are created d
 |-------|-------------|
 | `/api/categories` | GET categories from Sanity (proxied via Railway) |
 | `/api/briefings` | GET articles for the intelligence hub (proxied via Railway) |
-| `/api/revalidate` | Sanity publish webhook — signature-verified (`next-sanity/webhook`), revalidates tag + paths. Lives at `src/app/(website)/api/revalidate/route.ts` (route group does not affect the URL) |
+| `/api/revalidate` | Sanity publish webhook — signature-verified (`next-sanity/webhook`), revalidates tag + paths. Since 2026-09-04 it **branches on `_type`**: a `series` payload revalidates `/intelligence/series` and that series' page rather than `/analysis/<slug>`. ⚠ The webhook's own filter lives in the Sanity dashboard and is still `_type == "article"`, so the series branch is unreachable until it widens — see `LAUNCH.md`. Lives at `src/app/(website)/api/revalidate/route.ts` (route group does not affect the URL) |
 | `/api/vectorize` | Sanity publish webhook → Pinecone upsert (constant-time secret, rate-limited) |
 | `/api/search/semantic` | Pinecone semantic search (admin-gated) |
 | `/api/knowledge/{sources,evidence,candidates}` | Editorial AIOS inbox APIs (admin-gated) |
@@ -333,7 +350,7 @@ All 4 tools require email submission before revealing results:
 
 ## 5. The Offering — Full Catalogue
 
-Reviewed against the code on **2026-08-15**. Every figure below is a commercial
+Reviewed against the code on **2026-09-04** (figures re-checked against `src/lib/offering.ts` line by line; `npm run test:sanity-prices` green). Every figure below is a commercial
 claim rendered on a live page; the "Where it lives" column is the single source
 of truth for that price. `LadderBox.tsx` carries the same warning — change a
 price there and here together, or the ladder starts lying.
@@ -384,8 +401,11 @@ sell (restore them when the first report is on sale — see `LAUNCH.md`).
 ### 5.4 Adjacent, not a rung
 
 **WaymarkPath** — the career-transition companion for the individual
-professional. Presented as "Related — a separate companion" on `/products`,
-`/advisory` and the homepage; **no price is published anywhere on this site**.
+professional. Presented as "Related — a separate companion" on `/products`, the
+homepage and — since 2026-09-04 — `/advisory/drift-retainer` rather than the
+`/advisory` hub, plus a `sister`-flagged entry in the Products dropdown.
+**No price is published anywhere on this site**, and `/waymarkpath` is still a
+waitlist: the link stays internal because the app's own deploy is stale.
 
 ### 5.5 The Ladder (credit chain, `LadderBox.tsx`)
 
@@ -515,6 +535,11 @@ SESSION_SECRET=<long random secret, 32+ characters>
 | Footer | `src/components/layout/Footer.tsx` |
 | Article page | `src/app/(website)/analysis/[slug]/page.tsx` |
 | Intelligence hub | `src/app/(website)/intelligence/page.tsx` |
+| Series library + one series | `src/app/(website)/intelligence/series/page.tsx`, `.../series/[slug]/page.tsx` |
+| Series logic (part numbers, neighbours, progress) | `src/lib/series.ts` — pure, tested; the position in `entries` is the part number |
+| Series UI | `src/components/series/` (Strip, Nav, PartList, ResumeButton, ProgressTracker) |
+| Advisory engagement template | `src/components/advisory/` — `EngagementHero`, `AtAGlance`, `WhereItLeads`, `AdvisoryPracticeBand`, `EngagementContactForm`. All four engagement pages are built from these five |
+| WaymarkPath content | `src/lib/waymarkpath.ts` (single source for the seven capabilities) + `src/components/waymarkpath/` |
 | Advisory page | `src/app/(website)/advisory/page.tsx` |
 | Durable rate limiting | `src/lib/durable-rate-limit.ts` (Upstash / Vercel KV / in-memory degrade) |
 | Usage ledger + pricing | `src/lib/usage.ts`, `src/lib/pricing.ts`, `src/lib/metrics/` |
@@ -547,7 +572,7 @@ SESSION_SECRET=<long random secret, 32+ characters>
 | Canonical style rules (edit here — SSOT) | `.agent/rules/style/house-style.md`, `ai-tells.md` |
 | `voice-edit` skill (committed canonical / local mirror) | `.agent/skills/voice-edit/`, `.claude/skills/voice-edit/` |
 | Style rules → bundled module | `npm run gen:style` (also runs on `prebuild`) |
-| Sanity schemas | `src/sanity/schemaTypes/` |
+| Sanity schemas | `src/sanity/schemaTypes/` (`series.ts` added 2026-09-04, registered directly after `article` so Studio lists it there) |
 | Sanity queries | `src/sanity/lib/queries.ts` |
 | Content sync | `scripts/sync-content.ts` |
 | Pinecone backfill sync | `src/scripts/sync-pinecone.ts` |
@@ -6558,14 +6583,16 @@ Kit tags to map, verification steps.
   Dismissible `ToolSubscribeCard` on all four tools' results screens.
 - **Products**: toolkit page has a published two-tier price table (£79/£149,
   "Ask About Professional" removed); checklist £20 credit now "(valid 90
-  days)"; 30-day guarantee note on all three product pages; `LadderBox`
+  days)"; 30-day guarantee note on all three product pages (**withdrawn
+  2026-09-04 — see the entry at the top of §9**); `LadderBox`
   credit box on /products and /advisory; new `/products/success?product=sku`
   thank-you page with per-SKU next-rung offers (LS redirect target).
 - **Checkout/fulfilment**: LS webhook `order_created` now tags buyers in Kit
   by variant ID (`LEMONSQUEEZY_VARIANT_ID_*` → buyer-\* tags) via
   `src/lib/kit.ts`; delivery stays LS-native.
 - **Advisory**: "Focused Diagnostic" → **"The Exposure Diagnostic"**
-  (positioning, new scope bullets, 50%-refund clause); Briefing credit line +
+  (positioning, new scope bullets, 50%-refund clause — **the refund clause was
+  withdrawn 2026-09-04; the credit toward a retainer survives**); Briefing credit line +
   free-intro distinction; Retainer software-vs-retainer paragraph, Baseline
   Month guarantee line, founding block (£1,500/mo × 6, first five, flag-gated),
   annual copy (£20,000/yr); enquiry-form success now surfaces the booking link
@@ -7310,7 +7337,7 @@ left unset, being optional by design. | Resolved |
   goal names (`Gate Impression`, `Email Capture`, `Product View`, `Advisory Lead`,
   `Push Opt In`) and the three in `LAUNCH.md` §3 exist by exact name.
 - ~~Sanity schema not fully deployed to manifest~~ — resolved 2026-05-21.
-- ~~No unit tests for app logic~~ — **181 specs across 9 files**, green. The AI Act
+- ~~No unit tests for app logic~~ — **1,523 tests across 79 files**, green (2026-09-04; the "181 specs across 9 files" this once read was two hundred commits stale). The AI Act
   engine, rule pack, session schema, intake validator, and the report schema /
   citation verifier carry the bulk of them.
 - ~~Compliance Checker rule base stale and Step 10 incomplete~~ — resolved
@@ -7665,7 +7692,7 @@ no percentage confidence scores anywhere — the tool uses categorical labels.
 npm run dev              # Start dev server on localhost:3000
 
 # Production
-npm run build            # Build for production (verify: 74 static pages, 0 errors)
+npm run build            # Build for production (verify: 0 errors; ~119 static pages)
 npm start                # Start production server
 
 # Content Sync
@@ -7682,11 +7709,33 @@ npm run test:knowledge-inbox           # Route, schema, Studio and feature-flag 
 npm run knowledge:migrate-candidates   # DRY RUN by default; --write is required to write
 
 # Audit
-npm audit                # Expect 24 findings (Sanity toolchain subtree + sharp)
+npm audit                # 29 findings as of 2026-09-04 — build/CLI/dev tooling only
 
 # Linting
 npm run lint             # Run ESLint
+npm run typecheck        # tsc --noEmit
+npm run check            # lint + typecheck — the one to run before committing
+
+# Tests and guards. `prebuild` runs the starred four automatically; the rest do not
+# run themselves, and each exists because something shipped broken without it.
+npm test                 # Vitest — 1,523 tests across 79 files
+npm run test:manual      # * docs/operator-manual.md vs the code (21 facts)
+npm run test:checker-v2  # * Compliance Checker v2 propositions vs the pinned corpus
+npm run reg:check        # * Regulatory corpus hashes + reviewBy dates
+npm run rulepack:check   # * AI Act rule-pack hash drift  (via prebuild's node call)
+npm run test:security    # Outbound-call and CI-step assertions
+npm run test:pwa         # Service worker / manifest guards
+npm run test:sanity-prices      # Sanity product docs vs src/lib/offering.ts
+npm run test:dataset-access     # Anonymous-readability probe (network; CI-blocking)
+npm run test:regulatory-index   # Editorial vs Compliance-Checker lane separation
 ```
+
+> `test:sanity-prices` and `test:dataset-access` read `process.env` directly with
+> no dotenv loader, so a bare `npm run test:sanity-prices` aborts on a developer
+> machine. Export the env first: `set -a && . ./.env.local && set +a`, or pass
+> `NEXT_PUBLIC_SANITY_PROJECT_ID` / `NEXT_PUBLIC_SANITY_DATASET` inline. Both need
+> the network, which is why neither is in `prebuild` — a Sanity blip must not fail
+> a Vercel deploy.
 
 ---
 
@@ -7695,7 +7744,7 @@ npm run lint             # Run ESLint
 When starting a new Claude Code session:
 
 1. **Read this document first** for full context
-2. **The app builds cleanly** — `npm run build` should produce 74 static pages, 0 errors. `prebuild` now runs two gates: the style codegen and `rulepack-check.mjs`
+2. **The app builds cleanly** — `npm run build` should produce 0 errors. `prebuild` runs **five** gates: the style codegen, `rulepack-check.mjs`, the regulatory corpus check, `test:checker-v2` and `test:manual`
 3. **19 npm audit findings** (1 critical / 9 high / 8 moderate / 1 low, as of 2026-08-23) — every one in the Sanity v4 CLI/export subtree, which never executes in the function runtime. The three that *were* runtime-reachable (`sharp`, `nanoid`, `ws`) are pinned by `overrides`. Do not run `npm audit fix --force`; npm proposes `next@16`, which the Sanity v4 pin forbids. Anything new on top of this baseline is real.
 4. **APIs**: Anthropic, Exa, Sanity, Pinecone working. **Kit is 401ing in production** (legacy v3 key — see §10 P0). **Inoreader** OAuth cannot complete in production (redirect URI still localhost); it works locally.
 5. **Admin password** is deployment-specific and must not be committed or recorded in docs. `SESSION_SECRET` is required for signed admin sessions and must be 32+ characters.
@@ -7712,10 +7761,10 @@ When starting a new Claude Code session:
 ### Quick Verification
 
 ```bash
-npm run build            # Should pass with 74 static pages
-npm test                 # 181 specs across 9 files, all green
+npm run build            # Should pass with 0 errors
+npm test                 # 1,523 tests across 79 files, all green
 npm run rulepack:check   # 19 corpus files verified against the manifest
-npm audit                # Expect 24 findings (Sanity toolchain subtree + sharp)
+npm audit                # 29 findings as of 2026-09-04 — build/CLI/dev tooling only
 npm run dev              # Start dev server, visit localhost:3000
 ```
 

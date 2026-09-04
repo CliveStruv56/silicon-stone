@@ -11,7 +11,7 @@ auto-memory in `MEMORY.md`.
 replaced four overlapping guides that had gone stale together and then
 **contradicted each other on eight points of fact**, with nothing failing to
 say so. `scripts/manual-checks.ts` (`npm run test:manual`, in `prebuild` and
-CI) is what stops that recurring: 19 checks that read a value out of the code
+CI) is what stops that recurring: 20 checks that read a value out of the code
 and assert the manual still states it.
 
 Two rules when it fails:
@@ -22,8 +22,9 @@ Two rules when it fails:
 - **Every extractor must fail loudly when its anchor is missing.** A regex that
   silently stops matching turns the guard into a rubber stamp, which is the
   exact failure it exists to prevent. Three checks did this on first run and
-  were caught only because they assert their anchor was found. All 16 are
-  mutation-tested — verified to fail when the underlying code is changed.
+  were caught only because they assert their anchor was found. **Mutation-test
+  every check you add** — change the code it reads and watch it go red. A check
+  that has only ever been seen passing has not been tested at all.
 
 Guard facts, not prose: numbers, enum values, field names. Wording changes
 legitimately; a guard that fights the writer gets switched off.
@@ -476,10 +477,25 @@ its output rather than implying all six are equal work.
 The `production` dataset's `aclMode` is **`public`**, but that is not the whole
 story and reading it as such produces a false finding. **Type-level access
 control is configured on the project**, and it already draws the line correctly:
-the seven types the public site renders (`article`, `author`, `category`,
-`glossaryTerm`, `product`, `sanity.imageAsset`, `siteSettings`) answer anonymous
-GROQ; the ten internal ones — all four knowledge types plus `persona`,
-`libraryImage` and the Sanity system types — do not.
+the eight types the public site renders (`article`, `series`, `author`,
+`category`, `glossaryTerm`, `product`, `sanity.imageAsset`, `siteSettings`)
+answer anonymous GROQ; the ten internal ones — all four knowledge types plus
+`persona`, `libraryImage` and the Sanity system types — do not.
+
+**The console draws a denylist, so a new document type is anonymously readable
+by default.** That is the part to remember, and it was established rather than
+assumed on 2026-09-04: `persona` has five published documents and returns `0` to
+an anonymous count, so the block is real and specific — while `series`, created
+that morning, answered anonymous GROQ immediately with nobody touching the
+console. Correct for a public reading path; exactly wrong for the next internal
+type somebody adds, which will be world-readable until it is explicitly blocked.
+
+So adding an internal type is a **two-part** job: block it in the console, and
+add it to `MUST_BE_PRIVATE` in `scripts/dataset-access-checks.ts`. The script is
+what turns forgetting the first half into a red CI run rather than a silent leak.
+Note `MUST_BE_PUBLIC` is a single string (`article`) serving as the probe's
+positive control, not an inventory of the public types — it does not assert that
+`series` stays readable.
 
 This matters because a security audit concluded the opposite. It reasoned from
 `aclMode: public` that `sensitivity: confidential` in
@@ -734,6 +750,39 @@ walking the pages in a browser, not by the suite.
 **The revalidate webhook's filter must include `series`.** It lives in the Sanity
 dashboard, not this repo (see `LAUNCH.md`). Scoped to articles only, a series
 edit invalidates nothing and the page sits stale with no error anywhere.
+
+## The advisory pages come off one template (do not hand-roll a fifth)
+
+Each of the four engagements has its own page under `src/app/(website)/advisory/`,
+and all four are assembled from the same five components in
+`src/components/advisory/`: `AdvisoryPracticeBand`, `EngagementHero`,
+`AtAGlance`, `WhereItLeads`, `EngagementContactForm`.
+
+That is not tidiness. Three engagements were pages and the Retainer was a
+*section on the hub*, and that asymmetry is precisely **why** their styling kept
+diverging — a section and a page were never built from one template. A fifth
+engagement comes off these five components or the divergence starts again.
+
+Three things the pages depend on:
+
+- **Every price is `gbp(AMOUNTS.x)`; the four pages contain no `£` literal.**
+  Same rule as everywhere else — see the Pricing section below.
+- **`ENGAGEMENTS[].href` in `src/lib/offering.ts` is the single source of the
+  URL**, rendered by both the header dropdown and `/pricing`. A rename turns two
+  nav entries into a 404 with nothing failing nearby, so
+  `src/lib/advisory/engagement-pages.test.ts` asserts each `href` resolves to a
+  real `page.tsx`. It does **not** yet assert the href reaches `sitemap.ts`.
+- **`/advisory#retainer` must keep resolving.** The engagements used to be
+  fragments on the hub, and a fragment never reaches the server — so no redirect
+  could have covered the split. The hub keeps a summary block under that id, and
+  the same test guards it. A dead anchor does not 404; it silently scrolls
+  nowhere.
+
+**WaymarkPath has the same shape and the same rule.** `src/lib/waymarkpath.ts` is
+the single source for its seven capabilities, including the `feeds` field that
+records which stage hands output to which. It is a *sister* product: indigo
+(`--color-sister-indigo`), never the S&S amber/teal, and flagged `sister` in the
+header nav rather than added as a plain fourth Products entry.
 
 ## Publication dates (load-bearing — do not break)
 

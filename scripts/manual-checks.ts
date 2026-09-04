@@ -466,6 +466,66 @@ check('the series minimum and its field name match the schema', () => {
   )
 })
 
+check('the Studio sidebar list matches the types Studio actually shows', () => {
+  // §8 lists the document types in the Studio sidebar. That list was wrong the
+  // day `series` was added — and the SAME document said, in §10, that Series
+  // "sits directly under Article". A manual contradicting itself on a fact a
+  // reader can see on screen is the exact failure this script exists for, and
+  // nothing caught it, so here is the check that would have.
+  //
+  // Studio renders the tail of its sidebar with a filtered
+  // S.documentTypeListItems(), which follows *registration order* in
+  // schemaTypes/index.ts minus the types structure.ts excludes. So the manual's
+  // order is derivable, not a matter of taste.
+  const registration = extract(
+    'src/sanity/schemaTypes/index.ts',
+    /export const schema: \{ types: SchemaTypeDefinition\[\] \} = \{\s*types: \[([\s\S]*?)\],?\s*\}/,
+    'the registered schema types array',
+  )
+  const registered = registration
+    .split(',')
+    .map((line) => line.replace(/\/\/.*$/gm, '').trim())
+    .filter((name) => /^[a-zA-Z][a-zA-Z0-9]*$/.test(name))
+
+  const exclusions = extract(
+    'src/sanity/structure.ts',
+    /\.\.\.S\.documentTypeListItems\(\)\.filter\(\s*\(item\) =>\s*!\[([\s\S]*?)\]\.includes/,
+    'the documentTypeListItems exclusion list in structure.ts',
+  )
+  const excluded = new Set(
+    [...exclusions.matchAll(/'([^']+)'/g)].map((m) => m[1]),
+  )
+
+  const shown = registered.filter((name) => !excluded.has(name))
+  assert.ok(
+    shown.length >= 5,
+    `Only ${shown.length} type(s) resolved as sidebar-visible — the extractors ` +
+      'above matched something unexpected. Fix them rather than trusting this.',
+  )
+
+  // Each type's Studio label comes from its own schema file, so a rename shows
+  // up here rather than in a hand-kept table.
+  const labels = shown.map((name) =>
+    extract(
+      `src/sanity/schemaTypes/${name}.ts`,
+      new RegExp(`name: '${name}',\\s*\\n\\s*title: '([^']+)'`),
+      `the Studio title of the ${name} type`,
+    ),
+  )
+
+  // The manual writes them as a single middot-separated run, possibly wrapped
+  // across lines. Collapse whitespace before looking.
+  const flat = manual.replace(/\s+/g, ' ')
+  const expected = labels.join(' · ')
+  assert.ok(
+    flat.includes(expected),
+    'docs/operator-manual.md §8 no longer lists the Studio sidebar types ' +
+      `correctly.\n  expected, in this order: ${expected}\n` +
+      '  That order is registration order in schemaTypes/index.ts minus the ' +
+      'structure.ts exclusions — it is what Studio renders, not a preference.',
+  )
+})
+
 // ---------------------------------------------------------------------------
 
 function main(): void {
