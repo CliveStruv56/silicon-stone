@@ -169,7 +169,21 @@ export const FREE_OFFERINGS: Offering[] = [
   },
 ]
 
-/** Rung three: self-service digital products. */
+/**
+ * Rung three: self-service digital products, **in ascending price**.
+ *
+ * The order is the render order on both `/pricing` and `/products` — each maps
+ * this array — so a reader scanning either page reads the cheapest first. That
+ * put the Toolkit last from 2026-09-04, behind two £39 products, despite being
+ * the flagship: a price list sorted by anything other than price is a price
+ * list you have to read twice.
+ *
+ * The two £39 products tie, and Sector Reports is deliberately first of them —
+ * it is a product line awaiting its first report, where the Evidence Pack is
+ * not on sale at all. `offering.test.ts` asserts the ordering is non-decreasing,
+ * so inserting a new SKU in the wrong place fails rather than quietly landing
+ * mid-list.
+ */
 export const PRODUCTS: Offering[] = [
   {
     id: 'ai-audit-checklist',
@@ -180,22 +194,6 @@ export const PRODUCTS: Offering[] = [
     href: '/products/ai-audit-checklist',
     terms: [
       `Includes a ${gbp(AMOUNTS.toolkitDiscount)} discount code for the Compliance Toolkit, valid 90 days — ${gbp(DERIVED.bundleTotal)} for both rather than ${gbp(DERIVED.bundleSeparately)}.`,
-    ],
-  },
-  {
-    id: 'ai-act-toolkit',
-    name: 'AI Act Compliance Toolkit',
-    price: gbp(AMOUNTS.toolkitStandard),
-    priceTiers: [
-      { label: 'Standard', price: gbp(AMOUNTS.toolkitStandard) },
-      { label: 'Professional', price: gbp(AMOUNTS.toolkitProfessional) },
-    ],
-    summary:
-      'The governance toolkit: risk-classification decision tree, checklists by risk category, template policies, a Systems Register and a Compliance Tracker, against the phased AI Act timetable.',
-    href: '/products/ai-act-toolkit',
-    terms: [
-      'Professional adds a 30-minute video walkthrough applying each section to a business like yours.',
-      'The evidence base an advisory briefing starts from.',
     ],
   },
   {
@@ -219,6 +217,22 @@ export const PRODUCTS: Offering[] = [
       `The ${gbp(AMOUNTS.evidencePack)} credits against the ${gbp(AMOUNTS.toolkitStandard)} Toolkit, making that upgrade ${gbp(DERIVED.toolkitAfterEvidencePack)}.`,
     ],
     status: 'Not yet on sale',
+  },
+  {
+    id: 'ai-act-toolkit',
+    name: 'AI Act Compliance Toolkit',
+    price: gbp(AMOUNTS.toolkitStandard),
+    priceTiers: [
+      { label: 'Standard', price: gbp(AMOUNTS.toolkitStandard) },
+      { label: 'Professional', price: gbp(AMOUNTS.toolkitProfessional) },
+    ],
+    summary:
+      'The governance toolkit: risk-classification decision tree, checklists by risk category, template policies, a Systems Register and a Compliance Tracker, against the phased AI Act timetable.',
+    href: '/products/ai-act-toolkit',
+    terms: [
+      'Professional adds a 30-minute video walkthrough applying each section to a business like yours.',
+      'The evidence base an advisory briefing starts from.',
+    ],
   },
 ]
 

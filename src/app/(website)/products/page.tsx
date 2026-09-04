@@ -195,11 +195,20 @@ export default function ProductsPage() {
               return (
                 <Card key={offering.id} className="card-interactive h-full bg-stone-charcoal border-border-subtle flex flex-col">
                   <CardHeader>
-                    <div className="flex items-start justify-between mb-3">
+                    <div className="mb-3 flex items-start justify-between gap-3">
                       <div className={`p-3 rounded-lg ${presentation.iconBg}`}>
                         <Icon className={`w-6 h-6 ${presentation.iconColor}`} />
                       </div>
-                      <Badge className={presentation.badgeColor}>
+                      {/* `Badge` is `whitespace-nowrap shrink-0` by default, which
+                          is right for a two-word pill and wrong here: the card
+                          shows `offering.status` when there is one, and
+                          "Waitlist — first report in preparation" ran straight
+                          out of the card's right edge in the grid. Overridden
+                          rather than shortened, because the status is the
+                          catalogue's own words and /pricing shows them in full. */}
+                      <Badge
+                        className={`${presentation.badgeColor} min-w-0 shrink whitespace-normal text-right`}
+                      >
                         {offering.status ?? presentation.badge}
                       </Badge>
                     </div>

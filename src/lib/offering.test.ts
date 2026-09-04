@@ -73,6 +73,26 @@ describe('catalogue shape', () => {
     }
   })
 
+  it('lists the digital products in ascending price', () => {
+    /**
+     * `PRODUCTS` order is the render order on both `/pricing` and `/products`,
+     * since each maps the array. Until 2026-09-04 the Toolkit sat second at £79
+     * with two £39 products after it, so a price list read cheapest, dearest,
+     * middle, middle. The order is load-bearing now, which means it needs an
+     * assertion rather than a comment — a new SKU appended to the end would
+     * otherwise land after the £79 whatever it costs.
+     *
+     * Ties are allowed: Sector Reports and the Evidence Pack are both £39.
+     */
+    const amounts = PRODUCTS.map((product) => {
+      const parsed = Number(product.price.replace(/[^\d.]/g, ''))
+      expect(parsed, `could not read a figure out of '${product.price}'`).toBeGreaterThan(0)
+      return parsed
+    })
+
+    expect(amounts).toStrictEqual([...amounts].sort((a, b) => a - b))
+  })
+
   it('keeps a tiered offering agreeing with its own headline price', () => {
     /**
      * `price` and `priceTiers[0].price` are the same figure rendered in two

@@ -691,6 +691,29 @@ squeezed into, and rendering both would state the same prices twice in two
 different weights. Mutation-tested: pointing tier one at a different `AMOUNTS`
 key and reinstating the `priceNote` each turn it red.
 
+**The digital products are ordered by ascending price**, at the owner's
+instruction: £24 Checklist → £39 Sector Reports → £39 Evidence Pack → £79
+Toolkit. `PRODUCTS` order *is* the render order on both `/pricing` and
+`/products` now that each maps the array, so a reader scanning either page reads
+the cheapest first. It puts the flagship last, which is the trade: a price list
+sorted by anything but price is one you have to read twice. The two £39 products
+tie and Sector Reports leads them — a product line awaiting its first report,
+where the Evidence Pack is not on sale at all.
+
+`offering.test.ts` asserts the ordering is non-decreasing, parsing the figure out
+of each `price` string, so a new SKU appended to the end fails rather than
+landing after the £79 whatever it costs. Mutation-tested by pointing the
+Checklist's `price` at a dearer `AMOUNTS` key.
+
+**And a regression of my own, caught in the browser.** Making `/products` map the
+catalogue meant the card badge started rendering `offering.status` — so Sector
+Reports' "Waitlist — first report in preparation" replaced the short "Coming
+Soon", and `Badge` is `whitespace-nowrap shrink-0`, so it ran straight out of the
+card's right edge in the grid. Overridden on that one usage rather than
+shortening the status: the words are the catalogue's, and `/pricing` shows them
+in full. Measured at 25px clear of the edge on all four cards. No unit test would
+have seen this.
+
 **Verified on production**, across two deployments — the price and catalogue
 work (`dpl_279E4L5RQbcwkMU1KQJvzW6L7ex7`, built in 2m) and the tier rendering
 that followed (`silicon-stone-5d3t0juc9`, built in 1m). Both Ready, both aliased
