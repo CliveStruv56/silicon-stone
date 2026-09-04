@@ -604,6 +604,46 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### September 4, 2026 — The operator's manual, corrected on how a publish lands
+
+The manual asserted in **three** places that a revalidate webhook existed and
+merely needed its filter widened to include series: §1's status table, which
+called series *"Live, half-configured"*; §10's revalidation paragraph; and the
+warning box under *Building a series*. All three rested on a premise that turned
+out to be false. Corrected, and `/intelligence` and the homepage promo bands
+added to the series notes.
+
+Two sections added to §10, both written for an operator rather than an engineer:
+
+- **"Why you reload once"** — the habit first, then why. No revalidate webhook
+  and no plan slot for one; the Live Content API doing the work instead; the
+  four-step sequence that makes a stale first view expected rather than a fault;
+  and the two things worth holding on to — reload, and **Studio does not count**,
+  because the listener lives in the public site's layout. It ends by saying the
+  old claim is stale wherever else it is found, since it was in three documents.
+- **"Do not check a deploy with a script that polls"** — the bot mitigation, and
+  the reason it matters: a 403 challenge reads exactly like a broken deploy.
+
+Appendix D gains the honest limit: the mechanism was read out of `next-sanity`'s
+source and confirmed against which pages use a tagged fetch, but **the timing was
+never measured** — the attempt was abandoned because the mitigation above was
+blocking automated requests to the live site.
+
+**The manual's own guard caught the first attempt at the header.** Moving the
+full stop outside the bold broke the
+`**Verified against commit \`hash\`, D Month YYYY.**` pattern
+`scripts/manual-checks.ts` matches, and check 21 went red — which is the check
+doing exactly what it exists for. The header now names which parts were
+re-verified and when, so a reader can tell the 4 September sections from the
+21 August ones.
+
+Republished to the operator's manual artifact at the existing URL. That publish
+was **refused twice before it went through**, correctly: the live artifact was an
+older revision (`c885065f`) than the repo, so it had to be read in full and
+diffed first. Three Appendix D bullets exist there and not in the repo — traced
+to commit `b6f7f2ce`, *"strike what today settled"*, which removed them
+deliberately once they had been verified. Nothing lost.
+
 ### September 4, 2026 — Series, findable
 
 Series shipped this morning reachable from exactly two places: the Intelligence
