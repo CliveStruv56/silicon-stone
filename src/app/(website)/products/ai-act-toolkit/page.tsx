@@ -268,10 +268,6 @@ export default function AIActToolkitPage() {
               </tbody>
             </table>
           </div>
-          <p className="mt-4 max-w-3xl text-sm italic text-text-muted">
-            Professional: thirty minutes of video, applying each section to a business
-            like yours. {gbp(AMOUNTS.toolkitProfessional)} — still less than an hour of any consultant&rsquo;s time.
-          </p>
         </section>
 
         <Separator className="mx-auto max-w-7xl bg-border-subtle" />

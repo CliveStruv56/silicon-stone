@@ -181,7 +181,7 @@ regenerate with `deliverables/src/assemble-toolkit.mjs` and
       2 spreadsheets) so LS's native order email delivers them.
 - [ ] **AI Act Compliance Toolkit — Standard — £79.** Attach `AI Act Compliance
       Toolkit.pdf` + `AI Systems Register.xlsx` + `Compliance Tracker.xlsx`.
-- [ ] **AI Act Compliance Toolkit — Professional — £149.** Same three files plus
+- [ ] **AI Act Compliance Toolkit — Professional — £275.** Same three files plus
       the 30-minute video walkthrough — **not yet recorded**; this is the only
       product asset still missing (file or unlisted link in the delivery note).
 - [ ] Set each product's **receipt / redirect ("Continue") URL**. Use the **bare

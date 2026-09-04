@@ -206,8 +206,8 @@ export default function AIAuditChecklistPage() {
                 Know Where You Stand
               </h2>
               <p className="text-text-muted mb-8">
-                At {gbp(AMOUNTS.checklist)}, this is less than the cost of a business book — and it gives you
-                a structured picture of your AI exposure in a single afternoon.
+                A structured picture of your AI exposure in a single afternoon —
+                which systems you run, which vendors you depend on, and where the gaps are.
               </p>
               {buyable ? (
                 <Button size="lg" className="bg-stone-teal text-ink-on-accent hover:bg-stone-teal/90 font-semibold" asChild>

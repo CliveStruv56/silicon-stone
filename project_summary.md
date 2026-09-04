@@ -274,7 +274,7 @@ All draft-generating formats use Claude at temperature 0.4. Drafts are created d
 | `/tools/scenario-modeler` | ✅ | Geopolitical scenario comparison (email-gated; bridge → Advisory) |
 | `/tools/policy-stress-test` | ✅ | US vs EU regulatory friction scoring (email-gated; bridge → Advisory) |
 | `/products` | ✅ | Products hub: Checklist Pack first, Toolkit follow-on, Sector Reports |
-| `/products/ai-act-toolkit` | ✅ | Sales page: £79/£149 pricing tiers |
+| `/products/ai-act-toolkit` | ✅ | Sales page: £79/£275 pricing tiers |
 | `/products/ai-audit-checklist` | ✅ | Sales page: £24 gateway product |
 | `/products/sector-reports` | ✅ | (renamed from `/products/briefings`, 301) Coming Soon with email capture |
 | `/products/success` | ✅ | Post-checkout delivery page |
@@ -368,12 +368,17 @@ price there and here together, or the ladder starts lying.
 
 These three are the only `product` documents in Sanity (`product-ai-audit-checklist`,
 `product-ai-act-toolkit`, `product-sector-reports`) and the only SKUs the
-end-of-article gate can sell.
+end-of-article gate can sell. All **four** rows below appear on `/products` and
+`/pricing`: since 2026-09-04 `/products` maps `PRODUCTS` rather than retyping
+it, which is how the Evidence Pack — in the catalogue, on `/pricing` and in this
+table, but absent from the products page — came back. The prices never drifted
+there, because they were interpolated from `AMOUNTS`; the *list* drifted, and no
+price guard was ever going to catch that.
 
 | Product | Price | Summary | Where it lives |
 |---|---|---|---|
 | **AI Audit Checklist Pack** | **£24** | The gateway SKU. Systems inventory sheet, vendor dependency scorecard, quick gap analysis, board-ready risk summary. Ships a **£20 Toolkit discount code** (90 days) — so Checklist + Toolkit is £83 rather than £103. | `/products/ai-audit-checklist` |
-| **AI Act Compliance Toolkit** | **From £79** — Standard £79, Professional £149 | The flagship. Risk-classification decision tree, checklists by risk category, template policies, AI Systems Register + Compliance Tracker, phased action plan. Professional adds a 30-minute video walkthrough. | `/products/ai-act-toolkit` |
+| **AI Act Compliance Toolkit** | **From £79** — Standard £79, Professional £275 | The flagship. Risk-classification decision tree, checklists by risk category, template policies, AI Systems Register + Compliance Tracker, phased action plan. Professional adds a 30-minute video walkthrough. | `/products/ai-act-toolkit` |
 | **Sector Reports** | **£39 each, or 3 for £99** | 15–20pp briefings per industry (Manufacturing, Financial Services, Professional Services, Public Sector): AI landscape, AI Act exposure, geopolitical risk, three scenarios, 90-day checklist. | `/products/sector-reports` |
 | **Compliance Checker Evidence Pack** | **£39** (credits £39 against the £79 Toolkit → £40 upgrade) | Components 4–11 of the Compliance Checker report. **Built dark** behind `NEXT_PUBLIC_EVIDENCE_PACK_ENABLED` (default `false`); checkout and single-use code issuance are unbuilt. | `EvidencePackTeaser.tsx` via `ReportGate` |
 
@@ -391,12 +396,12 @@ sell (restore them when the first report is on sale — see `LAUNCH.md`).
 | **Advisory Briefing** | **£450** / one hour | Focused consultation on your tool results and one specific question, plus a written follow-up. Credited **in full** to your first retainer month if you proceed within 30 days. | `/advisory/advisory-briefing` |
 | **The Exposure Diagnostic** | **From £2,500** (custom scope) | AI system + vendor-evidence review, dependency mapping, regulatory-friction read, 15–25pp report, 30-day follow-up. Fee credited to the first retainer quarter. **No refund guarantee** — the revision-or-50%-refund clause was withdrawn on 2026-09-04; the site's refund position now lives once, at `/terms`. | `/advisory/exposure-diagnostic` |
 | **The Post-Omnibus Briefing** | **From £2,500**, fixed | US/UK-inbound. Fixed-scope written briefing (15–25pp) on what the AI Act now requires of you post-Digital Omnibus, delivered in three weeks, plus one interpretation call. | `/eu-exposure` |
-| ↳ *European Procurement Readiness* (add-on) | **From £1,500** | Add-on to the above: your systems mapped against EU buyer governance questionnaires, required-vs-theatre evidence triage, AI indemnification clause review. | `/eu-exposure` |
-| **The Drift Retainer** | **£2,000/mo** — three-month initial term, then rolling. £20,000/year annual. **Founding rate £1,500/mo for the first six months, first five clients** (`FOUNDING_OFFER_ACTIVE`). | The spine of the whole offering. Board-forwardable monthly briefing, a 90-minute working session on one live decision, "The Line" direct access between sessions, quarterly written exposure review on the 3×2 method. Opens with a Baseline Month — walk away after month one paying that month only. | `/advisory/drift-retainer` |
+| ↳ **European Procurement Readiness** (add-on) | **From £1,500** | Add-on to the above: your systems mapped against EU buyer governance questionnaires, required-vs-theatre evidence triage, AI indemnification clause review. In `MODULES` since 2026-09-04, so it now has a row on `/pricing`; it deliberately has **no card** in the `assessments` band on `/advisory`, because it is scoped and sold at `/eu-exposure`. | `/eu-exposure` + `/pricing` |
+| **The Drift Retainer** | **From £2,000/mo** — three-month initial term, then rolling. £20,000/year annual. **Founding rate £1,500/mo for the first six months, first five clients** (`FOUNDING_OFFER_ACTIVE`). | The spine of the whole offering. Board-forwardable monthly briefing, a 90-minute working session on one live decision, "The Line" direct access between sessions, quarterly written exposure review on the 3×2 method. Opens with a Baseline Month — walk away after month one paying that month only. | `/advisory/drift-retainer` |
 | **Strategic Assessment** | **From £8,000**, then transitions to retainer | The deep one-off: multi-framework analysis, 40+pp report, board-ready presentation, implementation roadmap. Positioned as the framework-neutral decision document before buying governance software. | `/advisory/strategic-assessment` |
 | **Board-level / multi-entity engagement** | **£25,000–£50,000** | Bespoke, for a group, multi-jurisdiction exposure or a board mandate; settles into a Drift Retainer. | `/advisory` (bespoke band) |
 | **Applied modules** | Sovereign Architecture Review **from £6,500**; AI Bill of Materials **from £4,500**; Manufacturing Exposure, Scenario Impact and Regulatory Friction **from £3,500** each | Scoped add-ons folded into a briefing or a retainer. All five priced as of 2026-08-15 — the £3,500 floor sits below the £4,500 module and above the £2,500 Diagnostic. | `/advisory` (assessments) |
-| Free 25-minute intro conversation | Free during the first 90 days (`FREE_INTRO_WINDOW`) | The launch-window front door to the retainer. Distinct from the £450 Briefing, which is a working session. | `/advisory#contact` |
+| Free 25-minute intro conversation | Free during the first 90 days (`FREE_INTRO_WINDOW`) | The launch-window front door to the retainer. Distinct from the £450 Briefing, which is a working session. Exported as `FREE_INTRO_CONVERSATION` — kept out of `ENGAGEMENTS` so the catalogue never imports a flag — and rendered as the **first row of the advisory ladder** on `/pricing` since 2026-09-04, replacing the italic footnote it used to be. | `/advisory#contact` + `/pricing` |
 
 ### 5.4 Adjacent, not a rung
 
@@ -405,7 +410,12 @@ professional. Presented as "Related — a separate companion" on `/products`, th
 homepage and — since 2026-09-04 — `/advisory/drift-retainer` rather than the
 `/advisory` hub, plus a `sister`-flagged entry in the Products dropdown.
 **No price is published anywhere on this site**, and `/waymarkpath` is still a
-waitlist: the link stays internal because the app's own deploy is stale.
+waitlist: the link stays internal because the app's own deploy is stale. Since
+2026-09-04 it is also on `/pricing`, exported as `SISTER_PRODUCT` and rendered
+in its own indigo band **after** the ladder rather than as a row in the free
+list — "one page, every price" has to answer for the thing with no price too,
+and a teal row in the catalogue would have said it is ours in the way the
+others are.
 
 ### 5.5 The Ladder (credit chain, `LadderBox.tsx`)
 
@@ -480,7 +490,7 @@ CONVERTKIT_TOOL_LEAD_TAG_ID=<id>    # Optional: tag for tool email captures
 
 # Payments (Lemon Squeezy checkout URLs)
 NEXT_PUBLIC_LEMONSQUEEZY_TOOLKIT_STANDARD_URL=<url>       # Toolkit Standard £79
-NEXT_PUBLIC_LEMONSQUEEZY_TOOLKIT_PROFESSIONAL_URL=<url>   # Toolkit Professional £149
+NEXT_PUBLIC_LEMONSQUEEZY_TOOLKIT_PROFESSIONAL_URL=<url>   # Toolkit Professional £275
 NEXT_PUBLIC_LEMONSQUEEZY_CHECKLIST_URL=<url>              # Checklist Pack £24
 
 # Analytics
@@ -593,6 +603,76 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### September 4, 2026 — Professional at £275, and the price list made complete
+
+A price change and a catalogue audit that ran behind it. Four surfaces were
+saying something the rest of the site was not.
+
+**Toolkit Professional moves to £275** (was £149). One line in `AMOUNTS`, and
+the six render sites follow: both Buy buttons, the two-tier table, `/pricing`'s
+price note and the closing CTA. The Sanity `product` document needed no change —
+its `priceLabel` is `From £79`, driven by Standard — and `npm run
+test:sanity-prices` is green. Eight documentation references were updated by
+hand, including the Lemon Squeezy product to be created in `LAUNCH.md` §0. Two
+`£149`s survive on purpose: the §9 entries from 2026-07-19 and 2026-08-15 are
+dated records of what was true then, and rewriting them would falsify the log.
+
+**Two pieces of value-comparison copy cut**, at the owner's instruction: the
+Toolkit's *"still less than an hour of any consultant's time"* and the Checklist
+Pack's *"less than the cost of a business book"*. Both argued the price down by
+comparing it to something else; the replacement on the Checklist says what the
+buyer gets instead.
+
+**The Drift Retainer said two different things about its own price.**
+`/pricing`, the header dropdown and the footer read "From £2,000" out of the
+catalogue; `/advisory` and `/advisory/drift-retainer` printed a bare
+"£2,000/month". A floor rendered as a rate is a commercial claim the scope
+conversation then has to walk back. Both now carry the qualifier, and the
+comment in `offering.ts` that claimed otherwise — it described a tier card
+deleted in an earlier refactor — was corrected.
+
+**`/products` mapped `PRODUCTS` instead of retyping it, and a product came
+back.** The page declared its own array of names, prices and links. The prices
+never drifted, because they interpolated `AMOUNTS`; the *list* drifted, which no
+price guard was ever going to catch — the Compliance Checker Evidence Pack was
+in the catalogue, on `/pricing` and in §5.2, and absent from the products page.
+It is the same defect the footer hit when it retyped the engagements. What stays
+in the page is presentation only — icon, badge, colours, bullets — keyed by
+offering id, with a neutral fallback so a new SKU renders plainly rather than
+vanishing. Four cards now, on a `md:grid-cols-2 xl:grid-cols-4` grid.
+
+**A guard on that** (`offering.test.ts`): the page must contain `PRODUCTS.map(`,
+and every id in `PRODUCTS` must be named in its `PRESENTATION` map. Mutation-tested
+both ways — renaming a card's key and emptying the mapped array each turn it red.
+
+**`/pricing` now answers for everything, including the things that cost
+nothing.** Three additions, all of which were real offerings living only in
+prose:
+
+- **European Procurement Readiness** (`From £1,500`) joined `MODULES`. It was
+  the only priced thing on the site in no catalogue, no menu and no price list —
+  reachable by reading to the bottom of `/eu-exposure`. It deliberately has no
+  card in the `assessments` band on `/advisory`: it is scoped and sold against
+  the Post-Omnibus Briefing.
+- **The free 25-minute intro conversation** is now the first row of the advisory
+  ladder rather than an italic footnote below the paid ones. Exported as
+  `FREE_INTRO_CONVERSATION` and gated at the render site, so the catalogue never
+  imports a flag.
+- **WaymarkPath** appears as `SISTER_PRODUCT` in its own indigo band *after* the
+  ladder — "one page, every price" has to answer for the thing with no price
+  too. Not a row in the free list: the colour is how the site says "separate
+  product", and a teal row would have said it is ours in the way the others are.
+
+The glossary was considered and left off — it is a reference surface, not an
+offering — and the Evidence Pack stays listed with its "Not yet on sale" badge
+rather than being hidden behind `EVIDENCE_PACK_ENABLED`, because the badge is
+already honest about it.
+
+Verified in a browser at 1440px, not only in the suite: `/pricing`, `/products`,
+`/products/ai-act-toolkit`, `/products/ai-audit-checklist`, `/advisory` and
+`/advisory/drift-retainer`. 1,527 tests green; `npm run build` green including
+every `prebuild` guard.
 
 ### September 4, 2026 — A refunds position, and four guards over the gaps left behind
 

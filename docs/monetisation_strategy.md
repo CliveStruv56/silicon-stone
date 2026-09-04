@@ -12,7 +12,7 @@ Prepared for Clive, Platform 91
 
 > **Historical strategy document — do not price from it.** Written before the
 > offering was built. Almost every figure below has been superseded: the
-> toolkit shipped at £79/£149 rather than £49–£99, the advisory ladder is
+> toolkit shipped at £79/£275 rather than £49–£99, the advisory ladder is
 > Briefing £450 → Exposure Diagnostic £2,500+ → Drift Retainer £2,000/mo →
 > Strategic Assessment £8,000+ → bespoke £25,000–£50,000, and the paid
 > newsletter stream was never built. The live catalogue is

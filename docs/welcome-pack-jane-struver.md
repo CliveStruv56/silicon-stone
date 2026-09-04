@@ -58,7 +58,7 @@ The platform is **live in production at siliconandstone.com** and has been since
 - A separate logic backend runs on Railway, handling subscribe, contact, briefings, and categories endpoints. (You don't have to think about this — it's invisible from the editor's seat.)
 - **Nine articles are published**, mostly the January 2026 launch set; another four generated drafts are queued in Sanity awaiting cover images and review.
 - **Four interactive tools** are live and email-gated for lead capture: Compliance Checker, Supply Chain Mapper, Scenario Modeler, Policy Stress-Test.
-- Three product sales pages are live (Toolkit £79/£149, AI Audit Checklist £24, Sector Briefings coming soon). Paid-product buttons use an early-access enquiry fallback until the Lemon Squeezy store and checkout URLs are configured.
+- Three product sales pages are live (Toolkit £79/£275, AI Audit Checklist £24, Sector Briefings coming soon). Paid-product buttons use an early-access enquiry fallback until the Lemon Squeezy store and checkout URLs are configured.
 - Newsletter and contact forms run through **Kit** (the platform formerly known as ConvertKit), with a **Substack** running in parallel for distribution.
 - Plausible analytics is deployed in code, pending account setup.
 - The Sanity → Pinecone vector pipeline runs automatically: every published article is indexed for semantic search and used as RAG context for future drafts.
@@ -187,7 +187,7 @@ Built to compound, not to sequence. Each layer activates as the audience justifi
 |---|---|---|
 | 1 | Free PDF lead magnets (email capture via Kit) | Lead capture **live** via tool email gates and homepage; Atlantic Drift PDF outline drafted, full PDF pending. |
 | 1 | Affiliate links in YouTube descriptions | Pending channel launch. |
-| 2 | Paid digital products — AI Audit Checklist Pack **£24**, AI Act Compliance Toolkit **£79 / £149**, Sector Reports **£39 each or 3 for £99** | Sales pages live with early-access enquiry fallback; Lemon Squeezy store creation + product files pending. Sector Reports is a waitlist until the first report exists. |
+| 2 | Paid digital products — AI Audit Checklist Pack **£24**, AI Act Compliance Toolkit **£79 / £275**, Sector Reports **£39 each or 3 for £99** | Sales pages live with early-access enquiry fallback; Lemon Squeezy store creation + product files pending. Sector Reports is a waitlist until the first report exists. |
 | 2 | YouTube ad revenue (AdSense) | Pending channel launch + thresholds (1,000 subs + 4,000 watch hours). |
 | 3 | Sponsorships (B2B integrations) | Month 12+, when audience-quality data justifies. |
 | 3 | Premium subscription | Unpriced and undecided — no such product exists. Month 12+, if the newsletter shows the engagement to justify one. The recurring revenue the business actually runs on is the Drift Retainer, below. |

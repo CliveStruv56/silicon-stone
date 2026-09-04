@@ -10,10 +10,12 @@ import { FOUNDING_OFFER_ACTIVE, FREE_INTRO_WINDOW, PRE_LAUNCH } from '@/lib/flag
 import {
   AMOUNTS,
   ENGAGEMENTS,
+  FREE_INTRO_CONVERSATION,
   FREE_OFFERINGS,
   MODULES,
   gbp,
   PRODUCTS,
+  SISTER_PRODUCT,
   type Offering,
 } from '@/lib/offering'
 
@@ -214,6 +216,12 @@ export default function PricingPage() {
           intro="One ascending ladder, from a one-hour briefing to the standing relationship. Every one-off engagement names a price and a path into the Drift Retainer."
         >
           <div>
+            {/* The ladder ascends from nothing, so the free conversation is its
+                first rung rather than a footnote under the paid ones — which is
+                where it sat until 2026-09-04, in italics, below the fold. */}
+            {FREE_INTRO_WINDOW && (
+              <OfferingRow offering={FREE_INTRO_CONVERSATION} accent="teal" />
+            )}
             {ENGAGEMENTS.map((offering) => (
               <OfferingRow key={offering.id} offering={offering} accent="amber" />
             ))}
@@ -228,15 +236,6 @@ export default function PricingPage() {
               <strong className="font-semibold">{gbp(AMOUNTS.driftRetainerFounding)} a month for the first six months</strong>,
               then the standard rate. Same Baseline Month guarantee.
             </div>
-          )}
-
-          {FREE_INTRO_WINDOW && (
-            <p className="mt-4 text-sm italic text-text-muted">
-              New here? The 25-minute intro conversation is free during our
-              launch window — the first ninety days. It is a conversation, not
-              the {gbp(AMOUNTS.advisoryBriefing)} Briefing, which is a working session on your specific
-              question.
-            </p>
           )}
         </Section>
 
@@ -261,6 +260,57 @@ export default function PricingPage() {
         >
           <LadderBox />
         </Section>
+
+        {/* WaymarkPath — adjacent to the ladder, not a rung on it, so it sits
+            after the ladder in its own band rather than in the free list. The
+            indigo is load-bearing: it is how the site says "separate product",
+            and a teal row in the catalogue above would say the opposite. It is
+            on this page at all because "one page, every price" has to answer
+            for the thing with no price too. */}
+        <section
+          aria-labelledby="sister-pricing-heading"
+          className="border-b border-border-subtle bg-stone-charcoal/30"
+        >
+          <div className="mx-auto max-w-5xl px-6 py-10 lg:px-8 lg:py-12">
+            <div className="mb-6 max-w-2xl">
+              <div className="mb-2 font-mono text-[12px] uppercase tracking-[0.12em] text-sister-indigo">
+                Related — a separate companion
+              </div>
+              <h2
+                id="sister-pricing-heading"
+                className="text-2xl font-bold text-text-primary sm:text-3xl"
+              >
+                Not on the ladder
+              </h2>
+              <p className="mt-2 leading-relaxed text-text-muted">
+                A sister product for the individual rather than the organisation.
+                It is listed here so the page can be read as a complete answer to
+                &ldquo;what does any of this cost?&rdquo;
+              </p>
+            </div>
+
+            <div className="grid gap-2 rounded-xl border border-sister-indigo/30 bg-stone-charcoal p-5 sm:grid-cols-[1fr_auto] sm:gap-8">
+              <div className="min-w-0 sm:order-1">
+                <h3 className="text-base font-semibold text-text-primary">
+                  <Link href={SISTER_PRODUCT.href} className="hover:underline">
+                    {SISTER_PRODUCT.name}
+                  </Link>
+                </h3>
+                <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-text-muted">
+                  {SISTER_PRODUCT.summary}
+                </p>
+              </div>
+              <div className="sm:order-2 sm:text-right">
+                <div className="font-mono text-lg font-semibold text-sister-indigo">
+                  {SISTER_PRODUCT.price}
+                </div>
+                <div className="text-xs text-text-muted sm:max-w-[13rem]">
+                  {SISTER_PRODUCT.priceNote}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* The terms that apply across everything, gathered once rather than
             repeated on each row. */}

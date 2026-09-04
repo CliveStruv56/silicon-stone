@@ -3,7 +3,7 @@
 > **Superseded for launch (2026-07-19): follow `LAUNCH.md` at the repo root.**
 > The pre-launch packaging release changed the store shape this doc describes:
 > the Toolkit is now **two one-time variants** (Standard £79 / Professional
-> £149), each product needs a **redirect URL** to
+> £275), each product needs a **redirect URL** to
 > `/products/success?product={sku}`, the `order_created` webhook now **tags
 > buyers in Kit** (no longer a stub) via `LEMONSQUEEZY_VARIANT_ID_*` env vars,
 > and two **discount codes** (`LAUNCH48`, £20/90-day) are required. This doc

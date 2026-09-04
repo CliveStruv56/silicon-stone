@@ -42,7 +42,7 @@ export const AMOUNTS = {
   /** Products. */
   checklist: 24,
   toolkitStandard: 79,
-  toolkitProfessional: 149,
+  toolkitProfessional: 275,
   sectorReport: 39,
   sectorReportTrio: 99,
   evidencePack: 39,
@@ -253,8 +253,12 @@ export const ENGAGEMENTS: Offering[] = [
   {
     id: 'drift-retainer',
     name: 'The Drift Retainer',
-    // "From", not a flat rate: the tier card on /advisory reads "From
-    // £2,000/mo" and the header note is built from this string.
+    // "From", not a flat rate, and every surface must say so. Until
+    // 2026-09-04 two of them did not: the retainer summary block on /advisory
+    // and the "At a glance" card on /advisory/drift-retainer both printed a
+    // bare "£2,000/month" while this string, the header note and /pricing
+    // carried the qualifier. A floor rendered as a rate is a commercial claim
+    // the scope conversation then has to walk back.
     price: `From ${gbp(AMOUNTS.driftRetainerMonthly)}`,
     priceNote: 'per month · three-month initial term',
     summary:
@@ -299,11 +303,70 @@ export const ENGAGEMENTS: Offering[] = [
 ]
 
 /**
+ * The free 25-minute intro conversation — the launch-window front door to the
+ * advisory ladder.
+ *
+ * Kept out of `ENGAGEMENTS` because it is gated on `FREE_INTRO_WINDOW`, and a
+ * catalogue that imported a flag would hand every consumer of it a value that
+ * silently changes on a date. `/pricing` decides whether to render it, exactly
+ * as it already decides about the founding rate.
+ */
+export const FREE_INTRO_CONVERSATION: Offering = {
+  id: 'intro-conversation',
+  name: 'Intro conversation',
+  price: 'Free',
+  priceNote: '25 minutes · launch window',
+  summary:
+    'A conversation, not a working session — where you are, what has prompted the question, and which rung of the ladder actually fits. Free for the first ninety days.',
+  href: '/advisory#contact',
+  terms: [
+    `Distinct from the ${gbp(AMOUNTS.advisoryBriefing)} Advisory Briefing, which is an hour of work on your specific question with a written follow-up.`,
+  ],
+}
+
+/**
+ * WaymarkPath — the sister product, adjacent to the ladder rather than a rung
+ * on it.
+ *
+ * On `/pricing` for the same reason everything else is: the page promises every
+ * price on one page, and "no price published yet" is an answer a reader came
+ * for. Rendered in its own indigo band, never in the free list — the colour is
+ * how the site distinguishes a separate product from an S&S offering, and a
+ * teal row would say it is ours in the way the others are.
+ */
+export const SISTER_PRODUCT: Offering = {
+  id: 'waymarkpath',
+  name: 'WaymarkPath',
+  price: 'Free',
+  priceNote: 'early access · no paid tier published',
+  summary:
+    'The career-transition companion for the individual professional navigating the same shifts these products address at company level. Seven stages that share one context, so what each settles the next already knows.',
+  href: '/waymarkpath',
+}
+
+/**
  * Follow-on modules — scoped add-ons folded into a briefing or a retainer.
  * £3,500 is the floor: narrower in scope than the AI Bill of Materials, above
  * the Exposure Diagnostic.
  */
 export const MODULES: Offering[] = [
+  {
+    // The one module with no card in the `assessments` band on /advisory, and
+    // that asymmetry is deliberate rather than an omission to be tidied up: it
+    // is an add-on to the Post-Omnibus Briefing, scoped and sold at
+    // /eu-exposure, where it has always been one sentence of prose. It belongs
+    // here because /pricing promises every price on one page, and until
+    // 2026-09-04 this was the only priced thing on the site that appeared in no
+    // catalogue, no menu and no price list — a £1,500 offer reachable only by
+    // reading to the bottom of another page.
+    id: 'european-procurement-readiness',
+    name: 'European Procurement Readiness',
+    price: `From ${gbp(AMOUNTS.procurementAddOn)}`,
+    priceNote: 'add-on to the Post-Omnibus Briefing',
+    summary:
+      'Your systems mapped against the governance questionnaires European buyers actually send, with the evidence you must hold separated from the evidence that is theatre, and your AI indemnification clauses reviewed.',
+    href: '/eu-exposure',
+  },
   {
     id: 'sovereign-architecture-review',
     name: 'Sovereign Architecture Review',
@@ -410,6 +473,13 @@ export const SANITY_PRODUCTS: Array<{
 
 /** Look up a display price by offering id, for surfaces that show only that. */
 export function priceOf(id: string): string {
-  const all = [...FREE_OFFERINGS, ...PRODUCTS, ...ENGAGEMENTS, ...MODULES]
+  const all = [
+    ...FREE_OFFERINGS,
+    ...PRODUCTS,
+    ...ENGAGEMENTS,
+    ...MODULES,
+    FREE_INTRO_CONVERSATION,
+    SISTER_PRODUCT,
+  ]
   return all.find((o) => o.id === id)?.price ?? ''
 }

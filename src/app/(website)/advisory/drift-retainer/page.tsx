@@ -62,7 +62,7 @@ export default function DriftRetainerPage() {
         />
 
         <AtAGlance
-          price={`${gbp(AMOUNTS.driftRetainerMonthly)}/month`}
+          price={`From ${gbp(AMOUNTS.driftRetainerMonthly)}/month`}
           priceNote="Three-month initial term, then rolling monthly · limited to a handful of client companies at any time"
           points={[
             'A board-forwardable monthly briefing — what shifted, and the decision it changes',

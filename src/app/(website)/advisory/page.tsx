@@ -445,7 +445,7 @@ export default function ServicesPage() {
               </div>
               <div className="lg:justify-self-end lg:text-right">
                 <div className="font-mono text-2xl font-semibold text-text-primary">
-                  {gbp(AMOUNTS.driftRetainerMonthly)}<span className="text-text-muted">/month</span>
+                  <span className="text-text-muted">From </span>{gbp(AMOUNTS.driftRetainerMonthly)}<span className="text-text-muted">/month</span>
                 </div>
                 <div className="mb-5 text-sm text-text-muted">
                   Three-month initial term, then rolling

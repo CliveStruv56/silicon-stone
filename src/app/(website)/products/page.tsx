@@ -12,10 +12,12 @@ import {
   Shield,
   ClipboardCheck,
   FileText,
+  FileSearch,
   ArrowRight,
   CheckCircle,
+  type LucideIcon,
 } from 'lucide-react'
-import { AMOUNTS, gbp } from '@/lib/offering'
+import { PRODUCTS, type Offering } from '@/lib/offering'
 
 export const metadata: Metadata = {
   title: 'Products | Silicon and Stone',
@@ -33,12 +35,45 @@ export const metadata: Metadata = {
   },
 }
 
-const products = [
-  {
-    title: 'AI Audit Checklist Pack',
-    slug: 'ai-audit-checklist',
-    description: 'A quick-start pack for auditing your AI exposure, vendor dependencies, and compliance gaps. The essential first step.',
-    price: gbp(AMOUNTS.checklist),
+/**
+ * How each product is *presented* — icon, badge, colours, the bullets under the
+ * summary. Name, price, description and link are NOT here: they come from
+ * `PRODUCTS` in `src/lib/offering.ts`, which this page now maps.
+ *
+ * It retyped the whole list until 2026-09-04, and the failure that predicts had
+ * already happened — the Compliance Checker Evidence Pack was on `/pricing`, in
+ * the catalogue and in `project_summary.md` §5.2, and simply absent here. The
+ * prices never drifted, because they were interpolated from `AMOUNTS`; the
+ * *list* drifted, which no price guard was ever going to catch. It is the same
+ * defect the footer hit when it retyped the engagements and duplicated the
+ * Post-Omnibus Briefing.
+ *
+ * A product with no entry below still renders, in the neutral treatment — the
+ * point of the change is that a new SKU cannot vanish from this page, so the
+ * fallback must be plain rather than absent.
+ */
+type Presentation = {
+  badge: string
+  badgeColor: string
+  icon: LucideIcon
+  iconColor: string
+  iconBg: string
+  highlights: string[]
+  cta: string
+}
+
+const NEUTRAL: Presentation = {
+  badge: 'Product',
+  badgeColor: 'bg-surface-elevated text-text-muted',
+  icon: FileText,
+  iconColor: 'text-text-muted',
+  iconBg: 'bg-surface-elevated',
+  highlights: [],
+  cta: 'Read more',
+}
+
+const PRESENTATION: Record<string, Presentation> = {
+  'ai-audit-checklist': {
     badge: 'Quick Start',
     badgeColor: 'bg-stone-teal text-ink-on-accent',
     icon: ClipboardCheck,
@@ -49,15 +84,10 @@ const products = [
       'Vendor Dependency Scorecard',
       'Quick Compliance Gap Analysis',
       'Board-Ready Risk Summary template',
-      `Includes ${gbp(AMOUNTS.toolkitDiscount)} discount on full Toolkit`,
     ],
     cta: 'View Checklist Pack',
   },
-  {
-    title: 'AI Act Compliance Toolkit',
-    slug: 'ai-act-toolkit',
-    description: 'A structured governance toolkit for cataloguing systems, classifying risk, collecting vendor evidence, and planning against phased AI Act implementation.',
-    price: `From ${gbp(AMOUNTS.toolkitStandard)}`,
+  'ai-act-toolkit': {
     badge: 'Flagship',
     badgeColor: 'bg-accent-fill text-ink-on-accent',
     icon: Shield,
@@ -73,11 +103,7 @@ const products = [
     ],
     cta: 'View Toolkit',
   },
-  {
-    title: 'Sector Reports',
-    slug: 'sector-reports',
-    description: 'Focused 15-20 page briefings on AI impact, regulatory exposure, and geopolitical risk for specific industries.',
-    price: `From ${gbp(AMOUNTS.sectorReport)}`,
+  'sector-reports': {
     badge: 'Coming Soon',
     badgeColor: 'bg-surface-elevated text-text-muted',
     icon: FileText,
@@ -92,7 +118,34 @@ const products = [
     ],
     cta: 'View Sector Reports',
   },
-]
+  'evidence-pack': {
+    badge: 'Not yet on sale',
+    badgeColor: 'bg-surface-elevated text-text-muted',
+    icon: FileSearch,
+    iconColor: 'text-stone-teal',
+    iconBg: 'bg-stone-teal/10',
+    // Deliberately does not restate the summary above it — the card renders
+    // `offering.summary` and then these, so a bullet repeating it reads as
+    // padding. Same reason the checklist's credit line is left to `terms`.
+    highlights: [
+      'Components 4–11 of the report: the reasoning, not just the verdict',
+      'Article-by-article provisions, quoted from the pinned consolidated text',
+      'The vendor questions to send, with the anchor each one rests on',
+      'A record you can put in front of a buyer or an auditor',
+    ],
+    cta: 'See the Compliance Checker',
+  },
+}
+
+/**
+ * The one card that links outward rather than to `/products/<slug>`: the
+ * Evidence Pack is sold against a Compliance Checker result, so its `href` in
+ * the catalogue points at the tool. Read the link off the offering rather than
+ * rebuilding it from a slug, or this card 404s.
+ */
+function productCard(offering: Offering) {
+  return { offering, presentation: PRESENTATION[offering.id] ?? NEUTRAL }
+}
 
 export default function ProductsPage() {
   return (
@@ -136,42 +189,53 @@ export default function ProductsPage() {
 
         {/* Products Grid */}
         <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {products.map((product) => {
-              const Icon = product.icon
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-4">
+            {PRODUCTS.map(productCard).map(({ offering, presentation }) => {
+              const Icon = presentation.icon
               return (
-                <Card key={product.slug} className="card-interactive h-full bg-stone-charcoal border-border-subtle flex flex-col">
+                <Card key={offering.id} className="card-interactive h-full bg-stone-charcoal border-border-subtle flex flex-col">
                   <CardHeader>
                     <div className="flex items-start justify-between mb-3">
-                      <div className={`p-3 rounded-lg ${product.iconBg}`}>
-                        <Icon className={`w-6 h-6 ${product.iconColor}`} />
+                      <div className={`p-3 rounded-lg ${presentation.iconBg}`}>
+                        <Icon className={`w-6 h-6 ${presentation.iconColor}`} />
                       </div>
-                      <Badge className={product.badgeColor}>
-                        {product.badge}
+                      <Badge className={presentation.badgeColor}>
+                        {offering.status ?? presentation.badge}
                       </Badge>
                     </div>
                     <CardTitle className="text-xl text-text-primary">
-                      {product.title}
+                      {offering.name}
                     </CardTitle>
                     <div className="text-lg font-mono text-silicon-amber-strong mt-1">
-                      {product.price}
+                      {offering.price}
+                      {offering.priceNote && (
+                        <span className="ml-2 font-sans text-xs text-text-muted">
+                          {offering.priceNote}
+                        </span>
+                      )}
                     </div>
                     <CardDescription className="mt-2">
-                      {product.description}
+                      {offering.summary}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="flex-1 flex flex-col">
                     <ul className="space-y-2 flex-1">
-                      {product.highlights.map((item, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm text-text-muted">
+                      {presentation.highlights.map((item) => (
+                        <li key={item} className="flex items-start gap-2 text-sm text-text-muted">
                           <CheckCircle className="w-4 h-4 text-stone-teal flex-shrink-0 mt-0.5" />
                           {item}
                         </li>
                       ))}
+                      {offering.terms?.map((term) => (
+                        <li key={term} className="flex items-start gap-2 text-sm text-text-muted">
+                          <CheckCircle className="w-4 h-4 text-silicon-amber-strong flex-shrink-0 mt-0.5" />
+                          {term}
+                        </li>
+                      ))}
                     </ul>
-                    <Link href={`/products/${product.slug}`} className="mt-6">
+                    <Link href={offering.href} className="mt-6">
                       <Button className="w-full bg-surface-elevated text-text-primary hover:bg-surface-elevated/80">
-                        {product.cta}
+                        {presentation.cta}
                         <ArrowRight className="w-4 h-4 ml-2" />
                       </Button>
                     </Link>

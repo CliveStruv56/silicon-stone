@@ -73,6 +73,40 @@ describe('catalogue shape', () => {
     }
   })
 
+  it('gives every product a card on the products page', () => {
+    /**
+     * `/products` retyped its own product list until 2026-09-04, and the
+     * failure that predicts had already happened: the Compliance Checker
+     * Evidence Pack was in this catalogue, on `/pricing` and in
+     * `project_summary.md` §5.2, and simply absent from the products page. No
+     * price guard caught it, because no price had drifted — the *list* had.
+     *
+     * The page now maps `PRODUCTS`, so a product can no longer vanish. What it
+     * can still do is fall through to the neutral presentation and render with
+     * no icon, no badge and no bullets, which looks like a half-finished card
+     * rather than a missing one. This asserts each id is named in the
+     * presentation map, so adding a SKU fails here until someone gives it a
+     * card.
+     */
+    const page = fs.readFileSync(
+      path.join(process.cwd(), 'src/app/(website)/products/page.tsx'),
+      'utf8',
+    )
+
+    // The page must map the catalogue rather than declare its own list.
+    expect(page).toContain('PRODUCTS.map(')
+
+    const presentation = page.slice(
+      page.indexOf('const PRESENTATION'),
+      page.indexOf('function productCard'),
+    )
+    expect(presentation.length, 'PRESENTATION map not found in the page').toBeGreaterThan(0)
+
+    for (const product of PRODUCTS) {
+      expect(presentation, `no card for '${product.id}'`).toContain(`'${product.id}':`)
+    }
+  })
+
   it('emphasises only the ladder rungs that move money', () => {
     // Rungs 2 and 4 are scope progressions. Bolding them would read as a
     // discount that does not exist.
