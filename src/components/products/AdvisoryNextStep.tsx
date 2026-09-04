@@ -4,7 +4,7 @@ import { AMOUNTS, gbp } from '@/lib/offering'
 
 /**
  * "Take it further" band for product pages — the explicit route from a one-off
- * purchase to advisory. The warmest retainer lead is the buyer who's clearly
+ * purchase to advisory. The warmest retainer lead is the client who's clearly
  * exposed, so every product names a path to the Advisory Briefing and the
  * Drift Retainer rather than ending at the next product.
  */
