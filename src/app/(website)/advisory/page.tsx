@@ -304,7 +304,7 @@ const tiers: Tier[] = [
     description: 'The standing relationship. A board-forwardable monthly briefing, a working session on one live decision, a direct line between sessions, and a quarterly written exposure review. For leadership teams that stay ahead of the drift, not catch up to it.',
     features: [
       'A board-forwardable monthly briefing — what shifted, and the decision it changes',
-      'A working session on one live decision, externally refereed',
+      'A working session on one live decision, refereed rather than advised',
       'The Line — direct access between sessions for the awkward questions',
       'A quarterly written exposure review on the 3×2 method',
       'A standing line to thirty years inside the industry',
@@ -513,7 +513,7 @@ export default function ServicesPage() {
                   <ul className="space-y-3">
                     {[
                       'The monthly briefing — a short, board-forwardable written read plus a call: what shifted in the drift this month, and the decision it changes',
-                      'The working session — ninety minutes on one live decision, externally refereed',
+                      'The working session — ninety minutes on one live decision, refereed rather than advised: the call turns on the evidence, not on who prepared the better presentation',
                       'The Line — direct access between sessions to challenge a vendor claim, sanity-check a proposal, or prepare a board answer',
                       'The quarterly exposure review — a deeper written read on the same 3×2 method the public analysis uses, traced to your exposure',
                     ].map((item, i) => (
