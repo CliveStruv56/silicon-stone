@@ -247,8 +247,6 @@ type Tier = {
   description: string
   features: string[]
   pathNote?: string
-  /** Italic satisfaction/guarantee clause after the features. */
-  guaranteeNote?: string
   cta: string
   /** Append the free-intro launch-window line under the CTA while the flag is on. */
   ctaLaunchLine?: boolean
@@ -293,8 +291,6 @@ const tiers: Tier[] = [
       '30-day follow-up call',
     ],
     pathNote: 'Designed as an on-ramp: the diagnostic scopes naturally into a Drift Retainer, and its fee is credited toward your first quarter.',
-    guaranteeNote:
-      'If the final report contains nothing actionable for your situation, a full second revision round or a 50% refund — your call.',
     cta: 'Request a diagnostic',
     highlighted: false,
   },
@@ -817,9 +813,6 @@ export default function ServicesPage() {
                       </ul>
                       {tier.pathNote && (
                         <p className="text-xs italic text-text-muted">{tier.pathNote}</p>
-                      )}
-                      {tier.guaranteeNote && (
-                        <p className="text-xs italic text-text-muted">{tier.guaranteeNote}</p>
                       )}
                       <div className="mt-auto">
                         {/* The href still does the scrolling, so this works

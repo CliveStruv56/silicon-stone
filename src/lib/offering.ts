@@ -221,7 +221,6 @@ export const ENGAGEMENTS: Offering[] = [
     href: '/advisory#diagnostic',
     terms: [
       'Fee credited toward your first quarter on the Drift Retainer.',
-      'If the report contains nothing actionable, a full second revision round or a 50% refund — your call.',
     ],
   },
   {
