@@ -569,6 +569,65 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### September 4, 2026 — The 3×2 method stops reading as a separate product
+
+`/advisory` sold two things that never met. The Drift Retainer section cited
+"the same 3×2 method" in its own bullet list, and seventy lines later a section
+headed "The 3×2 Method. Applied to Your Decision." explained the method without
+naming the Retainer once. A reader could reasonably take the second for a
+different offering.
+
+**The root cause was a scoping error, not layout.** The only two strings on the
+whole site tying the method to the Retainer (`advisory/page.tsx`, the tier-card
+feature and the "What it includes" bullet) both attached it to the *quarterly*
+review. Nowhere did any copy say the Retainer applies three domains and two
+methods continuously — so the method presented as a feature of one deliverable
+rather than as what the relationship runs on. Four structural symptoms followed:
+the section was the only one on the page with no `id`, no nav entry and no CTA
+while every neighbour is a linkable destination; its only two links left the
+funnel into free tools; it never said "Drift Retainer"; and it was cited before
+it was defined.
+
+**What changed.** The section is now `#method`, reachable from the Advisory
+dropdown and from the hero, and carries a kicker — "What the Retainer reads,
+every month" — over an intro that names both engagements and links
+`/methodology`. It closes on the ladder rather than on a free tool, with the
+sentence the owner confirmed: *the Diagnostic is one pass over two domains; the
+Retainer runs all three, both ways, every month.*
+
+Every card gained an **"On your desk"** line. All five previously described
+activity ("We trace…", "We run…") and named no artefact, so the section could
+not answer what a buyer receives.
+
+**The per-card "Try {tool}" links are gone**, and `tool`/`toolHref` with them.
+Two of three domains had one, the third did not, neither method did, and the two
+that existed were the section's only interactive elements — so for a buying
+reader the whole section resolved to "go and use a free thing". The tools are
+named once below the grid, in the sentence that explains the asymmetry: three of
+the five can be self-served, and the talent layer and long-memory filter are
+judgement calls that only run with a person. Stated per-card it read as an
+unfinished grid; stated once it reads as a reason.
+
+**Two smaller fixes on the same page.** The hero had no CTA, no price and no
+product name while `advisory/layout.tsx`'s metadata leads with the Drift
+Retainer — search promised a product and the page delivered a category. It now
+carries an "In short" line (priced from `AMOUNTS`, never a literal), a booking
+button and a link to `#method`. The `Services` badge now says `Advisory`, which
+is what the nav, the URL and the metadata all say.
+
+**Mobile.** The Retainer's heading and standfirst moved out of the prose column
+to sit full-width above the grid, and the card is `order-1 lg:order-2`. Measured
+at 390px: the card now starts **256px** into the section instead of after the
+whole prose column (which begins at 1629px). Desktop is unchanged — both columns
+still start at 226px.
+
+`/methodology` also gained a Drift Retainer button; its CTA offered only
+`/intelligence` and `/about`, so the canonical explanation of the thing every
+engagement is sold on was a dead end for a buyer.
+
+No prices moved. `offering.test.ts` (the `£`-literal guard) green, typecheck
+clean, lint clean.
+
 ### September 4, 2026 — Every refund promise on the site is withdrawn
 
 Two commercial claims are gone, at the owner's request. Neither was a bug; both

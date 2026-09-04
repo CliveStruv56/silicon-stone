@@ -73,6 +73,10 @@ const primaryNavigation: NavItem[] = [
       // rather than leaving the reader to guess from two identical prices.
       { name: 'Post-Omnibus Briefing', href: '/eu-exposure', note: `${priceOf('post-omnibus-briefing')} · US & UK` },
       { name: 'Modules', href: '/advisory#modules', note: `From ${gbp(AMOUNTS.moduleFloor)}` },
+      // The 3×2 section was the one part of /advisory that no menu reached and
+      // no anchor named, which is part of why it read as a separate product
+      // rather than as what the Retainer runs on.
+      { name: 'The 3×2 Method', href: '/advisory#method' },
       { name: 'All prices', href: '/pricing' },
       { name: 'Contact', href: '/advisory#contact' },
     ],

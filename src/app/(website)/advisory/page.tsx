@@ -33,42 +33,53 @@ import {
 } from 'lucide-react'
 import { AMOUNTS, gbp } from '@/lib/offering'
 
+/**
+ * The 3×2 method, as the Advisory page states it.
+ *
+ * Every card carries an `output` — what actually lands on the client's desk.
+ * Without it all five read as descriptions of activity ("We trace…", "We
+ * run…"), which cannot answer the only question a buyer is asking here.
+ *
+ * The per-card "Try {tool}" links are deliberately gone. Two of the three
+ * domains had one and the third did not, neither method did, and the two links
+ * that existed were the section's *only* interactive elements — so for a
+ * buying reader the whole section resolved to "go and use a free thing". The
+ * tools are named once, below the grid, in the sentence that explains why only
+ * three of the five have one.
+ */
 const domains = [
   {
     id: 'supply-chain',
     title: 'Supply Chain Forensics',
     description: 'We trace critical components from raw materials to finished product, identifying the chokepoints and concentration risks before they reach a news ticker.',
+    output: 'A dependency map with the chokepoints named, and the procurement questions to put to each exposed supplier.',
     icon: Search,
     color: 'text-stone-teal',
     bgColor: 'bg-stone-teal/10',
     borderColor: 'border-stone-teal/30',
     hoverBorderColor: 'hover:border-stone-teal/30',
-    tool: 'Supply Chain Mapper',
-    toolHref: '/tools/supply-chain-mapper',
   },
   {
     id: 'policy-stress',
     title: 'Policy Stress-Testing',
     description: 'We run a single development through the US and EU regulatory systems to find where compliance with one becomes friction with the other.',
+    output: 'Where US and EU requirements pull against each other in your operations, friction-scored, with the order to fix them in.',
     icon: Scale,
     color: 'text-silicon-amber-strong',
     bgColor: 'bg-silicon-amber/10',
     borderColor: 'border-silicon-amber/30',
     hoverBorderColor: 'hover:border-silicon-amber/30',
-    tool: 'Policy Stress-Test',
-    toolHref: '/tools/policy-stress-test',
   },
   {
     id: 'talent-flow',
     title: 'Talent & Capability Flow',
     description: 'We track where senior engineers, fab technicians, and regulatory experts actually move, and what their landing and leaving does to capability — the layer most technology-policy commentary misses.',
+    output: 'Where the capability you depend on is accumulating or leaking — in your suppliers, your regulators, and your own team.',
     icon: Users,
     color: 'text-sister-indigo',
     bgColor: 'bg-sister-indigo/10',
     borderColor: 'border-sister-indigo/30',
     hoverBorderColor: 'hover:border-sister-indigo/30',
-    tool: null,
-    toolHref: null,
   },
 ]
 
@@ -77,6 +88,7 @@ const methods = [
     id: 'scenario-modelling',
     title: 'Scenario Modelling',
     description: 'Three futures per question — low / medium / high friction — quantified with Value at Stake. A structured menu of preparation moves, not a prediction.',
+    output: 'Three costed futures for the decision in front of you, and the trigger that tells you which one you are in.',
     icon: TrendingUp,
     color: 'text-alert-red',
     bgColor: 'bg-alert-red/10',
@@ -87,6 +99,7 @@ const methods = [
     id: 'long-memory-filter',
     title: 'Long-Memory Filter',
     description: 'Pattern-matching the present against thirty years of industrial cycles (the 1986 Semiconductor Agreement, the 1990s offshoring wave), separating structural change from hype.',
+    output: 'A straight answer on whether the thing everyone is reacting to is structural, or a cycle you have already lived through.',
     icon: Clock,
     color: 'text-text-muted',
     bgColor: 'bg-surface-elevated',
@@ -401,8 +414,11 @@ export default function ServicesPage() {
           <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
             <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-center lg:gap-12">
               <div>
+                {/* "Advisory" not "Services": the nav, the URL and the page
+                    metadata all say Advisory, and this badge was the only
+                    surface calling it something else. */}
                 <Badge variant="outline" className="mb-4 border-stone-teal text-stone-teal">
-                  Services
+                  Advisory
                 </Badge>
                 <h1 className="text-4xl font-bold text-text-primary sm:text-5xl mb-6">
                   Strategic Advisory for the Technopolitical Age
@@ -418,6 +434,40 @@ export default function ServicesPage() {
                   vendors, the technology exposures that could become operating
                   constraints — read continuously, not once.
                 </p>
+
+                {/* The offer, named and priced, above the fold. The H1 is a
+                    category; the page metadata leads with the Drift Retainer,
+                    so a reader arriving from search was promised a product and
+                    met a category. This is the reconciliation. */}
+                <p className="mt-6 border-l-2 border-silicon-amber/60 pl-4 leading-relaxed text-text-muted">
+                  <strong className="font-semibold text-text-primary">In short.</strong>{' '}
+                  The Drift Retainer is a standing monthly read on how the drift moves
+                  against your business, from {gbp(AMOUNTS.driftRetainerMonthly)} a month.
+                  If you would rather take one pass at it first, the Exposure Diagnostic
+                  is from {gbp(AMOUNTS.exposureDiagnostic)}.
+                </p>
+
+                {/* The page had no CTA above the fold at all — the first
+                    actionable element sat inside the Retainer card. */}
+                <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
+                  <a
+                    href="#contact"
+                    onClick={() => setFormData((prev) => ({ ...prev, engagement: 'Drift Retainer' }))}
+                  >
+                    <Button size="lg" className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90">
+                      Book a 25-minute conversation
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </a>
+                  <a href="#method" className="text-sm text-stone-teal hover:underline">
+                    How the method works →
+                  </a>
+                </div>
+                {FREE_INTRO_WINDOW && (
+                  <p className="mt-2 text-xs italic text-text-muted">
+                    Free during our launch window — the first ninety days.
+                  </p>
+                )}
               </div>
 
               <div className="relative">
@@ -445,21 +495,28 @@ export default function ServicesPage() {
         {/* The Drift Retainer — the spine */}
         <section id="retainer" className="scroll-mt-24 border-b border-silicon-amber/30 bg-silicon-amber/5">
           <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+            {/* Heading and standfirst sit full-width, above the grid, so the
+                "What it includes" card can come directly under them on mobile.
+                They used to live inside the prose column, which put the price
+                and the button roughly five hundred words down a phone screen —
+                on desktop the 3fr/2fr grid hid the problem entirely. */}
+            <div className="mb-8 lg:mb-10">
+              <div className="mb-4 flex flex-wrap items-center gap-2">
+                <Badge className="bg-accent-fill text-ink-on-accent">Most popular</Badge>
+                <Badge variant="outline" className="border-silicon-amber text-silicon-amber-strong">
+                  Ongoing
+                </Badge>
+              </div>
+              <h2 className="mb-3 text-3xl font-bold text-text-primary sm:text-4xl">
+                The Drift Retainer
+              </h2>
+              <p className="text-xl font-medium text-text-primary/90">
+                Your standing read on the drift — so the leadership team is never
+                blindsided.
+              </p>
+            </div>
             <div className="grid grid-cols-1 gap-10 lg:grid-cols-[3fr_2fr] lg:items-start">
-              <div>
-                <div className="mb-4 flex flex-wrap items-center gap-2">
-                  <Badge className="bg-accent-fill text-ink-on-accent">Most popular</Badge>
-                  <Badge variant="outline" className="border-silicon-amber text-silicon-amber-strong">
-                    Ongoing
-                  </Badge>
-                </div>
-                <h2 className="mb-3 text-3xl font-bold text-text-primary sm:text-4xl">
-                  The Drift Retainer
-                </h2>
-                <p className="mb-5 text-xl font-medium text-text-primary/90">
-                  Your standing read on the drift — so the leadership team is never
-                  blindsided.
-                </p>
+              <div className="order-2 lg:order-1">
                 <p className="mb-4 max-w-2xl leading-relaxed text-text-muted">
                   You have bought the licences and your people are experimenting. When the
                   board asks what has actually changed in how the business makes money,
@@ -493,6 +550,17 @@ export default function ServicesPage() {
                   where the exposure is real and where the next quarter&rsquo;s focus belongs.
                   You know within thirty days whether the relationship earns its fee.
                 </p>
+                {/* The forward reference the section was missing. It cites "the
+                    same 3×2 method" in its own bullet list without ever saying
+                    what that is or where to find it. */}
+                <p className="mt-6 max-w-2xl leading-relaxed text-text-muted">
+                  <strong className="font-semibold text-text-primary">What we read.</strong>{' '}
+                  Three forensic domains — supply chain, policy, talent — each read two
+                  ways, for scenarios and against thirty years of precedent.{' '}
+                  <a href="#method" className="text-stone-teal hover:underline">
+                    What the 3×2 method means in practice →
+                  </a>
+                </p>
                 <p className="mt-6 border-l-2 border-sister-indigo/50 pl-4 text-sm italic text-text-muted">
                   The same drift runs through individual careers as well as company
                   strategy. Where the brief is personal rather than organisational,{' '}
@@ -503,7 +571,7 @@ export default function ServicesPage() {
                 </p>
               </div>
 
-              <Card className="bg-stone-charcoal border-silicon-amber/40">
+              <Card className="order-1 bg-stone-charcoal border-silicon-amber/40 lg:order-2">
                 <CardHeader>
                   <div className="text-xs font-mono uppercase tracking-wider text-text-muted">
                     What it includes
@@ -581,16 +649,38 @@ export default function ServicesPage() {
           </div>
         </section>
 
-        {/* Methodology Section */}
-        <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
+        {/* The 3×2 method — the Retainer's operating system, not a separate
+            offering.
+
+            It used to read as a different product, for four compounding
+            reasons: it was the only section on the page with no `id`, no nav
+            entry and no CTA, while every neighbour is a linkable destination;
+            its only two links left the funnel into free tools; it never said
+            "Drift Retainer" once; and the Retainer above cites "the same 3×2
+            method" seventy lines *before* anything defines it.
+
+            Underneath all four sat one scoping error. The only two strings on
+            the whole site tying the method to the Retainer both attached it to
+            the *quarterly* review, so the method presented as a feature of one
+            deliverable rather than as what the relationship runs on. The
+            kicker and the intro below are the fix; the rest follows from it. */}
+        <section id="method" className="scroll-mt-24 mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
           <div className="mb-8">
+            <div className="mb-3 font-mono text-xs uppercase tracking-wider text-silicon-amber-strong">
+              What the Retainer reads, every month
+            </div>
             <h2 className="text-2xl font-semibold text-text-primary mb-4">
               The 3×2 Method. Applied to Your Decision.
             </h2>
             <p className="text-text-muted max-w-3xl">
-              Every engagement draws on the Forensic Technopolitics methodology: three
-              forensic domains and two analytical methods. These applied views turn that
-              method into practical work.
+              Three forensic domains, two ways of reading each. The monthly briefing
+              covers whichever moved; the quarterly exposure review runs all six. It is
+              the same method behind the public analysis — pointed at your business
+              rather than at the market.{' '}
+              <Link href="/methodology" className="text-stone-teal hover:underline">
+                See the full 3×2 matrix
+              </Link>
+              .
             </p>
           </div>
 
@@ -620,17 +710,14 @@ export default function ServicesPage() {
                         {domain.description}
                       </CardDescription>
                     </CardHeader>
-                    {domain.tool && domain.toolHref && (
-                      <CardContent>
-                        <Link
-                          href={domain.toolHref}
-                          className={`inline-flex items-center text-sm ${domain.color} hover:underline`}
-                        >
-                          Try {domain.tool}
-                          <ArrowRight className="w-3 h-3 ml-1" />
-                        </Link>
-                      </CardContent>
-                    )}
+                    <CardContent>
+                      <div className="mb-1.5 font-mono text-[11px] uppercase tracking-wider text-text-muted">
+                        On your desk
+                      </div>
+                      <p className="text-sm leading-relaxed text-text-primary">
+                        {domain.output}
+                      </p>
+                    </CardContent>
                   </Card>
                 </motion.div>
               )
@@ -663,10 +750,62 @@ export default function ServicesPage() {
                         {method.description}
                       </CardDescription>
                     </CardHeader>
+                    <CardContent>
+                      <div className="mb-1.5 font-mono text-[11px] uppercase tracking-wider text-text-muted">
+                        On your desk
+                      </div>
+                      <p className="text-sm leading-relaxed text-text-primary">
+                        {method.output}
+                      </p>
+                    </CardContent>
                   </Card>
                 </motion.div>
               )
             })}
+          </div>
+
+          {/* The section's close. It used to end on the second method card,
+              leaving the reader at a dead stop between two priced sections.
+
+              The tools are named here rather than on the cards because the
+              asymmetry is the argument: three of the five can be automated and
+              two cannot, so the two you cannot self-serve are the two you are
+              paying a person for. Stated per-card it read as an unfinished
+              grid; stated once it reads as a reason. */}
+          <div className="mt-10 rounded-lg border border-silicon-amber/30 bg-silicon-amber/5 p-6 lg:p-8">
+            <p className="max-w-3xl leading-relaxed text-text-muted">
+              Three of these five you can run yourself, free:{' '}
+              <Link href="/tools/supply-chain-mapper" className="text-stone-teal hover:underline">
+                Supply Chain Mapper
+              </Link>
+              ,{' '}
+              <Link href="/tools/policy-stress-test" className="text-stone-teal hover:underline">
+                Policy Stress-Test
+              </Link>{' '}
+              and{' '}
+              <Link href="/tools/scenario-modeler" className="text-stone-teal hover:underline">
+                Scenario Modeler
+              </Link>
+              . The talent layer and the long-memory filter are judgement calls — they
+              only run with a person.
+            </p>
+            <p className="mt-4 max-w-3xl text-lg font-medium leading-relaxed text-text-primary">
+              The Diagnostic is one pass over two domains. The Retainer runs all three,
+              both ways, every month.
+            </p>
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <a href="#retainer">
+                <Button className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90">
+                  See the Drift Retainer
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </a>
+              <a href="#diagnostic">
+                <Button className="bg-surface-elevated text-text-primary hover:bg-surface-elevated/80">
+                  Or one pass — the Exposure Diagnostic
+                </Button>
+              </a>
+            </div>
           </div>
         </section>
 

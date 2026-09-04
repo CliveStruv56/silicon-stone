@@ -422,12 +422,21 @@ export default function MethodologyPage() {
               <p className="text-text-muted mb-8">
                 Our analysis applies the 3&nbsp;×&nbsp;2 matrix to the most pressing
                 questions in AI regulation, semiconductor supply chains, and digital
-                sovereignty.
+                sovereignty. Pointed at one business rather than at the market, the
+                same matrix is what the Drift Retainer reads every month.
               </p>
+              {/* This block offered only /intelligence and /about, so the
+                  method page — the canonical explanation of the thing every
+                  engagement is sold on — was a dead end for a buyer. */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/intelligence">
                   <Button className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90">
                     Read Our Analysis
+                  </Button>
+                </Link>
+                <Link href="/advisory#retainer">
+                  <Button variant="outline" className="border-silicon-amber text-silicon-amber-strong hover:bg-silicon-amber/10">
+                    The Drift Retainer
                   </Button>
                 </Link>
                 <Link href="/about">
