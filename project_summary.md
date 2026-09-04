@@ -1,7 +1,7 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-08-24
+> Last Updated: 2026-09-04
 > Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (78 prerendered pages), 1,497 tests green, 19 npm audit findings — every one of them in the Sanity CLI/export subtree, which never executes in the function runtime, gated behind the Next 16 / Sanity v5 upgrade**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, **Guide**, YouTube Script, Research Only), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
@@ -372,7 +372,7 @@ sell (restore them when the first report is on sale — see `LAUNCH.md`).
 | Engagement | Price | Summary | Where it lives |
 |---|---|---|---|
 | **Advisory Briefing** | **£450** / one hour | Focused consultation on your tool results and one specific question, plus a written follow-up. Credited **in full** to your first retainer month if you proceed within 30 days. | `/advisory#briefing` |
-| **The Exposure Diagnostic** | **From £2,500** (custom scope) | AI system + vendor-evidence review, dependency mapping, regulatory-friction read, 15–25pp report, 30-day follow-up. Fee credited to the first retainer quarter. Carries a revision-or-50%-refund guarantee. | `/advisory#diagnostic` |
+| **The Exposure Diagnostic** | **From £2,500** (custom scope) | AI system + vendor-evidence review, dependency mapping, regulatory-friction read, 15–25pp report, 30-day follow-up. Fee credited to the first retainer quarter. **No refund guarantee** — the revision-or-50%-refund clause was withdrawn on 2026-09-04. | `/advisory#diagnostic` |
 | **The Post-Omnibus Briefing** | **From £2,500**, fixed | US/UK-inbound. Fixed-scope written briefing (15–25pp) on what the AI Act now requires of you post-Digital Omnibus, delivered in three weeks, plus one interpretation call. | `/eu-exposure` |
 | ↳ *European Procurement Readiness* (add-on) | **From £1,500** | Add-on to the above: your systems mapped against EU buyer governance questionnaires, required-vs-theatre evidence triage, AI indemnification clause review. | `/eu-exposure` |
 | **The Drift Retainer** | **£2,000/mo** — three-month initial term, then rolling. £20,000/year annual. **Founding rate £1,500/mo for the first six months, first five clients** (`FOUNDING_OFFER_ACTIVE`). | The spine of the whole offering. Board-forwardable monthly briefing, a 90-minute working session on one live decision, "The Line" direct access between sessions, quarterly written exposure review on the 3×2 method. Opens with a Baseline Month — walk away after month one paying that month only. | `/advisory#retainer` |
@@ -568,6 +568,39 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### September 4, 2026 — Every refund promise on the site is withdrawn
+
+Two commercial claims are gone, at the owner's request. Neither was a bug; both
+were promises the business no longer wants to make.
+
+The **30-day money-back guarantee** ran under every purchase CTA on the AI Act
+Toolkit and Sector Reports pages, and again on the post-purchase success page.
+`src/components/products/GuaranteeNote.tsx` and all four renders are deleted
+rather than commented out, so there is no dormant copy to switch back on by
+accident.
+
+The **Exposure Diagnostic's revision-or-50%-refund clause** rendered twice from
+two sources — the tier card on `/advisory` and the terms list on `/pricing`, via
+`offering.ts`. Both are gone, and the optional `guaranteeNote` Tier field went
+with them: the Diagnostic was its only user, and a spare field nothing sets is
+how the promise gets reintroduced by mistake.
+
+**What deliberately stays**: the Drift Retainer's Baseline Month walk-away, on
+`/advisory` and `/pricing`. It is a different promise attached to a different
+product, and the owner kept it.
+
+Verified on production: `/products`, `/products/ai-act-toolkit`,
+`/products/sector-reports`, `/products/success`,
+`/products/ai-audit-checklist`, `/eu-exposure`, `/advisory`, `/pricing` and `/`
+all return 200 with **zero** occurrences of "refund" or "money-back". The only
+surviving "guarantee" strings are the three Baseline Month lines. Suite green
+(1,497 tests, 77 files), prebuild guards green, `test:sanity-prices` agrees with
+the code catalogue across 3 published products, CI green on both commits.
+
+This entry also corrects §5.3, which still advertised the Diagnostic's refund
+guarantee three weeks after the page stopped doing so.
+
 
 ### August 24, 2026 — The notification's first live run found the contact form broken
 
