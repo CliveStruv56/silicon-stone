@@ -99,6 +99,21 @@ export interface Offering {
   price: string
   /** Qualifier shown beside the price ("one hour", "three-month term"). */
   priceNote?: string
+  /**
+   * Where an offering is sold at two named prices rather than one headline
+   * figure with a qualifier hung off it.
+   *
+   * The Toolkit had the second shape until 2026-09-04 and it buried the upper
+   * tier: `/pricing` rendered "£79" in amber and "Standard · £275 Professional"
+   * in small muted grey underneath, so the £275 read as a footnote about the
+   * £79 rather than as a price you could buy. Both figures are prices; both are
+   * rendered as prices.
+   *
+   * `price` stays the headline — `priceOf()` feeds the header nav's "From £79"
+   * from it — and the first tier repeats it from the same `AMOUNTS` key, so the
+   * two cannot drift.
+   */
+  priceTiers?: Array<{ label: string; price: string }>
   /** One sentence: what the buyer gets. */
   summary: string
   /**
@@ -171,7 +186,10 @@ export const PRODUCTS: Offering[] = [
     id: 'ai-act-toolkit',
     name: 'AI Act Compliance Toolkit',
     price: gbp(AMOUNTS.toolkitStandard),
-    priceNote: `Standard · ${gbp(AMOUNTS.toolkitProfessional)} Professional`,
+    priceTiers: [
+      { label: 'Standard', price: gbp(AMOUNTS.toolkitStandard) },
+      { label: 'Professional', price: gbp(AMOUNTS.toolkitProfessional) },
+    ],
     summary:
       'The governance toolkit: risk-classification decision tree, checklists by risk category, template policies, a Systems Register and a Compliance Tracker, against the phased AI Act timetable.',
     href: '/products/ai-act-toolkit',

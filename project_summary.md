@@ -674,6 +674,23 @@ Verified in a browser at 1440px, not only in the suite: `/pricing`, `/products`,
 `/advisory/drift-retainer`. 1,527 tests green; `npm run build` green including
 every `prebuild` guard.
 
+**Then the Toolkit's upper tier was made a price rather than a footnote.**
+`/pricing` rendered "£79" in amber with "Standard · £275 Professional" beneath
+it in small muted grey — so the £275 read as a note *about* the £79 rather than
+as something you could buy. `Offering` gains an optional `priceTiers`, and the
+Toolkit uses it: each tier is named beside its figure in the same weight and the
+same accent colour, stacked and right-aligned on `/pricing`, wrapped on the
+`/products` card. `price` stays the headline, because `priceOf()` feeds the
+header nav's "From £79" from it, and the first tier repeats it from the same
+`AMOUNTS` key so the two cannot drift.
+
+Guarded in `offering.test.ts`: a tiered offering's first tier must equal its
+`price`, every tier must be a formatted sterling figure, and a tiered offering
+must carry **no** `priceNote` — the note is what the upper tier used to be
+squeezed into, and rendering both would state the same prices twice in two
+different weights. Mutation-tested: pointing tier one at a different `AMOUNTS`
+key and reinstating the `priceNote` each turn it red.
+
 **Verified on production**, `dpl_279E4L5RQbcwkMU1KQJvzW6L7ex7` — Ready, built in
 2m, aliased to the bare apex. Checked by `curl` against `siliconandstone.com`
 rather than by reading the build log, which matters here: Vercel had a build in

@@ -206,14 +206,31 @@ export default function ProductsPage() {
                     <CardTitle className="text-xl text-text-primary">
                       {offering.name}
                     </CardTitle>
-                    <div className="text-lg font-mono text-silicon-amber-strong mt-1">
-                      {offering.price}
-                      {offering.priceNote && (
-                        <span className="ml-2 font-sans text-xs text-text-muted">
-                          {offering.priceNote}
-                        </span>
-                      )}
-                    </div>
+                    {offering.priceTiers ? (
+                      /* Both tiers priced in the accent colour. The Toolkit's
+                         upper tier used to trail the headline as muted grey
+                         prose, which read as a note about the £79 rather than a
+                         price of its own. */
+                      <dl className="mt-1 flex flex-wrap items-baseline gap-x-4 gap-y-1">
+                        {offering.priceTiers.map((tier) => (
+                          <div key={tier.label} className="flex items-baseline gap-1.5">
+                            <dt className="text-xs text-text-muted">{tier.label}</dt>
+                            <dd className="font-mono text-lg text-silicon-amber-strong">
+                              {tier.price}
+                            </dd>
+                          </div>
+                        ))}
+                      </dl>
+                    ) : (
+                      <div className="text-lg font-mono text-silicon-amber-strong mt-1">
+                        {offering.price}
+                        {offering.priceNote && (
+                          <span className="ml-2 font-sans text-xs text-text-muted">
+                            {offering.priceNote}
+                          </span>
+                        )}
+                      </div>
+                    )}
                     <CardDescription className="mt-2">
                       {offering.summary}
                     </CardDescription>

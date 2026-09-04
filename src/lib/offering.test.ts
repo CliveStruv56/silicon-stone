@@ -73,6 +73,33 @@ describe('catalogue shape', () => {
     }
   })
 
+  it('keeps a tiered offering agreeing with its own headline price', () => {
+    /**
+     * `price` and `priceTiers[0].price` are the same figure rendered in two
+     * places: the header nav builds "From £79" out of `priceOf()`, which reads
+     * `price`, while `/pricing` and `/products` render the tier list. Both come
+     * from the same `AMOUNTS` key today; this fails if someone later types one
+     * of them by hand.
+     *
+     * A tiered offering must also carry no `priceNote`. The note is what the
+     * upper tier used to be squeezed into — "Standard · £275 Professional" in
+     * muted grey — and rendering both would restate the same prices twice in
+     * two different weights.
+     */
+    const tiered = [...PRODUCTS, ...ENGAGEMENTS, ...MODULES].filter((o) => o.priceTiers)
+    expect(tiered.length, 'no tiered offering found — has the field been dropped?')
+      .toBeGreaterThan(0)
+
+    for (const offering of tiered) {
+      expect(offering.priceTiers!.length, `${offering.id} tiers`).toBeGreaterThan(1)
+      expect(offering.priceTiers![0].price, `${offering.id} headline`).toBe(offering.price)
+      expect(offering.priceNote, `${offering.id} priceNote`).toBeUndefined()
+      for (const tier of offering.priceTiers!) {
+        expect(tier.price, `${offering.id} · ${tier.label}`).toMatch(/^£[\d,]+$/)
+      }
+    }
+  })
+
   it('gives every product a card on the products page', () => {
     /**
      * `/products` retyped its own product list until 2026-09-04, and the

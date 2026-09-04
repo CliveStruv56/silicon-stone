@@ -84,11 +84,32 @@ function OfferingRow({ offering, accent }: { offering: Offering; accent: 'teal' 
       </div>
 
       <div className="sm:order-2 sm:text-right">
-        <div className={`font-mono text-lg font-semibold ${priceColor}`}>
-          {offering.price}
-        </div>
-        {offering.priceNote && (
-          <div className="text-xs text-text-muted sm:max-w-[13rem]">{offering.priceNote}</div>
+        {offering.priceTiers ? (
+          /* Two prices, not a price and a footnote. Each tier is named beside a
+             figure in the same weight and the same colour, because both are
+             things you can buy — see the note on `priceTiers` in offering.ts. */
+          <dl className="space-y-1">
+            {offering.priceTiers.map((tier) => (
+              <div
+                key={tier.label}
+                className="flex items-baseline gap-2 sm:justify-end"
+              >
+                <dt className="text-xs text-text-muted">{tier.label}</dt>
+                <dd className={`font-mono text-lg font-semibold ${priceColor}`}>
+                  {tier.price}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        ) : (
+          <>
+            <div className={`font-mono text-lg font-semibold ${priceColor}`}>
+              {offering.price}
+            </div>
+            {offering.priceNote && (
+              <div className="text-xs text-text-muted sm:max-w-[13rem]">{offering.priceNote}</div>
+            )}
+          </>
         )}
       </div>
     </div>
