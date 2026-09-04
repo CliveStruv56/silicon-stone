@@ -101,6 +101,13 @@ export interface Offering {
   priceNote?: string
   /** One sentence: what the buyer gets. */
   summary: string
+  /**
+   * The question a buyer is asking when this is the right rung, in their words
+   * rather than ours. The advisory chooser and the cross-links between the four
+   * engagement pages are keyed on this, because "I don't know what we've got"
+   * sorts a reader faster than a product name and a price do.
+   */
+  question?: string
   /** Where to read more / buy. */
   href: string
   /** Terms, credits and guarantees attached to this price. */
@@ -206,7 +213,8 @@ export const ENGAGEMENTS: Offering[] = [
     priceNote: 'one hour',
     summary:
       'A focused consultation on your tool results and one specific question, with a written follow-up. The low-commitment way to test the water.',
-    href: '/advisory#briefing',
+    question: 'I need a read on this one thing.',
+    href: '/advisory/advisory-briefing',
     terms: [
       'Credited in full toward your first month on the Drift Retainer if you proceed within 30 days.',
     ],
@@ -218,6 +226,7 @@ export const ENGAGEMENTS: Offering[] = [
     priceNote: 'custom scope',
     summary:
       'Where your dependency on specific vendors, models and jurisdictions becomes an operating constraint — with a 15–25 page report and a 30-day follow-up call.',
+    question: 'I do not know what we have actually got.',
     // Its own page since 2026-09-04, not an anchor on /advisory. It is the same
     // price as the Post-Omnibus Briefing, which has had `/eu-exposure` all
     // along, and it was carrying 84 words in a four-across grid cell. Both the
@@ -250,7 +259,14 @@ export const ENGAGEMENTS: Offering[] = [
     priceNote: 'per month · three-month initial term',
     summary:
       'The standing relationship. A board-forwardable monthly briefing, a working session on one live decision, direct access between sessions, and a quarterly written exposure review.',
-    href: '/advisory#retainer',
+    question: 'It keeps moving and we keep reacting.',
+    // Its own page since 2026-09-04. It was the last engagement presented as a
+    // section on the hub while the others had pages, and that asymmetry was the
+    // reason their styling kept diverging — a section and a page were never
+    // built from one template. `/advisory#retainer` still resolves: the hub
+    // keeps a summary block under that id, because a dead anchor does not 404,
+    // it silently scrolls nowhere.
+    href: '/advisory/drift-retainer',
     terms: [
       'The Baseline Month guarantee: after month one, walk away paying that month only.',
       `Twelve months for the price of ten — ${gbp(AMOUNTS.driftRetainerAnnual)} a year.`,
@@ -264,6 +280,7 @@ export const ENGAGEMENTS: Offering[] = [
     priceNote: 'then transitions to retainer',
     summary:
       'The deep one-off for a high-stakes decision: multi-framework analysis, a 40-page report, a board-ready presentation and an implementation roadmap.',
+    question: 'The board has to decide.',
     /** Own page since 2026-09-04 — see the Exposure Diagnostic note above. */
     href: '/advisory/strategic-assessment',
     terms: [

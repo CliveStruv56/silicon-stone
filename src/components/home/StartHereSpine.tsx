@@ -48,7 +48,7 @@ const rungs: Rung[] = [
     title: 'Retain',
     body: 'A standing read on the drift, so your leadership team is never blindsided. Diagnostics and assessments scope into an ongoing relationship.',
     cta: 'Explore Advisory',
-    href: '/advisory#retainer',
+    href: '/advisory/drift-retainer',
     tone: 'paid',
   },
 ]

@@ -27,13 +27,13 @@ export function AdvisoryNextStep() {
             days.
           </p>
           <div className="flex flex-col justify-center gap-4 sm:flex-row">
-            <Link href="/advisory#contact">
+            <Link href="/advisory/advisory-briefing">
               <span className="inline-flex items-center gap-1.5 rounded-md bg-accent-fill px-5 py-2.5 text-sm font-semibold text-ink-on-accent transition-colors hover:bg-accent-fill/90">
                 Book an Advisory Briefing — {gbp(AMOUNTS.advisoryBriefing)}
                 <ArrowRight className="h-4 w-4" />
               </span>
             </Link>
-            <Link href="/advisory#retainer">
+            <Link href="/advisory/drift-retainer">
               <span className="inline-flex items-center gap-1.5 rounded-md border border-silicon-amber/60 px-5 py-2.5 text-sm font-medium text-silicon-amber-strong transition-colors hover:bg-silicon-amber/10">
                 See the Drift Retainer
                 <ArrowRight className="h-4 w-4" />

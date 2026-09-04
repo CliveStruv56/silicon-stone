@@ -62,11 +62,13 @@ const primaryNavigation: NavItem[] = [
     children: [
       // Price notes come from src/lib/offering.ts so the menu cannot drift from
       // /pricing — this nav carried a stale duplicate set until 2026-08-15.
-      { name: 'Advisory Briefing', href: '/advisory#briefing', note: priceOf('advisory-briefing') },
-      // These two are full pages, not anchors — the same treatment the
-      // Post-Omnibus Briefing has always had at the same price point.
+      // All four engagements are full pages now, built from one template — the
+      // treatment the Post-Omnibus Briefing has always had at the same price
+      // point. While the Retainer alone lived as a section on /advisory it kept
+      // a structural advantage over the others no matter how good their copy got.
+      { name: 'Advisory Briefing', href: '/advisory/advisory-briefing', note: priceOf('advisory-briefing') },
       { name: 'The Exposure Diagnostic', href: '/advisory/exposure-diagnostic', note: priceOf('exposure-diagnostic') },
-      { name: 'The Drift Retainer', href: '/advisory#retainer', note: `${priceOf('drift-retainer')}/mo` },
+      { name: 'The Drift Retainer', href: '/advisory/drift-retainer', note: `${priceOf('drift-retainer')}/mo` },
       { name: 'Strategic Assessment', href: '/advisory/strategic-assessment', note: priceOf('strategic-assessment') },
       // A separate page rather than an anchor, and the one paid offering that
       // was in no menu at all — reachable only from inline links on five pages.

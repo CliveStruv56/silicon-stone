@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
-  ArrowRight,
   CheckCircle,
   Clock,
   FileText,
@@ -11,15 +10,16 @@ import {
   Presentation,
   Route,
   Shield,
-  Wallet,
 } from 'lucide-react'
 
 import { Header, Footer } from '@/components/layout'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
+import { AdvisoryPracticeBand } from '@/components/advisory/AdvisoryPracticeBand'
+import { AtAGlance } from '@/components/advisory/AtAGlance'
 import { EngagementContactForm } from '@/components/advisory/EngagementContactForm'
+import { EngagementHero } from '@/components/advisory/EngagementHero'
+import { WhereItLeads } from '@/components/advisory/WhereItLeads'
 import { AMOUNTS, gbp } from '@/lib/offering'
 import {
   ASSESSMENT_REPORT_CONTENTS,
@@ -72,71 +72,35 @@ export default function StrategicAssessmentPage() {
       <Header />
 
       <main className="flex-1">
-        {/* Hero. The headline is the tier card's own positioning line, which was
-            always the sharpest argument on the page and the least visible. */}
-        <section className="border-b border-border-subtle bg-slate-deep">
-          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
-            <div className="grid grid-cols-1 gap-10 lg:grid-cols-[3fr_2fr] lg:items-start lg:gap-12">
-              <div>
-                <Badge variant="outline" className="mb-4 border-sister-indigo text-sister-indigo">
-                  The deep one-off · for a high-stakes decision
-                </Badge>
-                <h1 className="mb-6 text-4xl font-bold text-text-primary sm:text-5xl">
-                  Before you commit to governance software, know what you need it to do.
-                </h1>
-                <p className="mb-6 text-xl leading-relaxed text-text-muted">
-                  AI governance platforms are sold at four figures a month. The decision
-                  to buy one is usually made from a vendor&rsquo;s own framing of the
-                  problem, because that is the only framing on the table.
-                </p>
-                <p className="leading-relaxed text-text-muted">
-                  The Strategic Assessment gives your board a framework-neutral decision
-                  document instead: what you are actually required to do, what you
-                  genuinely need tooling for, and what you do not. It is vendor-agnostic
-                  because we sell no software and take no referral fees.
-                </p>
-              </div>
+        <AdvisoryPracticeBand />
 
-              <Card className="border-sister-indigo/40 bg-stone-charcoal">
-                <CardHeader>
-                  <div className="font-mono text-xs uppercase tracking-wider text-text-muted">
-                    At a glance
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-5">
-                  <div>
-                    <div className="font-mono text-2xl font-semibold text-text-primary">
-                      From {gbp(AMOUNTS.strategicAssessment)}
-                    </div>
-                    <div className="text-sm text-text-muted">
-                      Scoped to the decision in front of the board
-                    </div>
-                  </div>
-                  <ul className="space-y-3 border-t border-border-subtle pt-4">
-                    {[
-                      'Multi-framework analysis across everything in scope',
-                      'A report of 40+ pages, and a board-ready presentation',
-                      'An implementation roadmap you can actually sequence work from',
-                    ].map((item) => (
-                      <li key={item} className="flex items-start gap-2 text-sm text-text-primary">
-                        <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-sister-indigo" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="border-t border-border-subtle pt-4">
-                    <a href="#contact">
-                      <Button size="lg" className="w-full bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90">
-                        Request a proposal
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
-                    </a>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </section>
+        <EngagementHero
+          badge="The deep one-off · for a high-stakes decision"
+          title="Before you commit to governance software, know what you need it to do."
+          lead="AI governance platforms are sold at four figures a month. The decision to buy one is usually made from a vendor’s own framing of the problem, because that is the only framing on the table."
+          body="The Strategic Assessment gives your board a framework-neutral decision document instead: what you are actually required to do, what you genuinely need tooling for, and what you do not. It is vendor-agnostic because we sell no software and take no referral fees."
+          inShort={
+            <>
+              A board-ready decision document from {gbp(AMOUNTS.strategicAssessment)} —
+              multi-framework analysis, a 40-page report, a presentation and an
+              implementation roadmap, scoped to the decision in front of you.
+            </>
+          }
+          ctaLabel="Request a proposal"
+          imageCaption="Multi-framework analysis, read against the decision your board actually has to take."
+        />
+
+        <AtAGlance
+          price={`From ${gbp(AMOUNTS.strategicAssessment)}`}
+          priceNote="Scoped to the decision in front of the board"
+          points={[
+            'Multi-framework analysis across everything in scope',
+            'A report of 40+ pages, and a board-ready presentation',
+            'An implementation roadmap you can actually sequence work from',
+            'Vendor-agnostic — we sell no software and take no referral fees',
+          ]}
+          ctaLabel="Request a proposal"
+        />
 
         {/* Independence — the differentiator, stated once and properly. */}
         <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
@@ -184,7 +148,7 @@ export default function StrategicAssessmentPage() {
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.1 }}
                 >
-                  <Card className="h-full border-border-subtle bg-stone-charcoal">
+                  <Card className="card-interactive h-full border-border-subtle bg-stone-charcoal">
                     <CardHeader>
                       <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg border border-sister-indigo/30 bg-sister-indigo/10">
                         <Icon className="h-5 w-5 text-sister-indigo" />
@@ -252,12 +216,9 @@ export default function StrategicAssessmentPage() {
         <section className="border-y border-silicon-amber/30 bg-silicon-amber/5">
           <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
             <div className="max-w-3xl">
-              <div className="mb-3 flex items-center gap-2">
-                <Wallet className="h-5 w-5 text-silicon-amber-strong" />
-                <h2 className="text-2xl font-semibold text-text-primary">
-                  From {gbp(AMOUNTS.strategicAssessment)}
-                </h2>
-              </div>
+              <h2 className="mb-4 text-2xl font-semibold text-text-primary">
+                From {gbp(AMOUNTS.strategicAssessment)}, scoped to the decision
+              </h2>
               <p className="mb-4 leading-relaxed text-text-muted">
                 Scoped against the decision and the frameworks in play, and fixed before
                 the work starts.
@@ -265,7 +226,7 @@ export default function StrategicAssessmentPage() {
               <p className="leading-relaxed text-text-muted">
                 Once the decision is made, keeping it current is a different job from
                 making it — so the assessment transitions into{' '}
-                <Link href="/advisory#retainer" className="text-silicon-amber-strong hover:underline">
+                <Link href="/advisory/drift-retainer" className="text-silicon-amber-strong hover:underline">
                   a Drift Retainer
                 </Link>{' '}
                 for ongoing oversight, if and when the board wants that. It is not a
@@ -282,6 +243,20 @@ export default function StrategicAssessmentPage() {
             </div>
           </div>
         </section>
+
+        <WhereItLeads
+          currentId="strategic-assessment"
+          heading="Where it leads"
+          intro="An assessment settles one decision. Keeping the decision current, or scoping it in the first place, is a different job."
+          bridges={{
+            'advisory-briefing':
+              'An hour first, to work out whether the decision is really as big as it looks.',
+            'exposure-diagnostic':
+              'If the board cannot yet say what it runs, a pass over the estate has to come before a decision about it.',
+            'drift-retainer':
+              'Once the decision is made, keeping it current is a standing job rather than another one-off. The assessment transitions into one if the board wants that.',
+          }}
+        />
 
         <EngagementContactForm
           interest="Strategic Assessment"

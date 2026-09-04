@@ -644,7 +644,7 @@ export default function ComplianceCheckerPage() {
                         See the Post-Omnibus Briefing
                       </Link>
                       , or a standing read via the{' '}
-                      <Link href="/advisory#retainer" className="text-silicon-amber-strong hover:underline">
+                      <Link href="/advisory/drift-retainer" className="text-silicon-amber-strong hover:underline">
                         Drift Retainer
                       </Link>
                       .

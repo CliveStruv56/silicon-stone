@@ -371,11 +371,11 @@ sell (restore them when the first report is on sale — see `LAUNCH.md`).
 
 | Engagement | Price | Summary | Where it lives |
 |---|---|---|---|
-| **Advisory Briefing** | **£450** / one hour | Focused consultation on your tool results and one specific question, plus a written follow-up. Credited **in full** to your first retainer month if you proceed within 30 days. | `/advisory#briefing` |
+| **Advisory Briefing** | **£450** / one hour | Focused consultation on your tool results and one specific question, plus a written follow-up. Credited **in full** to your first retainer month if you proceed within 30 days. | `/advisory/advisory-briefing` |
 | **The Exposure Diagnostic** | **From £2,500** (custom scope) | AI system + vendor-evidence review, dependency mapping, regulatory-friction read, 15–25pp report, 30-day follow-up. Fee credited to the first retainer quarter. **No refund guarantee** — the revision-or-50%-refund clause was withdrawn on 2026-09-04. | `/advisory/exposure-diagnostic` |
 | **The Post-Omnibus Briefing** | **From £2,500**, fixed | US/UK-inbound. Fixed-scope written briefing (15–25pp) on what the AI Act now requires of you post-Digital Omnibus, delivered in three weeks, plus one interpretation call. | `/eu-exposure` |
 | ↳ *European Procurement Readiness* (add-on) | **From £1,500** | Add-on to the above: your systems mapped against EU buyer governance questionnaires, required-vs-theatre evidence triage, AI indemnification clause review. | `/eu-exposure` |
-| **The Drift Retainer** | **£2,000/mo** — three-month initial term, then rolling. £20,000/year annual. **Founding rate £1,500/mo for the first six months, first five clients** (`FOUNDING_OFFER_ACTIVE`). | The spine of the whole offering. Board-forwardable monthly briefing, a 90-minute working session on one live decision, "The Line" direct access between sessions, quarterly written exposure review on the 3×2 method. Opens with a Baseline Month — walk away after month one paying that month only. | `/advisory#retainer` |
+| **The Drift Retainer** | **£2,000/mo** — three-month initial term, then rolling. £20,000/year annual. **Founding rate £1,500/mo for the first six months, first five clients** (`FOUNDING_OFFER_ACTIVE`). | The spine of the whole offering. Board-forwardable monthly briefing, a 90-minute working session on one live decision, "The Line" direct access between sessions, quarterly written exposure review on the 3×2 method. Opens with a Baseline Month — walk away after month one paying that month only. | `/advisory/drift-retainer` |
 | **Strategic Assessment** | **From £8,000**, then transitions to retainer | The deep one-off: multi-framework analysis, 40+pp report, board-ready presentation, implementation roadmap. Positioned as the framework-neutral decision document before buying governance software. | `/advisory/strategic-assessment` |
 | **Board-level / multi-entity engagement** | **£25,000–£50,000** | Bespoke, for a group, multi-jurisdiction exposure or a board mandate; settles into a Drift Retainer. | `/advisory` (bespoke band) |
 | **Applied modules** | Sovereign Architecture Review **from £6,500**; AI Bill of Materials **from £4,500**; Manufacturing Exposure, Scenario Impact and Regulatory Friction **from £3,500** each | Scoped add-ons folded into a briefing or a retainer. All five priced as of 2026-08-15 — the £3,500 floor sits below the £4,500 module and above the £2,500 Diagnostic. | `/advisory` (assessments) |
@@ -568,6 +568,56 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### September 4, 2026 — Four engagements, four pages, one template
+
+`/advisory` becomes a hub. The Advisory Briefing and the Drift Retainer join the
+Exposure Diagnostic and the Strategic Assessment on their own pages, all four
+built from `EngagementHero` + `AtAGlance` + `WhereItLeads`.
+
+**The root cause was asymmetry, not CSS.** Three engagements were pages and the
+Retainer was a section on the hub. That is *why* the styling diverged — a
+section and a page were never built from one template — and why the four-across
+tier grid still existed to give the others any presence. A measured audit found
+the bones already agreed (identical H1 scale, identical `py-10 lg:py-12` rhythm)
+and thirteen divergences on top, the loudest being that two of the four had a
+hero photograph and two had a price card, so the whole right-hand column changed
+shape as you moved between them. The price card moved one band down into
+`AtAGlance`; the hero shape is now defined once.
+
+**The tier grid is deleted.** Two of its cards duplicated pages that exist and a
+third duplicated the Retainer section directly above it. `Tier` had grown four
+optional bolt-on fields — `positioning`, `priceDetail`, `introDistinction`,
+`pathNote` — each added to squeeze copy into a grid cell, which is what a format
+looks like when it has run out. Every one of those fields is now a section on
+the engagement's own page. In its place, a compact chooser keyed on
+`Offering.question` — the buyer's words, because "I do not know what we have
+actually got" sorts a reader faster than a name and a price do.
+
+**The hash-highlight shipped this morning is gone with it.** It marked whichever
+tier card the URL fragment named; there are no tier cards now, and every
+dropdown entry lands on a page about that engagement, which answers the original
+complaint more completely than a highlight did. Dead code, removed rather than
+left.
+
+**`AdvisoryPracticeBand`** is the same three lines of orientation on all four
+pages — byte-identical, which is half of what makes them read as a family. The
+other half is `WhereItLeads`, which puts the ladder on every page instead of
+only inside `LadderBox` on the hub. It matters most on the Briefing, whose whole
+job is to end knowing what to do next.
+
+**The migration trap.** Twelve places pointed at `#retainer` — four tool pages,
+`/methodology`, `AdvisoryBand`, `StartHereSpine`, `AdvisoryNextStep`, the
+catalogue and the nav. An anchor that no longer exists does not 404; the browser
+loads the page and silently stays at the top, which is breakage nobody reports.
+So the hub keeps a Retainer summary block under that id which links onward, and
+`engagement-pages.test.ts` asserts both halves (mutation-tested). The
+high-traffic pointers were repointed at the page.
+
+`/pricing` needed no edit — it renders `ENGAGEMENTS[].href`, so two catalogue
+strings moved it. Verified: all four appear there as page URLs.
+
+Suite green (1,523 across 79 files), build green, 119 prerendered pages.
 
 ### September 4, 2026 — The Diagnostic and the Assessment get their own pages
 

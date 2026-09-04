@@ -28,10 +28,12 @@ const STATIC_ROUTES: Array<{
   { path: '/methodology', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/glossary', changeFrequency: 'weekly', priority: 0.7 },
   { path: '/advisory', changeFrequency: 'monthly', priority: 0.6 },
-  // The two advisory engagements that own a page rather than an anchor. Both
-  // are high-value and searched for by name, so they rank alongside /advisory
+  // All four advisory engagements own a page rather than an anchor. Each is
+  // high-value and searched for by name, so they rank alongside /advisory
   // rather than under it.
+  { path: '/advisory/advisory-briefing', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/advisory/exposure-diagnostic', changeFrequency: 'monthly', priority: 0.6 },
+  { path: '/advisory/drift-retainer', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/advisory/strategic-assessment', changeFrequency: 'monthly', priority: 0.6 },
   // Footer-only US-inbound front door — kept out of primary nav, but in the
   // sitemap so search/campaign discovery can reach it (F12).

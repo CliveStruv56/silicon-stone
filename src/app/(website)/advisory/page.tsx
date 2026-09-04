@@ -1,13 +1,13 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Header, Footer } from '@/components/layout'
 import { LadderBox } from '@/components/products/LadderBox'
 import { submitWithOfflineQueue } from '@/lib/offline/submit'
-import { BOOKING_URL, FOUNDING_OFFER_ACTIVE, FREE_INTRO_WINDOW } from '@/lib/flags'
+import { BOOKING_URL, FREE_INTRO_WINDOW } from '@/lib/flags'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -31,7 +31,12 @@ import {
   Layers,
   type LucideIcon,
 } from 'lucide-react'
-import { AMOUNTS, gbp } from '@/lib/offering'
+import {
+  AMOUNTS,
+  ENGAGEMENTS as CATALOGUE_ENGAGEMENTS,
+  gbp,
+  type Offering,
+} from '@/lib/offering'
 
 /**
  * The 3×2 method, as the Advisory page states it.
@@ -234,135 +239,26 @@ const SUBJECT_AREAS = [
   'Policy Analysis',
 ] as const
 
-type Tier = {
-  name: string
-  /**
-   * Which `ENGAGEMENTS` value this tier's CTA preselects on the form. Without
-   * it the visitor has to re-declare, in a second control, the thing they just
-   * clicked a button to ask for.
-   */
-  engagement: (typeof ENGAGEMENTS)[number]
-  /**
-   * Fragment id for the tier's card, so the Advisory menu can link straight to
-   * it. The Drift Retainer deliberately has none: a dedicated `#retainer`
-   * section already exists further down the page and the nav points there, so
-   * adding the same id here would duplicate it.
-   */
-  anchor?: string
-  price: string
-  priceNote?: string
-  /** Italic line rendered directly under the price (credit / guarantee copy). */
-  priceDetail?: string
-  /** Shown under priceDetail only while FREE_INTRO_WINDOW is on. */
-  introDistinction?: string
-  /** Positioning paragraph at the top of the card body. */
-  positioning?: string
-  description: string
-  features: string[]
-  pathNote?: string
-  cta: string
-  /** Append the free-intro launch-window line under the CTA while the flag is on. */
-  ctaLaunchLine?: boolean
-  /**
-   * A commercial claim, not a UI state: this is the tier we actually sell most
-   * of, and it carries the "Most popular" badge.
-   *
-   * This used to be called `highlighted` and drove both the badge and every
-   * piece of accent styling on the card — which meant the Drift Retainer's card
-   * was lit whichever engagement you had arrived to read, because it is the
-   * only tier with the flag and (deliberately) the only one with no anchor. The
-   * fix is not to let the flag follow the URL: that would tell a visitor who
-   * clicked "Advisory Briefing" that the Advisory Briefing is the most popular
-   * product, which is false. Popularity and selection are now two signals with
-   * two treatments — see `selectedAnchor` in the component.
-   */
-  popular?: boolean
-  /** Full page for this engagement, where one exists instead of an anchor. */
-  href?: string
-}
-
-const tiers: Tier[] = [
-  {
-    name: 'Advisory Briefing',
-    engagement: 'Advisory Briefing',
-    anchor: 'briefing',
-    price: gbp(AMOUNTS.advisoryBriefing),
-    priceNote: 'one hour',
-    priceDetail:
-      `${gbp(AMOUNTS.advisoryBriefing)}. Credited in full toward your first month on the Drift Retainer if you proceed within 30 days — so if we work together, the conversation was free.`,
-    introDistinction:
-      'New here? Start with the free 25-minute conversation (launch offer). The Briefing is the working session: your tool results, your specific question, a written follow-up.',
-    description: 'A focused strategic consultation built on your tool results and a specific question. The low-commitment way to test the water.',
-    features: [
-      'Review of your interactive tool results',
-      'Expert interpretation and context',
-      'Initial recommendations',
-      'Follow-up summary document',
-    ],
-    cta: 'Request a briefing',
-  },
-  {
-    name: 'The Exposure Diagnostic',
-    engagement: 'Exposure Diagnostic',
-    anchor: 'diagnostic',
-    price: `From ${gbp(AMOUNTS.exposureDiagnostic)}`,
-    priceNote: 'custom scope',
-    positioning:
-      `If you need template policies and a document pack, a fixed-price compliance shop will do it cheaper — our own ${gbp(AMOUNTS.toolkitStandard)} toolkit covers the essentials. The Exposure Diagnostic is for the questions documents can’t answer: where your dependency on specific vendors, models and jurisdictions becomes an operating constraint, and what to do about it this quarter.`,
-    description: 'A focused review of your AI governance, evidence gaps, and technology dependencies — the clearest first picture of where you stand.',
-    features: [
-      'AI system and vendor-evidence review — what you run, and what your vendors can prove',
-      'Dependency mapping — models, APIs, cloud, and jurisdiction exposure across your stack',
-      'Regulatory-friction read — where US/EU divergence touches your operations',
-      'Written report (15–25 pages) with executive summary and prioritised actions',
-      '30-day follow-up call',
-    ],
-    // Standalone first, credit second (owner's decision, 2026-09-04). This
-    // used to read "Designed as an on-ramp", which defined the product by the
-    // thing it leads to rather than by what it is.
-    pathNote: 'Stands on its own — and the fee is credited toward your first quarter if you go on to a Drift Retainer.',
-    cta: 'Request a diagnostic',
-    href: '/advisory/exposure-diagnostic',
-  },
-  {
-    name: 'The Drift Retainer',
-    engagement: 'Drift Retainer',
-    price: `From ${gbp(AMOUNTS.driftRetainerMonthly)}/mo`,
-    priceNote: 'three-month initial term',
-    priceDetail:
-      'The Baseline Month guarantee: after month one, walk away paying that month only. You know within thirty days whether the relationship earns its fee.',
-    description: 'The standing relationship. A board-forwardable monthly briefing, a working session on one live decision, a direct line between sessions, and a quarterly written exposure review. For leadership teams that stay ahead of the drift, not catch up to it.',
-    features: [
-      'A board-forwardable monthly briefing — what shifted, and the decision it changes',
-      'A working session on one live decision, refereed rather than advised',
-      'The Line — direct access between sessions for the awkward questions',
-      'A quarterly written exposure review on the 3×2 method',
-      'A standing line to thirty years inside the industry',
-    ],
-    cta: 'Book a 25-minute conversation',
-    ctaLaunchLine: true,
-    popular: true,
-  },
-  {
-    name: 'Strategic Assessment',
-    engagement: 'Strategic Assessment',
-    anchor: 'assessment',
-    price: `From ${gbp(AMOUNTS.strategicAssessment)}`,
-    priceNote: 'then transitions to retainer',
-    positioning:
-      'Before you commit €1,000–€3,100 a month to governance software, know what you actually need it to do. The Strategic Assessment gives your board a framework-neutral decision document — vendor-agnostic, because we sell no software and take no referral fees.',
-    description: 'Comprehensive multi-framework analysis with a board-ready presentation and implementation roadmap — the deep one-off for a high-stakes decision, which then settles into an ongoing Drift Retainer.',
-    features: [
-      'Multi-framework analysis',
-      'Comprehensive report (40+ pages)',
-      'Board-ready presentation',
-      'Implementation roadmap',
-      'Transitions into a Drift Retainer for ongoing oversight',
-    ],
-    cta: 'Request a proposal',
-    href: '/advisory/strategic-assessment',
-  },
+/**
+ * The four rungs, in ascending commitment, straight from the catalogue.
+ *
+ * This replaces a local `tiers` array and a `Tier` type that had grown four
+ * optional bolt-on fields — `positioning`, `priceDetail`, `introDistinction`,
+ * `pathNote` — each added to squeeze more copy into a four-across grid cell.
+ * That is what a format looks like when it has run out; every one of those
+ * fields is now a section on the engagement's own page.
+ *
+ * Reading the ids from `ENGAGEMENTS` means the chooser cannot disagree with
+ * /pricing or the header nav about a price, a name or a URL.
+ */
+const LADDER_ENGAGEMENTS = [
+  'advisory-briefing',
+  'exposure-diagnostic',
+  'drift-retainer',
+  'strategic-assessment',
 ]
+  .map((id) => CATALOGUE_ENGAGEMENTS.find((offering) => offering.id === id))
+  .filter((offering): offering is Offering => Boolean(offering))
 
 export default function ServicesPage() {
   const [formData, setFormData] = useState({
@@ -378,23 +274,6 @@ export default function ServicesPage() {
   const [formLoading, setFormLoading] = useState(false)
   const [formError, setFormError] = useState('')
 
-  /**
-   * Which tier the visitor actually asked for, read off the URL fragment.
-   *
-   * Read on mount as well as on `hashchange`, because the two ways in differ:
-   * arriving from the header dropdown on another page is a fresh mount with the
-   * hash already set and fires no event, while clicking within the page fires
-   * the event without remounting. Handling only one of them covers exactly half
-   * the traffic — and it is the mount case that the dropdown uses.
-   */
-  const [selectedAnchor, setSelectedAnchor] = useState('')
-
-  useEffect(() => {
-    const readHash = () => setSelectedAnchor(window.location.hash.replace(/^#/, ''))
-    readHash()
-    window.addEventListener('hashchange', readHash)
-    return () => window.removeEventListener('hashchange', readHash)
-  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -533,158 +412,152 @@ export default function ServicesPage() {
         </section>
 
         {/* The Drift Retainer — the spine */}
-        <section id="retainer" className="scroll-mt-24 border-b border-silicon-amber/30 bg-silicon-amber/5">
-          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
-            {/* Heading and standfirst sit full-width, above the grid, so the
-                "What it includes" card can come directly under them on mobile.
-                They used to live inside the prose column, which put the price
-                and the button roughly five hundred words down a phone screen —
-                on desktop the 3fr/2fr grid hid the problem entirely. */}
-            <div className="mb-8 lg:mb-10">
-              <div className="mb-4 flex flex-wrap items-center gap-2">
-                <Badge className="bg-accent-fill text-ink-on-accent">Most popular</Badge>
-                <Badge variant="outline" className="border-silicon-amber text-silicon-amber-strong">
-                  Ongoing
-                </Badge>
-              </div>
-              <h2 className="mb-3 text-3xl font-bold text-text-primary sm:text-4xl">
-                The Drift Retainer
-              </h2>
-              <p className="text-xl font-medium text-text-primary/90">
-                Your standing read on the drift — so the leadership team is never
-                blindsided.
-              </p>
-            </div>
-            <div className="grid grid-cols-1 gap-10 lg:grid-cols-[3fr_2fr] lg:items-start">
-              <div className="order-2 lg:order-1">
+        {/* The Drift Retainer moved to /advisory/drift-retainer on 2026-09-04.
+            This block stays, and keeps the id, because twelve places across the
+            site pointed at `#retainer` — four tool pages, /methodology, the
+            homepage band, the Start Here spine, AdvisoryNextStep and the
+            catalogue among them — and an anchor that no longer exists does not
+            404. It silently scrolls nowhere, which is the kind of breakage
+            nobody reports. A hub should summarise its engagements anyway. */}
+        <section id="retainer" className="scroll-mt-24 border-y border-silicon-amber/30 bg-silicon-amber/5">
+          <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-[3fr_2fr] lg:items-center">
+              <div>
+                <div className="mb-4 flex flex-wrap items-center gap-2">
+                  <Badge className="bg-accent-fill text-ink-on-accent">Most popular</Badge>
+                  <Badge variant="outline" className="border-silicon-amber text-silicon-amber-strong">
+                    Ongoing
+                  </Badge>
+                </div>
+                <h2 className="mb-3 text-2xl font-semibold text-text-primary">
+                  The Drift Retainer
+                </h2>
                 <p className="mb-4 max-w-2xl leading-relaxed text-text-muted">
-                  You have bought the licences and your people are experimenting. When the
-                  board asks what has actually changed in how the business makes money,
-                  manages risk, or serves customers, the honest answer is often: not much.
-                  Meanwhile the drift does not hold still. Export controls shift, a fab
-                  reports delays, a regulatory position diverges across the Atlantic — and
-                  the exposure you mapped in spring reads differently by autumn.
+                  The standing relationship, and the spine of everything here. A senior,
+                  independent reading of how technopolitical movement affects your supply
+                  chains, your procurement and your people — delivered every month, in
+                  language a semi-technical leadership team can act on.
                 </p>
                 <p className="max-w-2xl leading-relaxed text-text-muted">
-                  The Drift Retainer is the relationship behind the analysis: a senior,
-                  independent reading of how technopolitical movement affects{' '}
-                  <em>your</em> supply chains, <em>your</em> procurement, and{' '}
-                  <em>your</em> people — delivered every month, in language a
-                  semi-technical leadership team can act on.
-                </p>
-                <p className="mt-4 max-w-2xl leading-relaxed text-text-muted">
-                  Equally for{' '}
-                  <strong className="font-semibold text-text-primary">
-                    US companies operating in or entering Europe
-                  </strong>
-                  : a standing, independent read on how the AI Act, the sovereignty
-                  package, and the wider drift affect your European position — so
-                  compliance becomes a maintained state, not an annual panic.
-                </p>
-                <p className="mt-6 max-w-2xl leading-relaxed text-text-muted">
-                  <strong className="font-semibold text-text-primary">How it starts.</strong>{' '}
-                  Every engagement opens with the Baseline Month: a structured read of where
-                  AI and the drift currently touch your operations, built from your org chart,
-                  your current tools and spend, and short conversations with three or four
-                  process owners. It ends with a Baseline Briefing — the two or three places
-                  where the exposure is real and where the next quarter&rsquo;s focus belongs.
-                  You know within thirty days whether the relationship earns its fee.
-                </p>
-                {/* The forward reference the section was missing. It cites "the
-                    same 3×2 method" in its own bullet list without ever saying
-                    what that is or where to find it. */}
-                <p className="mt-6 max-w-2xl leading-relaxed text-text-muted">
-                  <strong className="font-semibold text-text-primary">What we read.</strong>{' '}
-                  Three forensic domains — supply chain, policy, talent — each read two
-                  ways, for scenarios and against thirty years of precedent.{' '}
-                  <a href="#method" className="text-stone-teal hover:underline">
-                    What the 3×2 method means in practice →
-                  </a>
-                </p>
-                <p className="mt-6 border-l-2 border-sister-indigo/50 pl-4 text-sm italic text-text-muted">
-                  The same drift runs through individual careers as well as company
-                  strategy. Where the brief is personal rather than organisational,{' '}
-                  <Link href="/waymarkpath" className="text-sister-indigo hover:underline">
-                    WaymarkPath
-                  </Link>{' '}
-                  is the companion.
+                  Every engagement opens with the Baseline Month, so you know within thirty
+                  days whether the relationship earns its fee.
                 </p>
               </div>
+              <div className="lg:justify-self-end lg:text-right">
+                <div className="font-mono text-2xl font-semibold text-text-primary">
+                  {gbp(AMOUNTS.driftRetainerMonthly)}<span className="text-text-muted">/month</span>
+                </div>
+                <div className="mb-5 text-sm text-text-muted">
+                  Three-month initial term, then rolling
+                </div>
+                <Link href="/advisory/drift-retainer">
+                  <Button size="lg" className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90">
+                    Read about the Drift Retainer
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
 
-              <Card className="order-1 bg-stone-charcoal border-silicon-amber/40 lg:order-2">
-                <CardHeader>
-                  <div className="text-xs font-mono uppercase tracking-wider text-text-muted">
-                    What it includes
+
+        {/* The four engagements, as a chooser rather than four fat cards.
+
+            The tier grid this replaces had stopped earning its height: two of
+            its cards duplicated pages that now exist, a third duplicated the
+            Retainer section directly above it, and the `Tier` type had grown
+            four optional bolt-on fields to squeeze copy into a grid cell.
+
+            Rows are keyed on the buyer's question rather than the product name,
+            because "I do not know what we have actually got" sorts a reader
+            faster than a name and a price do. Everything comes from the
+            catalogue, so this cannot drift from /pricing or the nav. */}
+        <section id="engagements" className="scroll-mt-24 bg-stone-charcoal/50">
+          <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
+            <div className="mb-8 max-w-3xl">
+              <h2 className="mb-4 text-2xl font-semibold text-text-primary">
+                Four ways to work together
+              </h2>
+              <p className="text-text-muted">
+                One ascending ladder, from an hour on a single question to the standing
+                relationship. Every one-off names a fixed price, and each credits toward
+                the next — so you never pay twice for the same ground.
+              </p>
+            </div>
+
+            <ul className="divide-y divide-border-subtle overflow-hidden rounded-lg border border-border-subtle bg-stone-charcoal">
+              {LADDER_ENGAGEMENTS.map((offering) => (
+                <li key={offering.id}>
+                  <Link
+                    href={offering.href}
+                    className="group flex flex-col gap-3 p-6 transition-colors hover:bg-surface-elevated/40 sm:flex-row sm:items-center sm:gap-6"
+                  >
+                    <div className="sm:w-2/5">
+                      {offering.question && (
+                        <p className="mb-1.5 font-serif text-base italic leading-snug text-text-primary">
+                          &ldquo;{offering.question}&rdquo;
+                        </p>
+                      )}
+                      <div className="text-lg font-semibold text-text-primary">
+                        {offering.name}
+                      </div>
+                    </div>
+                    <p className="flex-1 text-sm leading-relaxed text-text-muted">
+                      {offering.summary}
+                    </p>
+                    <div className="flex flex-shrink-0 items-center gap-4 sm:w-40 sm:justify-end">
+                      <div className="text-right">
+                        <div className="font-mono text-sm font-semibold text-silicon-amber-strong">
+                          {offering.price}
+                        </div>
+                        {offering.priceNote && (
+                          <div className="text-xs text-text-muted">{offering.priceNote}</div>
+                        )}
+                      </div>
+                      <ArrowRight className="h-4 w-4 flex-shrink-0 text-stone-teal transition-transform group-hover:translate-x-0.5" />
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+
+            {/* Bespoke / enterprise band — the top of the ladder above the
+                Strategic Assessment, scoped one-to-one (A4). */}
+            <div className="mt-8 rounded-lg border border-border-subtle bg-stone-charcoal p-6 lg:p-8">
+              <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                <div className="max-w-2xl">
+                  <div className="mb-2 font-mono text-xs uppercase tracking-wider text-text-muted">
+                    Bespoke · enterprise
                   </div>
-                </CardHeader>
-                <CardContent className="space-y-5">
-                  <ul className="space-y-3">
-                    {[
-                      'The monthly briefing — a short, board-forwardable written read plus a call: what shifted in the drift this month, and the decision it changes',
-                      'The working session — ninety minutes on one live decision, refereed rather than advised: the call turns on the evidence, not on who prepared the better presentation',
-                      'The Line — direct access between sessions to challenge a vendor claim, sanity-check a proposal, or prepare a board answer',
-                      'The quarterly exposure review — a deeper written read on the same 3×2 method the public analysis uses, traced to your exposure',
-                    ].map((item, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-text-primary">
-                        <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-silicon-amber-strong" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                  <p className="border-t border-border-subtle pt-4 text-sm leading-relaxed text-text-muted">
-                    Software tracks your controls. It doesn&rsquo;t read export controls. A
-                    governance platform will tell you what&rsquo;s in your inventory; the
-                    Drift Retainer tells you what&rsquo;s about to change around it — and
-                    which decision it changes. Most clients eventually run both; the
-                    Retainer also tells you which platform you actually need before you
-                    buy one.
+                  <h3 className="mb-2 text-xl font-semibold text-text-primary">
+                    Board-level and multi-entity engagements
+                  </h3>
+                  <p className="text-sm leading-relaxed text-text-muted">
+                    For a group, multi-jurisdiction exposure, or a board-level mandate — a
+                    bespoke engagement scoped to the question, which then settles into a
+                    Drift Retainer for ongoing oversight.
                   </p>
-                  <div className="border-t border-border-subtle pt-4">
-                    <div className="text-lg font-semibold text-text-primary">
-                      {gbp(AMOUNTS.driftRetainerMonthly)}<span className="text-text-muted">/month</span>
-                    </div>
-                    <div className="text-sm text-text-muted">
-                      Three-month initial term, then rolling monthly · limited to a handful
-                      of client companies at any time
-                    </div>
-                    <p className="mt-3 text-sm italic text-text-muted">
-                      The Baseline Month guarantee: after month one, walk away paying that
-                      month only. You know within thirty days whether the relationship
-                      earns its fee.
-                    </p>
-                    <p className="mt-3 text-sm italic text-text-muted">
-                      Prefer annual? Twelve months for the price of ten ({gbp(AMOUNTS.driftRetainerAnnual)}/year).
-                    </p>
+                </div>
+                <div className="flex flex-shrink-0 flex-col items-start gap-3 lg:items-end">
+                  <div className="font-mono text-lg font-semibold text-text-primary">
+                    {gbp(AMOUNTS.bespokeFloor)}–{gbp(AMOUNTS.bespokeCeiling)}
                   </div>
-                  {FOUNDING_OFFER_ACTIVE && (
-                    <div className="rounded-lg border border-silicon-amber/40 bg-silicon-amber/10 p-4 text-sm leading-relaxed text-text-primary">
-                      <strong className="font-semibold text-silicon-amber-strong">
-                        Founding rate — five companies, launch only.
-                      </strong>{' '}
-                      The first five retainer clients join at{' '}
-                      <strong className="font-semibold">{gbp(AMOUNTS.driftRetainerFounding)}/month for the first six months</strong>,
-                      then the standard rate. Same Baseline Month guarantee.
-                    </div>
-                  )}
-                  <div>
-                    <a
-                      href="#contact"
-                      className="block"
-                      onClick={() => setFormData((prev) => ({ ...prev, engagement: 'Drift Retainer' }))}
-                    >
-                      <Button size="lg" className="w-full bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90">
-                        Book a 25-minute conversation
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
-                    </a>
-                    {FREE_INTRO_WINDOW && (
-                      <p className="mt-2 text-center text-xs italic text-text-muted">
-                        Free during our launch window — the first ninety days.
-                      </p>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+                  <a
+                    href="#contact"
+                    onClick={() => setFormData((prev) => ({ ...prev, engagement: 'Board-level engagement' }))}
+                  >
+                    <Button className="bg-surface-elevated text-text-primary hover:bg-surface-elevated/80">
+                      Discuss an engagement
+                    </Button>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* The Ladder — every paid step credits toward the next (§2.4) */}
+            <div className="mt-8">
+              <LadderBox />
             </div>
           </div>
         </section>
@@ -905,7 +778,7 @@ export default function ServicesPage() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-xs font-mono text-text-muted uppercase mb-3">Deliverables</div>
+                      <div className="mb-3 font-mono text-xs uppercase tracking-wider text-text-muted">Deliverables</div>
                       <ul className="space-y-2">
                         {assessment.deliverables.map((item, i) => (
                           <li key={i} className="flex items-start gap-2 text-sm text-text-primary">
@@ -926,178 +799,8 @@ export default function ServicesPage() {
         </section>
 
         {/* Service Tiers */}
-        <section className="bg-stone-charcoal/50">
-          <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
-            <div className="mb-8 text-center">
-              <h2 className="text-2xl font-semibold text-text-primary mb-4">
-                Engagement Options
-              </h2>
-              <p className="text-text-muted max-w-2xl mx-auto">
-                One ascending ladder — from a low-commitment briefing to the standing
-                relationship. Every one-off engagement names a price and a path into the
-                Drift Retainer.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {tiers.map((tier, idx) => {
-                const isPopular = tier.popular === true
-                const isSelected = Boolean(tier.anchor) && tier.anchor === selectedAnchor
-                return (
-                <motion.div
-                  key={tier.name}
-                  id={tier.anchor}
-                  className={tier.anchor ? 'scroll-mt-24' : undefined}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: idx * 0.1 }}
-                >
-                  {/* Two signals, two treatments. Amber fill = "most popular",
-                      a standing commercial claim. Cyan ring = "this is the one
-                      you asked for" — the same colour the header uses for the
-                      active nav item, so arriving from that menu reads as one
-                      gesture. `aria-current` carries it for anyone who cannot
-                      see either colour. */}
-                  <Card
-                    aria-current={isSelected ? 'true' : undefined}
-                    className={`card-interactive h-full ${
-                      isPopular
-                        ? 'bg-slate-deep border-silicon-amber'
-                        : 'bg-stone-charcoal border-border-subtle'
-                    } ${isSelected ? 'ring-2 ring-silicon-cyan ring-offset-2 ring-offset-stone-charcoal' : ''}`}
-                  >
-                    <CardHeader>
-                      <div className="mb-2 flex flex-wrap items-center gap-2 empty:hidden">
-                        {isPopular && (
-                          <Badge className="w-fit bg-accent-fill text-ink-on-accent">
-                            Most Popular
-                          </Badge>
-                        )}
-                        {isSelected && (
-                          <Badge variant="outline" className="w-fit border-silicon-cyan text-silicon-cyan">
-                            You selected this
-                          </Badge>
-                        )}
-                      </div>
-                      <CardTitle className="text-xl text-text-primary">
-                        {tier.name}
-                      </CardTitle>
-                      <div className="mt-1">
-                        <span className={`font-mono text-base font-semibold ${isPopular ? 'text-silicon-amber-strong' : 'text-text-primary'}`}>
-                          {tier.price}
-                        </span>
-                        {tier.priceNote && (
-                          <span className="ml-2 text-xs text-text-muted">{tier.priceNote}</span>
-                        )}
-                      </div>
-                      {tier.priceDetail && (
-                        <p className="mt-2 text-xs italic text-text-muted">{tier.priceDetail}</p>
-                      )}
-                      {tier.introDistinction && FREE_INTRO_WINDOW && (
-                        <p className="mt-2 text-xs italic text-text-muted">{tier.introDistinction}</p>
-                      )}
-                      {tier.positioning && (
-                        <p className="mt-2 text-xs leading-relaxed text-text-muted">{tier.positioning}</p>
-                      )}
-                      <CardDescription className="mt-2">
-                        {tier.description}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="flex flex-col h-full space-y-4">
-                      <ul className="space-y-2">
-                        {tier.features.map((feature, i) => (
-                          <li key={i} className="flex items-start gap-2 text-sm text-text-primary">
-                            <CheckCircle className={`w-4 h-4 flex-shrink-0 mt-0.5 ${isPopular ? 'text-silicon-amber-strong' : 'text-stone-teal'}`} />
-                            {feature}
-                          </li>
-                        ))}
-                      </ul>
-                      {tier.pathNote && (
-                        <p className="text-xs italic text-text-muted">{tier.pathNote}</p>
-                      )}
-                      <div className="mt-auto space-y-2">
-                        {/* The href still does the scrolling, so this works
-                            without JS; the click only preselects the tier the
-                            visitor just asked for. */}
-                        <a
-                          href="#contact"
-                          className="block"
-                          onClick={() => setFormData((prev) => ({ ...prev, engagement: tier.engagement }))}
-                        >
-                          <Button
-                            className={`w-full ${isPopular ? 'bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90' : 'bg-surface-elevated text-text-primary hover:bg-surface-elevated/80'}`}
-                          >
-                            {tier.cta}
-                          </Button>
-                        </a>
-                        {/* The two engagements that own a page say so here —
-                            a card cannot carry a considered purchase and this
-                            is the route to the one that can. */}
-                        {tier.href && (
-                          <Link
-                            href={tier.href}
-                            className="flex items-center justify-center gap-1 text-sm text-stone-teal hover:underline"
-                          >
-                            Full details
-                            <ArrowRight className="h-3 w-3" />
-                          </Link>
-                        )}
-                        {tier.ctaLaunchLine && FREE_INTRO_WINDOW && (
-                          <p className="text-center text-xs italic text-text-muted">
-                            Free during our launch window — the first ninety days.
-                          </p>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-                )
-              })}
-            </div>
-
-            {/* Bespoke / enterprise band — the top of the ladder above the
-                Strategic Assessment, scoped one-to-one (A4). */}
-            <div className="mt-8 rounded-lg border border-border-subtle bg-stone-charcoal p-6 lg:p-8">
-              <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-                <div className="max-w-2xl">
-                  <div className="mb-2 font-mono text-xs uppercase tracking-wider text-text-muted">
-                    Bespoke · enterprise
-                  </div>
-                  <h3 className="mb-2 text-xl font-semibold text-text-primary">
-                    Board-level and multi-entity engagements
-                  </h3>
-                  <p className="text-sm leading-relaxed text-text-muted">
-                    For a group, multi-jurisdiction exposure, or a board-level mandate — a
-                    bespoke engagement scoped to the question, which then settles into a
-                    Drift Retainer for ongoing oversight.
-                  </p>
-                </div>
-                <div className="flex flex-shrink-0 flex-col items-start gap-3 lg:items-end">
-                  <div className="font-mono text-lg font-semibold text-text-primary">
-                    {gbp(AMOUNTS.bespokeFloor)}–{gbp(AMOUNTS.bespokeCeiling)}
-                  </div>
-                  <a
-                    href="#contact"
-                    onClick={() => setFormData((prev) => ({ ...prev, engagement: 'Board-level engagement' }))}
-                  >
-                    <Button className="bg-surface-elevated text-text-primary hover:bg-surface-elevated/80">
-                      Discuss an engagement
-                    </Button>
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            {/* The Ladder — every paid step credits toward the next (§2.4) */}
-            <div className="mt-8">
-              <LadderBox />
-            </div>
-          </div>
-        </section>
-
         {/* Contact Form */}
-        <section id="contact" className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
+        <section id="contact" className="scroll-mt-24 mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             <div>
               <h2 className="text-2xl font-semibold text-text-primary mb-4">

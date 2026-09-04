@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
-  ArrowRight,
   CheckCircle,
   Clock,
   FileText,
@@ -15,11 +14,13 @@ import {
 } from 'lucide-react'
 
 import { Header, Footer } from '@/components/layout'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
+import { AdvisoryPracticeBand } from '@/components/advisory/AdvisoryPracticeBand'
+import { AtAGlance } from '@/components/advisory/AtAGlance'
 import { EngagementContactForm } from '@/components/advisory/EngagementContactForm'
+import { EngagementHero } from '@/components/advisory/EngagementHero'
+import { WhereItLeads } from '@/components/advisory/WhereItLeads'
 import { AMOUNTS, gbp } from '@/lib/offering'
 import {
   DIAGNOSTIC_REPORT_CONTENTS,
@@ -28,26 +29,19 @@ import {
 } from '@/lib/advisory/provisional-content'
 
 /**
- * The Exposure Diagnostic, on its own page.
+ * The Exposure Diagnostic.
  *
- * It was a card in a four-across grid on `/advisory` carrying 84 words, next to
- * a Drift Retainer with 559 — and the `Tier` type had grown four optional
- * bolt-on fields (`positioning`, `priceDetail`, `introDistinction`, `pathNote`)
- * to squeeze copy into that card, which is what a format looks like when it has
- * run out. The Post-Omnibus Briefing is the same price and has had its own page
- * at `/eu-exposure` all along; this is the missing twin.
- *
- * **Framed standalone, at the owner's decision (2026-09-04).** Every one-off
- * used to be defined by its route into the Retainer — "designed as an on-ramp",
- * "scopes naturally into". The credit is still here and is still a real
- * benefit, but it closes the argument now rather than being the product's
- * identity.
+ * Rebuilt onto the shared engagement template (`AdvisoryPracticeBand`,
+ * `EngagementHero`, `AtAGlance`, `WhereItLeads`) so it cannot drift from its
+ * three siblings. Its own first version put the price card in the hero's right
+ * column, which is what displaced the photograph every other page in the family
+ * has — the single loudest inconsistency a reader moving between pages would hit.
  *
  * Sections gated on `PROVISIONAL_CONTENT_APPROVED` are drafted, not
  * owner-supplied. See `src/lib/advisory/provisional-content.ts`.
  */
 
-/** What the engagement reviews. Verbatim from the tier card on `/advisory`. */
+/** What the engagement reviews. Verbatim from the tier card it replaced. */
 const REVIEW_AREAS = [
   {
     icon: Search,
@@ -72,70 +66,35 @@ export default function ExposureDiagnosticPage() {
       <Header />
 
       <main className="flex-1">
-        {/* Hero */}
-        <section className="border-b border-border-subtle bg-slate-deep">
-          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
-            <div className="grid grid-cols-1 gap-10 lg:grid-cols-[3fr_2fr] lg:items-start lg:gap-12">
-              <div>
-                <Badge variant="outline" className="mb-4 border-stone-teal text-stone-teal">
-                  A one-off engagement
-                </Badge>
-                <h1 className="mb-6 text-4xl font-bold text-text-primary sm:text-5xl">
-                  Where your AI dependency becomes an operating constraint.
-                </h1>
-                <p className="mb-6 text-xl leading-relaxed text-text-muted">
-                  Most organisations can list the AI they bought. Far fewer can say which
-                  vendors they cannot replace, which jurisdictions their data actually
-                  touches, or which of their suppliers could not evidence a claim if a
-                  buyer asked next month.
-                </p>
-                <p className="leading-relaxed text-text-muted">
-                  The Exposure Diagnostic is the clearest first picture of where you
-                  stand: what you run, what your vendors can prove, and where the
-                  dependency turns into something that limits what the business can do.
-                </p>
-              </div>
+        <AdvisoryPracticeBand />
 
-              <Card className="border-stone-teal/40 bg-stone-charcoal">
-                <CardHeader>
-                  <div className="font-mono text-xs uppercase tracking-wider text-text-muted">
-                    At a glance
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-5">
-                  <div>
-                    <div className="font-mono text-2xl font-semibold text-text-primary">
-                      From {gbp(AMOUNTS.exposureDiagnostic)}
-                    </div>
-                    <div className="text-sm text-text-muted">
-                      Custom scope, quoted against an agreed boundary
-                    </div>
-                  </div>
-                  <ul className="space-y-3 border-t border-border-subtle pt-4">
-                    {[
-                      'A written report of 15–25 pages, with an executive summary',
-                      'Prioritised actions — what to do this quarter, and why that order',
-                      'A 30-day follow-up call once you have tried to act on it',
-                    ].map((item) => (
-                      <li key={item} className="flex items-start gap-2 text-sm text-text-primary">
-                        <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-stone-teal" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="border-t border-border-subtle pt-4">
-                    <a href="#contact">
-                      <Button size="lg" className="w-full bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90">
-                        Request a diagnostic
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
-                    </a>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </section>
+        <EngagementHero
+          badge="A one-off engagement"
+          title="Where your AI dependency becomes an operating constraint."
+          lead="Most organisations can list the AI they bought. Far fewer can say which vendors they cannot replace, which jurisdictions their data actually touches, or which of their suppliers could not evidence a claim if a buyer asked next month."
+          body="The Exposure Diagnostic is the clearest first picture of where you stand: what you run, what your vendors can prove, and where the dependency turns into something that limits what the business can do."
+          inShort={
+            <>
+              One pass over the whole estate, from {gbp(AMOUNTS.exposureDiagnostic)}, scoped
+              to a boundary you agree before anything is invoiced — with a written report
+              and a 30-day follow-up call.
+            </>
+          }
+          ctaLabel="Request a diagnostic"
+          imageCaption="Dependency mapping, vendor evidence and regulatory friction — read across your whole stack."
+        />
+
+        <AtAGlance
+          price={`From ${gbp(AMOUNTS.exposureDiagnostic)}`}
+          priceNote="Custom scope, quoted against an agreed boundary"
+          points={[
+            'A written report of 15–25 pages, with an executive summary',
+            'Prioritised actions — what to do this quarter, and why that order',
+            'A 30-day follow-up call once you have tried to act on it',
+            'Credited toward your first quarter if you go on to a Drift Retainer',
+          ]}
+          ctaLabel="Request a diagnostic"
+        />
 
         {/* Who it is for — and who it is not. The strongest paragraph the tier
             card had, previously rendered at 12px inside a grid cell. */}
@@ -159,8 +118,8 @@ export default function ExposureDiagnosticPage() {
               The Exposure Diagnostic is for the questions documents cannot answer: where
               your dependency on specific vendors, models and jurisdictions becomes an
               operating constraint, and what to do about it this quarter. It suits an
-              organisation that has already adopted AI in earnest and now has to answer
-              for it — to a board, a regulator, or a customer running a procurement
+              organisation that has already adopted AI in earnest and now has to answer for
+              it — to a board, a regulator, or a customer running a procurement
               questionnaire.
             </p>
           </div>
@@ -187,7 +146,7 @@ export default function ExposureDiagnosticPage() {
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.1 }}
                 >
-                  <Card className="h-full border-border-subtle bg-stone-charcoal">
+                  <Card className="card-interactive h-full border-border-subtle bg-stone-charcoal">
                     <CardHeader>
                       <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg border border-stone-teal/30 bg-stone-teal/10">
                         <Icon className="h-5 w-5 text-stone-teal" />
@@ -254,7 +213,7 @@ export default function ExposureDiagnosticPage() {
         )}
 
         {/* Price and what it credits toward. The credit closes the argument
-            rather than defining the product — see the header comment. */}
+            rather than defining the product. */}
         <section className="border-y border-silicon-amber/30 bg-silicon-amber/5">
           <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
             <div className="max-w-3xl">
@@ -267,14 +226,14 @@ export default function ExposureDiagnosticPage() {
                 accruing against a day rate.
               </p>
               <p className="leading-relaxed text-text-muted">
-                It stands on its own: you can take the report, act on it, and never speak
-                to us again. If the exposure turns out to be the kind that keeps moving,
-                the fee is{' '}
+                It stands on its own: you can take the report, act on it, and never speak to
+                us again. If the exposure turns out to be the kind that keeps moving, the fee
+                is{' '}
                 <strong className="font-semibold text-text-primary">
                   credited toward your first quarter
                 </strong>{' '}
                 on{' '}
-                <Link href="/advisory#retainer" className="text-silicon-amber-strong hover:underline">
+                <Link href="/advisory/drift-retainer" className="text-silicon-amber-strong hover:underline">
                   the Drift Retainer
                 </Link>
                 .
@@ -282,6 +241,20 @@ export default function ExposureDiagnosticPage() {
             </div>
           </div>
         </section>
+
+        <WhereItLeads
+          currentId="exposure-diagnostic"
+          heading="Where it leads"
+          intro="A diagnostic is one pass over two domains. What you do with it depends on what it finds."
+          bridges={{
+            'advisory-briefing':
+              'Not sure a full pass is what you need? An hour on the single question first, credited toward the diagnostic’s bigger sibling if you go on.',
+            'drift-retainer':
+              'If the exposure turns out to keep moving, the diagnostic fee is credited toward your first quarter of a standing monthly read.',
+            'strategic-assessment':
+              'If what the diagnostic surfaces is a decision rather than a to-do list, this is the framework-neutral document a board needs to take it.',
+          }}
+        />
 
         <EngagementContactForm
           interest="Exposure Diagnostic"

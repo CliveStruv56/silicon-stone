@@ -6,8 +6,8 @@ import { describe, expect, it } from 'vitest'
 import { ENGAGEMENTS } from '../offering'
 
 /**
- * The two dedicated engagement pages, and the two things about them that break
- * silently.
+ * The four dedicated engagement pages, and the three things about them that
+ * break silently.
  *
  * **The Kit tag.** `/api/contact` carries one `interest` field and Kit segments
  * on its exact string. A dedicated page hard-codes that value as a prop rather
@@ -44,7 +44,9 @@ function interestProps(pageFile: string): string[] {
 }
 
 const DEDICATED_PAGES = [
+  'advisory/advisory-briefing',
   'advisory/exposure-diagnostic',
+  'advisory/drift-retainer',
   'advisory/strategic-assessment',
 ]
 
@@ -81,6 +83,24 @@ describe('dedicated engagement pages', () => {
             unknown.map((u) => `  ${u.route} → "${u.interest}"`).join('\n')
         : '',
     ).toEqual([])
+  })
+
+  /**
+   * The Drift Retainer moved from a section on `/advisory` to its own page on
+   * 2026-09-04, and twelve places across the site pointed at `#retainer` — four
+   * tool pages, /methodology, the homepage band, the Start Here spine,
+   * AdvisoryNextStep and the catalogue among them. Most were repointed, but an
+   * anchor that no longer exists does not 404: the browser loads the page and
+   * silently stays at the top. Nothing errors, nothing logs, and the reader just
+   * lands on the wrong thing. So the hub keeps a summary block under that id,
+   * and this asserts it is still there.
+   */
+  it('keeps the #retainer anchor alive on the hub', () => {
+    const hub = fs.readFileSync(path.join(APP_DIR, 'advisory/page.tsx'), 'utf8')
+    expect(hub).toContain('id="retainer"')
+    // And it has to lead somewhere — a summary that does not link on is a
+    // dead end for every one of those inbound links.
+    expect(hub).toContain('/advisory/drift-retainer')
   })
 
   it('points every catalogue href at a route that exists', () => {

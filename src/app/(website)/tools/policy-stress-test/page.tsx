@@ -685,7 +685,7 @@ export default function PolicyStressTestPage() {
 
                 {/* CTA */}
                 <div className="flex justify-center pt-6">
-                  <Link href="/advisory#retainer">
+                  <Link href="/advisory/drift-retainer">
                     <Button className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90">
                       <FileText className="w-4 h-4 mr-2" />
                       Request Detailed Compliance Assessment

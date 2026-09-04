@@ -434,7 +434,7 @@ export default function MethodologyPage() {
                     Read Our Analysis
                   </Button>
                 </Link>
-                <Link href="/advisory#retainer">
+                <Link href="/advisory/drift-retainer">
                   <Button variant="outline" className="border-silicon-amber text-silicon-amber-strong hover:bg-silicon-amber/10">
                     The Drift Retainer
                   </Button>
