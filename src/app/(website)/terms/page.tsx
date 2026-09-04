@@ -22,7 +22,7 @@ export default function TermsPage() {
             <h1 className="text-4xl font-bold text-text-primary sm:text-5xl mb-4">
               Terms of Service
             </h1>
-            <p className="text-text-muted">Last updated: March 2026</p>
+            <p className="text-text-muted">Last updated: September 2026</p>
           </div>
         </section>
 
@@ -92,6 +92,95 @@ export default function TermsPage() {
                 Advisory and consulting engagements are governed by individual engagement
                 letters agreed between Silicon and Stone and the client. These terms apply
                 to the general use of the website and digital products only.
+              </p>
+            </div>
+
+            {/*
+              Refunds and Cancellation.
+
+              Added 2026-09-04, the same day every discretionary refund promise
+              was withdrawn from the site — the 30-day money-back note under the
+              product CTAs and the Exposure Diagnostic's revision-or-50%-refund
+              clause. Withdrawing them left the site selling digital downloads
+              with no stated position at all, which is a worse place to be than
+              either promising something or promising nothing.
+
+              This section states statutory rights and stops there. It offers
+              nothing beyond them, deliberately.
+
+              ⚠ Two things it depends on:
+                1. Lemon Squeezy is the Merchant of Record, so it is the seller
+                 of record to the buyer and its refund process is the one that
+                 actually runs. If that arrangement ever changes, this is wrong.
+              2. The claim that the 14-day cancellation right is lost on
+                 download is TRUE ONLY IF the checkout captures express consent
+                 AND an acknowledgement that the right is lost. The store does
+                 not exist yet; LAUNCH.md carries this as a launch-blocking
+                 checklist item. Written conditionally here so it stays accurate
+                 either way.
+
+              This has not been reviewed by a solicitor. It should be before the
+              store opens.
+            */}
+            <div>
+              <h2 className="text-xl font-semibold text-text-primary mb-3">
+                Refunds and Cancellation
+              </h2>
+              <p className="text-text-muted leading-relaxed mb-3">
+                Digital products are sold through Lemon Squeezy, which acts as merchant of
+                record. Lemon Squeezy is the seller for the purposes of your transaction, issues
+                the receipt, handles VAT, and processes any refund. Requests can be made through
+                the receipt email, or to us at the address below and we will take them up.
+              </p>
+              <p className="text-text-muted leading-relaxed mb-3">
+                <strong className="text-text-primary">
+                  If you are buying as a consumer in the UK or EU
+                </strong>{' '}
+                you normally have 14 days to cancel a distance purchase and receive a refund.
+                Digital content is the exception: where you have expressly asked for immediate
+                access and acknowledged at checkout that you lose the right to cancel by doing
+                so, that right ends when the download or unlock begins. Where you have not been
+                given access, the 14-day right stands.
+              </p>
+              <p className="text-text-muted leading-relaxed mb-3">
+                <strong className="text-text-primary">
+                  Separately, and regardless of the above
+                </strong>
+                , if a product is faulty, does not match its description, or never arrives, you
+                are entitled to have that put right. Tell us and we will repair, replace or
+                refund it. This is a statutory right and nothing on this site limits it.
+              </p>
+              <ul className="space-y-2 text-text-muted mb-3">
+                <li className="flex items-start gap-2">
+                  <span className="text-stone-teal mt-1">-</span>
+                  <span>
+                    We publish no money-back guarantee and no discretionary refund window. What
+                    is set out here is what applies.
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-stone-teal mt-1">-</span>
+                  <span>
+                    Every product page states what the product is before purchase, and the
+                    interactive tools are free — so you can judge the analysis before you buy any
+                    of it.
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-stone-teal mt-1">-</span>
+                  <span>
+                    Purchases made by a business are not consumer purchases, and the statutory
+                    cancellation right above does not apply to them.
+                  </span>
+                </li>
+              </ul>
+              <p className="text-text-muted leading-relaxed">
+                <strong className="text-text-primary">Advisory engagements</strong> are not
+                covered by this section. Fees, scope, cancellation and any credit toward a
+                further engagement are set out in the engagement letter agreed before work
+                begins, and that letter governs. Where a fee is described on this site as
+                credited toward a later engagement, that is a credit against a future purchase,
+                not a refund.
               </p>
             </div>
 

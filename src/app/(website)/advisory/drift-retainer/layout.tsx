@@ -1,5 +1,9 @@
 import type { Metadata } from 'next'
 
+import { JsonLd } from '@/components/seo/JsonLd'
+import { buildEngagementBreadcrumbSchema } from '@/lib/seo'
+import { ENGAGEMENTS } from '@/lib/offering'
+
 const description =
   'A standing, independent read on how the technopolitical drift affects your supply chains, procurement and people — a board-forwardable monthly briefing, a working session on one live decision, direct access between sessions, and a quarterly written exposure review.'
 
@@ -11,8 +15,30 @@ export const metadata: Metadata = {
   twitter: { card: 'summary_large_image', title: 'The Drift Retainer', description },
 }
 
+
+/**
+ * Structured data lives in the layout, not the page: two of the four engagement
+ * pages are Client Components (framer-motion), and this is server-rendered
+ * metadata that has no business in the client bundle. It also puts the
+ * breadcrumb next to the canonical, which is the same concern.
+ *
+ * The engagement is looked up by id in `ENGAGEMENTS` rather than retyped, so the
+ * breadcrumb cannot call it something the header, footer and /pricing do not.
+ */
+const engagement = ENGAGEMENTS.find((e) => e.id === 'drift-retainer')!
+
 export default function DriftRetainerLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  return children
+  return (
+    <>
+      <JsonLd
+        data={buildEngagementBreadcrumbSchema({
+          name: engagement.name,
+          path: engagement.href,
+        })}
+      />
+      {children}
+    </>
+  )
 }

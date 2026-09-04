@@ -8,6 +8,8 @@ import {
   Users,
   Search,
   Layers,
+  Tag,
+  Compass,
 } from 'lucide-react'
 import { Header, Footer } from '@/components/layout'
 import { ThemeToggle } from '@/components/layout/ThemeToggle'
@@ -37,8 +39,20 @@ const sections = [
   {
     name: 'Advisory',
     href: '/advisory',
-    description: 'Working with us on exposure and resilience.',
+    description: 'Four engagements, from a one-hour briefing to a board-level assessment.',
     icon: Briefcase,
+  },
+  {
+    name: 'Pricing',
+    href: '/pricing',
+    description: 'Every price on one page.',
+    icon: Tag,
+  },
+  {
+    name: 'WaymarkPath',
+    href: '/waymarkpath',
+    description: 'The sister product — career transition for the individual professional.',
+    icon: Compass,
   },
   {
     name: 'Methodology',

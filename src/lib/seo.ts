@@ -180,12 +180,14 @@ export function buildSeriesSchema(s: SchemaSeries) {
 }
 
 /** Intelligence → Series → this series. */
-export function buildSeriesBreadcrumbSchema(s: { title: string; slug: string }) {
-  const items = [
-    { name: 'Intelligence', url: absoluteUrl('/intelligence') },
-    { name: 'Series', url: absoluteUrl('/intelligence/series') },
-    { name: s.title, url: absoluteUrl(`/intelligence/series/${s.slug}`) },
-  ]
+/**
+ * The BreadcrumbList shape, in one place.
+ *
+ * There were three copies of this map by 2026-09-04 and a fourth was about to be
+ * written for the advisory pages. `position` is 1-based and must stay in list
+ * order — Google reads it as the hierarchy, not the array.
+ */
+function breadcrumbList(items: Array<{ name: string; path: string }>) {
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -193,9 +195,37 @@ export function buildSeriesBreadcrumbSchema(s: { title: string; slug: string }) 
       '@type': 'ListItem',
       position: index + 1,
       name: item.name,
-      item: item.url,
+      item: absoluteUrl(item.path),
     })),
   }
+}
+
+export function buildSeriesBreadcrumbSchema(s: { title: string; slug: string }) {
+  return breadcrumbList([
+    { name: 'Intelligence', path: '/intelligence' },
+    { name: 'Series', path: '/intelligence/series' },
+    { name: s.title, path: `/intelligence/series/${s.slug}` },
+  ])
+}
+
+/**
+ * Advisory → this engagement.
+ *
+ * The four engagement pages had no structured data at all until 2026-09-04, so
+ * a search engine inferred their place from the URL rather than from the labels
+ * the site uses. `name` and `path` come from `ENGAGEMENTS` in
+ * `src/lib/offering.ts` at the call site — the same catalogue the header, the
+ * footer and `/pricing` render — so the breadcrumb cannot name an engagement
+ * something the rest of the site does not call it.
+ *
+ * Two levels, not three: `sitemap.ts` deliberately ranks these alongside
+ * `/advisory` rather than beneath it, because each is searched for by name.
+ */
+export function buildEngagementBreadcrumbSchema(engagement: { name: string; path: string }) {
+  return breadcrumbList([
+    { name: 'Advisory', path: '/advisory' },
+    { name: engagement.name, path: engagement.path },
+  ])
 }
 
 export function buildBreadcrumbSchema(a: SchemaArticle) {
@@ -222,6 +252,7 @@ export function buildBreadcrumbSchema(a: SchemaArticle) {
     })),
   }
 }
+
 
 export function buildGlossarySchema(terms: GlossaryTerm[]) {
   const url = absoluteUrl('/glossary')

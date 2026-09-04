@@ -441,6 +441,20 @@ pages on 2026-08-11. It was stale (four pages said 30 June, `/eu-exposure` said
       clients are signed, then set it to `false`.
 - [ ] Redeploy (env changes need a new deployment).
 
+- [ ] ⚠ **Checkout must capture express consent to immediate access.** Enable
+      Lemon Squeezy's digital-goods consent step so the buyer actively confirms
+      (a) they want access straight away and (b) they understand this ends their
+      14-day cancellation right. `/terms` → *Refunds and Cancellation* states
+      that the right is lost when the download begins **where the buyer has
+      consented and acknowledged**. If the checkout never asks, the condition is
+      not met, the 14-day right survives, and the site is describing a position
+      it does not have. Written conditionally on purpose, so the sentence stays
+      true either way — but it is only *useful* once the checkout asks.
+      > Also outstanding: `/terms` has not been reviewed by a solicitor. The
+      > Refunds section was written on 2026-09-04 to close the gap left when
+      > every discretionary refund promise was withdrawn; it states statutory
+      > rights and offers nothing beyond them. Get it read before the store opens.
+
 ## 2. Launch day — verification
 
 - [ ] Switch LS out of test mode. Run **one real £24 Checklist purchase**:

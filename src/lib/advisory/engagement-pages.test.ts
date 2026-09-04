@@ -103,6 +103,60 @@ describe('dedicated engagement pages', () => {
     expect(hub).toContain('/advisory/drift-retainer')
   })
 
+  /**
+   * A page that exists but is not in the sitemap ships unindexed, and nothing
+   * about it looks wrong — the route 200s, the nav works, the suite is green.
+   * `sitemap.ts` keeps a hand-curated STATIC_ROUTES array (deliberately: it
+   * carries a priority and a change frequency per route, which cannot be
+   * derived), so the only thing standing between a fifth engagement page and
+   * invisibility is somebody remembering. This is that somebody.
+   */
+  it('lists every catalogue href in the sitemap', () => {
+    const sitemap = fs.readFileSync('src/app/sitemap.ts', 'utf8')
+    const paths = [...sitemap.matchAll(/path: '([^']+)'/g)].map((m) => m[1])
+    expect(
+      paths.length,
+      'No STATIC_ROUTES entries found in src/app/sitemap.ts — this check has ' +
+        'gone blind. Fix the pattern rather than deleting it.',
+    ).toBeGreaterThan(5)
+
+    const missing = ENGAGEMENTS.map((offering) => offering.href.split('#')[0])
+      .filter((routePath) => routePath && routePath !== '/advisory')
+      .filter((routePath) => !paths.includes(routePath))
+
+    expect(
+      missing,
+      missing.length
+        ? `Engagement page(s) missing from sitemap.ts STATIC_ROUTES — they will ` +
+            `not be indexed:\n${missing.map((m) => `  ${m}`).join('\n')}`
+        : '',
+    ).toEqual([])
+  })
+
+  /**
+   * Each engagement layout looks its own entry up by id to build the breadcrumb,
+   * with a non-null assertion. A renamed id would make that `undefined` and
+   * crash the page at render with nothing pointing at the cause, so the ids are
+   * asserted here instead.
+   */
+  it('resolves every id the engagement layouts look up', () => {
+    const known = new Set(ENGAGEMENTS.map((offering) => offering.id))
+    const unknown = DEDICATED_PAGES.flatMap((route) => {
+      const layout = fs.readFileSync(path.join(APP_DIR, route, 'layout.tsx'), 'utf8')
+      return [...layout.matchAll(/ENGAGEMENTS\.find\(\(e\) => e\.id === '([^']+)'\)/g)].map(
+        (m) => ({ route, id: m[1] }),
+      )
+    }).filter(({ id }) => !known.has(id))
+
+    expect(
+      unknown,
+      unknown.length
+        ? `Engagement layout looks up an id that is not in the catalogue:\n` +
+            unknown.map((u) => `  ${u.route} → "${u.id}"`).join('\n')
+        : '',
+    ).toEqual([])
+  })
+
   it('points every catalogue href at a route that exists', () => {
     const broken = ENGAGEMENTS.filter((offering) => {
       const [routePath] = offering.href.split('#')

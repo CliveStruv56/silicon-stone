@@ -110,6 +110,73 @@ function walk(dir: string): string[] {
   })
 }
 
+/**
+ * Copy that promises a customer their money back, in any of its usual dresses.
+ *
+ * Not `guarantee` — the Baseline Month guarantee on the Drift Retainer is live,
+ * deliberate, and says "walk away paying that month only", which is a different
+ * promise. A guard that fought that word would be switched off inside a week.
+ * Nor `credit`: crediting a fee toward a later purchase is the whole shape of
+ * the ladder.
+ */
+const REFUND_PROMISE = /refunds?|refunded|money[-\s]?back|no[-\s]?quibble|risk[-\s]?free/i
+
+/**
+ * Where the word may legitimately appear.
+ *
+ * The terms page is the *only* place the site may discuss refunds, because a
+ * refund position is a legal statement about statutory rights rather than a
+ * marketing line — and keeping it to one file is what stops it being restated,
+ * loosely, next to a Buy button.
+ */
+const REFUND_ALLOWED = new Set([
+  'src/app/(website)/terms/page.tsx',
+  'src/lib/offering.test.ts',
+])
+
+describe('no refund promise outside the terms page', () => {
+  /**
+   * Every refund promise on the site was withdrawn on 2026-09-04 — a 30-day
+   * money-back note under the product CTAs, and the Exposure Diagnostic's
+   * revision-or-50%-refund clause. `GuaranteeNote.tsx` and the `guaranteeNote`
+   * field were deleted so the promise could not return by accident, but
+   * `Offering.terms` is still free text that no test reads: putting the clause
+   * back passed the whole suite silently. This is the assertion that was
+   * missing.
+   */
+  it('finds no money-back language in any component, page or catalogue entry', () => {
+    const offenders = walk('src')
+      .filter((file) => !REFUND_ALLOWED.has(file.split(path.sep).join('/')))
+      .flatMap((file) => {
+        const lines = stripComments(fs.readFileSync(file, 'utf8')).split('\n')
+        return lines
+          .map((line, i) => ({ file, line: i + 1, text: line.trim() }))
+          .filter(({ text }) => REFUND_PROMISE.test(text))
+      })
+
+    expect(
+      offenders,
+      offenders.length
+        ? 'Refund promise found outside the terms page. Every one was withdrawn ' +
+            'on 2026-09-04 — if this is a deliberate reinstatement it is a ' +
+            'commercial decision, so make it in one place (/terms) and add the ' +
+            'file here with a reason:\n' +
+            offenders.map((o) => `  ${o.file}:${o.line}  ${o.text}`).join('\n')
+        : '',
+    ).toEqual([])
+  })
+
+  it('leaves the Baseline Month guarantee and the ladder credits alone', () => {
+    // A pair of canaries: if the pattern above ever widens to `guarantee` or
+    // `credit`, these fail rather than the guard quietly deleting live copy.
+    const retainer = ENGAGEMENTS.find((offering) => offering.id === 'drift-retainer')
+    expect(retainer?.terms?.some((term) => term.includes('Baseline Month'))).toBe(true)
+    expect(
+      ENGAGEMENTS.some((offering) => offering.terms?.some((term) => /[Cc]redited/.test(term))),
+    ).toBe(true)
+  })
+})
+
 describe('no hard-coded prices outside the catalogue', () => {
   it('finds no £ literal in any component or page', () => {
     const offenders = walk('src')
