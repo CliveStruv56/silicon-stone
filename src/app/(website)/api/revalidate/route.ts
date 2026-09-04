@@ -33,10 +33,18 @@ export async function POST(req: NextRequest) {
         // webhook but would have revalidated /analysis/<series-slug> — a path
         // that does not exist — the moment one did not.
         //
-        // NOTE: the webhook's own filter lives in the Sanity dashboard, not in
-        // this repo (see LAUNCH.md). If it is still scoped to
-        // `_type == "article"`, editing a series fires nothing at all and its
-        // page sits stale with no error anywhere.
+        // NOTE: **nothing calls this route today.** The Sanity plan includes two
+        // webhooks and both are spoken for (vectorize, on-publish); creating a
+        // third returns 400. Established 2026-09-04 — before that, LAUNCH.md
+        // said the filter was the obstacle, which was wrong: there is no
+        // webhook to filter.
+        //
+        // Cache invalidation happens instead through the Live Content API —
+        // <SanityLive /> in the website layout, revalidating the sync tags that
+        // every `sanityFetch` result carries. This route stays because it is
+        // correct and costs nothing, and because widening `on-publish`'s filter
+        // to fire it is the cheap path if publish-time invalidation is ever
+        // wanted. See LAUNCH.md.
         revalidateTag('sanity')
         revalidatePath('/')
         revalidatePath('/intelligence')

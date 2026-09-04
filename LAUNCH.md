@@ -257,34 +257,61 @@ Filters differ, and the difference matters:
 | `/api/revalidate` | **`_type in ["article", "series"]`** |
 
 A **series** is a published document with its own page (`/intelligence/series/<slug>`),
-and that page is cached until `revalidateTag('sanity')` frees it. If the
-revalidate filter is left at `_type == "article"`, editing or reordering a series
-fires nothing at all: the page sits stale, indefinitely, with no error anywhere.
-The route already knows what to do with a `series` payload — the filter is the
-only thing standing between it and being asked.
+and that page is cached until its sync tags are freed. The route already knows
+what to do with a `series` payload; its filter would have to say
+`_type in ["article", "series"]` for it ever to be asked.
 
-**Since 2026-09-04 this reaches two more pages.** The homepage and `/intelligence`
-both render a `SeriesPromo` band naming the featured series and its part count,
-so a series edit that fires nothing now leaves a stale *promotion* on the two
-busiest pages on the site — advertising a part count that has moved, or a series
-that has been renamed. The route already calls `revalidatePath('/')` and
-`revalidatePath('/intelligence')` on every payload it accepts, so nothing in the
-code needs to change; the filter is still the only thing standing in the way.
+> ### ⚠ `/api/revalidate` does not exist as a webhook, and cannot on this plan
+>
+> Established 2026-09-04, after this section had spent weeks telling the reader
+> to create three. **The Sanity plan includes two webhooks and both are used**
+> (`Silicon-stone-pinecone`, `on-publish`). Creating a third returns
+> `400 You have used all the included webhooks in your plan`. The route is
+> deployed and `SANITY_REVALIDATE_SECRET` is set in Vercel; only the hook is
+> missing, and no amount of dashboard work will add it.
+>
+> **What has been invalidating the cache all along is the Live Content API, not
+> a webhook.** `src/sanity/lib/live.ts` calls `defineLive`, `<SanityLive />` is
+> mounted in the website layout, and on a content event it invokes
+> next-sanity's `revalidateSyncTags` server action — `revalidateTag('sanity:…')`
+> for each sync tag on the affected query. Every statically cached page that
+> reads Sanity does so through `sanityFetch`, so every one of them is tagged:
+> the homepage, `/analysis/<slug>`, `/intelligence/series` and each series page.
+> (`/intelligence` uses the plain client and is *not* tagged — it does not need
+> to be, being a dynamic route rendered per request.)
+>
+> **The residual gap is a first-visitor one.** The event reaches a *browser*, so
+> the revalidation is triggered by someone having a page open. In practice the
+> first request after a publish can be served the cached copy, `<SanityLive />`
+> then frees the tag, and the next request is fresh — which is why publishing
+> has always looked fine, and why nobody noticed the missing webhook. The
+> mechanism was read out of `next-sanity`'s source; the timing was not measured
+> end to end.
+>
+> **So do not buy a plan upgrade for this on its own.** If deterministic,
+> publish-time invalidation is ever wanted, the cheaper move is to widen
+> `on-publish`'s filter to `_type in ["article", "series"]` and have that route
+> do the `revalidatePath` calls — one webhook, two jobs — rather than paying for
+> a third slot.
 
 | URL | Auth | What it does | Symptom if missing |
 |---|---|---|---|
 | `/api/vectorize` | header `x-sanity-webhook-secret` = `SANITY_WEBHOOK_SECRET` | Embeds the article, writes back Related Articles | No semantic search hit, no related articles, no prior-coverage on future drafts |
 | `/api/on-publish` | same header, same secret | Runs the pre-publish checks server-side and records anything wrong; sends the Audit-tier push | Nothing catches a publish made outside Studio; no push ever fires |
-| `/api/revalidate` | `next-sanity` **signature** (`SANITY_REVALIDATE_SECRET`) | Invalidates the home page, `/intelligence`, the article page, and — on a `series` payload — the series index and that series' page | New articles do not appear until the next deploy; series edits never appear at all |
+| `/api/revalidate` | `next-sanity` **signature** (`SANITY_REVALIDATE_SECRET`) | Would invalidate the home page, `/intelligence`, the article page, and — on a `series` payload — the series index and that series' page | **Not created; the plan has no slot for it.** See the box above: the Live Content API covers the same surfaces. |
 
-- [ ] All three created, with the secret set in Vercel.
-- [ ] ⚠ **`/api/revalidate` includes `series` in its filter.** See the table
-      above. This is the one filter that is not `_type == "article"`.
+- [x] The two the plan allows are created, with the secret set in Vercel.
+- [x] ⚠ **`/api/revalidate` includes `series` in its filter** — moot: there is no
+      such webhook and cannot be. Do not spend time on this.
 - [ ] ⚠ **The projection includes `_type`.** A payload without it is the
       *delete* shape: `/api/vectorize` will treat every delivery as a request to
       remove that article's vector.
 - [ ] Verify by publishing one article and checking Sanity's own delivery log —
       that log is the only place a 401/429/503 from these routes ever surfaces.
+
+Check the live state at any time with `npx sanity hook list`, or in full
+(filters and projections included) against the management API:
+`GET https://api.sanity.io/v2021-10-04/hooks/projects/<projectId>`.
 
 ### Web Push — VAPID keys
 

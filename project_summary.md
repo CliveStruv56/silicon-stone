@@ -660,11 +660,31 @@ exported function in `src/lib/series.ts` with six tests, including that a series
 flagged `complete` in Studio with a part still in draft must **not** claim
 completeness. Mutation-tested both ways.
 
-**One consequence recorded in `LAUNCH.md`.** The revalidate webhook's `series`
-filter was already a pending launch item; it now matters more. The route already
-calls `revalidatePath('/')` and `revalidatePath('/intelligence')`, so a series
-edit that fires nothing leaves a stale *promotion* — a wrong part count, or a
-renamed series — on the two busiest pages, not just a stale library page.
+**One consequence chased into `LAUNCH.md`, and it turned out to be a different
+finding entirely.** The revalidate webhook's `series` filter was a pending launch
+item, and the new bands made it look more urgent. Checking it (`npx sanity hook
+list`, then the management API) showed **there is no `/api/revalidate` webhook at
+all** — and there cannot be: the plan includes two, both are used, and a third
+returns `400 You have used all the included webhooks in your plan`.
+
+What has been freeing the cache all along is the **Live Content API**, not a
+webhook. `<SanityLive />` is mounted in the website layout and, on a content
+event, calls next-sanity's `revalidateSyncTags` server action. Every statically
+cached page that reads Sanity does so through `sanityFetch` and is therefore
+tagged — homepage, `/analysis/<slug>`, the series index and each series page.
+(`/intelligence` uses the plain client and is untagged; it is a dynamic route, so
+it does not need to be.) The residual gap is a first-visitor one: the event
+reaches a browser, so the first request after a publish may be served the cached
+copy before the tag is freed. That is why publishing always looked fine and why
+nobody noticed the absence. Mechanism read out of `next-sanity`'s source; timing
+not measured end to end.
+
+Recorded in `LAUNCH.md` as a warning box replacing the instruction to create
+three webhooks, and in the route's own comment, which had named the filter as the
+obstacle. **Do not buy a plan upgrade for this alone** — if deterministic
+publish-time invalidation is ever wanted, widening `on-publish`'s filter to
+`_type in ["article", "series"]` and having it do the `revalidatePath` calls is
+one webhook doing two jobs.
 
 Checked at 1440px and 390px on both pages, plus the empty case. 1,536 tests
 green; build green at 119 pages.
