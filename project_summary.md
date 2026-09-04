@@ -372,11 +372,11 @@ sell (restore them when the first report is on sale — see `LAUNCH.md`).
 | Engagement | Price | Summary | Where it lives |
 |---|---|---|---|
 | **Advisory Briefing** | **£450** / one hour | Focused consultation on your tool results and one specific question, plus a written follow-up. Credited **in full** to your first retainer month if you proceed within 30 days. | `/advisory#briefing` |
-| **The Exposure Diagnostic** | **From £2,500** (custom scope) | AI system + vendor-evidence review, dependency mapping, regulatory-friction read, 15–25pp report, 30-day follow-up. Fee credited to the first retainer quarter. **No refund guarantee** — the revision-or-50%-refund clause was withdrawn on 2026-09-04. | `/advisory#diagnostic` |
+| **The Exposure Diagnostic** | **From £2,500** (custom scope) | AI system + vendor-evidence review, dependency mapping, regulatory-friction read, 15–25pp report, 30-day follow-up. Fee credited to the first retainer quarter. **No refund guarantee** — the revision-or-50%-refund clause was withdrawn on 2026-09-04. | `/advisory/exposure-diagnostic` |
 | **The Post-Omnibus Briefing** | **From £2,500**, fixed | US/UK-inbound. Fixed-scope written briefing (15–25pp) on what the AI Act now requires of you post-Digital Omnibus, delivered in three weeks, plus one interpretation call. | `/eu-exposure` |
 | ↳ *European Procurement Readiness* (add-on) | **From £1,500** | Add-on to the above: your systems mapped against EU buyer governance questionnaires, required-vs-theatre evidence triage, AI indemnification clause review. | `/eu-exposure` |
 | **The Drift Retainer** | **£2,000/mo** — three-month initial term, then rolling. £20,000/year annual. **Founding rate £1,500/mo for the first six months, first five clients** (`FOUNDING_OFFER_ACTIVE`). | The spine of the whole offering. Board-forwardable monthly briefing, a 90-minute working session on one live decision, "The Line" direct access between sessions, quarterly written exposure review on the 3×2 method. Opens with a Baseline Month — walk away after month one paying that month only. | `/advisory#retainer` |
-| **Strategic Assessment** | **From £8,000**, then transitions to retainer | The deep one-off: multi-framework analysis, 40+pp report, board-ready presentation, implementation roadmap. Positioned as the framework-neutral decision document before buying governance software. | `/advisory#assessment` |
+| **Strategic Assessment** | **From £8,000**, then transitions to retainer | The deep one-off: multi-framework analysis, 40+pp report, board-ready presentation, implementation roadmap. Positioned as the framework-neutral decision document before buying governance software. | `/advisory/strategic-assessment` |
 | **Board-level / multi-entity engagement** | **£25,000–£50,000** | Bespoke, for a group, multi-jurisdiction exposure or a board mandate; settles into a Drift Retainer. | `/advisory` (bespoke band) |
 | **Applied modules** | Sovereign Architecture Review **from £6,500**; AI Bill of Materials **from £4,500**; Manufacturing Exposure, Scenario Impact and Regulatory Friction **from £3,500** each | Scoped add-ons folded into a briefing or a retainer. All five priced as of 2026-08-15 — the £3,500 floor sits below the £4,500 module and above the £2,500 Diagnostic. | `/advisory` (assessments) |
 | Free 25-minute intro conversation | Free during the first 90 days (`FREE_INTRO_WINDOW`) | The launch-window front door to the retainer. Distinct from the £450 Briefing, which is a working session. | `/advisory#contact` |
@@ -568,6 +568,71 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### September 4, 2026 — The Diagnostic and the Assessment get their own pages
+
+Two problems on `/advisory`, one a bug and one a positioning failure.
+
+**The bug.** Every tier in the Engagement Options grid rendered its accent
+styling *and* its "Most Popular" badge off one `highlighted` boolean, and only
+the Drift Retainer carried it — while being (deliberately) the only tier with no
+anchor, because `#retainer` belongs to the spine section. So whichever
+engagement you arrived to read, the Retainer's card was the lit one.
+
+The fix is **not** to let that flag follow the URL. `popular` is a standing
+commercial claim; letting it move would tell a visitor who clicked "Advisory
+Briefing" that the Advisory Briefing is the most popular product, which is
+false. Popularity and selection are now two signals: amber fill plus the badge
+for `popular`, and a cyan ring plus a "You selected this" badge — and
+`aria-current`, since colour alone is not a selection indicator — for the tier
+named in the fragment. `selectedAnchor` reads the hash on mount **and** on
+`hashchange`: arriving from the header dropdown is a fresh mount that fires no
+event, while an in-page click fires the event without remounting, so handling
+one covers half the traffic and misses the case the dropdown actually uses.
+
+**The positioning.** Measured, the Retainer carried 559 words (116 in its card,
+443 in its own section) against 55 / 84 / 77 for the Briefing, the Diagnostic
+and the Assessment. The `Tier` type had grown four optional bolt-on fields —
+`positioning`, `priceDetail`, `introDistinction`, `pathNote` — each added to
+squeeze more copy into a grid cell, which is what a format looks like when it
+has run out. The Diagnostic's sharpest paragraph was rendering at 12px.
+
+**The Exposure Diagnostic and the Strategic Assessment now own pages**
+(`/advisory/exposure-diagnostic`, `/advisory/strategic-assessment`), on the
+`/eu-exposure` template — the Post-Omnibus Briefing is the same price and has
+had its own page all along. The Advisory Briefing deliberately stays a card: it
+is the low-friction step and a full page works against that. Because both the
+header dropdown and `/pricing` render `ENGAGEMENTS[].href`, repointing two
+values in `offering.ts` moved both surfaces; nothing else linked those anchors.
+
+**Standalone framing, at the owner's decision.** Every one-off used to be
+defined by its route into the Retainer — "designed as an on-ramp", "settles
+into". The credit is still stated and is still real, but it closes the argument
+now instead of being the product's identity.
+
+**Invented content cannot reach a customer.** The owner asked for a drafted
+structure for the engagement process and the proof section, with the real detail
+to follow. A stated timeline is a commercial promise, and this repo auto-deploys
+on push, so that content lives in `src/lib/advisory/provisional-content.ts`
+behind `PROVISIONAL_CONTENT_APPROVED = false` — a hard-coded constant, not an
+env flag, so switching it on requires opening the file where the draft text is
+and replacing it first. Every other section is traceable to `offering.ts` or to
+copy already published, so both pages stand up with the gate off. **No
+testimonial, case study or client quote was written, in draft or otherwise**;
+the proof section is a layout slot only.
+
+`EngagementContactForm` (`src/components/advisory/`) is new: `/advisory` and
+`/eu-exposure` had already hand-rolled the same submit path twice and drifted
+apart in their success states. `/eu-exposure` is **not** migrated onto it here —
+that is a live conversion form and its refactor deserves its own verification.
+
+`engagement-pages.test.ts` guards the two things that fail silently: the
+hard-coded Kit `interest` tag (a typo yields a working form whose leads land in
+no segment) and the catalogue `href` (a renamed route turns two nav entries into
+404s). Both mutation-tested. `Contact Form Submit` now carries the engagement as
+a Plausible prop — advisory leads were previously one undifferentiated bucket.
+
+Build green, both routes statically prerendered.
 
 ### September 4, 2026 — WaymarkPath stops being sold as vapourware
 

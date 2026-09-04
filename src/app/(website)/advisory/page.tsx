@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
@@ -263,7 +263,22 @@ type Tier = {
   cta: string
   /** Append the free-intro launch-window line under the CTA while the flag is on. */
   ctaLaunchLine?: boolean
-  highlighted: boolean
+  /**
+   * A commercial claim, not a UI state: this is the tier we actually sell most
+   * of, and it carries the "Most popular" badge.
+   *
+   * This used to be called `highlighted` and drove both the badge and every
+   * piece of accent styling on the card — which meant the Drift Retainer's card
+   * was lit whichever engagement you had arrived to read, because it is the
+   * only tier with the flag and (deliberately) the only one with no anchor. The
+   * fix is not to let the flag follow the URL: that would tell a visitor who
+   * clicked "Advisory Briefing" that the Advisory Briefing is the most popular
+   * product, which is false. Popularity and selection are now two signals with
+   * two treatments — see `selectedAnchor` in the component.
+   */
+  popular?: boolean
+  /** Full page for this engagement, where one exists instead of an anchor. */
+  href?: string
 }
 
 const tiers: Tier[] = [
@@ -285,7 +300,6 @@ const tiers: Tier[] = [
       'Follow-up summary document',
     ],
     cta: 'Request a briefing',
-    highlighted: false,
   },
   {
     name: 'The Exposure Diagnostic',
@@ -303,9 +317,12 @@ const tiers: Tier[] = [
       'Written report (15–25 pages) with executive summary and prioritised actions',
       '30-day follow-up call',
     ],
-    pathNote: 'Designed as an on-ramp: the diagnostic scopes naturally into a Drift Retainer, and its fee is credited toward your first quarter.',
+    // Standalone first, credit second (owner's decision, 2026-09-04). This
+    // used to read "Designed as an on-ramp", which defined the product by the
+    // thing it leads to rather than by what it is.
+    pathNote: 'Stands on its own — and the fee is credited toward your first quarter if you go on to a Drift Retainer.',
     cta: 'Request a diagnostic',
-    highlighted: false,
+    href: '/advisory/exposure-diagnostic',
   },
   {
     name: 'The Drift Retainer',
@@ -324,7 +341,7 @@ const tiers: Tier[] = [
     ],
     cta: 'Book a 25-minute conversation',
     ctaLaunchLine: true,
-    highlighted: true,
+    popular: true,
   },
   {
     name: 'Strategic Assessment',
@@ -343,7 +360,7 @@ const tiers: Tier[] = [
       'Transitions into a Drift Retainer for ongoing oversight',
     ],
     cta: 'Request a proposal',
-    highlighted: false,
+    href: '/advisory/strategic-assessment',
   },
 ]
 
@@ -360,6 +377,24 @@ export default function ServicesPage() {
   const [formQueued, setFormQueued] = useState(false)
   const [formLoading, setFormLoading] = useState(false)
   const [formError, setFormError] = useState('')
+
+  /**
+   * Which tier the visitor actually asked for, read off the URL fragment.
+   *
+   * Read on mount as well as on `hashchange`, because the two ways in differ:
+   * arriving from the header dropdown on another page is a fresh mount with the
+   * hash already set and fires no event, while clicking within the page fires
+   * the event without remounting. Handling only one of them covers exactly half
+   * the traffic — and it is the mount case that the dropdown uses.
+   */
+  const [selectedAnchor, setSelectedAnchor] = useState('')
+
+  useEffect(() => {
+    const readHash = () => setSelectedAnchor(window.location.hash.replace(/^#/, ''))
+    readHash()
+    window.addEventListener('hashchange', readHash)
+    return () => window.removeEventListener('hashchange', readHash)
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -396,7 +431,12 @@ export default function ServicesPage() {
       }
 
       setFormSubmitted(true)
-      window.plausible?.('Contact Form Submit')
+      // The engagement rides as a prop. Without it this goal counted advisory
+      // leads in one undifferentiated bucket, so there was no way to tell a
+      // £450 briefing enquiry from a £25,000 board mandate in analytics.
+      window.plausible?.('Contact Form Submit', {
+        props: { engagement: formData.engagement || 'Unspecified' },
+      })
     } catch (err) {
       setFormError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
     } finally {
@@ -900,7 +940,10 @@ export default function ServicesPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {tiers.map((tier, idx) => (
+              {tiers.map((tier, idx) => {
+                const isPopular = tier.popular === true
+                const isSelected = Boolean(tier.anchor) && tier.anchor === selectedAnchor
+                return (
                 <motion.div
                   key={tier.name}
                   id={tier.anchor}
@@ -910,18 +953,38 @@ export default function ServicesPage() {
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.1 }}
                 >
-                  <Card className={`card-interactive h-full ${tier.highlighted ? 'bg-slate-deep border-silicon-amber' : 'bg-stone-charcoal border-border-subtle'}`}>
+                  {/* Two signals, two treatments. Amber fill = "most popular",
+                      a standing commercial claim. Cyan ring = "this is the one
+                      you asked for" — the same colour the header uses for the
+                      active nav item, so arriving from that menu reads as one
+                      gesture. `aria-current` carries it for anyone who cannot
+                      see either colour. */}
+                  <Card
+                    aria-current={isSelected ? 'true' : undefined}
+                    className={`card-interactive h-full ${
+                      isPopular
+                        ? 'bg-slate-deep border-silicon-amber'
+                        : 'bg-stone-charcoal border-border-subtle'
+                    } ${isSelected ? 'ring-2 ring-silicon-cyan ring-offset-2 ring-offset-stone-charcoal' : ''}`}
+                  >
                     <CardHeader>
-                      {tier.highlighted && (
-                        <Badge className="w-fit mb-2 bg-accent-fill text-ink-on-accent">
-                          Most Popular
-                        </Badge>
-                      )}
+                      <div className="mb-2 flex flex-wrap items-center gap-2 empty:hidden">
+                        {isPopular && (
+                          <Badge className="w-fit bg-accent-fill text-ink-on-accent">
+                            Most Popular
+                          </Badge>
+                        )}
+                        {isSelected && (
+                          <Badge variant="outline" className="w-fit border-silicon-cyan text-silicon-cyan">
+                            You selected this
+                          </Badge>
+                        )}
+                      </div>
                       <CardTitle className="text-xl text-text-primary">
                         {tier.name}
                       </CardTitle>
                       <div className="mt-1">
-                        <span className={`font-mono text-base font-semibold ${tier.highlighted ? 'text-silicon-amber-strong' : 'text-text-primary'}`}>
+                        <span className={`font-mono text-base font-semibold ${isPopular ? 'text-silicon-amber-strong' : 'text-text-primary'}`}>
                           {tier.price}
                         </span>
                         {tier.priceNote && (
@@ -945,7 +1008,7 @@ export default function ServicesPage() {
                       <ul className="space-y-2">
                         {tier.features.map((feature, i) => (
                           <li key={i} className="flex items-start gap-2 text-sm text-text-primary">
-                            <CheckCircle className={`w-4 h-4 flex-shrink-0 mt-0.5 ${tier.highlighted ? 'text-silicon-amber-strong' : 'text-stone-teal'}`} />
+                            <CheckCircle className={`w-4 h-4 flex-shrink-0 mt-0.5 ${isPopular ? 'text-silicon-amber-strong' : 'text-stone-teal'}`} />
                             {feature}
                           </li>
                         ))}
@@ -953,7 +1016,7 @@ export default function ServicesPage() {
                       {tier.pathNote && (
                         <p className="text-xs italic text-text-muted">{tier.pathNote}</p>
                       )}
-                      <div className="mt-auto">
+                      <div className="mt-auto space-y-2">
                         {/* The href still does the scrolling, so this works
                             without JS; the click only preselects the tier the
                             visitor just asked for. */}
@@ -963,13 +1026,25 @@ export default function ServicesPage() {
                           onClick={() => setFormData((prev) => ({ ...prev, engagement: tier.engagement }))}
                         >
                           <Button
-                            className={`w-full ${tier.highlighted ? 'bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90' : 'bg-surface-elevated text-text-primary hover:bg-surface-elevated/80'}`}
+                            className={`w-full ${isPopular ? 'bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90' : 'bg-surface-elevated text-text-primary hover:bg-surface-elevated/80'}`}
                           >
                             {tier.cta}
                           </Button>
                         </a>
+                        {/* The two engagements that own a page say so here —
+                            a card cannot carry a considered purchase and this
+                            is the route to the one that can. */}
+                        {tier.href && (
+                          <Link
+                            href={tier.href}
+                            className="flex items-center justify-center gap-1 text-sm text-stone-teal hover:underline"
+                          >
+                            Full details
+                            <ArrowRight className="h-3 w-3" />
+                          </Link>
+                        )}
                         {tier.ctaLaunchLine && FREE_INTRO_WINDOW && (
-                          <p className="mt-2 text-center text-xs italic text-text-muted">
+                          <p className="text-center text-xs italic text-text-muted">
                             Free during our launch window — the first ninety days.
                           </p>
                         )}
@@ -977,7 +1052,8 @@ export default function ServicesPage() {
                     </CardContent>
                   </Card>
                 </motion.div>
-              ))}
+                )
+              })}
             </div>
 
             {/* Bespoke / enterprise band — the top of the ladder above the

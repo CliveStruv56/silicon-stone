@@ -218,7 +218,11 @@ export const ENGAGEMENTS: Offering[] = [
     priceNote: 'custom scope',
     summary:
       'Where your dependency on specific vendors, models and jurisdictions becomes an operating constraint — with a 15–25 page report and a 30-day follow-up call.',
-    href: '/advisory#diagnostic',
+    // Its own page since 2026-09-04, not an anchor on /advisory. It is the same
+    // price as the Post-Omnibus Briefing, which has had `/eu-exposure` all
+    // along, and it was carrying 84 words in a four-across grid cell. Both the
+    // header nav and /pricing render this `href`, so they follow from here.
+    href: '/advisory/exposure-diagnostic',
     terms: [
       'Fee credited toward your first quarter on the Drift Retainer.',
     ],
@@ -260,7 +264,8 @@ export const ENGAGEMENTS: Offering[] = [
     priceNote: 'then transitions to retainer',
     summary:
       'The deep one-off for a high-stakes decision: multi-framework analysis, a 40-page report, a board-ready presentation and an implementation roadmap.',
-    href: '/advisory#assessment',
+    /** Own page since 2026-09-04 — see the Exposure Diagnostic note above. */
+    href: '/advisory/strategic-assessment',
     terms: [
       'Framework-neutral and vendor-agnostic — we sell no software and take no referral fees.',
     ],
