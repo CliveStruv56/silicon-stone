@@ -674,6 +674,21 @@ Verified in a browser at 1440px, not only in the suite: `/pricing`, `/products`,
 `/advisory/drift-retainer`. 1,527 tests green; `npm run build` green including
 every `prebuild` guard.
 
+**Verified on production**, `dpl_279E4L5RQbcwkMU1KQJvzW6L7ex7` — Ready, built in
+2m, aliased to the bare apex. Checked by `curl` against `siliconandstone.com`
+rather than by reading the build log, which matters here: Vercel had a build in
+flight about a minute *before* the push landed, so the deployment's timestamp
+alone could not tell you which commit it carried. What settles it is the content
+— the live pages serve the new figures:
+
+| Surface | Asserted on production |
+|---|---|
+| `/products/ai-act-toolkit` | **£275** twice (tier table + Buy button), zero `£149`, no consultant's-time line |
+| `/pricing` | "Standard · £275 Professional"; European Procurement Readiness, Intro conversation and WaymarkPath all present |
+| `/pricing`, `/advisory`, `/advisory/drift-retainer` | **From £2,000** everywhere; no bare rate survives |
+| `/products` | four cards, Compliance Checker Evidence Pack among them |
+| `/products/ai-audit-checklist` | zero occurrences of "business book" |
+
 ### September 4, 2026 — A refunds position, and four guards over the gaps left behind
 
 The day's earlier work — four engagement pages, the WaymarkPath rebuild, the
