@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { AdvisoryNextStep } from '@/components/products/AdvisoryNextStep'
 import { EarlyAccessCTA } from '@/components/products/EarlyAccessCTA'
-import { GuaranteeNote } from '@/components/products/GuaranteeNote'
 import { isConfiguredCheckout } from '@/lib/checkout'
 import { PRE_LAUNCH } from '@/lib/flags'
 import {
@@ -142,9 +141,6 @@ export default function AIActToolkitPage() {
                 <p className="text-xs text-text-muted mt-3">
                   Professional includes a 30-minute video walkthrough.
                 </p>
-                <div className="mt-4">
-                  <GuaranteeNote />
-                </div>
               </div>
 
               <div className="bg-stone-charcoal border border-border-subtle rounded-xl p-8">
@@ -349,9 +345,6 @@ export default function AIActToolkitPage() {
                     buttonClassName="border-stone-teal text-stone-teal hover:bg-stone-teal/10"
                   />
                 )}
-              </div>
-              <div className="mb-6 flex justify-center">
-                <GuaranteeNote className="justify-center" />
               </div>
               <p className="text-sm text-text-muted">
                 Not sure yet?{' '}

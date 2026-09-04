@@ -129,10 +129,6 @@ export default async function PurchaseSuccessPage({
             </Link>{' '}
             and we&rsquo;ll sort it.
           </p>
-          <p className="mt-3 text-sm italic text-text-muted">
-            If it doesn&rsquo;t earn its price, email within 30 days for a full refund. No
-            forms, no questions.
-          </p>
         </section>
       </main>
 
