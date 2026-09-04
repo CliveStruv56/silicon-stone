@@ -7,7 +7,11 @@ import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/layout/ThemeToggle'
 import { AMOUNTS, gbp, priceOf } from '@/lib/offering'
 
-type NavChild = { name: string; href: string; note?: string }
+// `sister` marks an entry that is adjacent to the ladder rather than a rung on
+// it — WaymarkPath is a separate product, not a fourth thing to buy here. It
+// renders in the indigo the rest of the site reserves for that cross-link
+// (--sister-indigo), so the dropdown does not read as if we sell it.
+type NavChild = { name: string; href: string; note?: string; sister?: boolean }
 
 type NavItem = {
   name: string
@@ -49,6 +53,7 @@ const primaryNavigation: NavItem[] = [
       { name: 'AI Act Compliance Toolkit', href: '/products/ai-act-toolkit', note: `From ${priceOf('ai-act-toolkit')}` },
       { name: 'Sector Reports', href: '/products/sector-reports', note: 'Coming soon' },
       { name: 'All products', href: '/products' },
+      { name: 'WaymarkPath', href: '/waymarkpath', note: 'Early access', sister: true },
     ],
   },
   {
@@ -174,7 +179,9 @@ export function Header() {
                 <Link
                   key={child.name}
                   href={child.href}
-                  className="block rounded-md px-3 py-2 text-sm text-text-muted transition-colors hover:bg-surface-elevated hover:text-text-primary whitespace-nowrap"
+                  className={`block rounded-md px-3 py-2 text-sm transition-colors hover:bg-surface-elevated hover:text-text-primary whitespace-nowrap ${
+                    child.sister ? 'text-sister-indigo' : 'text-text-muted'
+                  }`}
                 >
                   {child.name}
                   {child.note && (
@@ -303,7 +310,9 @@ export function Header() {
                       <Link
                         key={child.name}
                         href={child.href}
-                        className="block py-1.5 text-sm text-text-muted hover:text-text-primary"
+                        className={`block py-1.5 text-sm hover:text-text-primary ${
+                          child.sister ? 'text-sister-indigo' : 'text-text-muted'
+                        }`}
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         {child.name}

@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { StaggerContainer, StaggerItem } from '@/components/ui/StaggerContainer'
+import { FlowRibbon } from '@/components/waymarkpath'
 import {
   Shield,
   ClipboardCheck,
@@ -210,14 +211,18 @@ export default function ProductsPage() {
                         <p className="mt-2 max-w-2xl text-text-muted leading-relaxed">
                           The career-transition companion for the individual
                           professional navigating the same shifts these products
-                          address at company level.
+                          address at company level. Most tools solve one piece of
+                          a career change; these seven stages share the same
+                          context, so what one settles the next one already knows.
                         </p>
 
-                        <ul className="mt-5 grid gap-2 sm:grid-cols-3">
+                        <FlowRibbon className="mt-6 max-w-2xl" />
+
+                        <ul className="mt-6 grid gap-2 sm:grid-cols-3">
                           {[
-                            'Skills gap analysis, ranked by priority',
-                            'A roadmap with milestones and progress tracking',
-                            'Daily AI check-ins that hold the plan together',
+                            'Gap analysis against ESCO, the EU’s 13,890-skill classification',
+                            'A CV scored against the filters that reject it before a human reads it',
+                            'A daily coach that carries your history instead of starting cold',
                           ].map((item) => (
                             <li key={item} className="flex items-start gap-2 text-sm text-text-muted">
                               <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-sister-indigo" />
@@ -227,7 +232,10 @@ export default function ProductsPage() {
                         </ul>
                       </div>
 
-                      <div className="flex-shrink-0">
+                      <div className="flex flex-shrink-0 flex-col items-start gap-2 lg:items-end">
+                        <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-text-muted">
+                          Early access
+                        </span>
                         <span className="inline-flex items-center gap-2 rounded-md border border-sister-indigo/40 px-4 py-2 text-sm font-medium text-sister-indigo transition-colors group-hover:bg-sister-indigo/10">
                           See WaymarkPath
                           <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />

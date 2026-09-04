@@ -1,177 +1,186 @@
-'use client'
-
-import { useState } from 'react'
+import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Header, Footer } from '@/components/layout'
-import { submitWithOfflineQueue } from '@/lib/offline/submit'
-import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import {
-  User,
-  BarChart3,
-  Target,
-  BookOpen,
-  FileText,
-  MessageCircle,
-  ArrowRight,
-  CheckCircle,
-  Loader2,
-} from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 
-const features = [
+import { Header, Footer } from '@/components/layout'
+import { Badge } from '@/components/ui/badge'
+import { StaggerContainer, StaggerItem } from '@/components/ui/StaggerContainer'
+import { ConnectedSystem, FlowRibbon, WaymarkPathSignup } from '@/components/waymarkpath'
+import { WAYMARKPATH_PROOF } from '@/lib/waymarkpath'
+
+/**
+ * The WaymarkPath page.
+ *
+ * This is a server component: every interactive part (the two signup forms, the
+ * connected-system diagram) is a client component of its own. It used to be
+ * `'use client'` with the form inline and rendered twice off one piece of
+ * state, so submitting the hero form turned the closing CTA into a success
+ * panel. Metadata moved back here from a sibling `layout.tsx` that existed only
+ * to work around the client boundary.
+ *
+ * Colour register is `--sister-indigo` throughout, not the S&S amber/teal. The
+ * design system reserves that token for WaymarkPath specifically, so the page
+ * reads as a sister product rather than as another Silicon and Stone line.
+ */
+
+export const metadata: Metadata = {
+  title: 'WaymarkPath — Career Navigation for the AI Shift | Silicon and Stone',
+  description:
+    'A career-transition companion for mid-career professionals: skills measured against ESCO, gaps ranked, a CV that clears the filters, and a coach that carries your history.',
+  alternates: { canonical: '/waymarkpath' },
+}
+
+const FRICTIONS = [
   {
-    icon: User,
-    title: 'Profile & Goals',
-    description: 'Define where you are and where you want to be. Set your target role, timeline, and constraints.',
+    title: 'Which experience actually transfers',
+    body: 'Twenty years of work does not come labelled for the role you are moving into. Most of it transfers. The difficulty is establishing which parts, in the vocabulary the target role recognises.',
   },
   {
-    icon: BarChart3,
-    title: 'Skills Inventory',
-    description: 'Catalogue your existing skills with proficiency levels. See what you already bring to the table.',
+    title: 'What to learn first',
+    body: 'There is more available training than there is time. Without a ranking, effort goes to whatever is nearest to hand rather than to whatever is actually blocking the move.',
   },
   {
-    icon: Target,
-    title: 'Gap Analysis',
-    description: 'AI-powered comparison showing transferable strengths and critical skill gaps, ranked by priority.',
+    title: 'Why applications go unanswered',
+    body: 'Most applications are filtered before a person reads them. A CV can be accurate, well written and still fail on formatting the applicant never gets to see.',
   },
   {
-    icon: BookOpen,
-    title: 'Learning Path',
-    description: 'Curated resources and roadmap milestones for closing skill gaps, with progress tracking.',
-  },
-  {
-    icon: FileText,
-    title: 'Resume & Applications',
-    description: 'Upload your CV, generate ATS-optimised versions, save job listings, and create tailored cover letters.',
-  },
-  {
-    icon: MessageCircle,
-    title: 'Daily Check-ins',
-    description: 'Conversational AI coaching with streak tracking and accountability. Stay on course, every day.',
+    title: 'What holds it together over months',
+    body: 'A transition runs across months of ordinary working weeks. Human coaching is the usual answer to that, at an hourly rate that rules it out for most of the people who need it.',
   },
 ]
 
+const AUDIENCE = [
+  'Directors considering a pivot',
+  'Managers upskilling into AI roles',
+  'Technical leads moving to strategy',
+  'Anyone 35–55 navigating career change',
+]
+
 export default function WaymarkPathPage() {
-  const [email, setEmail] = useState('')
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'queued' | 'error'>('idle')
-  const [errorMsg, setErrorMsg] = useState('')
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setStatus('loading')
-    setErrorMsg('')
-
-    try {
-      const result = await submitWithOfflineQueue('/api/subscribe', {
-        email,
-        tag: 'WaymarkPath_Early_Access',
-      })
-      if (result.queued) {
-        setStatus('queued')
-        setEmail('')
-        return
-      }
-      const res = result.response
-
-      if (!res.ok) {
-        const data = await res.json()
-        throw new Error(data.error || 'Failed to subscribe')
-      }
-
-      setStatus('success')
-      setEmail('')
-      window.plausible?.('WaymarkPath Signup')
-    } catch (err) {
-      setStatus('error')
-      setErrorMsg(err instanceof Error ? err.message : 'Something went wrong')
-    }
-  }
-
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex min-h-screen flex-col">
       <Header />
 
       <main className="flex-1">
         {/* Hero */}
-        <section className="bg-slate-deep border-b border-border-subtle">
-          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+        <section className="border-b border-border-subtle bg-slate-deep">
+          <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8 lg:py-20">
             <div className="max-w-3xl">
-              <Badge className="mb-4 bg-silicon-amber/20 text-silicon-amber-strong border-silicon-amber/30">
-                Early Access — Coming Soon
-              </Badge>
-              <h1 className="text-4xl font-bold text-text-primary sm:text-5xl lg:text-6xl leading-tight mb-6">
-                WaymarkPath
+              <div className="mb-5 flex flex-wrap items-center gap-3">
+                <span className="font-mono text-sm uppercase tracking-[0.18em] text-sister-indigo">
+                  WaymarkPath
+                </span>
+                <Badge className="border-sister-indigo/30 bg-sister-indigo/15 text-sister-indigo">
+                  Early access
+                </Badge>
+              </div>
+
+              <h1 className="mb-6 text-4xl font-bold leading-tight text-text-primary sm:text-5xl lg:text-[3.4rem]">
+                Seven stages of a career change, working from one set of facts
+                about you.
               </h1>
-              <p className="text-2xl text-text-muted leading-relaxed mb-2">
-                Your AI-powered career transition companion.
-              </p>
-              <p className="text-lg text-text-muted leading-relaxed mb-8">
-                For mid-career professionals navigating significant career changes.
-                Personalised AI coaching, structured roadmaps, skills gap analysis,
-                and daily accountability check-ins&mdash;transforming an overwhelming
-                career pivot into a clear, achievable path.
+
+              <p className="mb-4 text-xl leading-relaxed text-text-muted">
+                A transition companion for mid-career professionals. It catalogues
+                what you already have, measures it against what the target role
+                requires, and keeps the plan alive through the months that takes.
               </p>
 
-              {/* Signup form */}
-              {status === 'success' || status === 'queued' ? (
-                <div className="flex items-center gap-3 p-4 rounded-lg bg-stone-teal/10 border border-stone-teal/30">
-                  <CheckCircle className="w-5 h-5 text-stone-teal flex-shrink-0" />
-                  <p className="text-stone-teal">
-                    {status === 'queued'
-                      ? "You're offline — your signup will send when the connection returns."
-                      : "You're on the list. We'll notify you when early access opens."}
-                  </p>
-                </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-lg">
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="your@email.com"
-                    required
-                    className="flex-1 rounded-md border border-border-subtle bg-stone-charcoal px-4 py-3 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-silicon-amber"
-                  />
-                  <Button
-                    type="submit"
-                    disabled={status === 'loading'}
-                    size="lg"
-                    className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90 font-semibold whitespace-nowrap"
-                  >
-                    {status === 'loading' ? (
-                      <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Joining...</>
-                    ) : (
-                      'Get Early Access'
-                    )}
-                  </Button>
-                </form>
-              )}
-
-              {status === 'error' && (
-                <p className="text-sm text-alert-red mt-2">{errorMsg}</p>
-              )}
-
-              <p className="text-xs text-text-muted mt-3">
-                No spam. We&apos;ll only email you about WaymarkPath launch updates.
+              <p className="mb-9 leading-relaxed text-text-muted">
+                Silicon and Stone reads the technology shift at company level.
+                WaymarkPath reads it at the level of a single career — a separate
+                product, built by the same hand.
               </p>
+
+              <WaymarkPathSignup id="hero" />
+
+              <FlowRibbon className="mt-12 max-w-2xl" />
             </div>
           </div>
         </section>
 
+        {/* The frictions */}
+        <section className="border-b border-border-subtle bg-stone-charcoal/40">
+          <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8 lg:py-16">
+            <div className="mb-10 max-w-2xl">
+              <h2 className="mb-4 text-3xl font-bold text-text-primary">
+                Career changes rarely fail for lack of effort
+              </h2>
+              <p className="text-lg leading-relaxed text-text-muted">
+                They fail on four specific unknowns, and none of them resolve by
+                trying harder.
+              </p>
+            </div>
+
+            <StaggerContainer className="grid gap-5 sm:grid-cols-2">
+              {FRICTIONS.map((item) => (
+                <StaggerItem key={item.title}>
+                  <div className="card-interactive h-full rounded-xl border border-border-subtle bg-stone-charcoal p-6">
+                    <h3 className="mb-2 font-semibold text-text-primary">{item.title}</h3>
+                    <p className="text-sm leading-relaxed text-text-muted">{item.body}</p>
+                  </div>
+                </StaggerItem>
+              ))}
+            </StaggerContainer>
+          </div>
+        </section>
+
+        {/* The connected system — the centrepiece */}
+        <section className="border-b border-border-subtle">
+          <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8 lg:py-20">
+            <div className="mb-10 max-w-2xl">
+              <span className="mb-3 block font-mono text-[12px] uppercase tracking-[0.12em] text-sister-indigo">
+                How it fits together
+              </span>
+              <h2 className="mb-4 text-3xl font-bold text-text-primary">
+                Most tools solve one piece of this
+              </h2>
+              <p className="text-lg leading-relaxed text-text-muted">
+                A CV checker does not know what you are aiming at. A course
+                catalogue does not know what you already have. Here the gap
+                analysis sets the learning order, the same strengths reframe the
+                CV, and the coach sees all of it. Select a stage to see what it
+                settles and what receives it.
+              </p>
+            </div>
+
+            <ConnectedSystem />
+          </div>
+        </section>
+
+        {/* Proof */}
+        <section className="border-b border-border-subtle bg-stone-charcoal/40">
+          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-14">
+            <StaggerContainer className="grid gap-6 md:grid-cols-3">
+              {WAYMARKPATH_PROOF.map((item) => (
+                <StaggerItem key={item.label}>
+                  <div className="h-full border-l-2 border-sister-indigo/40 pl-5">
+                    <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-text-muted">
+                      {item.label}
+                    </span>
+                    <p className="mt-1 text-xl font-semibold text-text-primary">{item.value}</p>
+                    <p className="mt-2 text-sm leading-relaxed text-text-muted">{item.note}</p>
+                  </div>
+                </StaggerItem>
+              ))}
+            </StaggerContainer>
+          </div>
+        </section>
+
         {/* Who it's for */}
-        <section className="bg-stone-charcoal/50 border-b border-border-subtle">
+        <section className="border-b border-border-subtle">
           <div className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8">
-              <span className="font-mono text-xs uppercase tracking-wider text-text-muted">Built for:</span>
+            <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-8">
+              <span className="font-mono text-xs uppercase tracking-wider text-text-muted">
+                Built for:
+              </span>
               <div className="flex flex-wrap gap-3">
-                {[
-                  'Directors considering a pivot',
-                  'Managers upskilling into AI roles',
-                  'Technical leads moving to strategy',
-                  'Anyone 35\u201355 navigating career change',
-                ].map((who) => (
-                  <Badge key={who} variant="outline" className="border-border-subtle text-text-muted text-xs">
+                {AUDIENCE.map((who) => (
+                  <Badge
+                    key={who}
+                    variant="outline"
+                    className="border-border-subtle text-xs text-text-muted"
+                  >
                     {who}
                   </Badge>
                 ))}
@@ -180,128 +189,27 @@ export default function WaymarkPathPage() {
           </div>
         </section>
 
-        {/* Features grid */}
-        <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
-          <div className="text-center max-w-2xl mx-auto mb-8">
-            <h2 className="text-3xl font-bold text-text-primary mb-4">
-              Six Steps to Your Next Chapter
-            </h2>
-            <p className="text-lg text-text-muted">
-              WaymarkPath breaks down the complexity of career transition into
-              structured, manageable stages&mdash;with AI coaching at every step.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature, idx) => {
-              const Icon = feature.icon
-              return (
-                <Card key={feature.title} className="bg-stone-charcoal border-border-subtle">
-                  <CardContent className="pt-6">
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className="font-mono text-xs text-silicon-amber-strong">0{idx + 1}</span>
-                      <Icon className="w-5 h-5 text-stone-teal" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-text-primary mb-2">
-                      {feature.title}
-                    </h3>
-                    <p className="text-sm text-text-muted">{feature.description}</p>
-                  </CardContent>
-                </Card>
-              )
-            })}
-          </div>
-        </section>
-
-        {/* How it works */}
-        <section className="bg-stone-charcoal">
-          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
-            <div className="max-w-3xl mx-auto">
-              <h2 className="text-2xl font-bold text-text-primary mb-8 text-center">
-                From Overwhelm to Orchestration
+        {/* Closing CTA */}
+        <section className="bg-slate-deep">
+          <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8 lg:py-16">
+            <div className="max-w-2xl">
+              <h2 className="mb-4 text-2xl font-bold text-text-primary">
+                Join the early access list
               </h2>
-              <div className="space-y-6">
-                {[
-                  {
-                    step: '01',
-                    title: 'Audit your position',
-                    description: 'Map your current skills, experience, and transferable strengths against your target role.',
-                  },
-                  {
-                    step: '02',
-                    title: 'Identify the gaps',
-                    description: 'AI analysis surfaces the critical skill gaps ranked by impact on your career transition.',
-                  },
-                  {
-                    step: '03',
-                    title: 'Build your roadmap',
-                    description: 'A personalised learning path with milestones, resources, and realistic timelines.',
-                  },
-                  {
-                    step: '04',
-                    title: 'Execute daily',
-                    description: 'AI coaching check-ins keep you accountable and on track. Streaks build momentum.',
-                  },
-                ].map((item) => (
-                  <div key={item.step} className="flex gap-4">
-                    <div className="font-mono text-2xl font-bold text-silicon-amber-strong/30 flex-shrink-0 w-10">
-                      {item.step}
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-text-primary mb-1">{item.title}</h3>
-                      <p className="text-sm text-text-muted">{item.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Bottom CTA */}
-        <section className="bg-slate-deep border-t border-border-subtle">
-          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-14">
-            <div className="text-center max-w-2xl mx-auto">
-              <h2 className="text-2xl font-bold text-text-primary mb-4">
-                Be First In
-              </h2>
-              <p className="text-text-muted mb-8">
-                WaymarkPath is in active development. Join the early access list
-                to be notified when the first version launches.
+              <p className="mb-8 leading-relaxed text-text-muted">
+                WaymarkPath is in late development: all seven stages are built,
+                and the billing and account work is the remainder. The early
+                access list gets it first, and gets asked what is missing while
+                that still changes the product.
               </p>
 
-              {status === 'success' || status === 'queued' ? (
-                <div className="flex items-center justify-center gap-3 p-4 rounded-lg bg-stone-teal/10 border border-stone-teal/30 max-w-md mx-auto">
-                  <CheckCircle className="w-5 h-5 text-stone-teal flex-shrink-0" />
-                  <p className="text-stone-teal">
-                    {status === 'queued' ? 'Signup queued — sends when you reconnect.' : "You're on the list."}
-                  </p>
-                </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="your@email.com"
-                    required
-                    className="flex-1 rounded-md border border-border-subtle bg-stone-charcoal px-4 py-3 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-silicon-amber"
-                  />
-                  <Button
-                    type="submit"
-                    disabled={status === 'loading'}
-                    className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90 font-semibold"
-                  >
-                    {status === 'loading' ? 'Joining...' : 'Get Early Access'}
-                  </Button>
-                </form>
-              )}
+              <WaymarkPathSignup id="closing" />
 
-              <p className="text-sm text-text-muted mt-8">
-                Already using Silicon and Stone?{' '}
+              <p className="mt-10 text-sm text-text-muted">
+                Here for the company-level view?{' '}
                 <Link href="/intelligence" className="text-stone-teal hover:underline">
                   Explore the Intelligence Stream
-                  <ArrowRight className="w-3 h-3 inline ml-1" />
+                  <ArrowRight className="ml-1 inline h-3 w-3" />
                 </Link>
               </p>
             </div>

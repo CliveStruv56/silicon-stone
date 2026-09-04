@@ -569,6 +569,53 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### September 4, 2026 — WaymarkPath stops being sold as vapourware
+
+`/waymarkpath` described a product that did not exist yet. It does: in
+`~/Projects/WaymarkPath-Implementation`, Milestones 0–7 are complete — Profile &
+Goals, Skills Inventory, Gap Analysis, Learning Path, Resume Hub, Job Tracker,
+Daily Check-ins — with Milestone 8 (Stripe) part-built. The site was
+understating a nearly finished product, and three things followed from that.
+
+**The page had no animation at all.** No framer-motion, no `StaggerContainer`,
+no `card-interactive`, on a site where every other significant page moves. It
+also used the S&S amber/teal accents, contradicting the one rule the design
+system states about this product: `--sister-indigo` exists specifically so
+WaymarkPath reads as a *sister* product rather than a fourth S&S line.
+
+**A live bug: the email form was rendered twice off one piece of state.**
+Submitting the hero form silently turned the closing CTA into a success panel.
+Extracting `WaymarkPathSignup` and rendering two instances fixes it, and the
+walk-through now asserts the closing form survives a hero submit. The page also
+dropped `'use client'` and became a server component; its `layout.tsx`, which
+existed only to carry metadata across that boundary, is gone.
+
+**`src/lib/waymarkpath.ts` is the new single source.** Three surfaces describe
+the same seven capabilities, so the copy lives once, the way prices live once in
+`offering.ts`. Its `feeds` field is load-bearing rather than decorative: it
+records which stage hands its output to which, and that relationship is what
+`ConnectedSystem` draws. WaymarkPath's actual claim is that the seven share
+context; a feature grid asserts that and shows seven disconnected boxes.
+
+Also: `FlowRibbon` (the compact motif, reused in the Products band),
+`WAYMARKPATH_PROOF` (ESCO's 13,890 skills, O*NET bridging — the evidence the
+page leans on in place of testimonials it does not have), and WaymarkPath added
+to the Products dropdown. That last one carries a new `sister` flag on
+`NavChild` rather than being a plain fourth entry, because the design system is
+explicit that WaymarkPath is adjacent to the Read → Use → Buy → Engage ladder
+and not a rung on it. `mobileNavigation` spreads the same array, so desktop and
+mobile both got it from the one addition.
+
+**Do not reuse `EarlyAccessCTA` for this form.** It looks like exactly the right
+component and posts `tags: ['early-access', tierTag]` firing `Early Access
+Request`; this one posts `tag: 'WaymarkPath_Early_Access'` firing `WaymarkPath
+Signup`, both configured by exact string outside the repo. Consolidating them
+would retire a live Plausible goal silently.
+
+Still a waitlist, deliberately: `WAYMARKPATH_HREF` points internally, because
+the app's own Vercel deployment currently serves a stale build and its latest
+deploy errored. Flipping that constant is the whole change when it is fixed.
+
 ### September 4, 2026 — The 3×2 method stops reading as a separate product
 
 `/advisory` sold two things that never met. The Drift Retainer section cited
