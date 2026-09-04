@@ -2,6 +2,71 @@
 
 > Track every change shipped as part of the 2026 homepage redesign here. Append-only.
 
+## 2026-09-04 — Series reached the homepage and `/intelligence`
+
+Series shipped that morning reachable from exactly two places: the Intelligence
+dropdown and the footer. The homepage had no entry point, and `/intelligence` —
+the page a reader actually lands on to browse — contained the word nowhere. A
+reading path nobody can find is a reading path nobody reads.
+
+- Files changed: `src/components/series/SeriesPromo.tsx` (new),
+  `src/lib/series-promo.ts` (new), `src/lib/series.ts`,
+  `src/app/(website)/page.tsx`,
+  `src/app/(website)/intelligence/page.tsx`,
+  `src/app/(website)/intelligence/IntelligenceFeed.tsx`,
+  `src/app/(website)/intelligence/series/page.tsx`, `src/lib/series.test.ts`
+- Requested by: Clive
+- Notes:
+  - **The hero copy on `/intelligence` was not merely missing a link — it had
+    become untrue.** The sentence sets out to enumerate the ways into the
+    archive ("by topic, by tier …, or by the role it serves"), and the newest
+    one was not in it. It now ends "…or as a **series**, in the order the
+    argument was built", with the word linked.
+  - **One component, two surfaces.** `SeriesPromo` renders the band on both, fed
+    by one server fetch (`getSeriesPromo`) that reuses `SERIES_INDEX_QUERY` — so
+    the order the library lists series in cannot disagree with the order the
+    promos pick from. The `urlFor` call lives there once; a second hand-written
+    copy of it is the shape of drift this repo has paid for before.
+  - **It renders nothing when no series exist.** Not a heading over an empty
+    list — the rule `verifyReport` follows when it drops the whole GDPR block.
+    Verified by stubbing the fetch to `[]` and loading both pages: no heading,
+    no stray eyebrow text. The library page may say "No series published yet"
+    because that is what a reader went there to learn; a promo on another page
+    may not.
+  - **It degrades in both directions.** One series today, so the featured one
+    gets the row and any others collapse into "All N series". The second series
+    changes the copy, not the layout.
+  - **Placement on the homepage: straight after the tier ladder.** That block is
+    the homepage's answer to "how do I read this?", and it only ever answered by
+    *length* — Pulse, Briefing, Audit. A series answers by *sequence*. Anywhere
+    further down it would compete with the Buy and Engage bands, which is a
+    different question.
+  - **Placement on `/intelligence` moved the same day, and the second position
+    is right.** It went in above `ThreeReadings` — a reading path belongs with
+    the reading modes, and height above the feed is scarce, the first article
+    being ~1,700px down at 1440px. Both true, both the wrong tie-break: how to
+    read a single briefing is what every reader needs; a series is one route
+    some will want. Order is now hero → Three Readings (433px) → series (823px)
+    → Find Your Perspective (1,172px) → filters → feed.
+  - **The first cut was 389px against a 150px estimate**, which is a different
+    trade on a page that already scrolls two screens to an article. Hence the
+    `compact` variant — eyebrow and heading on one line, no intro paragraph,
+    266px — used on `/intelligence` only. The homepage has no such preamble and
+    keeps the full form.
+  - **A duplicate rule, caught while building.** `partsLabel` — "6 parts · 5
+    published", and the rule that the published count appears *only* when it
+    differs from the total — already existed on the series index, and was
+    written a second time in the band. The two had drifted in wording before
+    either shipped. Now one exported function in `src/lib/series.ts` with six
+    tests, including that a series flagged `complete` with a part still in draft
+    must **not** claim completeness. Mutation-tested both ways.
+  - **No feed filter, deliberately.** A series is ordered and the feed is
+    impact-ranked; `CLAUDE.md` records why the feed query was left alone.
+    Selecting a series navigates to its page.
+  - Checked at 1440px and 390px on both pages, plus the empty case. Nothing on
+    the homepage's price-bearing bands changed: `StartHereSpine` and
+    `AdvisoryBand` already read "From £2,000/mo".
+
 ## 2026-08-17 — §Find Your Perspective: the persona cards became the filter
 
 The cards on `/intelligence` said "pick the perspective closest to your work to
