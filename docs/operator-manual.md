@@ -58,7 +58,7 @@ first use.
 | Broadcast / "email this article" | **Does not exist** | There is no route. Sending is manual, in Kit. |
 | Substack | **Manual only** | No integration of any kind. |
 | Web Push | **Live** (21 Aug 2026) | VAPID keys are configured on production, verified. Publishing an **Audit-tier** article notifies the "New Audit-tier Deep Dives" subscribers, once per article ever. Nothing fires for other tiers, and the AI Act deadline topic is still sent by hand. Subscriber numbers start from zero — nobody could subscribe before the keys existed. |
-| Lemon Squeezy / checkout | **No store** | `NEXT_PUBLIC_PRE_LAUNCH` defaults true, which suppresses every checkout link. Product gates link to the product page instead. |
+| Lemon Squeezy / checkout | **No store** | `NEXT_PUBLIC_PRE_LAUNCH` defaults true, which suppresses every checkout link. Product gates link to the product page instead. ⚠ When the store does open, the checkout **must** ask the buyer to confirm they want immediate access and understand it ends their 14-day cancellation right — `/terms` states the right is lost on download *on that condition*, and without the consent step the site is describing a position it does not have. Launch-blocking; see `LAUNCH.md`. |
 | Compliance Checker v2 | **Dark** | v1 is what every visitor gets. See §13. |
 | ChatGPT knowledge capture | **Blocked** | Not an engineering problem — it needs a Business-tier seat. See §11. |
 

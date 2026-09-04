@@ -2,7 +2,7 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-09-04
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (119 prerendered pages), 1,523 tests green, **29 npm audit findings (re-counted 2026-09-04, was 19 on 2026-08-23)** — every root advisory sits in build, CLI or dev-only tooling; see §2 for the caveat**
+> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (119 prerendered pages), 1,527 tests green, **29 npm audit findings (re-counted 2026-09-04, was 19 on 2026-08-23)** — every root advisory sits in build, CLI or dev-only tooling; see §2 for the caveat**
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, **Guide**, YouTube Script, Research Only), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
@@ -283,7 +283,7 @@ All draft-generating formats use Claude at temperature 0.4. Drafts are created d
 | `/pricing` | ✅ | Every price on one page, rendered from `src/lib/offering.ts`; respects the launch flags |
 | `/waymarkpath` | ✅ | WaymarkPath sister-product page (career transition app). Rebuilt 2026-09-04: a server component, content sourced from `src/lib/waymarkpath.ts`, sister-indigo palette, still a **waitlist** — the link stays internal because the app's own deploy is stale |
 | `/privacy` | ✅ | Privacy policy (GDPR, data collection, third-party services) |
-| `/terms` | ✅ | Terms of service (Scottish governing law) |
+| `/terms` | ✅ | Terms of service (Scottish governing law). Carries **Refunds and Cancellation** since 2026-09-04 — statutory rights only, and the one place on the site permitted to discuss refunds |
 
 **301 redirects** (`next.config.ts`, explicit `statusCode: 301`): `/analysis`→`/intelligence`, `/briefings`→`/intelligence`, `/services`→`/advisory`, `/products/briefings`→`/products/sector-reports`.
 
@@ -389,7 +389,7 @@ sell (restore them when the first report is on sale — see `LAUNCH.md`).
 | Engagement | Price | Summary | Where it lives |
 |---|---|---|---|
 | **Advisory Briefing** | **£450** / one hour | Focused consultation on your tool results and one specific question, plus a written follow-up. Credited **in full** to your first retainer month if you proceed within 30 days. | `/advisory/advisory-briefing` |
-| **The Exposure Diagnostic** | **From £2,500** (custom scope) | AI system + vendor-evidence review, dependency mapping, regulatory-friction read, 15–25pp report, 30-day follow-up. Fee credited to the first retainer quarter. **No refund guarantee** — the revision-or-50%-refund clause was withdrawn on 2026-09-04. | `/advisory/exposure-diagnostic` |
+| **The Exposure Diagnostic** | **From £2,500** (custom scope) | AI system + vendor-evidence review, dependency mapping, regulatory-friction read, 15–25pp report, 30-day follow-up. Fee credited to the first retainer quarter. **No refund guarantee** — the revision-or-50%-refund clause was withdrawn on 2026-09-04; the site's refund position now lives once, at `/terms`. | `/advisory/exposure-diagnostic` |
 | **The Post-Omnibus Briefing** | **From £2,500**, fixed | US/UK-inbound. Fixed-scope written briefing (15–25pp) on what the AI Act now requires of you post-Digital Omnibus, delivered in three weeks, plus one interpretation call. | `/eu-exposure` |
 | ↳ *European Procurement Readiness* (add-on) | **From £1,500** | Add-on to the above: your systems mapped against EU buyer governance questionnaires, required-vs-theatre evidence triage, AI indemnification clause review. | `/eu-exposure` |
 | **The Drift Retainer** | **£2,000/mo** — three-month initial term, then rolling. £20,000/year annual. **Founding rate £1,500/mo for the first six months, first five clients** (`FOUNDING_OFFER_ACTIVE`). | The spine of the whole offering. Board-forwardable monthly briefing, a 90-minute working session on one live decision, "The Line" direct access between sessions, quarterly written exposure review on the 3×2 method. Opens with a Baseline Month — walk away after month one paying that month only. | `/advisory/drift-retainer` |
@@ -593,6 +593,68 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### September 4, 2026 — A refunds position, and four guards over the gaps left behind
+
+The day's earlier work — four engagement pages, the WaymarkPath rebuild, the
+refund withdrawal, series — left five gaps a documentation audit found. All five
+were things nothing would have caught.
+
+**`/terms` gains Refunds and Cancellation.** Withdrawing every discretionary
+promise left the site selling digital downloads with *no* stated position, which
+is worse than promising either something or nothing. The section states
+statutory rights and offers nothing beyond them. It rests on two facts that can
+silently stop being true, both recorded in the code comment and in `LAUNCH.md`:
+
+- **Lemon Squeezy is Merchant of Record**, so it is the seller of record to the
+  buyer and its process is the one that actually runs a refund. Inventing a
+  Silicon & Stone refund process would have described something that does not
+  exist.
+- **The 14-day cancellation right for digital content ends on download only if
+  the checkout captures express consent AND an acknowledgement that the right is
+  lost.** No store exists yet, so the page is written *conditionally* — it stays
+  accurate either way — and the consent capture is now a launch-blocking item.
+
+⚠ **Not reviewed by a solicitor.** `LAUNCH.md` says so beside the launch gate.
+
+**A guard on refund copy** (`src/lib/offering.test.ts`). `Offering.terms` is free
+text no test read: restoring the 50% clause passed the whole suite silently. The
+walker now fails on money-back language anywhere in `src/` outside `/terms` —
+one allowlisted file, because a refund position is a legal statement and
+restating it loosely next to a Buy button is how it goes wrong. It deliberately
+does **not** ban `guarantee` (Baseline Month is live and a different promise) or
+`credit` (the ladder is built on them), and two canaries assert both survive, so
+widening the pattern fails rather than quietly deleting live copy.
+Mutation-tested with a money-back line on `/pricing` and with the exact
+withdrawn clause back in the catalogue.
+
+**The footer and `/more` follow the catalogue.** Neither had moved when the
+engagements got pages. The footer gains a fifth column mapped from
+`ENGAGEMENTS`. **The first attempt retyped the list and duplicated the
+Post-Omnibus Briefing** — it is in the catalogue *and* was hard-coded beside it —
+which the rendered footer caught and the suite did not. The catalogue holds
+**six** entries, not the four I assumed: `post-omnibus-briefing` lives at
+`/eu-exposure`, and `board-level` is an anchor with no page. The column filters
+on *has a page of its own*, stated as a rule so a future engagement appears
+unaided.
+
+**BreadcrumbList on all four engagement pages.** They emitted no structured data
+at all, so a search engine inferred hierarchy from the URL rather than the
+labels the site uses. It lives in each `layout.tsx`, not the page — two of the
+four are Client Components. Names come from `ENGAGEMENTS` by id. Three
+near-identical breadcrumb builders became one `breadcrumbList()` helper in
+`src/lib/seo.ts` rather than four.
+
+**Two new assertions in `engagement-pages.test.ts`.** Every catalogue `href` must
+appear in `sitemap.ts` — a page that exists but is not indexed looks entirely
+healthy, since the route 200s, the nav works and the suite is green. And each
+layout's `ENGAGEMENTS.find(...)!` is a non-null assertion that would crash at
+render on a renamed id, so the ids are asserted too.
+
+1,527 tests green, 119 pages, `tsc`/eslint clean, manual (21 checks) and
+security guards pass. Verified on production, deployment `2yxnycy9q`: `/terms`
+carries the section, `/advisory/strategic-assessment` emits its breadcrumb, and
+the footer's Advisory column reads back with no duplicate.
 
 ### September 4, 2026 — Series: the archive in the order the argument was built
 
@@ -7337,7 +7399,7 @@ left unset, being optional by design. | Resolved |
   goal names (`Gate Impression`, `Email Capture`, `Product View`, `Advisory Lead`,
   `Push Opt In`) and the three in `LAUNCH.md` §3 exist by exact name.
 - ~~Sanity schema not fully deployed to manifest~~ — resolved 2026-05-21.
-- ~~No unit tests for app logic~~ — **1,523 tests across 79 files**, green (2026-09-04; the "181 specs across 9 files" this once read was two hundred commits stale). The AI Act
+- ~~No unit tests for app logic~~ — **1,527 tests across 79 files**, green (2026-09-04; the "181 specs across 9 files" this once read was two hundred commits stale). The AI Act
   engine, rule pack, session schema, intake validator, and the report schema /
   citation verifier carry the bulk of them.
 - ~~Compliance Checker rule base stale and Step 10 incomplete~~ — resolved
@@ -7718,7 +7780,7 @@ npm run check            # lint + typecheck — the one to run before committing
 
 # Tests and guards. `prebuild` runs the starred four automatically; the rest do not
 # run themselves, and each exists because something shipped broken without it.
-npm test                 # Vitest — 1,523 tests across 79 files
+npm test                 # Vitest — the whole suite, all green
 npm run test:manual      # * docs/operator-manual.md vs the code (21 facts)
 npm run test:checker-v2  # * Compliance Checker v2 propositions vs the pinned corpus
 npm run reg:check        # * Regulatory corpus hashes + reviewBy dates
@@ -7762,7 +7824,7 @@ When starting a new Claude Code session:
 
 ```bash
 npm run build            # Should pass with 0 errors
-npm test                 # 1,523 tests across 79 files, all green
+npm test                 # The whole suite, all green
 npm run rulepack:check   # 19 corpus files verified against the manifest
 npm audit                # 29 findings as of 2026-09-04 — build/CLI/dev tooling only
 npm run dev              # Start dev server, visit localhost:3000

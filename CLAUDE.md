@@ -768,10 +768,27 @@ Three things the pages depend on:
 - **Every price is `gbp(AMOUNTS.x)`; the four pages contain no `£` literal.**
   Same rule as everywhere else — see the Pricing section below.
 - **`ENGAGEMENTS[].href` in `src/lib/offering.ts` is the single source of the
-  URL**, rendered by both the header dropdown and `/pricing`. A rename turns two
-  nav entries into a 404 with nothing failing nearby, so
-  `src/lib/advisory/engagement-pages.test.ts` asserts each `href` resolves to a
-  real `page.tsx`. It does **not** yet assert the href reaches `sitemap.ts`.
+  URL**, rendered by the header dropdown, `/pricing` and the footer's Advisory
+  column. A rename turns three nav entries into a 404 with nothing failing
+  nearby, so `src/lib/advisory/engagement-pages.test.ts` asserts each `href`
+  resolves to a real `page.tsx`, **that it appears in `sitemap.ts`'s
+  STATIC_ROUTES** (a page that exists but is not indexed looks entirely healthy
+  — the route 200s, the nav works, the suite is green), and that every id the
+  engagement layouts look up still exists in the catalogue.
+- **Anything listing the engagements maps `ENGAGEMENTS`; nothing retypes them.**
+  The footer's first attempt retyped the list and duplicated the Post-Omnibus
+  Briefing, which is in the catalogue and was hard-coded beside it — caught by
+  looking at the rendered footer, not by the suite. Note the catalogue holds
+  **six** entries, not four: `post-omnibus-briefing` lives at `/eu-exposure` and
+  `board-level` is an anchor (`/advisory#contact`) with no page. The footer
+  filters on *has a page of its own*, stated as a rule so a future engagement
+  appears without anyone remembering.
+- **Each engagement page emits a `BreadcrumbList` from its `layout.tsx`**, not
+  its page — two of the four are Client Components and structured data has no
+  business in the client bundle. Names come from `ENGAGEMENTS` by id, so a
+  breadcrumb cannot call an engagement something the rest of the site does not.
+  All breadcrumb builders share `breadcrumbList()` in `src/lib/seo.ts`; there
+  were three near-identical copies before a fourth was nearly written.
 - **`/advisory#retainer` must keep resolving.** The engagements used to be
   fragments on the hub, and a fragment never reaches the server — so no redirect
   could have covered the split. The hub keeps a summary block under that id, and
@@ -812,15 +829,34 @@ on others (the "£83 for both rather than £103" line is a sum of two prices, no
 a third price). Components interpolate `gbp(AMOUNTS.x)` — **never** write a `£`
 literal in a page or component, prose included.
 
-Two checks enforce this, and both are meant to be annoying:
+Three checks enforce this, and all three are meant to be annoying:
 
 - `src/lib/offering.test.ts` walks `src/` and fails on any `£` outside a
   four-file allowlist. Add to the allowlist only with a reason.
+- **The same file fails on money-back language outside `/terms`.** Every refund
+  promise was withdrawn on 2026-09-04, and `Offering.terms` is free text no test
+  read — putting the 50% clause back passed the whole suite silently. The
+  allowlist is one file, because a refund position is a legal statement about
+  statutory rights and restating it loosely next to a Buy button is how it goes
+  wrong. The pattern deliberately excludes `guarantee` (the Baseline Month
+  guarantee is live and is a different promise) and `credit` (the ladder is
+  built on credits); two canaries assert both survive, so widening the pattern
+  fails rather than quietly deleting live copy.
 - `npm run test:sanity-prices` fails CI when a published Sanity `product`
   document's `priceLabel` / `name` / `productPath` disagrees with
   `SANITY_PRODUCTS`. Those three documents are the one copy code cannot import,
   and the end-of-article gate renders them, so changing a product price means
   changing `AMOUNTS` **and** the document in Studio.
+
+**The site publishes no refund guarantee.** `/terms` → *Refunds and
+Cancellation* states statutory rights and offers nothing beyond them. Two things it rests on, and both can silently stop being true:
+Lemon Squeezy is **Merchant of Record**, so it is the seller of record and its
+process is the one that runs a refund; and the claim that the 14-day
+cancellation right ends on download holds **only if the checkout captures
+express consent and an acknowledgement**. The store does not exist yet, so that
+is a launch-blocking item in `LAUNCH.md`, and the sentence on the page is
+written conditionally so it stays accurate until then. It has **not** been
+reviewed by a solicitor.
 
 A price is a commercial claim. `project_summary.md` §5 is the written record of
 what is on sale, at what, and why.
