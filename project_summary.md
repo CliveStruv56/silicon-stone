@@ -691,19 +691,32 @@ squeezed into, and rendering both would state the same prices twice in two
 different weights. Mutation-tested: pointing tier one at a different `AMOUNTS`
 key and reinstating the `priceNote` each turn it red.
 
-**Verified on production**, `dpl_279E4L5RQbcwkMU1KQJvzW6L7ex7` — Ready, built in
-2m, aliased to the bare apex. Checked by `curl` against `siliconandstone.com`
-rather than by reading the build log, which matters here: Vercel had a build in
-flight about a minute *before* the push landed, so the deployment's timestamp
-alone could not tell you which commit it carried. What settles it is the content
-— the live pages serve the new figures:
+**Verified on production**, across two deployments — the price and catalogue
+work (`dpl_279E4L5RQbcwkMU1KQJvzW6L7ex7`, built in 2m) and the tier rendering
+that followed (`silicon-stone-5d3t0juc9`, built in 1m). Both Ready, both aliased
+to the bare apex.
+
+**Checked by `curl` against `siliconandstone.com`, not by reading a build log**,
+and that distinction earned its keep twice. On the first deploy Vercel already
+had a build in flight about a minute *before* the push landed; on the second,
+three production builds sat within eighteen minutes of each other. In neither
+case could a timestamp tell you which commit a deployment carried. What settles
+it is markup only the new code emits — the second was confirmed by polling for
+`Professional</dt>`, which nothing in the previous rendering produced.
+
+One method note worth keeping: the `vercel ls` **status** watcher parsed columns
+out of the CLI's table and fired an empty event when the layout shifted for a
+row still building. The **content** watcher was right both times. Watch for what
+the change actually renders, not for a status field.
 
 | Surface | Asserted on production |
 |---|---|
 | `/products/ai-act-toolkit` | **£275** twice (tier table + Buy button), zero `£149`, no consultant's-time line |
-| `/pricing` | "Standard · £275 Professional"; European Procurement Readiness, Intro conversation and WaymarkPath all present |
+| `/pricing` | `<dt>Standard</dt><dd>£79</dd>` and `<dt>Professional</dt><dd>£275</dd>`; **zero** occurrences of the old "Standard · £275 Professional" footnote |
+| `/pricing` | European Procurement Readiness, Intro conversation and WaymarkPath all present |
 | `/pricing`, `/advisory`, `/advisory/drift-retainer` | **From £2,000** everywhere; no bare rate survives |
-| `/products` | four cards, Compliance Checker Evidence Pack among them |
+| `/products` | four cards, Compliance Checker Evidence Pack among them; Toolkit card carries both tiers |
+| Header nav | still **"From £79"** — the check that mattered most, since `priceOf()` reads `price` and the tier change could have silently blanked it |
 | `/products/ai-audit-checklist` | zero occurrences of "business book" |
 
 ### September 4, 2026 — A refunds position, and four guards over the gaps left behind
