@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { sanityFetch } from '@/sanity/lib/live'
 import { SERIES_INDEX_QUERY } from '@/sanity/lib/queries'
 import { urlFor } from '@/sanity/lib/image'
-import { seriesHref } from '@/lib/series'
+import { partsLabel, seriesHref } from '@/lib/series'
 
 /**
  * The series library.
@@ -38,14 +38,6 @@ type SeriesSummary = {
   categories?: SeriesCategory[] | null
   partCount?: number | null
   publishedCount?: number | null
-}
-
-function partsLabel(total: number, published: number, status?: string | null): string {
-  const parts = `${total} ${total === 1 ? 'part' : 'parts'}`
-  // Only say "N published" when it differs — on a complete series the number
-  // twice reads as an error rather than as information.
-  if (published < total) return `${parts} · ${published} published`
-  return status === 'complete' ? `${parts} · complete` : parts
 }
 
 export default async function SeriesIndexPage() {

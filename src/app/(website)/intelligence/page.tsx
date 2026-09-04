@@ -1,5 +1,6 @@
 import { client } from '@/sanity/lib/client'
 import { urlFor } from '@/sanity/lib/image'
+import { getSeriesPromo } from '@/lib/series-promo'
 import { IntelligenceFeed, type Article } from './IntelligenceFeed'
 import { getPersonaParam, getTierParam, getTopicParam } from './filters'
 
@@ -66,10 +67,18 @@ export default async function IntelligencePage({
   const first = (value: string | string[] | undefined) =>
     (Array.isArray(value) ? value[0] : value) ?? null
 
-  const initialArticles = await getInitialArticles()
+  // Fetched here, on the server, rather than inside the client feed: the band
+  // is the entry point to the series library, and a reader with no JavaScript
+  // must still find it. Same reason the feed itself is server-rendered.
+  const [initialArticles, series] = await Promise.all([
+    getInitialArticles(),
+    getSeriesPromo(),
+  ])
+
   return (
     <IntelligenceFeed
       initialArticles={initialArticles}
+      series={series}
       initialFilters={{
         persona: getPersonaParam(first(params.persona)),
         tier: getTierParam(first(params.tier)),

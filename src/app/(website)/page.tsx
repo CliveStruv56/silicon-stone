@@ -17,6 +17,8 @@ import {
 } from '@/components/home'
 import { sanityFetch } from '@/sanity/lib/live'
 import { SITE_SETTINGS_QUERY, ARTICLES_BY_TIER_QUERY } from '@/sanity/lib/queries'
+import { getSeriesPromo } from '@/lib/series-promo'
+import { SeriesPromo } from '@/components/series/SeriesPromo'
 import { SITE_URL, absoluteUrl } from '@/lib/site'
 
 export const metadata: Metadata = {
@@ -36,11 +38,15 @@ const ORG_SAME_AS: string[] = [
 ]
 
 export default async function Home() {
-  const [settingsRes, pulseRes, briefingRes, auditRes] = await Promise.all([
+  const [settingsRes, pulseRes, briefingRes, auditRes, series] = await Promise.all([
     sanityFetch({ query: SITE_SETTINGS_QUERY }),
     sanityFetch({ query: ARTICLES_BY_TIER_QUERY, params: { tier: 'pulse', limit: 1 } }),
     sanityFetch({ query: ARTICLES_BY_TIER_QUERY, params: { tier: 'briefing', limit: 1 } }),
     sanityFetch({ query: ARTICLES_BY_TIER_QUERY, params: { tier: 'audit', limit: 1 } }),
+    // Joins the existing parallel fetch rather than adding a waterfall; it
+    // fails closed to an empty list, so a Sanity blip costs the band and not
+    // the homepage.
+    getSeriesPromo(),
   ])
 
   const siteSettings = settingsRes.data
@@ -140,6 +146,25 @@ export default async function Home() {
           briefingArticle={briefingArticle}
           auditArticle={auditArticle}
         />
+
+        {/* 6b. Series — the other way into the same archive.
+
+            Sits immediately after the tier ladder because that block is the
+            homepage's answer to "how do I read this?", and it only ever
+            answered it by length. A series answers it by sequence. Anywhere
+            further down and it would be competing with the Buy and Engage
+            bands, which is a different question entirely.
+
+            Renders nothing when no series are published — see SeriesPromo. */}
+        <div className="border-b border-border-subtle bg-stone-charcoal/30">
+          <SeriesPromo
+            series={series}
+            eyebrow="Or start at the beginning"
+            heading="Follow one question from the first piece"
+            intro="Most of what we publish answers the week. A series answers a question — the same analysis, put back in the order the argument was built."
+            className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12"
+          />
+        </div>
 
         {/* 7. Persona Compass — Find Your Perspective (+ Positional lens) */}
         <PersonaCompass />

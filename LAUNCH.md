@@ -263,6 +263,14 @@ fires nothing at all: the page sits stale, indefinitely, with no error anywhere.
 The route already knows what to do with a `series` payload — the filter is the
 only thing standing between it and being asked.
 
+**Since 2026-09-04 this reaches two more pages.** The homepage and `/intelligence`
+both render a `SeriesPromo` band naming the featured series and its part count,
+so a series edit that fires nothing now leaves a stale *promotion* on the two
+busiest pages on the site — advertising a part count that has moved, or a series
+that has been renamed. The route already calls `revalidatePath('/')` and
+`revalidatePath('/intelligence')` on every payload it accepts, so nothing in the
+code needs to change; the filter is still the only thing standing in the way.
+
 | URL | Auth | What it does | Symptom if missing |
 |---|---|---|---|
 | `/api/vectorize` | header `x-sanity-webhook-secret` = `SANITY_WEBHOOK_SECRET` | Embeds the article, writes back Related Articles | No semantic search hit, no related articles, no prior-coverage on future drafts |

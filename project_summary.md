@@ -604,6 +604,66 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### September 4, 2026 — Series, findable
+
+Series shipped this morning reachable from exactly two places: the Intelligence
+dropdown and the footer. `/intelligence` — the page a reader actually lands on —
+contained the word nowhere, and neither did the homepage. A reading path nobody
+can find is a reading path nobody reads.
+
+The sharpest evidence was in the hero copy, which sets out to *enumerate* the
+ways into the archive: "by topic, by tier …, or by the role it serves." That is
+not a navigation gap, it is a sentence that had become untrue. It now ends "…or
+as a **series**, in the order the argument was built", with the word linked.
+
+**`SeriesPromo`** (`src/components/series/SeriesPromo.tsx`) is the band, rendered
+on both surfaces from one component and one fetch (`src/lib/series-promo.ts`,
+reusing `SERIES_INDEX_QUERY` — so the order the library lists series in cannot
+disagree with the order the promos pick from). Three properties:
+
+- **No series, no band.** Not a heading over an empty list — the rule
+  `verifyReport` follows when it drops the whole GDPR block. Verified by stubbing
+  the fetch to `[]` and loading both pages: no heading, no stray eyebrow text.
+  The library page may say "No series published yet" because that is what a
+  reader went there to learn; a promo on another page may not.
+- **It degrades in both directions.** One series today, so the featured one gets
+  the row and any others collapse into "All N series". The second series changes
+  the copy, not the layout.
+- **The count is of slots.** `partCount` includes parts still in draft, because
+  position *is* part number.
+
+**Placement, and the reason for each.** On `/intelligence` it sits directly under
+the hero, above the explainers: a series is a way of reading, so it belongs with
+`ThreeReadings` and `PersonaIntro` rather than beneath them — and measured at
+1440px the first article is ~1,700px down, so anything below the explainers is
+past the point where the reader has committed to the impact-ranked feed. On the
+homepage it follows the tier ladder, which is that page's answer to "how do I
+read this?" — and which had only ever answered it by *length*. A series answers
+it by *sequence*.
+
+**The first cut was 389px and I had estimated 150.** On a page that already makes
+a reader scroll two screens for an article, that is a different trade than the
+one proposed, so the band grew a `compact` variant: eyebrow and heading on one
+line, no intro paragraph, 266px. The homepage has no such preamble and keeps the
+full form.
+
+**A duplicate rule, caught while building.** `partsLabel` — "6 parts · 5
+published", and the rule that the published count appears *only* when it differs
+from the total — existed on the series index, and I wrote it a second time in the
+band. The two had already drifted in wording before either shipped. It is now one
+exported function in `src/lib/series.ts` with six tests, including that a series
+flagged `complete` in Studio with a part still in draft must **not** claim
+completeness. Mutation-tested both ways.
+
+**One consequence recorded in `LAUNCH.md`.** The revalidate webhook's `series`
+filter was already a pending launch item; it now matters more. The route already
+calls `revalidatePath('/')` and `revalidatePath('/intelligence')`, so a series
+edit that fires nothing leaves a stale *promotion* — a wrong part count, or a
+renamed series — on the two busiest pages, not just a stale library page.
+
+Checked at 1440px and 390px on both pages, plus the empty case. 1,536 tests
+green; build green at 119 pages.
+
 ### September 4, 2026 — Professional at £275, and the price list made complete
 
 A price change and a catalogue audit that ran behind it. Four surfaces were

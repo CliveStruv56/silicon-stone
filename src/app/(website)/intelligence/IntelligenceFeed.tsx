@@ -8,6 +8,8 @@ import { Header, Footer } from '@/components/layout'
 import { Badge } from '@/components/ui/badge'
 import { BottomSheet } from '@/components/ui/BottomSheet'
 import { PersonaFilter } from '@/components/briefings/PersonaFilter'
+import { SeriesPromo } from '@/components/series/SeriesPromo'
+import type { SeriesPromoItem } from '@/lib/series'
 import { PersonaIntro } from '@/components/briefings/PersonaIntro'
 import { ThreeReadings } from '@/components/ThreeReadings'
 import { DynamicCTA } from '@/components/article'
@@ -364,9 +366,11 @@ function TierPills({
 
 export function IntelligenceFeed({
   initialArticles,
+  series,
   initialFilters,
 }: {
   initialArticles: Article[]
+  series?: SeriesPromoItem[]
   initialFilters?: FeedFilters
 }) {
   const [articles, setArticles] = useState<Article[]>(initialArticles)
@@ -554,8 +558,15 @@ export function IntelligenceFeed({
                 <h1 className="text-4xl lg:text-5xl font-bold text-text-primary mb-4">
                   Intelligence
                 </h1>
+                {/* This sentence sets out to enumerate the ways into the
+                    archive, so leaving series out of it was not a gap in the
+                    navigation but a wrong claim in the copy. */}
                 <p className="text-lg text-text-muted max-w-2xl">
-                  One library, filtered your way — by topic, by tier (scan the Pulse, digest the Briefing, or audit the deep analysis), or by the role it serves.
+                  One library, read your way — by topic, by tier (scan the Pulse, digest the Briefing, or audit the deep analysis), by the role it serves, or as a{' '}
+                  <Link href="/intelligence/series" className="text-stone-teal underline underline-offset-4 hover:text-stone-teal/80">
+                    series
+                  </Link>
+                  , in the order the argument was built.
                 </p>
               </div>
 
@@ -577,6 +588,22 @@ export function IntelligenceFeed({
             </div>
           </div>
         </section>
+
+        {/* Series — placed directly under the hero, above the explainers, for
+            two reasons. It is a way of reading, so it belongs with
+            ThreeReadings and PersonaIntro rather than buried by them; and the
+            first article on this page sits ~1,700px down, so anything below
+            the explainers is past the point where a reader has committed to
+            the impact-ranked feed. Renders nothing when no series exist. */}
+        {series && series.length > 0 && (
+          <SeriesPromo
+            series={series}
+            compact
+            eyebrow="Another way in"
+            heading="Read a series, in order"
+            className="mx-auto max-w-7xl border-b border-border-subtle px-6 py-8 lg:px-8"
+          />
+        )}
 
         {/* Three Readings of Every Briefing — relocated from the homepage */}
         <ThreeReadings className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-10 border-b border-border-subtle" />

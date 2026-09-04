@@ -4,6 +4,7 @@ import {
   neighboursFor,
   partHref,
   partNumberFor,
+  partsLabel,
   publishedParts,
   recordSeriesProgress,
   resolveSeriesContext,
@@ -47,6 +48,45 @@ describe('partNumberFor', () => {
     expect(partNumberFor(WITH_GAP, 'zzz')).toBeNull()
     expect(partNumberFor(null, 'a')).toBeNull()
     expect(partNumberFor(WITH_GAP, '')).toBeNull()
+  })
+})
+
+describe('partsLabel', () => {
+  /**
+   * One editorial rule, three call sites — the series index, and the promo band
+   * on `/intelligence` and the homepage. It was written twice within a day and
+   * the two copies had already drifted in wording ("5 published" against
+   * "5 published so far") before either shipped, which is why it is a shared
+   * function with a test rather than a comment asking people to keep them in
+   * step.
+   */
+  it('counts every slot, including parts still in draft', () => {
+    expect(partsLabel(6, 5)).toBe('6 parts · 5 published')
+  })
+
+  it('says "N published" only when it differs from the total', () => {
+    // The whole point: on a finished series the same number twice reads as a
+    // bug rather than as information.
+    expect(partsLabel(6, 6)).toBe('6 parts')
+    expect(partsLabel(6, 6, 'in-progress')).toBe('6 parts')
+  })
+
+  it('marks a complete series complete', () => {
+    expect(partsLabel(6, 6, 'complete')).toBe('6 parts · complete')
+  })
+
+  it('never says "complete" while parts are unpublished', () => {
+    // A series can be flagged complete in Studio while a part is still a draft.
+    // Claiming completeness over a gap is the worse of the two errors.
+    expect(partsLabel(6, 5, 'complete')).toBe('6 parts · 5 published')
+  })
+
+  it('singularises a one-part series', () => {
+    expect(partsLabel(1, 1)).toBe('1 part')
+  })
+
+  it('survives an empty series without saying "0 parts · 0 published"', () => {
+    expect(partsLabel(0, 0)).toBe('0 parts')
   })
 })
 

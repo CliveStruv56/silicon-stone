@@ -39,12 +39,58 @@ export interface SeriesPart {
   article: SeriesPartArticle | null
 }
 
+/**
+ * A series as the promo band on `/intelligence` and the homepage needs it.
+ *
+ * Lives here rather than in the component because two server surfaces build it
+ * and one client component renders it — putting the shape in the renderer would
+ * make the fetchers import from a component, which is backwards and is how the
+ * next copy of the mapping gets written by hand.
+ */
+export interface SeriesPromoItem {
+  _id: string
+  title: string
+  slug: string
+  standfirst?: string | null
+  status?: string | null
+  /** Resolved by `urlFor` server-side; the raw image ref never reaches a page. */
+  coverImageUrl?: string | null
+  /** Every slot, including parts still in draft. See the rule at the top. */
+  partCount?: number | null
+  /** What a reader can open today. */
+  publishedCount?: number | null
+}
+
 export interface SeriesRef {
   _id?: string
   title: string
   slug: string
   status?: string | null
   parts: SeriesPart[] | null
+}
+
+/**
+ * How a series' size reads on screen: "6 parts", "6 parts · 5 published",
+ * "6 parts · complete".
+ *
+ * Shared because it was written twice within a day — once on the series index
+ * and once on the promo band — and the two had already drifted in wording
+ * before either shipped. It encodes one editorial rule that must not vary
+ * between the page listing series and the pages advertising them: **say
+ * "N published" only when it differs from the total.** On a complete series the
+ * same number printed twice reads as a bug rather than as information.
+ *
+ * `total` counts every slot, including parts still in draft, because an entry's
+ * position is its part number — see the rule at the top of this file.
+ */
+export function partsLabel(
+  total: number,
+  published: number,
+  status?: string | null,
+): string {
+  const parts = `${total} ${total === 1 ? 'part' : 'parts'}`
+  if (published < total) return `${parts} · ${published} published`
+  return status === 'complete' ? `${parts} · complete` : parts
 }
 
 /** A part's number is its 1-based position, counting unresolved slots. */
