@@ -20,7 +20,7 @@ export function AdvisoryNextStep() {
             When the tool reaches its limit
           </h2>
           <p className="mb-8 text-text-muted">
-            The buyers who get the most from these products are usually the ones
+            The clients who get the most from these products are usually the ones
             already carrying real exposure. If that&apos;s you, the warmest next step is
             a {gbp(AMOUNTS.advisoryBriefing)} Advisory Briefing — a one-hour read on your specific situation,
             credited in full toward a Drift Retainer if you go on to one within 30
