@@ -686,6 +686,39 @@ publish-time invalidation is ever wanted, widening `on-publish`'s filter to
 `_type in ["article", "series"]` and having it do the `revalidatePath` calls is
 one webhook doing two jobs.
 
+**And chasing that finding tripped Vercel's bot mitigation, which is worth
+knowing about before it scares somebody.** Verifying the day's deploys had used
+two background watchers polling `siliconandstone.com` every 10 seconds, plus
+dozens of `curl`s. Partway through the session production began answering every
+automated client with **`HTTP 403` and `x-vercel-mitigated: challenge`** — a
+"Vercel Security Checkpoint" body where the page should be.
+
+Three things about it:
+
+- **It is not a firewall rule somebody left on.**
+  `GET /v1/security/firewall/config` returns `{"active":null,"draft":null,"versions":[]}`
+  and the active-config endpoint says "Config not found". This is Vercel's
+  automatic mitigation, which engages on its own and relaxes on its own.
+- **It hits automated clients only.** `curl`, `curl` with a browser User-Agent,
+  Anthropic's own infrastructure from a different IP, and Puppeteer Chrome
+  *both* headless and headful all got the challenge; the owner's ordinary
+  browser loaded the site normally throughout. A driven browser is not a way
+  around it, so **do not conclude the site is down from automated evidence** —
+  ask someone to open it, which is the only test that settles it.
+- **A 403 challenge reads exactly like a broken deploy.** The page content is
+  simply absent. Check the status code and `x-vercel-mitigated` before believing
+  a verification that "found nothing". This is the same class of trap as the
+  EUR-Lex WAF answering `202` with an empty body, recorded in `CLAUDE.md` — a
+  guard that looks at content alone cannot tell "not there" from "not served".
+
+**The rule that follows:** verify a deploy with a few spaced-out requests, never
+a polling loop; if a loop is genuinely needed, 60s+ intervals rather than 10s.
+Earlier verifications in the session were still sound — they returned real page
+content, which a challenge page cannot fake — but the traffic that produced them
+is what caused this. A Firewall bypass rule keyed on a header would exempt
+scripted checks if that is ever wanted; it was judged overkill for the volume
+this repo actually needs.
+
 Checked at 1440px and 390px on both pages, plus the empty case. 1,536 tests
 green; build green at 119 pages.
 
