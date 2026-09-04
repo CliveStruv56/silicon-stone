@@ -4,9 +4,17 @@ How an article gets researched, drafted, edited, checked, published, and capture
 back into knowledge. Written for the person running the publication.
 
 **Verified against commit `ce037c64`, 21 August 2026.** Every claim here was
-checked against the code on that date. Where something could not be checked by
-reading code, it is listed in [Appendix D — What has not been verified](#appendix-d--what-has-not-been-verified).
+checked against the code on that date, and part of it was **re-verified on
+4 September 2026** — see below. Where something could not be checked by reading
+code, it is listed in
+[Appendix D — What has not been verified](#appendix-d--what-has-not-been-verified).
 If you are reading this months later, the header is the first thing to distrust.
+
+What changed on 4 September 2026: §1 and §10 on how a publish reaches the live
+site — there is **no revalidate webhook and cannot be**, which this manual
+previously got wrong in three places; §10 gains *Why you reload once* and a
+warning about polling the live site; §10's series notes gain the two new promo
+bands. Nothing else was re-checked, so treat the rest as of the August date.
 
 This manual replaces `authoring-guide.md`, `article-generation-guide.md` and
 `editorial-aios-manual.md`. It links to `admin-research-workflow.md` rather than
@@ -52,7 +60,7 @@ first use.
 | Article vector index + related articles | **Live** | Fires automatically on publish. |
 | Knowledge capture over MCP | **Live**, behind one flag | Works from Claude Code and `curl`. See §11. |
 | Kit (ConvertKit) subscribe | **Live** | Subscribers arrive. |
-| Series (ordered reading paths) | **Live, half-configured** | You can build and publish one today (§10), and readers see it. But the Sanity **revalidate webhook is still filtered to `_type == "article"`**, so *editing or reordering* a published series changes nothing on the live site and nothing anywhere reports an error. Until that filter widens, treat a published series as fixed until the next deploy. |
+| Series (ordered reading paths) | **Live** | Build and publish one today (§10). Readers reach it from `/intelligence`, the homepage, the Intelligence menu and the footer. Edits reach the live site the same way article edits do — see *Why you reload once* in §10. |
 | Kit **tags** | **Not configured** | The account holds two tags; the code maps ~18. Subscribes succeed but arrive **untagged** — no segmentation. A missing tag ID is skipped by design, so nothing errors. |
 | Kit sending address | **Unverified** | You cannot reliably send until this is done. |
 | Broadcast / "email this article" | **Does not exist** | There is no route. Sending is manual, in Kit. |
@@ -895,9 +903,9 @@ field, so public page loads never have to call an embedding or search provider.
 
 Anything you typed into Related Articles by hand gets overwritten here.
 
-**Revalidation.** The home page, `/intelligence`, and the article's own page are
-invalidated so the new piece appears. The sitemap and RSS feed rebuild on their own
-schedule.
+**Revalidation.** The home page, the article's own page and the series pages are
+freed from cache so the new piece appears. The sitemap and RSS feed rebuild on
+their own schedule. This is not a webhook — see *Why you reload once* below.
 
 **The publish audit.** The pre-publish checks run again, server-side. The dialog
 you saw in Studio runs in your browser, so anything publishing another way — a
@@ -909,6 +917,65 @@ Check tab) is the normal state. If it finds something, the field says what, and
 it clears itself once you fix the article and republish. It does **not**
 unpublish anything — silently reversing a deliberate publish is worse than a live
 article carrying a warning.
+
+### ⚠ Why you reload once
+
+**After publishing, open the public site — not Studio — and reload the page once.**
+That is the whole habit. Everything below is why it exists.
+
+There is **no revalidate webhook**, and there cannot be one: the Sanity plan
+includes two webhooks and both are already used (vectorisation and the publish
+audit). Asking for a third is refused outright. The route to receive one is
+built and waiting; the slot is not there.
+
+What frees the cache instead is Sanity's **Live Content API**. Every public page
+that reads Sanity does so through a tagged fetch, and a small component in the
+site layout listens for content changes and clears the matching tags. So:
+
+1. You publish. Nothing has changed on the live site yet.
+2. A browser loads a public page — **and may be served the old cached copy**.
+3. That page receives the change event and clears the cache.
+4. The next load is the new version.
+
+Two things follow from step 2, and they are the only things you need to hold on
+to:
+
+- **A stale first view is expected, not a fault.** Reload, and it is right.
+- **Studio does not count.** The Studio route sits outside the public site's
+  layout, so the listener never runs there. Sitting in Studio after publishing
+  triggers nothing at all.
+
+Two things that make this less fragile than it sounds. One load of **any** public
+page clears the tags for **every** affected page — the homepage, the article, the
+series index, the series page — so you do not need to tour the site. And a stale
+page can only be served until the first visitor arrives, which in practice is
+you, checking your own work.
+
+> This was established on 4 September 2026. Before then this manual, `LAUNCH.md`
+> and the route's own comment all said a revalidate webhook existed and merely
+> needed its filter widened to include series. That was wrong: there was never a
+> webhook to filter. If you find that claim anywhere else, it is stale.
+
+### ⚠ Do not check a deploy with a script that polls
+
+If you are ever tempted to watch the live site in a loop — or you ask an
+assistant to — **don't**. Vercel's automatic bot mitigation engages on that
+traffic shape and starts answering every automated client with `HTTP 403` and a
+"Vercel Security Checkpoint" page.
+
+It matters because **that 403 looks exactly like a broken deploy**: the content
+is simply absent. It cost real alarm on 4 September 2026 before anyone checked
+the status code.
+
+- It hits **automated clients only**. An ordinary browser is unaffected —
+  confirmed while the block was live. So if a script says the site is empty,
+  open the site yourself before believing it.
+- It is **not** a firewall rule anyone switched on, so there is nothing to turn
+  off. It engages by itself and relaxes by itself.
+- A scripted browser is not a way round it; headless and visible browsers are
+  both challenged.
+
+A few requests, spaced out, are fine. It is the loop that trips it.
 
 **A push notification, for Audit-tier articles only.** Publishing something at
 the Audit tier notifies everyone subscribed to "New Audit-tier Deep Dives". Once
@@ -954,11 +1021,14 @@ sits above the end-of-article offer. That pair is not the same thing as **Relate
 Intelligence** below it: Related is what the machine thinks is similar, the
 series pair is the order you chose.
 
-> ⚠ **A series edit only reaches the live site if the revalidate webhook is
-> configured for it.** That filter lives in the Sanity dashboard, not in this
-> repo — see the webhook table in `LAUNCH.md`. If it is still scoped to articles
-> only, reordering a series changes nothing a reader can see, and nothing
-> anywhere reports an error.
+A published series is also **promoted where readers actually are**: a band on
+`/intelligence`, directly under "Three Readings of Every Briefing", and another
+on the homepage after the tier ladder. Both show the featured series — set
+**Featured** on the one you want there — with its title, standfirst and an
+honest part count. With no series published, neither band renders at all.
+
+Series edits reach the live site exactly the way article edits do. See *Why you
+reload once* in §10.
 
 ### How many people are subscribed
 
@@ -1392,6 +1462,14 @@ Not confirmed by running it:
   which anyone could. What remains untested is the send itself and the marker,
   and only a real subscriber can settle them — subscribe a device, then publish
   the next Audit-tier piece or POST `/api/push/send`.
+- **The timing of cache invalidation after a publish (§10).** That the Live
+  Content API frees the cache — rather than a webhook — was read out of
+  `next-sanity`'s source and confirmed against which pages use a tagged fetch.
+  What was *not* measured is how quickly the change lands: whether the reload
+  after a publish is reliably fresh, or occasionally needs a second. A
+  measurement was attempted on 4 September and abandoned, because the bot
+  mitigation described in that section was blocking automated requests to the
+  live site. The habit in §10 holds either way.
 - **The non-administrator refusal in §2.** Both ends are unit-tested — a
   non-admin role is refused, and the client is held to *not* sending that person
   to `/login` — but it has not been exercised with a real non-administrator
