@@ -1,0 +1,31 @@
+{
+  "tool": "Built-in image_gen",
+  "artDirection": "Square premium editorial photography; grounded Atlantic atmosphere; textured stone and oak; slate blue, weathered teal and warm amber practical lighting; realistic optics and natural side light; central subject safe for square and 4:3 crops; no text, logos, globes or holographic overlays.",
+  "images": [
+    {
+      "file": "public/advisory/advisory-overview.webp",
+      "prompt": "A contemporary coastal research workspace overlooking a working Atlantic container port. Foreground an oak worktable with paper charts and an understated brass compass; distant cranes and infrastructure. Wide but composed, a sense of informed independent perspective.",
+      "source": "/Users/clivestruver/.codex/generated_images/01a0821e-3eaf-7a92-92e5-c4af72a80bcd/exec-1b4b3304-d111-4957-8919-44c5a95a09cb.png"
+    },
+    {
+      "file": "public/advisory/advisory-briefing.webp",
+      "prompt": "Close editorial still life of two chairs drawn up to a small oak meeting table by a window, an open notebook, a single printed analytical chart without readable text, two ceramic cups and a pencil. Quiet focussed working discussion implied, no people. Intimate and direct, not corporate stock photography.",
+      "source": "/Users/clivestruver/.codex/generated_images/01a0821e-3eaf-7a92-92e5-c4af72a80bcd/exec-a2f3cf5f-c6c6-4073-8e1d-9c81d5537c17.png"
+    },
+    {
+      "file": "public/advisory/exposure-diagnostic.webp",
+      "prompt": "An elegant technical inspection bench: a silicon circuit board under a large optical inspection lens, finely connected dark teal circuit traces and a few amber status lights, adjacent neatly stacked evidence papers with no readable text. Concrete material detail, precision, tracing dependencies, not science fiction.",
+      "source": "/Users/clivestruver/.codex/generated_images/01a0821e-3eaf-7a92-92e5-c4af72a80bcd/exec-9d8ad465-7c9c-4144-9552-3682fa5f30e3.png"
+    },
+    {
+      "file": "public/advisory/drift-retainer.webp",
+      "prompt": "A modern coastal watchpoint on an Atlantic headland, a substantial stone observation room and a wide window looking onto shipping lanes and a distant working port, a warm desk light glowing inside. Calm continued observation of a changing horizon; no globe, no telescope, no people.",
+      "source": "/Users/clivestruver/.codex/generated_images/01a0821e-3eaf-7a92-92e5-c4af72a80bcd/exec-c2bf69a3-1f99-48dd-b804-84135651c499.png"
+    },
+    {
+      "file": "public/advisory/strategic-assessment.webp",
+      "prompt": "A considered overhead editorial still life on an oak strategy table, physical architectural blocks and three different branching routes marked on translucent tracing sheets, a single brass ruler, dark teal and stone grey materials. Suggest a consequential choice grounded in evidence, no chess pieces, no readable text.",
+      "source": "/Users/clivestruver/.codex/generated_images/01a0821e-3eaf-7a92-92e5-c4af72a80bcd/exec-46a24b2d-33a7-4742-8322-fbb2f235888d.png"
+    }
+  ]
+}

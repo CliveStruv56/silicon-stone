@@ -255,7 +255,7 @@ export default function PricingPage() {
               </strong>{' '}
               The first five Drift Retainer clients join at{' '}
               <strong className="font-semibold">{gbp(AMOUNTS.driftRetainerFounding)} a month for the first six months</strong>,
-              then the standard rate. Same Baseline Month guarantee.
+              then the standard rate. Monthly retainers have no minimum term.
             </div>
           )}
         </Section>

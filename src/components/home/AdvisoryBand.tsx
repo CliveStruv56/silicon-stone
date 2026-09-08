@@ -29,7 +29,7 @@ const tiers: Tier[] = [
   {
     label: 'Most popular · Ongoing',
     title: 'The Drift Retainer',
-    body: `When the board asks what has actually changed, a standing independent read on how the drift affects your supply chains, procurement, and people — delivered monthly, so the leadership team is never blindsided. From ${gbp(AMOUNTS.driftRetainerMonthly)}/mo.`,
+    body: `When the board asks what has actually changed, a standing independent read on how the drift affects your supply chains, procurement, and people — delivered monthly, so the leadership team is never blindsided. ${gbp(AMOUNTS.driftRetainerMonthly)}/mo.`,
     href: '/advisory/drift-retainer',
     popular: true,
   },

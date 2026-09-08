@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowRight, CheckCircle, Mail, User, Building2, MessageSquare } from 'lucide-react'
 
@@ -52,6 +52,7 @@ export function EngagementContactForm({
   messagePlaceholder?: string
   trustItems?: TrustItem[]
 }) {
+  const formId = useId()
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -154,13 +155,14 @@ export function EngagementContactForm({
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1.5 block text-sm text-text-muted">
+                  <label htmlFor={`${formId}-name`} className="mb-1.5 block text-sm text-text-muted">
                     <User className="mr-1 inline h-3 w-3" />
                     Name
                   </label>
                   <Input
                     type="text"
                     required
+                    id={`${formId}-name`}
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="border-border-subtle bg-stone-charcoal text-text-primary placeholder:text-text-muted/50 focus:border-stone-teal"
@@ -168,13 +170,14 @@ export function EngagementContactForm({
                   />
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-sm text-text-muted">
+                  <label htmlFor={`${formId}-email`} className="mb-1.5 block text-sm text-text-muted">
                     <Mail className="mr-1 inline h-3 w-3" />
                     Email
                   </label>
                   <Input
                     type="email"
                     required
+                    id={`${formId}-email`}
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     className="border-border-subtle bg-stone-charcoal text-text-primary placeholder:text-text-muted/50 focus:border-stone-teal"
@@ -184,12 +187,13 @@ export function EngagementContactForm({
               </div>
 
               <div>
-                <label className="mb-1.5 block text-sm text-text-muted">
+                <label htmlFor={`${formId}-company`} className="mb-1.5 block text-sm text-text-muted">
                   <Building2 className="mr-1 inline h-3 w-3" />
                   Company
                 </label>
                 <Input
                   type="text"
+                  id={`${formId}-company`}
                   value={formData.company}
                   onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                   className="border-border-subtle bg-stone-charcoal text-text-primary placeholder:text-text-muted/50 focus:border-stone-teal"
@@ -198,12 +202,13 @@ export function EngagementContactForm({
               </div>
 
               <div>
-                <label className="mb-1.5 block text-sm text-text-muted">
+                <label htmlFor={`${formId}-message`} className="mb-1.5 block text-sm text-text-muted">
                   <MessageSquare className="mr-1 inline h-3 w-3" />
                   {messageLabel}
                 </label>
                 <textarea
                   rows={4}
+                  id={`${formId}-message`}
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   className="w-full rounded-md border border-border-subtle bg-stone-charcoal px-3 py-2 text-sm text-text-primary placeholder:text-text-muted/50 focus:border-stone-teal focus:outline-none focus:ring-1 focus:ring-stone-teal"
@@ -211,7 +216,7 @@ export function EngagementContactForm({
                 />
               </div>
 
-              {formError && <p className="text-center text-sm text-alert-red">{formError}</p>}
+              {formError && <p role="alert" className="text-center text-sm text-alert-red">{formError}</p>}
 
               <Button
                 type="submit"

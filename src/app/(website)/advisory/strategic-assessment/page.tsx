@@ -87,6 +87,8 @@ export default function StrategicAssessmentPage() {
             </>
           }
           ctaLabel="Request a proposal"
+          imageSrc="/advisory/strategic-assessment.webp"
+          imageAlt="Architectural blocks and branching routes on tracing sheets, arranged on a strategy table"
           imageCaption="Multi-framework analysis, read against the decision your board actually has to take."
         />
 

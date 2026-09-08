@@ -97,7 +97,7 @@ export interface Offering {
   name: string
   /** Display price exactly as it should read on screen. */
   price: string
-  /** Qualifier shown beside the price ("one hour", "three-month term"). */
+  /** Qualifier shown beside the price ("one hour", "rolling monthly"). */
   priceNote?: string
   /**
    * Where an offering is sold at two named prices rather than one headline
@@ -285,14 +285,8 @@ export const ENGAGEMENTS: Offering[] = [
   {
     id: 'drift-retainer',
     name: 'The Drift Retainer',
-    // "From", not a flat rate, and every surface must say so. Until
-    // 2026-09-04 two of them did not: the retainer summary block on /advisory
-    // and the "At a glance" card on /advisory/drift-retainer both printed a
-    // bare "£2,000/month" while this string, the header note and /pricing
-    // carried the qualifier. A floor rendered as a rate is a commercial claim
-    // the scope conversation then has to walk back.
-    price: `From ${gbp(AMOUNTS.driftRetainerMonthly)}`,
-    priceNote: 'per month · three-month initial term',
+    price: gbp(AMOUNTS.driftRetainerMonthly),
+    priceNote: 'per month · rolling monthly, no minimum term',
     summary:
       'The standing relationship. A board-forwardable monthly briefing, a working session on one live decision, direct access between sessions, and a quarterly written exposure review.',
     question: 'It keeps moving and we keep reacting.',
@@ -304,7 +298,7 @@ export const ENGAGEMENTS: Offering[] = [
     // it silently scrolls nowhere.
     href: '/advisory/drift-retainer',
     terms: [
-      'The Baseline Month guarantee: after month one, walk away paying that month only.',
+      'Rolling monthly with no minimum term, starting with a Baseline Month.',
       `Twelve months for the price of ten — ${gbp(AMOUNTS.driftRetainerAnnual)} a year.`,
       'Limited to a handful of client companies at any time.',
     ],

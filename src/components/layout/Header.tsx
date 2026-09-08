@@ -5,7 +5,6 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/layout/ThemeToggle'
-import { AMOUNTS, gbp, priceOf } from '@/lib/offering'
 
 // `sister` marks an entry that is adjacent to the ladder rather than a rung on
 // it — WaymarkPath is a separate product, not a fourth thing to buy here. It
@@ -52,8 +51,8 @@ const primaryNavigation: NavItem[] = [
     name: 'Products',
     href: '/products',
     children: [
-      { name: 'AI Audit Checklist Pack', href: '/products/ai-audit-checklist', note: priceOf('ai-audit-checklist') },
-      { name: 'AI Act Compliance Toolkit', href: '/products/ai-act-toolkit', note: `From ${priceOf('ai-act-toolkit')}` },
+      { name: 'AI Audit Checklist Pack', href: '/products/ai-audit-checklist' },
+      { name: 'AI Act Compliance Toolkit', href: '/products/ai-act-toolkit' },
       { name: 'Sector Reports', href: '/products/sector-reports', note: 'Coming soon' },
       { name: 'All products', href: '/products' },
       { name: 'WaymarkPath', href: '/waymarkpath', note: 'Early access', sister: true },
@@ -63,28 +62,12 @@ const primaryNavigation: NavItem[] = [
     name: 'Advisory',
     href: '/advisory',
     children: [
-      // Price notes come from src/lib/offering.ts so the menu cannot drift from
-      // /pricing — this nav carried a stale duplicate set until 2026-08-15.
-      // All four engagements are full pages now, built from one template — the
-      // treatment the Post-Omnibus Briefing has always had at the same price
-      // point. While the Retainer alone lived as a section on /advisory it kept
-      // a structural advantage over the others no matter how good their copy got.
-      { name: 'Advisory Briefing', href: '/advisory/advisory-briefing', note: priceOf('advisory-briefing') },
-      { name: 'The Exposure Diagnostic', href: '/advisory/exposure-diagnostic', note: priceOf('exposure-diagnostic') },
-      { name: 'The Drift Retainer', href: '/advisory/drift-retainer', note: `${priceOf('drift-retainer')}/mo` },
-      { name: 'Strategic Assessment', href: '/advisory/strategic-assessment', note: priceOf('strategic-assessment') },
-      // A separate page rather than an anchor, and the one paid offering that
-      // was in no menu at all — reachable only from inline links on five pages.
-      // Filed under Advisory, not Products: it is a scoped engagement, and
-      // everything under Products is a digital download.
-      //
-      // The note carries "US & UK" because this and the Exposure Diagnostic
-      // both open at £2,500 and sat two rows apart reading as the same offer.
-      // The audience is the real difference — the Diagnostic reads your whole
-      // stack, this one reads your European market entry — so the menu says so
-      // rather than leaving the reader to guess from two identical prices.
-      { name: 'Post-Omnibus Briefing', href: '/eu-exposure', note: `${priceOf('post-omnibus-briefing')} · US & UK` },
-      { name: 'Modules', href: '/advisory#modules', note: `From ${gbp(AMOUNTS.moduleFloor)}` },
+      { name: 'Advisory Briefing', href: '/advisory/advisory-briefing' },
+      { name: 'The Exposure Diagnostic', href: '/advisory/exposure-diagnostic' },
+      { name: 'The Drift Retainer', href: '/advisory/drift-retainer' },
+      { name: 'Strategic Assessment', href: '/advisory/strategic-assessment' },
+      { name: 'Post-Omnibus Briefing', href: '/eu-exposure', note: 'US & UK' },
+      { name: 'Modules', href: '/advisory#modules' },
       // The 3×2 section was the one part of /advisory that no menu reached and
       // no anchor named, which is part of why it read as a separate product
       // rather than as what the Retainer runs on.

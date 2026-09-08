@@ -1,261 +1,77 @@
 'use client'
 
-import Link from 'next/link'
-import { CheckCircle, Clock, MessageSquare, Shield } from 'lucide-react'
-
-import { Header, Footer } from '@/components/layout'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
-import { AdvisoryPracticeBand } from '@/components/advisory/AdvisoryPracticeBand'
-import { AtAGlance } from '@/components/advisory/AtAGlance'
-import { EngagementContactForm } from '@/components/advisory/EngagementContactForm'
-import { EngagementHero } from '@/components/advisory/EngagementHero'
-import { WhereItLeads } from '@/components/advisory/WhereItLeads'
+import { Shield } from 'lucide-react'
+import { FocusedEngagementPage } from '@/components/advisory/FocusedEngagementPage'
 import { FOUNDING_OFFER_ACTIVE } from '@/lib/flags'
-import { AMOUNTS, gbp } from '@/lib/offering'
-
-/**
- * The Drift Retainer, on its own page.
- *
- * It was the last engagement presented as a section on `/advisory` while the
- * other three had pages. That asymmetry was not cosmetic: it is why the styling
- * kept diverging (a section and a page were never built from one template) and
- * why the four-across tier grid had to exist to give the others any presence at
- * all. Moving it here lets all four come off `EngagementHero` + `AtAGlance` +
- * `WhereItLeads`, so consistency stops being something to police.
- *
- * `/advisory#retainer` still resolves — the hub keeps a summary block under that
- * id, because a dead anchor does not 404, it silently scrolls nowhere, and
- * twelve places across the site pointed at it.
- */
+import { AMOUNTS, gbp, priceOf } from '@/lib/offering'
 
 const INCLUDES = [
-  'The monthly briefing — a short, board-forwardable written read plus a call: what shifted in the drift this month, and the decision it changes',
-  'The working session — ninety minutes on one live decision, refereed rather than advised: the call turns on the evidence, not on who prepared the better presentation',
-  'The Line — direct access between sessions to challenge a vendor claim, sanity-check a proposal, or prepare a board answer',
-  'The quarterly exposure review — a deeper written read on the same 3×2 method the public analysis uses, traced to your exposure',
+  { title: 'Monthly briefing', cadence: 'Every month', body: 'A concise written briefing you can forward to the board, plus a call: what has changed in technology and policy, and which decisions it affects.' },
+  { title: 'Working session', cadence: 'Every month', body: 'Ninety minutes on one live decision. An independent facilitator keeps the discussion grounded in evidence and helps your team reach a clear position.' },
+  { title: 'The Line', cadence: 'Between sessions', body: 'Direct access to challenge a vendor claim, sense-check a proposal or prepare an answer for the board while the question is still live.' },
+  { title: 'Exposure review', cadence: 'Every quarter', body: 'A deeper written review of how your exposure has changed and where the next quarter’s attention belongs.' },
 ]
 
 export default function DriftRetainerPage() {
   return (
-    <div className="flex min-h-screen flex-col">
-      <Header />
-
-      <main className="flex-1">
-        <AdvisoryPracticeBand />
-
-        <EngagementHero
-          badge="The standing relationship · most popular"
-          title="Your standing read on the drift."
-          lead="You have bought the licences and your people are experimenting. When the board asks what has actually changed in how the business makes money, manages risk, or serves customers, the honest answer is often: not much."
-          body="Meanwhile the drift does not hold still. Export controls shift, a fab reports delays, a regulatory position diverges across the Atlantic — and the exposure you mapped in spring reads differently by autumn."
-          inShort={
-            <>
-              A senior, independent reading of how technopolitical movement affects your
-              supply chains, your procurement and your people — delivered every month, from{' '}
-              {gbp(AMOUNTS.driftRetainerMonthly)} a month on a three-month initial term.
-            </>
-          }
-          ctaLabel="Book a 25-minute conversation"
-          imageCaption="Three forensic domains, two analytical methods — read against your business, every month."
-          showLaunchLine
-        />
-
-        <AtAGlance
-          price={`From ${gbp(AMOUNTS.driftRetainerMonthly)}/month`}
-          priceNote="Three-month initial term, then rolling monthly · limited to a handful of client companies at any time"
-          points={[
-            'A board-forwardable monthly briefing — what shifted, and the decision it changes',
-            'A ninety-minute working session on one live decision, externally refereed',
-            'The Line — direct access between sessions for the awkward questions',
-            'A quarterly written exposure review on the 3×2 method',
-          ]}
-          ctaLabel="Book a 25-minute conversation"
-        />
-
-        {/* Who it is for */}
-        <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
-          <div className="max-w-3xl">
-            <div className="mb-3 font-mono text-xs uppercase tracking-wider text-text-muted">
-              Who this is for
-            </div>
-            <h2 className="mb-4 text-2xl font-semibold text-text-primary">
-              Leadership teams that stay ahead of the drift, not catch up to it.
-            </h2>
-            <p className="mb-4 leading-relaxed text-text-muted">
-              The Drift Retainer is the relationship behind the analysis: a senior,
-              independent reading of how technopolitical movement affects <em>your</em>{' '}
-              supply chains, <em>your</em> procurement, and <em>your</em> people —
-              delivered every month, in language a semi-technical leadership team can act
-              on.
-            </p>
-            <p className="leading-relaxed text-text-muted">
-              Equally for{' '}
-              <strong className="font-semibold text-text-primary">
-                US companies operating in or entering Europe
-              </strong>
-              : a standing, independent read on how the AI Act, the sovereignty package,
-              and the wider drift affect your European position — so compliance becomes a
-              maintained state, not an annual panic.
-            </p>
+    <FocusedEngagementPage
+      hero={{
+        badge: 'Drift Retainer',
+        title: 'An independent view, as the picture changes.',
+        lead: 'Your AI suppliers, technology choices and policy obligations keep changing. Your leadership team needs to know which changes matter to the business — and what to do about them.',
+        body: 'The Drift Retainer brings a senior, independent perspective to your supply chains, procurement and people, with regular time to work through the decisions in front of you.',
+        inShort: 'Ongoing technology and policy advice, grounded in your operations and delivered through a standing monthly relationship.',
+        ctaLabel: 'Book a 25-minute conversation',
+        imageSrc: '/advisory/drift-retainer.webp',
+        imageAlt: 'A stone coastal observation room overlooking Atlantic shipping lanes, with a warm desk light inside',
+        imageCaption: 'A clear view of what is changing around your business.',
+        showLaunchLine: true,
+      }}
+      audience={<>
+        <p className="text-xl text-text-primary">For leadership teams making technology decisions in a changing environment.</p>
+        <p>You have adopted AI and now need to explain what it changes for revenue, risk and customers. You want someone independent to test the assumptions, interpret developments and help the team decide where to focus.</p>
+        <p>The retainer also supports US companies operating in or entering Europe that need an ongoing view of how European policy and technology dependencies affect their position.</p>
+      </>}
+      process={<>
+        <div className="mb-10 grid gap-6 lg:grid-cols-[1fr_2fr] lg:gap-12">
+          <h3 className="text-lg font-semibold text-text-primary">Start with a Baseline Month</h3>
+          <div className="max-w-3xl space-y-4 leading-relaxed text-text-muted">
+            <p>We examine where AI and technology change touch your operations, using your organisation chart, current tools and spend, and short conversations with three or four process owners.</p>
+            <p>The Baseline Briefing identifies the two or three areas of real exposure and sets the priorities for the work that follows.</p>
           </div>
-        </section>
-
-        <Separator className="mx-auto max-w-7xl bg-border-subtle" />
-
-        {/* What it includes, and the anti-software argument */}
-        <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
-          <div className="grid grid-cols-1 gap-10 lg:grid-cols-[3fr_2fr] lg:items-start">
-            <div>
-              <h2 className="mb-4 text-2xl font-semibold text-text-primary">
-                How it starts
-              </h2>
-              <p className="mb-4 max-w-2xl leading-relaxed text-text-muted">
-                Every engagement opens with the Baseline Month: a structured read of where
-                AI and the drift currently touch your operations, built from your org
-                chart, your current tools and spend, and short conversations with three or
-                four process owners. It ends with a Baseline Briefing — the two or three
-                places where the exposure is real and where the next quarter&rsquo;s focus
-                belongs.
-              </p>
-              <p className="mb-6 max-w-2xl leading-relaxed text-text-muted">
-                <strong className="font-semibold text-text-primary">
-                  You know within thirty days whether the relationship earns its fee.
-                </strong>{' '}
-                After month one you can walk away paying that month only.
-              </p>
-              <p className="mb-6 max-w-2xl leading-relaxed text-text-muted">
-                <strong className="font-semibold text-text-primary">What we read.</strong>{' '}
-                Three forensic domains — supply chain, policy, talent — each read two ways,
-                for scenarios and against thirty years of precedent.{' '}
-                <Link href="/advisory#method" className="text-stone-teal hover:underline">
-                  What the 3×2 method means in practice →
-                </Link>
-              </p>
-              <p className="max-w-2xl border-l-2 border-sister-indigo/50 pl-4 text-sm italic text-text-muted">
-                The same drift runs through individual careers as well as company strategy.
-                Where the brief is personal rather than organisational,{' '}
-                <Link href="/waymarkpath" className="text-sister-indigo hover:underline">
-                  WaymarkPath
-                </Link>{' '}
-                is the companion.
-              </p>
-            </div>
-
-            <Card className="border-silicon-amber/40 bg-stone-charcoal">
-              <CardHeader>
-                <div className="font-mono text-xs uppercase tracking-wider text-text-muted">
-                  What it includes
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-5">
-                <ul className="space-y-3">
-                  {INCLUDES.map((item) => (
-                    <li key={item} className="flex items-start gap-2 text-sm text-text-primary">
-                      <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-silicon-amber-strong" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-                <p className="border-t border-border-subtle pt-4 text-sm leading-relaxed text-text-muted">
-                  Software tracks your controls. It doesn&rsquo;t read export controls. A
-                  governance platform will tell you what&rsquo;s in your inventory; the
-                  Drift Retainer tells you what&rsquo;s about to change around it — and
-                  which decision it changes. Most clients eventually run both; the Retainer
-                  also tells you which platform you actually need before you buy one.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
-
-        {/* Price and terms */}
-        <section className="border-y border-silicon-amber/30 bg-silicon-amber/5">
-          <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
-            <div className="max-w-3xl">
-              <h2 className="mb-4 text-2xl font-semibold text-text-primary">
-                {gbp(AMOUNTS.driftRetainerMonthly)} a month, on a three-month initial term
-              </h2>
-              <p className="mb-4 leading-relaxed text-text-muted">
-                <strong className="font-semibold text-text-primary">
-                  The Baseline Month guarantee:
-                </strong>{' '}
-                after month one, walk away paying that month only.
-              </p>
-              <p className="mb-4 leading-relaxed text-text-muted">
-                Prefer annual? Twelve months for the price of ten —{' '}
-                {gbp(AMOUNTS.driftRetainerAnnual)} a year. Either way it is limited to a
-                handful of client companies at any time.
-              </p>
-              <p className="leading-relaxed text-text-muted">
-                An{' '}
-                <Link href="/advisory/advisory-briefing" className="text-silicon-amber-strong hover:underline">
-                  Advisory Briefing
-                </Link>{' '}
-                is credited in full toward your first month, and an{' '}
-                <Link href="/advisory/exposure-diagnostic" className="text-silicon-amber-strong hover:underline">
-                  Exposure Diagnostic
-                </Link>{' '}
-                toward your first quarter.
-              </p>
-              {FOUNDING_OFFER_ACTIVE && (
-                <div className="mt-6 rounded-lg border border-silicon-amber/40 bg-silicon-amber/10 p-4 text-sm leading-relaxed text-text-primary">
-                  <strong className="font-semibold text-silicon-amber-strong">
-                    Founding rate — five companies, launch only.
-                  </strong>{' '}
-                  The first five retainer clients join at{' '}
-                  <strong className="font-semibold">
-                    {gbp(AMOUNTS.driftRetainerFounding)}/month for the first six months
-                  </strong>
-                  , then the standard rate. Same Baseline Month guarantee.
-                </div>
-              )}
-            </div>
-          </div>
-        </section>
-
-        <WhereItLeads
-          currentId="drift-retainer"
-          heading="Where it starts"
-          intro="Most retainers begin with a smaller piece of work. Each of these credits toward the relationship if you go on to one."
-          bridges={{
-            'advisory-briefing':
-              'One hour on a single question, credited in full toward your first retainer month.',
-            'exposure-diagnostic':
-              'One pass over the estate first, so month one starts from a map rather than a blank page. Credited toward your first quarter.',
-            'strategic-assessment':
-              'For a board decision that has to be made before any standing arrangement makes sense.',
-          }}
-        />
-
-        <EngagementContactForm
-          interest="Drift Retainer"
-          plausibleEvent="Engagement Enquiry"
-          heading="Book a 25-minute conversation"
-          intro="Tell us roughly where AI sits in your operations and what the board is asking. We'll say whether a retainer is the right shape, or whether something smaller is."
-          messageLabel="What is the board asking?"
-          messagePlaceholder="What has changed, what it costs us, whether we are exposed…"
-          trustItems={[
-            {
-              icon: Shield,
-              title: 'Confidentiality first',
-              body: 'All enquiries are treated with strict confidentiality.',
-            },
-            {
-              icon: Clock,
-              title: 'Thirty days to decide',
-              body: 'The Baseline Month guarantee — after month one, walk away paying that month only.',
-            },
-            {
-              icon: MessageSquare,
-              title: 'A standing line',
-              body: 'Thirty years inside the technology industry, on call between sessions.',
-            },
-          ]}
-        />
-      </main>
-
-      <Footer />
-    </div>
+        </div>
+        <h3 className="mb-6 text-lg font-semibold text-text-primary">Then keep the picture current</h3>
+        <dl className="grid gap-x-10 gap-y-8 md:grid-cols-2">
+          {INCLUDES.map(item => <div key={item.title} className="border-t border-border-subtle pt-5">
+            <dt className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+              <span className="text-lg font-semibold text-text-primary">{item.title}</span>
+              <span className="text-sm text-stone-teal">{item.cadence}</span>
+            </dt>
+            <dd className="text-sm leading-relaxed text-text-muted">{item.body}</dd>
+          </div>)}
+        </dl>
+        <p className="mt-8 max-w-3xl border-l-2 border-stone-teal/40 pl-5 text-sm leading-relaxed text-text-muted">The analysis covers supply chains, policy and talent, using scenarios and thirty years of industry precedent to understand what a change means for your business.</p>
+      </>}
+      price={`${priceOf('drift-retainer')}/month`}
+      pricing={<>
+        <p className="font-semibold text-text-primary">Rolling monthly, with no minimum term.</p>
+        <p>The retainer includes the Baseline Month and the ongoing support described above. You can finish after the first month, paying for that month only, or continue month by month.</p>
+        <p>Prefer annual? Twelve months for the price of ten — {gbp(AMOUNTS.driftRetainerAnnual)} a year.</p>
+        <p>We work with a handful of client companies at a time so each relationship gets the attention it needs.</p>
+        {FOUNDING_OFFER_ACTIVE && <div className="border-t border-silicon-amber/30 pt-4 text-sm">
+          <p className="mb-1 font-semibold text-text-primary">Founding offer</p>
+          <p>The first five retainer clients join at {gbp(AMOUNTS.driftRetainerFounding)}/month for the first six months, then the standard monthly rate. The monthly option has no minimum term.</p>
+        </div>}
+      </>}
+      contact={{
+        interest: 'Drift Retainer',
+        plausibleEvent: 'Engagement Enquiry',
+        heading: 'Book a 25-minute conversation',
+        intro: "Tell us where AI sits in your operations and what your leadership team is trying to decide. We’ll discuss whether the retainer fits your needs.",
+        messageLabel: 'What is your team trying to decide?',
+        messagePlaceholder: 'What has changed, what it costs us, where we are exposed…',
+        trustItems: [{ icon: Shield, title: 'Confidentiality first', body: 'All enquiries are treated with strict confidentiality.' }],
+      }}
+    />
   )
 }

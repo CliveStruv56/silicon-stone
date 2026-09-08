@@ -361,7 +361,7 @@ export default function ServicesPage() {
                 <p className="mt-6 border-l-2 border-silicon-amber/60 pl-4 leading-relaxed text-text-muted">
                   <strong className="font-semibold text-text-primary">In short.</strong>{' '}
                   The Drift Retainer is a standing monthly read on how the drift moves
-                  against your business, from {gbp(AMOUNTS.driftRetainerMonthly)} a month.
+                  against your business, {gbp(AMOUNTS.driftRetainerMonthly)} a month.
                   If you would rather take one pass at it first, the Exposure Diagnostic
                   is from {gbp(AMOUNTS.exposureDiagnostic)}.
                 </p>
@@ -392,8 +392,8 @@ export default function ServicesPage() {
               <div className="relative">
                 <div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-border-subtle lg:aspect-square">
                   <Image
-                    src="/intelligence-stream-bg.png"
-                    alt="A Forensic Technopolitics global risk map — supply-chain tracing, policy stress-testing and dependency mapping across the transatlantic system"
+                    src="/advisory/advisory-overview.webp"
+                    alt="A coastal workspace with charts and a compass overlooking a working container port"
                     fill
                     priority
                     sizes="(min-width: 1024px) 50vw, 100vw"
@@ -445,10 +445,10 @@ export default function ServicesPage() {
               </div>
               <div className="lg:justify-self-end lg:text-right">
                 <div className="font-mono text-2xl font-semibold text-text-primary">
-                  <span className="text-text-muted">From </span>{gbp(AMOUNTS.driftRetainerMonthly)}<span className="text-text-muted">/month</span>
+                  {gbp(AMOUNTS.driftRetainerMonthly)}<span className="text-text-muted">/month</span>
                 </div>
                 <div className="mb-5 text-sm text-text-muted">
-                  Three-month initial term, then rolling
+                  Rolling monthly, no minimum term
                 </div>
                 <Link href="/advisory/drift-retainer">
                   <Button size="lg" className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90">

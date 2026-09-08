@@ -44,7 +44,7 @@ const rungs: Rung[] = [
     tone: 'paid',
   },
   {
-    marker: `From ${gbp(AMOUNTS.driftRetainerMonthly)}/mo`,
+    marker: `${gbp(AMOUNTS.driftRetainerMonthly)}/mo`,
     title: 'Retain',
     body: 'A standing read on the drift, so your leadership team is never blindsided. Diagnostics and assessments scope into an ongoing relationship.',
     cta: 'Explore Advisory',
