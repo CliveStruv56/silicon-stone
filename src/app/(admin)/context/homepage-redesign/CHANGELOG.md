@@ -761,3 +761,23 @@ When sections ship, log them here in this format:
   Adding it to the panel ran every row flush to the edge.
 - Typecheck, lint, suite (1,562), build (125 pages), test:manual, test:security.
   Panel measured open at 390x844 and 360x640.
+
+## 2026-09-09 (tenth) — The header had never been sticky
+
+- Found while checking the new mobile menu on the tool pages: the menu was fine,
+  but you could not reach it once scrolled, because the header scrolled away.
+- Cause: `globals.css` had a bare `.noise-overlay { position: relative }`. The
+  header carries both `sticky` and `noise-overlay`; single-class selectors tie on
+  specificity, and this file comes after Tailwind's utilities, so `relative` won.
+  Measured at scroll 1300: computed `relative`, `top: -1300`, on /advisory and
+  /intelligence as well as the tools.
+- Fixed by scoping to `.noise-overlay:not(.sticky):not(.fixed)`. Both of those
+  establish a containing block, so `::before` loses nothing. Only four elements
+  use the class.
+- Side effect, intended: the hide-on-scroll implementation in `Header.tsx` was
+  dead code and is now live — hides to `top: -64` scrolling down, returns to `0`
+  scrolling up.
+- Anchors were already built for it: all five `#` targets land clear of the
+  header on both viewports, thanks to existing `scroll-mt-24`/`scroll-mt-28`.
+- Typecheck, lint, suite (1,562), build (125 pages), test:manual, test:security.
+  Menu re-tested on four tool pages scrolled deep; ten anchors measured.

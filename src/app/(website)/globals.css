@@ -274,8 +274,24 @@ html.dark {
 
 /* ===== FORENSIC TECHNOPOLITICS DESIGN SYSTEM ===== */
 
-/* Noise texture overlay - applied via pseudo-element */
-.noise-overlay {
+/* Noise texture overlay - applied via pseudo-element.
+
+   The `:not()` guard is load-bearing. `::before` needs a positioned ancestor,
+   so this sets one — but a bare `.noise-overlay { position: relative }` is a
+   single-class selector that ties with Tailwind's `.sticky` on specificity and
+   then wins on source order, because this file comes after the utilities.
+
+   The site header carries both classes. From whenever the noise texture was
+   added until 2026-09-09 it was therefore `position: relative`, not sticky: it
+   scrolled away on every page, and the hide-on-scroll implementation in
+   `Header.tsx` — scroll-direction tracking, rAF, 8px hysteresis — ran on every
+   scroll while translating an element that had already left the viewport.
+   Nothing errored; the header simply did not stick, and on a long tool page the
+   menu became unreachable without scrolling back to the top.
+
+   `sticky` and `fixed` both establish a containing block for `::before`, so
+   skipping the declaration for them costs nothing. */
+.noise-overlay:not(.sticky):not(.fixed) {
   position: relative;
 }
 .noise-overlay::before {

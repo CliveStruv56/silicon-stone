@@ -656,6 +656,49 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### September 9, 2026 (sticky header) — the header had never been sticky, anywhere
+
+Found while checking the new mobile menu on the tool pages. The menu itself was
+fine on all four; you could not *reach* it once you had scrolled, because the
+header scrolled away with the page.
+
+**One line of CSS ordering.** The header's class list says `sticky top-0`, but it
+also carries `noise-overlay`, and `globals.css` had a bare
+`.noise-overlay { position: relative }`. Both are single-class selectors, so
+specificity ties and **source order decides** — that file comes after Tailwind's
+utilities, so `relative` won and `sticky` never applied. Measured at scroll
+1300 the header's computed position was `relative` with `top: -1300`, on
+`/advisory` and `/intelligence` as well as the tool pages.
+
+Two consequences, both now fixed by scoping the rule
+`.noise-overlay:not(.sticky):not(.fixed)`:
+
+- **The nav was unreachable on any scrolled page.** Worst on the tool pages,
+  which are long and which you scroll through to use.
+- **The hide-on-scroll feature in `Header.tsx` was dead code.** Scroll-direction
+  tracking, `requestAnimationFrame`, 8px hysteresis against momentum jitter, a
+  `condensed` state driving `-translate-y-full` — all of it ran on every scroll,
+  translating an element that had already left the viewport. It is now live:
+  measured hiding to `top: -64` on scroll down and returning to `0` on scroll up.
+
+**`sticky` and `fixed` both establish a containing block**, so skipping the
+declaration for them costs the `::before` noise texture nothing. Only four
+elements use `noise-overlay` and the other three already declare `relative` or
+do not care.
+
+**The anchors were already built for this.** Every `#` target checked —
+`#modules`, `#retainer`, `#contact`, `#ai-bill-of-materials`,
+`#sovereign-architecture-review` — lands clear of the header on both viewports,
+because the `scroll-mt-24`/`scroll-mt-28` classes were written for a sticky
+header that was not sticking.
+
+**Validated:** typecheck, full lint, suite (1,562), build (125 pages),
+`test:manual`, `test:security`; sticky and hide/reveal measured on three routes;
+the menu re-tested on all four tool pages scrolled deep — hamburger reachable,
+panel correct, five probe points across it uncovered, body locked, no console
+errors; ten anchor targets measured against the header on mobile and desktop.
+
+
 ### September 9, 2026 (mobile) — The mobile menu became an overlay
 
 Measured before the change on a 390×844 viewport: the open menu was **1,065px
