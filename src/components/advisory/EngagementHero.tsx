@@ -17,8 +17,6 @@ export function EngagementHero({
   imageCaption,
   imageSrc,
   imageAlt,
-  artwork = 'photograph',
-  imageRatio = 1,
   showRelatedLink = true,
   showLaunchLine = false,
 }: {
@@ -33,12 +31,6 @@ export function EngagementHero({
   imageCaption: string
   imageSrc: string
   imageAlt: string
-  /** A photograph is framed and scrimmed; a transparent cutout floats on the page. */
-  artwork?: 'photograph' | 'cutout'
-  /** Width ÷ height of a cutout, so its box hugs the artwork instead of leaving a
-      transparent band between the picture and its caption. Ignored for photographs,
-      which are cropped to the frame. */
-  imageRatio?: number
   showRelatedLink?: boolean
   /** Only the Retainer runs the free-intro launch offer. */
   showLaunchLine?: boolean
@@ -79,45 +71,23 @@ export function EngagementHero({
             )}
           </div>
 
-          {artwork === 'cutout' ? (
-            /* A cutout has no edges of its own to frame, and --scrim-ink is fixed dark
-               for artwork that is always dark — laid over transparency it would float
-               a dark band on the light theme's stone page. So the caption comes out
-               from under the image and themes with everything else. */
-            <figure className="relative m-0">
-              <div className="relative" style={{ aspectRatio: imageRatio }}>
-                <Image
-                  src={imageSrc}
-                  alt={imageAlt}
-                  fill
-                  priority
-                  sizes="(min-width: 1024px) 50vw, 100vw"
-                  className="object-contain object-center"
-                />
-              </div>
-              <figcaption className="mt-4 text-sm italic text-balance text-text-muted">
-                {imageCaption}
-              </figcaption>
-            </figure>
-          ) : (
-            <div className="relative">
-              <div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-border-subtle lg:aspect-square">
-                <Image
-                  src={imageSrc}
-                  alt={imageAlt}
-                  fill
-                  priority
-                  sizes="(min-width: 1024px) 50vw, 100vw"
-                  className="object-cover object-center"
-                />
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-scrim-ink via-scrim-ink/70 to-transparent p-5 pt-16">
-                  <p className="text-sm italic text-balance text-white/90 [text-shadow:0_1px_8px_rgba(0,0,0,0.7)]">
-                    {imageCaption}
-                  </p>
-                </div>
+          <div className="relative">
+            <div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-border-subtle lg:aspect-square">
+              <Image
+                src={imageSrc}
+                alt={imageAlt}
+                fill
+                priority
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                className="object-cover object-center"
+              />
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-scrim-ink via-scrim-ink/70 to-transparent p-5 pt-16">
+                <p className="text-sm italic text-balance text-white/90 [text-shadow:0_1px_8px_rgba(0,0,0,0.7)]">
+                  {imageCaption}
+                </p>
               </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
     </section>

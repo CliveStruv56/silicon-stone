@@ -12,8 +12,8 @@ a free reference page, `/eu-exposure` 301s to it, and the £2,500 briefing and t
 Procurement Readiness is now part of an agreed Exposure Diagnostic or Strategic
 Assessment scope. The Advisory Briefing also got new owner-supplied hero artwork
 — a dark panel in the ordinary framed treatment, after a borderless cutout
-variant was tried and set aside; **the other four hero images are expected to be
-replaced next.** Read the September 9 entry in §9. Legal dates on the new page were researched when written and not re-verified
+variant was tried, set aside and deleted; **the other four hero images are
+expected to be replaced next.** Read the September 9 entry in §9. Legal dates on the new page were researched when written and not re-verified
 at commit time.
 
 ## Latest session — 8 September 2026
@@ -694,16 +694,24 @@ panel** — 99.9% opaque, with alpha only on its four rounded corners — so it 
 the ordinary framed treatment at 1200×1200 like the other four heroes, and that
 is what is live.
 
-`EngagementHero` keeps the `artwork: 'photograph' | 'cutout'` variant and
-`imageRatio` from the first attempt. **Nothing passes them today.** They are held
-for the remaining hero replacements; if those all arrive as panels, delete the
-branch. Two things it records that are easy to get wrong again: `--scrim-ink` is
-deliberately fixed dark for always-dark photographs, so over a transparent image
-it floats a dark band on the light theme's stone page; and a cutout needs
-`imageRatio` with the asset trimmed to its content, or the caption drifts a long
-way below the picture. **An alpha channel does not make a file a cutout** — check
-the actual transparent-pixel count. **The other four hero images are still
-photographs and are expected to be replaced next.**
+The `artwork: 'photograph' | 'cutout'` variant added for the first attempt has
+been **deleted** — it ended the day with no caller, and an untested branch on the
+component all five advisory pages render is a liability, not an option held in
+reserve. `EngagementHero` is byte-identical to its state before the attempt. Two
+findings survive it, and both cost an hour to rediscover:
+
+- **An alpha channel does not make a file a cutout.** Count the non-opaque
+  pixels: `A_softened_panel.png` has 1,884 out of 2,560,000, all corner rounding.
+- **A genuine cutout cannot use the framed hero.** `--scrim-ink` is deliberately
+  fixed dark for always-dark photographs, so over transparency it floats a dark
+  band on the light theme's stone page. Such artwork needs the frame and scrim
+  dropped, the caption moved out from under the image into themed muted text, and
+  the asset trimmed to its content with a matching box ratio — otherwise the
+  caption drifts a long way below the picture. `0585693a` has a working
+  implementation if it is ever wanted again.
+
+**The other four hero images are still photographs and are expected to be
+replaced next.**
 
 **Validated:** full Vitest suite (1,551 tests, 80 files), production build (122
 prerendered pages, up from 119), `test:security`, `test:sanity-prices` (3

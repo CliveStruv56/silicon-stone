@@ -640,3 +640,17 @@ When sections ship, log them here in this format:
   if those arrive as panels too.
 - Alt text and caption unchanged — same scene. Typecheck and the full suite
   (1,551 tests) pass. Walked in a browser in both themes.
+
+## 2026-09-09 (later still) — Cutout hero variant deleted
+
+- `artwork: 'photograph' | 'cutout'` and `imageRatio` are removed from
+  `EngagementHero`, which is now byte-identical to its state before the variant
+  was added. It ended the day with no caller, and an untested branch on the
+  component every advisory page renders is a liability rather than an option in
+  reserve.
+- The working implementation is in `0585693a` if a genuine cutout ever arrives.
+  What it knew: the caption scrim is fixed dark, so over transparency it floats a
+  dark band on the light theme; and the asset must be trimmed to its content with
+  a matching box ratio or the caption drifts far below the picture.
+- `cutoutHandling` dropped from `docs/advisory-image-prompts.json`; the
+  pixel-counting warning is kept on the image entry, where it is still true.
