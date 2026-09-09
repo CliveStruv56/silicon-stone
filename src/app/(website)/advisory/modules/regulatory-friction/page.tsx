@@ -5,9 +5,10 @@ import Link from 'next/link'
 import { ModulePage } from '@/components/advisory/ModulePage'
 import { DigitalOmnibusContext } from '@/components/advisory/DigitalOmnibusContext'
 import { Shield } from 'lucide-react'
-import { MODULES } from '@/lib/offering'
+import { MODULES, offeringById } from '@/lib/offering'
 
 const offering = MODULES.find(m => m.id === 'regulatory-friction')!
+const guide = offeringById('us-executive-guide')
 
 export default function RegulatoryFrictionPage() {
   return (
@@ -19,6 +20,9 @@ export default function RegulatoryFrictionPage() {
       body={<>
         <p>The free tool tests a position against published policy. This module maps two jurisdictions against each other across your actual operations, and scores where the friction between them costs you time, money or a deal.</p>
         <p>It is most useful for organisations operating on both sides of the Atlantic, where compliance work is being duplicated or where a requirement in one jurisdiction is quietly blocking something in the other.</p>
+        <p>For background on European digital sovereignty from a US perspective, start with the free{' '}
+          <Link href={guide.href} className="text-stone-teal underline underline-offset-4">{guide.name}</Link>.
+          {' '}This assessment takes that context into your own operations, with a prioritised transatlantic roadmap.</p>
         <p>It reads regulation as an operating constraint. It is not legal advice, and it does not replace counsel on any specific obligation.</p>
         <DigitalOmnibusContext>The revised EU rules change what applies, to whom and from when. We map those changes against your US obligations rather than treating either in isolation.</DigitalOmnibusContext>
       </>}

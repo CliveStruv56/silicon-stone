@@ -9,6 +9,7 @@ import { submitWithOfflineQueue } from '@/lib/offline/submit'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { offeringById } from '@/lib/offering'
 import {
   ArrowRight,
   CheckCircle,
@@ -18,6 +19,9 @@ import {
   Layers,
   KeyRound,
 } from 'lucide-react'
+
+const frictionAssessment = offeringById('regulatory-friction')
+const exposureDiagnostic = offeringById('exposure-diagnostic')
 
 const requiredNow = [
   'Transparency duties under Article 50 — disclosing AI interaction and labelling synthetic content',
@@ -289,14 +293,27 @@ export default function AtlanticDriftPage() {
                 <div className="mb-2 flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-silicon-amber-strong">
                   <ArrowRight className="h-4 w-4" /> The next step
                 </div>
-                <p className="text-sm leading-relaxed text-text-muted">
-                  When you want this read against your own systems rather than in general,
-                  the{' '}
-                  <Link href="/advisory/exposure-diagnostic" className="text-silicon-amber-strong hover:underline">
-                    Exposure Diagnostic
+                <h3 className="text-xl font-semibold text-text-primary">{frictionAssessment.name}</h3>
+                <p className="mt-2 font-mono text-sm text-silicon-amber-strong">{frictionAssessment.price}</p>
+                <p className="mt-3 text-sm leading-relaxed text-text-muted">
+                  The guide gives you the background. When you need to understand where US
+                  and EU requirements create friction across your own operations, the assessment
+                  maps the gaps and priorities for your business.
+                </p>
+                <p className="mt-3 text-sm leading-relaxed text-text-muted">{frictionAssessment.summary}</p>
+                <Link
+                  href={frictionAssessment.href}
+                  className="mt-5 inline-flex items-center gap-2 rounded-md bg-accent-fill px-4 py-2.5 text-sm font-medium text-ink-on-accent transition-colors hover:bg-accent-fill/90"
+                >
+                  Explore the {frictionAssessment.name}
+                  <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
+                </Link>
+                <p className="mt-4 border-t border-silicon-amber/20 pt-4 text-sm leading-relaxed text-text-muted">
+                  Need a broader review of your systems and vendor dependencies?{' '}
+                  <Link href={exposureDiagnostic.href} className="text-stone-teal underline underline-offset-4">
+                    {exposureDiagnostic.name}
                   </Link>{' '}
-                  examines your systems, vendor evidence and European Procurement Readiness
-                  within an agreed scope, with prioritised actions.
+                  covers that wider scope.
                 </p>
               </div>
             </div>

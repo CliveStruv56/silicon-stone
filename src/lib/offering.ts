@@ -475,6 +475,13 @@ export const SANITY_PRODUCTS: Array<{
   },
 ]
 
+/** Resolve a catalogue entry for links and calls to action; fail on a mistyped id. */
+export function offeringById(id: string): Offering {
+  const offering = [...FREE_OFFERINGS, ...PRODUCTS, ...ENGAGEMENTS, ...MODULES].find(o => o.id === id)
+  if (!offering) throw new Error(`Unknown offering: ${id}`)
+  return offering
+}
+
 /** Look up a display price by offering id, for surfaces that show only that. */
 export function priceOf(id: string): string {
   const all = [

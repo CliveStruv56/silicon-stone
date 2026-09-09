@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { StaggerContainer, StaggerItem } from '@/components/ui/StaggerContainer'
 import { ForensicCard } from '@/components/ui/ForensicCard'
 import { Badge } from '@/components/ui/badge'
-import { AMOUNTS, gbp } from '@/lib/offering'
+import { offeringById } from '@/lib/offering'
 import { ArrowRight } from 'lucide-react'
 
 /* Preview frames.
@@ -31,7 +31,7 @@ const tools = [
     preview: '/tools/supply-chain-mapper-preview.webp',
     previewAlt:
       'Isometric illustration: supply routes from a mine, a chemical plant and a container port converge on a single mountain pass marked with a red warning symbol, then continue to a semiconductor fabrication plant.',
-    takeFurther: { label: 'Manufacturing Exposure Module', href: '/advisory' },
+    takeFurther: offeringById('manufacturing-exposure'),
   },
   {
     name: 'Compliance Checker',
@@ -42,7 +42,7 @@ const tools = [
     preview: '/tools/compliance-checker-preview.webp',
     previewAlt:
       'Isometric illustration: circuit traces run from a server rack out to four graded tiers — red and flagged with a warning symbol, amber, teal, then unlit grey — echoing the EU AI Act risk classes from prohibited down to minimal.',
-    takeFurther: { label: `AI Act Compliance Toolkit (${gbp(AMOUNTS.toolkitStandard)})`, href: '/products' },
+    takeFurther: offeringById('advisory-briefing'),
   },
   {
     name: 'Scenario Modeler',
@@ -53,7 +53,7 @@ const tools = [
     preview: '/tools/scenario-modeler-preview.webp',
     previewAlt:
       'Isometric illustration: three coloured paths leave one office tower for three different futures — a fractured red plateau under a warning symbol, a cracked sandstone block, and intact teal ground carrying a smaller building.',
-    takeFurther: { label: 'Scenario Impact Analysis', href: '/advisory' },
+    takeFurther: offeringById('scenario-impact'),
   },
   {
     name: 'Policy Stress-Test',
@@ -64,7 +64,7 @@ const tools = [
     preview: '/tools/policy-stress-test-preview.webp',
     previewAlt:
       'Isometric illustration: the US Capitol and a European institutional building sit on opposite sides of a deep rift, their green policy routes reaching the edge and stopping at red warning symbols rather than meeting.',
-    takeFurther: { label: 'Regulatory Friction Assessment', href: '/advisory' },
+    takeFurther: offeringById('regulatory-friction'),
   },
 ]
 
@@ -163,7 +163,7 @@ export function ToolsGallery() {
                     href={tool.takeFurther.href}
                     className="mt-4 pt-3 border-t border-dashed border-border-subtle/70 flex items-center gap-1.5 font-mono text-[12.5px] font-semibold tracking-[0.03em] text-text-muted transition-colors hover:text-text-primary"
                   >
-                    <span>Take it further → {tool.takeFurther.label}</span>
+                    <span>Take it further → {tool.takeFurther.name}</span>
                   </Link>
                 </ForensicCard>
               </StaggerItem>

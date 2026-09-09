@@ -37,7 +37,10 @@ import { ReportGate } from '@/components/tools/ReportGate'
 import { CopyMarkdownButton } from '@/components/tools/CopyMarkdownButton'
 import { ToolSubscribeCard } from '@/components/tools/ToolSubscribeCard'
 import { complianceCheckerMarkdown } from '@/lib/tools-markdown'
-import { AMOUNTS, gbp } from '@/lib/offering'
+import { FollowOnOffering } from '@/components/advisory/FollowOnOffering'
+import { AMOUNTS, gbp, offeringById } from '@/lib/offering'
+
+const briefing = offeringById('advisory-briefing')
 
 function values(value: AssessmentValue | undefined): string[] {
   if (!value) return []
@@ -640,8 +643,8 @@ export default function ComplianceCheckerPage() {
                     </div>
                     <p className="text-xs text-text-muted text-center border-t border-border-subtle pt-4">
                       Need it interpreted for your business?{' '}
-                      <Link href="/advisory/exposure-diagnostic" className="text-silicon-amber-strong hover:underline">
-                        See the Exposure Diagnostic
+                      <Link href={briefing.href} className="text-silicon-amber-strong hover:underline">
+                        Explore the {briefing.name}
                       </Link>
                       , or a standing read via the{' '}
                       <Link href="/advisory/drift-retainer" className="text-silicon-amber-strong hover:underline">
@@ -816,6 +819,12 @@ export default function ComplianceCheckerPage() {
             </motion.div>
           )}
         </section>
+        <FollowOnOffering
+          offering={briefing}
+          eyebrow="Take your Compliance Checker results further"
+          intro="Have a question about your result? Bring your assessment and the evidence you have. We will help you interpret what it means for your business and decide what to do next."
+          note="One hour on your question, with a written follow-up."
+        />
       </main>
 
       <Footer />
