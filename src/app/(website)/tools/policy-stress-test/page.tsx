@@ -462,12 +462,18 @@ export default function PolicyStressTestPage() {
                 <label className="text-sm font-medium text-text-primary mb-2 block">
                   Company Size
                 </label>
-                <div className="flex gap-2">
+                {/* A grid, not a flex row. Three `flex-1` buttons cannot shrink
+                    below their own content — flex items default to
+                    `min-width: auto` — and "Enterprise (250+ employees)" plus
+                    `px-4` pushed the row 6px past a 390px viewport, so the whole
+                    page scrolled sideways. Stacked on mobile, which is what the
+                    policy pickers above already do, and three across from `sm`. */}
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                   {COMPANY_SIZES.map(size => (
                     <button
                       key={size.value}
                       onClick={() => setSelectedSize(size.value)}
-                      className={`flex-1 px-4 py-2 rounded-lg border text-sm transition-all ${
+                      className={`px-4 py-2 rounded-lg border text-sm transition-all ${
                         selectedSize === size.value
                           ? 'bg-stone-teal/20 border-stone-teal/40 text-stone-teal'
                           : 'bg-surface-elevated border-border-subtle text-text-muted hover:text-text-primary'

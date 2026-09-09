@@ -819,3 +819,23 @@ When sections ship, log them here in this format:
   the mapper was the only one, and it is now clean at both.
 - Typecheck, lint, suite (1,562), build (125 pages), test:manual, test:security.
   Both branches walked in a browser.
+
+## 2026-09-09 (twelfth) — Layout audit of the other three tools
+
+- Swept Compliance Checker, Scenario Modeler and Policy Stress-Test at 1440 and
+  390 for horizontal scroll, elements past the viewport, children spilling their
+  parent, text clipped by a fixed height, sub-30px tap targets and console
+  errors. Also drove the Policy Stress-Test to its results state.
+- **One defect: Policy Stress-Test scrolled sideways on mobile by 6px.** The
+  Company Size row was three `flex-1` buttons, and flex items default to
+  `min-width: auto` — they cannot shrink below their own content, so
+  "Enterprise (250+ employees)" plus `px-4` pushed the row past a 390px
+  viewport. Now `grid grid-cols-1 sm:grid-cols-3`: stacked on mobile, which is
+  what the policy pickers directly above it already do, three across from `sm`.
+- Everything else clean. The `line-clamp-2` hits on the Scenario Modeler are
+  deliberate two-line truncation, not clipping — a false positive of the check.
+- Two observations, no change made: the Scenario Modeler says "Hover for
+  details" on touch devices, and the price badge on the follow-on band sits far
+  right of its heading at desktop width. The second is the shared component's
+  behaviour on all four tools.
+- Typecheck, lint, suite (1,562), build (125 pages), test:manual, test:security.
