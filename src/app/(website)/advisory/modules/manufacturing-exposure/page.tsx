@@ -14,7 +14,7 @@ export default function ManufacturingExposurePage() {
       name={offering.name}
       price={offering.price}
       lead="Semiconductor, cloud, supplier and operational dependencies mapped where they matter to your organisation — with the chokepoints named and the questions to put to your suppliers."
-      fromTool={{ name: 'the Supply Chain Mapper', href: '/tools/supply-chain-mapper' }}
+      fromTool={offering.fromTool}
       body={<>
         <p>The free tool models dependency at the level of an industry. This module does it at the level of your organisation: the components you actually buy, the suppliers you actually depend on, and the substitutions that are realistically available to you.</p>
         <p>It is most useful when a board or a customer has asked a question the tool cannot answer — which of these dependencies would genuinely stop us, and what would we do about it.</p>

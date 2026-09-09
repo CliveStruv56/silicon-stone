@@ -14,7 +14,7 @@ export default function ScenarioImpactPage() {
       name={offering.name}
       price={offering.price}
       lead="Geopolitical scenarios built for your industry and geography, with the value at stake quantified by business unit rather than described in the abstract."
-      fromTool={{ name: 'the Scenario Modeler', href: '/tools/scenario-modeler' }}
+      fromTool={offering.fromTool}
       body={<>
         <p>The free tool runs published scenarios against general assumptions. This module builds the scenarios that actually threaten your business, and puts a number against each one — by business unit, not as a single company-wide figure that no one can act on.</p>
         <p>It is most useful ahead of a planning cycle or an investment decision, where the argument turns on how much is at risk rather than on whether a risk exists.</p>

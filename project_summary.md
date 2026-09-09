@@ -656,6 +656,33 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### September 9, 2026 (last) — Follow-on prompts rewritten; Advisory dropdown trimmed
+
+**The follow-on block was there and the owner could not see it.** It had shipped
+on all three tool pages, but it opened *"When the tool reaches its limit"* —
+which describes the module rather than speaking to the reader — and it wore the
+same quiet `bg-stone-charcoal` card styling as the tool's own panels. At the
+bottom of an 800-line tool page that reads as more tool, not as the next step.
+Worth remembering: *rendered* and *noticed* are different tests, and only the
+second one matters here.
+
+- It now opens **"Now you have run the Supply Chain Mapper"**, addresses someone
+  who has just finished, and wears the amber band and solid CTA the site uses for
+  commercial callouts everywhere else.
+- **The tool↔module pairing moved into the catalogue** (`Offering.fromTool`). It
+  had been stated in three places — the module page's prose, the tool page's
+  block, and the test asserting they agree — which is two too many for a fact
+  `MODULES` can hold. The module pages now read it rather than retyping it.
+- **Modules, All prices and Contact are gone from the Advisory dropdown**, at the
+  owner's request. `/pricing` is still reachable from the footer's Engage column
+  and the mobile `/more` page, and `#contact` from the footer's Company column;
+  `/advisory#modules` now has no menu entry at all, which is the intended effect.
+
+**Validated:** full suite (1,562), production build (125 pages), `test:manual`,
+`test:security`, full lint, and all three tool pages walked in a browser with the
+block's kicker, heading and CTA read back from the DOM.
+
+
 ### September 9, 2026 (latest) — Sovereign Architecture Review folded into the Strategic Assessment
 
 **A different diagnosis from the AI Bill of Materials, and worth not confusing

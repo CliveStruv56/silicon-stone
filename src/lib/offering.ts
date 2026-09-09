@@ -125,6 +125,16 @@ export interface Offering {
   terms?: string[]
   /** Short status label where the thing cannot be bought today. */
   status?: string
+  /**
+   * For a follow-on module: the free tool it follows on from.
+   *
+   * The pairing was stated in three places — the module page's own prose, the
+   * `FollowOnModule` block on the tool page, and the test that checks the two
+   * agree — which is two too many for a fact the catalogue can hold. It lives
+   * here so the tool page can name the tool the reader has just finished
+   * without either surface retyping it.
+   */
+  fromTool?: { name: string; href: string }
 }
 
 /** Rung one and two of the ladder: everything that costs nothing. */
@@ -383,6 +393,7 @@ export const MODULES: Offering[] = [
     summary:
       'Semiconductor, cloud, supplier and operational dependencies mapped where they matter, with chokepoints and procurement questions.',
     href: '/advisory/modules/manufacturing-exposure',
+    fromTool: { name: 'Supply Chain Mapper', href: '/tools/supply-chain-mapper' },
   },
   {
     id: 'scenario-impact',
@@ -391,6 +402,7 @@ export const MODULES: Offering[] = [
     summary:
       'Custom geopolitical scenario modelling for your industry and geography, with value-at-stake quantified by business unit.',
     href: '/advisory/modules/scenario-impact',
+    fromTool: { name: 'Scenario Modeler', href: '/tools/scenario-modeler' },
   },
   {
     id: 'regulatory-friction',
@@ -399,6 +411,7 @@ export const MODULES: Offering[] = [
     summary:
       'US versus EU compliance gap analysis, friction-scored for your operations, with a priority matrix and a transatlantic roadmap.',
     href: '/advisory/modules/regulatory-friction',
+    fromTool: { name: 'Policy Stress-Test', href: '/tools/policy-stress-test' },
   },
 ]
 

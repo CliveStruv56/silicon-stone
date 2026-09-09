@@ -45,7 +45,10 @@ export function ModulePage({ name, price, lead, body, deliverables, fromTool, sc
 
             {fromTool && (
               <p className="mt-6 max-w-3xl leading-relaxed text-text-muted">
-                Follows on from{' '}
+                {/* The catalogue stores the bare tool name, because the tool
+                    pages use it as a heading. The article belongs to the
+                    sentence, not to the name. */}
+                Follows on from the{' '}
                 <Link href={fromTool.href} className="text-stone-teal underline underline-offset-4">
                   {fromTool.name}
                 </Link>

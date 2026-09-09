@@ -15,7 +15,7 @@ export default function RegulatoryFrictionPage() {
       name={offering.name}
       price={offering.price}
       lead="Where US and EU requirements pull in different directions across your operations, scored for friction and set out as a roadmap rather than a list of rules."
-      fromTool={{ name: 'the Policy Stress-Test', href: '/tools/policy-stress-test' }}
+      fromTool={offering.fromTool}
       body={<>
         <p>The free tool tests a position against published policy. This module maps two jurisdictions against each other across your actual operations, and scores where the friction between them costs you time, money or a deal.</p>
         <p>It is most useful for organisations operating on both sides of the Atlantic, where compliance work is being duplicated or where a requirement in one jurisdiction is quietly blocking something in the other.</p>

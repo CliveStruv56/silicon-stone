@@ -711,3 +711,21 @@ When sections ship, log them here in this format:
 - Three new guards, all mutation-tested. Full suite (1,562), build (125 pages),
   full lint, four routes walked plus the redirect. Catalogue down to 12 priced
   items from 14.
+
+## 2026-09-09 (seventh) — Follow-on prompts rewritten; Advisory dropdown trimmed
+
+- The follow-on block had shipped on all three tool pages but the owner could not
+  see it: it opened "When the tool reaches its limit" (describing the module, not
+  addressing the reader) and wore the same quiet card styling as the tool's own
+  panels. Rendered and noticed are different tests.
+- Now opens "Now you have run the {tool}", speaks to someone who has just
+  finished, and uses the amber band and solid CTA the site uses for commercial
+  callouts.
+- Tool↔module pairing moved into the catalogue as `Offering.fromTool`; it had
+  been stated in the module page prose, the tool page block and the test. Module
+  pages read it now.
+- Modules, All prices and Contact removed from the Advisory dropdown at the
+  owner's request. /pricing stays reachable from the footer and /more, #contact
+  from the footer; /advisory#modules now has no menu entry, as intended.
+- Full suite (1,562), build (125 pages), test:manual, test:security, full lint,
+  three tool pages walked in a browser.
