@@ -45,6 +45,11 @@ const footerNavigation = {
       name: engagement.name,
       href: engagement.href,
     })),
+    // Not an engagement either — the follow-on modules, which lost their header
+    // dropdown entry on 2026-09-09. Without this the index is reachable only by
+    // scrolling /advisory, and the three module pages depend entirely on their
+    // tool page for discovery.
+    { name: 'Modules', href: '/advisory#modules' },
     // Not an engagement — the free guide that feeds them.
     { name: 'US Executive’s Guide', href: '/us-executive-guide' },
   ],

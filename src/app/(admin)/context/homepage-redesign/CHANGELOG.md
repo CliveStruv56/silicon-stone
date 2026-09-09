@@ -729,3 +729,15 @@ When sections ship, log them here in this format:
   from the footer; /advisory#modules now has no menu entry, as intended.
 - Full suite (1,562), build (125 pages), test:manual, test:security, full lint,
   three tool pages walked in a browser.
+
+## 2026-09-09 (eighth) — Modules link restored, in the footer
+
+- The Advisory dropdown lost its Modules entry earlier today at the owner's
+  request, which left `/advisory#modules` with no menu entry anywhere and the
+  three module pages depending entirely on their tool page for discovery.
+- A Modules link is back in the footer's Advisory column, sat with the
+  `US Executive's Guide` as the other non-engagement entry. The column still
+  maps `ENGAGEMENTS` for the engagements themselves; only the two things that
+  are not engagements are stated literally, each with a comment saying why.
+- Full suite (1,562), build (125 pages), test:manual, test:security, lint. The
+  rendered column read back from the DOM in a browser.
