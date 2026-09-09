@@ -741,3 +741,23 @@ When sections ship, log them here in this format:
   are not engagements are stated literally, each with a comment saying why.
 - Full suite (1,562), build (125 pages), test:manual, test:security, lint. The
   rendered column read back from the DOM in a browser.
+
+## 2026-09-09 (ninth) — Mobile menu is an overlay, with collapsing sections
+
+- Measured before: 1,065px tall in an 844px viewport, `position: static`,
+  `overflow: visible`, no height cap, no scroll lock. It pushed the page down,
+  you scrolled the page to reach Subscribe, and the bottom tab bar covered the
+  lower rows.
+- Now anchored to the header with `top-full` (no hard-coded offset to drift
+  against the safe-area inset), `h-[calc(100dvh-7.5rem)]` with its own scroll,
+  and the body locked while open. A `max-h` was tried first and left a strip of
+  the article visible above the tab bar — a fixed height is what closes it.
+- Sections collapse; `/more` keeps the secondary-nav job so the menu only has to
+  be the site tree. The active section opens itself. Parent rows are a link *and*
+  a disclosure — a pure toggle would strand /tools and /advisory, neither of
+  which lists its own hub among its children. 12 rows against 26, fits one
+  screen.
+- Trap recorded: `.safe-x` sets padding-left/right outright and beats `px-6`.
+  Adding it to the panel ran every row flush to the edge.
+- Typecheck, lint, suite (1,562), build (125 pages), test:manual, test:security.
+  Panel measured open at 390x844 and 360x640.

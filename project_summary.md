@@ -656,6 +656,43 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### September 9, 2026 (mobile) — The mobile menu became an overlay
+
+Measured before the change on a 390×844 viewport: the open menu was **1,065px
+tall in an 844px viewport**, `position: static`, `overflow: visible`, no height
+cap and no body-scroll lock. It expanded inline and pushed the page down, so you
+scrolled *the page* to reach About and Subscribe, and the fixed bottom tab bar
+covered the lower rows. All 26 rows were always open because tapping a parent
+navigated rather than expanding.
+
+Three changes, and **none is sufficient alone**:
+
+- **It is anchored to the header** (`absolute … top-full`) rather than offset by
+  a hard-coded height, so it cannot drift against the safe-area inset on a
+  notched device.
+- **It has its own height and scroll** — `h-[calc(100dvh-7.5rem)]`, which covers
+  the header above and runs under the tab bar below. A `max-h` was tried first
+  and was wrong: the panel shrank to its content and left a strip of the article
+  visible above the tab bar, which read as a half-open sheet.
+- **The body is locked while it is open**, so a flick that misses the panel no
+  longer scrolls the article underneath.
+
+**The sections collapse**, since `/more` carries the secondary navigation and the
+menu only has to be the site tree. The section you are already in opens itself.
+The row is a link *and* a disclosure, because it is both: collapsing the parent
+into a pure toggle would strand `/tools` and `/advisory`, neither of which lists
+its own hub among its children. Collapsed, the whole tree now fits on one screen
+with no scrolling — 12 rows against 26.
+
+One trap worth recording: **`.safe-x` sets `padding-left`/`right` outright, so it
+beats `px-6`.** Adding it to the panel ran every row flush to the screen edge.
+The header element already carries it; the panel must not.
+
+**Validated:** typecheck, full lint, suite (1,562), build (125 pages),
+`test:manual`, `test:security`, and the panel measured open at 390×844 and
+360×640 — position, height, scroll state and body lock read from the DOM.
+
+
 ### September 9, 2026 (last) — Follow-on prompts rewritten; Advisory dropdown trimmed
 
 **The follow-on block was there and the owner could not see it.** It had shipped

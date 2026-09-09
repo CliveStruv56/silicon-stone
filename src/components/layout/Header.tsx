@@ -78,7 +78,6 @@ const secondaryNavigation: NavItem[] = [
   { name: 'About', href: '/about' },
 ]
 
-const mobileNavigation: NavItem[] = [...primaryNavigation, ...secondaryNavigation]
 
 // Detail routes get a mobile back affordance (P1-4); the fallback target is
 // used when the page was deep-linked and there is no history to go back to.
@@ -91,6 +90,16 @@ function backFallback(pathname: string): string | null {
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [condensed, setCondensed] = useState(false)
+  /**
+   * Which sections of the mobile menu are expanded.
+   *
+   * Every section used to be open at once, which made the menu 1,065px tall in
+   * an 844px viewport — so it pushed the page down and you scrolled *the page*
+   * to reach About and Subscribe, with the fixed tab bar sitting over the lower
+   * rows. `/more` carries the secondary navigation, so this only has to be the
+   * site tree, and a collapsed tree fits.
+   */
+  const [openSections, setOpenSections] = useState<string[]>([])
   const pathname = usePathname()
   const router = useRouter()
   const fallback = backFallback(pathname)
@@ -122,6 +131,40 @@ export function Header() {
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  /**
+   * The section you are already in opens itself. Landing in a fully collapsed
+   * menu with no indication of where you are is worse than one extra tap.
+   */
+  useEffect(() => {
+    if (!mobileMenuOpen) return
+    const current = primaryNavigation.find(
+      (item) =>
+        matchesHref(item.href) || (item.children ?? []).some((child) => matchesHref(child.href)),
+    )
+    setOpenSections(current ? [current.name] : [])
+    // Re-seeded each time the menu opens, not on every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mobileMenuOpen, pathname])
+
+  /**
+   * The menu is a fixed overlay with its own scroll, so the page behind it must
+   * not scroll too — otherwise a flick that misses the panel moves the article
+   * underneath and you close the menu somewhere else entirely.
+   */
+  useEffect(() => {
+    if (!mobileMenuOpen) return
+    const previous = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = previous
+    }
+  }, [mobileMenuOpen])
+
+  const toggleSection = (name: string) =>
+    setOpenSections((open) =>
+      open.includes(name) ? open.filter((n) => n !== name) : [...open, name],
+    )
 
   const goBack = () => {
     if (window.history.length > 1) router.back()
@@ -271,48 +314,110 @@ export function Header() {
         </div>
       </nav>
 
-      {/* Mobile menu */}
+      {/* Mobile menu — a fixed overlay with its own scroll, not an inline
+          expansion. It used to be `position: static` with `overflow: visible`
+          and no height cap, so at 26 always-open rows it ran 1,065px tall in an
+          844px viewport: the page grew, the reader scrolled *the page* to reach
+          Subscribe, and the fixed bottom tab bar covered the lower rows.
+
+          Three things fix it together and none is sufficient alone: the panel
+          is anchored below the header (`top-full`, so no hard-coded height to
+          drift against the safe-area inset) and scrolls itself, the body is
+          locked while it is open, and the sections collapse so the tree fits
+          without scrolling at all. The `max-h` is what clears the bottom tab
+          bar: 9rem covers the header above and the bar below, so the panel
+          never runs under either. */}
       {mobileMenuOpen && (
-        <div id="mobile-menu" className="lg:hidden">
-          <div className="space-y-1 px-6 pb-4 pt-2">
-            {mobileNavigation.map((item: NavItem) => (
-              <div key={item.name}>
-                <Link
-                  href={item.href}
-                  aria-current={isActive(item) ? 'page' : undefined}
-                  className={`block py-2 text-base font-medium hover:text-text-primary ${
-                    isActive(item) ? 'text-silicon-cyan' : 'text-text-muted'
-                  }`}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  {item.name}
-                </Link>
-                {item.children && item.children.length > 0 && (
-                  <div className="ml-4 space-y-1">
-                    {item.children.map((child) => (
-                      <Link
-                        key={child.name}
-                        href={child.href}
-                        className={`block py-1.5 text-sm hover:text-text-primary ${
-                          child.sister ? 'text-sister-indigo' : 'text-text-muted'
-                        }`}
-                        onClick={() => setMobileMenuOpen(false)}
+        <div
+          id="mobile-menu"
+          className="absolute inset-x-0 top-full h-[calc(100dvh-7.5rem)] overflow-y-auto overscroll-contain border-b border-border-subtle bg-slate-deep lg:hidden"
+        >
+          <div className="space-y-1 px-6 pb-8 pt-2">
+            {primaryNavigation.map((item: NavItem) => {
+              const expanded = openSections.includes(item.name)
+              return (
+                <div key={item.name} className="border-b border-border-subtle/60 last:border-b-0">
+                  {/* The row is a link *and* a disclosure, because it is both.
+                      Collapsing the parent into a pure toggle would strand
+                      /tools and /advisory: neither section lists its own hub
+                      among its children. */}
+                  <div className="flex items-center justify-between">
+                    <Link
+                      href={item.href}
+                      aria-current={isActive(item) ? 'page' : undefined}
+                      className={`flex-1 py-3 text-base font-medium hover:text-text-primary ${
+                        isActive(item) ? 'text-silicon-cyan' : 'text-text-muted'
+                      }`}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {item.name}
+                    </Link>
+                    {item.children && item.children.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => toggleSection(item.name)}
+                        aria-expanded={expanded}
+                        aria-label={`${expanded ? 'Hide' : 'Show'} ${item.name} pages`}
+                        className="-mr-2 p-2 text-text-muted transition-colors hover:text-text-primary"
                       >
-                        {child.name}
-                        {child.note && (
-                          <span className="ml-2 font-mono text-[12px] uppercase tracking-[0.08em] text-text-muted/60">
-                            {child.note}
-                          </span>
-                        )}
-                      </Link>
-                    ))}
+                        <svg
+                          className={`h-5 w-5 transition-transform duration-200 motion-reduce:transition-none ${
+                            expanded ? 'rotate-180' : ''
+                          }`}
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                          aria-hidden="true"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                        </svg>
+                      </button>
+                    )}
                   </div>
-                )}
-              </div>
+                  {item.children && item.children.length > 0 && expanded && (
+                    <div className="ml-4 space-y-1 pb-2">
+                      {item.children.map((child) => (
+                        <Link
+                          key={child.name}
+                          href={child.href}
+                          className={`block py-2 text-sm hover:text-text-primary ${
+                            child.sister ? 'text-sister-indigo' : 'text-text-muted'
+                          }`}
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          {child.name}
+                          {child.note && (
+                            <span className="ml-2 font-mono text-[12px] uppercase tracking-[0.08em] text-text-muted/60">
+                              {child.note}
+                            </span>
+                          )}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+
+            {/* Methodology, Glossary and About have no children, so they stay
+                flat rather than pretending to be sections. */}
+            {secondaryNavigation.map((item: NavItem) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                aria-current={isActive(item) ? 'page' : undefined}
+                className={`block py-3 text-base font-medium hover:text-text-primary ${
+                  isActive(item) ? 'text-silicon-cyan' : 'text-text-muted'
+                }`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {item.name}
+              </Link>
             ))}
             <Link
               href="/search"
-              className="block py-2 text-base font-medium text-text-muted hover:text-text-primary"
+              className="block py-3 text-base font-medium text-text-muted hover:text-text-primary"
               onClick={() => setMobileMenuOpen(false)}
             >
               Search
