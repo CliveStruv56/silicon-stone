@@ -63,7 +63,6 @@ export const AMOUNTS = {
 
   /** Follow-on modules. */
   moduleFloor: 3500,
-  sovereignArchitectureReview: 6500,
 } as const
 
 /** Format an amount as sterling: 24 → "£24", 25000 → "£25,000". */
@@ -296,6 +295,7 @@ export const ENGAGEMENTS: Offering[] = [
     href: '/advisory/strategic-assessment',
     terms: [
       'European Procurement Readiness can be included in the agreed assessment scope.',
+      'A Sovereign Architecture Review can be included in the agreed assessment scope.',
       'Framework-neutral and vendor-agnostic — we sell no software and take no referral fees.',
     ],
   },
@@ -357,23 +357,25 @@ export const SISTER_PRODUCT: Offering = {
  * £3,500 is the floor: narrower in scope than a full engagement, above the
  * Exposure Diagnostic.
  *
- * Each has a page of its own since 2026-09-09, and three of them sit beneath
- * the free tool they follow on from. The AI Bill of Materials was the fifth
- * until the same day, when it was folded into the Exposure Diagnostic: it was
- * the same job at a finer grain, its own price note already read "available
- * within a scoped diagnostic", and pricing it separately asked the buyer to
- * choose on a distinction they could not evaluate. It survives as an anchored
- * section on `/advisory/exposure-diagnostic`, not as a product.
+ * All three have a page of their own since 2026-09-09, and each sits beneath the
+ * free tool it follows on from — which is now what a module *is*. Two others
+ * were folded into engagements the same day rather than priced separately:
+ *
+ * - The **AI Bill of Materials** into the Exposure Diagnostic. It was the same
+ *   job at a finer grain, and its own price note already read "available within
+ *   a scoped diagnostic".
+ * - The **Sovereign Architecture Review** into the Strategic Assessment. Not a
+ *   duplicate of anything — key custody, administrative access and
+ *   abstraction-layer feasibility appear nowhere else — but at £6,500 among
+ *   £3,500 modules it was a narrow, deep engagement filed as an add-on to a
+ *   £2,500 product. It went to the Assessment rather than the Diagnostic
+ *   because that product already ends in a board-ready roadmap, and because
+ *   "from £8,000" holds the work where "from £2,500" would anchor every
+ *   scoping conversation far too low.
+ *
+ * Both survive as anchored sections on their engagement's page, not as products.
  */
 export const MODULES: Offering[] = [
-  {
-    id: 'sovereign-architecture-review',
-    name: 'Sovereign Architecture Review',
-    price: `From ${gbp(AMOUNTS.sovereignArchitectureReview)}`,
-    summary:
-      'Where inference, weights and keys sit, who can reach them, and whether you can satisfy a buyer’s sovereignty demand without re-architecting.',
-    href: '/advisory/modules/sovereign-architecture-review',
-  },
   {
     id: 'manufacturing-exposure',
     name: 'Manufacturing Exposure Module',

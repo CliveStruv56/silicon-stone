@@ -656,6 +656,46 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### September 9, 2026 (latest) — Sovereign Architecture Review folded into the Strategic Assessment
+
+**A different diagnosis from the AI Bill of Materials, and worth not confusing
+the two.** The BoM was a duplicate — the same job at a finer grain. The
+Sovereign Architecture Review is **not** a duplicate: key custody, administrative
+access and abstraction-layer feasibility appear nowhere else on the site. Its
+defect was **positioning**. At £6,500 it sat among three £3,500 modules, under a
+heading whose own copy calls modules additions to a diagnostic — and a £6,500
+add-on to a £2,500 product is upside down. It was a narrow, deep engagement
+filed as a module.
+
+- It is now an **anchored scope option on `/advisory/strategic-assessment`**,
+  beside European Procurement Readiness and on the same pattern, with no price of
+  its own. `AMOUNTS.sovereignArchitectureReview` is deleted.
+- **The Assessment rather than the Diagnostic**, deliberately: that product
+  already ends in a board-ready roadmap, and *from £8,000* holds the work where
+  *from £2,500* would anchor every scoping conversation far too low. This was the
+  owner's decision from four costed options.
+- The module page — built earlier the same day — is deleted, and
+  `/advisory/modules/sovereign-architecture-review` **301s to the anchor**. It
+  was live for about an hour, which is long enough to have been linked.
+- The Digital Omnibus applications list drops its row: it lists offerings, and
+  this is no longer one. Its sovereignty language moved onto the Assessment's row
+  rather than being lost.
+- **Modules are now exactly the three tool follow-ons**, which is a clean
+  definition rather than a leftover. A test asserts that set.
+
+**Three new guards, all mutation-tested:** the `#sovereign-architecture-review`
+anchor, no separate price for either folded-in deliverable (matching an `AMOUNTS`
+key at line start, so the doc comment explaining the decision does not satisfy
+it), and the module catalogue containing only tool follow-ons.
+
+**Validated:** full suite (1,562 tests), production build (125 prerendered pages
+— one fewer, as expected), full lint, and `/advisory`, `/advisory/strategic-assessment`,
+`/digital-omnibus` and `/pricing` walked in a browser with the redirect confirmed
+landing on the anchor. £6,500 appears nowhere on the site.
+
+**The catalogue is now 12 priced items**, down from 14 at the start of the day.
+
+
 ### September 9, 2026 (later) — Advisory restructured; AI Bill of Materials folded into the Diagnostic
 
 **Intent, in the owner's words:** too many products, and two of them doing

@@ -44,6 +44,14 @@ import {
  * owner-supplied. See `src/lib/advisory/provisional-content.ts`.
  */
 
+/** The architecture-level scope option, folded in from the retired module. */
+const SOVEREIGN_SCOPE = [
+  'A model-dependency map: where inference, weights and keys sit, and who can reach them',
+  'An abstraction-layer assessment — can you satisfy a buyer’s sovereignty demand without re-architecting?',
+  'A key-custody and admin-access review: EU-resident keys, and where a US administrative override still reaches EU data',
+  'A sovereignty roadmap that keeps your options open',
+]
+
 const DELIVERABLES = [
   {
     icon: Layers,
@@ -166,6 +174,46 @@ export default function StrategicAssessmentPage() {
               )
             })}
           </div>
+        </section>
+
+        {/* The Sovereign Architecture Review, folded in on 2026-09-09.
+
+            It was a £6,500 "follow-on module" sitting among three £3,500 ones,
+            under a heading whose own copy calls modules additions to a
+            diagnostic — a £6,500 add-on to a £2,500 product is upside down. It
+            is not a duplicate of anything (key custody, administrative access
+            and abstraction-layer feasibility appear nowhere else on the site);
+            it was a narrow, deep engagement wearing a module's clothes.
+
+            It belongs here rather than on the Diagnostic because this product
+            already ends in a board-ready roadmap, and because "from £8,000"
+            holds the work where "from £2,500" would anchor every scoping
+            conversation far too low. It carries no price of its own: it is a
+            scope option, on the European Procurement Readiness pattern below.
+
+            The anchor is the id the module page and the Digital Omnibus list
+            both pointed at. */}
+        <section id="sovereign-architecture-review" className="scroll-mt-24 mx-auto max-w-7xl px-6 pb-10 lg:px-8 lg:pb-12">
+          <h2 className="text-2xl font-semibold text-text-primary">Sovereign Architecture Review</h2>
+          <p className="mt-4 max-w-3xl leading-relaxed text-text-muted">
+            Where sovereignty is part of the decision, the assessment goes to architecture
+            level: where inference, weights and keys sit, and who can reach them. It
+            establishes what your architecture can already support and what the rest would
+            cost, so a buyer&rsquo;s demand can be answered with a plan rather than a rebuild.
+          </p>
+          <ul className="mt-5 grid gap-4 md:grid-cols-2">
+            {SOVEREIGN_SCOPE.map(item => (
+              <li key={item} className="flex items-start gap-3 text-sm leading-relaxed text-text-primary">
+                <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-stone-teal" />
+                {item}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-5 max-w-3xl text-sm italic leading-relaxed text-text-muted">
+            Included in the agreed assessment scope where relevant, not a separate purchase.
+            It keeps your options open — it does not pick your vendors for you, and it keeps
+            what the law requires distinct from what a buyer merely prefers.
+          </p>
         </section>
 
         <section className="mx-auto max-w-7xl px-6 pb-10 lg:px-8 lg:pb-12">

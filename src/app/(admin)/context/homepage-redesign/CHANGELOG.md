@@ -692,3 +692,22 @@ When sections ship, log them here in this format:
   deleted section.
 - Full suite (1,559), build (126 pages), test:manual, test:security,
   test:sanity-prices, full lint. Nine routes walked, no console errors.
+
+## 2026-09-09 (sixth) — Sovereign Architecture Review becomes a scope option
+
+- Not a duplicate, unlike the AI Bill of Materials: key custody, administrative
+  access and abstraction-layer feasibility appear nowhere else. Its defect was
+  positioning — £6,500 among three £3,500 modules, under a heading that calls
+  modules additions to a £2,500 diagnostic.
+- Now an anchored scope option on `/advisory/strategic-assessment`, beside
+  European Procurement Readiness, with no price of its own.
+  `AMOUNTS.sovereignArchitectureReview` deleted. The Assessment rather than the
+  Diagnostic because it already ends in a board-ready roadmap and "from £8,000"
+  holds the work.
+- Module page deleted; `/advisory/modules/sovereign-architecture-review` 301s to
+  the anchor — it was live for about an hour. Digital Omnibus list drops the row
+  and folds its sovereignty language into the Strategic Assessment row.
+- Modules are now exactly the three tool follow-ons, asserted by a test.
+- Three new guards, all mutation-tested. Full suite (1,562), build (125 pages),
+  full lint, four routes walked plus the redirect. Catalogue down to 12 priced
+  items from 14.
