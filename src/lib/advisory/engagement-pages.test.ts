@@ -3,7 +3,7 @@ import path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
-import { ENGAGEMENTS } from '../offering'
+import { ENGAGEMENTS, MODULES } from '../offering'
 
 /**
  * The four dedicated engagement pages, and the three things about them that
@@ -174,5 +174,113 @@ describe('dedicated engagement pages', () => {
             broken.map((o) => `  ${o.id} → ${o.href}`).join('\n')
         : '',
     ).toEqual([])
+  })
+})
+
+/**
+ * The follow-on module pages, added 2026-09-09 when the five cards on
+ * `/advisory` became four pages and an index.
+ *
+ * They fail in the same three silent ways the engagement pages do — an
+ * unsegmented Kit tag, a catalogue href pointing at no route, a page missing
+ * from the sitemap — plus one of their own: three of them are reached from the
+ * free tool they follow on from, and that link is the whole reason the pages
+ * were moved. A tool page that stops rendering its module is a page nobody
+ * arrives at, and nothing else would notice.
+ */
+describe('follow-on module pages', () => {
+  /** Every module page's route, derived from the catalogue rather than retyped. */
+  const modulePages = MODULES.map((offering) => ({
+    id: offering.id,
+    name: offering.name,
+    href: offering.href,
+    dir: path.join(APP_DIR, offering.href.replace(/^\//, '')),
+  }))
+
+  it('has a page and its own metadata for every module in the catalogue', () => {
+    expect(modulePages.length).toBeGreaterThan(0)
+    for (const m of modulePages) {
+      expect(fs.existsSync(path.join(m.dir, 'page.tsx')), `${m.href} page.tsx`).toBe(true)
+      const layout = path.join(m.dir, 'layout.tsx')
+      expect(fs.existsSync(layout), `${m.href} layout.tsx`).toBe(true)
+      expect(fs.readFileSync(layout, 'utf8')).toContain('alternates')
+    }
+  })
+
+  /**
+   * A module page tags its enquiry with the catalogue `name`, so Kit segments
+   * module leads apart from engagement leads. Retyping the string would produce
+   * a working form whose leads land in no segment — the failure the engagement
+   * pages already guard against.
+   *
+   * The engagement pages hard-code that literal; the module pages reference
+   * `module.name` instead, which cannot drift by construction. Both forms are
+   * accepted, a literal that disagrees with the catalogue is not, and a page
+   * that tags nothing at all fails either way.
+   */
+  it('tags every module enquiry with the catalogue name', () => {
+    for (const m of modulePages) {
+      const source = fs.readFileSync(path.join(m.dir, 'page.tsx'), 'utf8')
+      const values = [...source.matchAll(/\binterest:\s*(offering\.name|'([^']+)')/g)]
+      expect(
+        values.length,
+        `${m.href} must tag its enquiry — no interest: found`,
+      ).toBeGreaterThan(0)
+
+      const wrong = values.map((v) => v[2]).filter((literal) => literal && literal !== m.name)
+      expect(
+        wrong,
+        wrong.length
+          ? `${m.href} tags "${wrong.join('", "')}" but the catalogue says "${m.name}"`
+          : '',
+      ).toEqual([])
+    }
+  })
+
+  it('lists every module page in the sitemap', () => {
+    const sitemap = fs.readFileSync('src/app/sitemap.ts', 'utf8')
+    const paths = [...sitemap.matchAll(/path: '([^']+)'/g)].map((m) => m[1])
+    expect(paths.length).toBeGreaterThan(5)
+
+    const missing = modulePages.map((m) => m.href).filter((href) => !paths.includes(href))
+    expect(
+      missing,
+      missing.length
+        ? `Module page(s) missing from sitemap.ts STATIC_ROUTES:\n${missing.map((m) => `  ${m}`).join('\n')}`
+        : '',
+    ).toEqual([])
+  })
+
+  /**
+   * The three modules that grew out of a tool must be reachable from it. This
+   * reads the tool page rather than the component, because rendering
+   * `FollowOnModule` somewhere else entirely would satisfy an import check.
+   */
+  it.each([
+    ['supply-chain-mapper', 'manufacturing-exposure'],
+    ['scenario-modeler', 'scenario-impact'],
+    ['policy-stress-test', 'regulatory-friction'],
+  ])('tools/%s offers the %s module', (tool, moduleId) => {
+    const source = fs.readFileSync(path.join(APP_DIR, 'tools', tool, 'page.tsx'), 'utf8')
+    expect(source).toContain(`<FollowOnModule moduleId="${moduleId}" />`)
+  })
+
+  /**
+   * The AI Bill of Materials was folded into the Exposure Diagnostic on
+   * 2026-09-09. It kept its anchor because the phrase is searched for and was a
+   * linkable destination for months, and `/products/ai-act-toolkit` points at
+   * it — an anchor that no longer exists does not 404, it silently lands the
+   * reader at the top of the page.
+   */
+  it('keeps the #ai-bill-of-materials anchor alive on the Exposure Diagnostic', () => {
+    const page = fs.readFileSync(path.join(APP_DIR, 'advisory/exposure-diagnostic/page.tsx'), 'utf8')
+    expect(page).toContain('id="ai-bill-of-materials"')
+  })
+
+  /** It is a deliverable now, not a product: it must carry no price of its own. */
+  it('does not price the AI Bill of Materials separately', () => {
+    const offering = fs.readFileSync('src/lib/offering.ts', 'utf8')
+    expect(offering).not.toContain('aiBillOfMaterials')
+    expect(MODULES.map((m) => m.id)).not.toContain('ai-bill-of-materials')
   })
 })

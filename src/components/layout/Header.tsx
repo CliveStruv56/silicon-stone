@@ -68,10 +68,6 @@ const primaryNavigation: NavItem[] = [
       { name: 'The Drift Retainer', href: '/advisory/drift-retainer' },
       { name: 'Strategic Assessment', href: '/advisory/strategic-assessment' },
       { name: 'Modules', href: '/advisory#modules' },
-      // The 3×2 section was the one part of /advisory that no menu reached and
-      // no anchor named, which is part of why it read as a separate product
-      // rather than as what the Retainer runs on.
-      { name: 'The 3×2 Method', href: '/advisory#method' },
       { name: 'All prices', href: '/pricing' },
       { name: 'Contact', href: '/advisory#contact' },
     ],

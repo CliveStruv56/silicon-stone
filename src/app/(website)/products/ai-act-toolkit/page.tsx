@@ -351,10 +351,11 @@ export default function AIActToolkitPage() {
               </p>
               <p className="mt-3 text-sm text-text-muted">
                 Need the systems register built and evidenced for you?{' '}
-                <Link href="/advisory#modules" className="text-stone-teal hover:underline">
-                  The AI Bill of Materials module
+                <Link href="/advisory/exposure-diagnostic#ai-bill-of-materials" className="text-stone-teal hover:underline">
+                  The Exposure Diagnostic
                 </Link>
-                {' '}version-tracks every model, dataset, wrapper and API, with provenance and licence status.
+                {' '}can go to component level and hand you an AI Bill of Materials: every model,
+                dataset, wrapper and API version-tracked, with provenance and licence status.
               </p>
               <div className="flex items-center justify-center gap-6 mt-8 text-xs text-text-muted">
                 <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> Digital delivery</span>

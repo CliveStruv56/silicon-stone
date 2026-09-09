@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import type { FeatureCollection, Feature, LineString } from 'geojson'
 import { Tooltip } from 'react-tooltip'
 import { Header, Footer } from '@/components/layout'
+import { FollowOnModule } from '@/components/advisory/FollowOnModule'
 import { EmailGateOverlay } from '@/components/tools/EmailGateOverlay'
 import { usePrintGate } from '@/components/tools/usePrintGate'
 import { CopyMarkdownButton } from '@/components/tools/CopyMarkdownButton'
@@ -816,6 +817,7 @@ export default function SupplyChainMapperPage() {
             </Link>
           </div>
         </section>
+        <FollowOnModule moduleId="manufacturing-exposure" />
       </main>
 
       <Footer />

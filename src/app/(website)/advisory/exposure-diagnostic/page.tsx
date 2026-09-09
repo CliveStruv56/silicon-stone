@@ -2,15 +2,23 @@
 
 import Link from 'next/link'
 import { DigitalOmnibusContext } from '@/components/advisory/DigitalOmnibusContext'
-import { Clock, Shield } from 'lucide-react'
+import { CheckCircle, Clock, Shield } from 'lucide-react'
 import { FocusedEngagementPage, EngagementSteps } from '@/components/advisory/FocusedEngagementPage'
 import { AMOUNTS, gbp } from '@/lib/offering'
 
 const REVIEW_AREAS = [
-  { title: 'Systems and vendor evidence', body: 'What AI you run, what your vendors can prove and where the evidence is missing.' },
+  { title: 'Systems and vendor evidence', body: 'What AI you run, what your vendors can prove and where the evidence is missing — down to component level, as an AI Bill of Materials.' },
   { title: 'Dependencies', body: 'How your models, APIs and cloud services connect, where your data goes and which suppliers would be difficult to replace.' },
   { title: 'European Procurement Readiness', body: 'Where European sales or procurement are in scope, map buyer questionnaires to your evidence, identify gaps that could block a deal, and flag contractual commitments for review with counsel.' },
   { title: 'Regulatory friction', body: 'Where different jurisdictional requirements affect your operations and create constraints on the business.' },
+]
+
+/** The component-level inventory, where the estate warrants going that deep. */
+const AI_BOM = [
+  'Each model, dataset, fine-tune, wrapper, API and library, version-tracked',
+  'Provenance and licence status for every component, with the gaps your vendors cannot yet evidence',
+  'A mapping to the Cyber Resilience Act’s SBOM duty and to AI Act Article 50 transparency',
+  'A prioritised remediation list — what to fix first, and why',
 ]
 
 export default function ExposureDiagnosticPage() {
@@ -46,6 +54,38 @@ export default function ExposureDiagnosticPage() {
               <dd className="text-sm leading-relaxed text-text-muted">{area.body}</dd>
             </div>)}
           </dl>
+        </div>
+        {/* The AI Bill of Materials, folded in on 2026-09-09.
+
+            It was a separately priced module until then, and it was the same
+            job at a finer grain: both start by inventorying what you run, both
+            interrogate vendor evidence, both end in a prioritised list. Its own
+            price note already read "available within a scoped diagnostic". Two
+            prices for one job asked the buyer to choose on a distinction they
+            could not evaluate before the work began.
+
+            It keeps an anchor because the phrase is searched for and was a
+            linkable destination for months — but it is a deliverable here, not
+            a product, so it carries no price of its own. */}
+        <div id="ai-bill-of-materials" className="mt-10 scroll-mt-28 border-t border-border-subtle pt-8">
+          <h3 className="mb-3 text-lg font-semibold text-text-primary">The AI Bill of Materials</h3>
+          <p className="mb-5 max-w-3xl leading-relaxed text-text-muted">
+            The register you keep afterwards. Where the estate warrants it, the systems
+            review goes to component level and you receive a version-tracked inventory of
+            what your AI is actually made of — the artefact that answers a regulator or a
+            buyer, rather than a report that describes one.
+          </p>
+          <ul className="grid gap-4 md:grid-cols-2">
+            {AI_BOM.map(item => (
+              <li key={item} className="flex items-start gap-3 text-sm leading-relaxed text-text-primary">
+                <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-stone-teal" />
+                {item}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-5 max-w-3xl text-sm italic leading-relaxed text-text-muted">
+            Part of the agreed diagnostic scope where relevant, not a separate purchase.
+          </p>
         </div>
         <DigitalOmnibusContext>We use the relevant Digital Omnibus changes to examine your systems, roles and evidence. European Procurement Readiness forms part of the agreed diagnostic scope where relevant.</DigitalOmnibusContext>
       </>}

@@ -63,7 +63,6 @@ export const AMOUNTS = {
 
   /** Follow-on modules. */
   moduleFloor: 3500,
-  aiBillOfMaterials: 4500,
   sovereignArchitectureReview: 6500,
 } as const
 
@@ -354,9 +353,17 @@ export const SISTER_PRODUCT: Offering = {
 }
 
 /**
- * Follow-on modules — scoped add-ons folded into a briefing or a retainer.
- * £3,500 is the floor: narrower in scope than the AI Bill of Materials, above
- * the Exposure Diagnostic.
+ * Follow-on modules — scoped add-ons folded into a diagnostic or a retainer.
+ * £3,500 is the floor: narrower in scope than a full engagement, above the
+ * Exposure Diagnostic.
+ *
+ * Each has a page of its own since 2026-09-09, and three of them sit beneath
+ * the free tool they follow on from. The AI Bill of Materials was the fifth
+ * until the same day, when it was folded into the Exposure Diagnostic: it was
+ * the same job at a finer grain, its own price note already read "available
+ * within a scoped diagnostic", and pricing it separately asked the buyer to
+ * choose on a distinction they could not evaluate. It survives as an anchored
+ * section on `/advisory/exposure-diagnostic`, not as a product.
  */
 export const MODULES: Offering[] = [
   {
@@ -365,16 +372,7 @@ export const MODULES: Offering[] = [
     price: `From ${gbp(AMOUNTS.sovereignArchitectureReview)}`,
     summary:
       'Where inference, weights and keys sit, who can reach them, and whether you can satisfy a buyer’s sovereignty demand without re-architecting.',
-    href: '/advisory#sovereign-architecture-review',
-  },
-  {
-    id: 'ai-bill-of-materials',
-    name: 'AI Bill of Materials',
-    price: `From ${gbp(AMOUNTS.aiBillOfMaterials)}`,
-    summary:
-      'Every model, dataset, fine-tune, wrapper, API and library, version-tracked, with provenance and licence status — before a regulator or a buyer asks.',
-    href: '/advisory#modules',
-    terms: ['Available within a scoped diagnostic or assessment.'],
+    href: '/advisory/modules/sovereign-architecture-review',
   },
   {
     id: 'manufacturing-exposure',
@@ -382,7 +380,7 @@ export const MODULES: Offering[] = [
     price: `From ${gbp(AMOUNTS.moduleFloor)}`,
     summary:
       'Semiconductor, cloud, supplier and operational dependencies mapped where they matter, with chokepoints and procurement questions.',
-    href: '/advisory#modules',
+    href: '/advisory/modules/manufacturing-exposure',
   },
   {
     id: 'scenario-impact',
@@ -390,7 +388,7 @@ export const MODULES: Offering[] = [
     price: `From ${gbp(AMOUNTS.moduleFloor)}`,
     summary:
       'Custom geopolitical scenario modelling for your industry and geography, with value-at-stake quantified by business unit.',
-    href: '/advisory#modules',
+    href: '/advisory/modules/scenario-impact',
   },
   {
     id: 'regulatory-friction',
@@ -398,7 +396,7 @@ export const MODULES: Offering[] = [
     price: `From ${gbp(AMOUNTS.moduleFloor)}`,
     summary:
       'US versus EU compliance gap analysis, friction-scored for your operations, with a priority matrix and a transatlantic roadmap.',
-    href: '/advisory#modules',
+    href: '/advisory/modules/regulatory-friction',
   },
 ]
 

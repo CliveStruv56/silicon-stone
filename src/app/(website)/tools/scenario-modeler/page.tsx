@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Header, Footer } from '@/components/layout'
+import { FollowOnModule } from '@/components/advisory/FollowOnModule'
 import { CopyMarkdownButton } from '@/components/tools/CopyMarkdownButton'
 import { ToolSubscribeCard } from '@/components/tools/ToolSubscribeCard'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -823,6 +824,7 @@ export default function ScenarioModelerPage() {
             </motion.div>
           </AnimatePresence>
         </section>
+        <FollowOnModule moduleId="scenario-impact" />
       </main>
 
       <Footer />

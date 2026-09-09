@@ -656,6 +656,62 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### September 9, 2026 (later) — Advisory restructured; AI Bill of Materials folded into the Diagnostic
+
+**Intent, in the owner's words:** too many products, and two of them doing
+substantially the same job.
+
+- **The AI Bill of Materials is no longer a product.** It was a £4,500 module
+  beside a £2,500 Exposure Diagnostic, and it was the same job at a finer grain —
+  both start by inventorying what you run, both interrogate vendor evidence, both
+  end in a prioritised list. Its own price note already read *"available within a
+  scoped diagnostic"*. Two prices for one job asked the buyer to choose on a
+  distinction they could not evaluate before the work began. It is now a named,
+  **anchored** deliverable on `/advisory/exposure-diagnostic#ai-bill-of-materials`
+  — anchored because the phrase is searched for and had been linkable for months.
+  `AMOUNTS.aiBillOfMaterials` is deleted. **The Diagnostic price is unchanged at
+  from £2,500**, the owner's decision: the same pattern as European Procurement
+  Readiness five days earlier, which removed a price rather than adding one.
+- **Four module pages** at `/advisory/modules/…`, off one new `ModulePage`
+  template — the same "one template or it diverges" rule the four engagement
+  pages follow. Modules are not engagements (no hero artwork, no "where it
+  leads"), so they get their own template rather than a fifth variant of
+  `FocusedEngagementPage`.
+- **Three of them now sit beneath the free tool they follow on from**, via
+  `FollowOnModule`, which reads the catalogue by id rather than taking name,
+  price and summary as props. A reader who has just hit the Supply Chain Mapper's
+  limit is told what answers the next question, where the question occurs. The
+  Compliance Checker has no module and deliberately shows no block.
+- **`/advisory#modules` is now a short index** rendered from `MODULES`. The
+  deliverables live on the pages; restating them in both places would guarantee
+  drift.
+- **The 3×2 method section is deleted** from `/advisory`, with its dropdown
+  entry. `/methodology` and its top-nav link are untouched, and the hero's "How
+  the method works" now points there. **The H1 is "Our Advisory offerings in a
+  nutshell".** The page went from 1,024 lines to 656.
+
+**Four new guards, each mutation-tested** (`engagement-pages.test.ts`): a module
+page missing from the sitemap, a tool page that stops rendering its module, an
+enquiry tagged with something the catalogue does not say, and the loss of the
+`#ai-bill-of-materials` anchor. All four were confirmed red before being accepted
+green.
+
+**Three defects the suite could not have caught, found by building and walking
+the pages:** naming a const `module` (reserved in Next's lint rules — `tsc` and
+per-file lint both passed, the build did not); passing a Lucide icon from a
+Server Component into the Client Component enquiry form, which fails only at
+prerender; and a hero link plus an image caption still describing the deleted 3×2
+section — a dead anchor does not 404, it silently leaves the reader at the top.
+
+**Validated:** full suite (1,559 tests, up from 1,551), production build (126
+prerendered pages, up from 122), `test:manual`, `test:security`,
+`test:sanity-prices`, full lint, and all nine affected routes walked in a browser
+with no console errors. **Open:** the module pages have no hero artwork, by
+choice rather than oversight. **Next, at the owner's request: review the
+Sovereign Architecture Review** — the last module with no tool behind it, whose
+dependency-mapping content overlaps the Diagnostic.
+
+
 ### September 9, 2026 — Post-Omnibus Briefing retired; `/digital-omnibus` is the canonical reference
 
 **Intent:** stop selling the Digital Omnibus as a separate £2,500 briefing and

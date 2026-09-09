@@ -668,3 +668,27 @@ When sections ship, log them here in this format:
   best when the question has a clear boundary.
 - Typecheck and the full suite (1,551 tests) pass. Walked in a browser in both
   themes.
+
+## 2026-09-09 (fifth) — Advisory restructure; AI Bill of Materials merged in
+
+- Owner's brief: too many products, and the Exposure Diagnostic and AI Bill of
+  Materials doing substantially the same job.
+- **AI Bill of Materials retired as a product.** Same job at a finer grain as the
+  Diagnostic; its own price note already said "available within a scoped
+  diagnostic". Now an anchored deliverable at
+  `/advisory/exposure-diagnostic#ai-bill-of-materials`. `AMOUNTS.aiBillOfMaterials`
+  deleted. **Diagnostic stays at from £2,500** — the owner's call, and the same
+  pattern as European Procurement Readiness.
+- Four module pages under `/advisory/modules/`, all off one new `ModulePage`
+  template. Three are rendered beneath their tool by `FollowOnModule`, which
+  reads the catalogue by id. `/advisory#modules` is now a short index.
+- 3×2 method section and its dropdown entry deleted; `/methodology` untouched and
+  the hero link repointed at it. H1 is "Our Advisory offerings in a nutshell".
+  `/advisory` went from 1,024 to 656 lines.
+- Four new guards, each mutation-tested red before being accepted green.
+- Three defects found by building and walking, not by the suite: a const named
+  `module` (reserved in Next lint), a Lucide icon passed from a Server Component
+  into the client enquiry form, and a hero link plus caption still describing the
+  deleted section.
+- Full suite (1,559), build (126 pages), test:manual, test:security,
+  test:sanity-prices, full lint. Nine routes walked, no console errors.

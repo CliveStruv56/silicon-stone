@@ -2,22 +2,16 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { DigitalOmnibusContext } from '@/components/advisory/DigitalOmnibusContext'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Header, Footer } from '@/components/layout'
 import { LadderBox } from '@/components/products/LadderBox'
 import { submitWithOfflineQueue } from '@/lib/offline/submit'
 import { BOOKING_URL, FREE_INTRO_WINDOW } from '@/lib/flags'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Separator } from '@/components/ui/separator'
 import {
-  Search,
-  Scale,
-  TrendingUp,
   Clock,
   CheckCircle,
   ArrowRight,
@@ -25,186 +19,17 @@ import {
   Building2,
   User,
   MessageSquare,
-  Globe,
-  FileText,
   Shield,
-  Users,
-  Layers,
-  type LucideIcon,
 } from 'lucide-react'
 import {
   AMOUNTS,
   ENGAGEMENTS as CATALOGUE_ENGAGEMENTS,
+  MODULES,
   gbp,
   type Offering,
 } from '@/lib/offering'
 
-/**
- * The 3×2 method, as the Advisory page states it.
- *
- * Every card carries an `output` — what actually lands on the client's desk.
- * Without it all five read as descriptions of activity ("We trace…", "We
- * run…"), which cannot answer the only question a buyer is asking here.
- *
- * The per-card "Try {tool}" links are deliberately gone. Two of the three
- * domains had one and the third did not, neither method did, and the two links
- * that existed were the section's *only* interactive elements — so for a
- * buying reader the whole section resolved to "go and use a free thing". The
- * tools are named once, below the grid, in the sentence that explains why only
- * three of the five have one.
- */
-const domains = [
-  {
-    id: 'supply-chain',
-    title: 'Supply Chain Forensics',
-    description: 'We trace critical components from raw materials to finished product, identifying the chokepoints and concentration risks before they reach a news ticker.',
-    output: 'A dependency map with the chokepoints named, and the procurement questions to put to each exposed supplier.',
-    icon: Search,
-    color: 'text-stone-teal',
-    bgColor: 'bg-stone-teal/10',
-    borderColor: 'border-stone-teal/30',
-    hoverBorderColor: 'hover:border-stone-teal/30',
-  },
-  {
-    id: 'policy-stress',
-    title: 'Policy Stress-Testing',
-    description: 'We run a single development through the US and EU regulatory systems to find where compliance with one becomes friction with the other.',
-    output: 'Where US and EU requirements pull against each other in your operations, friction-scored, with the order to fix them in.',
-    icon: Scale,
-    color: 'text-silicon-amber-strong',
-    bgColor: 'bg-silicon-amber/10',
-    borderColor: 'border-silicon-amber/30',
-    hoverBorderColor: 'hover:border-silicon-amber/30',
-  },
-  {
-    id: 'talent-flow',
-    title: 'Talent & Capability Flow',
-    description: 'We track where senior engineers, fab technicians, and regulatory experts actually move, and what their landing and leaving does to capability — the layer most technology-policy commentary misses.',
-    output: 'Where the capability you depend on is accumulating or leaking — in your suppliers, your regulators, and your own team.',
-    icon: Users,
-    color: 'text-sister-indigo',
-    bgColor: 'bg-sister-indigo/10',
-    borderColor: 'border-sister-indigo/30',
-    hoverBorderColor: 'hover:border-sister-indigo/30',
-  },
-]
 
-const methods = [
-  {
-    id: 'scenario-modelling',
-    title: 'Scenario Modelling',
-    description: 'Three futures per question — low / medium / high friction — quantified with Value at Stake. A structured menu of preparation moves, not a prediction.',
-    output: 'Three costed futures for the decision in front of you, and the trigger that tells you which one you are in.',
-    icon: TrendingUp,
-    color: 'text-alert-red',
-    bgColor: 'bg-alert-red/10',
-    borderColor: 'border-alert-red/30',
-    hoverBorderColor: 'hover:border-alert-red/30',
-  },
-  {
-    id: 'long-memory-filter',
-    title: 'Long-Memory Filter',
-    description: 'Pattern-matching the present against thirty years of industrial cycles (the 1986 Semiconductor Agreement, the 1990s offshoring wave), separating structural change from hype.',
-    output: 'A straight answer on whether the thing everyone is reacting to is structural, or a cycle you have already lived through.',
-    icon: Clock,
-    color: 'text-text-muted',
-    bgColor: 'bg-surface-elevated',
-    borderColor: 'border-border-subtle',
-    hoverBorderColor: 'hover:border-border-subtle',
-  },
-]
-
-/**
- * Follow-on modules. All five carry a price: the three older ones (Manufacturing
- * Exposure, Scenario Impact, Regulatory Friction) were bare while the two newer
- * ones showed £4,500 and £6,500 in the same grid, which read as unfinished
- * rather than bespoke and quietly contradicted the fixed-price stance the rest
- * of the site sells on. £3,500 is the floor: narrower in scope than the £4,500
- * AI Bill of Materials, above the £2,500 Exposure Diagnostic.
- */
-type Assessment = {
-  title: string
-  description: string
-  deliverables: string[]
-  icon: LucideIcon
-  color: string
-  fromTool?: string
-  price?: string
-  priceNote?: string
-}
-
-const assessments: Assessment[] = [
-  {
-    title: 'Manufacturing Exposure Module',
-    description: 'Add a focused view of semiconductor, cloud, supplier, and operational dependencies where they matter to your organisation.',
-    deliverables: [
-      'Technology and supplier dependency map',
-      'Chokepoint identification for critical components',
-      'Procurement questions for exposed suppliers',
-      'Prioritised resilience actions',
-    ],
-    icon: Globe,
-    fromTool: 'Supply Chain Mapper',
-    price: `From ${gbp(AMOUNTS.moduleFloor)}`,
-    color: 'stone-teal',
-  },
-  {
-    title: 'Scenario Impact Analysis',
-    description: 'Custom geopolitical scenario modelling for your industry and geography with quantified value-at-stake metrics.',
-    deliverables: [
-      'Custom scenario development for your context',
-      'Value-at-stake quantification by business unit',
-      'Cascade effect mapping',
-      'Early warning indicator framework',
-    ],
-    icon: TrendingUp,
-    fromTool: 'Scenario Modeler',
-    price: `From ${gbp(AMOUNTS.moduleFloor)}`,
-    color: 'alert-red',
-  },
-  {
-    title: 'Regulatory Friction Assessment',
-    description: 'US vs EU compliance gap analysis with friction scoring and transatlantic compliance roadmap.',
-    deliverables: [
-      'Dual-jurisdiction compliance mapping',
-      'Friction scoring for your operations',
-      'Priority action matrix',
-      'Cost and timeline estimates',
-    ],
-    icon: FileText,
-    fromTool: 'Policy Stress-Test',
-    price: `From ${gbp(AMOUNTS.moduleFloor)}`,
-    color: 'silicon-amber',
-  },
-  {
-    title: 'AI Bill of Materials',
-    description:
-      'Know what your AI is actually made of — every model, dataset, wrapper and API — before a regulator or a buyer asks.',
-    deliverables: [
-      'A complete AI bill of materials: each model, dataset, fine-tune, wrapper, API and library, version-tracked',
-      'Provenance and licence status for every component, with the gaps your vendors cannot yet evidence',
-      'A mapping to the Cyber Resilience Act’s SBOM duty and to AI Act Article 50 transparency',
-      'A prioritised remediation list — what to fix before the September 2026 reporting duties bite',
-    ],
-    icon: Layers,
-    price: `From ${gbp(AMOUNTS.aiBillOfMaterials)}`,
-    priceNote: 'Available within a scoped diagnostic or assessment.',
-    color: 'stone-teal',
-  },
-  {
-    title: 'Sovereign Architecture Review',
-    description: 'Design for sovereignty as an option, not an emergency rebuild.',
-    deliverables: [
-      'A model-dependency map: where inference, weights and keys sit, and who can reach them',
-      'An abstraction-layer assessment — can you satisfy a buyer’s sovereignty demand without re-architecting?',
-      'A key-custody and admin-access review: EU-resident keys, and where a US administrative override still reaches EU data',
-      'A sovereignty roadmap that keeps your options open — it does not pick your vendors for you',
-    ],
-    icon: Shield,
-    price: `From ${gbp(AMOUNTS.sovereignArchitectureReview)}`,
-    color: 'sister-indigo',
-  },
-]
 
 /**
  * The contact form's two questions.
@@ -340,7 +165,7 @@ export default function ServicesPage() {
                   Advisory
                 </Badge>
                 <h1 className="text-4xl font-bold text-text-primary sm:text-5xl mb-6">
-                  Strategic Advisory for the Technopolitical Age
+                  Our Advisory offerings in a nutshell
                 </h1>
                 <p className="text-xl text-text-muted leading-relaxed mb-6">
                   AI adoption creates a governance problem and a dependency problem at
@@ -378,9 +203,9 @@ export default function ServicesPage() {
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </a>
-                  <a href="#method" className="text-sm text-stone-teal hover:underline">
+                  <Link href="/methodology" className="text-sm text-stone-teal hover:underline">
                     How the method works →
-                  </a>
+                  </Link>
                 </div>
                 {FREE_INTRO_WINDOW && (
                   <p className="mt-2 text-xs italic text-text-muted">
@@ -402,7 +227,7 @@ export default function ServicesPage() {
                   {/* Gradient scrim for caption legibility */}
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-scrim-ink via-scrim-ink/70 to-transparent p-5 pt-16">
                     <p className="text-sm italic text-balance text-white/90 [text-shadow:0_1px_8px_rgba(0,0,0,0.7)]">
-                      Three forensic domains, two analytical methods — applied to your decision.
+                      Read continuously, and pointed at your business rather than the market.
                     </p>
                   </div>
                 </div>
@@ -562,245 +387,52 @@ export default function ServicesPage() {
           </div>
         </section>
 
-        {/* The 3×2 method — the Retainer's operating system, not a separate
-            offering.
 
-            It used to read as a different product, for four compounding
-            reasons: it was the only section on the page with no `id`, no nav
-            entry and no CTA, while every neighbour is a linkable destination;
-            its only two links left the funnel into free tools; it never said
-            "Drift Retainer" once; and the Retainer above cites "the same 3×2
-            method" seventy lines *before* anything defines it.
+        {/* Follow-on modules — an index, not a catalogue.
 
-            Underneath all four sat one scoping error. The only two strings on
-            the whole site tying the method to the Retainer both attached it to
-            the *quarterly* review, so the method presented as a feature of one
-            deliverable rather than as what the relationship runs on. The
-            kicker and the intro below are the fix; the rest follows from it. */}
-        <section id="method" className="scroll-mt-24 mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
-          <div className="mb-8">
-            <div className="mb-3 font-mono text-xs uppercase tracking-wider text-silicon-amber-strong">
-              What the Retainer reads, every month
-            </div>
-            <h2 className="text-2xl font-semibold text-text-primary mb-4">
-              The 3×2 Method. Applied to Your Decision.
-            </h2>
-            <p className="text-text-muted max-w-3xl">
-              Three forensic domains, two ways of reading each. The monthly briefing
-              covers whichever moved; the quarterly exposure review runs all six. It is
-              the same method behind the public analysis — pointed at your business
-              rather than at the market.{' '}
-              <Link href="/methodology" className="text-stone-teal hover:underline">
-                See the full 3×2 matrix
-              </Link>
-              .
-            </p>
-          </div>
+            Each module has had a page of its own since 2026-09-09, and three of
+            them are reached from the free tool they follow on from. Restating
+            their deliverables here would put the same four bullets in two
+            places and guarantee they drift; the index carries what a reader
+            needs to choose, and the page carries the rest.
 
-          <div className="mb-6 text-xs font-mono uppercase tracking-wider text-text-muted">
-            Three forensic domains
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {domains.map((domain, idx) => {
-              const Icon = domain.icon
-              return (
-                <motion.div
-                  key={domain.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: idx * 0.1 }}
-                >
-                  <Card className={`card-interactive h-full bg-stone-charcoal border-border-subtle ${domain.hoverBorderColor}`}>
-                    <CardHeader>
-                      <div className={`w-10 h-10 rounded-lg ${domain.bgColor} ${domain.borderColor} border flex items-center justify-center mb-3`}>
-                        <Icon className={`w-5 h-5 ${domain.color}`} />
-                      </div>
-                      <CardTitle className="text-lg text-text-primary">
-                        {domain.title}
-                      </CardTitle>
-                      <CardDescription className="text-sm">
-                        {domain.description}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="mb-1.5 font-mono text-[11px] uppercase tracking-wider text-text-muted">
-                        On your desk
-                      </div>
-                      <p className="text-sm leading-relaxed text-text-primary">
-                        {domain.output}
-                      </p>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              )
-            })}
-          </div>
-
-          <div className="mt-10 mb-6 text-xs font-mono uppercase tracking-wider text-text-muted">
-            Two analytical methods · applied across all three domains
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {methods.map((method, idx) => {
-              const Icon = method.icon
-              return (
-                <motion.div
-                  key={method.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: idx * 0.1 }}
-                >
-                  <Card className={`card-interactive h-full bg-stone-charcoal border-border-subtle ${method.hoverBorderColor}`}>
-                    <CardHeader>
-                      <div className={`w-10 h-10 rounded-lg ${method.bgColor} ${method.borderColor} border flex items-center justify-center mb-3`}>
-                        <Icon className={`w-5 h-5 ${method.color}`} />
-                      </div>
-                      <CardTitle className="text-lg text-text-primary">
-                        {method.title}
-                      </CardTitle>
-                      <CardDescription className="text-sm">
-                        {method.description}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="mb-1.5 font-mono text-[11px] uppercase tracking-wider text-text-muted">
-                        On your desk
-                      </div>
-                      <p className="text-sm leading-relaxed text-text-primary">
-                        {method.output}
-                      </p>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              )
-            })}
-          </div>
-
-          {/* The section's close. It used to end on the second method card,
-              leaving the reader at a dead stop between two priced sections.
-
-              The tools are named here rather than on the cards because the
-              asymmetry is the argument: three of the five can be automated and
-              two cannot, so the two you cannot self-serve are the two you are
-              paying a person for. Stated per-card it read as an unfinished
-              grid; stated once it reads as a reason. */}
-          <div className="mt-10 rounded-lg border border-silicon-amber/30 bg-silicon-amber/5 p-6 lg:p-8">
-            <p className="max-w-3xl leading-relaxed text-text-muted">
-              Three of these five you can run yourself, free:{' '}
-              <Link href="/tools/supply-chain-mapper" className="text-stone-teal hover:underline">
-                Supply Chain Mapper
-              </Link>
-              ,{' '}
-              <Link href="/tools/policy-stress-test" className="text-stone-teal hover:underline">
-                Policy Stress-Test
-              </Link>{' '}
-              and{' '}
-              <Link href="/tools/scenario-modeler" className="text-stone-teal hover:underline">
-                Scenario Modeler
-              </Link>
-              . The talent layer and the long-memory filter are judgement calls — they
-              only run with a person.
-            </p>
-            <p className="mt-4 max-w-3xl text-lg font-medium leading-relaxed text-text-primary">
-              The Diagnostic is one pass over two domains. The Retainer runs all three,
-              both ways, every month.
-            </p>
-            <div className="mt-6 flex flex-wrap items-center gap-3">
-              <a href="#retainer">
-                <Button className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90">
-                  See the Drift Retainer
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </a>
-              <a href="#diagnostic">
-                <Button className="bg-surface-elevated text-text-primary hover:bg-surface-elevated/80">
-                  Or one pass — the Exposure Diagnostic
-                </Button>
-              </a>
-            </div>
-          </div>
-        </section>
-
-        <Separator className="mx-auto max-w-7xl bg-border-subtle" />
-
-        {/* Assessment Offerings */}
+            Rendered from `MODULES` rather than retyped, for the reason the
+            footer learned: the first hand-typed copy of a catalogue list
+            duplicated an entry that was already in it. */}
         <section id="modules" className="scroll-mt-24 mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
           <div className="mb-8">
             <h2 className="text-2xl font-semibold text-text-primary mb-4">
               Follow-on Modules
             </h2>
             <p className="text-text-muted max-w-3xl">
-              Each module deepens a single exposure where self-service tools reach their
-              limit. Available as additions to a diagnostic — or folded into a Drift
-              Retainer as the standing relationship requires.
+              Each module deepens a single exposure where the self-service tools reach
+              their limit. Take one on its own, add it to a diagnostic, or fold it into a
+              Drift Retainer as the standing relationship requires.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {assessments.map((assessment, idx) => {
-              const Icon = assessment.icon
-              return (
-                <motion.div
-                  key={assessment.title}
-                  id={assessment.title === 'Sovereign Architecture Review' ? 'sovereign-architecture-review' : undefined}
-                  className="scroll-mt-28"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: idx * 0.1 }}
+          <ul className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {MODULES.map((offering) => (
+              <li key={offering.id}>
+                <Link
+                  href={offering.href}
+                  className="card-interactive flex h-full flex-col rounded-lg border border-border-subtle bg-stone-charcoal p-6 transition-colors hover:border-stone-teal"
                 >
-                  <Card className="card-interactive h-full bg-stone-charcoal border-border-subtle">
-                    <CardHeader>
-                      {/* Price and provenance are not alternatives. These were
-                          an either/or, so the three modules that grew out of a
-                          tool showed only "From {tool}" and no price at all —
-                          which is why they sat unpriced next to two that were
-                          not. Both render now, price first. */}
-                      <div className="flex items-start justify-between gap-3">
-                        <Icon className={`w-6 h-6 flex-shrink-0 text-${assessment.color}`} />
-                        <div className="flex flex-col items-end gap-1.5">
-                          {assessment.price && (
-                            <Badge variant="outline" className="text-[12px] font-mono text-text-primary border-border-subtle">
-                              {assessment.price}
-                            </Badge>
-                          )}
-                          {assessment.fromTool && (
-                            <Badge variant="outline" className="text-[12px] text-text-muted border-border-subtle">
-                              From {assessment.fromTool}
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                      <CardTitle className="text-lg text-text-primary mt-3">
-                        {assessment.title}
-                      </CardTitle>
-                      <CardDescription>
-                        {assessment.description}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="mb-3 font-mono text-xs uppercase tracking-wider text-text-muted">Deliverables</div>
-                      <ul className="space-y-2">
-                        {assessment.deliverables.map((item, i) => (
-                          <li key={i} className="flex items-start gap-2 text-sm text-text-primary">
-                            <CheckCircle className="w-4 h-4 text-stone-teal flex-shrink-0 mt-0.5" />
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
-                      {assessment.title === 'Sovereign Architecture Review' && (
-                        <DigitalOmnibusContext>We assess data flows, access, key custody and portability against applicable requirements and buyer expectations, keeping legal duties and strategic sovereignty preferences distinct.</DigitalOmnibusContext>
-                      )}
-                      {assessment.priceNote && (
-                        <p className="mt-4 text-xs italic text-text-muted">{assessment.priceNote}</p>
-                      )}
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              )
-            })}
-          </div>
+                  <div className="mb-2 flex items-start justify-between gap-3">
+                    <h3 className="text-lg font-semibold text-text-primary">{offering.name}</h3>
+                    <Badge variant="outline" className="flex-shrink-0 font-mono text-[12px] text-text-primary border-border-subtle">
+                      {offering.price}
+                    </Badge>
+                  </div>
+                  <p className="text-sm leading-relaxed text-text-muted">{offering.summary}</p>
+                  <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-stone-teal">
+                    For more details
+                    <ArrowRight className="h-4 w-4" />
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
         </section>
 
         {/* Service Tiers */}

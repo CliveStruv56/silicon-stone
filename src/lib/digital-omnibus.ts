@@ -23,5 +23,5 @@ export const OMNIBUS_APPLICATIONS = [
   { name: 'Advisory Briefing', href: '/advisory/advisory-briefing', question: 'What does this mean for one decision?', detail: 'A focused interpretation of a regulatory change, a vendor claim or a question about your EU exposure.' },
   { name: 'Exposure Diagnostic', href: '/advisory/exposure-diagnostic', question: 'Where are we exposed?', detail: 'Examine your systems, vendor evidence and dependencies. European Procurement Readiness is included where relevant to the agreed scope.' },
   { name: 'Strategic Assessment', href: '/advisory/strategic-assessment', question: 'What should the board commit to?', detail: 'Translate requirements, procurement evidence gaps and regulatory uncertainty into investment priorities and an implementation roadmap.' },
-  { name: 'Sovereign Architecture Review', href: '/advisory#sovereign-architecture-review', question: 'Can our architecture support the choices ahead?', detail: 'Review data flows, access, key custody and portability against applicable requirements and buyer expectations.' },
+  { name: 'Sovereign Architecture Review', href: '/advisory/modules/sovereign-architecture-review', question: 'Can our architecture support the choices ahead?', detail: 'Review data flows, access, key custody and portability against applicable requirements and buyer expectations.' },
 ]

@@ -38,6 +38,12 @@ const STATIC_ROUTES: Array<{
   { path: '/advisory/exposure-diagnostic', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/advisory/drift-retainer', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/advisory/strategic-assessment', changeFrequency: 'monthly', priority: 0.6 },
+  // Follow-on modules. Their own pages since 2026-09-09; three are reached
+  // from the free tool they follow on from, so search is the other way in.
+  { path: '/advisory/modules/manufacturing-exposure', changeFrequency: 'monthly', priority: 0.5 },
+  { path: '/advisory/modules/scenario-impact', changeFrequency: 'monthly', priority: 0.5 },
+  { path: '/advisory/modules/regulatory-friction', changeFrequency: 'monthly', priority: 0.5 },
+  { path: '/advisory/modules/sovereign-architecture-review', changeFrequency: 'monthly', priority: 0.5 },
   { path: '/digital-omnibus', changeFrequency: 'monthly', priority: 0.7 },
   // US-inbound lead magnet — the guide behind the EU Exposure Briefing (D1).
   { path: '/us-executive-guide', changeFrequency: 'monthly', priority: 0.6 },
