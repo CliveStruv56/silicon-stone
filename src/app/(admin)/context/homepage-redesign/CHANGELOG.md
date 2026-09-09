@@ -781,3 +781,23 @@ When sections ship, log them here in this format:
   header on both viewports, thanks to existing `scroll-mt-24`/`scroll-mt-28`.
 - Typecheck, lint, suite (1,562), build (125 pages), test:manual, test:security.
   Menu re-tested on four tool pages scrolled deep; ten anchors measured.
+
+## 2026-09-09 (eleventh) — Tool and guide next steps linked consistently
+
+- Owner-approved: Compliance Checker → Advisory Briefing; US Executive’s Guide
+  → Regulatory Friction Assessment as primary, Exposure Diagnostic secondary.
+- Added the checker’s amber bottom panel and aligned its results advisory link.
+  Self-service recommendations and assessment logic remain as before.
+- Added a contextual guide backlink on the assessment. Policy Stress-Test still
+  leads to that assessment.
+- All four homepage “Take it further” links now resolve to the relevant offering
+  page, replacing general Advisory/Products destinations.
+- Shared panel: `FollowOnOffering.tsx`; module wrapper: `FollowOnModule.tsx`.
+  Names, prices and URLs resolve through `offeringById()` in the catalogue.
+- Committed and deployed as `8a20e438`. Production build (125 prerendered pages),
+  targeted lint/typecheck and 33 catalogue/advisory tests passed. Full GitHub CI
+  passed, including security, manual, Sanity and PWA checks. Desktop/mobile panel
+  checks passed locally; all five affected production pages returned 200 with
+  the approved destinations. CI: https://github.com/CliveStruv56/silicon-stone/actions/runs/34392715314.
+- Handover: `project_summary.md` opening section and §11. No outstanding work for
+  this request; wait for the next owner-directed review.

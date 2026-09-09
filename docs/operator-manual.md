@@ -16,6 +16,11 @@ previously got wrong in three places; §10 gains *Why you reload once* and a
 warning about polling the live site; §10's series notes gain the two new promo
 bands. Nothing else was re-checked, so treat the rest as of the August date.
 
+What changed on 9 September 2026: §13 now records the live tool-to-advisory
+paths and the US Executive’s Guide’s primary paid next step, verified at deployed
+commit `8a20e438`. This was a navigation review, not a re-review of the legal
+content or the rest of this manual.
+
 This manual replaces `authoring-guide.md`, `article-generation-guide.md` and
 `editorial-aios-manual.md`. It links to `admin-research-workflow.md` rather than
 repeating it.
@@ -1326,6 +1331,30 @@ unverified** and check it yourself.
 The site publishes four interactive tools — the **Compliance Checker**, **Supply
 Chain Mapper**, **Scenario Modeler** and **Policy Stress Test**. They are products,
 not part of the publishing pipeline, and they are documented separately.
+
+### Where readers go next
+
+Each tool has an amber panel linking to its paid follow-on. The homepage’s
+“Take it further” links go directly to the same offering pages:
+
+| Free entry point | Paid follow-on |
+|---|---|
+| Compliance Checker | [Advisory Briefing](https://siliconandstone.com/advisory/advisory-briefing) |
+| Policy Stress-Test | [Regulatory Friction Assessment](https://siliconandstone.com/advisory/modules/regulatory-friction) |
+| Supply Chain Mapper | [Manufacturing Exposure Module](https://siliconandstone.com/advisory/modules/manufacturing-exposure) |
+| Scenario Modeler | [Scenario Impact Analysis](https://siliconandstone.com/advisory/modules/scenario-impact) |
+
+The [US Executive’s Guide](https://siliconandstone.com/us-executive-guide) also
+makes Regulatory Friction Assessment its primary paid next step. Exposure
+Diagnostic is secondary for a broader systems/vendor review. The assessment links
+back to the guide for background. The three modules are also listed on Advisory
+and Pricing; the footer’s Modules link opens the Advisory index.
+
+The Briefing is a one-question advisory engagement, not a fourth module. The
+checker’s self-service recommendations remain available. Prices and destinations
+come from `src/lib/offering.ts`; consult the live pages when quoting them.
+
+### Compliance Checker v2
 
 One thing an operator should know: the **EU AI Act Compliance Checker** has a
 rebuilt v2 that is **fully built but dark**. Every visitor gets v1. Release is

@@ -777,10 +777,11 @@ Three things the pages depend on:
   engagement layouts look up still exists in the catalogue.
 - **Anything listing the engagements maps `ENGAGEMENTS`; nothing retypes them.**
   The footer's first attempt retyped the list and duplicated the Post-Omnibus
-  Briefing, which is in the catalogue and was hard-coded beside it — caught by
+  Briefing, which was then in the catalogue and was hard-coded beside it — caught by
   looking at the rendered footer, not by the suite. Note the catalogue holds
-  **six** entries, not four: `post-omnibus-briefing` lives at `/eu-exposure` and
-  `board-level` is an anchor (`/advisory#contact`) with no page. The footer
+  **five** entries, not four: `board-level` is an anchor
+  (`/advisory#contact`) with no page. The Post-Omnibus Briefing was retired on
+  2026-09-09; `/eu-exposure` redirects to free `/digital-omnibus`. The footer
   filters on *has a page of its own*, stated as a rule so a future engagement
   appears without anyone remembering.
 - **Each engagement page emits a `BreadcrumbList` from its `layout.tsx`**, not
@@ -800,6 +801,28 @@ the single source for its seven capabilities, including the `feeds` field that
 records which stage hands output to which. It is a *sister* product: indigo
 (`--color-sister-indigo`), never the S&S amber/teal, and flagged `sister` in the
 header nav rather than added as a plain fourth Products entry.
+
+## Tool and guide follow-ons (owner-approved 9 September 2026)
+
+`FollowOnOffering.tsx` owns the amber next-step panel. `FollowOnModule.tsx`
+wraps it for the three `MODULES`, using `Offering.fromTool`. The Compliance
+Checker uses the shared panel with the **Advisory Briefing**, which stays in
+`ENGAGEMENTS`; do not create a fourth module to make that pairing work.
+
+- Compliance Checker → Advisory Briefing (also the results advisory link).
+- Policy Stress-Test → Regulatory Friction Assessment.
+- Supply Chain Mapper → Manufacturing Exposure Module.
+- Scenario Modeler → Scenario Impact Analysis.
+- US Executive’s Guide → Regulatory Friction Assessment **primary**, Exposure
+  Diagnostic **secondary**. The assessment links back to the guide for context.
+
+Homepage follow-on links go directly to these offering pages. Resolve names,
+prices and URLs from `offeringById()` in `src/lib/offering.ts`; do not retype
+catalogue entries. Module pages share `ModulePage.tsx`. Modules remain discoverable
+through `/advisory#modules`, `/pricing` and the footer; they are not in the
+Advisory dropdown. AI Bill of Materials is a Diagnostic deliverable and Sovereign
+Architecture Review is a Strategic Assessment scope option, neither separately
+priced. These changes shipped in `8a20e438` and its September 9 predecessors.
 
 ## Publication dates (load-bearing — do not break)
 
