@@ -18,8 +18,8 @@ export default function AdvisoryBriefingPage() {
         inShort: 'A focused one-hour working session, with prioritised recommendations and a written follow-up.',
         ctaLabel: 'Request a briefing',
         imageSrc: '/advisory/advisory-briefing.webp',
-        imageAlt: 'An isometric stone plinth on a cracked slab, lit from above, with teal, amber and warning-red channels converging on it',
-        imageCaption: 'One question, set down and lit from every side.',
+        imageAlt: 'An isometric walled stone enclosure on a slate slab, a lit stepped plinth at its centre, with an amber path leading in through one gate and teal circuit lines running out',
+        imageCaption: 'One question, set down inside a clear boundary.',
       }}
       audience={<>
         <p className="text-xl text-text-primary">For leaders with one specific question to resolve.</p>

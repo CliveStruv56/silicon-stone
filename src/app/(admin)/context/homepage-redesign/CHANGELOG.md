@@ -654,3 +654,17 @@ When sections ship, log them here in this format:
   a matching box ratio or the caption drifts far below the picture.
 - `cutoutHandling` dropped from `docs/advisory-image-prompts.json`; the
   pixel-counting warning is kept on the image entry, where it is still true.
+
+## 2026-09-09 (fourth) — Advisory Briefing hero: `C1_lifted_panel.png`
+
+- Third candidate and the one kept. Another dark panel (1,884 non-opaque pixels
+  of 2,560,000, all corner rounding), so the framed treatment again, flattened
+  onto `#0f141e` at 1200x1200. No component change — the cutout variant stayed
+  deleted.
+- **Different scene, so the alt text and caption changed with it**: a walled
+  stone enclosure with a lit stepped plinth, an amber path in through one gate
+  and teal circuit lines out. Caption is now "One question, set down inside a
+  clear boundary", which echoes the page's own line about the Briefing working
+  best when the question has a clear boundary.
+- Typecheck and the full suite (1,551 tests) pass. Walked in a browser in both
+  themes.

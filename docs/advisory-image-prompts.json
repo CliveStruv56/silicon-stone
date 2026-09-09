@@ -9,8 +9,8 @@
     },
     {
       "file": "public/advisory/advisory-briefing.webp",
-      "prompt": "Supplied by the owner, not generated here: an isometric stone plinth on a cracked slab, lit from above, with teal, amber and warning-red channels converging on it. Departs from the photographic art direction above; the illustration reads as a diagram of one question examined from several angles.",
-      "source": "Images/A_softened_panel.png (1600x1600, opaque apart from its four rounded corners \u2014 a dark panel rather than a cutout, so it takes the same framed treatment as the other four at 1200x1200. Replaced the generated still life on 2026-09-09. Note for the next replacement: an alpha channel does not make a file a cutout \u2014 count the non-opaque pixels. A genuine cutout needs its own treatment, because the caption scrim is fixed dark and would float a dark band over transparency on the light theme.)"
+      "prompt": "Supplied by the owner, not generated here: an isometric walled stone enclosure on a slate slab, a lit stepped plinth at its centre, an amber path leading in through one gate and teal circuit lines running out. Departs from the photographic art direction above; the illustration reads as a diagram of one question brought inside a defined boundary, which is what the page says the Briefing is for.",
+      "source": "Images/C1_lifted_panel.png (1600x1600, opaque apart from its four rounded corners \u2014 a dark panel rather than a cutout, so it takes the same framed treatment as the other four at 1200x1200. Third candidate and the one kept: B_isolated_cutout.png and A_softened_panel.png preceded it on 2026-09-09. Note for the next replacement: an alpha channel does not make a file a cutout \u2014 count the non-opaque pixels. A genuine cutout would need the frame and scrim dropped, because the caption scrim is fixed dark and floats a dark band over transparency on the light theme.)"
     },
     {
       "file": "public/advisory/exposure-diagnostic.webp",

@@ -687,12 +687,14 @@ make it a free reference that feeds the existing engagements.
 
 **Advisory Briefing artwork, and an unused cutout variant on the shared hero.**
 The Briefing hero is an isometric illustration supplied by the owner, replacing
-the generated still life. Two candidates were tried. `B_isolated_cutout.png` is a
-genuine transparent cutout and was shipped first in a new borderless treatment;
-the owner set it aside. `A_softened_panel.png` is the same scene on a **dark
-panel** — 99.9% opaque, with alpha only on its four rounded corners — so it takes
-the ordinary framed treatment at 1200×1200 like the other four heroes, and that
-is what is live.
+the generated still life. **Three candidates were tried and the third is live:**
+`B_isolated_cutout.png` (a genuine transparent cutout, shipped first in a new
+borderless treatment, then set aside), `A_softened_panel.png`, and
+`C1_lifted_panel.png` — a walled enclosure with a lit plinth at its centre. Both
+panels are **99.9% opaque**, with alpha only on their four rounded corners, so
+they take the ordinary framed treatment at 1200×1200 like the other four heroes.
+The alt text and caption changed with the third: it is a different scene, not a
+different rendering of the same one.
 
 The `artwork: 'photograph' | 'cutout'` variant added for the first attempt has
 been **deleted** — it ended the day with no caller, and an untested branch on the
