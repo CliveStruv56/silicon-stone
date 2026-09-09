@@ -19,7 +19,13 @@ export function FollowOnOffering({ offering, eyebrow, intro, note }: {
         <div className="mb-3 font-mono text-xs uppercase tracking-wider text-silicon-amber-strong">
           {eyebrow}
         </div>
-        <div className="flex flex-wrap items-start justify-between gap-4">
+        {/* The badge sits beside the name, not at the far edge. With
+            `justify-between` it was pushed to the right of a max-w-7xl row —
+            around 900px from the heading at desktop width — so the price read
+            as an unrelated chit floating in the band rather than as this
+            offering's price. `flex-wrap` still drops it below on a narrow
+            screen, where the heading takes the full width. */}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
           <h2 id={`follow-on-${offering.id}`} className="text-2xl font-semibold text-text-primary">
             {offering.name}
           </h2>

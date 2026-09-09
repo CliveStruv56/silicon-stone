@@ -855,3 +855,16 @@ When sections ship, log them here in this format:
   reports true with the instruction shown and 0 inline descriptions.
 - No other tool had the pattern; the string appears nowhere else.
 - Lint, suite (1,562), build (125 pages), test:manual, test:security.
+
+## 2026-09-09 (fourteenth) — Follow-on price badge moved beside the title
+
+- `justify-between` pushed the badge to the far edge of a `max-w-7xl` row —
+  roughly 900px from the heading at desktop width — so the price read as an
+  unrelated chit floating in the band rather than as this offering's price.
+- Now `flex flex-wrap items-center gap-x-3`: measured 12px after the heading and
+  on the same row across all four tool pages at 1440. `flex-wrap` still drops it
+  below on a narrow screen, where the module names take the full width; the
+  Compliance Checker's shorter "Advisory Briefing" keeps it inline even at 390.
+- One shared component, so all four surfaces changed together — which is why it
+  was worth asking before doing it.
+- Lint, suite (1,562), build (125 pages), test:manual, test:security.
