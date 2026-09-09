@@ -716,7 +716,16 @@ export default function SupplyChainMapperPage() {
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="h-full flex items-center justify-center text-center p-8 border border-dashed border-border-subtle rounded-xl text-text-muted min-h-[300px]"
+                    /* No `h-full`. This sits *below* the Top Exposure Nodes card
+                       inside a grid column that stretches to the 600px map beside
+                       it, so `height: 100%` resolved to the whole column rather
+                       than the space left under that card — and the panel
+                       overflowed its column by exactly the card's height, landing
+                       on top of the Exposure Report Snapshot below. `min-h`
+                       gives it presence without claiming height it does not have.
+                       The selected-node branch above is plain `space-y-4`; the
+                       two disagreeing is what gave it away. */
+                    className="flex items-center justify-center text-center p-8 border border-dashed border-border-subtle rounded-xl text-text-muted min-h-[300px]"
                   >
                     <div>
                       <Network className="w-12 h-12 mx-auto mb-4 opacity-50" />

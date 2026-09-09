@@ -801,3 +801,21 @@ When sections ship, log them here in this format:
   the approved destinations. CI: https://github.com/CliveStruv56/silicon-stone/actions/runs/34392715314.
 - Handover: `project_summary.md` opening section and §11. No outstanding work for
   this request; wait for the next owner-directed review.
+
+## 2026-09-09 (eleventh) — Supply Chain Mapper: empty state overflowed its column
+
+- Spotted while checking desktop dropdowns over a scrolled tool page, not by the
+  suite. The "Select a Node" panel rendered on top of the Exposure Report
+  Snapshot card: its icon over the Download .md button, its last line over
+  "QUESTIONS FOR PROCUREMENT".
+- Cause: `h-full` on the empty state. It sits *below* the Top Exposure Nodes card
+  inside a grid column that stretches to the 600px map beside it, so
+  `height: 100%` resolved to the whole column rather than the space left under
+  that card — and it overflowed by exactly the card's height. `min-h-[300px]`
+  already gave it presence; `h-full` only added the overflow.
+- The tell: the selected-node branch of the same ternary is plain `space-y-4`.
+  Two branches of one conditional disagreeing about height is the smell.
+- Swept all four tools at 1440 and 390 for any child spilling past its column —
+  the mapper was the only one, and it is now clean at both.
+- Typecheck, lint, suite (1,562), build (125 pages), test:manual, test:security.
+  Both branches walked in a browser.
