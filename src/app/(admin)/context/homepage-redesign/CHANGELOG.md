@@ -839,3 +839,19 @@ When sections ship, log them here in this format:
   right of its heading at desktop width. The second is the shared component's
   behaviour on all four tools.
 - Typecheck, lint, suite (1,562), build (125 pages), test:manual, test:security.
+
+## 2026-09-09 (thirteenth) — Scenario Modeler: "Hover for details" on a phone
+
+- The copy was the symptom. The detail it promised — `impact.description` for
+  each sector bar — lived only behind `group-hover:opacity-100` with no tap
+  handler, so on a touch device it was **unreachable**, not merely mislabelled.
+  Deleting the sentence alone would have hidden that rather than fixed it.
+- Split on `(hover: hover)` in CSS, so no JS and no hydration risk. Where hover
+  exists: unchanged — overlay on the bar, instruction shown. Where it does not:
+  the instruction is hidden and each description renders under its bar in muted
+  text. Under, not over: at 390px the bar truncates it to a few words.
+- Verified by reading `matchMedia('(hover: hover)')` in both emulations — touch
+  reports false with the instruction hidden and 6 descriptions visible; desktop
+  reports true with the instruction shown and 0 inline descriptions.
+- No other tool had the pattern; the string appears nowhere else.
+- Lint, suite (1,562), build (125 pages), test:manual, test:security.

@@ -116,12 +116,21 @@ function ImpactChart({ impacts, maxValue }: { impacts: SectorImpact[]; maxValue:
                 className="h-full rounded"
                 style={{ backgroundColor: SEVERITY_COLORS[impact.severity] }}
               />
-              <div className="absolute inset-0 flex items-center px-2">
+              {/* The hover overlay only exists where hovering does. */}
+              <div className="absolute inset-0 hidden items-center px-2 [@media(hover:hover)]:flex">
                 <span className="text-xs text-white/90 truncate opacity-0 group-hover:opacity-100 transition-opacity">
                   {impact.description}
                 </span>
               </div>
             </div>
+            {/* Without this the description was unreachable on a touch device:
+                it lived only behind `group-hover`, and there is no hover on a
+                phone. Shown under the bar rather than over it, because at 390px
+                the bar truncates it to a few words. Hidden where hover works, so
+                the desktop chart is unchanged. */}
+            <p className="mt-1 text-xs leading-relaxed text-text-muted [@media(hover:hover)]:hidden">
+              {impact.description}
+            </p>
           </motion.div>
         )
       })}
@@ -535,7 +544,8 @@ export default function ScenarioModelerPage() {
                       Sector Impact Analysis
                     </CardTitle>
                     <CardDescription>
-                      Value at stake by sector, adjusted by the selected exposure lens. Hover for details.
+                      Value at stake by sector, adjusted by the selected exposure lens.{' '}
+                      <span className="hidden [@media(hover:hover)]:inline">Hover for details.</span>
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
