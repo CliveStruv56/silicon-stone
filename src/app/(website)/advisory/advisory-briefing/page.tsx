@@ -20,8 +20,6 @@ export default function AdvisoryBriefingPage() {
         imageSrc: '/advisory/advisory-briefing.webp',
         imageAlt: 'An isometric stone plinth on a cracked slab, lit from above, with teal, amber and warning-red channels converging on it',
         imageCaption: 'One question, set down and lit from every side.',
-        artwork: 'cutout',
-        imageRatio: 3 / 2,
       }}
       audience={<>
         <p className="text-xl text-text-primary">For leaders with one specific question to resolve.</p>

@@ -11,9 +11,9 @@ a free reference page, `/eu-exposure` 301s to it, and the £2,500 briefing and t
 £1,500 European Procurement Readiness add-on are out of the catalogue —
 Procurement Readiness is now part of an agreed Exposure Diagnostic or Strategic
 Assessment scope. The Advisory Briefing also got new owner-supplied hero artwork
-and a `cutout` variant on the shared `EngagementHero`; **the other four hero
-images are expected to be replaced the same way.** Read the September 9 entry in
-§9. Legal dates on the new page were researched when written and not re-verified
+— a dark panel in the ordinary framed treatment, after a borderless cutout
+variant was tried and set aside; **the other four hero images are expected to be
+replaced next.** Read the September 9 entry in §9. Legal dates on the new page were researched when written and not re-verified
 at commit time.
 
 ## Latest session — 8 September 2026
@@ -685,24 +685,32 @@ make it a free reference that feeds the existing engagements.
   named instruments rather than generic mentions of AI or sovereignty, and
   `IntelligenceTiers` links only the first matching featured story.
 
-**Advisory Briefing artwork, and a cutout variant on the shared hero.** The
-Briefing hero is now an isometric illustration supplied by the owner, replacing
-the generated still life. `EngagementHero` gained `artwork: 'photograph' |
-'cutout'` (default unchanged, so the other three pages are untouched) and
-`imageRatio`. The cutout branch drops the frame and the caption scrim and puts
-the caption in themed muted text: `--scrim-ink` is deliberately fixed dark for
-always-dark photographs, so over a transparent image it would float a dark band
-on the light theme's stone page. Assets for that branch are trimmed to their
-content and padded to a clean ratio so the box hugs the artwork — without
-`imageRatio` the caption drifts a long way below the picture. The recipe is in
-`docs/advisory-image-prompts.json` under `cutoutHandling`. **The other four hero
-images are still photographs and are expected to be replaced next.**
+**Advisory Briefing artwork, and an unused cutout variant on the shared hero.**
+The Briefing hero is an isometric illustration supplied by the owner, replacing
+the generated still life. Two candidates were tried. `B_isolated_cutout.png` is a
+genuine transparent cutout and was shipped first in a new borderless treatment;
+the owner set it aside. `A_softened_panel.png` is the same scene on a **dark
+panel** — 99.9% opaque, with alpha only on its four rounded corners — so it takes
+the ordinary framed treatment at 1200×1200 like the other four heroes, and that
+is what is live.
+
+`EngagementHero` keeps the `artwork: 'photograph' | 'cutout'` variant and
+`imageRatio` from the first attempt. **Nothing passes them today.** They are held
+for the remaining hero replacements; if those all arrive as panels, delete the
+branch. Two things it records that are easy to get wrong again: `--scrim-ink` is
+deliberately fixed dark for always-dark photographs, so over a transparent image
+it floats a dark band on the light theme's stone page; and a cutout needs
+`imageRatio` with the asset trimmed to its content, or the caption drifts a long
+way below the picture. **An alpha channel does not make a file a cutout** — check
+the actual transparent-pixel count. **The other four hero images are still
+photographs and are expected to be replaced next.**
 
 **Validated:** full Vitest suite (1,551 tests, 80 files), production build (122
 prerendered pages, up from 119), `test:security`, `test:sanity-prices` (3
 published products) and `test:manual` (21 facts). The Briefing hero was walked in
-a browser at 1440px in both themes and at 420px. **Not done:** no production
-verification after deploy, and no review of the Omnibus page's legal claims.
+a browser at 1440px in both themes and at 420px, for both candidate images.
+**Not done:** no production verification after deploy, and no review of the
+Omnibus page's legal claims.
 
 
 ### September 8, 2026 — Advisory pages simplified and deployed

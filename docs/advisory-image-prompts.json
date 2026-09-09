@@ -1,6 +1,6 @@
 {
   "tool": "Built-in image_gen",
-  "cutoutHandling": "Artwork supplied as a transparent cutout is trimmed to its content, padded to its own clean ratio and encoded to WebP with alpha kept. It is rendered by the shared EngagementHero with artwork: 'cutout' and a matching imageRatio, which drops the border and the caption scrim: --scrim-ink is deliberately fixed dark for always-dark photographs, so over transparency it would float a dark band on the light theme.",
+  "cutoutHandling": "No current page uses this; the path exists for artwork supplied as a genuine transparent cutout. Check first \u2014 a dark panel with rounded corners reads as a cutout by file type and is not one. Such artwork is trimmed to its content, padded to its own clean ratio and encoded to WebP with alpha kept. It is rendered by the shared EngagementHero with artwork: 'cutout' and a matching imageRatio, which drops the border and the caption scrim: --scrim-ink is deliberately fixed dark for always-dark photographs, so over transparency it would float a dark band on the light theme.",
   "artDirection": "Square premium editorial photography; grounded Atlantic atmosphere; textured stone and oak; slate blue, weathered teal and warm amber practical lighting; realistic optics and natural side light; central subject safe for square and 4:3 crops; no text, logos, globes or holographic overlays.",
   "images": [
     {
@@ -11,7 +11,7 @@
     {
       "file": "public/advisory/advisory-briefing.webp",
       "prompt": "Supplied by the owner, not generated here: an isometric stone plinth on a cracked slab, lit from above, with teal, amber and warning-red channels converging on it. Departs from the photographic art direction above; the illustration reads as a diagram of one question examined from several angles.",
-      "source": "Images/B_isolated_cutout.png (1600x1600 transparent cutout; trimmed to its content, padded to 3:2 and encoded 1200x800 with alpha intact. Rendered by EngagementHero's artwork: 'cutout' variant, which drops the frame and the fixed-dark caption scrim. Replaced the generated still life on 2026-09-09.)"
+      "source": "Images/A_softened_panel.png (1600x1600, opaque apart from its four rounded corners \u2014 a dark panel rather than a cutout, so it takes the ordinary framed treatment at 1200x1200 like the other four. Replaced the generated still life on 2026-09-09, after Images/B_isolated_cutout.png was tried in the borderless cutout variant and set aside.)"
     },
     {
       "file": "public/advisory/exposure-diagnostic.webp",

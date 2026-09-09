@@ -619,7 +619,24 @@ When sections ship, log them here in this format:
   gained `artwork: 'photograph' | 'cutout'` (default unchanged) and `imageRatio`;
   the cutout branch drops the frame and the fixed-dark caption scrim, which would
   otherwise float a dark band on the light theme. Other four heroes unchanged.
+  **Superseded the same day — see 2026-09-09 (later).**
 - Full suite (1,551 tests), build (122 prerendered pages), `test:security`,
   `test:sanity-prices` and `test:manual` passed. Briefing hero walked in a
   browser in both themes and at 420px. The Omnibus page's legal dates were not
   re-verified at commit time; no post-deploy production check.
+
+## 2026-09-09 (later) — Advisory Briefing hero: the panel, not the cutout
+
+- The owner set the cutout aside and supplied `A_softened_panel.png`: the same
+  scene on a dark panel, opaque apart from its four rounded corners. An alpha
+  channel does not make a file a cutout — 1,884 of its 2,560,000 pixels are
+  non-opaque, all of them corner rounding.
+- So it takes the ordinary framed treatment (rounded card, hairline border,
+  caption over the scrim), flattened onto `#0f141e` at 1200x1200 like the other
+  four heroes. The borderless variant would have floated a dark square on the
+  light theme's stone page.
+- `artwork: 'cutout'` and `imageRatio` stay on `EngagementHero` but **nothing
+  passes them now.** Held for the remaining hero replacements; delete the branch
+  if those arrive as panels too.
+- Alt text and caption unchanged — same scene. Typecheck and the full suite
+  (1,551 tests) pass. Walked in a browser in both themes.
