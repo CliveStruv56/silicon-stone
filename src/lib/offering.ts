@@ -2,7 +2,7 @@
  * The offering catalogue — every price the site charges, in one place.
  *
  * This exists because they were in nine. A 2026-08-15 audit found the same
- * figures restated across `/products`, `/advisory`, `/eu-exposure`, the three
+ * figures restated across `/products`, `/advisory`, the three
  * product subpages, the header nav, three homepage bands and `LadderBox` — and
  * found six places where they had drifted apart. Every one of those surfaces
  * now reads from here. `AMOUNTS` is the only place a number is typed.
@@ -52,8 +52,6 @@ export const AMOUNTS = {
   /** Advisory. */
   advisoryBriefing: 450,
   exposureDiagnostic: 2500,
-  postOmnibusBriefing: 2500,
-  procurementAddOn: 1500,
   driftRetainerMonthly: 2000,
   /** Twelve months for the price of ten. */
   driftRetainerAnnual: 20000,
@@ -259,27 +257,11 @@ export const ENGAGEMENTS: Offering[] = [
     summary:
       'Where your dependency on specific vendors, models and jurisdictions becomes an operating constraint — with a 15–25 page report and a 30-day follow-up call.',
     question: 'I do not know what we have actually got.',
-    // Its own page since 2026-09-04, not an anchor on /advisory. It is the same
-    // price as the Post-Omnibus Briefing, which has had `/eu-exposure` all
-    // along, and it was carrying 84 words in a four-across grid cell. Both the
-    // header nav and /pricing render this `href`, so they follow from here.
+    // The dedicated page is shared by navigation and pricing.
     href: '/advisory/exposure-diagnostic',
     terms: [
+      'European Procurement Readiness forms part of the agreed diagnostic scope where relevant.',
       'Fee credited toward your first quarter on the Drift Retainer.',
-    ],
-  },
-  {
-    id: 'post-omnibus-briefing',
-    name: 'The Post-Omnibus Briefing',
-    price: `From ${gbp(AMOUNTS.postOmnibusBriefing)}`,
-    priceNote: 'fixed price, fixed scope',
-    summary:
-      'For US and UK companies selling into Europe: what the AI Act now actually requires of you after the Digital Omnibus, in plain English, delivered within three weeks.',
-    href: '/eu-exposure',
-    terms: [
-      'Written briefing of 15–25 pages, an executive summary and one interpretation call.',
-      `European Procurement Readiness add-on from ${gbp(AMOUNTS.procurementAddOn)}.`,
-      'Extends into a Drift Retainer where the exposure is ongoing.',
     ],
   },
   {
@@ -314,6 +296,7 @@ export const ENGAGEMENTS: Offering[] = [
     /** Own page since 2026-09-04 — see the Exposure Diagnostic note above. */
     href: '/advisory/strategic-assessment',
     terms: [
+      'European Procurement Readiness can be included in the agreed assessment scope.',
       'Framework-neutral and vendor-agnostic — we sell no software and take no referral fees.',
     ],
   },
@@ -377,29 +360,12 @@ export const SISTER_PRODUCT: Offering = {
  */
 export const MODULES: Offering[] = [
   {
-    // The one module with no card in the `assessments` band on /advisory, and
-    // that asymmetry is deliberate rather than an omission to be tidied up: it
-    // is an add-on to the Post-Omnibus Briefing, scoped and sold at
-    // /eu-exposure, where it has always been one sentence of prose. It belongs
-    // here because /pricing promises every price on one page, and until
-    // 2026-09-04 this was the only priced thing on the site that appeared in no
-    // catalogue, no menu and no price list — a £1,500 offer reachable only by
-    // reading to the bottom of another page.
-    id: 'european-procurement-readiness',
-    name: 'European Procurement Readiness',
-    price: `From ${gbp(AMOUNTS.procurementAddOn)}`,
-    priceNote: 'add-on to the Post-Omnibus Briefing',
-    summary:
-      'Your systems mapped against the governance questionnaires European buyers actually send, with the evidence you must hold separated from the evidence that is theatre, and your AI indemnification clauses reviewed.',
-    href: '/eu-exposure',
-  },
-  {
     id: 'sovereign-architecture-review',
     name: 'Sovereign Architecture Review',
     price: `From ${gbp(AMOUNTS.sovereignArchitectureReview)}`,
     summary:
       'Where inference, weights and keys sit, who can reach them, and whether you can satisfy a buyer’s sovereignty demand without re-architecting.',
-    href: '/advisory#modules',
+    href: '/advisory#sovereign-architecture-review',
   },
   {
     id: 'ai-bill-of-materials',
@@ -408,7 +374,7 @@ export const MODULES: Offering[] = [
     summary:
       'Every model, dataset, fine-tune, wrapper, API and library, version-tracked, with provenance and licence status — before a regulator or a buyer asks.',
     href: '/advisory#modules',
-    terms: ['Or added to a Post-Omnibus Briefing.'],
+    terms: ['Available within a scoped diagnostic or assessment.'],
   },
   {
     id: 'manufacturing-exposure',
@@ -453,7 +419,6 @@ export const LADDER: Array<{
   { from: `${gbp(AMOUNTS.checklist)} Checklist Pack`, emphasis: `${gbp(AMOUNTS.toolkitDiscount)} off`, to: 'the AI Act Compliance Toolkit.' },
   { from: `${gbp(AMOUNTS.toolkitStandard)}+ Compliance Toolkit`, to: 'the evidence base a briefing starts from.' },
   { from: `${gbp(AMOUNTS.advisoryBriefing)} Advisory Briefing`, emphasis: 'credited in full', to: 'to your first retainer month.' },
-  { from: `${gbp(AMOUNTS.postOmnibusBriefing)}+ Post-Omnibus Briefing`, to: 'extends into a Drift Retainer where the exposure is ongoing.' },
   { from: `${gbp(AMOUNTS.exposureDiagnostic)}+ Exposure Diagnostic`, emphasis: 'credited', to: 'to your first retainer quarter.' },
 ]
 

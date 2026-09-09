@@ -19,10 +19,6 @@ import { BOOKING_URL, FREE_INTRO_WINDOW } from '@/lib/flags'
  * surface and the Plausible goal, all of which are easy to get subtly wrong and
  * impossible to notice from a screenshot.
  *
- * `/eu-exposure` is deliberately NOT migrated onto this in the same change. It
- * is a working conversion form on a live page, and a refactor of it is its own
- * piece of work with its own verification — not a side effect of adding pages.
- *
  * `interest` is the value Kit segments on, so it must be an exact-match string
  * from `ENGAGEMENTS` in `src/app/(website)/advisory/page.tsx`. It is a prop
  * rather than a free-text field because a dedicated page already knows which

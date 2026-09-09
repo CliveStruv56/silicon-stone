@@ -1,5 +1,6 @@
 {
   "tool": "Built-in image_gen",
+  "cutoutHandling": "Artwork supplied as a transparent cutout is trimmed to its content, padded to its own clean ratio and encoded to WebP with alpha kept. It is rendered by the shared EngagementHero with artwork: 'cutout' and a matching imageRatio, which drops the border and the caption scrim: --scrim-ink is deliberately fixed dark for always-dark photographs, so over transparency it would float a dark band on the light theme.",
   "artDirection": "Square premium editorial photography; grounded Atlantic atmosphere; textured stone and oak; slate blue, weathered teal and warm amber practical lighting; realistic optics and natural side light; central subject safe for square and 4:3 crops; no text, logos, globes or holographic overlays.",
   "images": [
     {
@@ -9,8 +10,8 @@
     },
     {
       "file": "public/advisory/advisory-briefing.webp",
-      "prompt": "Close editorial still life of two chairs drawn up to a small oak meeting table by a window, an open notebook, a single printed analytical chart without readable text, two ceramic cups and a pencil. Quiet focussed working discussion implied, no people. Intimate and direct, not corporate stock photography.",
-      "source": "/Users/clivestruver/.codex/generated_images/01a0821e-3eaf-7a92-92e5-c4af72a80bcd/exec-a2f3cf5f-c6c6-4073-8e1d-9c81d5537c17.png"
+      "prompt": "Supplied by the owner, not generated here: an isometric stone plinth on a cracked slab, lit from above, with teal, amber and warning-red channels converging on it. Departs from the photographic art direction above; the illustration reads as a diagram of one question examined from several angles.",
+      "source": "Images/B_isolated_cutout.png (1600x1600 transparent cutout; trimmed to its content, padded to 3:2 and encoded 1200x800 with alpha intact. Rendered by EngagementHero's artwork: 'cutout' variant, which drops the frame and the fixed-dark caption scrim. Replaced the generated still life on 2026-09-09.)"
     },
     {
       "file": "public/advisory/exposure-diagnostic.webp",

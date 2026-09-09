@@ -37,10 +37,10 @@ function advisoryEngagementTags(): string[] {
   return [...block![1].matchAll(/'([^']+)'/g)].map((m) => m[1])
 }
 
-/** Every `interest="…"` a page hands to `EngagementContactForm`. */
+/** Direct form props and the contact object used by FocusedEngagementPage. */
 function interestProps(pageFile: string): string[] {
   const source = fs.readFileSync(pageFile, 'utf8')
-  return [...source.matchAll(/\binterest="([^"]+)"/g)].map((m) => m[1])
+  return [...source.matchAll(/\binterest(?:="([^"]+)"|:\s*'([^']+)')/g)].map((m) => m[1] || m[2])
 }
 
 const DEDICATED_PAGES = [

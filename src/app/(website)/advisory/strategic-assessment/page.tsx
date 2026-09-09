@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { DigitalOmnibusContext } from '@/components/advisory/DigitalOmnibusContext'
 import { motion } from 'framer-motion'
 import {
   CheckCircle,
@@ -165,6 +166,12 @@ export default function StrategicAssessmentPage() {
               )
             })}
           </div>
+        </section>
+
+        <section className="mx-auto max-w-7xl px-6 pb-10 lg:px-8 lg:pb-12">
+          <h2 className="text-2xl font-semibold text-text-primary">European Procurement Readiness</h2>
+          <p className="mt-4 max-w-3xl leading-relaxed text-text-muted">Where European procurement is part of the decision, the assessment includes buyer evidence requirements, gaps that could delay market access, and the cost and sequence of addressing them. Contractual commitments are flagged for review with counsel. This work is included in the agreed assessment scope.</p>
+          <DigitalOmnibusContext>We translate the relevant regulatory changes and remaining uncertainty into governance choices, investment priorities and a board-ready roadmap.</DigitalOmnibusContext>
         </section>
 
         {/* PROVISIONAL — drafted, not owner-supplied. See the module comment. */}

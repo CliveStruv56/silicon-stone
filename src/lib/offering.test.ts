@@ -67,7 +67,6 @@ describe('catalogue shape', () => {
       'exposure-diagnostic',
       'drift-retainer',
       'strategic-assessment',
-      'post-omnibus-briefing',
     ]) {
       expect(priceOf(id), `priceOf('${id}')`).toMatch(/£/)
     }

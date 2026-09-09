@@ -36,7 +36,7 @@ const CORE_PAGES: Array<{ title: string; path: string; note: string }> = [
   { title: 'Drift Retainer', path: '/advisory/drift-retainer', note: 'The standing relationship: monthly briefing, working session, and a quarterly exposure review.' },
   { title: 'Strategic Assessment', path: '/advisory/strategic-assessment', note: 'The deep one-off for a high-stakes decision, with a board-ready presentation.' },
   { title: 'Pricing', path: '/pricing', note: 'Every price on one page — products, tools and advisory engagements.' },
-  { title: 'Post-Omnibus Briefing', path: '/eu-exposure', note: 'EU exposure for organisations selling into Europe.' },
+  { title: 'Digital Omnibus', path: '/digital-omnibus', note: 'Free reference: enacted AI changes, proposed data and privacy changes, milestones and business implications for UK, EU and US leaders.' },
   { title: 'US Executive’s Guide', path: '/us-executive-guide', note: 'The free guide to EU AI regulation from a US vantage point.' },
 ]
 

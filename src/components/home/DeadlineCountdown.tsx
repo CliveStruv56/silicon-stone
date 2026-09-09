@@ -16,8 +16,11 @@ export function DeadlineCountdown() {
 
         <p className="text-xs leading-relaxed text-text-muted md:max-w-2xl">
           Catalogue your systems. Clarify your role. Capture vendor evidence. Set review triggers.
-          Article 50 transparency obligations have applied since 2 August 2026; watermarking
-          for systems already on the market follows on 2 December 2026.
+          Article 50 transparency obligations have applied since 2 August 2026; the marking
+          transition for certain systems marketed before that date ends on 2 December 2026.{' '}
+          <Link href="/digital-omnibus#timeline" className="text-stone-teal underline underline-offset-4">
+            Digital Omnibus timeline
+          </Link>
         </p>
 
         <Link

@@ -1,8 +1,41 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-09-04
-> Status: **Live in Production — siliconandstone.com on Vercel + Railway logic backend, Build Passing (119 prerendered pages), 1,527 tests green, **29 npm audit findings (re-counted 2026-09-04, was 19 on 2026-08-23)** — every root advisory sits in build, CLI or dev-only tooling; see §2 for the caveat**
+> Last Updated: 2026-09-09
+> Status: **Live in production. Advisory refresh `4acedf4e` deployed and verified 2026-09-08; production build passed (119 prerendered pages). Full Vitest suite and npm audit were not rerun today; older counts below are dated historical results.**
+
+## Latest session — 9 September 2026
+
+**The Post-Omnibus Briefing is retired as a paid offer.** `/digital-omnibus` is
+a free reference page, `/eu-exposure` 301s to it, and the £2,500 briefing and the
+£1,500 European Procurement Readiness add-on are out of the catalogue —
+Procurement Readiness is now part of an agreed Exposure Diagnostic or Strategic
+Assessment scope. The Advisory Briefing also got new owner-supplied hero artwork
+and a `cutout` variant on the shared `EngagementHero`; **the other four hero
+images are expected to be replaced the same way.** Read the September 9 entry in
+§9. Legal dates on the new page were researched when written and not re-verified
+at commit time.
+
+## Latest session — 8 September 2026
+
+**Start tomorrow here, then read the September 8 entry in §9 and the current
+advisory follow-up in §11.** The advisory refresh is finished and live, not a
+pending plan. Implementation commit: `4acedf4eb1ca5dc034fb6006ee439f7d062d6bb1`
+on `main`; Vercel deployment `t4otA98cbAZPb9dnrCD9RnAMoe8m` completed.
+
+- Drift Retainer, Advisory Briefing and Exposure Diagnostic now share the order:
+  intro → CTA → who it’s for → how it works → pricing → contact CTA/form.
+- Retainer is **£2,000/month, rolling monthly, no minimum term**. £20,000/year
+  and the existing founding offer remain. Fee-credit mentions and service
+  cross-links were removed from the Retainer body only.
+- Five distinct advisory hero images are in `public/advisory/`. Dropdowns show
+  no price amounts; **All prices** remains. Further dropdown work is unscoped.
+- Build, typecheck, targeted lint, desktop/mobile browser checks and a simulated
+  contact submission passed. The live Retainer returned HTTP 200 with the new
+  heading, image, price and monthly terms. No real test enquiry was sent.
+
+The sections below retain earlier programme history. Their dated test, audit,
+integration and content counts were not all reverified in this session.
 
 **Current State**: Full-featured intelligence portal live at siliconandstone.com (**bare apex is canonical**; `www` 308s to it). Public website on Vercel, separate logic backend on Railway (subscribe / contact / briefings / categories migrated; write endpoints protected by shared key), 4 interactive tools, product/commerce pages whose CTAs read "Buy Now" but open an email capture until Lemon Squeezy checkout URLs are configured (owner's call, 2026-08-11 — see §9), Kit (formerly ConvertKit) newsletter & contact integration with parallel Substack distribution, Plausible analytics (6 custom events), AI content creation pipeline (Pulse, Signal, Deep Dive, **Guide**, YouTube Script, Research Only), and embedded CMS Studio. Security posture hardened: per-session JWT cookie, requireAdmin() server-action checks, gated /knowledge and /api/search/semantic, GitHub Actions check workflow. Plausible is live on production.
 
@@ -27,11 +60,10 @@ user-visible behaviour changed, and the only live difference is a new
 `…-wave-04-execution-brief.md`), then §9. **Wave 2 (provenance) is the next
 thread and has a contract but no code: `docs/siliconstone-knowledge-wave-02-brief.md`.**
 
-**The next session's stated priority is an operator's manual** for the
-publication and the article-generation pipeline. Its contract is
-`docs/user-manual-brief.md` — the central point being that four overlapping
-guides already exist and one of them (`editorial-aios-manual.md`) is partly
-obsolete, so the job is consolidation rather than a fifth document.
+**The operator's manual is already written** at `docs/operator-manual.md`.
+The latest active thread is the owner's review of the advisory pages and
+navigation; see the September 8 handoff above and §11. Do not restart the
+manual-writing brief as tomorrow's task.
 
 **The long-standing P0 is resolved as of 2026-08-20: the production Kit API key is now a valid v4 key** (36 chars, `kit_` prefix), verified the same day with a read-only `GET /v4/account` returning 200 for account "SIlicon and Stone". The funnel no longer terminates in a failed POST. It has **not** been proven end to end — nobody has run a live `POST /api/subscribe`, because that puts a real subscriber on the list — so the parts are verified and the whole path is not. The same verification found three things behind it, all open: `CONVERTKIT_FORM_ID` pointed at a form named **"Mills form"** (**closed 2026-08-24**: it is the account's only form, renamed "Silicon and Stone Briefing", ID unchanged); two tag env vars still hold literal placeholder strings; and **none of the ~18 launch tags exist in Kit at all** (the account has two tags), so subscribes succeed but arrive untagged. The Kit sending address is also unverified. Beyond that: Lemon Squeezy store not yet created, 9 drafts unpublished, and 7 of 12 published articles still lack cover images. Go-live sequence lives in `LAUNCH.md`; defects and debt in §10.
 
@@ -100,6 +132,7 @@ answer.
 
 | Read | For |
 |---|---|
+| **Latest session above + §9 September 8 + §11 advisory follow-up** | Today’s shipped advisory decisions, evidence and next-session starting point. |
 | **`docs/operator-manual.md`** | How the publication is actually run — research, drafting, the guards, publishing, knowledge capture. Written for the operator. **Replaces `authoring-guide.md`, `article-generation-guide.md` and `editorial-aios-manual.md`, all now pointer stubs.** |
 | **`docs/test-spec-article-flows.md`** | Eleven costed tasks proving every creation path still works, with `npm run test:cleanup` to undo them. **All eleven run 2026-08-21** — fifteen defects found, fourteen fixed (the last three under §11 Priority 0c, the fifteenth found in a browser afterwards), one watch item. Re-run after any pipeline or guard change. |
 | `§11` below | What to do next. **Priority 0c is empty** — the three defects it held were closed on 2026-08-21; the entry survives for the reasoning behind the third. |
@@ -107,11 +140,12 @@ answer.
 | `docs/siliconstone-knowledge-wave-03-brief.md` | Only if touching the knowledge programme. Contract, the six owner decisions, and *What was built*. Its wave-2 sibling is the provenance half. |
 | `LAUNCH.md` | Owner setup: Kit, Lemon Squeezy, **and the Sanity webhooks** — three of them, configured only in the Sanity dashboard and recorded nowhere else. |
 
-**Guards that will fail the build if you drift:** `npm run test:manual` (the
-operator manual against the code), `rulepack-check`, `reg:check`,
-`test:checker-v2`, `test:sanity-prices`, `test:security`. All in `prebuild`.
-A failure is a real signal — fix the code or fix the check's anchor, never
-loosen it to green.
+**Checks run by `prebuild` (verified 2026-09-08):** style generation,
+`rulepack-check.mjs`, the regulatory corpus check, `test:checker-v2` and
+`test:manual` (the operator manual against the code). `test:sanity-prices` and
+`test:security` are separate checks; they did not run as part of today's
+build. A failure is a real signal — fix the code or fix the check's anchor,
+never loosen it to green.
 
 **Four ways an article gets created**, and they are not equal: `/create`,
 `/import` (paste from elsewhere), `ss-draft-local` (Claude Code, Max plan), and
@@ -121,7 +155,7 @@ Manual §5 has the table.
 This is the **Silicon & Stone intelligence portal** — a Next.js 15 + Sanity CMS platform for "Forensic Technopolitics" analysis. It combines a public website, admin research/authoring tools, digital product sales pages, and an embedded CMS Studio.
 
 **Key facts:**
-- Build passes cleanly (`npm run build` — **119 static pages**, 0 errors, verified 2026-09-04)
+- Production build passed (`npm run build` — **119 prerendered pages**, 0 errors, verified 2026-09-08; non-failing service-worker precache-size and Node warnings).
 - `npm audit` baseline (**re-counted 2026-09-04: 29 findings — 1 critical, 16 high, 11 moderate, 1 low**; it read 24 on 2026-08-05 and 19 on 2026-08-23, so it is drifting upward and both earlier figures are superseded). The root advisories are `tar`, `adm-zip`, `extract-zip` (Sanity export + the Puppeteer download step), `brace-expansion`, `browserslist`, `esbuild`, `js-yaml`, `@humanfs` (build, dev server, eslint, `gray-matter`), `undici`, `form-data`, `ip-address` (CLI and HTTP-client transitives), and `dompurify` / `@xmldom/xmldom` (Studio). **None is a Next.js or React advisory.** ⚠ The per-path reachability claim — that none of these executes in the Vercel function runtime — was last actually traced on 2026-08-23, when there were ten fewer; it deserves a fresh pass rather than a restatement. The old "13 moderate / uuid only" baseline was stale; the tree drifted while the repo was quiet. Next.js was bumped 15.5.18 → **15.5.21** (closes two HIGH Server Actions advisories: DoS + SSRF) and the `postcss` override was refreshed to `^8.5.23` (resolves 8.5.25, clearing both PostCSS path-traversal advisories). Everything remaining traces through `sanity@4` — `@sanity/cli` → `@sanity/runtime-cli` (adm-zip), `@sanity/export` (tar, critical), `@sanity/template-validator` (undici), `preferred-pm` (js-yaml) — i.e. Studio CLI/export tooling that is not reachable from any served route, plus `sharp` (libvips CVEs; needs ≥0.35 but Next 15.5 declares `^0.34.3`) and `ws` via `openai`/`exa-js`. **Do not run `npm audit fix --force`** — npm proposes `next@16`, which the Sanity v4 pin forbids. These clear together at the Next 16 / Sanity v5 upgrade.
 - All API integrations verified working: Anthropic, Exa.ai, Inoreader, Sanity, ConvertKit
 - Admin login: configured via `ADMIN_PASSWORD` in the deployment environment. Do not store the live password in project docs.
@@ -258,9 +292,9 @@ All draft-generating formats use Claude at temperature 0.4. Drafts are created d
 | `/glossary` | ✅ | Defined terms; `DefinedTermSet` JSON-LD |
 | `/methodology` | ✅ | Forensic Technopolitics 3×2 matrix + Three Readings panel |
 | `/advisory` | ✅ | (renamed from `/services`, 301) The advisory **hub**: the four engagements as a chooser keyed on `Offering.question`, the 3×2 practice band (`#method`), follow-on modules, `#retainer` summary block, contact form (Kit). The four-across tier grid was **deleted** on 2026-09-04 when each engagement got its own page |
-| `/advisory/advisory-briefing` | ✅ | £450, one hour (2026-09-04) |
-| `/advisory/exposure-diagnostic` | ✅ | From £2,500 (2026-09-04) |
-| `/advisory/drift-retainer` | ✅ | From £2,000/mo (2026-09-04). `/advisory#retainer` still resolves — a summary block is kept on the hub under that id, and `engagement-pages.test.ts` guards it |
+| `/advisory/advisory-briefing` | ✅ | £450, one hour plus written follow-up; shared focused layout since 2026-09-08 |
+| `/advisory/exposure-diagnostic` | ✅ | From £2,500, agreed scope; shared focused layout since 2026-09-08 |
+| `/advisory/drift-retainer` | ✅ | £2,000/month, rolling monthly with no minimum term (2026-09-08). `/advisory#retainer` still resolves — a summary block is kept on the hub under that id, and `engagement-pages.test.ts` guards it |
 | `/advisory/strategic-assessment` | ✅ | From £8,000 (2026-09-04) |
 | `/eu-exposure` | ✅ | Post-Omnibus Briefing — footer-only US-inbound front door |
 | `/us-executive-guide` | ✅ | Free lead-magnet guide (301 from `/atlantic-drift`) |
@@ -287,7 +321,13 @@ All draft-generating formats use Claude at temperature 0.4. Drafts are created d
 
 **301 redirects** (`next.config.ts`, explicit `statusCode: 301`): `/analysis`→`/intelligence`, `/briefings`→`/intelligence`, `/services`→`/advisory`, `/products/briefings`→`/products/sector-reports`.
 
-**Navigation** (current as of 2026-09-04): primary Intelligence (dropdown: All intelligence, **Series**, US Executive's Guide) · Tools · Products (dropdown: Checklist, Toolkit, Sector Reports, **WaymarkPath** — flagged `sister`, rendered in indigo — All prices) · Advisory (dropdown: the four **engagement pages**, Post-Omnibus Briefing, **The 3×2 Method** → `/advisory#method`, Modules, All prices, Contact), separator, secondary Methodology · About, Search icon, Subscribe button (→ `/#subscribe`). Dropdown price notes and every engagement `href` are read from `src/lib/offering.ts`, not held as literals — which is why `engagement-pages.test.ts` asserts each `href` resolves to a real `page.tsx`.
+**Navigation** (reviewed 2026-09-08): primary Intelligence, Tools, Products and
+Advisory; secondary Methodology, Glossary and About, plus Search and Subscribe.
+`src/components/layout/Header.tsx` defines the desktop and mobile menus.
+All monetary price notes have been removed from Products and Advisory. Keep
+non-price notes (Free, Coming soon, Early access, US & UK), service links and
+**All prices**. The owner plans further dropdown changes but has not supplied
+their scope.
 
 **301 redirects** also include `/atlantic-drift` → `/us-executive-guide`. Note that the four engagements were previously *fragments* on `/advisory`, and a fragment never reaches the server — so no redirect could have covered the split. That is why the hub keeps a live `#retainer` block.
 
@@ -391,13 +431,18 @@ sell (restore them when the first report is on sale — see `LAUNCH.md`).
 
 ### 5.3 Paid — Engage (advisory)
 
+Retainer price and terms updated **2026-09-08** against `src/lib/offering.ts`.
+The shared six-part layout applies to Briefing, Diagnostic and Retainer only;
+Strategic Assessment keeps its existing structure. All five advisory pages
+(the hub and four service pages) now have distinct hero artwork.
+
 | Engagement | Price | Summary | Where it lives |
 |---|---|---|---|
 | **Advisory Briefing** | **£450** / one hour | Focused consultation on your tool results and one specific question, plus a written follow-up. Credited **in full** to your first retainer month if you proceed within 30 days. | `/advisory/advisory-briefing` |
 | **The Exposure Diagnostic** | **From £2,500** (custom scope) | AI system + vendor-evidence review, dependency mapping, regulatory-friction read, 15–25pp report, 30-day follow-up. Fee credited to the first retainer quarter. **No refund guarantee** — the revision-or-50%-refund clause was withdrawn on 2026-09-04; the site's refund position now lives once, at `/terms`. | `/advisory/exposure-diagnostic` |
 | **The Post-Omnibus Briefing** | **From £2,500**, fixed | US/UK-inbound. Fixed-scope written briefing (15–25pp) on what the AI Act now requires of you post-Digital Omnibus, delivered in three weeks, plus one interpretation call. | `/eu-exposure` |
 | ↳ **European Procurement Readiness** (add-on) | **From £1,500** | Add-on to the above: your systems mapped against EU buyer governance questionnaires, required-vs-theatre evidence triage, AI indemnification clause review. In `MODULES` since 2026-09-04, so it now has a row on `/pricing`; it deliberately has **no card** in the `assessments` band on `/advisory`, because it is scoped and sold at `/eu-exposure`. | `/eu-exposure` + `/pricing` |
-| **The Drift Retainer** | **From £2,000/mo** — three-month initial term, then rolling. £20,000/year annual. **Founding rate £1,500/mo for the first six months, first five clients** (`FOUNDING_OFFER_ACTIVE`). | The spine of the whole offering. Board-forwardable monthly briefing, a 90-minute working session on one live decision, "The Line" direct access between sessions, quarterly written exposure review on the 3×2 method. Opens with a Baseline Month — walk away after month one paying that month only. | `/advisory/drift-retainer` |
+| **The Drift Retainer** | **£2,000/month** — rolling monthly, no minimum term. £20,000/year annual. **Founding rate £1,500/mo for the first six months, first five clients** (`FOUNDING_OFFER_ACTIVE`). | The spine of the whole offering. Board-forwardable monthly briefing, a 90-minute working session on one live decision, "The Line" direct access between sessions, quarterly written exposure review on the 3×2 method. Opens with a Baseline Month — walk away after month one paying that month only. | `/advisory/drift-retainer` |
 | **Strategic Assessment** | **From £8,000**, then transitions to retainer | The deep one-off: multi-framework analysis, 40+pp report, board-ready presentation, implementation roadmap. Positioned as the framework-neutral decision document before buying governance software. | `/advisory/strategic-assessment` |
 | **Board-level / multi-entity engagement** | **£25,000–£50,000** | Bespoke, for a group, multi-jurisdiction exposure or a board mandate; settles into a Drift Retainer. | `/advisory` (bespoke band) |
 | **Applied modules** | Sovereign Architecture Review **from £6,500**; AI Bill of Materials **from £4,500**; Manufacturing Exposure, Scenario Impact and Regulatory Friction **from £3,500** each | Scoped add-ons folded into a briefing or a retainer. All five priced as of 2026-08-15 — the £3,500 floor sits below the £4,500 module and above the £2,500 Diagnostic. | `/advisory` (assessments) |
@@ -407,8 +452,9 @@ sell (restore them when the first report is on sale — see `LAUNCH.md`).
 
 **WaymarkPath** — the career-transition companion for the individual
 professional. Presented as "Related — a separate companion" on `/products`, the
-homepage and — since 2026-09-04 — `/advisory/drift-retainer` rather than the
-`/advisory` hub, plus a `sister`-flagged entry in the Products dropdown.
+homepage, plus a `sister`-flagged entry in the Products dropdown. The
+WaymarkPath paragraph and link were removed from the Drift Retainer body on
+2026-09-08; normal header/footer links remain.
 **No price is published anywhere on this site**, and `/waymarkpath` is still a
 waitlist: the link stays internal because the app's own deploy is stale. Since
 2026-09-04 it is also on `/pricing`, exported as `SISTER_PRODUCT` and rendered
@@ -418,6 +464,11 @@ and a teal row in the catalogue would have said it is ours in the way the
 others are.
 
 ### 5.5 The Ladder (credit chain, `LadderBox.tsx`)
+
+**2026-09-08 scope clarification:** credits remain in the catalogue, main
+pricing page and the Briefing/Diagnostic pages. Only their mentions on the
+Drift Retainer page were removed, to simplify that page. Do not delete the
+services or abolish the credit policy based on that copy change.
 
 £24 Checklist → £20 off the Toolkit · £79+ Toolkit → the evidence base a
 briefing starts from · £450 Advisory Briefing → credited in full to month one ·
@@ -548,7 +599,8 @@ SESSION_SECRET=<long random secret, 32+ characters>
 | Series library + one series | `src/app/(website)/intelligence/series/page.tsx`, `.../series/[slug]/page.tsx` |
 | Series logic (part numbers, neighbours, progress) | `src/lib/series.ts` — pure, tested; the position in `entries` is the part number |
 | Series UI | `src/components/series/` (Strip, Nav, PartList, ResumeButton, ProgressTracker) |
-| Advisory engagement template | `src/components/advisory/` — `EngagementHero`, `AtAGlance`, `WhereItLeads`, `AdvisoryPracticeBand`, `EngagementContactForm`. All four engagement pages are built from these five |
+| Advisory engagement template | `src/components/advisory/FocusedEngagementPage.tsx` owns the Briefing/Diagnostic/Retainer layout, using `EngagementHero`, `EngagementSteps` and `EngagementContactForm`. Strategic Assessment still uses `AtAGlance`, `WhereItLeads` and `AdvisoryPracticeBand` with the shared hero/form. |
+| Advisory hero assets | `public/advisory/*.webp`; generation prompts and original local paths in `docs/advisory-image-prompts.json` |
 | WaymarkPath content | `src/lib/waymarkpath.ts` (single source for the seven capabilities) + `src/components/waymarkpath/` |
 | Advisory page | `src/app/(website)/advisory/page.tsx` |
 | Durable rate limiting | `src/lib/durable-rate-limit.ts` (Upstash / Vercel KV / in-memory degrade) |
@@ -603,6 +655,148 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### September 9, 2026 — Post-Omnibus Briefing retired; `/digital-omnibus` is the canonical reference
+
+**Intent:** stop selling the Digital Omnibus as a separate £2,500 briefing and
+make it a free reference that feeds the existing engagements.
+
+- **`/digital-omnibus` is a new free page** — the two tracks kept apart (the
+  enacted AI changes vs the still-proposed data/privacy/cyber file), a milestone
+  history, and how each engagement applies the context. No price, no enquiry
+  form. Application dates come from the shared rule pack via
+  `ai-act-timeline.ts`; the page deliberately does not start a second calendar.
+- **`/eu-exposure` permanently redirects to it**, belt and braces: a 301 in
+  `next.config.ts` and a `permanentRedirect()` in the surviving page, with the
+  layout deleted. The sitemap entry moved across at priority 0.7.
+- **The catalogue lost two priced things.** `post-omnibus-briefing` and the
+  `european-procurement-readiness` module are gone from `ENGAGEMENTS`/`MODULES`,
+  along with `AMOUNTS.postOmnibusBriefing` and `AMOUNTS.procurementAddOn` and the
+  ladder rung. European Procurement Readiness is now a term on the Exposure
+  Diagnostic and Strategic Assessment — part of an agreed scope, not an add-on
+  with its own price. Header dropdown, footer, `llms.txt` and `BottomTabBar`
+  follow from the catalogue.
+- **`DIGITAL_OMNIBUS_REVIEWED` is an editorial review date, not `Date.now()`.**
+  Sources live beside the claims in `src/lib/digital-omnibus.ts`;
+  `docs/digital-omnibus-reference.md` holds the decisions and the review
+  procedure. **The legal dates were researched in the session that wrote them and
+  were not re-verified when committing.**
+- **One contextual link, not one per story.** `isDigitalOmnibusRelated()` matches
+  named instruments rather than generic mentions of AI or sovereignty, and
+  `IntelligenceTiers` links only the first matching featured story.
+
+**Advisory Briefing artwork, and a cutout variant on the shared hero.** The
+Briefing hero is now an isometric illustration supplied by the owner, replacing
+the generated still life. `EngagementHero` gained `artwork: 'photograph' |
+'cutout'` (default unchanged, so the other three pages are untouched) and
+`imageRatio`. The cutout branch drops the frame and the caption scrim and puts
+the caption in themed muted text: `--scrim-ink` is deliberately fixed dark for
+always-dark photographs, so over a transparent image it would float a dark band
+on the light theme's stone page. Assets for that branch are trimmed to their
+content and padded to a clean ratio so the box hugs the artwork — without
+`imageRatio` the caption drifts a long way below the picture. The recipe is in
+`docs/advisory-image-prompts.json` under `cutoutHandling`. **The other four hero
+images are still photographs and are expected to be replaced next.**
+
+**Validated:** full Vitest suite (1,551 tests, 80 files), production build (122
+prerendered pages, up from 119), `test:security`, `test:sanity-prices` (3
+published products) and `test:manual` (21 facts). The Briefing hero was walked in
+a browser at 1440px in both themes and at 420px. **Not done:** no production
+verification after deploy, and no review of the Omnibus page's legal claims.
+
+
+### September 8, 2026 — Advisory pages simplified and deployed
+
+**Intent:** consistent advisory products, enough useful information without
+repeated blocks, a clear reading order and a compelling enquiry route.
+
+**Owner decisions and shipped scope:**
+
+- The agreed order is intro → CTA → who it’s for → process/what it is → pricing
+  → CTA. It applies to Drift Retainer, Advisory Briefing and Exposure Diagnostic.
+  `FocusedEngagementPage` now enforces that order; the first CTA sits in the
+  hero and the last is the existing enquiry form. Early `AtAGlance` price blocks,
+  practice comparison bands and related-service card sections are removed from
+  these three pages. Briefing and Diagnostic keep concise relevant inline links.
+- Retainer pricing is **£2,000/month**, with no “From”, rolling monthly and no
+  minimum term. The owner's last price correction repeated the same amount;
+  removing “From” was the interpretation communicated before implementation.
+  No alternative amount was supplied, and the owner subsequently requested
+  commit/push. This is the shipped baseline, not an unanswered release blocker.
+- Keep the **£20,000 annual option** (twelve months for ten), Baseline Month
+  onboarding and ability to finish after month one paying only that month.
+  The existing flag-controlled **£1,500/month founding offer** for the first
+  five clients' first six months remains; its monthly option has no minimum
+  term. Launch-window introductory-call behaviour is unchanged.
+- Remove WaymarkPath wording, “Where it leads”, method/comparison links and
+  related-service cards from the Retainer body. Only its `#contact` link remains
+  in the initial main content. Header, footer and booking flow are retained.
+- Remove Briefing/Diagnostic **fee-credit mentions from Retainer only**. Both
+  services and their credits remain on their own pages, the advisory hub and
+  `/pricing`. This does not cancel the credit policy.
+- Remove monetary amounts from all desktop/mobile dropdowns. Keep “All prices”,
+  destinations and descriptive notes. Further dropdown changes are for a later
+  instruction, not part of this implementation.
+- Distinct hero images for the hub and four service pages. The built-in
+  `image_gen` generated the set; five 1200px WebP files (about 856 KiB total) are
+  committed in `public/advisory/`. Prompts and original local paths are recorded
+  in `docs/advisory-image-prompts.json`. Production uses the committed WebPs,
+  never the local `.codex/generated_images` paths.
+
+**Implementation:** the three page files own product-specific copy;
+`src/components/advisory/FocusedEngagementPage.tsx` owns layout and sequential
+steps. `EngagementHero` takes explicit image source/alt and can hide the related
+link; its main CTA is one anchor styled through `Button asChild`.
+`EngagementContactForm` retains the existing submission/analytics/offline flow,
+with associated labels via `useId` and an accessible error alert added.
+`src/lib/offering.ts`, the advisory hub, homepage `AdvisoryBand`/`StartHereSpine`
+and `/pricing` agree on the fixed monthly rate and rolling terms. Strategic
+Assessment received its own artwork, not the six-part layout.
+
+**Copy boundaries:** no new Diagnostic timeline was invented. The unpublished
+week-by-week draft in `src/lib/advisory/provisional-content.ts` remains unapproved
+and hidden. The Diagnostic page uses the established agreed scope, 15–25 page
+report, prioritised actions and 30-day follow-up. Do not enable provisional
+content just to restore a removed section. `docs/advisory-page-copy.md` remains
+an obsolete brief and is not a source for current terms or layout.
+
+**Validation actually run:**
+
+- `npm run typecheck` and targeted ESLint across changed advisory/navigation/
+  pricing/home components passed. `git diff --check` passed.
+- `npm run build` passed: 119 prerendered pages. Its style generation, rule-pack
+  checks, regulatory corpus check, Checker v2 verification and 21 operator-manual
+  checks passed. Build emitted non-failing Node and service-worker precache-size
+  warnings; do not describe it as warning-free.
+- Browser checks covered the three revised pages on desktop and 390px mobile,
+  dark/light presentation, loaded images, heading order, retained “All prices”
+  and price-free menus. No horizontal overflow on the checked layouts or browser
+  errors on the checked routes. Strategic Assessment, `/advisory`, `/pricing`
+  and `/` also loaded locally.
+- The shared form reached “Message received” using an intercepted local
+  `/api/contact` response. **No real enquiry was sent; downstream Kit/email
+  delivery was not retested.** The full Vitest suite, security audit and
+  Sanity price probe were not rerun in this session.
+
+**Release:** commit [`4acedf4e`](https://github.com/CliveStruv56/silicon-stone/commit/4acedf4eb1ca5dc034fb6006ee439f7d062d6bb1),
+pushed to `origin/main` at the owner's request. GitHub reported both Vercel and
+Railway deployment statuses successful. Vercel deployment:
+[`t4otA98cbAZPb9dnrCD9RnAMoe8m`](https://vercel.com/clivestruv56s-projects/silicon-stone/t4otA98cbAZPb9dnrCD9RnAMoe8m).
+The canonical live Retainer returned HTTP 200; its parsed HTML contained the
+new heading “An independent view, as the picture changes.”, £2,000/month,
+rolling-monthly/no-minimum wording, the new image and only `#contact` in main.
+The other revised pages were browser-checked locally; do not claim a separate
+post-deployment production check for each.
+
+**Local preview:** `npm run start -- --port 3100` was left running after the
+successful build. It may not survive the session. Restart it if the build is
+present, or use `npm run dev -- --port 3100` when editing; do not run both on
+that port. Screenshots in `/private/tmp/` are temporary evidence, not committed
+assets or required inputs for tomorrow.
+
+Earlier September 4 entries below describe the old template and “From” price.
+They are retained as history; this entry and the current catalogue supersede
+those decisions.
 
 ### September 4, 2026 — The operator's manual, corrected on how a publish lands
 
@@ -7718,6 +7912,25 @@ left unset, being optional by design. | Resolved |
 
 ## 11. What's Next (Current Priorities)
 
+### Current owner thread — advisory review, 8 September 2026
+
+The implementation and deployment are complete. Start the next session from
+commit `4acedf4e` and the live pages, not the old advisory build brief:
+
+- [Drift Retainer](https://siliconandstone.com/advisory/drift-retainer)
+- [Advisory Briefing](https://siliconandstone.com/advisory/advisory-briefing)
+- [Exposure Diagnostic](https://siliconandstone.com/advisory/exposure-diagnostic)
+
+The next input is the owner's reaction to the live pages and the promised
+further dropdown changes. Their details have **not** been supplied. Do not
+remove “All prices”, hide the Briefing/Diagnostic listings, change annual or
+founding offers, or apply the new layout to Strategic Assessment by inference.
+Keep the three revised products consistent and avoid repeating deliverable or
+pricing blocks. No implementation blocker remains for today's scope.
+
+The older programme priorities below are retained as background; they do not
+replace this latest owner-directed thread.
+
 ### Where this stands after 22–23 August
 
 **The article pipeline and the knowledge capture half are verified working.**
@@ -8111,7 +8324,7 @@ npm run test:regulatory-index   # Editorial vs Compliance-Checker lane separatio
 
 When starting a new Claude Code session:
 
-1. **Read this document first** for full context
+1. **Read the Latest session section first**, then §9 September 8 and §11 advisory follow-up. The advisory changes are already deployed; older dated entries are history.
 2. **The app builds cleanly** — `npm run build` should produce 0 errors. `prebuild` runs **five** gates: the style codegen, `rulepack-check.mjs`, the regulatory corpus check, `test:checker-v2` and `test:manual`
 3. **19 npm audit findings** (1 critical / 9 high / 8 moderate / 1 low, as of 2026-08-23) — every one in the Sanity v4 CLI/export subtree, which never executes in the function runtime. The three that *were* runtime-reachable (`sharp`, `nanoid`, `ws`) are pinned by `overrides`. Do not run `npm audit fix --force`; npm proposes `next@16`, which the Sanity v4 pin forbids. Anything new on top of this baseline is real.
 4. **APIs**: Anthropic, Exa, Sanity, Pinecone working. **Kit is 401ing in production** (legacy v3 key — see §10 P0). **Inoreader** OAuth cannot complete in production (redirect URI still localhost); it works locally.

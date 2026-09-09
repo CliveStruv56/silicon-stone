@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { DigitalOmnibusContext } from '@/components/advisory/DigitalOmnibusContext'
 import { Clock, Shield } from 'lucide-react'
 import { FocusedEngagementPage, EngagementSteps } from '@/components/advisory/FocusedEngagementPage'
 import { AMOUNTS, gbp } from '@/lib/offering'
@@ -8,6 +9,7 @@ import { AMOUNTS, gbp } from '@/lib/offering'
 const REVIEW_AREAS = [
   { title: 'Systems and vendor evidence', body: 'What AI you run, what your vendors can prove and where the evidence is missing.' },
   { title: 'Dependencies', body: 'How your models, APIs and cloud services connect, where your data goes and which suppliers would be difficult to replace.' },
+  { title: 'European Procurement Readiness', body: 'Where European sales or procurement are in scope, map buyer questionnaires to your evidence, identify gaps that could block a deal, and flag contractual commitments for review with counsel.' },
   { title: 'Regulatory friction', body: 'Where different jurisdictional requirements affect your operations and create constraints on the business.' },
 ]
 
@@ -38,13 +40,14 @@ export default function ExposureDiagnosticPage() {
         ]} />
         <div className="mt-10 border-t border-border-subtle pt-8">
           <h3 className="mb-5 text-lg font-semibold text-text-primary">What the review covers</h3>
-          <dl className="grid gap-6 md:grid-cols-3">
+          <dl className="grid gap-6 md:grid-cols-2">
             {REVIEW_AREAS.map(area => <div key={area.title}>
               <dt className="mb-2 font-semibold text-text-primary">{area.title}</dt>
               <dd className="text-sm leading-relaxed text-text-muted">{area.body}</dd>
             </div>)}
           </dl>
         </div>
+        <DigitalOmnibusContext>We use the relevant Digital Omnibus changes to examine your systems, roles and evidence. European Procurement Readiness forms part of the agreed diagnostic scope where relevant.</DigitalOmnibusContext>
       </>}
       price={`From ${gbp(AMOUNTS.exposureDiagnostic)}`}
       pricing={<>

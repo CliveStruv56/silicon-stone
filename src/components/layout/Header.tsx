@@ -26,6 +26,7 @@ const primaryNavigation: NavItem[] = [
     href: '/intelligence',
     children: [
       { name: 'All intelligence', href: '/intelligence' },
+      { name: 'Digital Omnibus', href: '/digital-omnibus' },
       // Ordered reading paths. The feed ranks by impact; a series is the same
       // archive in the order the argument was built.
       { name: 'Series', href: '/intelligence/series' },
@@ -66,7 +67,6 @@ const primaryNavigation: NavItem[] = [
       { name: 'The Exposure Diagnostic', href: '/advisory/exposure-diagnostic' },
       { name: 'The Drift Retainer', href: '/advisory/drift-retainer' },
       { name: 'Strategic Assessment', href: '/advisory/strategic-assessment' },
-      { name: 'Post-Omnibus Briefing', href: '/eu-exposure', note: 'US & UK' },
       { name: 'Modules', href: '/advisory#modules' },
       // The 3×2 section was the one part of /advisory that no menu reached and
       // no anchor named, which is part of why it read as a separate product

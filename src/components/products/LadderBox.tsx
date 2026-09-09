@@ -6,12 +6,6 @@ import { LADDER } from '@/lib/offering'
  * "The Ladder" credit box — every paid step leads to the next. Shown on
  * /products, /advisory and /pricing.
  *
- * Supersedes the locked pre-launch copy (packaging spec §2.4), which ran
- * £24 → £450 → £2,500 and had two problems: it skipped the Toolkit even though
- * the first rung's whole benefit is money off it, and it said "Briefing" for
- * the Advisory Briefing while a second, unrelated briefing existed on
- * /eu-exposure. Both briefings are now named in full.
- *
  * The rungs come from `LADDER` in src/lib/offering.ts, so the figures here
  * cannot drift from the pages they point at, and the data decides which rungs
  * carry a money credit worth emphasising.

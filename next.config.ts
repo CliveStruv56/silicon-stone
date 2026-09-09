@@ -73,6 +73,7 @@ const nextConfig: NextConfig = {
     const routeRedirects = [
       { source: '/analysis', destination: '/intelligence', statusCode: 301 },
       { source: '/briefings', destination: '/intelligence', statusCode: 301 },
+      { source: '/eu-exposure', destination: '/digital-omnibus', statusCode: 301 },
       { source: '/services', destination: '/advisory', statusCode: 301 },
       { source: '/products/briefings', destination: '/products/sector-reports', statusCode: 301 },
       // The free guide moved off /atlantic-drift, which collided with the

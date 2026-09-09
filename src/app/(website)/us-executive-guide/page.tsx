@@ -292,11 +292,11 @@ export default function AtlanticDriftPage() {
                 <p className="text-sm leading-relaxed text-text-muted">
                   When you want this read against your own systems rather than in general,
                   the{' '}
-                  <Link href="/eu-exposure" className="text-silicon-amber-strong hover:underline">
-                    Post-Omnibus Briefing
+                  <Link href="/advisory/exposure-diagnostic" className="text-silicon-amber-strong hover:underline">
+                    Exposure Diagnostic
                   </Link>{' '}
-                  is the fixed-price, fixed-scope engagement — what the AI Act now requires of
-                  your business, and the decisions to take this quarter.
+                  examines your systems, vendor evidence and European Procurement Readiness
+                  within an agreed scope, with prioritised actions.
                 </p>
               </div>
             </div>

@@ -46,7 +46,7 @@ export const metadata: Metadata = {
  * prices never drifted, because they were interpolated from `AMOUNTS`; the
  * *list* drifted, which no price guard was ever going to catch. It is the same
  * defect the footer hit when it retyped the engagements and duplicated the
- * Post-Omnibus Briefing.
+ * Digital Omnibus reference.
  *
  * A product with no entry below still renders, in the neutral treatment — the
  * point of the change is that a new SKU cannot vanish from this page, so the
@@ -179,8 +179,8 @@ export default function ProductsPage() {
               <p className="text-sm text-text-primary">
                 <span className="font-semibold text-silicon-amber-strong">The AI Act is already applying in phases.</span>
                 {' '}Transparency obligations have applied since 2 August 2026. The timetable is moving. The evidence gap remains.{' '}
-                <Link href="/eu-exposure" className="font-medium text-silicon-amber-strong underline">
-                  Need it interpreted for your business? See the Post-Omnibus Briefing.
+                <Link href="/digital-omnibus" className="font-medium text-silicon-amber-strong underline">
+                  Read the Digital Omnibus explanation and timeline.
                 </Link>
               </p>
             </div>

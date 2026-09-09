@@ -12,7 +12,10 @@ deployment model.
 - Embedded Sanity Studio at `src/app/studio`.
 - Next.js API routes for Sanity, search, newsletter/contact proxying, and vectorization.
 - Railway FastAPI backend scaffold in `backend/`.
-- Operational docs in `docs/` and the session handoff in `project_summary.md`.
+- Operational docs in `docs/` and the [session handoff](project_summary.md).
+  Start at **Latest session — 9 September 2026** for the retirement of the
+  Post-Omnibus Briefing and the advisory refresh below it — owner decisions,
+  validation and next-session work.
 - `LAUNCH.md` — the go-live runbook: launch flags to flip, Lemon Squeezy store
   and discount-code setup, Kit tag mapping, and launch-day verification steps.
 

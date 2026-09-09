@@ -6,6 +6,7 @@ import { StaggerContainer, StaggerItem } from '@/components/ui/StaggerContainer'
 import { ForensicCard } from '@/components/ui/ForensicCard'
 import { Badge } from '@/components/ui/badge'
 import { formatDate } from '@/lib/format'
+import { isDigitalOmnibusRelated } from '@/lib/digital-omnibus-related'
 
 interface Article {
   _id: string
@@ -86,6 +87,8 @@ export function IntelligenceTiers({
     briefing: briefingArticle,
     audit: auditArticle,
   }
+  // One contextual reference across the featured stories, even if several match.
+  const omnibusTier = tiers.find(tier => isDigitalOmnibusRelated(articles[tier.key]))?.key
 
   return (
     <section
@@ -186,6 +189,15 @@ export function IntelligenceTiers({
                         </p>
                       )}
                     </div>
+
+                    {omnibusTier === tier.key && (
+                      <p className="mt-4 text-xs leading-relaxed text-text-muted">
+                        Background to this story:{' '}
+                        <Link href="/digital-omnibus" className="text-stone-teal underline underline-offset-4">
+                          Digital Omnibus explained
+                        </Link>
+                      </p>
+                    )}
 
                     <Link
                       href={tier.href}

@@ -579,3 +579,47 @@ When sections ship, log them here in this format:
 - Notes: [anything notable]
 
 -->
+
+## 2026-09-08 — Advisory refresh and menu price cleanup
+
+- Requested by Clive; shipped in `4acedf4e` on `main`. Vercel deployment
+  `t4otA98cbAZPb9dnrCD9RnAMoe8m` succeeded; live Retainer HTML verified.
+- Briefing, Diagnostic and Retainer now share `FocusedEngagementPage`: intro
+  and CTA, audience, process, one pricing section, then the enquiry form.
+- Retainer is £2,000/month, rolling monthly with no minimum term. Annual and
+  existing founding options remain. Homepage price mentions and catalogue
+  agree; Retainer service cross-links and fee-credit mentions are removed.
+- Desktop/mobile menu price amounts removed; **All prices** and non-price
+  notes remain. Further dropdown changes await the owner's instructions.
+- Five distinct WebP hero images in `public/advisory/`; prompts in
+  `docs/advisory-image-prompts.json`. Strategic Assessment received new artwork
+  while retaining its existing page structure.
+- Build (119 prerendered pages), typecheck, targeted lint and desktop/mobile
+  checks passed. Contact confirmation checked with a simulated response only.
+  Full session details and next steps are in `project_summary.md` §9 and §11.
+
+## 2026-09-09 — Post-Omnibus Briefing retired; Digital Omnibus reference page
+
+- Requested by Clive. `/digital-omnibus` is a new free reference: the enacted AI
+  changes and the still-proposed data/privacy/cyber file kept apart, a milestone
+  history, and how each engagement applies the context. No price, no form.
+- `/eu-exposure` permanently redirects there — a 301 in `next.config.ts` and a
+  `permanentRedirect()` in the page; its layout is deleted. Sitemap entry moved.
+- Catalogue lost `post-omnibus-briefing` and the `european-procurement-readiness`
+  module, with `AMOUNTS.postOmnibusBriefing`, `AMOUNTS.procurementAddOn` and the
+  ladder rung. Procurement Readiness is now a term on the Exposure Diagnostic and
+  Strategic Assessment. Header, footer, `llms.txt` and the PWA tab bar follow.
+- Application dates come from the shared rule pack via `ai-act-timeline.ts`; the
+  page starts no second calendar. `DIGITAL_OMNIBUS_REVIEWED` is an editorial
+  review date, not the clock. Decisions and review procedure in
+  `docs/digital-omnibus-reference.md`.
+- One contextual link across the featured stories, matched on named instruments
+  rather than generic AI or sovereignty mentions.
+- Advisory Briefing hero replaced with owner-supplied artwork. `EngagementHero`
+  gained `artwork: 'photograph' | 'cutout'` (default unchanged) and `imageRatio`;
+  the cutout branch drops the frame and the fixed-dark caption scrim, which would
+  otherwise float a dark band on the light theme. Other four heroes unchanged.
+- Full suite (1,551 tests), build (122 prerendered pages), `test:security`,
+  `test:sanity-prices` and `test:manual` passed. Briefing hero walked in a
+  browser in both themes and at 420px. The Omnibus page's legal dates were not
+  re-verified at commit time; no post-deploy production check.

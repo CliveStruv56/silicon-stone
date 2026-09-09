@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { DigitalOmnibusContext } from '@/components/advisory/DigitalOmnibusContext'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Header, Footer } from '@/components/layout'
@@ -187,7 +188,7 @@ const assessments: Assessment[] = [
     ],
     icon: Layers,
     price: `From ${gbp(AMOUNTS.aiBillOfMaterials)}`,
-    priceNote: 'Or added to a Post-Omnibus Briefing.',
+    priceNote: 'Available within a scoped diagnostic or assessment.',
     color: 'stone-teal',
   },
   {
@@ -218,9 +219,8 @@ const assessments: Assessment[] = [
  * `ENGAGEMENTS` is the ladder, in ascending order, and is what gets segmented
  * on — so the strings are exact-match tags, not prose. "Drift Retainer" keeps
  * its historic wording rather than the page's "The Drift Retainer" so any
- * existing Kit segment still matches, and drops "The" to sit consistently with
- * `/eu-exposure`, which posts "Post-Omnibus Briefing". That briefing is
- * deliberately absent here: it has its own form on its own page.
+ * existing Kit segment still matches. European Procurement Readiness now
+ * belongs within the diagnostic or assessment scope.
  */
 const ENGAGEMENTS = [
   'Advisory Briefing',
@@ -743,6 +743,8 @@ export default function ServicesPage() {
               return (
                 <motion.div
                   key={assessment.title}
+                  id={assessment.title === 'Sovereign Architecture Review' ? 'sovereign-architecture-review' : undefined}
+                  className="scroll-mt-28"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -787,6 +789,9 @@ export default function ServicesPage() {
                           </li>
                         ))}
                       </ul>
+                      {assessment.title === 'Sovereign Architecture Review' && (
+                        <DigitalOmnibusContext>We assess data flows, access, key custody and portability against applicable requirements and buyer expectations, keeping legal duties and strategic sovereignty preferences distinct.</DigitalOmnibusContext>
+                      )}
                       {assessment.priceNote && (
                         <p className="mt-4 text-xs italic text-text-muted">{assessment.priceNote}</p>
                       )}

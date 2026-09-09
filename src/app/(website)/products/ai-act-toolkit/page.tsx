@@ -186,9 +186,9 @@ export default function AIActToolkitPage() {
               <Shield className="w-5 h-5 text-silicon-amber-strong flex-shrink-0" />
               <p className="text-sm text-text-primary">
                 <span className="font-semibold text-silicon-amber-strong">AI Act implementation is phased.</span>
-                {' '}Transparency obligations have applied since 2 August 2026. The Digital Omnibus — Regulation (EU) 2026/1744, in force 27 July 2026 — moves standalone high-risk to 2 December 2027 and embedded high-risk to 2 August 2028. The evidence work continues.{' '}
-                <Link href="/eu-exposure" className="font-medium text-silicon-amber-strong underline">
-                  See the Post-Omnibus Briefing.
+                {' '}Transparency obligations have applied since 2 August 2026. The Digital Omnibus on AI — Regulation (EU) 2026/1744, in force 27 July 2026 — moves standalone high-risk to 2 December 2027 and embedded high-risk to 2 August 2028. The evidence work continues.{' '}
+                <Link href="/digital-omnibus" className="font-medium text-silicon-amber-strong underline">
+                  Read the Digital Omnibus explanation and timeline.
                 </Link>
               </p>
             </div>

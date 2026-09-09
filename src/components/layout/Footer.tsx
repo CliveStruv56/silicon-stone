@@ -10,6 +10,7 @@ const LINKEDIN_URL = process.env.NEXT_PUBLIC_LINKEDIN_URL || 'https://www.linked
 const footerNavigation = {
   intelligence: [
     { name: 'All intelligence', href: '/intelligence' },
+    { name: 'Digital Omnibus', href: '/digital-omnibus' },
     { name: 'Series', href: '/intelligence/series' },
     { name: 'Atlantic Drift', href: '/analysis/category/atlantic-drift' },
     { name: 'AI Act & Compliance', href: '/analysis/category/ai-act' },
@@ -36,10 +37,7 @@ const footerNavigation = {
    * `/advisory#contact`, and a footer link that jumps to a form on another page
    * is not a destination — it reads as a fifth product and delivers a scroll
    * position. The rule is the filter, so if Board-level ever gets a page it
-   * appears here without anyone remembering to add it. Retyping the list would
-   * have duplicated the Post-Omnibus Briefing, which is in the catalogue and was
-   * also hard-coded here — caught by looking at the rendered footer, not by the
-   * suite.
+   * appears here without anyone remembering to add it.
    */
   advisory: [
     { name: 'Advisory', href: '/advisory' },

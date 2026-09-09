@@ -640,8 +640,8 @@ export default function ComplianceCheckerPage() {
                     </div>
                     <p className="text-xs text-text-muted text-center border-t border-border-subtle pt-4">
                       Need it interpreted for your business?{' '}
-                      <Link href="/eu-exposure" className="text-silicon-amber-strong hover:underline">
-                        See the Post-Omnibus Briefing
+                      <Link href="/advisory/exposure-diagnostic" className="text-silicon-amber-strong hover:underline">
+                        See the Exposure Diagnostic
                       </Link>
                       , or a standing read via the{' '}
                       <Link href="/advisory/drift-retainer" className="text-silicon-amber-strong hover:underline">

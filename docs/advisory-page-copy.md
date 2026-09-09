@@ -1,25 +1,22 @@
 # Advisory Page — Finished Copy
 
-> # ⚠ SUPERSEDED — 4 September 2026. Do not build from this file.
+> # ⚠ SUPERSEDED — updated 8 September 2026. Do not build from this file.
 >
-> This was a build brief for a build that has since happened twice over. On
-> 2026-09-04 the four engagements each got **their own page**, assembled from
-> `EngagementHero` + `AtAGlance` + `WhereItLeads` + `AdvisoryPracticeBand` +
-> `EngagementContactForm` (`src/components/advisory/`), and the four-across tier
-> grid this document specifies was **deleted**. What is still true here is the
-> page intro (§"Page intro"), which matches `advisory/page.tsx` verbatim.
+> This is a historical brief with obsolete prices, minimum terms, links and
+> layout instructions. Current copy lives in `src/app/(website)/advisory/`;
+> current amounts and terms live in `src/lib/offering.ts`.
 >
-> Specifically obsolete: the Drift Retainer as a block on `/advisory` (it is
-> `/advisory/drift-retainer`); the "revised four-tier block"; every `[…](#contact)`
-> CTA (three of the four engagements now have their own form with a hard-coded
-> Kit `interest`); "Keep the three existing module cards" (there are five); the
-> `### Focused Diagnostic` heading (shipped as **The Exposure Diagnostic**); the
-> "designed as an on-ramp" framing, which was deliberately reversed; and the
-> `**Services**` hero badge, now `Advisory`.
+> On 2026-09-08, Briefing, Diagnostic and Retainer moved to
+> `FocusedEngagementPage`: intro → CTA → who it’s for → how it works → pricing
+> → contact form. Strategic Assessment keeps the earlier structure. Every
+> advisory page has its own hero image; do not restore the shared globe.
 >
-> **For what the pages actually say, read the pages.** For prices, read
-> `src/lib/offering.ts`. For why they are shaped this way, read §9 of
-> `project_summary.md` (entries dated 2026-09-04).
+> Retainer is **£2,000/month, rolling monthly, no minimum term**; the annual
+> option and founding offer remain. Its body no longer carries fee-credit
+> mentions, WaymarkPath or related-service links. Credits remain elsewhere.
+>
+> Read `project_summary.md` §9 (September 8) for the owner's decisions,
+> implementation, validation and deployed commit `4acedf4e`.
 
 *Drop-in copy for the `/advisory` rebuild. UK English, house voice.*
 
