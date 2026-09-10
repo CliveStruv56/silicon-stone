@@ -10,7 +10,7 @@
     {
       "file": "public/advisory/advisory-briefing.webp",
       "prompt": "Supplied by the owner, not generated here: an isometric walled stone enclosure on a slate slab, a lit stepped plinth at its centre, an amber path leading in through one gate and teal circuit lines running out. Departs from the photographic art direction above; the illustration reads as a diagram of one question brought inside a defined boundary, which is what the page says the Briefing is for.",
-      "source": "Images/C1_lifted_panel.png (1600x1600, opaque apart from its four rounded corners \u2014 a dark panel rather than a cutout, so it takes the same framed treatment as the other four at 1200x1200. Third candidate and the one kept: B_isolated_cutout.png and A_softened_panel.png preceded it on 2026-09-09. Note for the next replacement: an alpha channel does not make a file a cutout \u2014 count the non-opaque pixels. A genuine cutout would need the frame and scrim dropped, because the caption scrim is fixed dark and floats a dark band over transparency on the light theme.)"
+      "source": "Images/C1_lifted_panel.png (1600x1600, opaque apart from its four rounded corners — a dark panel rather than a cutout, so it takes the same framed treatment as the other four at 1200x1200. Third candidate and the one kept: B_isolated_cutout.png and A_softened_panel.png preceded it on 2026-09-09. Note for the next replacement: an alpha channel does not make a file a cutout — count the non-opaque pixels. A genuine cutout would need the frame and scrim dropped, because the caption scrim is fixed dark and floats a dark band over transparency on the light theme.)"
     },
     {
       "file": "public/advisory/exposure-diagnostic.webp",
@@ -26,6 +26,33 @@
       "file": "public/advisory/strategic-assessment.webp",
       "prompt": "A considered overhead editorial still life on an oak strategy table, physical architectural blocks and three different branching routes marked on translucent tracing sheets, a single brass ruler, dark teal and stone grey materials. Suggest a consequential choice grounded in evidence, no chess pieces, no readable text.",
       "source": "/Users/clivestruver/.codex/generated_images/01a0821e-3eaf-7a92-92e5-c4af72a80bcd/exec-46a24b2d-33a7-4742-8322-fbb2f235888d.png"
+    }
+  ],
+  "houseStyle": {
+    "note": "Written 2026-09-10 from the Advisory Briefing image, which the owner picked as the house style. Prepend this block to every scene prompt below. The three photographic images it replaces (Diagnostic, Retainer, Assessment) stay in place until a generated candidate is approved.",
+    "prompt": "Stylised isometric 3D diorama, three-quarter view from about 30 degrees above, rendered like a matte clay model with soft studio light and a faint ambient occlusion, not photorealistic. One self-contained scene sits on a single floating slab of dark blue-grey slate with rough hand-hewn edges, casting a soft shadow onto a plain near-black charcoal background (#0f141e to #1c2330) with nothing else in frame. Built forms are pale sandstone blocks with hairline cracks and chipped corners; corner posts, caps and edge trims are weathered verdigris teal. The only strong light in the scene is a warm amber glow (#f0a33d) emitted from within it, on paths, thresholds or windows, falling softly onto nearby stone. Thin teal circuit traces (#7fcbc4) are inlaid flush into the slate and run in right-angled zig-zags from the built form to the slab's edges. Small in the frame: the whole scene occupies the central 65 percent of a 1600 by 1600 square, with empty charcoal above and below so it survives a 4:3 crop and a dark caption band across the bottom fifth. No text, no lettering, no logos, no people, no figures, no screens, no globes, no maps, no holograms, no lens flare, no vegetation, no sky. Colour restricted to slate blue-grey, pale sandstone, verdigris teal and amber."
+  },
+  "proposed": [
+    {
+      "file": "public/advisory/exposure-diagnostic.webp",
+      "page": "/advisory/exposure-diagnostic",
+      "caption": "Trace the dependencies. Examine the evidence. Set priorities.",
+      "prompt": "Scene: a walled sandstone yard on the slab, its wall lower than the Briefing's so the interior reads clearly. Inside, a grid of nine to twelve sandstone blocks of different sizes and heights, set on the slate like components on a board, with teal circuit traces running between them in the slate. One amber trace lights a single path through the grid, block to block, and ends at one block near the far corner that is set slightly apart, tilted a few degrees off square, with a fine crack glowing amber from inside. At the yard's open gate stands a low stone plinth holding a round brass-rimmed lens on a short stand, angled toward the grid, the amber path passing beneath it. Every other block stays unlit. The image should read as: many parts, one traced path, one part that needs attention.",
+      "variation": "Replace the walled yard with the blocks stacked as a stepped tower (a bill of materials), the amber trace climbing the stack and stopping at one block pulled a few centimetres out of alignment."
+    },
+    {
+      "file": "public/advisory/drift-retainer.webp",
+      "page": "/advisory/drift-retainer",
+      "caption": "A clear view of what is changing around your business.",
+      "prompt": "Scene: the slab is cut as a headland, one edge stepping down in two rough slate terraces to a lower level. On the high ground stands a squat sandstone watch-house, two storeys, verdigris-capped, with one wide window on the seaward side glowing warm amber and a short amber-lit stone stair leading up to its door. Across the lower level, three or four teal circuit traces run past the headland in long, slightly curved parallel lanes, like shipping lanes seen from above, each bending a little further from the last so the set reads as drifting. One small amber marker sits on the nearest lane directly below the window, as if just noted. Nothing moves; the sense of change comes from the curvature of the lanes and the steady lit window. Calm, continuous observation.",
+      "variation": "Same watch-house, but the lanes are drawn as three teal traces that start parallel at one slab edge and fan apart by the other, with the window's amber light laid as a faint cone across them."
+    },
+    {
+      "file": "public/advisory/strategic-assessment.webp",
+      "page": "/advisory/strategic-assessment",
+      "caption": "Three routes on the table. One built.",
+      "prompt": "Scene: on the slab, a single sandstone gateway with verdigris caps stands at the near edge, and three routes leave it across the slate toward a raised stepped plinth at the far side, the plinth's top step lit amber. The left and right routes are drawn only as faint teal traces inlaid in the slate, unbuilt. The centre route is built: a causeway of fitted sandstone slabs, its joints glowing amber, complete from gateway to plinth, with two low waypoint stones along it. Beside the gateway, a flat slate tablet the size of a board table lies on the ground with three thin teal lines scored into it echoing the three routes, the centre line filled amber. Reads as: options assessed, one route chosen and made real, ending somewhere raised.",
+      "variation": "Drop the tablet; instead let the two unbuilt routes each end at a small unlit sandstone marker short of the plinth, so only the built route arrives."
     }
   ]
 }
