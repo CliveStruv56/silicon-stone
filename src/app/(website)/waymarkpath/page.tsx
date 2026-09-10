@@ -4,7 +4,6 @@ import { ArrowRight } from 'lucide-react'
 
 import { Header, Footer } from '@/components/layout'
 import { Badge } from '@/components/ui/badge'
-import { StaggerContainer, StaggerItem } from '@/components/ui/StaggerContainer'
 import { ConnectedSystem, FlowRibbon, WaymarkPathSignup } from '@/components/waymarkpath'
 import { WAYMARKPATH_PROOF } from '@/lib/waymarkpath'
 
@@ -18,9 +17,8 @@ import { WAYMARKPATH_PROOF } from '@/lib/waymarkpath'
  * panel. Metadata moved back here from a sibling `layout.tsx` that existed only
  * to work around the client boundary.
  *
- * Colour register is `--sister-indigo` throughout, not the S&S amber/teal. The
- * design system reserves that token for WaymarkPath specifically, so the page
- * reads as a sister product rather than as another Silicon and Stone line.
+ * Indigo anchors the sister-product identity. The diagrams add scoped stage
+ * colours for direction, action and support in both light and dark themes.
  */
 
 export const metadata: Metadata = {
@@ -93,9 +91,30 @@ export default function WaymarkPathPage() {
               </p>
 
               <WaymarkPathSignup id="hero" />
-
-              <FlowRibbon className="mt-12 max-w-2xl" />
             </div>
+            <FlowRibbon expanded className="mt-12 max-w-5xl" />
+          </div>
+        </section>
+
+        {/* The connected system — the centrepiece */}
+        <section className="border-b border-border-subtle">
+          <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8 lg:py-20">
+            <div className="mb-10 max-w-2xl">
+              <p className="mb-3 text-base font-medium text-sister-indigo">
+                How it fits together
+              </p>
+              <h2 className="mb-4 text-3xl font-bold text-text-primary">
+                Most tools solve one piece of this
+              </h2>
+              <p className="text-lg leading-relaxed text-text-muted">
+                A CV checker does not know what you are aiming at. A course
+                catalogue does not know what you already have. Here the gap
+                analysis sets the learning order, the same strengths reframe the
+                CV, and the coach sees all of it. Select a stage to follow its connections.
+              </p>
+            </div>
+
+            <ConnectedSystem />
           </div>
         </section>
 
@@ -112,48 +131,25 @@ export default function WaymarkPathPage() {
               </p>
             </div>
 
-            <StaggerContainer className="grid gap-5 sm:grid-cols-2">
+            <div className="grid gap-5 sm:grid-cols-2">
               {FRICTIONS.map((item) => (
-                <StaggerItem key={item.title}>
+                <div key={item.title}>
                   <div className="card-interactive h-full rounded-xl border border-border-subtle bg-stone-charcoal p-6">
                     <h3 className="mb-2 font-semibold text-text-primary">{item.title}</h3>
                     <p className="text-sm leading-relaxed text-text-muted">{item.body}</p>
                   </div>
-                </StaggerItem>
+                </div>
               ))}
-            </StaggerContainer>
-          </div>
-        </section>
-
-        {/* The connected system — the centrepiece */}
-        <section className="border-b border-border-subtle">
-          <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8 lg:py-20">
-            <div className="mb-10 max-w-2xl">
-              <span className="mb-3 block font-mono text-[12px] uppercase tracking-[0.12em] text-sister-indigo">
-                How it fits together
-              </span>
-              <h2 className="mb-4 text-3xl font-bold text-text-primary">
-                Most tools solve one piece of this
-              </h2>
-              <p className="text-lg leading-relaxed text-text-muted">
-                A CV checker does not know what you are aiming at. A course
-                catalogue does not know what you already have. Here the gap
-                analysis sets the learning order, the same strengths reframe the
-                CV, and the coach sees all of it. Select a stage to see what it
-                settles and what receives it.
-              </p>
             </div>
-
-            <ConnectedSystem />
           </div>
         </section>
 
         {/* Proof */}
         <section className="border-b border-border-subtle bg-stone-charcoal/40">
           <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-14">
-            <StaggerContainer className="grid gap-6 md:grid-cols-3">
+            <div className="grid gap-6 md:grid-cols-3">
               {WAYMARKPATH_PROOF.map((item) => (
-                <StaggerItem key={item.label}>
+                <div key={item.label}>
                   <div className="h-full border-l-2 border-sister-indigo/40 pl-5">
                     <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-text-muted">
                       {item.label}
@@ -161,9 +157,9 @@ export default function WaymarkPathPage() {
                     <p className="mt-1 text-xl font-semibold text-text-primary">{item.value}</p>
                     <p className="mt-2 text-sm leading-relaxed text-text-muted">{item.note}</p>
                   </div>
-                </StaggerItem>
+                </div>
               ))}
-            </StaggerContainer>
+            </div>
           </div>
         </section>
 

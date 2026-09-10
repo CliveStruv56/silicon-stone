@@ -2,6 +2,8 @@
 
 import { motion, useReducedMotion } from 'framer-motion'
 import { WAYMARKPATH_CAPABILITIES } from '@/lib/waymarkpath'
+import { STAGE_VISUALS } from './stage-visuals'
+import styles from './waymarkpath.module.css'
 
 /**
  * The compact form of the connected-system motif, for the Products-page band.
@@ -11,8 +13,37 @@ import { WAYMARKPATH_CAPABILITIES } from '@/lib/waymarkpath'
  * clickable inside it would either swallow the navigation or nest a control in
  * an anchor. The interactive version lives on `/waymarkpath`.
  */
-export function FlowRibbon({ className = '' }: { className?: string }) {
+export function FlowRibbon({ className = '', expanded = false }: { className?: string; expanded?: boolean }) {
   const reduce = useReducedMotion()
+
+  if (expanded) {
+    return (
+      <div className={`${styles.theme} ${styles.ribbon} ${className}`}>
+        <div className={styles.ribbonIntro}>
+          <strong>Your next chapter, step by step</strong>
+          <span>Seven stages. One shared picture of you.</span>
+        </div>
+        <div className={styles.ribbonRoute}>
+          <motion.div
+            className={styles.ribbonTrack}
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: reduce ? 0 : 0.9, ease: 'easeInOut' }}
+            aria-hidden="true"
+          />
+          <ol className={styles.ribbonList} aria-label="The seven stages of your career journey">
+            {WAYMARKPATH_CAPABILITIES.map((cap) => (
+              <li className={styles.ribbonStage} key={cap.id} data-tone={STAGE_VISUALS[cap.id].tone}>
+                <span className={styles.ribbonDot} aria-hidden="true">{cap.step}</span>
+                <span className={styles.ribbonLabel}>{cap.short}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className={className} aria-hidden="true">
