@@ -754,9 +754,11 @@ edit invalidates nothing and the page sits stale with no error anywhere.
 ## The advisory pages come off one template (do not hand-roll a fifth)
 
 Each of the four engagements has its own page under `src/app/(website)/advisory/`,
-and all four are assembled from the same five components in
-`src/components/advisory/`: `AdvisoryPracticeBand`, `EngagementHero`,
-`AtAGlance`, `WhereItLeads`, `EngagementContactForm`.
+and all four are assembled from the same components in
+`src/components/advisory/`: `EngagementHero`, `AtAGlance`, `WhereItLeads`,
+`EngagementContactForm`, `RelatedCoverage`. (`AdvisoryPracticeBand` was
+deleted on 2026-09-10 at the owner's request; it had only ever rendered on the
+Strategic Assessment.)
 
 That is not tidiness. Three engagements were pages and the Retainer was a
 *section on the hub*, and that asymmetry is precisely **why** their styling kept

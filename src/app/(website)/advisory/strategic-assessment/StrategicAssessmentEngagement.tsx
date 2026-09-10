@@ -17,7 +17,6 @@ import {
 import { Header, Footer } from '@/components/layout'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { AdvisoryPracticeBand } from '@/components/advisory/AdvisoryPracticeBand'
 import { AtAGlance } from '@/components/advisory/AtAGlance'
 import { EngagementContactForm } from '@/components/advisory/EngagementContactForm'
 import { EngagementHero } from '@/components/advisory/EngagementHero'
@@ -88,8 +87,9 @@ export function StrategicAssessmentEngagement({ coverage }: Props) {
       <Header />
 
       <main className="flex-1">
-        <AdvisoryPracticeBand />
-
+        {/* The practice band ("AI adoption creates a governance problem…") was
+            removed at the owner's request on 2026-09-10; the hero now opens
+            the page, as it does on the other three engagements. */}
         <EngagementHero
           badge="The deep one-off · for a high-stakes decision"
           title="Before you commit to governance software, know what you need it to do."
@@ -314,7 +314,7 @@ export function StrategicAssessmentEngagement({ coverage }: Props) {
           intro="An assessment settles one decision. Keeping the decision current, or scoping it in the first place, is a different job."
           bridges={{
             'advisory-briefing':
-              'An hour first, to work out whether the decision is really as big as it looks.',
+              'If the question concerns one AI system, start with an hour interpreting its Compliance Checker result and setting priorities.',
             'exposure-diagnostic':
               'If the board cannot yet say what it runs, a pass over the estate has to come before a decision about it.',
             'drift-retainer':
