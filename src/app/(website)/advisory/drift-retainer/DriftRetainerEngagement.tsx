@@ -29,7 +29,7 @@ export function DriftRetainerEngagement({ coverage }: Props) {
         inShort: 'Ongoing technology and policy advice, grounded in your operations and delivered through a standing monthly relationship.',
         ctaLabel: 'Book a 25-minute conversation',
         imageSrc: '/advisory/drift-retainer.webp',
-        imageAlt: 'A stone coastal observation room overlooking Atlantic shipping lanes, with a warm desk light inside',
+        imageAlt: 'An isometric sandstone watch-house with a verdigris roof on a stepped slate headland, its wide window glowing amber and an amber-lit stair to its door; below, four teal lanes curve past across the slab like shipping lanes seen from above, one small amber marker on the nearest',
         imageCaption: 'A clear view of what is changing around your business.',
         showLaunchLine: true,
       }}

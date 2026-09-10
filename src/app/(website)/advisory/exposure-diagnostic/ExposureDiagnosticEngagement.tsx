@@ -38,7 +38,7 @@ export function ExposureDiagnosticEngagement({ coverage }: Props) {
         inShort: 'A scoped review of your systems, vendor evidence and dependencies, with a written report and prioritised actions.',
         ctaLabel: 'Request a diagnostic',
         imageSrc: '/advisory/exposure-diagnostic.webp',
-        imageAlt: 'A circuit board examined through an optical inspection lens beside supporting papers',
+        imageAlt: 'An isometric walled sandstone yard on a slate slab, stone blocks laid out like components with teal traces between them; one amber trace runs through the grid to a single cracked block glowing from within, past a brass lens on a stand at the gate',
         imageCaption: 'Trace the dependencies. Examine the evidence. Set priorities.',
       }}
       audience={<>

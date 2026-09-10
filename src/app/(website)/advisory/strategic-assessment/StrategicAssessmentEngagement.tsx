@@ -104,8 +104,8 @@ export function StrategicAssessmentEngagement({ coverage }: Props) {
           }
           ctaLabel="Request a proposal"
           imageSrc="/advisory/strategic-assessment.webp"
-          imageAlt="Architectural blocks and branching routes on tracing sheets, arranged on a strategy table"
-          imageCaption="Multi-framework analysis, read against the decision your board actually has to take."
+          imageAlt="An isometric sandstone gateway with verdigris caps on a slate slab; three routes leave it toward a raised stepped plinth lit amber, two drawn only as faint teal traces and the centre one built as a stone causeway with amber-lit joints, with a slate tablet beside the gate scored with the same three lines"
+          imageCaption="Three routes on the table. One built."
         />
 
         <AtAGlance
