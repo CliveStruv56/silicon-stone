@@ -28,6 +28,11 @@ export default function ToolsPage() {
                                 Move beyond static analysis. Use our interactive models to stress-test your
                                 assumptions against the realities of regulation, geography, and drift.
                             </p>
+                            <p className="mt-4 text-base text-text-muted leading-relaxed">
+                                Explore the exposure with our free tools. When you need a result
+                                interpreted or the analysis applied to your organisation, you can
+                                commission the relevant advisory work directly.
+                            </p>
                         </div>
                     </div>
                 </section>

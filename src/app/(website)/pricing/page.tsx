@@ -162,9 +162,8 @@ export default function PricingPage() {
             </h1>
             <p className="max-w-3xl text-xl leading-relaxed text-text-muted">
               One page, every price. The analysis and the tools are free and stay
-              free. Everything paid names a figure before you talk to us — and
-              every paid step credits toward the next, so you never buy the same
-              ground twice.
+              free. Everything paid names a figure before you talk to us.
+              Scope, fees and any applicable credits are set out before you commit.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="#products">
@@ -234,7 +233,7 @@ export default function PricingPage() {
           id="advisory"
           eyebrow="Engage"
           title="Advisory engagements"
-          intro="One ascending ladder, from a one-hour briefing to the standing relationship. Every one-off engagement names a price and a path into the Drift Retainer."
+          intro="From one AI system and one principal question to a broader review or a standing relationship. Choose the scope you need; further engagements are optional."
         >
           <div>
             {/* The ladder ascends from nothing, so the free conversation is its
@@ -263,8 +262,8 @@ export default function PricingPage() {
         <Section
           id="modules"
           eyebrow="Engage"
-          title="Follow-on modules"
-          intro="Scoped add-ons, folded into a briefing or a retainer rather than sold cold. Each names a floor; the final figure follows the scope agreed on the call."
+          title="Specialist advisory projects"
+          intro="Standalone projects, scoped and priced after a free conversation. No previous paid engagement is required. For retainer clients, projects are separately scoped and charged at the agreed project fee, in addition to the monthly retainer."
         >
           <div>
             {MODULES.map((offering) => (
@@ -277,7 +276,7 @@ export default function PricingPage() {
           id="ladder"
           eyebrow="How it fits together"
           title="Never pay twice for the same ground"
-          intro="The ladder is the pricing model, not a promotion. What you spend at one rung comes off the next."
+          intro="The credits below apply to the named purchases. Specialist projects are separately scoped and charged; commissioning one does not require an earlier purchase."
         >
           <LadderBox />
         </Section>

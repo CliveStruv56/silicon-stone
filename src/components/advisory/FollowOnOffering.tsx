@@ -4,11 +4,12 @@ import { Badge } from '@/components/ui/badge'
 import type { Offering } from '@/lib/offering'
 
 /** Shared treatment for the paid next step beneath a free tool. */
-export function FollowOnOffering({ offering, eyebrow, intro, note }: {
+export function FollowOnOffering({ offering, eyebrow, intro, note, ctaLabel }: {
   offering: Offering
   eyebrow: string
   intro: string
   note: string
+  ctaLabel?: string
 }) {
   return (
     <section
@@ -40,7 +41,7 @@ export function FollowOnOffering({ offering, eyebrow, intro, note }: {
             href={offering.href}
             className="inline-flex items-center gap-2 rounded-md bg-accent-fill px-5 py-2.5 font-medium text-ink-on-accent transition-colors hover:bg-accent-fill/90"
           >
-            For more details on the {offering.name}
+            {ctaLabel ?? `Explore the ${offering.name}`}
             <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
           </Link>
           <span className="text-sm text-text-muted">{note}</span>

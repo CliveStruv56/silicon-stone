@@ -1,6 +1,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { ArrowRight } from 'lucide-react'
+import { TOOL_JOURNEYS } from '@/lib/tool-journeys'
 
 /* Preview art is shared with `ToolsGallery` on the home page — same 1600px WebP
  * renders, same intrinsic ratio, so the two listings stay visually consistent
@@ -11,23 +13,10 @@ const PREVIEW_RATIO = 3168 / 1344
 
 const tools = [
   {
-    name: 'Supply Chain Mapper',
-    description: 'Visualise semiconductor supply-chain vulnerabilities and chokepoints',
-    href: '/tools/supply-chain-mapper',
-    preview: '/tools/supply-chain-mapper-preview.webp',
-    previewAlt:
-      'Isometric illustration: supply routes from a mine, a chemical plant and a container port converge on a single mountain pass marked with a red warning symbol, then continue to a semiconductor fabrication plant.',
-    icon: (
-      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    ),
-    color: 'text-stone-teal',
-  },
-  {
     name: 'Compliance Checker',
     description: 'Create a first-pass AI system record, identify likely obligations, and capture missing vendor evidence',
     href: '/tools/compliance-checker',
+    journey: TOOL_JOURNEYS['compliance-checker'],
     preview: '/tools/compliance-checker-preview.webp',
     previewAlt:
       'Isometric illustration: circuit traces run from a server rack out to four graded tiers — red and flagged with a warning symbol, amber, teal, then unlit grey — echoing the EU AI Act risk classes from prohibited down to minimal.',
@@ -39,9 +28,25 @@ const tools = [
     color: 'text-silicon-amber-strong',
   },
   {
+    name: 'Supply Chain Mapper',
+    description: 'Visualise semiconductor supply-chain vulnerabilities and chokepoints',
+    href: '/tools/supply-chain-mapper',
+    journey: TOOL_JOURNEYS['supply-chain-mapper'],
+    preview: '/tools/supply-chain-mapper-preview.webp',
+    previewAlt:
+      'Isometric illustration: supply routes from a mine, a chemical plant and a container port converge on a single mountain pass marked with a red warning symbol, then continue to a semiconductor fabrication plant.',
+    icon: (
+      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
+    color: 'text-stone-teal',
+  },
+  {
     name: 'Scenario Modeler',
     description: 'Compare strategic outcomes under different geopolitical futures',
     href: '/tools/scenario-modeler',
+    journey: TOOL_JOURNEYS['scenario-modeler'],
     preview: '/tools/scenario-modeler-preview.webp',
     previewAlt:
       'Isometric illustration: three coloured paths leave one office tower for three different futures — a fractured red plateau under a warning symbol, a cracked sandstone block, and intact teal ground carrying a smaller building.',
@@ -56,6 +61,7 @@ const tools = [
     name: 'Policy Stress-Test',
     description: 'Test your strategy against regulatory and trade policy scenarios',
     href: '/tools/policy-stress-test',
+    journey: TOOL_JOURNEYS['policy-stress-test'],
     preview: '/tools/policy-stress-test-preview.webp',
     previewAlt:
       'Isometric illustration: the US Capitol and a European institutional building sit on opposite sides of a deep rift, their green policy routes reaching the edge and stopping at red warning symbols rather than meeting.',
@@ -72,8 +78,8 @@ export function ToolsGrid() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {tools.map((tool) => (
-        <Link key={tool.name} href={tool.href}>
-          <Card className="card-interactive h-full bg-stone-charcoal border-border-subtle hover:border-stone-teal/50 cursor-pointer">
+        <Card key={tool.name} className="h-full flex flex-col bg-stone-charcoal border-border-subtle">
+          <Link href={tool.href} className="block flex-1 rounded-t-xl transition-colors hover:bg-surface-elevated/40">
             <CardHeader className="pb-2">
               <div className="flex justify-between items-start">
                 <CardTitle className="text-base font-medium text-text-primary flex items-center gap-3">
@@ -96,9 +102,23 @@ export function ToolsGrid() {
                 />
               </div>
               <p className="text-sm text-text-muted">{tool.description}</p>
+              <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-stone-teal">
+                Use the free tool <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </span>
             </CardContent>
-          </Card>
-        </Link>
+          </Link>
+          <div className="mx-6 border-t border-border-subtle py-4">
+            <Link href={tool.journey.offering.href} className="group block rounded-sm">
+              <span className="flex items-center gap-2 text-sm font-medium text-silicon-amber-strong group-hover:underline">
+                {tool.journey.actionLabel}
+                <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
+              </span>
+              <span className="mt-1.5 block text-xs text-text-muted">
+                {tool.journey.offering.name} · {tool.journey.offering.price}
+              </span>
+            </Link>
+          </div>
+        </Card>
       ))}
     </div>
   )

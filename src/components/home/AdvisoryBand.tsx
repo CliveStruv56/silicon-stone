@@ -19,7 +19,8 @@ const tiers: Tier[] = [
   {
     label: 'From consultation',
     title: 'Advisory Briefing',
-    body: 'A one-hour strategic consultation built on your tool results and specific questions.',
+    body: 'One AI system, one principal question. A review of your Checker result, a one-hour discussion and a written follow-up.',
+    href: '/advisory/advisory-briefing',
   },
   {
     label: 'First picture',

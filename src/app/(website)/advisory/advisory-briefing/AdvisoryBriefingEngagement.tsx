@@ -18,41 +18,44 @@ export function AdvisoryBriefingEngagement({ coverage }: Props) {
     <FocusedEngagementPage
       hero={{
         badge: 'Advisory Briefing',
-        title: 'One question, answered properly.',
-        lead: 'A vendor claim you cannot verify. A tool result you need to interpret. A board question that needs a clear answer.',
-        body: 'Bring the question and the evidence you have. We apply thirty years of technology industry experience to help you understand what matters and decide what to do next.',
-        inShort: 'A focused one-hour working session, with prioritised recommendations and a written follow-up.',
+        title: 'One AI system. One principal question.',
+        lead: 'Understand your Compliance Checker result and what it means for your business.',
+        body: 'Bring your result and the question it raises. We review it before the call, then use a one-hour discussion to clarify the assumptions, identify the priorities and help you decide what to do next.',
+        inShort: 'A review of your Checker result, a one-hour discussion and a written follow-up with priorities, evidence gaps and practical next steps.',
         ctaLabel: 'Request a briefing',
         imageSrc: '/advisory/advisory-briefing.webp',
         imageAlt: 'An isometric walled stone enclosure on a slate slab, a lit stepped plinth at its centre, with an amber path leading in through one gate and teal circuit lines running out',
         imageCaption: 'One question, set down inside a clear boundary.',
       }}
       audience={<>
-        <p className="text-xl text-text-primary">For leaders with one specific question to resolve.</p>
-        <p>You may have run the Compliance Checker, Supply Chain Mapper, Scenario Modeler or Policy Stress-Test and want help interpreting the result. Or you may need an independent view on a vendor proposal, a policy obligation or a decision facing your team.</p>
-        <p>The Briefing works best when the question has a clear boundary. If you need a review of your whole AI estate, the <Link href="/advisory/exposure-diagnostic" className="text-stone-teal underline underline-offset-4">Exposure Diagnostic</Link> is the more suitable starting point.</p>
+        <p className="text-xl text-text-primary">For leaders who need a clear interpretation of one AI system’s result.</p>
+        <p>You have run the <Link href="/tools/compliance-checker" className="text-stone-teal underline underline-offset-4">Compliance Checker</Link> and want to understand the classification, the missing evidence or the actions it suggests. Bring one principal question and a few sentences about how the system is used in your business.</p>
+        <p>You leave with priorities and next actions you can use independently. If the question reaches across several systems, the <Link href="/advisory/exposure-diagnostic" className="text-stone-teal underline underline-offset-4">Exposure Diagnostic</Link> provides a broader review.</p>
       </>}
       process={<>
         <EngagementSteps steps={[
-        { title: 'Bring your question', body: 'Tell us what you need to resolve and share any relevant tool results or supporting material. We confirm whether a focused hour is the right fit before you book.' },
-        { title: 'Work through the evidence', body: 'Use the hour to examine what the evidence says, where it falls short and what that means for your situation. We help you prioritise the next actions.' },
-        { title: 'Take the answer with you', body: 'Receive a written follow-up with the interpretation and recommendations, ready to share with colleagues and refer to after the call.' },
+        { title: 'Share your result and question', body: 'Send your Checker result, one principal question and a few sentences of business context. We confirm the fit before you book and read your result before the call. No supporting documents are needed.' },
+        { title: 'Work through it together', body: 'One hour to clarify the assumptions behind the result, discuss the implications for your AI system and identify the priorities. The discussion is grounded in your result and your account of how the system is used.' },
+        { title: 'Keep a written follow-up', body: 'Receive a short summary of what was clarified, what remains uncertain and the next actions. If further investigation would help, it is proposed separately. You can use the summary without commissioning more work.' },
       ]} />
-        <DigitalOmnibusContext>Bring one question about the revised EU rules, a vendor claim or your exposure in Europe. We interpret the relevant changes against that decision.</DigitalOmnibusContext>
+        <DigitalOmnibusContext>Where a revised EU rule affects your Checker result, we discuss what that change means for the AI system in scope.</DigitalOmnibusContext>
       </>}
       price={gbp(AMOUNTS.advisoryBriefing)}
       pricing={<>
-        <p className="font-semibold text-text-primary">Fixed fee for the one-hour session and written follow-up.</p>
-        <p>If you proceed to a <Link href="/advisory/drift-retainer" className="text-stone-teal underline underline-offset-4">Drift Retainer</Link> within 30 days, the briefing fee is credited in full toward your first month. There is no obligation to continue.</p>
+        <p className="font-semibold text-text-primary">One AI system, one principal question, one fixed fee.</p>
+        <p>Includes preparation from your Checker result and brief business context, the one-hour discussion and a short written follow-up.</p>
+        <p>The Briefing interprets your result based on your account. It does not verify your system or vendor evidence, certify compliance or include supporting-document review. Document review and wider investigations are scoped and charged separately.</p>
+        <p>Further work is optional. If you choose a <Link href="/advisory/drift-retainer" className="text-stone-teal underline underline-offset-4">Drift Retainer</Link> within 30 days, the briefing fee is credited in full toward your first month.</p>
         {FREE_INTRO_WINDOW && <p className="text-sm">If you simply want to meet us first, a free 25-minute introductory conversation is available during our launch window. The paid Briefing is the working session on your question.</p>}
       </>}
       contact={{
         interest: 'Advisory Briefing',
         plausibleEvent: 'Engagement Enquiry',
+        showIntroBooking: false,
         heading: 'Request a briefing',
-        intro: "Tell us the question you need to resolve. We’ll confirm whether the Briefing is the right fit before you book.",
-        messageLabel: 'What is the question?',
-        messagePlaceholder: 'A vendor claim, a tool result, a board question…',
+        intro: 'Describe the AI system and your principal question. We will confirm the fit and arrange for you to share your Checker result before the call. No supporting documents are needed.',
+        messageLabel: 'Which AI system, and what is your principal question?',
+        messagePlaceholder: 'How we use the system, what the Checker result says, and the question we want to resolve…',
         trustItems: [{ icon: Shield, title: 'Confidentiality first', body: 'All enquiries are treated with strict confidentiality.' }],
       }}
       coverage={coverage}

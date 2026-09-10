@@ -39,6 +39,7 @@ import { CopyMarkdownButton } from '@/components/tools/CopyMarkdownButton'
 import { ToolSubscribeCard } from '@/components/tools/ToolSubscribeCard'
 import { complianceCheckerMarkdown } from '@/lib/tools-markdown'
 import { FollowOnOffering } from '@/components/advisory/FollowOnOffering'
+import { TOOL_JOURNEYS } from '@/lib/tool-journeys'
 import { AMOUNTS, gbp, offeringById } from '@/lib/offering'
 
 const briefing = offeringById('advisory-briefing')
@@ -922,9 +923,21 @@ export default function ComplianceCheckerPage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
+                    <div className="border-b border-border-subtle pb-4">
+                      <p className="mb-3 text-sm text-text-primary">
+                        Need to understand this result? One AI system, one principal question,
+                        a one-hour discussion and a written follow-up.
+                      </p>
+                      <Button asChild className="w-full bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90">
+                        <Link href={briefing.href}>Advisory Briefing · {briefing.price}</Link>
+                      </Button>
+                      <p className="mt-2 text-xs text-text-muted">
+                        Includes reading your Checker result before the call. Document review is scoped separately.
+                      </p>
+                    </div>
                     <div>
                       <Link href={cta.primary.href}>
-                        <Button className="w-full bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90">
+                        <Button variant="outline" className="w-full border-stone-teal text-stone-teal dark:border-stone-teal">
                           {cta.primary.label}
                         </Button>
                       </Link>
@@ -944,17 +957,6 @@ export default function ComplianceCheckerPage() {
                       </Link>
                       <p className="mt-2 text-xs text-text-muted">{cta.secondary.blurb}</p>
                     </div>
-                    <p className="text-xs text-text-muted text-center border-t border-border-subtle pt-4">
-                      Need it interpreted for your business?{' '}
-                      <Link href={briefing.href} className="text-silicon-amber-strong hover:underline">
-                        Explore the {briefing.name}
-                      </Link>
-                      , or a standing read via the{' '}
-                      <Link href="/advisory/drift-retainer" className="text-silicon-amber-strong hover:underline">
-                        Drift Retainer
-                      </Link>
-                      .
-                    </p>
                   </CardContent>
                 </Card>
               </div>
@@ -1124,9 +1126,10 @@ export default function ComplianceCheckerPage() {
         </section>
         <FollowOnOffering
           offering={briefing}
-          eyebrow="Take your Compliance Checker results further"
-          intro="Have a question about your result? Bring your assessment and the evidence you have. We will help you interpret what it means for your business and decide what to do next."
-          note="One hour on your question, with a written follow-up."
+          eyebrow="Understand your Compliance Checker result"
+          intro={TOOL_JOURNEYS['compliance-checker'].intro}
+          ctaLabel="Explore the Advisory Briefing"
+          note="Includes preparation from your Checker result. Document review is scoped separately."
         />
       </main>
 

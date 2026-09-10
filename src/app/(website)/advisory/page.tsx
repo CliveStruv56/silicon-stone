@@ -305,9 +305,15 @@ export default function ServicesPage() {
                 Four ways to work together
               </h2>
               <p className="text-text-muted">
-                One ascending ladder, from an hour on a single question to the standing
-                relationship. Every one-off names a fixed price, and each credits toward
-                the next — so you never pay twice for the same ground.
+                Choose the engagement that fits your question, from a focused hour
+                to a broader review or a standing relationship. Scope and fees are
+                agreed before work begins; further work is optional.
+              </p>
+              <p className="mt-4 text-text-muted">
+                Already know the issue?{' '}
+                <a href="#modules" className="text-stone-teal underline underline-offset-4">
+                  Explore specialist projects on supplier dependencies, scenario impact and transatlantic friction.
+                </a>
               </p>
             </div>
 
@@ -402,12 +408,13 @@ export default function ServicesPage() {
         <section id="modules" className="scroll-mt-24 mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
           <div className="mb-8">
             <h2 className="text-2xl font-semibold text-text-primary mb-4">
-              Follow-on Modules
+              Specialist advisory projects
             </h2>
             <p className="text-text-muted max-w-3xl">
-              Each module deepens a single exposure where the self-service tools reach
-              their limit. Take one on its own, add it to a diagnostic, or fold it into a
-              Drift Retainer as the standing relationship requires.
+              Commission a focused investigation into your own suppliers, business units
+              or operations. Start with a free scoping conversation; no Briefing or
+              Diagnostic is required first. Projects for retainer clients are separately
+              scoped and charged in addition to the monthly fee.
             </p>
           </div>
 

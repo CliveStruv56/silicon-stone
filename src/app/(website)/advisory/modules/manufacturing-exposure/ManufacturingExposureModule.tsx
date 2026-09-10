@@ -87,7 +87,7 @@ export function ManufacturingExposureModule({ coverage }: Props) {
             the model held 31, and nothing would have failed. */}
         <p>The tool scores {SUPPLY_CHAIN_NODES.length} named chokepoints across {NODE_TYPE_OPTIONS.length} layers — fabrication, materials, equipment, design, advanced packaging and the IP and EDA toolchain — against {SUPPLY_CHAIN_SCENARIOS.length} stress scenarios. The module takes the components, boards, cloud capacity and accelerators on your own bill of materials and resolves each one down to those layers, so that a supplier who looks diversified at assembly level is shown to sit on the same foundry, the same packaging route or the same controlled material as the alternative.</p>
         <p>It is most useful when a board or a customer has asked a question the tool cannot answer — which of these dependencies would genuinely stop us, what would we do about it, and what can we show we did.</p>
-        <p>Where your exposure is broader than manufacturing, the <Link href="/advisory/exposure-diagnostic" className="text-stone-teal underline underline-offset-4">Exposure Diagnostic</Link> is the wider review and this module folds into its scope.</p>
+        <p>If you need an overall picture of your AI systems and vendor evidence, the <Link href="/advisory/exposure-diagnostic" className="text-stone-teal underline underline-offset-4">Exposure Diagnostic</Link> establishes the estate and priorities. This specialist project investigates physical components and sub-tier suppliers in depth, with its own scope and fee.</p>
       </>}
       audience={<>
         <p className="text-xl text-text-primary">For operations, supply chain and procurement leaders whose products depend on chips they never buy directly.</p>
@@ -118,12 +118,11 @@ export function ManufacturingExposureModule({ coverage }: Props) {
       scope={<>
         <p className="font-semibold text-text-primary">A fixed quote for the scope you agree.</p>
         <p>The fee is set by the number of product lines and critical suppliers in scope, which is agreed with you before work begins. The free tool’s exposure snapshot is a good starting point for that conversation, if you have run it.</p>
-        <p>Modules are scoped additions. They can be taken on their own, added to an <Link href="/advisory/exposure-diagnostic" className="text-stone-teal underline underline-offset-4">Exposure Diagnostic</Link>, or folded into a <Link href="/advisory/drift-retainer" className="text-stone-teal underline underline-offset-4">Drift Retainer</Link>, where the quarterly exposure review keeps the map current as suppliers, scenarios and controls move.</p>
       </>}
       contact={{
         interest: offering.name,
         plausibleEvent: 'Engagement Enquiry',
-        heading: 'Enquire about this module',
+        heading: 'Discuss this project',
         intro: 'Tell us which product lines and suppliers matter most. We will confirm the scope and fee before any work begins.',
         messageLabel: 'What are you trying to establish?',
         messagePlaceholder: 'A supplier concentration, a component you cannot second-source, a customer question…',

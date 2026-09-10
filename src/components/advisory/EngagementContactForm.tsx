@@ -39,6 +39,7 @@ export function EngagementContactForm({
   messageLabel = 'Tell us about your situation',
   messagePlaceholder = 'What are you trying to decide? What has prompted this now?',
   trustItems = [],
+  showIntroBooking = true,
 }: {
   interest: string
   plausibleEvent: string
@@ -47,6 +48,8 @@ export function EngagementContactForm({
   messageLabel?: string
   messagePlaceholder?: string
   trustItems?: TrustItem[]
+  /** A paid Briefing enquiry must not imply the free intro books that session. */
+  showIntroBooking?: boolean
 }) {
   const formId = useId()
   const [formData, setFormData] = useState({
@@ -132,7 +135,7 @@ export function EngagementContactForm({
                   ? 'You’re offline — your message will send automatically when the connection returns.'
                   : 'Thank you for reaching out. We’ll review your enquiry and respond within 48 hours.'}
               </p>
-              {!formQueued && BOOKING_URL && (
+              {!formQueued && showIntroBooking && BOOKING_URL && (
                 <div className="mt-6">
                   <p className="mb-3 text-sm text-text-muted">
                     Don’t want to wait? Pick a time for your 25-minute conversation now.

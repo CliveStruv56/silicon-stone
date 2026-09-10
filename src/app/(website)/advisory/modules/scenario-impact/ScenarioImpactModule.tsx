@@ -121,12 +121,11 @@ export function ScenarioImpactModule({ coverage }: Props) {
       scope={<>
         <p className="font-semibold text-text-primary">A fixed quote for the scope you agree.</p>
         <p>The fee is set by the number of scenarios and business units in scope, which is agreed with you before work begins. The free tool’s board brief for your nearest lens is a good starting point for that conversation, if you have run it.</p>
-        <p>Modules are scoped additions. They can be taken on their own, added to an <Link href="/advisory/exposure-diagnostic" className="text-stone-teal underline underline-offset-4">Exposure Diagnostic</Link>, or folded into a <Link href="/advisory/drift-retainer" className="text-stone-teal underline underline-offset-4">Drift Retainer</Link>, where the indicators are watched for you and the figures are refreshed as the scenarios move.</p>
       </>}
       contact={{
         interest: offering.name,
         plausibleEvent: 'Engagement Enquiry',
-        heading: 'Enquire about this module',
+        heading: 'Discuss this project',
         intro: 'Tell us which scenarios worry you and which parts of the business they would reach. We will confirm the scope and fee before any work begins.',
         messageLabel: 'What are you trying to quantify?',
         messagePlaceholder: 'An export control, a supplier failure, a jurisdictional change…',

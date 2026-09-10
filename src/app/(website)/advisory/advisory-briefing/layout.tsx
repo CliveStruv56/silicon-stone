@@ -5,10 +5,10 @@ import { buildEngagementBreadcrumbSchema } from '@/lib/seo'
 import { ENGAGEMENTS } from '@/lib/offering'
 
 const description =
-  'One focused hour on your tool results and one specific question, with a written follow-up — and credited in full toward your first month on a Drift Retainer if you proceed within 30 days. The low-commitment way to test the water.'
+  'One AI system, one principal question. A review of your Compliance Checker result, a one-hour discussion and a written follow-up with priorities, evidence gaps and next actions.'
 
 export const metadata: Metadata = {
-  title: 'The Advisory Briefing — One Hour, One Question | Silicon and Stone',
+  title: 'Advisory Briefing — One AI System, One Question | Silicon and Stone',
   description,
   alternates: { canonical: '/advisory/advisory-briefing' },
   openGraph: { title: 'The Advisory Briefing', description, type: 'website' },

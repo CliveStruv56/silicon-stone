@@ -2,7 +2,38 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-09-10
-> Status: **Live in production at commit `8a20e438` (9 September 2026). Production build, full GitHub CI and five-page live link verification passed. Older test and audit counts remain dated history.**
+> Status: **Tools and specialist advisory positioning changes implemented and verified locally on 10 September; owner requested commit and push. Deployment of this revision is not yet verified. Previous production/deployment records below are dated history.**
+
+## Current work — standalone specialist projects and the Advisory Briefing
+
+The owner confirmed that tools should primarily lead to standalone specialist
+projects. No prior paid engagement is required. Retainer clients commission
+specialist work at a separately agreed project fee, additional to the monthly fee.
+
+The immediate focus is Compliance Checker → Advisory Briefing (£450). The agreed
+Briefing scope is one AI system and one principal question, prepared from the
+Checker result and brief business context, with a one-hour discussion and a short
+written follow-up. Supporting-document review, system/vendor-evidence verification
+and wider investigations are outside that fee and separately scoped. Further work
+is optional. The existing retainer credit remains a secondary term.
+
+Implemented: matching catalogue/page/metadata/enquiry copy; the Briefing as the
+primary human-help option beside the Checker result; paired free and paid links
+on Tools and the homepage, with the Checker first; standalone/separate-fee wording
+on module pages, Advisory and Pricing; earlier specialist discovery on Advisory.
+Names, prices, navigation, contact segmentation and assessment rules are unchanged.
+The Briefing form's success state no longer offers a free intro booking as though
+that booked the paid session.
+
+Validation: lint, typecheck and 42 targeted tests passed. Local browser checks
+covered the Tools → Checker → Briefing → enquiry-form links, desktop/mobile
+presentation and absence of page errors. Nine additional local routes returned
+200 with the expected scope language. No enquiries were submitted. Production
+build, CI and post-deployment checks were not part of the local validation.
+The owner subsequently requested commit and push.
+
+See [the implementation plan](docs/tools-specialist-advisory-plan.md). The previous
+handover below records the earlier deployed linking work, not this local revision.
 
 ## Start here — handover for 10 September 2026
 

@@ -250,12 +250,13 @@ export const ENGAGEMENTS: Offering[] = [
     id: 'advisory-briefing',
     name: 'Advisory Briefing',
     price: gbp(AMOUNTS.advisoryBriefing),
-    priceNote: 'one hour',
+    priceNote: 'one AI system · one hour',
     summary:
-      'A focused consultation on your tool results and one specific question, with a written follow-up. The low-commitment way to test the water.',
-    question: 'I need a read on this one thing.',
+      'One AI system, one principal question. A review of your Compliance Checker result, a one-hour discussion and a written follow-up with priorities, evidence gaps and next actions.',
+    question: 'What does this result mean for our AI system?',
     href: '/advisory/advisory-briefing',
     terms: [
+      'Includes preparation from your Checker result and brief business context. Supporting-document review and wider investigations are scoped separately.',
       'Credited in full toward your first month on the Drift Retainer if you proceed within 30 days.',
     ],
   },
@@ -340,7 +341,7 @@ export const FREE_INTRO_CONVERSATION: Offering = {
     'A conversation, not a working session — where you are, what has prompted the question, and which rung of the ladder actually fits. Free for the first ninety days.',
   href: '/advisory#contact',
   terms: [
-    `Distinct from the ${gbp(AMOUNTS.advisoryBriefing)} Advisory Briefing, which is an hour of work on your specific question with a written follow-up.`,
+    `Distinct from the ${gbp(AMOUNTS.advisoryBriefing)} Advisory Briefing: one AI system, one principal question, a one-hour discussion and a written follow-up.`,
   ],
 }
 
@@ -364,7 +365,8 @@ export const SISTER_PRODUCT: Offering = {
 }
 
 /**
- * Follow-on modules — scoped add-ons folded into a diagnostic or a retainer.
+ * Specialist advisory projects, available directly without a paid prerequisite.
+ * Work for retainer clients is separately scoped and charged at the project fee.
  * £3,500 is the floor: narrower in scope than a full engagement, above the
  * Exposure Diagnostic.
  *

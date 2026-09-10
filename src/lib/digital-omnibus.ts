@@ -20,7 +20,7 @@ export const OMNIBUS_HISTORY = [
 ] as const
 
 export const OMNIBUS_APPLICATIONS = [
-  { name: 'Advisory Briefing', href: '/advisory/advisory-briefing', question: 'What does this mean for one decision?', detail: 'A focused interpretation of a regulatory change, a vendor claim or a question about your EU exposure.' },
+  { name: 'Advisory Briefing', href: '/advisory/advisory-briefing', question: 'What does this mean for our AI system?', detail: 'One AI system and one principal question, grounded in your Compliance Checker result, with a one-hour discussion and written next steps.' },
   { name: 'Exposure Diagnostic', href: '/advisory/exposure-diagnostic', question: 'Where are we exposed?', detail: 'Examine your systems, vendor evidence and dependencies. European Procurement Readiness is included where relevant to the agreed scope.' },
   { name: 'Strategic Assessment', href: '/advisory/strategic-assessment', question: 'What should the board commit to?', detail: 'Translate requirements, procurement evidence gaps and regulatory uncertainty into investment priorities and an implementation roadmap. Where sovereignty is part of the decision, the scope extends to data flows, access, key custody and portability.' },
 ]

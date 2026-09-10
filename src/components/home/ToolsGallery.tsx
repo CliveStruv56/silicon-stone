@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { StaggerContainer, StaggerItem } from '@/components/ui/StaggerContainer'
 import { ForensicCard } from '@/components/ui/ForensicCard'
 import { Badge } from '@/components/ui/badge'
-import { offeringById } from '@/lib/offering'
+import { TOOL_JOURNEYS } from '@/lib/tool-journeys'
 import { ArrowRight } from 'lucide-react'
 
 /* Preview frames.
@@ -23,26 +23,26 @@ const PREVIEW_RATIO = 3168 / 1344
 /* ─── Tool Data ─────────────────────────────────────────────────── */
 const tools = [
   {
+    name: 'Compliance Checker',
+    scenario: 'The board asks about an AI system. Start with its likely classification and evidence gaps.',
+    tagline: 'Create a first-pass AI system record with likely obligations and questions for your vendor.',
+    href: '/tools/compliance-checker',
+    accent: 'amber' as const,
+    preview: '/tools/compliance-checker-preview.webp',
+    previewAlt:
+      'Isometric illustration: circuit traces run from a server rack out to four graded tiers — red and flagged with a warning symbol, amber, teal, then unlit grey — echoing the EU AI Act risk classes from prohibited down to minimal.',
+    journey: TOOL_JOURNEYS['compliance-checker'],
+  },
+  {
     name: 'Supply Chain Mapper',
-    scenario: 'A TSMC facility reports delays. You already know which products are exposed.',
+    scenario: 'A foundry reports delays. Where could the dependencies reach your industry?',
     tagline: 'Visualise semiconductor chokepoints and trace upstream dependency in real time.',
     href: '/tools/supply-chain-mapper',
     accent: 'teal' as const,
     preview: '/tools/supply-chain-mapper-preview.webp',
     previewAlt:
       'Isometric illustration: supply routes from a mine, a chemical plant and a container port converge on a single mountain pass marked with a red warning symbol, then continue to a semiconductor fabrication plant.',
-    takeFurther: offeringById('manufacturing-exposure'),
-  },
-  {
-    name: 'Compliance Checker',
-    scenario: 'Monday, 9:14am. The board asks: "Are we compliant?" You answer in 60 seconds.',
-    tagline: 'Classify your AI systems against the EU AI Act — before your auditor does.',
-    href: '/tools/compliance-checker',
-    accent: 'amber' as const,
-    preview: '/tools/compliance-checker-preview.webp',
-    previewAlt:
-      'Isometric illustration: circuit traces run from a server rack out to four graded tiers — red and flagged with a warning symbol, amber, teal, then unlit grey — echoing the EU AI Act risk classes from prohibited down to minimal.',
-    takeFurther: offeringById('advisory-briefing'),
+    journey: TOOL_JOURNEYS['supply-chain-mapper'],
   },
   {
     name: 'Scenario Modeler',
@@ -53,7 +53,7 @@ const tools = [
     preview: '/tools/scenario-modeler-preview.webp',
     previewAlt:
       'Isometric illustration: three coloured paths leave one office tower for three different futures — a fractured red plateau under a warning symbol, a cracked sandstone block, and intact teal ground carrying a smaller building.',
-    takeFurther: offeringById('scenario-impact'),
+    journey: TOOL_JOURNEYS['scenario-modeler'],
   },
   {
     name: 'Policy Stress-Test',
@@ -64,7 +64,7 @@ const tools = [
     preview: '/tools/policy-stress-test-preview.webp',
     previewAlt:
       'Isometric illustration: the US Capitol and a European institutional building sit on opposite sides of a deep rift, their green policy routes reaching the edge and stopping at red warning symbols rather than meeting.',
-    takeFurther: offeringById('regulatory-friction'),
+    journey: TOOL_JOURNEYS['policy-stress-test'],
   },
 ]
 
@@ -94,8 +94,9 @@ export function ToolsGallery() {
                 From Analysis to Action
               </h2>
               <p className="text-base text-text-muted leading-relaxed">
-                Four tools that solve high-stakes problems — calibrated against
-                the same intelligence the briefings draw from.
+                Explore your exposure with four free tools. When you need the
+                result interpreted or the analysis applied to your organisation,
+                commission the relevant advisory work directly.
               </p>
               <div className="mt-7 flex flex-col gap-3 sm:flex-row">
                 <Link
@@ -154,16 +155,22 @@ export function ToolsGallery() {
                     href={tool.href}
                     className={`inline-flex items-center gap-1.5 text-sm font-medium transition-colors ${tool.accent === 'amber' ? 'text-silicon-amber-strong hover:text-silicon-amber-strong/80' : 'text-stone-teal hover:text-stone-teal/80'}`}
                   >
-                    <span>Launch tool</span>
+                    <span>Use the free tool</span>
                     <ArrowRight className="w-4 h-4" />
                   </Link>
 
                   {/* Bridge — the paid next step */}
                   <Link
-                    href={tool.takeFurther.href}
-                    className="mt-4 pt-3 border-t border-dashed border-border-subtle/70 flex items-center gap-1.5 font-mono text-[12.5px] font-semibold tracking-[0.03em] text-text-muted transition-colors hover:text-text-primary"
+                    href={tool.journey.offering.href}
+                    className="mt-4 block rounded-sm border-t border-border-subtle pt-3 text-sm text-silicon-amber-strong hover:underline"
                   >
-                    <span>Take it further → {tool.takeFurther.name}</span>
+                    <span className="flex items-center gap-2 font-medium">
+                      {tool.journey.actionLabel}
+                      <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
+                    </span>
+                    <span className="mt-1.5 block text-xs text-text-muted">
+                      {tool.journey.offering.name} · {tool.journey.offering.price}
+                    </span>
                   </Link>
                 </ForensicCard>
               </StaggerItem>

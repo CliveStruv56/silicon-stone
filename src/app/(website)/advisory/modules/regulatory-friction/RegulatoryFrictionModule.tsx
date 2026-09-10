@@ -116,12 +116,11 @@ export function RegulatoryFrictionModule({ coverage }: Props) {
       scope={<>
         <p className="font-semibold text-text-primary">A fixed quote for the scope you agree.</p>
         <p>The fee is set by the entities, jurisdictions and operations in scope, which are agreed with you before work begins. The free tool’s stress-test brief for your industry is a good starting point for that conversation, if you have run it.</p>
-        <p>Modules are scoped additions. They can be taken on their own, added to an <Link href="/advisory/exposure-diagnostic" className="text-stone-teal underline underline-offset-4">Exposure Diagnostic</Link>, or folded into a <Link href="/advisory/drift-retainer" className="text-stone-teal underline underline-offset-4">Drift Retainer</Link>, where the calendar is kept current as dates and guidance move on both sides.</p>
       </>}
       contact={{
         interest: offering.name,
         plausibleEvent: 'Engagement Enquiry',
-        heading: 'Enquire about this module',
+        heading: 'Discuss this project',
         intro: 'Tell us which jurisdictions and operations are in scope. We will confirm the scope and fee before any work begins.',
         messageLabel: 'Where is the friction?',
         messagePlaceholder: 'Duplicated compliance work, a requirement blocking a launch, a transatlantic data question…',

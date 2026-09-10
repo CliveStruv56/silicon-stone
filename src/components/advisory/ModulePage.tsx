@@ -65,7 +65,7 @@ export function ModulePage({
         <section className="border-b border-border-subtle bg-slate-deep">
           <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
             <Badge variant="outline" className="mb-4 border-stone-teal text-stone-teal">
-              Follow-on module
+              Specialist advisory
             </Badge>
             <h1 className="mb-6 max-w-4xl text-4xl font-bold text-text-primary sm:text-5xl">{name}</h1>
             <p className="max-w-3xl text-xl leading-relaxed text-text-muted">{lead}</p>
@@ -75,18 +75,18 @@ export function ModulePage({
                 {/* The catalogue stores the bare tool name, because the tool
                     pages use it as a heading. The article belongs to the
                     sentence, not to the name. */}
-                Follows on from the{' '}
+                Explore the question first with the free{' '}
                 <Link href={fromTool.href} className="text-stone-teal underline underline-offset-4">
                   {fromTool.name}
                 </Link>
-                , which you can run yourself for nothing. This module is what happens when
-                you need the same question answered against your own estate.
+                . You can commission this specialist project directly, whether or not
+                you have used the tool.
               </p>
             )}
 
             <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3">
               <Button asChild size="lg" className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90">
-                <a href="#contact">Enquire about this module</a>
+                <a href="#contact">Discuss this project</a>
               </Button>
               <span className="font-mono text-lg font-semibold text-silicon-amber-strong">{price}</span>
             </div>
@@ -151,7 +151,11 @@ export function ModulePage({
               <h2 id="scope-heading" className="mb-3 text-2xl font-semibold text-text-primary">Scope and fee</h2>
               <p className="font-mono text-3xl font-semibold text-silicon-amber-strong">{price}</p>
             </div>
-            <div className="max-w-3xl space-y-4 leading-relaxed text-text-muted">{scope}</div>
+            <div className="max-w-3xl space-y-4 leading-relaxed text-text-muted">
+              <p>A standalone specialist engagement, scoped and priced after a free conversation. No previous paid engagement is required.</p>
+              {scope}
+              <p>For <Link href="/advisory/drift-retainer" className="text-stone-teal underline underline-offset-4">Drift Retainer</Link> clients, this project is separately scoped and charged at the agreed project fee. It is additional to the monthly retainer.</p>
+            </div>
           </div>
         </section>
 
