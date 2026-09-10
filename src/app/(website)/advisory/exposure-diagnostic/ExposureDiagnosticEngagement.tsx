@@ -37,7 +37,9 @@ export function ExposureDiagnosticEngagement({ coverage }: Props) {
         body: 'The Exposure Diagnostic connects those questions into a clear picture of your AI estate, so you can see which dependencies could constrain the business and where to act first.',
         inShort: 'A scoped review of your systems, vendor evidence and dependencies, with a written report and prioritised actions.',
         ctaLabel: 'Request a diagnostic',
-        imageSrc: '/advisory/exposure-diagnostic.webp',
+        // Versioned filename: a replacement under the same name sat behind
+        // browser and image-optimizer caches. Rename on every replacement.
+        imageSrc: '/advisory/exposure-diagnostic-v2.webp',
         imageAlt: 'An isometric walled sandstone yard on a slate slab, stone blocks laid out like components with teal traces between them; one amber trace runs through the grid to a single cracked block glowing from within, past a brass lens on a stand at the gate',
         imageCaption: 'Trace the dependencies. Examine the evidence. Set priorities.',
       }}
