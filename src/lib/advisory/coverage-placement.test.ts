@@ -15,7 +15,7 @@ const ROOT = process.cwd()
 describe('coverage placements', () => {
   it('offers every module and every engagement with a page of its own', () => {
     const values = COVERAGE_PLACEMENTS.map(p => p.value)
-    for (const module of MODULES) expect(values).toContain(module.id)
+    for (const offeringModule of MODULES) expect(values).toContain(offeringModule.id)
     for (const engagement of ENGAGEMENTS) {
       if (engagement.href.includes('#')) expect(values, engagement.id).not.toContain(engagement.id)
       else expect(values, engagement.id).toContain(engagement.id)
