@@ -2,7 +2,7 @@
 
 import { motion, useReducedMotion } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
-import { WAYMARKPATH_CAPABILITIES } from '@/lib/waymarkpath'
+import { WAYMARKPATH_CAPABILITIES, WAYMARKPATH_POSITIONING } from '@/lib/waymarkpath'
 import { STAGE_VISUALS } from './stage-visuals'
 import styles from './waymarkpath.module.css'
 
@@ -21,7 +21,7 @@ export function FlowRibbon({ className = '', expanded = false }: { className?: s
     return (
       <div className={`${styles.theme} ${styles.ribbon} ${className}`}>
         <div className={styles.ribbonIntro}>
-          <h2>Your next chapter, step by step</h2>
+          <h2>{WAYMARKPATH_POSITIONING.stagesHeading}</h2>
           <span>Seven stages. One shared picture of you.</span>
         </div>
         <div className={styles.ribbonRoute}>

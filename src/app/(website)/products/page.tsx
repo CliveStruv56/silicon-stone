@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { StaggerContainer, StaggerItem } from '@/components/ui/StaggerContainer'
 import { FlowRibbon } from '@/components/waymarkpath'
+import { WAYMARKPATH_POSITIONING } from '@/lib/waymarkpath'
 import {
   Shield,
   ClipboardCheck,
@@ -298,12 +299,11 @@ export default function ProductsPage() {
                         <h2 id="sister-heading" className="text-2xl font-bold text-text-primary">
                           WaymarkPath
                         </h2>
+                        <p className="mt-3 max-w-2xl text-lg font-medium leading-relaxed text-text-primary">
+                          {WAYMARKPATH_POSITIONING.headline}
+                        </p>
                         <p className="mt-2 max-w-2xl text-text-muted leading-relaxed">
-                          The career-transition companion for the individual
-                          professional navigating the same shifts these products
-                          address at company level. Most tools solve one piece of
-                          a career change; these seven stages share the same
-                          context, so what one settles the next one already knows.
+                          {WAYMARKPATH_POSITIONING.panelDescription}
                         </p>
 
                         <FlowRibbon className="mt-6 max-w-2xl" />

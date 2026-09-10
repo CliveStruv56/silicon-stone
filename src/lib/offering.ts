@@ -33,6 +33,8 @@
  * written record of what is on sale and why.
  */
 
+import { WAYMARKPATH_POSITIONING } from './waymarkpath'
+
 /**
  * The raw figures, in pounds. Everything displayed anywhere is derived from
  * these — nothing else in the codebase should contain a price as a number or
@@ -357,8 +359,7 @@ export const SISTER_PRODUCT: Offering = {
   name: 'WaymarkPath',
   price: 'Free',
   priceNote: 'early access · no paid tier published',
-  summary:
-    'The career-transition companion for the individual professional navigating the same shifts these products address at company level. Seven stages that share one context, so what each settles the next already knows.',
+  summary: `${WAYMARKPATH_POSITIONING.headline} ${WAYMARKPATH_POSITIONING.panelDescription}`,
   href: '/waymarkpath',
 }
 

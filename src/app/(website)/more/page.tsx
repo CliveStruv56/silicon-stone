@@ -51,7 +51,7 @@ const sections = [
   {
     name: 'WaymarkPath',
     href: '/waymarkpath',
-    description: 'The sister product — career transition for the individual professional.',
+    description: 'The sister product — AI awareness, skills and career development.',
     icon: Compass,
   },
   {

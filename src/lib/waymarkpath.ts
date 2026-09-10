@@ -17,6 +17,18 @@
  * them, where they are visible to anyone editing it.
  */
 
+/** Shared positioning for the standalone page and sister-product panels. */
+export const WAYMARKPATH_POSITIONING = {
+  headline: 'Build the AI awareness and skills to move forward in your career.',
+  description:
+    'AI is reshaping work across roles and industries. WaymarkPath helps you take stock of your experience, identify the skills to develop next, and turn those priorities into a practical learning and career plan—whether you want to grow in your current role, take on new responsibilities or change direction.',
+  panelDescription:
+    'Identify the strengths you already bring, the skills to develop next and the practical steps towards your career goals—in your current role or a new one.',
+  stagesHeading: 'Seven connected stages of your career development',
+  metaDescription:
+    'Build AI awareness and the skills to progress in your career. Take stock of your strengths, prioritise learning and plan your next steps with WaymarkPath.',
+} as const
+
 export type WaymarkPathCapabilityId =
   | 'profile'
   | 'skills'
@@ -49,7 +61,7 @@ export const WAYMARKPATH_CAPABILITIES: readonly WaymarkPathCapability[] = [
     step: '01',
     name: 'Profile & Goals',
     short: 'Profile',
-    summary: 'Set your target role, timeline and priorities.',
+    summary: 'Set your career goals, timeline and priorities.',
     promise: 'Where you are, and where you intend to be.',
     detail:
       'A guided intake that fixes the target role, the timeline and the constraints you are actually working under. Target roles resolve against ESCO occupations rather than free text, so everything downstream compares like with like.',
@@ -60,10 +72,10 @@ export const WAYMARKPATH_CAPABILITIES: readonly WaymarkPathCapability[] = [
     step: '02',
     name: 'Skills Inventory',
     short: 'Skills',
-    summary: 'Discover the experience you can take into a new role.',
+    summary: 'Discover the strengths you can build on as your role evolves.',
     promise: 'What you already bring, at the level you bring it.',
     detail:
-      'Your existing skills catalogued with proficiency and years behind them. This is the half most people underestimate: a transition rarely fails because the skills are absent, but because nobody has written them down in terms the target role recognises.',
+      'Your existing skills catalogued with proficiency and experience. See how your strengths line up with the requirements of the role you want to develop in, whether that is your current role or a new one.',
     feeds: ['gaps'],
   },
   {
@@ -71,7 +83,7 @@ export const WAYMARKPATH_CAPABILITIES: readonly WaymarkPathCapability[] = [
     step: '03',
     name: 'Gap Analysis',
     short: 'Gaps',
-    summary: 'Find the skills that stand between you and your next role.',
+    summary: 'Find the skills to develop next for your career goals.',
     promise: 'The distance between the two, ranked.',
     detail:
       'Your inventory compared against what the target occupation requires, splitting the result into transferable strengths and genuine gaps, each with a priority. It reads across ESCO and O*NET, so a European skills profile still lines up against US job-market vocabulary.',
@@ -85,7 +97,7 @@ export const WAYMARKPATH_CAPABILITIES: readonly WaymarkPathCapability[] = [
     summary: 'Turn your priority gaps into achievable milestones.',
     promise: 'What to close first, and what can wait.',
     detail:
-      'The ranked gaps become a sequence with milestones and progress tracking, rather than a reading list. Priority comes from the gap analysis, so effort goes to the shortfalls that actually block the move.',
+      'The ranked gaps become a sequence with milestones and progress tracking, rather than a reading list. Priority comes from the gap analysis, so effort goes to the shortfalls that matter most to your development.',
     feeds: ['checkins'],
   },
   {
@@ -118,7 +130,7 @@ export const WAYMARKPATH_CAPABILITIES: readonly WaymarkPathCapability[] = [
     summary: 'Keep moving with a coach who knows your goals.',
     promise: 'The part that makes the other six survive contact with a working week.',
     detail:
-      'A short daily conversation with a coach that has your goals, your gaps and your live applications in front of it — so it does not start cold each time. Commitments and streaks are the accountability layer that career changers otherwise pay a coach by the hour for.',
+      'A short daily conversation with a coach that has your goals, your gaps and your live applications in front of it — so it does not start cold each time. Commitments and streaks help you keep learning and career development part of your working week.',
     feeds: ['gaps'],
   },
 ] as const
@@ -161,7 +173,7 @@ export const WAYMARKPATH_PROOF = [
   },
   {
     label: 'Built for',
-    value: 'Mid-career change',
-    note: 'Not job search with extra steps. The assumption throughout is that the target role is not the one you currently hold.',
+    value: 'Every career stage',
+    note: 'Support for growing in your current role, taking on new responsibilities or changing direction.',
   },
 ] as const

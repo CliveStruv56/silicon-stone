@@ -5,7 +5,7 @@ import { ArrowRight } from 'lucide-react'
 import { Header, Footer } from '@/components/layout'
 import { Badge } from '@/components/ui/badge'
 import { ConnectedSystem, FlowRibbon, WaymarkPathSignup } from '@/components/waymarkpath'
-import { WAYMARKPATH_PROOF } from '@/lib/waymarkpath'
+import { WAYMARKPATH_POSITIONING, WAYMARKPATH_PROOF } from '@/lib/waymarkpath'
 
 /**
  * The WaymarkPath page.
@@ -22,36 +22,35 @@ import { WAYMARKPATH_PROOF } from '@/lib/waymarkpath'
  */
 
 export const metadata: Metadata = {
-  title: 'WaymarkPath — Career Navigation for the AI Shift | Silicon and Stone',
-  description:
-    'A career-transition companion for mid-career professionals: skills measured against ESCO, gaps ranked, a CV that clears the filters, and a coach that carries your history.',
+  title: 'WaymarkPath — AI Awareness and Career Development | Silicon and Stone',
+  description: WAYMARKPATH_POSITIONING.metaDescription,
   alternates: { canonical: '/waymarkpath' },
 }
 
 const FRICTIONS = [
   {
-    title: 'Which experience actually transfers',
-    body: 'Twenty years of work does not come labelled for the role you are moving into. Most of it transfers. The difficulty is establishing which parts, in the vocabulary the target role recognises.',
+    title: 'Which strengths to build on',
+    body: 'As your role changes, it can be hard to see which parts of your experience matter most. Taking stock gives you a starting point for building new skills and taking on new responsibilities.',
   },
   {
     title: 'What to learn first',
-    body: 'There is more available training than there is time. Without a ranking, effort goes to whatever is nearest to hand rather than to whatever is actually blocking the move.',
+    body: 'There is more available training than there is time. Without a ranking, effort goes to whatever is nearest to hand rather than to the skills that matter most to your goals.',
   },
   {
     title: 'Why applications go unanswered',
-    body: 'Most applications are filtered before a person reads them. A CV can be accurate, well written and still fail on formatting the applicant never gets to see.',
+    body: 'When you are ready to apply for a new role, your CV needs to work for both people and screening systems. Formatting problems can stop relevant experience from reaching the person who needs to see it.',
   },
   {
     title: 'What holds it together over months',
-    body: 'A transition runs across months of ordinary working weeks. Human coaching is the usual answer to that, at an hourly rate that rules it out for most of the people who need it.',
+    body: 'Career development has to fit around your everyday work. A practical plan, clear priorities and regular check-ins help you keep making progress as your responsibilities change.',
   },
 ]
 
 const AUDIENCE = [
-  'Directors considering a pivot',
-  'Managers upskilling into AI roles',
-  'Technical leads moving to strategy',
-  'Anyone 35–55 navigating career change',
+  'Employees building AI awareness',
+  'People growing in their current role',
+  'Professionals taking on new responsibilities',
+  'Anyone considering a career change',
 ]
 
 export default function WaymarkPathPage() {
@@ -74,14 +73,11 @@ export default function WaymarkPathPage() {
               </div>
 
               <h1 className="mb-6 text-4xl font-bold leading-tight text-text-primary sm:text-5xl lg:text-[3.4rem]">
-                Seven stages of a career change, working from one set of facts
-                about you.
+                {WAYMARKPATH_POSITIONING.headline}
               </h1>
 
               <p className="mb-4 text-xl leading-relaxed text-text-muted">
-                A transition companion for mid-career professionals. It catalogues
-                what you already have, measures it against what the target role
-                requires, and keeps the plan alive through the months that takes.
+                {WAYMARKPATH_POSITIONING.description}
               </p>
 
               <p className="mb-9 leading-relaxed text-text-muted">
@@ -123,11 +119,11 @@ export default function WaymarkPathPage() {
           <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8 lg:py-16">
             <div className="mb-10 max-w-2xl">
               <h2 className="mb-4 text-3xl font-bold text-text-primary">
-                Career changes rarely fail for lack of effort
+                Career progress takes more than effort
               </h2>
               <p className="text-lg leading-relaxed text-text-muted">
-                They fail on four specific unknowns, and none of them resolve by
-                trying harder.
+                Knowing your strengths, choosing what to learn and finding time
+                to act are challenges at every career stage.
               </p>
             </div>
 
