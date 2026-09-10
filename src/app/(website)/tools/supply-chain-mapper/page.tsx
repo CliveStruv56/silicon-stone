@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -121,6 +121,14 @@ export default function SupplyChainMapperPage() {
     sourcingFlexibility: 'single-source',
     geography: 'europe',
   })
+
+  /* The node detail opens under the map, full width, so a click on the map or
+     the Top Exposure list can land the panel below the fold. `nearest` scrolls
+     only when it is actually out of view. */
+  const detailRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (selectedNode) detailRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  }, [selectedNode])
 
   const handleSelectNode = useCallback((node: SupplyChainNode) => {
     setSelectedNode(node)
@@ -435,8 +443,8 @@ export default function SupplyChainMapperPage() {
             </Card>
           </div>
 
-          {/* Filters */}
-          <div className="mb-6">
+          {/* Filters — one plain row sitting directly on the map */}
+          <div className="mb-3 px-1">
             <MapFilters
               activeNodeTypes={activeNodeTypes}
               activeRiskLevels={activeRiskLevels}
@@ -511,18 +519,53 @@ export default function SupplyChainMapperPage() {
                 </CardContent>
               </Card>
 
-              <AnimatePresence mode="wait">
-                {selectedNode ? (
+              <AnimatePresence>
+                {!selectedNode && (
                   <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    key={selectedNode.id}
-                    className="space-y-4"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    /* No `h-full`. This sits *below* the Top Exposure Nodes card
+                       inside a grid column that stretches to the 600px map beside
+                       it, so `height: 100%` resolved to the whole column rather
+                       than the space left under that card — and the panel
+                       overflowed its column by exactly the card's height, landing
+                       on top of the Exposure Report Snapshot below. `min-h`
+                       gives it presence without claiming height it does not have.
+                       (The selected-node detail no longer lives in this column at
+                       all — it renders full width under the map, below.) */
+                    className="flex items-center justify-center text-center p-8 border border-dashed border-border-subtle rounded-xl text-text-muted min-h-[300px]"
                   >
-                    <Card className="bg-stone-charcoal border-border-subtle">
-                      <CardHeader className="pb-2">
-                        <div className="flex justify-between items-start">
+                    <div>
+                      <Network className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      <p className="text-xl mb-2">Select a Node</p>
+                      <p className="text-sm">
+                        Click on any supply chain node on the map to analyse its strategic significance and dependencies.
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+
+          {/* Node detail — full width under the map, laid out in columns so it
+              reads across rather than down. It used to sit under the Top
+              Exposure list in the sidebar, which left the whole left column
+              empty beneath the map once a node was selected. */}
+          <div ref={detailRef} className="scroll-mt-24">
+            <AnimatePresence mode="wait">
+              {selectedNode && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  key={selectedNode.id}
+                  className="mt-6"
+                >
+                  <Card className="bg-stone-charcoal border-border-subtle">
+                    <CardHeader className="pb-2">
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
                           <Badge
                             className="w-fit mb-2"
                             style={{
@@ -533,25 +576,29 @@ export default function SupplyChainMapperPage() {
                           >
                             {selectedNode.risk} Risk
                           </Badge>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setSelectedNode(null)}
-                            className="h-6 w-6 text-text-muted hover:text-text-primary"
-                          >
-                            <X className="w-4 h-4" />
-                          </Button>
+                          <CardTitle className="text-xl text-text-primary">{selectedNode.name}</CardTitle>
+                          <div className="mt-1 flex items-center gap-2 text-text-muted font-mono text-sm">
+                            <div
+                              className="w-3 h-3 rounded-full"
+                              style={{ backgroundColor: NODE_COLORS[selectedNode.type] }}
+                            />
+                            {selectedNode.type} &middot; {selectedNode.country}
+                          </div>
                         </div>
-                        <CardTitle className="text-xl text-text-primary">{selectedNode.name}</CardTitle>
-                        <div className="flex items-center gap-2 text-text-muted font-mono text-sm">
-                          <div
-                            className="w-3 h-3 rounded-full"
-                            style={{ backgroundColor: NODE_COLORS[selectedNode.type] }}
-                          />
-                          {selectedNode.type} &middot; {selectedNode.country}
-                        </div>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setSelectedNode(null)}
+                          aria-label="Close node detail"
+                          className="h-6 w-6 shrink-0 text-text-muted hover:text-text-primary"
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="grid gap-6 lg:grid-cols-3">
+                      {/* Column 1: what it is and how exposed you are */}
+                      <div className="space-y-4">
                         <div>
                           <h4 className="text-sm font-semibold text-text-muted uppercase tracking-wider mb-2">
                             Analysis
@@ -600,7 +647,10 @@ export default function SupplyChainMapperPage() {
                             ))}
                           </div>
                         )}
+                      </div>
 
+                      {/* Column 2: what happens if it fails and what to do */}
+                      <div className="space-y-4">
                         <div className="bg-alert-red/10 border border-alert-red/20 p-4 rounded-lg">
                           <h4 className="text-sm font-semibold text-alert-red uppercase tracking-wider mb-2 flex items-center gap-2">
                             <AlertTriangle className="w-4 h-4" />
@@ -641,7 +691,10 @@ export default function SupplyChainMapperPage() {
                             </ul>
                           </div>
                         )}
+                      </div>
 
+                      {/* Column 3: what to ask, watch, and where it sits in the chain */}
+                      <div className="space-y-4">
                         {selectedNode.supplierQuestions && (
                           <div>
                             <h4 className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-silicon-amber-strong">
@@ -674,6 +727,64 @@ export default function SupplyChainMapperPage() {
                           </div>
                         )}
 
+                        {(upstreamNodes.length > 0 || downstreamNodes.length > 0) && (
+                          <div>
+                            <h4 className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-text-muted">
+                              <Network className="w-4 h-4 text-stone-teal" />
+                              Supply Chain Position
+                            </h4>
+                            <div className="space-y-4">
+                              {upstreamNodes.length > 0 && (
+                                <div>
+                                  <div className="flex items-center gap-2 text-xs text-text-muted mb-2">
+                                    <ArrowRight className="w-3 h-3" />
+                                    Depends On
+                                  </div>
+                                  <div className="flex flex-wrap gap-2">
+                                    {upstreamNodes.map(node => (
+                                      <button
+                                        key={node.id}
+                                        onClick={() => handleSelectNode(node)}
+                                        className="flex items-center gap-1.5 px-2 py-1 bg-surface-elevated rounded text-xs text-text-primary hover:bg-stone-teal/20 transition-colors"
+                                      >
+                                        <div
+                                          className="w-2 h-2 rounded-full"
+                                          style={{ backgroundColor: NODE_COLORS[node.type] }}
+                                        />
+                                        {node.name}
+                                      </button>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              {downstreamNodes.length > 0 && (
+                                <div>
+                                  <div className="flex items-center gap-2 text-xs text-text-muted mb-2">
+                                    <ArrowLeft className="w-3 h-3" />
+                                    Supplies To
+                                  </div>
+                                  <div className="flex flex-wrap gap-2">
+                                    {downstreamNodes.map(node => (
+                                      <button
+                                        key={node.id}
+                                        onClick={() => handleSelectNode(node)}
+                                        className="flex items-center gap-1.5 px-2 py-1 bg-surface-elevated rounded text-xs text-text-primary hover:bg-stone-teal/20 transition-colors"
+                                      >
+                                        <div
+                                          className="w-2 h-2 rounded-full"
+                                          style={{ backgroundColor: NODE_COLORS[node.type] }}
+                                        />
+                                        {node.name}
+                                      </button>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
                         <div className="border-t border-border-subtle pt-3">
                           <div className="mb-2 flex items-center justify-between text-xs text-text-muted">
                             <span>Evidence</span>
@@ -698,96 +809,12 @@ export default function SupplyChainMapperPage() {
                             <p className="text-xs text-text-muted">Curated Silicon & Stone assessment. Source references pending detailed review.</p>
                           )}
                         </div>
-                      </CardContent>
-                    </Card>
-
-                    {/* Dependencies */}
-                    {(upstreamNodes.length > 0 || downstreamNodes.length > 0) && (
-                      <Card className="bg-stone-charcoal border-border-subtle">
-                        <CardHeader className="pb-2">
-                          <CardTitle className="text-sm text-text-muted uppercase tracking-wider flex items-center gap-2">
-                            <Network className="w-4 h-4 text-stone-teal" />
-                            Supply Chain Position
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                          {upstreamNodes.length > 0 && (
-                            <div>
-                              <div className="flex items-center gap-2 text-xs text-text-muted mb-2">
-                                <ArrowRight className="w-3 h-3" />
-                                Depends On
-                              </div>
-                              <div className="flex flex-wrap gap-2">
-                                {upstreamNodes.map(node => (
-                                  <button
-                                    key={node.id}
-                                    onClick={() => handleSelectNode(node)}
-                                    className="flex items-center gap-1.5 px-2 py-1 bg-surface-elevated rounded text-xs text-text-primary hover:bg-stone-teal/20 transition-colors"
-                                  >
-                                    <div
-                                      className="w-2 h-2 rounded-full"
-                                      style={{ backgroundColor: NODE_COLORS[node.type] }}
-                                    />
-                                    {node.name}
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {downstreamNodes.length > 0 && (
-                            <div>
-                              <div className="flex items-center gap-2 text-xs text-text-muted mb-2">
-                                <ArrowLeft className="w-3 h-3" />
-                                Supplies To
-                              </div>
-                              <div className="flex flex-wrap gap-2">
-                                {downstreamNodes.map(node => (
-                                  <button
-                                    key={node.id}
-                                    onClick={() => handleSelectNode(node)}
-                                    className="flex items-center gap-1.5 px-2 py-1 bg-surface-elevated rounded text-xs text-text-primary hover:bg-stone-teal/20 transition-colors"
-                                  >
-                                    <div
-                                      className="w-2 h-2 rounded-full"
-                                      style={{ backgroundColor: NODE_COLORS[node.type] }}
-                                    />
-                                    {node.name}
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </CardContent>
-                      </Card>
-                    )}
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    /* No `h-full`. This sits *below* the Top Exposure Nodes card
-                       inside a grid column that stretches to the 600px map beside
-                       it, so `height: 100%` resolved to the whole column rather
-                       than the space left under that card — and the panel
-                       overflowed its column by exactly the card's height, landing
-                       on top of the Exposure Report Snapshot below. `min-h`
-                       gives it presence without claiming height it does not have.
-                       The selected-node branch above is plain `space-y-4`; the
-                       two disagreeing is what gave it away. */
-                    className="flex items-center justify-center text-center p-8 border border-dashed border-border-subtle rounded-xl text-text-muted min-h-[300px]"
-                  >
-                    <div>
-                      <Network className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                      <p className="text-xl mb-2">Select a Node</p>
-                      <p className="text-sm">
-                        Click on any supply chain node on the map to analyse its strategic significance and dependencies.
-                      </p>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           <Card className="mt-6 bg-stone-charcoal border-border-subtle">

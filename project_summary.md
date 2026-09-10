@@ -720,6 +720,26 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### September 10, 2026 (night) — Supply Chain Mapper: filters as a plain row, node detail opens across
+
+Two owner-requested layout changes on `/tools/supply-chain-mapper`. The filter
+panel (`MapFilters.tsx`) was a bordered card with three stacked rows of pill
+buttons; it is now one unboxed row directly above the map — a small icon and a
+word per group ("Node types", "Risk", "Connections"), then the toggles as plain
+text with a colour dot (a ring for risk levels, matching how the map draws
+them). Inactive toggles strike through; every toggle carries `aria-pressed`;
+"Reset" appears only when something is filtered. The node detail used to stack
+under the Top Exposure list in the right-hand column, so selecting a node
+produced a very tall sidebar and an empty left column beneath the 600px map.
+It now renders full width under the map as one card in three columns —
+analysis/position/scores/risk bars; failure impact/lead time/substitutability/
+mitigation; supplier questions/signals/supply-chain position/evidence — with
+the "Supply Chain Position" card folded in as a section. A `useEffect` scrolls
+the panel into view (`block: 'nearest'`, so only when it is actually below the
+fold) on selection; the "Select a Node" placeholder stays in the sidebar only
+while nothing is selected. Verified with Puppeteer at 1440px and 400px; no
+horizontal overflow at phone width.
+
 ### September 10, 2026 (evening) — Articles placed under offerings from Studio
 
 `article.appearsUnder` ("Show under offerings", Content group, checkbox grid)
