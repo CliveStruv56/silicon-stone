@@ -16,9 +16,12 @@ type Props = {
 }
 
 /**
- * Published coverage sitting under a paid offer — the evidence that the
- * subject is one the publication actually works in, rather than a service
- * page written from the outside.
+ * Published pieces sitting under a paid offer — the evidence that the subject
+ * is one the publication actually works in, rather than a service page written
+ * from the outside. Headed "Further reading", never "coverage this draws on":
+ * the work draws on the accumulated knowledge base, and the owner does not
+ * want the strip to read as if the engagement were assembled from four
+ * articles.
  *
  * The lists are typed into each page for now. The intended source is a field
  * on the Sanity `article` document saying which offers a piece should appear
@@ -35,7 +38,10 @@ export function RelatedCoverage({ articles, more }: Props) {
     <section aria-labelledby="coverage-heading" className="border-t border-border-subtle">
       <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
         <div className="mb-8 flex flex-wrap items-baseline justify-between gap-4">
-          <h2 id="coverage-heading" className="text-2xl font-semibold text-text-primary">Coverage this draws on</h2>
+          {/* Not "coverage this draws on": the engagement draws on the
+              accumulated knowledge base, and these pieces are evidence of the
+              field, not its sources. The heading must not imply otherwise. */}
+          <h2 id="coverage-heading" className="text-2xl font-semibold text-text-primary">Further reading on this topic</h2>
           {more && (
             <Link href={more.href} className="inline-flex items-center gap-1 text-sm font-medium text-stone-teal underline underline-offset-4">
               {more.label}

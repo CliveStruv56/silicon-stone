@@ -738,7 +738,9 @@ questionnaire and S&S supports the conversation; no page or week counts; the
 scope floor stays unquantified; a written report, the register as a spreadsheet
 and a 30-day follow-up call are promised.
 
-New `RelatedCoverage` strip ("Coverage this draws on") sits after the enquiry
+New `RelatedCoverage` strip ("Further reading on this topic" — retitled the
+same day at the owner's request, because "coverage this draws on" read as if
+the engagement were sourced from four articles) sits after the enquiry
 form on all three module pages, each with four published articles and a
 category link, all slugs verified against production. The lists are typed into
 the pages for now. **Next step, owner-requested:** a field on the Sanity
