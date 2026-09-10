@@ -6,10 +6,47 @@ import type {
   ExposureDependency,
   ExposureProfile,
   ExposureSector,
+  SourcingFlexibility,
+  ExposureGeography,
   FrictionLevel,
   Scenario,
   SectorImpact,
 } from '@/types/scenario'
+
+/**
+ * The exposure-lens options, exported so the Scenario Impact module page can
+ * read the lens's size from the same lists the tool renders. Labels are what
+ * the selects show; add an option here and both pages follow.
+ */
+export const SECTOR_OPTIONS: Array<{ value: ExposureSector; label: string }> = [
+  { value: 'industrial', label: 'Industrial' },
+  { value: 'automotive', label: 'Automotive' },
+  { value: 'ai-cloud', label: 'AI / Cloud' },
+  { value: 'healthcare', label: 'Healthcare' },
+  { value: 'financial-services', label: 'Financial Services' },
+  { value: 'consumer-tech', label: 'Consumer Tech' },
+]
+
+export const GEOGRAPHY_OPTIONS: Array<{ value: ExposureGeography; label: string }> = [
+  { value: 'europe', label: 'Europe' },
+  { value: 'north-america', label: 'North America' },
+  { value: 'asia', label: 'Asia' },
+  { value: 'global', label: 'Global' },
+]
+
+export const DEPENDENCY_OPTIONS: Array<{ value: ExposureDependency; label: string }> = [
+  { value: 'advanced-chips', label: 'Advanced chips' },
+  { value: 'cloud-ai', label: 'Cloud / AI compute' },
+  { value: 'regulated-ai', label: 'Regulated AI' },
+  { value: 'connected-products', label: 'Connected products' },
+  { value: 'data-services', label: 'Data services' },
+]
+
+export const SOURCING_OPTIONS: Array<{ value: SourcingFlexibility; label: string }> = [
+  { value: 'single-source', label: 'Single-source' },
+  { value: 'dual-source', label: 'Dual-source' },
+  { value: 'diversified', label: 'Diversified' },
+]
 
 export const DEFAULT_EXPOSURE_PROFILE: ExposureProfile = {
   sector: 'industrial',

@@ -12,7 +12,11 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   DEFAULT_EXPOSURE_PROFILE,
+  DEPENDENCY_OPTIONS,
+  GEOGRAPHY_OPTIONS,
   SCENARIOS,
+  SECTOR_OPTIONS,
+  SOURCING_OPTIONS,
   FRICTION_COLORS,
   SEVERITY_COLORS,
   SEVERITY_TEXT_COLORS,
@@ -24,15 +28,7 @@ import {
 } from '@/lib/scenario-data'
 import { scenarioModelerMarkdown, scenarioCompareMarkdown } from '@/lib/tools-markdown'
 import { offeringById } from '@/lib/offering'
-import type {
-  ExposureDependency,
-  ExposureGeography,
-  ExposureProfile,
-  ExposureSector,
-  Scenario,
-  SectorImpact,
-  SourcingFlexibility,
-} from '@/types/scenario'
+import type { ExposureProfile, Scenario, SectorImpact } from '@/types/scenario'
 import {
   AlertTriangle,
   TrendingDown,
@@ -50,36 +46,6 @@ import {
   GitCompareArrows,
   Sparkles,
 } from 'lucide-react'
-
-const SECTOR_OPTIONS: Array<{ value: ExposureSector; label: string }> = [
-  { value: 'industrial', label: 'Industrial' },
-  { value: 'automotive', label: 'Automotive' },
-  { value: 'ai-cloud', label: 'AI / Cloud' },
-  { value: 'healthcare', label: 'Healthcare' },
-  { value: 'financial-services', label: 'Financial Services' },
-  { value: 'consumer-tech', label: 'Consumer Tech' },
-]
-
-const GEOGRAPHY_OPTIONS: Array<{ value: ExposureGeography; label: string }> = [
-  { value: 'europe', label: 'Europe' },
-  { value: 'north-america', label: 'North America' },
-  { value: 'asia', label: 'Asia' },
-  { value: 'global', label: 'Global' },
-]
-
-const DEPENDENCY_OPTIONS: Array<{ value: ExposureDependency; label: string }> = [
-  { value: 'advanced-chips', label: 'Advanced chips' },
-  { value: 'cloud-ai', label: 'Cloud / AI compute' },
-  { value: 'regulated-ai', label: 'Regulated AI' },
-  { value: 'connected-products', label: 'Connected products' },
-  { value: 'data-services', label: 'Data services' },
-]
-
-const SOURCING_OPTIONS: Array<{ value: SourcingFlexibility; label: string }> = [
-  { value: 'single-source', label: 'Single-source' },
-  { value: 'dual-source', label: 'Dual-source' },
-  { value: 'diversified', label: 'Diversified' },
-]
 
 const FOLLOW_ON_MODULE = offeringById('scenario-impact')
 

@@ -5,7 +5,7 @@ import { buildEngagementBreadcrumbSchema } from '@/lib/seo'
 import { MODULES } from '@/lib/offering'
 
 const description =
-  'Geopolitical scenarios built for your industry and geography, with value at stake quantified by business unit, cascade effects mapped and early warning indicators set. The follow-on module to the free Scenario Modeler.'
+  'Geopolitical scenarios built for your business, with revenue and margin at risk quantified by business unit as stated ranges, cascades mapped, early-warning indicators owned, and a board brief per scenario. The follow-on module to the free Scenario Modeler.'
 
 export const metadata: Metadata = {
   title: 'Scenario Impact Analysis — Value at Stake by Business Unit | Silicon and Stone',

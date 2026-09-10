@@ -720,6 +720,28 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### September 10, 2026 (last) — Scenario Impact Analysis page given the substance of its price
+
+Second module page filled to the Manufacturing Exposure pattern, on the
+owner's "defaults" to sixteen scoping questions: fee driven by scenarios ×
+business units, no duration stated, revenue and margin at risk as ranges,
+client figures under NDA with public filings as fallback, one workshop,
+scenarios adapted from the published five with probability bands, indicators
+handed over with the retainer offered for monitoring, model handed over,
+30-day follow-up call, board summary within the report, CFO/strategy/risk
+audience, the tool's six lens sectors, all three cross-pointers kept.
+`ScenarioImpactModule.tsx` now fills `audience`, `method` (six steps) and
+`context` ("How the numbers are built" — methodological, with one legal line:
+NIS2 Article 21(2)(c) business continuity and crisis management, read from the
+pinned corpus at `corpus/regulatory/nis2/2022-12-27/source.txt` line 889) and
+carries ten deliverables. Body counts (5 scenarios, 3 friction levels, 6/4/5/3
+lens options, 360 combinations) are read from `scenario-data.ts`; to make that
+possible the four lens option lists moved out of the modeler page into
+`scenario-data.ts` as exports. Layout metadata description rewritten.
+**Regulatory Friction is now the only thin module page** — same treatment
+pending. Verified in a browser at 1440px and 400px; the modeler still renders
+after the move.
+
 ### September 10, 2026 (latest) — Scenario Modeler: hero, presets, one control row, a number you can defend
 
 Third tool given the mapper/checker treatment, owner-approved. Hero
