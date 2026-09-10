@@ -2,9 +2,38 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-09-10
-> Status: **Tools and specialist advisory positioning changes implemented, committed as `f1ceb8ad`, deployed successfully on 10 September and verified live. GitHub CI passed. Previous production/deployment records below are dated history.**
+> Status: **Five standalone specialist advisory projects implemented and verified locally. Owner authorised commit and push; deployment verification is pending. Earlier deployment records below are history.**
 
-## Current work — standalone specialist projects and the Advisory Briefing
+## Current work — five standalone specialist projects
+
+The owner confirmed five scoped advisory projects, explicitly reconfirming the
+scope after delayed clarification answers: Manufacturing Exposure Module,
+Scenario Impact Analysis, Regulatory Friction Assessment, European Procurement
+Readiness and Sovereign Architecture Review. All can be commissioned directly.
+The three free tools remain optional starting points. New-project fees are agreed
+after scoping; the existing three prices and enquiry names remain unchanged.
+
+Implemented locally: a comparison higher on Advisory; discovery from its hero,
+shared desktop/mobile menu, homepage, Products and Pricing; two new project pages
+with deliverables, scope boundaries and catalogue-tagged enquiries; reciprocal
+links from broader engagements with overlap-aware fees; metadata, article
+placements, sitemap and llms.txt entries. The Sovereign Architecture page uses
+`/advisory/modules/sovereign-architecture`; the former module URL redirects there,
+and the Strategic Assessment retains its old anchor and onward link.
+
+See [the detailed implementation plan](docs/specialist-project-implementation-plan.md)
+for deliverables, boundaries, acceptance criteria and verification status.
+Validation passed: lint, typecheck, 59 targeted tests and the production build
+(including prebuild gates). Browser checks covered all five pages, desktop/mobile
+comparison, both themes, enquiry anchors, homepage discovery and the old Sovereign
+redirect. Sitemap and llms.txt include the new pages. No browser page errors were
+reported. The build warned that a 2.58 MB chunk exceeds the service-worker precache
+limit; this work does not change PWA configuration. Local production preview is
+running on port 3100.
+
+No enquiries were submitted. The owner authorised commit and push after local verification. Deployment success must be verified separately.
+
+## Previous release — tool journeys and the Advisory Briefing
 
 The owner confirmed that tools should primarily lead to standalone specialist
 projects. No prior paid engagement is required. Retainer clients commission
@@ -42,7 +71,7 @@ copy. No enquiry was submitted.
 
 See [the implementation plan](docs/tools-specialist-advisory-plan.md). The previous
 handover below records the earlier deployed linking work; this section is the
-current status for `f1ceb8ad`.
+release record for `f1ceb8ad`.
 
 ## Start here — handover for 10 September 2026
 

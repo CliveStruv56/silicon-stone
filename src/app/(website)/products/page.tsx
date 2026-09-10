@@ -352,12 +352,12 @@ export default function ProductsPage() {
               </h2>
               <p className="text-text-muted mb-8">
                 Our advisory services provide the depth and customisation that self-service tools cannot.
-                From AI readiness assessments to strategic briefings for your leadership team.
+                Commission a focused project on supplier exposure, scenario impact, regulatory friction, European procurement or sovereign architecture.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/advisory#contact">
+                <Link href="/advisory#modules">
                   <Button className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90">
-                    Discuss Advisory Services
+                    Explore specialist projects
                   </Button>
                 </Link>
                 <Link href="/tools">

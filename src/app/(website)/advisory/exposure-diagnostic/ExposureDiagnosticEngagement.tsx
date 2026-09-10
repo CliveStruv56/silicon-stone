@@ -95,6 +95,10 @@ export function ExposureDiagnosticEngagement({ coverage }: Props) {
             Part of the agreed diagnostic scope where relevant, not a separate purchase.
           </p>
         </div>
+        <p className="mt-5 max-w-3xl text-sm leading-relaxed text-text-muted">
+          For a defined buyer review, <Link href="/advisory/modules/european-procurement-readiness" className="text-stone-teal underline underline-offset-4">European Procurement Readiness</Link> can also be commissioned directly.
+          {' '}Where work overlaps with this diagnostic, we agree the combined scope and fee to account for it.
+        </p>
         <DigitalOmnibusContext>We use the relevant Digital Omnibus changes to examine your systems, roles and evidence. European Procurement Readiness forms part of the agreed diagnostic scope where relevant.</DigitalOmnibusContext>
       </>}
       price={`From ${gbp(AMOUNTS.exposureDiagnostic)}`}

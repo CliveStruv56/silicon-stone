@@ -271,7 +271,7 @@ export const ENGAGEMENTS: Offering[] = [
     // The dedicated page is shared by navigation and pricing.
     href: '/advisory/exposure-diagnostic',
     terms: [
-      'European Procurement Readiness forms part of the agreed diagnostic scope where relevant.',
+      'European Procurement Readiness can be included in the agreed diagnostic scope or commissioned separately.',
       'Fee credited toward your first quarter on the Drift Retainer.',
     ],
   },
@@ -307,8 +307,8 @@ export const ENGAGEMENTS: Offering[] = [
     /** Own page since 2026-09-04 — see the Exposure Diagnostic note above. */
     href: '/advisory/strategic-assessment',
     terms: [
-      'European Procurement Readiness can be included in the agreed assessment scope.',
-      'A Sovereign Architecture Review can be included in the agreed assessment scope.',
+      'European Procurement Readiness can be included in the agreed assessment scope or commissioned separately.',
+      'A Sovereign Architecture Review can be included in the agreed assessment scope or commissioned separately.',
       'Framework-neutral and vendor-agnostic — we sell no software and take no referral fees.',
     ],
   },
@@ -367,31 +367,17 @@ export const SISTER_PRODUCT: Offering = {
 /**
  * Specialist advisory projects, available directly without a paid prerequisite.
  * Work for retainer clients is separately scoped and charged at the project fee.
- * £3,500 is the floor: narrower in scope than a full engagement, above the
- * Exposure Diagnostic.
- *
- * All three have a page of their own since 2026-09-09, and each sits beneath the
- * free tool it follows on from — which is now what a module *is*. Two others
- * were folded into engagements the same day rather than priced separately:
- *
- * - The **AI Bill of Materials** into the Exposure Diagnostic. It was the same
- *   job at a finer grain, and its own price note already read "available within
- *   a scoped diagnostic".
- * - The **Sovereign Architecture Review** into the Strategic Assessment. Not a
- *   duplicate of anything — key custody, administrative access and
- *   abstraction-layer feasibility appear nowhere else — but at £6,500 among
- *   £3,500 modules it was a narrow, deep engagement filed as an add-on to a
- *   £2,500 product. It went to the Assessment rather than the Diagnostic
- *   because that product already ends in a board-ready roadmap, and because
- *   "from £8,000" holds the work where "from £2,500" would anchor every
- *   scoping conversation far too low.
- *
- * Both survive as anchored sections on their engagement's page, not as products.
+ * The owner expanded the range to five on 2026-09-10. Three have optional free
+ * tool pairings; Procurement Readiness and Sovereign Architecture also remain
+ * available within an agreed broader engagement. Their starting prices have
+ * not been set. AI Bill of Materials remains within the Exposure Diagnostic.
+ * `MODULES` is retained as the internal catalogue name to preserve consumers.
  */
 export const MODULES: Offering[] = [
   {
     id: 'manufacturing-exposure',
     name: 'Manufacturing Exposure Module',
+    question: 'Which supplier dependencies could interrupt our operations?',
     price: `From ${gbp(AMOUNTS.moduleFloor)}`,
     summary:
       'Semiconductor, cloud, supplier and operational dependencies mapped where they matter, with chokepoints and procurement questions.',
@@ -401,6 +387,7 @@ export const MODULES: Offering[] = [
   {
     id: 'scenario-impact',
     name: 'Scenario Impact Analysis',
+    question: 'What would a geopolitical shock cost our business?',
     price: `From ${gbp(AMOUNTS.moduleFloor)}`,
     summary:
       'Custom geopolitical scenario modelling for your industry and geography, with value-at-stake quantified by business unit.',
@@ -410,11 +397,30 @@ export const MODULES: Offering[] = [
   {
     id: 'regulatory-friction',
     name: 'Regulatory Friction Assessment',
+    question: 'Where do EU and US requirements create cost or delay?',
     price: `From ${gbp(AMOUNTS.moduleFloor)}`,
     summary:
       'US versus EU compliance gap analysis, friction-scored for your operations, with a priority matrix and a transatlantic roadmap.',
     href: '/advisory/modules/regulatory-friction',
     fromTool: { name: 'Policy Stress-Test', href: '/tools/policy-stress-test' },
+  },
+  {
+    id: 'european-procurement-readiness',
+    name: 'European Procurement Readiness',
+    question: 'What do we need to satisfy a European buyer’s review?',
+    price: 'Fee agreed after scoping',
+    summary:
+      'Buyer requirements mapped to your evidence, with gaps, response preparation and a prioritised plan for an agreed procurement process.',
+    href: '/advisory/modules/european-procurement-readiness',
+  },
+  {
+    id: 'sovereign-architecture-review',
+    name: 'Sovereign Architecture Review',
+    question: 'How much control do we have over our technology stack?',
+    price: 'Fee agreed after scoping',
+    summary:
+      'A map of hosting, access, key custody and exit constraints, with practical architecture options and a staged decision roadmap.',
+    href: '/advisory/modules/sovereign-architecture',
   },
 ]
 

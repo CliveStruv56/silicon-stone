@@ -21,10 +21,10 @@ describe('selective Digital Omnibus discovery', () => {
   })
 })
 
-it('retires the two separate commercial entries while retaining the diagnostic and assessment', () => {
+it('keeps the retired Omnibus briefing separate from the standalone procurement project', () => {
   const ids = [...ENGAGEMENTS, ...MODULES].map(offer => offer.id)
   expect(ids).not.toContain('post-omnibus-briefing')
-  expect(ids).not.toContain('european-procurement-readiness')
+  expect(ids).toContain('european-procurement-readiness')
   expect(ids).toContain('exposure-diagnostic')
   expect(ids).toContain('strategic-assessment')
 })

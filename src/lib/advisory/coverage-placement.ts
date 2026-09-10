@@ -20,7 +20,7 @@ import { ENGAGEMENTS, MODULES } from '@/lib/offering'
  * runs in the browser.
  */
 export const COVERAGE_PLACEMENTS: ReadonlyArray<{ value: string; title: string }> = [
-  ...MODULES.map(module => ({ value: module.id, title: `${module.name} (module)` })),
+  ...MODULES.map(module => ({ value: module.id, title: `${module.name} (specialist project)` })),
   ...ENGAGEMENTS.filter(engagement => !engagement.href.includes('#')).map(engagement => ({
     value: engagement.id,
     title: engagement.name,

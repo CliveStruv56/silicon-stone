@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Header, Footer } from '@/components/layout'
+import { SpecialistProjects } from '@/components/advisory/SpecialistProjects'
 import { LadderBox } from '@/components/products/LadderBox'
 import { submitWithOfflineQueue } from '@/lib/offline/submit'
 import { BOOKING_URL, FREE_INTRO_WINDOW } from '@/lib/flags'
@@ -45,8 +46,7 @@ import {
  * `ENGAGEMENTS` is the ladder, in ascending order, and is what gets segmented
  * on — so the strings are exact-match tags, not prose. "Drift Retainer" keeps
  * its historic wording rather than the page's "The Drift Retainer" so any
- * existing Kit segment still matches. European Procurement Readiness now
- * belongs within the diagnostic or assessment scope.
+ * existing Kit segment still matches. Specialist choices use catalogue names.
  */
 const ENGAGEMENTS = [
   'Advisory Briefing',
@@ -222,6 +222,9 @@ export default function ServicesPage() {
                   >
                     About the Advisory Briefing →
                   </Link>
+                  <a href="#modules" className="text-sm font-medium text-stone-teal underline underline-offset-4">
+                    Explore specialist projects
+                  </a>
                 </div>
                 {FREE_INTRO_WINDOW && (
                   <p className="mt-2 text-xs italic text-text-muted">
@@ -342,7 +345,7 @@ export default function ServicesPage() {
               <p className="mt-4 text-text-muted">
                 Already know the issue?{' '}
                 <a href="#modules" className="text-stone-teal underline underline-offset-4">
-                  Explore specialist projects on supplier dependencies, scenario impact and transatlantic friction.
+                  Compare the five specialist projects and their scope.
                 </a>
               </p>
             </div>
@@ -383,6 +386,13 @@ export default function ServicesPage() {
               ))}
             </ul>
 
+          </div>
+        </section>
+
+        <SpecialistProjects />
+
+        <section aria-label="Broader engagements and fee credits" className="bg-stone-charcoal/50">
+          <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
             {/* Bespoke / enterprise band — the top of the ladder above the
                 Strategic Assessment, scoped one-to-one (A4). */}
             <div className="mt-8 rounded-lg border border-border-subtle bg-stone-charcoal p-6 lg:p-8">
@@ -423,54 +433,6 @@ export default function ServicesPage() {
           </div>
         </section>
 
-
-        {/* Follow-on modules — an index, not a catalogue.
-
-            Each module has had a page of its own since 2026-09-09, and three of
-            them are reached from the free tool they follow on from. Restating
-            their deliverables here would put the same four bullets in two
-            places and guarantee they drift; the index carries what a reader
-            needs to choose, and the page carries the rest.
-
-            Rendered from `MODULES` rather than retyped, for the reason the
-            footer learned: the first hand-typed copy of a catalogue list
-            duplicated an entry that was already in it. */}
-        <section id="modules" className="scroll-mt-24 mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
-          <div className="mb-8">
-            <h2 className="text-2xl font-semibold text-text-primary mb-4">
-              Specialist advisory projects
-            </h2>
-            <p className="text-text-muted max-w-3xl">
-              Commission a focused investigation into your own suppliers, business units
-              or operations. Start with a free scoping conversation; no Briefing or
-              Diagnostic is required first. Projects for retainer clients are separately
-              scoped and charged in addition to the monthly fee.
-            </p>
-          </div>
-
-          <ul className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {MODULES.map((offering) => (
-              <li key={offering.id}>
-                <Link
-                  href={offering.href}
-                  className="card-interactive flex h-full flex-col rounded-lg border border-border-subtle bg-stone-charcoal p-6 transition-colors hover:border-stone-teal"
-                >
-                  <div className="mb-2 flex items-start justify-between gap-3">
-                    <h3 className="text-lg font-semibold text-text-primary">{offering.name}</h3>
-                    <Badge variant="outline" className="flex-shrink-0 font-mono text-[12px] text-text-primary border-border-subtle">
-                      {offering.price}
-                    </Badge>
-                  </div>
-                  <p className="text-sm leading-relaxed text-text-muted">{offering.summary}</p>
-                  <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-stone-teal">
-                    For more details
-                    <ArrowRight className="h-4 w-4" />
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
 
         {/* Service Tiers */}
         {/* Contact Form */}
@@ -598,7 +560,7 @@ export default function ServicesPage() {
                       What are you interested in?
                     </label>
                     <div className="grid grid-cols-2 gap-2">
-                      {ENGAGEMENTS.map((option) => (
+                      {[...ENGAGEMENTS, ...MODULES.map(project => project.name)].map((option) => (
                         <button
                           key={option}
                           type="button"

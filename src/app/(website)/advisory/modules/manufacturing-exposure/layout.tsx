@@ -5,7 +5,7 @@ import { buildEngagementBreadcrumbSchema } from '@/lib/seo'
 import { MODULES } from '@/lib/offering'
 
 const description =
-  'Semiconductor, cloud, supplier and operational dependencies mapped against your own organisation, with chokepoints named and the procurement questions to put to exposed suppliers. The follow-on module to the free Supply Chain Mapper.'
+  'Semiconductor, cloud, supplier and operational dependencies mapped against your own organisation, with chokepoints named and the procurement questions to put to exposed suppliers. A standalone specialist advisory project, available after a free scoping conversation.'
 
 export const metadata: Metadata = {
   title: 'Manufacturing Exposure Module — Supplier and Chokepoint Mapping | Silicon and Stone',

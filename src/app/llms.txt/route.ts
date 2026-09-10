@@ -1,6 +1,7 @@
 import { sanityFetch } from '@/sanity/lib/live'
 import { RSS_ARTICLES_QUERY } from '@/sanity/lib/queries'
 import { SITE_NAME, absoluteUrl } from '@/lib/site'
+import { MODULES } from '@/lib/offering'
 import { cleanDescription } from '@/lib/seo'
 
 /**
@@ -30,11 +31,12 @@ const CORE_PAGES: Array<{ title: string; path: string; note: string }> = [
   { title: 'Series', path: '/intelligence/series', note: 'Ordered reading paths — the analysis in the sequence the argument was built, not by date or impact.' },
   { title: 'Glossary', path: '/glossary', note: 'Defined terms across AI regulation, semiconductor supply chains and digital sovereignty.' },
   { title: 'Interactive tools', path: '/tools', note: 'AI Act compliance checker, supply-chain mapper, policy stress-test, scenario modeler.' },
-  { title: 'Advisory', path: '/advisory', note: 'Strategic advisory for AI governance and technology dependency — four engagements, from a one-hour briefing to a board-level assessment.' },
+  { title: 'Advisory', path: '/advisory', note: 'Strategic advisory for AI governance and technology dependency — four core engagements and five independently commissioned specialist projects.' },
   { title: 'Advisory Briefing', path: '/advisory/advisory-briefing', note: 'One AI system, one principal question: Checker result review, a one-hour discussion and a written follow-up. Document review is scoped separately.' },
   { title: 'Exposure Diagnostic', path: '/advisory/exposure-diagnostic', note: 'Where dependency on specific vendors, models and jurisdictions becomes an operating constraint.' },
   { title: 'Drift Retainer', path: '/advisory/drift-retainer', note: 'The standing relationship: monthly briefing, working session, and a quarterly exposure review.' },
   { title: 'Strategic Assessment', path: '/advisory/strategic-assessment', note: 'The deep one-off for a high-stakes decision, with a board-ready presentation.' },
+  ...MODULES.map(project => ({ title: project.name, path: project.href, note: `Standalone specialist advisory. ${project.summary}` })),
   { title: 'Pricing', path: '/pricing', note: 'Every price on one page — products, tools and advisory engagements.' },
   { title: 'Digital Omnibus', path: '/digital-omnibus', note: 'Free reference: enacted AI changes, proposed data and privacy changes, milestones and business implications for UK, EU and US leaders.' },
   { title: 'US Executive’s Guide', path: '/us-executive-guide', note: 'The free guide to EU AI regulation from a US vantage point.' },

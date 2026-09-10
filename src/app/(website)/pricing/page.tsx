@@ -162,7 +162,7 @@ export default function PricingPage() {
             </h1>
             <p className="max-w-3xl text-xl leading-relaxed text-text-muted">
               One page, every price. The analysis and the tools are free and stay
-              free. Everything paid names a figure before you talk to us.
+              free. Paid offerings show a starting price or state when a fee needs scoping.
               Scope, fees and any applicable credits are set out before you commit.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
@@ -174,6 +174,11 @@ export default function PricingPage() {
               <Link href="#advisory">
                 <Button className="bg-surface-elevated text-text-primary hover:bg-surface-elevated/80">
                   Advisory
+                </Button>
+              </Link>
+              <Link href="#modules">
+                <Button className="bg-surface-elevated text-text-primary hover:bg-surface-elevated/80">
+                  Specialist projects
                 </Button>
               </Link>
               <Link href="#ladder">

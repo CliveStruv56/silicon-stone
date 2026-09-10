@@ -5,7 +5,7 @@ import { ArrowRight } from 'lucide-react'
 import { StaggerContainer, StaggerItem } from '@/components/ui/StaggerContainer'
 import { ForensicCard } from '@/components/ui/ForensicCard'
 import { Badge } from '@/components/ui/badge'
-import { AMOUNTS, gbp } from '@/lib/offering'
+import { AMOUNTS, MODULES, gbp } from '@/lib/offering'
 
 type Tier = {
   label: string
@@ -104,6 +104,22 @@ export function AdvisoryBand() {
             ))}
           </div>
         </StaggerContainer>
+        <div className="mt-8 border-t border-border-subtle pt-6">
+          <h3 className="text-xl font-semibold text-text-primary">Specialist projects for a defined question</h3>
+          <p className="mt-2 max-w-3xl text-sm leading-relaxed text-text-muted">
+            Commission directly after a free scoping conversation. No tool, earlier purchase or retainer is required.
+          </p>
+          <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-3">
+            {MODULES.map(project => (
+              <li key={project.id}>
+                <Link href={project.href} className="text-sm text-stone-teal underline underline-offset-4">{project.name}</Link>
+              </li>
+            ))}
+          </ul>
+          <Link href="/advisory#modules" className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-stone-teal">
+            Compare specialist projects <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
+        </div>
       </div>
     </section>
   )

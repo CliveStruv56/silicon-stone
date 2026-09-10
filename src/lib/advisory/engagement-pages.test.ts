@@ -295,39 +295,45 @@ describe('follow-on module pages', () => {
     expect(page).toContain('id="ai-bill-of-materials"')
   })
 
-  /**
-   * The Sovereign Architecture Review was folded into the Strategic Assessment
-   * on 2026-09-09 for a different reason than the AI Bill of Materials: not
-   * duplication, but a £6,500 engagement filed as an add-on to a £2,500 one.
-   * Its anchor is the id both its own page and the Digital Omnibus list used to
-   * point at, and `/advisory/modules/sovereign-architecture-review` 301s to it.
-   */
+  /** Preserve inbound links even though this can now be commissioned separately. */
   it('keeps the #sovereign-architecture-review anchor on the Strategic Assessment', () => {
     const page = fs.readFileSync(path.join(APP_DIR, 'advisory/strategic-assessment/StrategicAssessmentEngagement.tsx'), 'utf8')
     expect(page).toContain('id="sovereign-architecture-review"')
   })
 
-  /**
-   * Both are deliverables now, not products: neither may carry a price of its
-   * own, and neither may reappear in the module catalogue.
-   */
-  it.each([
-    ['AI Bill of Materials', 'aiBillOfMaterials', 'ai-bill-of-materials'],
-    ['Sovereign Architecture Review', 'sovereignArchitectureReview', 'sovereign-architecture-review'],
-  ])('does not price the %s separately', (_name, amountKey, moduleId) => {
-    const offering = fs.readFileSync('src/lib/offering.ts', 'utf8')
-    // The doc comment explains why each was folded in, so only a real AMOUNTS
-    // entry counts — not the prose that records the decision.
-    expect(offering).not.toMatch(new RegExp(`^\\s*${amountKey}:`, 'm'))
-    expect(MODULES.map((m) => m.id)).not.toContain(moduleId)
+  it('keeps AI Bill of Materials within the Exposure Diagnostic', () => {
+    expect(MODULES.map(m => m.id)).not.toContain('ai-bill-of-materials')
   })
 
-  /** Every module left is a follow-on from a free tool. That is now what a module is. */
-  it('leaves only tool follow-on modules in the catalogue', () => {
-    expect(MODULES.map((m) => m.id).sort()).toEqual([
+  it('offers five standalone projects with only three optional tool pairings', () => {
+    expect(MODULES.map(m => m.id).sort()).toEqual([
+      'european-procurement-readiness',
       'manufacturing-exposure',
       'regulatory-friction',
       'scenario-impact',
+      'sovereign-architecture-review',
     ])
+    expect(MODULES.filter(m => m.fromTool).map(m => m.id).sort()).toEqual([
+      'manufacturing-exposure', 'regulatory-friction', 'scenario-impact',
+    ])
+  })
+
+  it('does not invent starting prices for the newly standalone scope', () => {
+    for (const id of ['european-procurement-readiness', 'sovereign-architecture-review']) {
+      expect(MODULES.find(m => m.id === id)?.price).toBe('Fee agreed after scoping')
+    }
+  })
+
+  it('offers catalogue enquiry names on the hub as well as the project pages', () => {
+    const hub = fs.readFileSync(path.join(APP_DIR, 'advisory/page.tsx'), 'utf8')
+    expect(hub).toContain('MODULES.map(project => project.name)')
+  })
+
+  it('keeps the standalone Sovereign route distinct from its legacy redirect', () => {
+    const config = fs.readFileSync('next.config.ts', 'utf8')
+    const offering = MODULES.find(m => m.id === 'sovereign-architecture-review')!
+    expect(offering.href).toBe('/advisory/modules/sovereign-architecture')
+    expect(config).toContain("source: '/advisory/modules/sovereign-architecture-review', destination: '/advisory/modules/sovereign-architecture'")
+    expect(config).not.toContain("source: '/advisory/modules/sovereign-architecture',")
   })
 })

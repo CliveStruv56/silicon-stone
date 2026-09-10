@@ -82,7 +82,7 @@ export function ManufacturingExposureModule({ coverage }: Props) {
       lead="Semiconductor, cloud, supplier and operational dependencies mapped where they matter to your organisation — with the chokepoints named, the evidence recorded and the questions to put to your suppliers."
       fromTool={offering.fromTool}
       body={<>
-        <p>The free tool models dependency at the level of an industry. This module does it at the level of your organisation: the components you actually buy, the suppliers you actually depend on, and the substitutions that are realistically available to you.</p>
+        <p>This project maps dependency at the level of your organisation: the components you actually buy, the suppliers you actually depend on, and the substitutions that are realistically available to you.</p>
         {/* Counts are read from the tool's data: the page said "thirty" while
             the model held 31, and nothing would have failed. */}
         <p>The tool scores {SUPPLY_CHAIN_NODES.length} named chokepoints across {NODE_TYPE_OPTIONS.length} layers — fabrication, materials, equipment, design, advanced packaging and the IP and EDA toolchain — against {SUPPLY_CHAIN_SCENARIOS.length} stress scenarios. The module takes the components, boards, cloud capacity and accelerators on your own bill of materials and resolves each one down to those layers, so that a supplier who looks diversified at assembly level is shown to sit on the same foundry, the same packaging route or the same controlled material as the alternative.</p>

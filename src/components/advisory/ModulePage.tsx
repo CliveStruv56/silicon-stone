@@ -38,22 +38,7 @@ type Props = {
   coverage?: ComponentProps<typeof RelatedCoverage>
 }
 
-/**
- * The one template every follow-on module page comes off.
- *
- * The four engagements learned this the expensive way: three were pages and the
- * Retainer was a section on the hub, and that asymmetry is exactly why their
- * styling kept diverging. A module is not an engagement — it has no hero
- * artwork and no "where it leads" band — so it gets its own template rather
- * than a fifth variant of `FocusedEngagementPage`. A sixth module comes off
- * this or the divergence starts again.
- *
- * The `audience`, `method`, `context` and `coverage` slots are optional
- * because they were added for one module (Manufacturing Exposure, 2026-09-10)
- * before the other two had content for them. They are slots on the template
- * rather than sections on that page so the others gain them by filling in
- * props, not by copying markup.
- */
+/** Shared presentation for independently commissioned specialist projects. */
 export function ModulePage({
   name, price, lead, body, deliverables, fromTool, scope, contact,
   audience, method, context, coverage,
@@ -64,23 +49,27 @@ export function ModulePage({
       <main className="flex-1">
         <section className="border-b border-border-subtle bg-slate-deep">
           <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+            <Link href="/advisory#modules" className="mb-5 block text-sm text-stone-teal underline underline-offset-4">All specialist projects</Link>
             <Badge variant="outline" className="mb-4 border-stone-teal text-stone-teal">
               Specialist advisory
             </Badge>
             <h1 className="mb-6 max-w-4xl text-4xl font-bold text-text-primary sm:text-5xl">{name}</h1>
             <p className="max-w-3xl text-xl leading-relaxed text-text-muted">{lead}</p>
 
+            <p className="mt-5 max-w-3xl leading-relaxed text-text-muted">
+              Commission this project directly after a free scoping conversation.
+              No previous engagement or use of a tool is required.
+            </p>
             {fromTool && (
               <p className="mt-6 max-w-3xl leading-relaxed text-text-muted">
                 {/* The catalogue stores the bare tool name, because the tool
                     pages use it as a heading. The article belongs to the
                     sentence, not to the name. */}
-                Explore the question first with the free{' '}
+                Optional starting point: the free{' '}
                 <Link href={fromTool.href} className="text-stone-teal underline underline-offset-4">
                   {fromTool.name}
                 </Link>
-                . You can commission this specialist project directly, whether or not
-                you have used the tool.
+                .
               </p>
             )}
 

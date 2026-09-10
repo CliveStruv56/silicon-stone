@@ -5,7 +5,7 @@ import { buildEngagementBreadcrumbSchema } from '@/lib/seo'
 import { MODULES } from '@/lib/offering'
 
 const description =
-  'Where US and EU requirements pull against each other across your operations: every conflict friction-scored, priced and dated, with a priority matrix, a regulatory calendar built from pinned statute, and a transatlantic roadmap with owners. The follow-on module to the free Policy Stress-Test.'
+  'Where US and EU requirements pull against each other across your operations: every conflict friction-scored, priced and dated, with a priority matrix, a regulatory calendar built from pinned statute, and a transatlantic roadmap with owners. A standalone specialist advisory project, available after a free scoping conversation.'
 
 export const metadata: Metadata = {
   title: 'Regulatory Friction Assessment — US and EU Gap Analysis | Silicon and Stone',

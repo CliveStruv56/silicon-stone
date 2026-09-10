@@ -183,23 +183,7 @@ export function StrategicAssessmentEngagement({ coverage }: Props) {
           </div>
         </section>
 
-        {/* The Sovereign Architecture Review, folded in on 2026-09-09.
-
-            It was a £6,500 "follow-on module" sitting among three £3,500 ones,
-            under a heading whose own copy calls modules additions to a
-            diagnostic — a £6,500 add-on to a £2,500 product is upside down. It
-            is not a duplicate of anything (key custody, administrative access
-            and abstraction-layer feasibility appear nowhere else on the site);
-            it was a narrow, deep engagement wearing a module's clothes.
-
-            It belongs here rather than on the Diagnostic because this product
-            already ends in a board-ready roadmap, and because "from £8,000"
-            holds the work where "from £2,500" would anchor every scoping
-            conversation far too low. It carries no price of its own: it is a
-            scope option, on the European Procurement Readiness pattern below.
-
-            The anchor is the id the module page and the Digital Omnibus list
-            both pointed at. */}
+        {/* Keep the legacy anchor for existing and browser-cached inbound links. */}
         <section id="sovereign-architecture-review" className="scroll-mt-24 mx-auto max-w-7xl px-6 pb-10 lg:px-8 lg:pb-12">
           <h2 className="text-2xl font-semibold text-text-primary">Sovereign Architecture Review</h2>
           <p className="mt-4 max-w-3xl leading-relaxed text-text-muted">
@@ -217,15 +201,23 @@ export function StrategicAssessmentEngagement({ coverage }: Props) {
             ))}
           </ul>
           <p className="mt-5 max-w-3xl text-sm italic leading-relaxed text-text-muted">
-            Included in the agreed assessment scope where relevant, not a separate purchase.
+            Available within the agreed assessment scope, or as a standalone specialist project.
             It keeps your options open — it does not pick your vendors for you, and it keeps
             what the law requires distinct from what a buyer merely prefers.
           </p>
+          <p className="mt-4 max-w-3xl text-sm leading-relaxed text-text-muted">
+            <Link href="/advisory/modules/sovereign-architecture" className="text-stone-teal underline underline-offset-4">Explore the standalone Sovereign Architecture Review</Link>.
+            {' '}Where work overlaps, we agree the combined scope and fee to account for it.
+          </p>
         </section>
 
-        <section className="mx-auto max-w-7xl px-6 pb-10 lg:px-8 lg:pb-12">
+        <section id="european-procurement-readiness" className="scroll-mt-24 mx-auto max-w-7xl px-6 pb-10 lg:px-8 lg:pb-12">
           <h2 className="text-2xl font-semibold text-text-primary">European Procurement Readiness</h2>
           <p className="mt-4 max-w-3xl leading-relaxed text-text-muted">Where European procurement is part of the decision, the assessment includes buyer evidence requirements, gaps that could delay market access, and the cost and sequence of addressing them. Contractual commitments are flagged for review with counsel. This work is included in the agreed assessment scope.</p>
+          <p className="mt-4 max-w-3xl text-sm leading-relaxed text-text-muted">
+            You can also commission <Link href="/advisory/modules/european-procurement-readiness" className="text-stone-teal underline underline-offset-4">European Procurement Readiness as a standalone project</Link>.
+            {' '}Where work overlaps, we agree the combined scope and fee to account for it.
+          </p>
           <DigitalOmnibusContext>We translate the relevant regulatory changes and remaining uncertainty into governance choices, investment priorities and a board-ready roadmap.</DigitalOmnibusContext>
         </section>
 

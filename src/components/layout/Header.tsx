@@ -67,6 +67,7 @@ const primaryNavigation: NavItem[] = [
       { name: 'The Exposure Diagnostic', href: '/advisory/exposure-diagnostic' },
       { name: 'The Drift Retainer', href: '/advisory/drift-retainer' },
       { name: 'Strategic Assessment', href: '/advisory/strategic-assessment' },
+      { name: 'Specialist projects', href: '/advisory#modules' },
     ],
   },
 ]
