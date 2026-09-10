@@ -720,6 +720,37 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### September 10, 2026 (late) — Compliance Checker made compelling: hero, examples, stepper, resume, header actions
+
+Owner asked for a more compelling top and any other improvements, and approved
+the proposals. **Before any copy was written, the 2 December 2026 date was
+verified**: it is not a date the Omnibus might have moved but one it created —
+Regulation (EU) 2026/1744 inserted Article 5(1)(ba)/(bb) and Article 113 applies
+them from that date; Article 111(4) sets the same date for legacy Article 50(2)
+marking. Both sentences sit verbatim in the pinned corpus (Articles 111, 113),
+and `npm run reg:drift` confirmed EUR-Lex's latest AI Act consolidation is still
+2026-07-27, so nothing has amended the Act since the pack was cut.
+
+The hero (`tools/compliance-checker/page.tsx`) now leads "Where does your AI
+system sit under the EU AI Act?" with three paragraphs — what you get, why to
+trust it (versioned rules, pinned CELEX, no model decides, every obligation
+linked to a readable provision), and why now (the two dates) — then a four-step
+"how it works" row and a four-tile proof strip. **Every number is read from
+data**: question count from `assessmentQuestions`, provision count from
+`RULE_PACK.manifest.corpus`, pack version and CELEX from the manifest, the two
+dates from `AI_ACT_TIMELINE` (general application by its `basis`, next step as
+the first `upcoming`). The disclaimer was reworded to a plain sentence. Three
+worked examples sit above the intake with verdicts **computed by the engine**
+from full answer sets, never typed, so a rule change moves the card. The intake's
+direct route became an outline button, "Answer the questions directly", with a
+sentence in the description. The progress card carries a section stepper with
+done/current/todo states. A restored session now shows a "Picked up where you
+left off" banner with Start again and dismiss (verified with a stubbed session
+response; local has no Redis). The result header gained Copy/Download and nine
+jump links, with `id` and `scroll-mt-24` on each target card. The layout's
+metadata description dropped "GPAI duties" — the tool has no question or rule
+for general-purpose models — at the owner's decision.
+
 ### September 10, 2026 (night) — Supply Chain Mapper: filters as a plain row, node detail opens across
 
 Two owner-requested layout changes on `/tools/supply-chain-mapper`. The filter

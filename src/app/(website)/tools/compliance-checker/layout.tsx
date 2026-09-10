@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'AI Act Compliance Checker | Silicon and Stone',
   description:
-    'Triage your EU AI Act obligations: assess risk tier, GPAI duties, and the transparency rules in force since August 2026.',
+    'Classify an AI system under the EU AI Act: a rule-based risk tier, the obligations that follow, the vendor evidence to ask for, and the transparency rules in force since August 2026.',
   alternates: { canonical: '/tools/compliance-checker' },
 }
 

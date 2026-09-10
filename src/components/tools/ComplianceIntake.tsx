@@ -182,7 +182,8 @@ export function ComplianceIntake({ questions, onConfirm, onSkip }: Props) {
         <CardTitle className="text-2xl text-text-primary">Describe the system in your own words</CardTitle>
         <CardDescription className="text-base">
           What the tool is, who it affects, and what happens with its output. We will turn that into
-          draft answers for you to check.
+          draft answers for you to check. Prefer to click through? Use the questions directly — the
+          button is below.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -222,13 +223,15 @@ export function ComplianceIntake({ questions, onConfirm, onSkip }: Props) {
         )}
 
         <div className="flex flex-col gap-3 pt-3 border-t border-border-subtle sm:flex-row sm:justify-between">
+          {/* Outline, not ghost: this is the other front door, and a ghost
+              button read as a footnote to the describe box. */}
           <Button
             type="button"
-            variant="ghost"
+            variant="outline"
             onClick={onSkip}
-            className="text-text-muted hover:text-text-primary"
+            className="border-stone-teal text-stone-teal dark:border-stone-teal"
           >
-            Answer the questions instead
+            Answer the questions directly
           </Button>
           <Button
             type="button"

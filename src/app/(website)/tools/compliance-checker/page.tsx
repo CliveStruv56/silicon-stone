@@ -12,6 +12,7 @@ import {
   Gauge,
   RefreshCcw,
   ShieldCheck,
+  X,
 } from 'lucide-react'
 import { Header, Footer } from '@/components/layout'
 import { Badge } from '@/components/ui/badge'
@@ -126,6 +127,134 @@ function resultCta(classification: string, role: string): { primary: CtaTarget; 
     : { primary: CHECKLIST_PACK, secondary: COMPLIANCE_TOOLKIT }
 }
 
+/**
+ * Three worked examples shown above the intake. The verdicts are NOT typed
+ * here: each answer set is run through the same engine the reader is about to
+ * use, so the card can never promise a tier the tool would not actually give.
+ * If a rule changes and an example's tier moves, the card moves with it.
+ */
+interface ExampleSystem {
+  title: string
+  description: string
+  answers: AssessmentAnswers
+}
+
+const EXAMPLE_BASE: AssessmentAnswers = {
+  assessment_reason: 'existing-tool',
+  tool_name: 'Example',
+  org_size: 'medium',
+  prohibited_screen: ['none'],
+  vendor_docs: ['none'],
+  change_control: ['annual-review'],
+}
+
+const EXAMPLE_SYSTEMS: ExampleSystem[] = [
+  {
+    title: 'CV screening for EU hiring',
+    description: 'A third-party tool ranks applicants; a recruiter reviews the shortlist but usually goes with it.',
+    answers: {
+      ...EXAMPLE_BASE,
+      origin: 'third-party',
+      eu_scope: ['eu-org'],
+      primary_use: 'employment',
+      affected_people: ['applicants'],
+      decision_impact: 'ranking',
+      profiling_confirm: 'yes',
+      human_oversight: 'rubber-stamp',
+      sensitive_domains: ['employment'],
+      data_types: ['employee'],
+      transparency: ['none'],
+    },
+  },
+  {
+    title: 'Customer-service chatbot',
+    description: 'Customers in the EU talk to an assistant built on a vendor model; it answers questions and hands off to staff.',
+    answers: {
+      ...EXAMPLE_BASE,
+      origin: 'third-party',
+      eu_scope: ['eu-users'],
+      primary_use: 'customer-service',
+      affected_people: ['customers'],
+      decision_impact: 'assistive',
+      human_oversight: 'meaningful',
+      sensitive_domains: ['none'],
+      data_types: ['personal'],
+      transparency: ['chatbot'],
+    },
+  },
+  {
+    title: 'Internal drafting assistant',
+    description: 'Staff use it for first drafts and research; every output is rewritten before it leaves the building.',
+    answers: {
+      ...EXAMPLE_BASE,
+      origin: 'third-party',
+      eu_scope: ['eu-org'],
+      primary_use: 'general-productivity',
+      affected_people: ['none'],
+      decision_impact: 'assistive',
+      human_oversight: 'meaningful',
+      sensitive_domains: ['none'],
+      data_types: ['none'],
+      transparency: ['none'],
+    },
+  },
+]
+
+const EXAMPLE_RESULTS = EXAMPLE_SYSTEMS.map((example) => ({
+  ...example,
+  result: evaluateAssessment(example.answers),
+}))
+
+/**
+ * Hero facts, every one read from data. The question count follows the
+ * catalogue; the pack version, cut-off and provision count follow the manifest;
+ * the two dates follow the pinned timeline, so neither can be typed stale.
+ */
+const PROVISION_COUNT = Object.keys(RULE_PACK.manifest.corpus).length
+/** The manifest stores the cut-off as ISO; the timeline writes "2 August 2026", so match it. */
+const CORPUS_CUT_OFF = new Date(`${RULE_PACK.manifest.corpusCutOff}T00:00:00Z`).toLocaleDateString('en-GB', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  timeZone: 'UTC',
+})
+const GENERAL_APPLICATION = AI_ACT_TIMELINE.find(
+  (entry) => entry.basis === 'Article 113, second paragraph',
+)
+const NEXT_DATED_STEP = AI_ACT_TIMELINE.find((entry) => entry.status === 'upcoming')
+
+const HOW_IT_WORKS = [
+  {
+    title: 'Describe it in your own words',
+    body: 'What the tool is, who it affects and what happens with its output. Or skip straight to the questions.',
+  },
+  {
+    title: 'Confirm what we read',
+    body: 'The description becomes draft answers. You accept or reject each one; nothing enters the engine unconfirmed.',
+  },
+  {
+    title: 'Answer what is left',
+    body: 'The remaining questions are asked, not assumed — the prohibited-practice screen is always among them.',
+  },
+  {
+    title: 'Keep the record',
+    body: 'Tier, role, duties, vendor questions, review triggers and the rules that fired, with the Article behind each.',
+  },
+]
+
+/** Jump links in the result header; each id is set on the card it names. */
+const RESULT_SECTIONS: Array<[id: string, label: string]> = [
+  ['why', 'Why this result'],
+  ['obligations', 'Obligations'],
+  ['vendor-questions', 'Vendor questions'],
+  ['adjacent', 'GDPR signals'],
+  ['report', 'Report'],
+  ['next-step', 'Next step'],
+  ['timing', 'Timing'],
+  ['penalties', 'Penalties'],
+  ['rules', 'Rules fired'],
+]
+
 const SESSION_ENDPOINT = '/api/tools/compliance-checker/session'
 const AUTOSAVE_DEBOUNCE_MS = 600
 
@@ -139,6 +268,9 @@ export default function ComplianceCheckerPage() {
   // The intake is offered first but is never the only way in: skipping it, or
   // resuming a saved run, drops straight into the fourteen-step click path.
   const [showIntake, setShowIntake] = useState(true)
+  // Set once, from the restore round-trip, so the reader is told they have
+  // landed mid-assessment rather than left to work it out from the step count.
+  const [resumed, setResumed] = useState<{ step: number; atResult: boolean } | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -154,6 +286,7 @@ export default function ComplianceCheckerPage() {
           setShowResult(Boolean(storedShowResult))
           // Someone mid-assessment wants their answers back, not a fresh start.
           setShowIntake(false)
+          setResumed({ step: step ?? 0, atResult: Boolean(storedShowResult) })
         }
       })
       .catch(() => {
@@ -198,6 +331,12 @@ export default function ComplianceCheckerPage() {
   const progress = Math.round(((currentIndex + 1) / visibleQuestions.length) * 100)
   const currentValue = currentQuestion ? answers[currentQuestion.id] : undefined
   const canContinue = !currentQuestion?.required || values(currentValue).length > 0
+  // Sections in the order the visible questions walk them, for the stepper.
+  const sections = useMemo(
+    () => Array.from(new Set(visibleQuestions.map((question) => question.section))),
+    [visibleQuestions],
+  )
+  const currentSectionIndex = currentQuestion ? sections.indexOf(currentQuestion.section) : 0
 
   const setAnswer = (question: AssessmentQuestion, value: AssessmentValue) => {
     setAnswers((prev) => ({ ...prev, [question.id]: value }))
@@ -267,6 +406,7 @@ export default function ComplianceCheckerPage() {
     setCurrentIndex(0)
     setShowResult(false)
     setShowIntake(true)
+    setResumed(null)
     fetch(SESSION_ENDPOINT, { method: 'DELETE' }).catch(() => {
       // Nothing to do — the local reset has already happened.
     })
@@ -277,24 +417,66 @@ export default function ComplianceCheckerPage() {
       <Header />
 
       <main className="flex-1 bg-background">
-        <section className="bg-slate-deep border-b border-border-subtle py-10 md:py-10">
+        <section className="bg-slate-deep border-b border-border-subtle py-10 lg:py-12">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="max-w-4xl">
               <Badge variant="outline" className="mb-4 border-stone-teal text-stone-teal">
                 AI Act Risk & Readiness
               </Badge>
-              <h1 className="text-3xl font-bold text-text-primary sm:text-4xl mb-4">
-                Create a first-pass AI system record
+              <h1 className="text-3xl font-bold text-text-primary sm:text-4xl mb-3">
+                Where does your AI system sit under the EU AI Act?
               </h1>
               <p className="text-lg text-text-muted max-w-3xl">
-                Classify a third-party AI tool or product use case, identify likely obligations,
-                capture missing vendor evidence, and set review triggers for ongoing governance.
+                A first-pass classification, the obligations that follow from it, and the evidence
+                to ask your vendor for — kept as an AI system record you can file.
               </p>
-              <div className="mt-6 grid gap-3 sm:grid-cols-3">
+              {/* Counts and dates are read from the catalogue, the pack manifest
+                  and the pinned timeline, never typed: a question added to the
+                  walk or a date moved by a later pack must not leave this
+                  introduction stating the wrong number. */}
+              <p className="mt-4 max-w-3xl leading-relaxed text-text-muted">
+                {assessmentQuestions.length} questions, fewer where some do not apply, on your role,
+                the EU connection, the use case, who is affected, the oversight in place and the
+                practices the Act forbids outright. You leave with a risk tier and a stated
+                confidence, your likely role under the Act, the duties that follow, the vendor
+                evidence you are missing, and the triggers that should send you back for a
+                reassessment.
+              </p>
+              <p className="mt-4 max-w-3xl leading-relaxed text-text-muted">
+                The tier is set by versioned rules run against the consolidated text of the
+                Regulation, pinned at a named CELEX and current to {CORPUS_CUT_OFF}.
+                No language model decides your classification. Every obligation the result shows is
+                anchored to the provision it rests on, and each of those{' '}
+                <Link href="/tools/compliance-checker/provisions" className="text-stone-teal underline underline-offset-4">
+                  {PROVISION_COUNT} provisions
+                </Link>{' '}
+                is readable here in the pinned text.
+              </p>
+              {GENERAL_APPLICATION && NEXT_DATED_STEP && (
+                <p className="mt-4 max-w-3xl leading-relaxed text-text-muted">
+                  The Article 50 transparency duties and the penalty regime have applied since{' '}
+                  {GENERAL_APPLICATION.date}. The next dated step is {NEXT_DATED_STEP.date}:{' '}
+                  {NEXT_DATED_STEP.label.charAt(0).toLowerCase() + NEXT_DATED_STEP.label.slice(1)}.
+                  The result tells you which line your system sits on.
+                </p>
+              )}
+
+              <ol className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {HOW_IT_WORKS.map((step, index) => (
+                  <li key={step.title} className="border-t border-border-subtle pt-4">
+                    <div className="mb-1 font-mono text-xs uppercase tracking-wider text-stone-teal">Step {index + 1}</div>
+                    <h2 className="mb-1 font-semibold text-text-primary">{step.title}</h2>
+                    <p className="text-sm leading-relaxed text-text-muted">{step.body}</p>
+                  </li>
+                ))}
+              </ol>
+
+              <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 {[
-                  ['Classification', 'Likely AI Act risk tier with confidence'],
-                  ['Vendor evidence', 'Questions to ask before relying on the tool'],
-                  ['Ongoing review', 'Triggers for reassessment after launch'],
+                  ['About five minutes', `${assessmentQuestions.length} questions; a description in your own words fills most of them.`],
+                  ['Rules, not a model', 'The tier comes from versioned rules. No language model decides it.'],
+                  ['Pinned statute', `Rule pack ${RULE_PACK.manifest.version}, built from CELEX ${RULE_PACK.manifest.provenance.celex}.`],
+                  ['Yours to keep', 'Copy or download the whole record as Markdown. Nothing is gated before the result.'],
                 ].map(([title, copy]) => (
                   <div key={title} className="border border-border-subtle bg-stone-charcoal/60 rounded-lg p-4">
                     <div className="text-sm font-semibold text-text-primary">{title}</div>
@@ -302,8 +484,9 @@ export default function ComplianceCheckerPage() {
                   </div>
                 ))}
               </div>
-              <p className="text-sm italic text-text-muted mt-5 opacity-80">
-                Informational triage only; not formal legal advice.
+              <p className="text-sm text-text-muted mt-5 opacity-80">
+                This is a first-pass triage against the text of the Act, not legal advice. A high-risk
+                or prohibited result is a reason to take advice, not a finding against you.
               </p>
               {COMPLIANCE_CHECKER_V2 && !v2Active && (
                 <p className="mt-4 text-sm text-text-muted">
@@ -319,6 +502,71 @@ export default function ComplianceCheckerPage() {
         </section>
 
         <section className="mx-auto max-w-5xl px-6 py-10">
+          {resumed && !v2Active && (
+            <div className="mb-6 flex flex-col gap-3 rounded-lg border border-stone-teal/40 bg-stone-teal/10 p-4 text-sm sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-text-primary">
+                <span className="font-semibold">Picked up where you left off.</span>{' '}
+                {resumed.atResult
+                  ? 'Your last result is restored below.'
+                  : `You were at step ${Math.min(resumed.step + 1, visibleQuestions.length)} of ${visibleQuestions.length}.`}
+              </p>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={reset}
+                  className="border-stone-teal text-stone-teal dark:border-stone-teal"
+                >
+                  <RefreshCcw className="w-3.5 h-3.5" />
+                  Start again
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setResumed(null)}
+                  aria-label="Dismiss"
+                  className="h-8 w-8 text-text-muted hover:text-text-primary"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Worked examples, shown only on the first screen. Each verdict is
+              computed by the engine from a full answer set, never typed. */}
+          {!v2Active && showIntake && !showResult && (
+            <div className="mb-8">
+              <div className="mb-3 flex items-baseline justify-between gap-4">
+                <h2 className="text-sm font-mono uppercase tracking-wider text-text-muted">
+                  What a result looks like
+                </h2>
+                <span className="text-xs text-text-muted">Three systems, run through the same rules</span>
+              </div>
+              <div className="grid gap-3 md:grid-cols-3">
+                {EXAMPLE_RESULTS.map(({ title, description, result: example }) => {
+                  const exampleTone = resultTone(example.classification)
+                  return (
+                    <div
+                      key={title}
+                      className={`rounded-lg border ${exampleTone.border} bg-stone-charcoal/60 p-4`}
+                    >
+                      <div className={`text-sm font-semibold ${exampleTone.text}`}>{example.classification}</div>
+                      <div className="mt-2 font-medium text-text-primary">{title}</div>
+                      <p className="mt-1 text-sm leading-relaxed text-text-muted">{description}</p>
+                      <div className="mt-3 text-xs text-text-muted">
+                        {example.role} · {example.confidence.toLowerCase()} confidence · {example.actions.length}{' '}
+                        {example.actions.length === 1 ? 'item' : 'items'} to act on
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
           {/*
             v2 renders *instead of* v1, never mixed into it — spec §23.2. The
             flag decides whether the preview is offered at all; the URL decides
@@ -357,12 +605,42 @@ export default function ComplianceCheckerPage() {
                           style={{ width: `${progress}%` }}
                         />
                       </div>
-                      <div className="mt-4 text-xs font-mono uppercase text-stone-teal">
-                        {currentQuestion.section}
-                      </div>
-                      <div className="text-sm text-text-muted mt-1">
+                      <div className="text-sm text-text-muted mt-2">
                         Step {currentIndex + 1} of {visibleQuestions.length}
                       </div>
+                      {/* The sections the walk covers, so the reader can see what
+                          is coming rather than only how far along they are. */}
+                      <ol className="mt-4 space-y-1.5" aria-label="Assessment sections">
+                        {sections.map((section, index) => {
+                          const state =
+                            index < currentSectionIndex ? 'done' : index === currentSectionIndex ? 'current' : 'todo'
+                          return (
+                            <li
+                              key={section}
+                              aria-current={state === 'current' ? 'step' : undefined}
+                              className={`flex items-center gap-2 text-xs ${
+                                state === 'current'
+                                  ? 'font-mono uppercase tracking-wider text-stone-teal'
+                                  : state === 'done'
+                                    ? 'text-text-muted'
+                                    : 'text-text-muted/60'
+                              }`}
+                            >
+                              {state === 'done' ? (
+                                <CheckCircle2 className="h-3 w-3 flex-shrink-0 text-stone-teal" aria-hidden />
+                              ) : (
+                                <span
+                                  className={`h-3 w-3 flex-shrink-0 rounded-full border ${
+                                    state === 'current' ? 'border-stone-teal bg-stone-teal' : 'border-text-muted/60'
+                                  }`}
+                                  aria-hidden
+                                />
+                              )}
+                              {section}
+                            </li>
+                          )
+                        })}
+                      </ol>
                     </CardContent>
                   </Card>
 
@@ -532,6 +810,25 @@ export default function ComplianceCheckerPage() {
                       <div className="text-xl font-semibold text-text-primary mt-1">{result.role}</div>
                     </div>
                   </div>
+                  {/* The record is long — a dozen cards — so the ways to keep it
+                      and the ways to move around it sit at the top, not only at
+                      the foot where they used to be alone. */}
+                  <div className="mt-5 flex flex-col gap-4 border-t border-border-subtle pt-4 lg:flex-row lg:items-start lg:justify-between">
+                    <div className="shrink-0">
+                      <CopyMarkdownButton
+                        toolName="Compliance Checker"
+                        filename={`ai-act-assessment-${new Date().toISOString().slice(0, 10)}.md`}
+                        getMarkdown={() => complianceCheckerMarkdown(result, answers, assessmentQuestions)}
+                      />
+                    </div>
+                    <nav aria-label="Sections of this result" className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
+                      {RESULT_SECTIONS.map(([id, label]) => (
+                        <a key={id} href={`#${id}`} className="text-text-muted hover:text-stone-teal">
+                          {label}
+                        </a>
+                      ))}
+                    </nav>
+                  </div>
                 </CardHeader>
               </Card>
 
@@ -541,7 +838,7 @@ export default function ComplianceCheckerPage() {
                 item, so they are several times taller than a plain bulleted
                 card and made any grid they sat in lopsided.
               */}
-              <div className="grid gap-6 lg:grid-cols-2">
+              <div id="why" className="scroll-mt-24 grid gap-6 lg:grid-cols-2">
                 <ResultCard
                   icon={<ShieldCheck className="w-5 h-5 text-stone-teal" />}
                   title="Why this result"
@@ -554,11 +851,15 @@ export default function ComplianceCheckerPage() {
                 />
               </div>
 
-              <ObligationList items={result.actions} />
+              <div id="obligations" className="scroll-mt-24">
+                <ObligationList items={result.actions} />
+              </div>
 
-              <VendorQuestionList items={result.vendorQuestions} />
+              <div id="vendor-questions" className="scroll-mt-24">
+                <VendorQuestionList items={result.vendorQuestions} />
+              </div>
 
-              <Card className="bg-stone-charcoal border-border-subtle">
+              <Card id="adjacent" className="scroll-mt-24 bg-stone-charcoal border-border-subtle">
                 <CardHeader>
                   <CardTitle className="text-lg text-text-primary">Adjacent GDPR and vendor-risk signals</CardTitle>
                   <CardDescription>
@@ -585,9 +886,11 @@ export default function ComplianceCheckerPage() {
                 front of it. Everything above this line is what the tool gave
                 away before the report existed, and still does.
               */}
-              <ReportGate answers={answers} />
+              <div id="report" className="scroll-mt-24">
+                <ReportGate answers={answers} />
+              </div>
 
-              <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
+              <div id="next-step" className="scroll-mt-24 grid gap-6 lg:grid-cols-[1fr_360px]">
                 <Card className="bg-stone-charcoal border-border-subtle">
                   <CardHeader>
                     <CardTitle className="text-lg text-text-primary">Ongoing review triggers</CardTitle>
@@ -656,7 +959,7 @@ export default function ComplianceCheckerPage() {
                 </Card>
               </div>
 
-              <Card className="bg-stone-charcoal border-border-subtle">
+              <Card id="timing" className="scroll-mt-24 bg-stone-charcoal border-border-subtle">
                 <CardHeader>
                   <CardTitle className="text-lg text-text-primary">Timing</CardTitle>
                   <CardDescription>
@@ -696,7 +999,7 @@ export default function ComplianceCheckerPage() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-stone-charcoal border-border-subtle">
+              <Card id="penalties" className="scroll-mt-24 bg-stone-charcoal border-border-subtle">
                 <CardHeader>
                   <CardTitle className="text-lg text-text-primary">Penalty ceilings</CardTitle>
                   <CardDescription>
@@ -751,7 +1054,7 @@ export default function ComplianceCheckerPage() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-stone-charcoal border-border-subtle">
+              <Card id="rules" className="scroll-mt-24 bg-stone-charcoal border-border-subtle">
                 <CardHeader>
                   <CardTitle className="text-lg text-text-primary">Rules fired</CardTitle>
                   <CardDescription>
