@@ -829,9 +829,19 @@ priced. These changes shipped in `8a20e438` and its September 9 predecessors.
 props; do not add a section to one module page. The `coverage` slot renders
 `RelatedCoverage` ("Further reading on this topic" — never "coverage this
 draws on", the owner does not want the engagement to read as sourced from four
-articles rather than the knowledge base) after the enquiry form; its article
-lists are typed into the pages until the planned Sanity `article` field naming
-the offers a piece appears under exists. The Chips Act article numbers on the
+articles rather than the knowledge base) after the enquiry form. Its articles
+come from `article.appearsUnder` in Sanity ("Show under offerings" in Studio),
+read by `coverageFor()` in `src/lib/advisory/coverage.ts` through `sanityFetch`
+so a placement needs no deploy. The checkbox list is `COVERAGE_PLACEMENTS`,
+derived from the catalogue — **modules only**, deliberately: the engagement
+pages have no slot for the strip, and a checkbox that places an article nowhere
+is the silent failure the field exists to remove. `coverage-placement.test.ts`
+asserts the schema reads the list rather than retyping it and that every
+placement's page fetches its own id, so an engagement cannot be added to the
+list before `FocusedEngagementPage` can render it. Because of that fetch, each
+module's `page.tsx` is a thin server half and the content lives in the
+`*Module.tsx` Client Component beside it (the enquiry form takes an icon, which
+cannot cross the server boundary). The Chips Act article numbers on the
 manufacturing page (23, 25, 26(4), Annex IV) are read from the pinned corpus
 under `corpus/regulatory/eu-chips-act/` — verify there before changing one.
 

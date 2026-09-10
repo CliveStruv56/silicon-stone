@@ -1,6 +1,7 @@
 import { defineType, defineField, defineArrayMember } from 'sanity'
 import { DocumentTextIcon } from '@sanity/icons'
 import { slugify } from '@/lib/utils'
+import { COVERAGE_PLACEMENTS } from '@/lib/advisory/coverage-placement'
 import { ClaimCheckInput } from '../components/ClaimCheckInput'
 import { ImagePromptsInput } from '../components/ImagePromptsInput'
 import { CitationsInput } from '../components/CitationsInput'
@@ -272,6 +273,19 @@ export const article = defineType({
       type: 'array',
       of: [defineArrayMember({ type: 'reference', to: [{ type: 'article' }] })],
       validation: (rule) => rule.max(3),
+    }),
+    defineField({
+      group: 'content',
+      name: 'appearsUnder',
+      title: 'Show under offerings',
+      description:
+        'Places this article in the "Further reading on this topic" strip at the foot of the ticked module or engagement pages. Newest first; the excerpt is the line shown under the title.',
+      type: 'array',
+      of: [defineArrayMember({ type: 'string' })],
+      // Derived from the offering catalogue, never typed here — see
+      // `coverage-placement.ts` for why.
+      options: { list: COVERAGE_PLACEMENTS.map(p => ({ value: p.value, title: p.title })), layout: 'grid' },
+      validation: (rule) => rule.unique(),
     }),
     defineField({
       group: 'content',

@@ -5,8 +5,8 @@ export type CoverageArticle = {
   title: string
   /** The `/analysis/<slug>` path. */
   href: string
-  /** One line on why this piece belongs under this offer. */
-  note: string
+  /** The line under the title — the article's excerpt when read from Sanity. */
+  note?: string
 }
 
 type Props = {
@@ -23,13 +23,13 @@ type Props = {
  * want the strip to read as if the engagement were assembled from four
  * articles.
  *
- * The lists are typed into each page for now. The intended source is a field
- * on the Sanity `article` document saying which offers a piece should appear
- * under, so an editor can place a new article without a deploy; this component
- * is the rendering half of that, and takes plain `{title, href, note}` so the
- * data can come from either place. Rendered at the base of the page, after the
- * enquiry form, because that is where a reader who is still deciding goes
- * looking for proof.
+ * The articles come from `article.appearsUnder` in Sanity, read by
+ * `coverageFor()` in `src/lib/advisory/coverage.ts`, so an editor places a
+ * piece under an offering without a deploy. This component takes plain
+ * `{title, href, note}` and knows nothing about where they came from. Rendered
+ * at the base of the page, after the enquiry form, because that is where a
+ * reader who is still deciding goes looking for proof. Nothing placed, nothing
+ * rendered — no heading over an empty list.
  */
 export function RelatedCoverage({ articles, more }: Props) {
   if (articles.length === 0) return null
@@ -55,7 +55,9 @@ export function RelatedCoverage({ articles, more }: Props) {
               <Link href={article.href} className="font-semibold leading-snug text-text-primary hover:text-stone-teal">
                 {article.title}
               </Link>
-              <p className="mt-2 text-sm leading-relaxed text-text-muted">{article.note}</p>
+              {article.note && (
+                <p className="mt-2 text-sm leading-relaxed text-text-muted">{article.note}</p>
+              )}
             </li>
           ))}
         </ul>

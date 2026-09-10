@@ -769,6 +769,7 @@ each claim's suggested revision.
 | Impact Score, Stone Truth, Methodology Audit | Image prompt timestamp/model |
 | What to do next, End-of-article gate | Citation snapshots, Generation snapshot |
 | Excerpt, Body, Sources / Citations, SEO | Related Articles *(editable, but overwritten on publish)* |
+| **Show under offerings** — tick a module or engagement and the piece appears in that page's "Further reading on this topic" strip, newest first, with the Excerpt as its line. No deploy needed. | |
 
 ### ⚠ Categories are required, and they are not navigation
 

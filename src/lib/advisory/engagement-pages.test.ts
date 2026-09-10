@@ -220,7 +220,15 @@ describe('follow-on module pages', () => {
    */
   it('tags every module enquiry with the catalogue name', () => {
     for (const m of modulePages) {
-      const source = fs.readFileSync(path.join(m.dir, 'page.tsx'), 'utf8')
+      // Since 2026-09-10 `page.tsx` is a thin server half that fetches the
+      // article placements; the content, enquiry form included, lives in the
+      // Client Component beside it. Read the whole directory so the check
+      // follows the content rather than the file name.
+      const source = fs
+        .readdirSync(m.dir)
+        .filter((file) => file.endsWith('.tsx'))
+        .map((file) => fs.readFileSync(path.join(m.dir, file), 'utf8'))
+        .join('\n')
       const values = [...source.matchAll(/\binterest:\s*(offering\.name|'([^']+)')/g)]
       expect(
         values.length,

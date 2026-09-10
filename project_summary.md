@@ -720,6 +720,29 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### September 10, 2026 (evening) — Articles placed under offerings from Studio
+
+`article.appearsUnder` ("Show under offerings", Content group, checkbox grid)
+names the module pages an article appears under in the "Further reading on
+this topic" strip. The option list is `COVERAGE_PLACEMENTS`
+(`src/lib/advisory/coverage-placement.ts`), derived from `MODULES`, so Studio
+cannot name an offering the site does not have. `ARTICLES_FOR_OFFERING_QUERY` orders by
+`coalesce(publishedAt, _updatedAt)` and caps at six; `coverageFor()`
+(`src/lib/advisory/coverage.ts`, server-only) reads it through `sanityFetch`,
+so placing an article re-renders the page with no deploy. Each module's
+`page.tsx` became a thin async server half and the content moved to a
+`*Module.tsx` Client Component beside it. The eleven previously typed
+placements were written to the published documents (no drafts existed) and the
+typed lists deleted; the three strips render from Sanity. Schema deployed with
+`npx sanity schema deploy`. `coverage-placement.test.ts` guards the derivation
+and that every placement's page fetches its own id. **Not done, by design:**
+the four engagement pages (`FocusedEngagementPage`) have no slot for the
+strip, so engagements are not offered in Studio — a checkbox that places an
+article nowhere would be a silent failure. Adding the slot to that template
+(and the same server/client split on the four engagement pages) is the next
+step if the owner wants further reading on the advisories too; the test then
+insists each is fetched.
+
 ### September 10, 2026 (later) — Supply Chain Mapper introduces itself and points at its module
 
 The mapper's hero was one sentence and a node count; the module was an amber

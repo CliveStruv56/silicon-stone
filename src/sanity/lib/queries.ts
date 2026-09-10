@@ -404,6 +404,21 @@ export const ARTICLES_BY_CATEGORY_QUERY = defineQuery(`
   }
 `)
 
+/**
+ * Articles an editor has placed under an offering (`article.appearsUnder`),
+ * for the "Further reading on this topic" strip on that offering's page.
+ * Capped so a generous editor cannot turn the strip into a feed.
+ */
+export const ARTICLES_FOR_OFFERING_QUERY = defineQuery(`
+  *[_type == "article" && defined(slug.current) && $offeringId in appearsUnder]
+  | order(coalesce(publishedAt, _updatedAt) desc) [0...6] {
+    _id,
+    title,
+    "slug": slug.current,
+    excerpt
+  }
+`)
+
 // Authors
 export const AUTHOR_QUERY = defineQuery(`
   *[_type == "author" && slug.current == $slug][0] {
