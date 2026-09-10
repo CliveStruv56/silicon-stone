@@ -45,6 +45,7 @@ import {
   type SourcingFlexibility,
 } from '@/lib/supply-chain-data'
 import { supplyChainMapperMarkdown } from '@/lib/tools-markdown'
+import { MODULES } from '@/lib/offering'
 import {
   AlertTriangle,
   ArrowRight,
@@ -92,6 +93,20 @@ const GEOGRAPHY_OPTIONS = [
   { value: 'europe', label: 'Europe-facing operations' },
   { value: 'asia', label: 'Asia-heavy supply base' },
   { value: 'global', label: 'Global / mixed exposure' },
+]
+
+/**
+ * The paid step up from this tool, read from the catalogue so the hero, the
+ * snapshot footer and the button cannot name or link it differently from
+ * `/pricing`. The band beneath the tool (`FollowOnModule`) does the same lookup.
+ */
+const FOLLOW_ON_MODULE = MODULES.find(m => m.id === 'manufacturing-exposure')!
+
+const HOW_IT_WORKS = [
+  { title: 'Set your context', body: 'Industry, critical chip class, sourcing posture and supply footprint.' },
+  { title: 'Choose a scenario', body: 'Baseline, Taiwan disruption, EUV constraint, HBM shortage or export-control escalation.' },
+  { title: 'Read the ranking', body: 'The chokepoints that matter most to your profile, scored and linked to what they depend on.' },
+  { title: 'Take the snapshot', body: 'Highest exposures, first response moves and procurement questions, copied or printed.' },
 ]
 
 export default function SupplyChainMapperPage() {
@@ -242,7 +257,7 @@ export default function SupplyChainMapperPage() {
 
       <main className="flex-1 bg-background">
         {/* Hero Section */}
-        <section className="bg-slate-deep border-b border-border-subtle py-8">
+        <section className="bg-slate-deep border-b border-border-subtle py-8 lg:py-12">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <Badge variant="outline" className="mb-4 border-silicon-amber text-silicon-amber-strong">
               Interactive Tool
@@ -250,9 +265,44 @@ export default function SupplyChainMapperPage() {
             <h1 className="text-3xl font-bold text-text-primary sm:text-4xl mb-4">
               Supply Chain Mapper
             </h1>
-            <p className="text-lg text-text-muted max-w-2xl">
-              Mapping the physical vulnerability of the digital world. Explore {SUPPLY_CHAIN_NODES.length} critical nodes across the global semiconductor supply chain.
+            <p className="text-lg text-text-muted max-w-3xl">
+              Mapping the physical vulnerability of the digital world. The tool models
+              {' '}{SUPPLY_CHAIN_NODES.length} named chokepoints across {NODE_TYPE_OPTIONS.length} layers of the
+              semiconductor supply chain — fabrication, materials, equipment, design, advanced
+              packaging and the IP and EDA toolchain — and how each depends on the others.
             </p>
+            {/* The counts are read from the data, not typed: a node added to the
+                model must not leave the introduction understating it. */}
+            <p className="mt-4 max-w-3xl leading-relaxed text-text-muted">
+              Set your industry, the chip class you depend on, your sourcing posture and your
+              supply footprint, then choose one of {SUPPLY_CHAIN_SCENARIOS.length} stress scenarios.
+              The map ranks the chokepoints that matter most to that profile, scores each on
+              exposure, substitution difficulty, lead-time pressure and geopolitical pressure,
+              and closes with a snapshot you can take into a meeting: the highest exposures,
+              the first response moves and the questions to put to procurement.
+            </p>
+            {/* The step up to the paid module is said here, before the reader
+                has invested time, so it arrives at the end as the natural next
+                step rather than a pitch appended to a free tool. */}
+            <p className="mt-4 max-w-3xl leading-relaxed text-text-muted">
+              It works at the level of an industry. When you need the same picture drawn
+              against your own suppliers and product lines, with the evidence recorded, that is
+              the{' '}
+              <Link href={FOLLOW_ON_MODULE.href} className="text-stone-teal underline underline-offset-4">
+                {FOLLOW_ON_MODULE.name}
+              </Link>
+              .
+            </p>
+
+            <ol className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {HOW_IT_WORKS.map((step, index) => (
+                <li key={step.title} className="border-t border-border-subtle pt-4">
+                  <div className="mb-1 font-mono text-xs uppercase tracking-wider text-stone-teal">Step {index + 1}</div>
+                  <h2 className="mb-1 font-semibold text-text-primary">{step.title}</h2>
+                  <p className="text-sm leading-relaxed text-text-muted">{step.body}</p>
+                </li>
+              ))}
+            </ol>
           </div>
         </section>
 
@@ -813,20 +863,37 @@ export default function SupplyChainMapperPage() {
                 </ul>
               </div>
             </CardContent>
+            {/* The highest-intent placement on the page: the reader has a
+                result in hand. The link is the catalogue's, never retyped. */}
+            <div className="border-t border-border-subtle px-6 py-4 text-sm leading-relaxed text-text-muted">
+              This snapshot works at industry level. To have it drawn against your own bill of
+              materials and suppliers, with the evidence recorded, see the{' '}
+              <Link href={FOLLOW_ON_MODULE.href} className="text-stone-teal underline underline-offset-4">
+                {FOLLOW_ON_MODULE.name}
+              </Link>
+              .
+            </div>
           </Card>
+        </section>
 
+        {/* The module band follows the snapshot directly. It used to sit below
+            the subscribe card and a button that sent the reader to the Drift
+            Retainer, so the one call to action visible after the result pointed
+            at the wrong product and the right one was a screen further down. */}
+        <FollowOnModule moduleId="manufacturing-exposure" />
+
+        <section className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
           <ToolSubscribeCard tool="supply-chain-mapper" />
 
-          {/* CTA */}
+          {/* CTA — kept at the owner's request, pointed at the module. */}
           <div className="flex justify-center pt-8">
-            <Link href="/advisory/drift-retainer">
+            <Link href={FOLLOW_ON_MODULE.href}>
               <Button className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90">
                 Request Supply Chain Exposure Report
               </Button>
             </Link>
           </div>
         </section>
-        <FollowOnModule moduleId="manufacturing-exposure" />
       </main>
 
       <Footer />

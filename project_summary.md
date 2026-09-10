@@ -720,6 +720,23 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### September 10, 2026 (later) — Supply Chain Mapper introduces itself and points at its module
+
+The mapper's hero was one sentence and a node count; the module was an amber
+band at the foot of the page, below the subscribe card and a button that sent
+the reader to the **Drift Retainer**. Now: a two-paragraph introduction (counts
+read from `supply-chain-data.ts`, never typed), a third paragraph naming the
+Manufacturing Exposure Module as the step from the industry picture to the
+reader's own, four "how it works" tiles, a module line at the foot of the
+Exposure Report Snapshot card (the highest-intent placement), the amber band
+directly after the snapshot, subscribe card after it, and the "Request Supply
+Chain Exposure Report" button kept at the owner's request but pointed at the
+module. The markdown export gains a "Next step" section with the module's
+absolute URL. Every reference to the module reads name and href from `MODULES`.
+The module page's "thirty named chokepoints" became a live count: the model
+holds 31. "Email me the brief" is `window.print()`, so the printed page already
+carries the band and the snapshot line.
+
 ### September 10, 2026 — Manufacturing Exposure Module page given the substance of a £3,500 offer
 
 The page had four deliverable bullets and three paragraphs. `ModulePage` now

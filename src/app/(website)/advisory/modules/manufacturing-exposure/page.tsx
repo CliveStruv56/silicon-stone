@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { ModulePage } from '@/components/advisory/ModulePage'
 import { Shield } from 'lucide-react'
 import { MODULES } from '@/lib/offering'
+import { NODE_TYPE_OPTIONS, SUPPLY_CHAIN_NODES, SUPPLY_CHAIN_SCENARIOS } from '@/lib/supply-chain-data'
 
 const offering = MODULES.find(m => m.id === 'manufacturing-exposure')!
 
@@ -106,7 +107,9 @@ export default function ManufacturingExposurePage() {
       fromTool={offering.fromTool}
       body={<>
         <p>The free tool models dependency at the level of an industry. This module does it at the level of your organisation: the components you actually buy, the suppliers you actually depend on, and the substitutions that are realistically available to you.</p>
-        <p>The tool scores thirty named chokepoints across six layers — fabrication, materials, equipment, design, advanced packaging and the IP and EDA toolchain — against five stress scenarios. The module takes the components, boards, cloud capacity and accelerators on your own bill of materials and resolves each one down to those layers, so that a supplier who looks diversified at assembly level is shown to sit on the same foundry, the same packaging route or the same controlled material as the alternative.</p>
+        {/* Counts are read from the tool's data: the page said "thirty" while
+            the model held 31, and nothing would have failed. */}
+        <p>The tool scores {SUPPLY_CHAIN_NODES.length} named chokepoints across {NODE_TYPE_OPTIONS.length} layers — fabrication, materials, equipment, design, advanced packaging and the IP and EDA toolchain — against {SUPPLY_CHAIN_SCENARIOS.length} stress scenarios. The module takes the components, boards, cloud capacity and accelerators on your own bill of materials and resolves each one down to those layers, so that a supplier who looks diversified at assembly level is shown to sit on the same foundry, the same packaging route or the same controlled material as the alternative.</p>
         <p>It is most useful when a board or a customer has asked a question the tool cannot answer — which of these dependencies would genuinely stop us, what would we do about it, and what can we show we did.</p>
         <p>Where your exposure is broader than manufacturing, the <Link href="/advisory/exposure-diagnostic" className="text-stone-teal underline underline-offset-4">Exposure Diagnostic</Link> is the wider review and this module folds into its scope.</p>
       </>}

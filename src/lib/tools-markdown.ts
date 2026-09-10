@@ -8,6 +8,7 @@ import { RULE_PACK } from './rulepack'
 import { ACTION_KIND_LABEL, groupObligations } from './ai-act-obligations'
 import type { ResultItem, ResultVendorQuestion } from './ai-act-rules'
 import { absoluteUrl } from './site'
+import { MODULES } from './offering'
 import type { Policy, IndustryImpact } from '@/types/policy'
 import type { Scenario, ExposureProfile as ScenarioExposureProfile } from '@/types/scenario'
 import type {
@@ -276,6 +277,12 @@ ${node.details}
 ${mitigation}${questions}${signals}${evidence}`
 }
 
+/**
+ * The paid step up from the mapper, from the catalogue so the export cannot
+ * name or link it differently from the page it was copied from.
+ */
+const FOLLOW_ON = MODULES.find(m => m.id === 'manufacturing-exposure')!
+
 export function supplyChainMapperMarkdown(args: SupplyMapArgs): string {
   const { profile, scenario, topNodes, selectedNode, selectedNodeExposureScore } = args
 
@@ -310,6 +317,9 @@ ${topList}
 ${bullets(supplierQuestions, 'Confirm second-source qualification and allocation rights for the top three nodes above.')}
 
 ${selectedNode ? `## Selected node detail\n\n${nodeMarkdown(selectedNode, selectedNodeExposureScore)}` : ''}
+## Next step
+
+This snapshot works at industry level. To have it drawn against your own bill of materials and suppliers, with the evidence recorded, see the ${FOLLOW_ON.name}: ${absoluteUrl(FOLLOW_ON.href)}
 `
 }
 
