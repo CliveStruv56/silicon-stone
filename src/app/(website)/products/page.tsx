@@ -305,21 +305,6 @@ export default function ProductsPage() {
                         <p className="mt-2 max-w-2xl text-text-muted leading-relaxed">
                           {WAYMARKPATH_POSITIONING.panelDescription}
                         </p>
-
-                        <FlowRibbon className="mt-6 max-w-2xl" />
-
-                        <ul className="mt-6 grid gap-2 sm:grid-cols-3">
-                          {[
-                            'Gap analysis against ESCO, the EU’s 13,890-skill classification',
-                            'A CV scored against the filters that reject it before a human reads it',
-                            'A daily coach that carries your history instead of starting cold',
-                          ].map((item) => (
-                            <li key={item} className="flex items-start gap-2 text-sm text-text-muted">
-                              <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-sister-indigo" />
-                              {item}
-                            </li>
-                          ))}
-                        </ul>
                       </div>
 
                       <div className="flex flex-shrink-0 flex-col items-start gap-2 lg:items-end">
@@ -332,6 +317,25 @@ export default function ProductsPage() {
                         </span>
                       </div>
                     </div>
+
+                    {/* The same seven-stage ribbon as /waymarkpath, spanning the
+                        card. It used to be a seven-dot sketch of this; the owner
+                        asked for the real thing (2026-09-10). Full width, so it
+                        sits below the heading row rather than beside the CTA. */}
+                    <FlowRibbon intro={false} surface="card" className="mt-8" />
+
+                    <ul className="mt-8 grid gap-2 sm:grid-cols-3">
+                      {[
+                        'Gap analysis against ESCO, the EU’s 13,890-skill classification',
+                        'A CV scored against the filters that reject it before a human reads it',
+                        'A daily coach that carries your history instead of starting cold',
+                      ].map((item) => (
+                        <li key={item} className="flex items-start gap-2 text-sm text-text-muted">
+                          <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-sister-indigo" />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </Link>
               </StaggerItem>

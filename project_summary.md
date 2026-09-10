@@ -759,6 +759,24 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### September 10, 2026 (Products) — WaymarkPath card carries the real seven-stage ribbon
+
+The WaymarkPath band on `/products` showed a seven-dot sketch of the stage
+ribbon (hollow indigo circles, mono labels) where `/waymarkpath` shows the
+full thing — icon dots, numbered badges, the four-tone track, names and
+summaries. Owner asked for the two to match. `FlowRibbon` now has one form:
+the compact branch and its `expanded` flag are gone, replaced by `intro`
+(the "Seven connected stages" heading, off inside the card, which already
+has an `<h2>`) and `surface` (`page` | `card`). The second exists because the
+chevrons between stages mask the track with a solid square painted
+`--slate-deep`, the standalone page's ground — on the charcoal card that
+would have shown as seven pale squares. `.ribbonOnCard` sets
+`--ribbon-surface` to `--stone-charcoal` and drops the ribbon's own top
+border and padding. The ribbon spans the card below the heading row rather
+than sitting beside the CTA. Verified at 1440px light and dark and at 400px,
+where it stacks vertically exactly as the standalone does; `/waymarkpath`
+unchanged. Lint and suite green.
+
 ### September 10, 2026 (advisory hub) — hero callout leads with the Advisory Briefing
 
 The hub's above-the-fold callout (`advisory/page.tsx`) was headed **"In

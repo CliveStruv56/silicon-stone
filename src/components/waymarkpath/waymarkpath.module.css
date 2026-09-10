@@ -19,9 +19,18 @@
 
 .ribbon {
   --ribbon-number-ink: #ffffff;
+  /* The arrows mask the track with a solid square, so this must match what
+     the ribbon sits on. Overridden by .ribbonOnCard. */
+  --ribbon-surface: var(--slate-deep);
   position: relative;
   padding: 32px 0 0;
   border-top: 1px solid var(--border-subtle);
+}
+
+.ribbonOnCard {
+  --ribbon-surface: var(--stone-charcoal);
+  padding-top: 0;
+  border-top: 0;
 }
 
 :global(.dark) .ribbon { --ribbon-number-ink: #1c2330; }
@@ -180,7 +189,7 @@
     transform-origin: left;
     background: linear-gradient(90deg, var(--waymark-starting) 20%, var(--waymark-direction) 35%, var(--waymark-action) 55%, var(--waymark-action) 80%, var(--waymark-support));
   }
-  .ribbonArrow { display: block; position: absolute; right: -9px; top: 32px; width: 20px; height: 20px; color: var(--stage-color); stroke-width: 2; background: var(--slate-deep); }
+  .ribbonArrow { display: block; position: absolute; right: -9px; top: 32px; width: 20px; height: 20px; color: var(--stage-color); stroke-width: 2; background: var(--ribbon-surface); }
   .mapList { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: repeat(3, 112px) auto; padding-top: 24px; }
   .mapList > li { display: contents; }
   .stageButton { grid-column: var(--column); grid-row: var(--row); flex-direction: column; justify-content: flex-start; gap: 12px; padding: 0 6px; text-align: center; z-index: 1; }

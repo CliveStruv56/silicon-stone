@@ -7,91 +7,71 @@ import { STAGE_VISUALS } from './stage-visuals'
 import styles from './waymarkpath.module.css'
 
 /**
- * The compact form of the connected-system motif, for the Products-page band.
+ * The seven stages on one drawn track — the same motif on `/waymarkpath` and
+ * on the Products-page band, so the two surfaces cannot drift apart (they had:
+ * the band carried a seven-dot sketch of this, which the owner asked to match
+ * the real thing on 2026-09-10).
  *
- * Seven nodes on a track that draws itself once, on scroll into view. There is
- * no interaction here on purpose: the whole band is a single link, so anything
- * clickable inside it would either swallow the navigation or nest a control in
- * an anchor. The interactive version lives on `/waymarkpath`.
+ * There is no interaction here on purpose: on Products the whole band is a
+ * single link, so anything clickable inside it would either swallow the
+ * navigation or nest a control in an anchor. The interactive version is
+ * `ConnectedSystem`.
+ *
+ * `intro` — the "Seven connected stages" heading. Off inside the Products card,
+ * which already has an `<h2>` for WaymarkPath itself.
+ * `surface` — what sits behind the ribbon. The arrows between stages mask the
+ * track with a solid square, so they must be painted the colour of whatever
+ * the ribbon is on: the page ground on `/waymarkpath`, the card on Products.
  */
-export function FlowRibbon({ className = '', expanded = false }: { className?: string; expanded?: boolean }) {
+export function FlowRibbon({
+  className = '',
+  intro = true,
+  surface = 'page',
+}: {
+  className?: string
+  intro?: boolean
+  surface?: 'page' | 'card'
+}) {
   const reduce = useReducedMotion()
 
-  if (expanded) {
-    return (
-      <div className={`${styles.theme} ${styles.ribbon} ${className}`}>
+  return (
+    <div
+      className={`${styles.theme} ${styles.ribbon} ${surface === 'card' ? styles.ribbonOnCard : ''} ${className}`}
+    >
+      {intro && (
         <div className={styles.ribbonIntro}>
           <h2>{WAYMARKPATH_POSITIONING.stagesHeading}</h2>
           <span>Seven stages. One shared picture of you.</span>
         </div>
-        <div className={styles.ribbonRoute}>
-          <motion.div
-            className={styles.ribbonTrack}
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: reduce ? 0 : 0.9, ease: 'easeInOut' }}
-            aria-hidden="true"
-          />
-          <ol className={styles.ribbonList} aria-label="The seven stages of your career journey">
-            {WAYMARKPATH_CAPABILITIES.map((cap, index) => {
-              const { icon: Icon, tone } = STAGE_VISUALS[cap.id]
-              return (
-                <li className={styles.ribbonStage} key={cap.id} data-tone={tone}>
-                  <span className={styles.ribbonDot} aria-hidden="true">
-                    <Icon />
-                    <span className={styles.ribbonNumber}>{cap.step}</span>
-                  </span>
-                  <div className={styles.ribbonCopy}>
-                    <h3 className={styles.ribbonLabel}>{cap.name}</h3>
-                    <p className={styles.ribbonSummary}>{cap.summary}</p>
-                  </div>
-                  {index < WAYMARKPATH_CAPABILITIES.length - 1 && (
-                    <ChevronRight className={styles.ribbonArrow} aria-hidden="true" />
-                  )}
-                </li>
-              )
-            })}
-          </ol>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className={className} aria-hidden="true">
-      <div className="relative">
-        {/* Resting track */}
-        <div className="absolute left-0 right-0 top-[7px] h-px bg-border-subtle" />
-
-        {/* Drawn track. transformOrigin left so it grows rather than fades. */}
+      )}
+      <div className={styles.ribbonRoute}>
         <motion.div
-          className="absolute left-0 right-0 top-[7px] h-px origin-left bg-sister-indigo/60"
-          initial={reduce ? { scaleX: 1 } : { scaleX: 0 }}
+          className={styles.ribbonTrack}
+          initial={{ scaleX: 0 }}
           whileInView={{ scaleX: 1 }}
-          viewport={{ once: true, margin: '-50px' }}
-          transition={reduce ? { duration: 0 } : { duration: 1.1, ease: 'easeInOut' }}
+          viewport={{ once: true }}
+          transition={{ duration: reduce ? 0 : 0.9, ease: 'easeInOut' }}
+          aria-hidden="true"
         />
-
-        <ol className="relative flex items-start justify-between">
-          {WAYMARKPATH_CAPABILITIES.map((cap, i) => (
-            <li key={cap.id} className="flex min-w-0 flex-col items-center gap-2">
-              <motion.span
-                className="block h-[15px] w-[15px] rounded-full border-2 border-sister-indigo bg-stone-charcoal"
-                initial={reduce ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.4 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true, margin: '-50px' }}
-                transition={
-                  reduce
-                    ? { duration: 0 }
-                    : { duration: 0.32, ease: 'easeOut', delay: 0.12 + i * 0.13 }
-                }
-              />
-              <span className="hidden truncate font-mono text-[10px] uppercase tracking-[0.1em] text-text-muted sm:block">
-                {cap.short}
-              </span>
-            </li>
-          ))}
+        <ol className={styles.ribbonList} aria-label="The seven stages of your career journey">
+          {WAYMARKPATH_CAPABILITIES.map((cap, index) => {
+            const { icon: Icon, tone } = STAGE_VISUALS[cap.id]
+            return (
+              <li className={styles.ribbonStage} key={cap.id} data-tone={tone}>
+                <span className={styles.ribbonDot} aria-hidden="true">
+                  <Icon />
+                  <span className={styles.ribbonNumber}>{cap.step}</span>
+                </span>
+                <div className={styles.ribbonCopy}>
+                  <h3 className={styles.ribbonLabel}>{cap.name}</h3>
+                  <p className={styles.ribbonSummary}>{cap.summary}</p>
+                </div>
+                {index < WAYMARKPATH_CAPABILITIES.length - 1 && (
+                  <ChevronRight className={styles.ribbonArrow} aria-hidden="true" />
+                )}
+              </li>
+            )
+          })}
         </ol>
       </div>
     </div>
