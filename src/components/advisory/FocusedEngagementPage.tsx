@@ -3,6 +3,7 @@ import type { ComponentProps, ReactNode } from 'react'
 import { Header, Footer } from '@/components/layout'
 import { EngagementContactForm } from './EngagementContactForm'
 import { EngagementHero } from './EngagementHero'
+import { RelatedCoverage } from './RelatedCoverage'
 
 type Props = {
   hero: Omit<ComponentProps<typeof EngagementHero>, 'showRelatedLink'>
@@ -11,10 +12,16 @@ type Props = {
   price: string
   pricing: ReactNode
   contact: ComponentProps<typeof EngagementContactForm>
+  /**
+   * Articles placed under this engagement in Studio (`article.appearsUnder`),
+   * fetched by the server half of the page. Rendered after the enquiry form,
+   * as on the module pages; nothing placed, nothing rendered.
+   */
+  coverage?: ComponentProps<typeof RelatedCoverage>
 }
 
 /** The agreed reading order for Briefing, Diagnostic and Retainer. */
-export function FocusedEngagementPage({ hero, audience, process, price, pricing, contact }: Props) {
+export function FocusedEngagementPage({ hero, audience, process, price, pricing, contact, coverage }: Props) {
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
@@ -46,6 +53,8 @@ export function FocusedEngagementPage({ hero, audience, process, price, pricing,
         </section>
 
         <EngagementContactForm {...contact} />
+
+        {coverage && <RelatedCoverage {...coverage} />}
       </main>
       <Footer />
     </div>

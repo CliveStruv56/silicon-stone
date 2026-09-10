@@ -735,13 +735,23 @@ so placing an article re-renders the page with no deploy. Each module's
 placements were written to the published documents (no drafts existed) and the
 typed lists deleted; the three strips render from Sanity. Schema deployed with
 `npx sanity schema deploy`. `coverage-placement.test.ts` guards the derivation
-and that every placement's page fetches its own id. **Not done, by design:**
-the four engagement pages (`FocusedEngagementPage`) have no slot for the
-strip, so engagements are not offered in Studio — a checkbox that places an
-article nowhere would be a silent failure. Adding the slot to that template
-(and the same server/client split on the four engagement pages) is the next
-step if the owner wants further reading on the advisories too; the test then
-insists each is fetched.
+and that every placement's page fetches its own id.
+
+**Same evening, the four engagement pages followed** at the owner's request.
+`FocusedEngagementPage` gained an optional `coverage` slot after the enquiry
+form; the Strategic Assessment, which keeps its own layout, renders
+`RelatedCoverage` itself in the same position. Each engagement `page.tsx` is
+now a thin async server half with the content in `*Engagement.tsx` beside it,
+and `COVERAGE_PLACEMENTS` offers every engagement with a page of its own
+(`board-level`, an anchor, excluded). A starting set of four articles per
+engagement was written to the published documents — editorial picks to be
+changed in Studio, not a decision: Briefing (AI Act Aug 2026, GPAI
+enforcement, CAIDA tiers, Brussels' five tools); Diagnostic (CAIDA tiers, test
+bottleneck, AI Act Aug 2026, Korean memory squeeze); Retainer (Brussels' five
+tools, Europe's five cards, Atlantic fault lines, circular AI financing);
+Assessment (Europe's five cards, CAIDA tiers, open-source gambit, circular AI
+financing). The tests that read an engagement's source now read the whole
+route directory. All seven offering pages carry the strip.
 
 ### September 10, 2026 (later) — Supply Chain Mapper introduces itself and points at its module
 

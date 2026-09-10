@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 
-import { MODULES, offeringById } from '@/lib/offering'
+import { ENGAGEMENTS, MODULES, offeringById } from '@/lib/offering'
 import { COVERAGE_PLACEMENTS, isCoveragePlacement } from './coverage-placement'
 
 const ROOT = process.cwd()
@@ -13,9 +13,13 @@ const ROOT = process.cwd()
  * article on, or an editor ticks a box that renders nowhere.
  */
 describe('coverage placements', () => {
-  it('offers every module', () => {
+  it('offers every module and every engagement with a page of its own', () => {
     const values = COVERAGE_PLACEMENTS.map(p => p.value)
     for (const module of MODULES) expect(values).toContain(module.id)
+    for (const engagement of ENGAGEMENTS) {
+      if (engagement.href.includes('#')) expect(values, engagement.id).not.toContain(engagement.id)
+      else expect(values, engagement.id).toContain(engagement.id)
+    }
   })
 
   it('names only real offerings, each once', () => {

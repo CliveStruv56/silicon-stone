@@ -38,8 +38,18 @@ function advisoryEngagementTags(): string[] {
 }
 
 /** Direct form props and the contact object used by FocusedEngagementPage. */
-function interestProps(pageFile: string): string[] {
-  const source = fs.readFileSync(pageFile, 'utf8')
+/**
+ * Reads every `.tsx` in the route directory, not just `page.tsx`: since
+ * 2026-09-10 the engagement pages are a thin server half that fetches the
+ * article placements, and the enquiry form lives in the `*Engagement.tsx`
+ * Client Component beside it.
+ */
+function interestProps(routeDir: string): string[] {
+  const source = fs
+    .readdirSync(routeDir)
+    .filter((file) => file.endsWith('.tsx'))
+    .map((file) => fs.readFileSync(path.join(routeDir, file), 'utf8'))
+    .join('\n')
   return [...source.matchAll(/\binterest(?:="([^"]+)"|:\s*'([^']+)')/g)].map((m) => m[1] || m[2])
 }
 
@@ -65,7 +75,7 @@ describe('dedicated engagement pages', () => {
     expect(valid.length).toBeGreaterThan(0)
 
     const used = DEDICATED_PAGES.flatMap((route) =>
-      interestProps(path.join(APP_DIR, route, 'page.tsx')).map((interest) => ({
+      interestProps(path.join(APP_DIR, route)).map((interest) => ({
         route,
         interest,
       })),
@@ -281,7 +291,7 @@ describe('follow-on module pages', () => {
    * reader at the top of the page.
    */
   it('keeps the #ai-bill-of-materials anchor alive on the Exposure Diagnostic', () => {
-    const page = fs.readFileSync(path.join(APP_DIR, 'advisory/exposure-diagnostic/page.tsx'), 'utf8')
+    const page = fs.readFileSync(path.join(APP_DIR, 'advisory/exposure-diagnostic/ExposureDiagnosticEngagement.tsx'), 'utf8')
     expect(page).toContain('id="ai-bill-of-materials"')
   })
 
@@ -293,7 +303,7 @@ describe('follow-on module pages', () => {
    * point at, and `/advisory/modules/sovereign-architecture-review` 301s to it.
    */
   it('keeps the #sovereign-architecture-review anchor on the Strategic Assessment', () => {
-    const page = fs.readFileSync(path.join(APP_DIR, 'advisory/strategic-assessment/page.tsx'), 'utf8')
+    const page = fs.readFileSync(path.join(APP_DIR, 'advisory/strategic-assessment/StrategicAssessmentEngagement.tsx'), 'utf8')
     expect(page).toContain('id="sovereign-architecture-review"')
   })
 
