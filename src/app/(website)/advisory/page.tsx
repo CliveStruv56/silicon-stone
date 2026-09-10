@@ -26,6 +26,7 @@ import {
   ENGAGEMENTS as CATALOGUE_ENGAGEMENTS,
   MODULES,
   gbp,
+  offeringById,
   type Offering,
 } from '@/lib/offering'
 
@@ -180,31 +181,46 @@ export default function ServicesPage() {
                 </p>
 
                 {/* The offer, named and priced, above the fold. The H1 is a
-                    category; the page metadata leads with the Drift Retainer,
-                    so a reader arriving from search was promised a product and
-                    met a category. This is the reconciliation. */}
+                    category; the page metadata leads with a product, so a
+                    reader arriving from search was promised one and met a
+                    category. This is the reconciliation.
+
+                    It leads with the Advisory Briefing, not the Drift Retainer
+                    (owner decision, 2026-09-10): the Briefing is the low-cost
+                    way in for a new client, and its fee is credited in full
+                    to the first Retainer month, so the Retainer stays the
+                    destination without being the ask. A Checker result is not
+                    a precondition — it is something to suggest or run on the
+                    25-minute call — so the copy must not read as one. */}
                 <p className="mt-6 border-l-2 border-silicon-amber/60 pl-4 leading-relaxed text-text-muted">
-                  <strong className="font-semibold text-text-primary">In short.</strong>{' '}
-                  The Drift Retainer is a standing monthly read on how the drift moves
-                  against your business, {gbp(AMOUNTS.driftRetainerMonthly)} a month.
-                  If you would rather take one pass at it first, the Exposure Diagnostic
-                  is from {gbp(AMOUNTS.exposureDiagnostic)}.
+                  <strong className="font-semibold text-text-primary">Where to begin.</strong>{' '}
+                  The Advisory Briefing takes one AI system and one principal question:
+                  an hour’s discussion and a written follow-up with priorities, evidence
+                  gaps and next actions, for {gbp(AMOUNTS.advisoryBriefing)}. Proceed to
+                  the Drift Retainer within thirty days and the whole fee comes off your
+                  first month.
                 </p>
 
                 {/* The page had no CTA above the fold at all — the first
-                    actionable element sat inside the Retainer card. */}
+                    actionable element sat inside the Retainer card. The free
+                    call stays the primary step because it is the lowest
+                    friction; it preselects the Briefing so the lead reaches
+                    Kit tagged with the engagement the hero just named. */}
                 <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
                   <a
                     href="#contact"
-                    onClick={() => setFormData((prev) => ({ ...prev, engagement: 'Drift Retainer' }))}
+                    onClick={() => setFormData((prev) => ({ ...prev, engagement: 'Advisory Briefing' }))}
                   >
                     <Button size="lg" className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90">
                       Book a 25-minute conversation
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </a>
-                  <Link href="/methodology" className="text-sm text-stone-teal hover:underline">
-                    How the method works →
+                  <Link
+                    href={offeringById('advisory-briefing').href}
+                    className="text-sm text-stone-teal hover:underline"
+                  >
+                    About the Advisory Briefing →
                   </Link>
                 </div>
                 {FREE_INTRO_WINDOW && (

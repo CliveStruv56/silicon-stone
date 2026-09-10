@@ -759,6 +759,30 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### September 10, 2026 (advisory hub) — hero callout leads with the Advisory Briefing
+
+The hub's above-the-fold callout (`advisory/page.tsx`) was headed **"In
+short."** and named the Drift Retainer at £2,000 a month, with the Exposure
+Diagnostic as the fallback. Owner decision: it now reads **"Where to begin."**
+and leads with the Advisory Briefing — one AI system, one principal question,
+an hour's discussion and a written follow-up, priced from
+`AMOUNTS.advisoryBriefing` — because that is the low-cost way in for a new
+client. The Retainer stays the destination without being the ask: the callout
+closes on the in-full credit to the first Retainer month within thirty days,
+which was already in the catalogue.
+
+Three things moved together, because the callout exists to reconcile the page
+with its metadata. The "Book a 25-minute conversation" button now preselects
+`Advisory Briefing` in the contact form (an exact Kit tag) instead of `Drift
+Retainer`; the text link beside it points at the Briefing's own page via
+`offeringById('advisory-briefing').href` rather than `/methodology`; and the
+layout's meta description leads with the Briefing so search and page agree
+again. **A Checker result is not a precondition for the Briefing** — the owner
+suggests or runs it on the 25-minute call — so the hero copy deliberately does
+not mention it, where the catalogue summary still does. The Exposure
+Diagnostic dropped out of the hero; it keeps its card below. Lint and the full
+suite (1566) green; verified in a browser.
+
 ### September 10, 2026 (Policy Stress-Test) — hero, worked pairs, coverage marked, score shown working
 
 Fourth tool given the treatment, on "defaults" to five questions. Hero

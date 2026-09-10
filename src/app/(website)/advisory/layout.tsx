@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
 
+// Leads with the Advisory Briefing because the hub's hero does: a searcher
+// promised one product must not land on a page whose callout names another.
 const description =
-  'The Drift Retainer: a standing, independent read on how the technopolitical drift affects your supply chains, procurement, and people — so AI activity becomes decisions the board can act on. Independent AI and technopolitical advisory from thirty years inside the industry.'
+  'The Advisory Briefing: one AI system, one principal question, an hour with an independent adviser and a written follow-up — the first step toward a standing read on how the technopolitical drift affects your supply chains, procurement, and people. Independent AI and technopolitical advisory from thirty years inside the industry.'
 
 export const metadata: Metadata = {
   title: 'Independent AI & Technopolitical Advisory | Silicon and Stone',
