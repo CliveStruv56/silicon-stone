@@ -720,6 +720,20 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### September 10, 2026 (deploy) — Four production builds failed on one lint error
+
+Production stayed on `4111516f` (15:10) while `9ef3b8b8`, `eae8a8fa`,
+`8fa251e9` and `7f4287ef` each failed Vercel's lint step with
+`@next/next/no-assign-module-variable`: `coverage-placement.test.ts` named a
+for-of loop variable `module`. Local `npx eslint` on the file reproduced it;
+the earlier sessions had run the test (green) but not the lint. Renamed to
+`offeringModule` in `70dbe257`, after `npx next lint` across the repo came
+back clean; that deploy went Ready at 15:57 and carries all five commits.
+The Vercel MCP token returns 401 on build logs; `vercel inspect
+<url> --logs` works. Lesson: **the build's lint pass is a separate gate from
+vitest and tsc** — run `npx next lint` (or eslint on every touched file,
+tests included) before pushing.
+
 ### September 10, 2026 (late) — Compliance Checker made compelling: hero, examples, stepper, resume, header actions
 
 Owner asked for a more compelling top and any other improvements, and approved
