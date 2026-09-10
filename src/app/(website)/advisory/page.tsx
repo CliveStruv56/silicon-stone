@@ -216,13 +216,27 @@ export default function ServicesPage() {
 
               <div className="relative">
                 <div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-border-subtle lg:aspect-square">
+                  {/* Two renders of the same grid, swapped on the `.dark` class
+                      as the About page does. The owner's original has cream
+                      gutters, which match the light ground and read as a stray
+                      light panel on the dark one; the dark file is the same
+                      four tiles with the gutters composited onto charcoal. */}
                   <Image
                     src="/advisory/advisory-overview-v2.webp"
                     alt="Four isometric stone dioramas in a grid, one for each engagement: a walled enclosure with a lit plinth, a yard of stone blocks under a lens, a watch-house above curving lanes, and a gateway with one built causeway"
                     fill
                     priority
                     sizes="(min-width: 1024px) 50vw, 100vw"
-                    className="object-cover object-center"
+                    className="object-cover object-center dark:hidden"
+                  />
+                  <Image
+                    src="/advisory/advisory-overview-dark-v2.webp"
+                    alt=""
+                    aria-hidden
+                    fill
+                    priority
+                    sizes="(min-width: 1024px) 50vw, 100vw"
+                    className="hidden object-cover object-center dark:block"
                   />
                   {/* Gradient scrim for caption legibility */}
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-scrim-ink via-scrim-ink/70 to-transparent p-5 pt-16">
