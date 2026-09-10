@@ -17,6 +17,15 @@
 >
 > Read `project_summary.md` §9 (September 8) for the owner's decisions,
 > implementation, validation and deployed commit `4acedf4e`.
+>
+> **Current positioning (2026-09-10):** the three specialist projects are
+> standalone advisory work, available after a free scoping conversation with
+> no paid prerequisite. Retainer clients are charged the separately agreed
+> project fee in addition to the monthly fee. The £450 Advisory Briefing is
+> bounded to one AI system and one principal question, based on the Compliance
+> Checker result and brief business context; document review and wider
+> investigation are separate. See `docs/tools-specialist-advisory-plan.md` and
+> the current source pages before changing live copy.
 
 *Drop-in copy for the `/advisory` rebuild. UK English, house voice.*
 

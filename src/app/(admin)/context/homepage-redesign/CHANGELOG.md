@@ -580,6 +580,33 @@ When sections ship, log them here in this format:
 
 -->
 
+## 2026-09-10 — Standalone specialist projects and Compliance Checker Briefing journey
+
+- Owner decision: the four free tools should primarily generate standalone
+  specialist projects. No paid prerequisite is required; work for Retainer
+  clients is separately scoped and charged in addition to the monthly fee.
+- The £450 Advisory Briefing is now explicitly bounded to one AI system and one
+  principal question. It is prepared from the Compliance Checker result and
+  brief business context, followed by a one-hour discussion and a short written
+  follow-up with priorities, evidence gaps and next actions. Supporting-document
+  review, evidence verification and wider investigations are separate.
+- Tools index, homepage cards and the Compliance Checker now show distinct free
+  and paid routes. Shared `src/lib/tool-journeys.ts` keeps destinations, action
+  labels and prices aligned. No new product or top-level navigation item was
+  added.
+- Module pages, Advisory, Pricing, footer, metadata and LLM guidance now call
+  the three modules specialist advisory projects and state standalone access
+  and separate fees. The paid Briefing enquiry confirmation no longer offers a
+  free introductory booking as though it booked the paid session.
+- Commit [`f1ceb8ad`](https://github.com/CliveStruv56/silicon-stone/commit/f1ceb8ad)
+  pushed to `main`. GitHub CI run
+  [`34503992775`](https://github.com/CliveStruv56/silicon-stone/actions/runs/34503992775)
+  passed; Vercel deployment
+  [`6cQYnomvnokZ9roRtQ5WVM5L5EGs`](https://vercel.com/clivestruv56s-projects/silicon-stone/6cQYnomvnokZ9roRtQ5WVM5L5EGs)
+  and Railway both reported success. Live Tools HTML returned the new copy.
+- Local validation: lint, typecheck, 42 targeted tests, desktop/mobile browser
+  checks and route checks passed. No enquiry was submitted.
+
 ## 2026-09-08 — Advisory refresh and menu price cleanup
 
 - Requested by Clive; shipped in `4acedf4e` on `main`. Vercel deployment

@@ -2,7 +2,7 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-09-10
-> Status: **Tools and specialist advisory positioning changes implemented and verified locally on 10 September; owner requested commit and push. Deployment of this revision is not yet verified. Previous production/deployment records below are dated history.**
+> Status: **Tools and specialist advisory positioning changes implemented, committed as `f1ceb8ad`, deployed successfully on 10 September and verified live. GitHub CI passed. Previous production/deployment records below are dated history.**
 
 ## Current work — standalone specialist projects and the Advisory Briefing
 
@@ -28,16 +28,25 @@ that booked the paid session.
 Validation: lint, typecheck and 42 targeted tests passed. Local browser checks
 covered the Tools → Checker → Briefing → enquiry-form links, desktop/mobile
 presentation and absence of page errors. Nine additional local routes returned
-200 with the expected scope language. No enquiries were submitted. Production
-build, CI and post-deployment checks were not part of the local validation.
-The owner subsequently requested commit and push.
+200 with the expected scope language. No enquiries were submitted. The owner
+requested commit and push; the commit is on `origin/main`.
+
+Release evidence: GitHub CI run
+[`34503992775`](https://github.com/CliveStruv56/silicon-stone/actions/runs/34503992775)
+completed successfully, including the production build and PWA checks. Vercel
+reported **Deployment has completed** for
+[`6cQYnomvnokZ9roRtQ5WVM5L5EGs`](https://vercel.com/clivestruv56s-projects/silicon-stone/6cQYnomvnokZ9roRtQ5WVM5L5EGs),
+and the Railway status reported success. The live site returned HTTP 200 and
+its Tools HTML contained the new specialist advisory and Checker-to-Briefing
+copy. No enquiry was submitted.
 
 See [the implementation plan](docs/tools-specialist-advisory-plan.md). The previous
-handover below records the earlier deployed linking work, not this local revision.
+handover below records the earlier deployed linking work; this section is the
+current status for `f1ceb8ad`.
 
 ## Start here — handover for 10 September 2026
 
-**The tool-to-advisory linking work is complete and deployed.** Implementation
+**The earlier tool-to-advisory linking work is complete and deployed.** Implementation
 commit [`8a20e438`](https://github.com/CliveStruv56/silicon-stone/commit/8a20e43832cd68f5de520831ab04fb3025f9c7dd)
 is on `main`. [Vercel deployment](https://vercel.com/clivestruv56s-projects/silicon-stone/7nasFQrXHww7Q4j12jkTzFzwyrtS)
 and [all GitHub CI checks](https://github.com/CliveStruv56/silicon-stone/actions/runs/34392715314)
@@ -70,9 +79,8 @@ The owner approved these paths; keep them unless asked to change them:
 - Previous September 9 work (offer retirements, module pages, dropdown changes,
   mobile overlay and sticky header) is already included. See §9 and the homepage
   changelog. Earlier September 8 navigation instructions are superseded.
-- Next step: await the owner's next review request. Other advisory hero images
-  were previously earmarked for replacement, but no new artwork or task was
-  supplied in this session. Existing v2/launch blockers are separate workstreams.
+  - Superseded for current positioning by the `f1ceb8ad` section above. Other
+    advisory hero images and existing v2/launch blockers are separate workstreams.
 
 ### Notion handover — updated and read back 9 September
 
@@ -530,12 +538,12 @@ Strategic Assessment keeps its existing structure. All five advisory pages
 
 | Engagement | Price | Summary | Where it lives |
 |---|---|---|---|
-| **Advisory Briefing** | **£450** / one hour | Focused consultation on your tool results and one specific question, plus a written follow-up. Credited **in full** to your first retainer month if you proceed within 30 days. | `/advisory/advisory-briefing` |
+| **Advisory Briefing** | **£450** / one AI system · one hour | One AI system and one principal question, prepared from the Compliance Checker result and brief business context, with a one-hour discussion and a written follow-up covering priorities, evidence gaps and next actions. Supporting-document review and wider investigation are separate. Credited **in full** to your first retainer month if you proceed within 30 days. | `/advisory/advisory-briefing` |
 | **The Exposure Diagnostic** | **From £2,500** (custom scope) | AI system + vendor-evidence review, dependency mapping, regulatory-friction read, 15–25pp report, 30-day follow-up. Fee credited to the first retainer quarter. **No refund guarantee** — the revision-or-50%-refund clause was withdrawn on 2026-09-04; the site's refund position now lives once, at `/terms`. | `/advisory/exposure-diagnostic` |
 | **The Drift Retainer** | **£2,000/month** — rolling monthly, no minimum term. £20,000/year annual. **Founding rate £1,500/mo for the first six months, first five clients** (`FOUNDING_OFFER_ACTIVE`). | The spine of the whole offering. Board-forwardable monthly briefing, a 90-minute working session on one live decision, "The Line" direct access between sessions, quarterly written exposure review on the 3×2 method. Opens with a Baseline Month — walk away after month one paying that month only. | `/advisory/drift-retainer` |
 | **Strategic Assessment** | **From £8,000**, then transitions to retainer | The deep one-off: multi-framework analysis, 40+pp report, board-ready presentation, implementation roadmap. Positioned as the framework-neutral decision document before buying governance software. | `/advisory/strategic-assessment` |
 | **Board-level / multi-entity engagement** | **£25,000–£50,000** | Bespoke, for a group, multi-jurisdiction exposure or a board mandate; settles into a Drift Retainer. | `/advisory` (bespoke band) |
-| **Follow-on modules** | **From £3,500 each** | Manufacturing Exposure Module, Scenario Impact Analysis and Regulatory Friction Assessment. Each can be taken on its own, added to a Diagnostic or folded into a Retainer. | `/advisory/modules/manufacturing-exposure`, `/advisory/modules/scenario-impact`, `/advisory/modules/regulatory-friction`; index at `/advisory#modules` |
+| **Specialist advisory projects** | **From £3,500 each** | Manufacturing Exposure Module, Scenario Impact Analysis and Regulatory Friction Assessment. Each is available as a standalone project after a free scoping conversation. Retainer clients are charged the separately agreed project fee in addition to the monthly fee. | `/advisory/modules/manufacturing-exposure`, `/advisory/modules/scenario-impact`, `/advisory/modules/regulatory-friction`; index at `/advisory#modules` |
 | Free 25-minute intro conversation | Free during the first 90 days (`FREE_INTRO_WINDOW`) | The launch-window front door to the retainer. Distinct from the £450 Briefing, which is a working session. Exported as `FREE_INTRO_CONVERSATION` — kept out of `ENGAGEMENTS` so the catalogue never imports a flag — and rendered as the **first row of the advisory ladder** on `/pricing` since 2026-09-04, replacing the italic footnote it used to be. | `/advisory#contact` + `/pricing` |
 
 **Retired/scoped on 9 September:** Post-Omnibus Briefing is no longer sold;
@@ -8479,14 +8487,15 @@ left unset, being optional by design. | Resolved |
 
 ## 11. What's Next (Current Priorities)
 
-### Current owner thread — completed advisory links, 9 September 2026
+### Current owner thread — specialist project positioning, 10 September 2026
 
-Start with the handover at the top and deployed commit `8a20e438`. All approved
-linking changes are complete; no pending question or deployment remains. Continue
-from the owner's next instruction rather than restarting the September 8 brief.
-The Advisory dropdown now contains the four engagement pages; Modules is in the
-footer, and Pricing remains accessible from the footer and More. The previously
-promised dropdown work was subsequently specified and shipped on September 9.
+Start with the handover at the top and deployed commit `f1ceb8ad`. The Tools →
+specialist-project route and the Compliance Checker → Advisory Briefing journey
+are complete, committed, deployed and CI-verified. The Advisory dropdown contains
+the four engagement pages; Specialist advisory projects remain indexed on
+Advisory/Pricing and reached from the tools, homepage and footer. No new top-level
+navigation item was added. Further work should start from the owner's next
+instruction rather than reopening this positioning decision.
 
 Other hero replacements remain a possible owner follow-up, without new assets or
 scope from this session. The older programme priorities below are background;

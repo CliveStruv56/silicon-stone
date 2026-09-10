@@ -35,7 +35,7 @@ Further investigation is optional and separately scoped.
 No new products, prices, checkout, document uploads, automatic transfer of
 Checker answers, assessment-rule changes, legal-content changes, or retainer
 redesign. Enquiries continue through the existing form. No external messages or
-test enquiries are sent. Deployment is separate from this local implementation.
+test enquiries are sent. Deployment followed after review and is recorded below.
 
 ## Validation
 
@@ -55,6 +55,12 @@ test enquiries are sent. Deployment is separate from this local implementation.
 - React review: stable list keys, separate link targets, shared catalogue prices
   and routes, no new client effects, dependencies or data transfers.
 
-Local implementation and validation are complete. The owner requested commit
-and push after reviewing the result. Production build/CI and post-deployment
-checks were not part of the local validation above; deployment is not yet verified.
+Local implementation and validation are complete. Commit `f1ceb8ad` was pushed
+to `origin/main`. GitHub CI run
+[`34503992775`](https://github.com/CliveStruv56/silicon-stone/actions/runs/34503992775)
+completed successfully, including the production build and PWA checks. Vercel
+reported deployment completed for
+[`6cQYnomvnokZ9roRtQ5WVM5L5EGs`](https://vercel.com/clivestruv56s-projects/silicon-stone/6cQYnomvnokZ9roRtQ5WVM5L5EGs),
+Railway reported success, and the live site returned HTTP 200 with the new
+Tools copy. No enquiry was submitted. Deployment is complete; no post-deploy
+application error scan beyond the live HTTP/content check was run.
