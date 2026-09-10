@@ -720,6 +720,24 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### September 10, 2026 (final) — Regulatory Friction Assessment page given the substance of its price
+
+Third and last module page filled to the Manufacturing Exposure pattern, on
+the owner's "defaults again". `RegulatoryFrictionModule.tsx` now fills
+`audience` (general counsel, compliance, COOs, US executives over EU
+operations; industries rendered from the tool's `INDUSTRIES`), `method` (six
+steps: scope, inventory the obligations, map the conflicts, score the
+friction, prioritise on the tool's immediate/30/90/180 ladder, roadmap and
+brief) and `context` — this one **regulatory**, "The calendar the friction
+runs on": AI Act dates read from `AI_ACT_TIMELINE` by `basis` (general
+application, Annex III, Annex I), and Data Act, CRA and NIS2 dates typed from
+each instrument's `applicationNote` in `corpus/regulatory/<id>/<version>/
+meta.json` with a comment saying so; NIS2 stated as a Directive whose duties
+arise under national law. Ten deliverables. Body counts (7 policies, 5 EU /
+2 US, 11 industries, 3 sizes) read from `policy-data.ts`. Layout description
+rewritten. **All three module pages now carry the full template.** Verified in
+a browser at 1440px and 400px; the Policy Stress-Test still renders.
+
 ### September 10, 2026 (last) — Scenario Impact Analysis page given the substance of its price
 
 Second module page filled to the Manufacturing Exposure pattern, on the
