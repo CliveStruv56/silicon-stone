@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Header, Footer } from '@/components/layout'
@@ -24,6 +24,7 @@ import {
   JURISDICTION_COLORS,
 } from '@/lib/policy-data'
 import { policyStressTestMarkdown } from '@/lib/tools-markdown'
+import { offeringById } from '@/lib/offering'
 import type { Policy, Jurisdiction, IndustryImpact } from '@/types/policy'
 import {
   Scale,
@@ -34,10 +35,10 @@ import {
   Building2,
   Globe,
   Gavel,
-  ShieldCheck,
   ClipboardList,
   ExternalLink,
   Mail,
+  Sparkles,
 } from 'lucide-react'
 
 // Friction modifier rises with organisational governance overhead
@@ -60,6 +61,59 @@ const SIZE_CONTEXT = {
     resourceNote: 'Expect cross-functional governance: legal, product, security, procurement, and regional business owners.',
   },
 } as const
+
+const FOLLOW_ON_MODULE = offeringById('regulatory-friction')
+
+/* Every hero number is read from the data. Coverage is stated honestly: the
+   model maps a subset of the policy × industry grid, and a reader who picks an
+   unmapped pair gets "No mapped exposure", so the size of that subset is said
+   up front rather than discovered after the click. */
+const EU_POLICIES = POLICIES.filter(p => p.jurisdiction === 'EU')
+const US_POLICIES = POLICIES.filter(p => p.jurisdiction === 'US')
+const MAPPED_PAIRINGS = POLICIES.reduce((sum, policy) => sum + Object.keys(policy.industryImpacts).length, 0)
+const TOTAL_PAIRINGS = POLICIES.length * INDUSTRIES.length
+
+/** `lastReviewed` is ISO — a full date where a person checked the entry against pinned text, year-month where it was not. */
+function formatReviewed(iso: string | undefined): string {
+  if (!iso) return 'not recorded'
+  const full = /^\d{4}-\d{2}-\d{2}$/.test(iso)
+  return new Date(`${full ? iso : `${iso}-01`}T00:00:00Z`).toLocaleDateString('en-GB', {
+    ...(full ? { day: 'numeric' } : {}),
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  })
+}
+
+const HOW_IT_WORKS = [
+  {
+    title: 'Pick your industry',
+    body: 'The policies that carry a mapping for it are marked before you choose, so you are not scored against a blank.',
+  },
+  {
+    title: 'Pair an EU and a US policy',
+    body: 'One from each side. Every pairing has a named pressure point: the sentence to take into the meeting.',
+  },
+  {
+    title: 'Set your size',
+    body: 'Startup, SME or enterprise. Governance overhead moves the score, and the brief says by how much.',
+  },
+  {
+    title: 'Read the brief',
+    body: 'Friction on both sides and combined, requirements, deadlines, an evidence checklist and a dated action plan.',
+  },
+]
+
+/**
+ * Worked pairs, one click each. The friction shown is the engine's own
+ * reading for that pair at that size, never typed, so the card cannot promise
+ * a score the tool would not give.
+ */
+const EXAMPLE_PAIRS: Array<{ title: string; industry: string; eu: string; us: string; size: keyof typeof SIZE_CONTEXT }> = [
+  { title: 'AI product, EU and US markets', industry: 'AI/ML', eu: 'eu-ai-act', us: 'us-export-controls', size: 'sme' },
+  { title: 'Connected vehicles, subsidised silicon', industry: 'Automotive', eu: 'eu-data-act', us: 'us-chips-act', size: 'enterprise' },
+  { title: 'Bank data across the Atlantic', industry: 'Financial Services', eu: 'gdpr', us: 'us-export-controls', size: 'enterprise' },
+]
 
 function clampScore(score: number) {
   return Math.min(10, Math.max(0, Math.round(score * 10) / 10))
@@ -335,6 +389,31 @@ export default function PolicyStressTestPage() {
     })
   }, [euImpact, usImpact])
 
+  const exampleReadings = useMemo(
+    () =>
+      EXAMPLE_PAIRS.map(example => {
+        const combined = calculateCombinedFriction(example.eu, example.us, example.industry)
+        const adjusted = clampScore(combined + SIZE_CONTEXT[example.size].modifier)
+        return { ...example, adjusted, band: getFrictionBand(adjusted) }
+      }),
+    [],
+  )
+
+  const loadExample = (example: (typeof EXAMPLE_PAIRS)[number]) => {
+    setSelectedIndustry(example.industry)
+    setSelectedEuPolicy(example.eu)
+    setSelectedUsPolicy(example.us)
+    setSelectedSize(example.size)
+    setShowResults(true)
+  }
+
+  // The brief renders below the controls; on a laptop the click produced no
+  // visible change. `nearest` scrolls only when it is actually out of view.
+  const resultsRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (showResults) resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [showResults])
+
   const handleAnalyze = () => {
     if (selectedIndustry) {
       // Result is free to view. The gate now only protects the printable
@@ -349,23 +428,116 @@ export default function PolicyStressTestPage() {
 
       <main className="flex-1 bg-background">
         {/* Hero Section */}
-        <section className="bg-slate-deep border-b border-border-subtle py-10 md:py-12">
-          <div className="mx-auto max-w-7xl px-6 lg:px-8 text-center">
-            <Badge variant="outline" className="mb-4 border-stone-teal text-stone-teal">
-              Interactive Tool
-            </Badge>
-            <h1 className="text-3xl font-bold text-text-primary sm:text-4xl mb-4">
-              Policy Stress-Test
-            </h1>
-            <p className="text-lg text-text-muted max-w-2xl mx-auto">
-              Compare US and EU regulatory requirements for your industry.
-              Understand compliance friction and prioritise your response.
-            </p>
+        <section className="bg-slate-deep border-b border-border-subtle py-10 lg:py-12">
+          <div className="mx-auto max-w-7xl px-6 lg:px-8">
+            <div className="max-w-4xl">
+              <Badge variant="outline" className="mb-4 border-stone-teal text-stone-teal">
+                Interactive Tool
+              </Badge>
+              <h1 className="text-3xl font-bold text-text-primary sm:text-4xl mb-3">
+                Where do EU and US rules pull your operation apart?
+              </h1>
+              <p className="text-lg text-text-muted max-w-3xl">
+                Pair one EU policy with one US policy for your industry and get the friction between
+                them scored, the pressure point named, and a dated action plan.
+              </p>
+              {/* Counts are read from the data, never typed. */}
+              <p className="mt-4 max-w-3xl leading-relaxed text-text-muted">
+                The tool holds {POLICIES.length} policies — {EU_POLICIES.length} EU ({EU_POLICIES.map(p => p.shortName).join(', ')}) and{' '}
+                {US_POLICIES.length} US ({US_POLICIES.map(p => p.shortName).join(', ')}) — mapped against{' '}
+                {INDUSTRIES.length} industries. Each mapping carries the requirements that reach that industry, a
+                friction score on a ten-point scale, a cost range, the deadlines that apply, and actions sorted
+                into immediate, 30, 90 and 180-day priorities. Every one of the {EU_POLICIES.length * US_POLICIES.length} EU–US
+                pairings has a named pressure point: the sentence about how the two regimes collide that you can
+                take into a meeting.
+              </p>
+              <p className="mt-4 max-w-3xl leading-relaxed text-text-muted">
+                The score is built in the open: the EU and US friction scores for your industry are averaged, a
+                modifier for your organisation’s size is added, and the result is capped at ten. The brief shows
+                that working beside the number. Coverage is partial and said so — {MAPPED_PAIRINGS} of the{' '}
+                {TOTAL_PAIRINGS} policy-by-industry pairings are mapped, and the policies without a mapping for your
+                industry are marked before you choose.
+              </p>
+              <p className="mt-4 max-w-3xl leading-relaxed text-text-muted">
+                It works at the level of an industry. When you need the same map drawn across your own entities and
+                operations, with every conflict priced and dated and a roadmap with owners, that is the{' '}
+                <Link href={FOLLOW_ON_MODULE.href} className="text-stone-teal underline underline-offset-4">
+                  {FOLLOW_ON_MODULE.name}
+                </Link>
+                .
+              </p>
+
+              <ol className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {HOW_IT_WORKS.map((step, index) => (
+                  <li key={step.title} className="border-t border-border-subtle pt-4">
+                    <div className="mb-1 font-mono text-xs uppercase tracking-wider text-stone-teal">Step {index + 1}</div>
+                    <h2 className="mb-1 font-semibold text-text-primary">{step.title}</h2>
+                    <p className="text-sm leading-relaxed text-text-muted">{step.body}</p>
+                  </li>
+                ))}
+              </ol>
+
+              <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                {[
+                  ['A score shown working', 'EU and US scores, their average, the size modifier and the cap, beside every result.'],
+                  ['Sources named', 'Each policy links to its official source and states when a person last reviewed it.'],
+                  ['Coverage stated', `${MAPPED_PAIRINGS} of ${TOTAL_PAIRINGS} pairings mapped. Unmapped ones are marked, not hidden.`],
+                  ['Yours to keep', 'Copy or download the brief as Markdown. The printable version asks for an email.'],
+                ].map(([title, copy]) => (
+                  <div key={title} className="border border-border-subtle bg-stone-charcoal/60 rounded-lg p-4">
+                    <div className="text-sm font-semibold text-text-primary">{title}</div>
+                    <div className="text-xs text-text-muted mt-1">{copy}</div>
+                  </div>
+                ))}
+              </div>
+              <p className="text-sm text-text-muted mt-5 opacity-80">
+                A triage brief against published policy, not legal advice. Cost ranges are directional and the
+                friction scale is a judgement, built to show where to ask better questions.
+              </p>
+            </div>
           </div>
         </section>
 
         {/* Configuration Section */}
         <section className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
+          {/* Worked pairs: one click sets all four controls and opens the brief.
+              The score on each is the engine's, computed at render. */}
+          <div className="mb-6">
+            <div className="mb-3 flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-text-muted">
+              <Sparkles className="w-3.5 h-3.5 text-silicon-amber-strong" aria-hidden />
+              Starting points
+            </div>
+            <div className="grid gap-3 md:grid-cols-3">
+              {exampleReadings.map(example => {
+                const active =
+                  selectedIndustry === example.industry &&
+                  selectedEuPolicy === example.eu &&
+                  selectedUsPolicy === example.us &&
+                  selectedSize === example.size
+                return (
+                  <button
+                    key={example.title}
+                    type="button"
+                    onClick={() => loadExample(example)}
+                    aria-pressed={active}
+                    className={`rounded-lg border p-4 text-left transition-colors ${
+                      active ? 'border-stone-teal bg-stone-teal/10' : 'border-border-subtle bg-stone-charcoal hover:border-stone-teal/60'
+                    }`}
+                  >
+                    <div className="flex items-baseline justify-between gap-3">
+                      <span className="text-sm font-medium text-text-primary">{example.title}</span>
+                      <span className={`font-mono text-sm ${example.band.tone}`}>{example.adjusted.toFixed(1)}/10</span>
+                    </div>
+                    <p className="mt-1 text-xs text-text-muted">
+                      {example.industry} · {getPolicyById(example.eu)?.shortName} × {getPolicyById(example.us)?.shortName} · {SIZE_CONTEXT[example.size].label}
+                    </p>
+                    <p className={`mt-2 text-xs ${example.band.tone}`}>{example.band.label}</p>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
           <Card className="bg-stone-charcoal border-border-subtle mb-8">
             <CardHeader>
               <CardTitle className="text-lg text-text-primary flex items-center gap-2">
@@ -422,7 +594,14 @@ export default function PolicyStressTestPage() {
                             : 'bg-surface-elevated border-border-subtle hover:border-blue-500/30'
                         }`}
                       >
-                        <div className="font-medium text-text-primary text-sm">{policy.shortName}</div>
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="font-medium text-text-primary text-sm">{policy.shortName}</span>
+                          {selectedIndustry && !getIndustryImpact(policy.id, selectedIndustry) && (
+                            <span className="rounded border border-border-subtle px-1.5 py-0.5 text-[11px] text-text-muted">
+                              Not mapped for {selectedIndustry}
+                            </span>
+                          )}
+                        </div>
                         <div className="text-xs text-text-muted">{policy.effectiveDate}</div>
                       </button>
                     ))}
@@ -449,7 +628,14 @@ export default function PolicyStressTestPage() {
                             : 'bg-surface-elevated border-border-subtle hover:border-red-500/30'
                         }`}
                       >
-                        <div className="font-medium text-text-primary text-sm">{policy.shortName}</div>
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="font-medium text-text-primary text-sm">{policy.shortName}</span>
+                          {selectedIndustry && !getIndustryImpact(policy.id, selectedIndustry) && (
+                            <span className="rounded border border-border-subtle px-1.5 py-0.5 text-[11px] text-text-muted">
+                              Not mapped for {selectedIndustry}
+                            </span>
+                          )}
+                        </div>
                         <div className="text-xs text-text-muted">{policy.effectiveDate}</div>
                       </button>
                     ))}
@@ -492,26 +678,13 @@ export default function PolicyStressTestPage() {
                   className="w-full bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90"
                 >
                 <Scale className="w-4 h-4 mr-2" />
-                Analyze Compliance Friction
+                Analyse compliance friction
               </Button>
             </CardContent>
           </Card>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            {[
-              { icon: ShieldCheck, title: 'What it tests', copy: 'Whether policy exposure is low-level monitoring, a real compliance workstream, or a board-level operational constraint.' },
-              { icon: ClipboardList, title: 'What you get', copy: 'A friction score, source-backed policy context, evidence checklist, and time-boxed action plan.' },
-              { icon: Scale, title: 'Why it adds value', copy: 'It turns regulatory drift into decisions about owners, documents, product scope, vendors, and regional exposure.' },
-            ].map(item => (
-              <div key={item.title} className="bg-stone-charcoal border border-border-subtle rounded-lg p-4">
-                <item.icon className="w-5 h-5 text-stone-teal mb-3" />
-                <h3 className="text-sm font-semibold text-text-primary mb-1">{item.title}</h3>
-                <p className="text-sm text-text-muted">{item.copy}</p>
-              </div>
-            ))}
-          </div>
-
           {/* Results */}
+          <div ref={resultsRef} className="scroll-mt-24" />
           <AnimatePresence>
             {showResults && selectedIndustry && (
               <motion.div
@@ -530,7 +703,7 @@ export default function PolicyStressTestPage() {
                           Decision Brief: {selectedIndustry}
                         </CardTitle>
                         <CardDescription className="mt-2">
-                          {SIZE_CONTEXT[selectedSize as keyof typeof SIZE_CONTEXT].label} operating profile. Sources reviewed {euPolicy?.lastReviewed || 'recently'}.
+                          {SIZE_CONTEXT[selectedSize as keyof typeof SIZE_CONTEXT].label} operating profile. Sources reviewed: {euPolicy?.shortName} {formatReviewed(euPolicy?.lastReviewed)} · {usPolicy?.shortName} {formatReviewed(usPolicy?.lastReviewed)}.
                         </CardDescription>
                       </div>
                       <div className="flex flex-wrap gap-2">
@@ -583,6 +756,10 @@ export default function PolicyStressTestPage() {
                       <div className="bg-surface-elevated border border-border-subtle rounded-lg p-4">
                         <div className={`text-sm font-semibold mb-1 ${frictionBand.tone}`}>{frictionBand.label}</div>
                         <p className="text-sm text-text-muted">{frictionBand.summary}</p>
+                        {/* How the number is made, so it can be argued rather than only read. */}
+                        <p className="mt-2 font-mono text-[11px] leading-relaxed text-text-muted">
+                          EU {euImpact ? `${euImpact.frictionScore}/10` : 'unmapped'} · US {usImpact ? `${usImpact.frictionScore}/10` : 'unmapped'} · average {combinedFriction.toFixed(1)} · +{SIZE_CONTEXT[selectedSize as keyof typeof SIZE_CONTEXT].modifier.toFixed(1)} {SIZE_CONTEXT[selectedSize as keyof typeof SIZE_CONTEXT].label.toLowerCase()} modifier · capped at 10
+                        </p>
                       </div>
                       <div className="bg-surface-elevated border border-border-subtle rounded-lg p-4">
                         <div className="text-sm font-semibold text-text-primary mb-1">{pressurePoint.title}</div>
@@ -692,7 +869,9 @@ export default function PolicyStressTestPage() {
 
                 {/* CTA */}
                 <div className="flex justify-center pt-6">
-                  <Link href="/advisory/drift-retainer">
+                  {/* Points at the module this tool feeds (owner-approved pairing,
+                      9 September), not the retainer the page used to send people to. */}
+                  <Link href={FOLLOW_ON_MODULE.href}>
                     <Button className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90">
                       <FileText className="w-4 h-4 mr-2" />
                       Request Detailed Compliance Assessment

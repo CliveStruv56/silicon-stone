@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Policy Stress-Test | Silicon and Stone',
   description:
-    'Stress-test how EU technology policy and the AI Act affect your organisation across regulatory scenarios.',
+    'Pair an EU policy with a US policy for your industry — AI Act, GDPR, Chips Acts, DMA, Data Act, export controls — and get the friction scored, the pressure point named, and a dated action plan.',
   alternates: { canonical: '/tools/policy-stress-test' },
 }
 

@@ -124,7 +124,7 @@ export const POLICIES: Policy[] = [
     relatedPolicies: ['gdpr', 'eu-chips-act'],
     sourceUrl: 'https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai',
     sourceLabel: 'European Commission AI Act timeline',
-    lastReviewed: '2 June 2026',
+    lastReviewed: '2026-09-10',
   },
   {
     id: 'us-export-controls',
@@ -221,7 +221,7 @@ export const POLICIES: Policy[] = [
     relatedPolicies: ['us-chips-act'],
     sourceUrl: 'https://www.bis.gov/press-release/commerce-strengthens-export-controls-restrict-chinas-capability-produce-advanced-semiconductors-military',
     sourceLabel: 'BIS semiconductor export-control updates',
-    lastReviewed: 'May 2026',
+    lastReviewed: '2026-05',
   },
   {
     id: 'eu-chips-act',
@@ -299,7 +299,7 @@ export const POLICIES: Policy[] = [
     relatedPolicies: ['eu-ai-act'],
     sourceUrl: 'https://www.consilium.europa.eu/en/press/press-releases/2023/07/25/chips-act-council-gives-its-final-approval/',
     sourceLabel: 'Council of the EU Chips Act approval',
-    lastReviewed: 'May 2026',
+    lastReviewed: '2026-09-10',
   },
   {
     id: 'us-chips-act',
@@ -363,7 +363,7 @@ export const POLICIES: Policy[] = [
     relatedPolicies: ['us-export-controls'],
     sourceUrl: 'https://www.commerce.gov/news/press-releases/2023/03/commerce-department-outlines-proposed-national-security-guardrails',
     sourceLabel: 'US Commerce CHIPS guardrails',
-    lastReviewed: 'May 2026',
+    lastReviewed: '2026-05',
   },
   {
     id: 'gdpr',
@@ -455,7 +455,7 @@ export const POLICIES: Policy[] = [
     relatedPolicies: ['eu-ai-act'],
     sourceUrl: 'https://gdpr-library.com/article/83',
     sourceLabel: 'GDPR Article 83 fine framework',
-    lastReviewed: 'May 2026',
+    lastReviewed: '2026-09-10',
   },
   {
     id: 'dma',
@@ -534,7 +534,7 @@ export const POLICIES: Policy[] = [
     relatedPolicies: ['gdpr'],
     sourceUrl: 'https://digital-markets-act.ec.europa.eu/designated-gatekeepers-must-now-comply-all-obligations-under-digital-markets-act-2024-03-07_mt',
     sourceLabel: 'European Commission DMA compliance notice',
-    lastReviewed: 'May 2026',
+    lastReviewed: '2026-05',
   },
   {
     id: 'eu-data-act',
@@ -616,7 +616,7 @@ export const POLICIES: Policy[] = [
     relatedPolicies: ['gdpr'],
     sourceUrl: 'https://digital-strategy.ec.europa.eu/en/policies/data-act',
     sourceLabel: 'European Commission Data Act overview',
-    lastReviewed: 'May 2026',
+    lastReviewed: '2026-09-10',
   },
 ]
 

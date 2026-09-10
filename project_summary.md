@@ -720,6 +720,32 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### September 10, 2026 (Policy Stress-Test) — hero, worked pairs, coverage marked, score shown working
+
+Fourth tool given the treatment, on "defaults" to five questions. Hero
+(`tools/policy-stress-test/page.tsx`) now leads "Where do EU and US rules pull
+your operation apart?" with three paragraphs, a four-step row and a proof
+strip; the three explainer tiles that sat *between* the Analyse button and the
+result are gone, their content in the hero. Every count is read from
+`policy-data.ts`: 7 policies (5 EU / 2 US, named), 11 industries, 10 EU–US
+pairings, and **coverage stated honestly — 31 of 77 policy × industry pairings
+are mapped**; a policy pill shows "Not mapped for {industry}" when the chosen
+industry has no mapping, so a reader is not scored against a blank. Three
+**starting-point pairs** (AI/ML × AI Act × Export Controls at SME; Automotive ×
+Data Act × US CHIPS; Financial Services × GDPR × Export Controls) load all four
+controls with one click and show the engine's own adjusted score and band. The
+brief shows the derivation beside the band (EU, US, average, size modifier,
+cap) and both policies' review dates. The result scrolls into view on Analyse.
+"Analyze" → "Analyse". The bottom button now points at the Regulatory Friction
+Assessment module (`offeringById`), not the Drift Retainer.
+
+`Policy.lastReviewed` converted to ISO. The four pinned instruments (AI Act,
+GDPR, Chips Act, Data Act) were checked against the rule pack / corpus — every
+dated claim held — and restamped `2026-09-10`; DMA, US export controls and US
+CHIPS are not pinned and keep `2026-05`, rendered "May 2026", **for the
+owner's review schedule**. Layout metadata description rewritten. Verified in
+a browser at 1440px and 400px.
+
 ### September 10, 2026 (final) — Regulatory Friction Assessment page given the substance of its price
 
 Third and last module page filled to the Manufacturing Exposure pattern, on
