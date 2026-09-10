@@ -33,6 +33,8 @@ export interface WaymarkPathCapability {
   name: string
   /** Compact label for the ribbon, where the full name will not fit. */
   short: string
+  /** Short outcome for the illustrated journey overview. */
+  summary: string
   /** One line, shown under the name. What this stage settles. */
   promise: string
   /** Two or three sentences, shown when the node is selected. */
@@ -47,6 +49,7 @@ export const WAYMARKPATH_CAPABILITIES: readonly WaymarkPathCapability[] = [
     step: '01',
     name: 'Profile & Goals',
     short: 'Profile',
+    summary: 'Set your target role, timeline and priorities.',
     promise: 'Where you are, and where you intend to be.',
     detail:
       'A guided intake that fixes the target role, the timeline and the constraints you are actually working under. Target roles resolve against ESCO occupations rather than free text, so everything downstream compares like with like.',
@@ -57,6 +60,7 @@ export const WAYMARKPATH_CAPABILITIES: readonly WaymarkPathCapability[] = [
     step: '02',
     name: 'Skills Inventory',
     short: 'Skills',
+    summary: 'Discover the experience you can take into a new role.',
     promise: 'What you already bring, at the level you bring it.',
     detail:
       'Your existing skills catalogued with proficiency and years behind them. This is the half most people underestimate: a transition rarely fails because the skills are absent, but because nobody has written them down in terms the target role recognises.',
@@ -67,6 +71,7 @@ export const WAYMARKPATH_CAPABILITIES: readonly WaymarkPathCapability[] = [
     step: '03',
     name: 'Gap Analysis',
     short: 'Gaps',
+    summary: 'Find the skills that stand between you and your next role.',
     promise: 'The distance between the two, ranked.',
     detail:
       'Your inventory compared against what the target occupation requires, splitting the result into transferable strengths and genuine gaps, each with a priority. It reads across ESCO and O*NET, so a European skills profile still lines up against US job-market vocabulary.',
@@ -77,6 +82,7 @@ export const WAYMARKPATH_CAPABILITIES: readonly WaymarkPathCapability[] = [
     step: '04',
     name: 'Learning Path',
     short: 'Learning',
+    summary: 'Turn your priority gaps into achievable milestones.',
     promise: 'What to close first, and what can wait.',
     detail:
       'The ranked gaps become a sequence with milestones and progress tracking, rather than a reading list. Priority comes from the gap analysis, so effort goes to the shortfalls that actually block the move.',
@@ -87,6 +93,7 @@ export const WAYMARKPATH_CAPABILITIES: readonly WaymarkPathCapability[] = [
     step: '05',
     name: 'Resume Hub',
     short: 'Resume',
+    summary: 'Reframe your experience for the role you want.',
     promise: 'A CV that survives the filter and reads as deliberate.',
     detail:
       'Your CV parsed into sections and scored against applicant tracking systems, with the formatting faults that cause silent rejections called out. Career-change mode reframes existing experience for the target industry, drawing on the strengths the gap analysis already identified.',
@@ -97,6 +104,7 @@ export const WAYMARKPATH_CAPABILITIES: readonly WaymarkPathCapability[] = [
     step: '06',
     name: 'Job Tracker',
     short: 'Jobs',
+    summary: 'Track applications and see how well each role fits.',
     promise: 'Every application, and how well it actually fits.',
     detail:
       'A pipeline from saved to offer, with roles added by URL and parsed automatically. Each one can be matched against your profile before you spend an evening on it, and cover letters start from what the system already knows about you.',
@@ -107,6 +115,7 @@ export const WAYMARKPATH_CAPABILITIES: readonly WaymarkPathCapability[] = [
     step: '07',
     name: 'Daily Check-ins',
     short: 'Check-ins',
+    summary: 'Keep moving with a coach who knows your goals.',
     promise: 'The part that makes the other six survive contact with a working week.',
     detail:
       'A short daily conversation with a coach that has your goals, your gaps and your live applications in front of it — so it does not start cold each time. Commitments and streaks are the accountability layer that career changers otherwise pay a coach by the hour for.',

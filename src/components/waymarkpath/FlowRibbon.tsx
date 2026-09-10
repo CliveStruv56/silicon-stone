@@ -1,6 +1,7 @@
 'use client'
 
 import { motion, useReducedMotion } from 'framer-motion'
+import { ChevronRight } from 'lucide-react'
 import { WAYMARKPATH_CAPABILITIES } from '@/lib/waymarkpath'
 import { STAGE_VISUALS } from './stage-visuals'
 import styles from './waymarkpath.module.css'
@@ -20,7 +21,7 @@ export function FlowRibbon({ className = '', expanded = false }: { className?: s
     return (
       <div className={`${styles.theme} ${styles.ribbon} ${className}`}>
         <div className={styles.ribbonIntro}>
-          <strong>Your next chapter, step by step</strong>
+          <h2>Your next chapter, step by step</h2>
           <span>Seven stages. One shared picture of you.</span>
         </div>
         <div className={styles.ribbonRoute}>
@@ -33,12 +34,24 @@ export function FlowRibbon({ className = '', expanded = false }: { className?: s
             aria-hidden="true"
           />
           <ol className={styles.ribbonList} aria-label="The seven stages of your career journey">
-            {WAYMARKPATH_CAPABILITIES.map((cap) => (
-              <li className={styles.ribbonStage} key={cap.id} data-tone={STAGE_VISUALS[cap.id].tone}>
-                <span className={styles.ribbonDot} aria-hidden="true">{cap.step}</span>
-                <span className={styles.ribbonLabel}>{cap.short}</span>
-              </li>
-            ))}
+            {WAYMARKPATH_CAPABILITIES.map((cap, index) => {
+              const { icon: Icon, tone } = STAGE_VISUALS[cap.id]
+              return (
+                <li className={styles.ribbonStage} key={cap.id} data-tone={tone}>
+                  <span className={styles.ribbonDot} aria-hidden="true">
+                    <Icon />
+                    <span className={styles.ribbonNumber}>{cap.step}</span>
+                  </span>
+                  <div className={styles.ribbonCopy}>
+                    <h3 className={styles.ribbonLabel}>{cap.name}</h3>
+                    <p className={styles.ribbonSummary}>{cap.summary}</p>
+                  </div>
+                  {index < WAYMARKPATH_CAPABILITIES.length - 1 && (
+                    <ChevronRight className={styles.ribbonArrow} aria-hidden="true" />
+                  )}
+                </li>
+              )
+            })}
           </ol>
         </div>
       </div>

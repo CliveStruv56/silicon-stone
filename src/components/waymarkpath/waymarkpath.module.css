@@ -18,36 +18,87 @@
 .theme [data-tone='support'] { --stage-color: var(--waymark-support); }
 
 .ribbon {
+  --ribbon-number-ink: #ffffff;
   position: relative;
-  padding: 24px 0 0;
+  padding: 32px 0 0;
   border-top: 1px solid var(--border-subtle);
 }
+
+:global(.dark) .ribbon { --ribbon-number-ink: #1c2330; }
 
 .ribbonIntro {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 24px;
+  align-items: baseline;
+  gap: 12px 32px;
   justify-content: space-between;
-  margin-bottom: 24px;
-  font-size: 14px;
+  margin-bottom: 36px;
   color: var(--text-muted);
+  font-size: 16px;
 }
 
-.ribbonIntro strong { color: var(--text-primary); font-weight: 500; }
+.ribbonIntro h2 {
+  color: var(--text-primary);
+  font-size: clamp(24px, 2.3vw, 30px);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
 .ribbonList { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
-.ribbonStage { position: relative; display: flex; align-items: center; gap: 16px; min-height: 52px; }
+.ribbonStage { position: relative; display: flex; align-items: flex-start; gap: 24px; padding: 0 0 28px; }
+.ribbonStage:last-child { padding-bottom: 0; }
 .ribbonStage:not(:last-child)::after {
-  content: ''; position: absolute; width: 3px; top: 32px; bottom: -10px; left: 15px;
-  background: var(--stage-color);
+  content: '';
+  position: absolute;
+  width: 3px;
+  top: 64px;
+  bottom: 0;
+  left: 31px;
+  background: color-mix(in srgb, var(--stage-color) 55%, var(--slate-deep));
 }
+
 .ribbonDot {
-  z-index: 1; display: grid; place-items: center; flex-shrink: 0; width: 32px; height: 32px;
-  border: 2px solid var(--stage-color); border-radius: 50%; color: var(--stage-color);
-  background: color-mix(in srgb, var(--stage-color) 12%, var(--stone-charcoal));
-  font-size: 12px; font-weight: 600;
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  border: 2px solid var(--stage-color);
+  border-radius: 50%;
+  color: var(--stage-color);
+  background: color-mix(in srgb, var(--stage-color) 14%, var(--stone-charcoal));
+  box-shadow: inset 0 0 0 5px var(--stone-charcoal);
 }
-.ribbonLabel { font-size: 14px; font-weight: 500; color: var(--text-primary); }
-.ribbonTrack { display: none; }
+
+.ribbonDot > svg { width: 30px; height: 30px; stroke-width: 1.7; }
+.ribbonNumber {
+  position: absolute;
+  right: -5px;
+  bottom: -4px;
+  display: grid;
+  place-items: center;
+  width: 25px;
+  height: 25px;
+  border: 3px solid var(--slate-deep);
+  border-radius: 50%;
+  background: var(--stage-color);
+  color: var(--ribbon-number-ink);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.ribbonCopy { padding-top: 3px; }
+.ribbonLabel {
+  font-family: var(--font-outfit), sans-serif;
+  font-size: 17px;
+  line-height: 1.35;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.ribbonSummary { margin-top: 8px; max-width: 42ch; font-size: 14px; line-height: 1.55; color: var(--text-muted); }
+.ribbonTrack, .ribbonArrow { display: none; }
 
 .system { padding: 24px 16px; border: 1px solid var(--border-subtle); border-radius: 20px; background: var(--stone-charcoal); }
 .legend { display: flex; flex-wrap: wrap; gap: 12px 24px; color: var(--text-muted); font-size: 13px; }
@@ -104,17 +155,32 @@
 .mapNote { margin-top: 20px; color: var(--text-muted); font-size: 13px; line-height: 1.6; }
 
 @media (min-width: 640px) {
-  .ribbonList { grid-template-columns: repeat(7, minmax(0, 1fr)); }
-  .ribbonStage { flex-direction: column; gap: 12px; text-align: center; }
-  .ribbonStage:not(:last-child)::after { display: none; }
-  .ribbonTrack { display: block; position: absolute; left: calc(100% / 14); right: calc(100% / 14); top: 15px; height: 3px; transform-origin: left; background: linear-gradient(90deg, var(--waymark-starting) 20%, var(--waymark-direction) 35%, var(--waymark-action) 55%, var(--waymark-action) 80%, var(--waymark-support)); }
-  .ribbonRoute { position: relative; }
-  .ribbonLabel { font-size: 13px; }
   .system { padding: 32px; }
 }
 
 @media (min-width: 1024px) {
-  .ribbonLabel { font-size: 14px; }
+  .ribbonIntro { margin-bottom: 42px; }
+  .ribbonRoute { position: relative; }
+  .ribbonList { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+  .ribbonStage { flex-direction: column; align-items: center; gap: 24px; padding: 0 10px; text-align: center; }
+  .ribbonStage:not(:last-child)::after { display: none; }
+  .ribbonDot { width: 84px; height: 84px; box-shadow: inset 0 0 0 7px var(--stone-charcoal); }
+  .ribbonDot > svg { width: 38px; height: 38px; }
+  .ribbonNumber { width: 29px; height: 29px; right: -3px; bottom: -3px; font-size: 12px; }
+  .ribbonCopy { padding-top: 0; }
+  .ribbonLabel { display: flex; align-items: center; justify-content: center; min-height: 46px; text-wrap: balance; }
+  .ribbonSummary { margin-top: 10px; text-wrap: pretty; }
+  .ribbonTrack {
+    display: block;
+    position: absolute;
+    left: calc(100% / 14);
+    right: calc(100% / 14);
+    top: 40px;
+    height: 4px;
+    transform-origin: left;
+    background: linear-gradient(90deg, var(--waymark-starting) 20%, var(--waymark-direction) 35%, var(--waymark-action) 55%, var(--waymark-action) 80%, var(--waymark-support));
+  }
+  .ribbonArrow { display: block; position: absolute; right: -9px; top: 32px; width: 20px; height: 20px; color: var(--stage-color); stroke-width: 2; background: var(--slate-deep); }
   .mapList { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: repeat(3, 112px) auto; padding-top: 24px; }
   .mapList > li { display: contents; }
   .stageButton { grid-column: var(--column); grid-row: var(--row); flex-direction: column; justify-content: flex-start; gap: 12px; padding: 0 6px; text-align: center; z-index: 1; }

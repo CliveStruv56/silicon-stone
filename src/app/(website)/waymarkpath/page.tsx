@@ -92,7 +92,7 @@ export default function WaymarkPathPage() {
 
               <WaymarkPathSignup id="hero" />
             </div>
-            <FlowRibbon expanded className="mt-12 max-w-5xl" />
+            <FlowRibbon expanded className="mt-12" />
           </div>
         </section>
 
