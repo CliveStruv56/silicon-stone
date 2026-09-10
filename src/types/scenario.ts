@@ -63,6 +63,8 @@ export interface Scenario {
   keyIndicators: string[]        // Early warning signals
   mitigationOptions: string[]
   confidence: ScenarioConfidence
+  /** ISO date a person last checked the evidence and probability. Set by hand at review; never derived from the clock. */
+  lastReviewed: string
   evidenceNotes: EvidenceNote[]
   boardBrief: BoardBrief
   exposureWeights: ExposureWeights

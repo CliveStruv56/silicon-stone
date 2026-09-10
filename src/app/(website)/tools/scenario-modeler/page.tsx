@@ -23,6 +23,7 @@ import {
   getMaxImpactValue,
 } from '@/lib/scenario-data'
 import { scenarioModelerMarkdown, scenarioCompareMarkdown } from '@/lib/tools-markdown'
+import { offeringById } from '@/lib/offering'
 import type {
   ExposureDependency,
   ExposureGeography,
@@ -47,7 +48,7 @@ import {
   MapPin,
   Radar,
   GitCompareArrows,
-  X,
+  Sparkles,
 } from 'lucide-react'
 
 const SECTOR_OPTIONS: Array<{ value: ExposureSector; label: string }> = [
@@ -78,6 +79,79 @@ const SOURCING_OPTIONS: Array<{ value: SourcingFlexibility; label: string }> = [
   { value: 'single-source', label: 'Single-source' },
   { value: 'dual-source', label: 'Dual-source' },
   { value: 'diversified', label: 'Diversified' },
+]
+
+const FOLLOW_ON_MODULE = offeringById('scenario-impact')
+
+/** Every hero number is read from the data, never typed. */
+const FRICTION_LEVEL_COUNT = new Set(SCENARIOS.map(s => s.frictionLevel)).size
+const LENS_COMBINATIONS =
+  SECTOR_OPTIONS.length * GEOGRAPHY_OPTIONS.length * DEPENDENCY_OPTIONS.length * SOURCING_OPTIONS.length
+const NEWEST_REVIEW = SCENARIOS.map(s => s.lastReviewed).sort().at(-1) ?? ''
+
+function formatReviewed(iso: string): string {
+  return new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  })
+}
+
+const HOW_IT_WORKS = [
+  {
+    title: 'Pick a scenario',
+    body: 'Five futures, each with a trigger, a timeframe, a base probability and the evidence behind it.',
+  },
+  {
+    title: 'Set your lens',
+    body: 'Sector, geography, dependency and sourcing posture. The value at stake and the board brief re-read around it.',
+  },
+  {
+    title: 'Read the board brief',
+    body: 'First impact, the 90-day action, the 12-month hedge and the trigger that says escalate.',
+  },
+  {
+    title: 'Compare a second',
+    body: 'Two scenarios under the same lens, side by side, then take both out as Markdown.',
+  },
+]
+
+/**
+ * Starting points: three named profiles a reader can set with one click.
+ * The band and value on each are computed by the engine for the scenario
+ * currently selected, so a preset never shows a number the lens would not.
+ */
+const PRESETS: Array<{ title: string; description: string; profile: ExposureProfile }> = [
+  {
+    title: 'German automotive tier-1',
+    description: 'Connected-product electronics, single-sourced, sold into European OEMs.',
+    profile: { sector: 'automotive', geography: 'europe', dependency: 'connected-products', sourcing: 'single-source' },
+  },
+  {
+    title: 'EU AI and cloud scale-up',
+    description: 'Accelerator and cloud-region dependent, dual-sourced, European customer base.',
+    profile: { sector: 'ai-cloud', geography: 'europe', dependency: 'cloud-ai', sourcing: 'dual-source' },
+  },
+  {
+    title: 'Healthcare provider network',
+    description: 'Regulated AI in clinical and administrative use, diversified suppliers.',
+    profile: { sector: 'healthcare', geography: 'europe', dependency: 'regulated-ai', sourcing: 'diversified' },
+  },
+]
+
+function sameProfile(a: ExposureProfile, b: ExposureProfile): boolean {
+  return a.sector === b.sector && a.geography === b.geography && a.dependency === b.dependency && a.sourcing === b.sourcing
+}
+
+/** Jump links above the result; each id is set on the card it names. */
+const RESULT_SECTIONS: Array<[id: string, label: string]> = [
+  ['brief', 'Board brief'],
+  ['impacts', 'Sector impacts'],
+  ['cascade', 'Cascade'],
+  ['indicators', 'Early warnings'],
+  ['mitigation', 'Mitigation'],
+  ['evidence', 'Evidence'],
 ]
 
 const SCENARIO_OPTIONS = SCENARIOS.map(scenario => ({
@@ -277,6 +351,59 @@ export default function ScenarioModelerPage() {
       .map(s => ({ value: s.id, label: s.name }))
   }, [selectedScenarioId])
 
+  const baseValueAtStake = useMemo(
+    () => selectedScenario.impacts.reduce((sum, impact) => sum + impact.valueNumeric, 0),
+    [selectedScenario],
+  )
+  // The four factors behind the multiplier, so the number can be defended
+  // rather than only read. `?? 1` mirrors getExposureMultiplier.
+  const lensFactors = useMemo(() => {
+    const weights = selectedScenario.exposureWeights
+    return [
+      ['Sector', weights.sectors[exposureProfile.sector] ?? 1],
+      ['Geography', weights.geographies[exposureProfile.geography] ?? 1],
+      ['Dependency', weights.dependencies[exposureProfile.dependency] ?? 1],
+      ['Sourcing', weights.sourcing[exposureProfile.sourcing] ?? 1],
+    ] as const
+  }, [selectedScenario, exposureProfile])
+
+  const presetReadings = useMemo(
+    () =>
+      PRESETS.map(preset => {
+        const multiplier = getExposureMultiplier(selectedScenario, preset.profile)
+        const total = getAdjustedImpacts(selectedScenario, preset.profile).reduce((sum, i) => sum + i.valueNumeric, 0)
+        return { ...preset, band: getExposureBand(multiplier), total: `€${total}B` }
+      }),
+    [selectedScenario],
+  )
+
+  const getMarkdown = () => {
+    const primaryArgs = {
+      scenario: selectedScenario,
+      profile: exposureProfile,
+      adjustedImpacts,
+      totalValueAtStake,
+      exposureMultiplier,
+      exposureBand,
+      boardBrief: adjustedBoardBrief,
+    }
+    if (secondary.scenario && secondary.boardBrief) {
+      return scenarioCompareMarkdown(primaryArgs, {
+        scenario: secondary.scenario,
+        profile: exposureProfile,
+        adjustedImpacts: secondary.adjustedImpacts,
+        totalValueAtStake: secondary.totalValueAtStake,
+        exposureMultiplier: secondary.exposureMultiplier,
+        exposureBand: secondary.exposureBand,
+        boardBrief: secondary.boardBrief,
+      })
+    }
+    return scenarioModelerMarkdown(primaryArgs)
+  }
+  const markdownFilename = secondary.scenario
+    ? `scenario-compare-${new Date().toISOString().slice(0, 10)}.md`
+    : `scenario-brief-${new Date().toISOString().slice(0, 10)}.md`
+
   const updateExposureProfile = <K extends keyof ExposureProfile>(
     key: K,
     value: ExposureProfile[K]
@@ -290,24 +417,92 @@ export default function ScenarioModelerPage() {
 
       <main className="flex-1 bg-background">
         {/* Hero Section */}
-        <section className="bg-slate-deep border-b border-border-subtle py-10 md:py-12">
-          <div className="mx-auto max-w-7xl px-6 lg:px-8 text-center">
-            <Badge variant="outline" className="mb-4 border-stone-teal text-stone-teal">
-              Interactive Tool
-            </Badge>
-            <h1 className="text-3xl font-bold text-text-primary sm:text-4xl mb-4">
-              Scenario Modeler
-            </h1>
-            <p className="text-lg text-text-muted max-w-2xl mx-auto">
-              Explore geopolitical futures and their impact on technology value chains.
-              Select a scenario to analyse sector-by-sector exposure and cascade effects.
-            </p>
+        <section className="bg-slate-deep border-b border-border-subtle py-10 lg:py-12">
+          <div className="mx-auto max-w-7xl px-6 lg:px-8">
+            <div className="max-w-4xl">
+              <Badge variant="outline" className="mb-4 border-stone-teal text-stone-teal">
+                Interactive Tool
+              </Badge>
+              <h1 className="text-3xl font-bold text-text-primary sm:text-4xl mb-3">
+                What does the next shock cost you?
+              </h1>
+              <p className="text-lg text-text-muted max-w-3xl">
+                {SCENARIOS.length} geopolitical scenarios, priced sector by sector and re-read through
+                your own exposure — with a board brief for each.
+              </p>
+              {/* Counts are read from the data, not typed: a scenario or a lens
+                  option added to the model must not leave this understating it. */}
+              <p className="mt-4 max-w-3xl leading-relaxed text-text-muted">
+                {SCENARIOS.length} scenarios across {FRICTION_LEVEL_COUNT} friction levels —{' '}
+                {SCENARIOS.map(s => s.shortName).join(', ')} — each with a trigger event, a timeframe,
+                a base probability, a stated confidence, value at stake by sector, a three-stage
+                cascade, early-warning indicators, mitigation options and the evidence the estimate
+                rests on.
+              </p>
+              <p className="mt-4 max-w-3xl leading-relaxed text-text-muted">
+                Set your sector, geography, the dependency that matters most and how you source it:{' '}
+                {LENS_COMBINATIONS} combinations. The lens scales the value at stake within a bounded
+                range and rewrites the first impact and the 90-day action of the board brief around
+                your operating context. It changes the exposure estimate, never the geopolitical
+                assumption — and the page shows the four factors behind every number.
+              </p>
+              {/* The step up to the paid module is said here, before the reader
+                  has invested time, so it arrives at the end as the natural next
+                  step rather than a pitch appended to a free tool. */}
+              <p className="mt-4 max-w-3xl leading-relaxed text-text-muted">
+                It works at the level of a sector. When you need the same picture drawn against your
+                own business units, with value at stake quantified for each, that is the{' '}
+                <Link href={FOLLOW_ON_MODULE.href} className="text-stone-teal underline underline-offset-4">
+                  {FOLLOW_ON_MODULE.name}
+                </Link>
+                .
+              </p>
+
+              <ol className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {HOW_IT_WORKS.map((step, index) => (
+                  <li key={step.title} className="border-t border-border-subtle pt-4">
+                    <div className="mb-1 font-mono text-xs uppercase tracking-wider text-stone-teal">Step {index + 1}</div>
+                    <h2 className="mb-1 font-semibold text-text-primary">{step.title}</h2>
+                    <p className="text-sm leading-relaxed text-text-muted">{step.body}</p>
+                  </li>
+                ))}
+              </ol>
+
+              <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                {[
+                  ['Evidence on every scenario', 'Each names the facts it rests on and states its confidence, with the date a person last reviewed it.'],
+                  ['A number you can defend', 'Base value at stake and the four lens factors are shown beside every total.'],
+                  ['Two at once', 'Compare any second scenario under the same lens, side by side.'],
+                  ['Yours to keep', 'Copy or download the brief, or the comparison, as Markdown. Nothing is gated.'],
+                ].map(([title, copy]) => (
+                  <div key={title} className="border border-border-subtle bg-stone-charcoal/60 rounded-lg p-4">
+                    <div className="text-sm font-semibold text-text-primary">{title}</div>
+                    <div className="text-xs text-text-muted mt-1">{copy}</div>
+                  </div>
+                ))}
+              </div>
+              <p className="text-sm text-text-muted mt-5 opacity-80">
+                Probabilities are our estimates and values are directional, built to show where to
+                ask better questions. Evidence last reviewed {formatReviewed(NEWEST_REVIEW)}.
+              </p>
+            </div>
           </div>
         </section>
 
         {/* Scenario Selector */}
         <section className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+          {/* At phone width five stacked cards are a screen and a half before
+              the first control, so the picker is a select there and cards above. */}
+          <div className="mb-6 sm:hidden">
+            <ProfileSelect
+              label="Scenario"
+              icon={Target}
+              value={selectedScenarioId}
+              options={SCENARIO_OPTIONS}
+              onChange={setSelectedScenarioId}
+            />
+          </div>
+          <div className="hidden sm:grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
             {SCENARIOS.map((scenario) => {
               const isSelected = selectedScenarioId === scenario.id
               const colors = FRICTION_COLORS[scenario.frictionLevel]
@@ -343,85 +538,6 @@ export default function ScenarioModelerPage() {
             })}
           </div>
 
-          <Card className="bg-stone-charcoal border-border-subtle mb-6">
-            <CardHeader>
-              <CardTitle className="text-lg text-text-primary flex items-center gap-2">
-                <Target className="w-5 h-5 text-silicon-amber-strong" />
-                Selected Scenario
-              </CardTitle>
-              <CardDescription>
-                Use the dropdown if the scenario cards are awkward on your device.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] gap-4 items-start">
-                <ProfileSelect
-                  label="Scenario"
-                  icon={Target}
-                  value={selectedScenarioId}
-                  options={SCENARIO_OPTIONS}
-                  onChange={setSelectedScenarioId}
-                />
-                <div className="rounded-lg border border-border-subtle bg-surface-elevated p-4">
-                  <div className="flex flex-wrap items-center gap-2 mb-2">
-                    <Badge
-                      variant="outline"
-                      className={`${FRICTION_COLORS[selectedScenario.frictionLevel].text} ${FRICTION_COLORS[selectedScenario.frictionLevel].border}`}
-                    >
-                      {selectedScenario.frictionLevel.toUpperCase()} FRICTION
-                    </Badge>
-                    <span className="text-xs text-text-muted">
-                      {selectedScenario.timeframe} | Base probability {selectedScenario.probability}
-                    </span>
-                  </div>
-                  <h2 className="text-base font-semibold text-text-primary mb-1">
-                    {selectedScenario.name}
-                  </h2>
-                  <p className="text-sm text-text-muted">
-                    {selectedScenario.triggerEvent}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-stone-charcoal border-border-subtle mb-6">
-            <CardHeader>
-              <CardTitle className="text-lg text-text-primary flex items-center gap-2">
-                <GitCompareArrows className="w-5 h-5 text-silicon-amber-strong" />
-                Compare a second scenario
-              </CardTitle>
-              <CardDescription>
-                Optional. Pick another scenario to see both under the same exposure lens, side by side.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                <select
-                  value={compareScenarioId ?? ''}
-                  onChange={(event) => setCompareScenarioId(event.target.value || null)}
-                  className="h-10 flex-1 rounded-md border border-border-subtle bg-surface-elevated px-3 text-sm text-text-primary outline-none transition-colors focus:border-silicon-amber"
-                >
-                  <option value="">No comparison</option>
-                  {compareOptions.map(option => (
-                    <option key={option.value} value={option.value}>{option.label}</option>
-                  ))}
-                </select>
-                {compareScenarioId && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    onClick={() => setCompareScenarioId(null)}
-                    className="text-text-muted hover:text-text-primary"
-                  >
-                    <X className="w-4 h-4" />
-                    Clear comparison
-                  </Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
           <Card className="bg-stone-charcoal border-border-subtle mb-8">
             <CardHeader>
               <CardTitle className="text-lg text-text-primary flex items-center gap-2">
@@ -432,8 +548,44 @@ export default function ScenarioModelerPage() {
                 Adjust the scenario around a specific operating context. This changes the exposure estimate and board brief, not the base geopolitical assumption.
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <CardContent className="space-y-5">
+              {/* Starting points: one click sets all four controls. The band and
+                  value shown are the engine's reading for the selected scenario. */}
+              <div>
+                <div className="mb-2 flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-text-muted">
+                  <Sparkles className="w-3.5 h-3.5 text-silicon-amber-strong" aria-hidden />
+                  Starting points
+                </div>
+                <div className="grid gap-3 md:grid-cols-3">
+                  {presetReadings.map(preset => {
+                    const active = sameProfile(exposureProfile, preset.profile)
+                    return (
+                      <button
+                        key={preset.title}
+                        type="button"
+                        onClick={() => setExposureProfile(preset.profile)}
+                        aria-pressed={active}
+                        className={`rounded-lg border p-3 text-left transition-colors ${
+                          active
+                            ? 'border-stone-teal bg-stone-teal/10'
+                            : 'border-border-subtle bg-surface-elevated hover:border-stone-teal/60'
+                        }`}
+                      >
+                        <div className="flex items-baseline justify-between gap-3">
+                          <span className="text-sm font-medium text-text-primary">{preset.title}</span>
+                          <span className="font-mono text-sm text-silicon-amber-strong">{preset.total}</span>
+                        </div>
+                        <p className="mt-1 text-xs text-text-muted">{preset.description}</p>
+                        <p className="mt-2 text-xs text-text-muted">
+                          {preset.band} exposure under {selectedScenario.shortName}
+                        </p>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                 <ProfileSelect
                   label="Sector"
                   icon={BriefcaseBusiness}
@@ -462,6 +614,25 @@ export default function ScenarioModelerPage() {
                   options={SOURCING_OPTIONS}
                   onChange={(value) => updateExposureProfile('sourcing', value)}
                 />
+                {/* Compare lives with the lens, not in a card of its own: it is
+                    the fifth control on the same result, and the separate card
+                    pushed the first result another screen down. */}
+                <label className="block">
+                  <span className="flex items-center gap-2 text-xs text-text-muted mb-2">
+                    <GitCompareArrows className="w-3.5 h-3.5" />
+                    Compare with
+                  </span>
+                  <select
+                    value={compareScenarioId ?? ''}
+                    onChange={(event) => setCompareScenarioId(event.target.value || null)}
+                    className="w-full rounded-md border border-border-subtle bg-surface-elevated px-3 py-2 text-sm text-text-primary outline-none transition-colors focus:border-stone-teal"
+                  >
+                    <option value="" className="bg-slate-deep text-text-primary">No comparison</option>
+                    {compareOptions.map(option => (
+                      <option key={option.value} value={option.value} className="bg-slate-deep text-text-primary">{option.label}</option>
+                    ))}
+                  </select>
+                </label>
               </div>
             </CardContent>
           </Card>
@@ -475,6 +646,24 @@ export default function ScenarioModelerPage() {
               transition={{ duration: 0.3 }}
               className="space-y-6"
             >
+              {/* The result runs to eight cards, so the ways to keep it and to
+                  move around it sit at the top as well as the foot. */}
+              <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                <div className="shrink-0">
+                  <CopyMarkdownButton toolName="Scenario Modeler" filename={markdownFilename} getMarkdown={getMarkdown} />
+                </div>
+                <nav aria-label="Sections of this result" className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
+                  {RESULT_SECTIONS.map(([id, label]) => (
+                    <a key={id} href={`#${id}`} className="text-text-muted hover:text-stone-teal">
+                      {label}
+                    </a>
+                  ))}
+                  {secondary.scenario && (
+                    <a href="#compare" className="text-text-muted hover:text-stone-teal">Comparison</a>
+                  )}
+                </nav>
+              </div>
+
               {/* Scenario Details Header */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Left: Scenario Overview */}
@@ -530,14 +719,24 @@ export default function ScenarioModelerPage() {
                         {totalValueAtStake}
                       </p>
                       <p className="text-xs text-text-muted mt-2">
-                        {exposureBand} exposure lens x{exposureMultiplier.toFixed(2)}
+                        {exposureBand} exposure lens ×{exposureMultiplier.toFixed(2)}
+                      </p>
+                      {/* How the number is made: base × four factors, bounded.
+                          Each sector value is rounded after scaling, so the
+                          total is the sum of those, not base × multiplier exactly. */}
+                      <p className="mt-2 font-mono text-[11px] leading-relaxed text-text-muted">
+                        Base €{baseValueAtStake}B
+                        {lensFactors.map(([label, weight]) => (
+                          <span key={label}> · {label} ×{weight.toFixed(2)}</span>
+                        ))}
+                        {' '}· bounded 0.65–1.85
                       </p>
                     </div>
                   </CardContent>
                 </Card>
 
                 {/* Right: Impact Chart */}
-                <Card className="lg:col-span-2 bg-stone-charcoal border-border-subtle">
+                <Card id="impacts" className="scroll-mt-24 lg:col-span-2 bg-stone-charcoal border-border-subtle">
                   <CardHeader>
                     <CardTitle className="text-lg text-text-primary flex items-center gap-2">
                       <TrendingDown className="w-5 h-5 text-silicon-amber-strong" />
@@ -573,7 +772,7 @@ export default function ScenarioModelerPage() {
               </div>
 
               {/* Board Brief */}
-              <Card className="bg-stone-charcoal border-border-subtle">
+              <Card id="brief" className="scroll-mt-24 bg-stone-charcoal border-border-subtle">
                 <CardHeader>
                   <CardTitle className="text-lg text-text-primary flex items-center gap-2">
                     <BriefcaseBusiness className="w-5 h-5 text-silicon-amber-strong" />
@@ -606,7 +805,7 @@ export default function ScenarioModelerPage() {
               </Card>
 
               {/* Cascade Effects */}
-              <Card className="bg-stone-charcoal border-border-subtle">
+              <Card id="cascade" className="scroll-mt-24 bg-stone-charcoal border-border-subtle">
                 <CardHeader>
                   <CardTitle className="text-lg text-text-primary flex items-center gap-2">
                     <ChevronRight className="w-5 h-5 text-alert-red" />
@@ -623,7 +822,7 @@ export default function ScenarioModelerPage() {
 
               {/* Key Indicators and Mitigation */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card className="bg-stone-charcoal border-border-subtle">
+                <Card id="indicators" className="scroll-mt-24 bg-stone-charcoal border-border-subtle">
                   <CardHeader>
                     <CardTitle className="text-lg text-text-primary flex items-center gap-2">
                       <Eye className="w-5 h-5 text-stone-teal" />
@@ -651,7 +850,7 @@ export default function ScenarioModelerPage() {
                   </CardContent>
                 </Card>
 
-                <Card className="bg-stone-charcoal border-border-subtle">
+                <Card id="mitigation" className="scroll-mt-24 bg-stone-charcoal border-border-subtle">
                   <CardHeader>
                     <CardTitle className="text-lg text-text-primary flex items-center gap-2">
                       <Shield className="w-5 h-5 text-silicon-amber-strong" />
@@ -681,14 +880,15 @@ export default function ScenarioModelerPage() {
               </div>
 
               {/* Evidence Notes */}
-              <Card className="bg-stone-charcoal border-border-subtle">
+              <Card id="evidence" className="scroll-mt-24 bg-stone-charcoal border-border-subtle">
                 <CardHeader>
                   <CardTitle className="text-lg text-text-primary flex items-center gap-2">
                     <Target className="w-5 h-5 text-stone-teal" />
                     Why This Matters Now
                   </CardTitle>
                   <CardDescription>
-                    Current assumptions behind this scenario. Confidence: {selectedScenario.confidence}.
+                    Current assumptions behind this scenario. Confidence: {selectedScenario.confidence}. Evidence
+                    last reviewed {formatReviewed(selectedScenario.lastReviewed)}.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -713,7 +913,7 @@ export default function ScenarioModelerPage() {
 
               {/* Comparison */}
               {secondary.scenario && (
-                <Card className="bg-stone-charcoal border-silicon-amber/30">
+                <Card id="compare" className="scroll-mt-24 bg-stone-charcoal border-silicon-amber/30">
                   <CardHeader>
                     <CardTitle className="text-lg text-text-primary flex items-center gap-2">
                       <GitCompareArrows className="w-5 h-5 text-silicon-amber-strong" />
@@ -792,38 +992,10 @@ export default function ScenarioModelerPage() {
 
               {/* Export + CTA */}
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-center pt-6">
-                <CopyMarkdownButton
-                  toolName="Scenario Modeler"
-                  filename={
-                    secondary.scenario
-                      ? `scenario-compare-${new Date().toISOString().slice(0, 10)}.md`
-                      : `scenario-brief-${new Date().toISOString().slice(0, 10)}.md`
-                  }
-                  getMarkdown={() => {
-                    const primaryArgs = {
-                      scenario: selectedScenario,
-                      profile: exposureProfile,
-                      adjustedImpacts,
-                      totalValueAtStake,
-                      exposureMultiplier,
-                      exposureBand,
-                      boardBrief: adjustedBoardBrief,
-                    }
-                    if (secondary.scenario && secondary.boardBrief) {
-                      return scenarioCompareMarkdown(primaryArgs, {
-                        scenario: secondary.scenario,
-                        profile: exposureProfile,
-                        adjustedImpacts: secondary.adjustedImpacts,
-                        totalValueAtStake: secondary.totalValueAtStake,
-                        exposureMultiplier: secondary.exposureMultiplier,
-                        exposureBand: secondary.exposureBand,
-                        boardBrief: secondary.boardBrief,
-                      })
-                    }
-                    return scenarioModelerMarkdown(primaryArgs)
-                  }}
-                />
-                <Link href="/advisory/drift-retainer">
+                <CopyMarkdownButton toolName="Scenario Modeler" filename={markdownFilename} getMarkdown={getMarkdown} />
+                {/* Points at the module this tool feeds (owner-approved pairing,
+                    9 September), not the retainer the page used to send people to. */}
+                <Link href={FOLLOW_ON_MODULE.href}>
                   <Button className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90">
                     Request Custom Scenario Analysis
                   </Button>

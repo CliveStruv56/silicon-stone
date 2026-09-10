@@ -720,6 +720,36 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### September 10, 2026 (latest) — Scenario Modeler: hero, presets, one control row, a number you can defend
+
+Third tool given the mapper/checker treatment, owner-approved. Hero
+(`tools/scenario-modeler/page.tsx`) now leads "What does the next shock cost
+you?" with three paragraphs (what it does, what the lens does, the step up to
+the Scenario Impact Analysis), a four-step row and a proof strip; the scenario
+count, friction-level count, short names and the 360 lens combinations are all
+read from the data. The three control cards collapsed into one: the "Selected
+Scenario" card (a dropdown duplicating the cards) is gone, its select survives
+only at phone width where the five cards are now hidden, and Compare became the
+fifth control in the lens row. Three **starting-point presets** (German
+automotive tier-1, EU AI/cloud scale-up, healthcare provider network) set the
+lens with one click and show band and value computed by the engine for the
+selected scenario. The value-at-stake box shows base value and the four lens
+factors with the 0.65–1.85 bound. A Copy/Download + jump-link bar sits above
+the result; each card carries an id. The bottom "Request Custom Scenario
+Analysis" button now points at the module (`offeringById('scenario-impact')`),
+not the Drift Retainer — the page contradicted its own follow-on panel.
+
+`Scenario.lastReviewed` added (ISO, hand-set at review, **never** from the
+clock — the owner asked whether it could be dynamic; it is a claim about when a
+person last checked the evidence, so a live date would be false). All five set
+to 2026-09-10 after reading each scenario's evidence; shown beside confidence
+and in the Markdown export. Two facts corrected in the review: the January
+2025 AI Diffusion Rule was rescinded in May 2025 (not "added to the stack"),
+and Intel cancelled Magdeburg in July 2025 (not "delayed"). The AI Act
+scenario's "possible simplification adjustments" became "the Omnibus's revised
+timelines, now law". Metadata description now lists the scenarios from the
+data. Verified in a browser at 1440px and 400px.
+
 ### September 10, 2026 (deploy) — Four production builds failed on one lint error
 
 Production stayed on `4111516f` (15:10) while `9ef3b8b8`, `eae8a8fa`,

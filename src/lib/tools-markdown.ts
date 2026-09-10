@@ -340,7 +340,7 @@ function scenarioBodyMarkdown(args: ScenarioMarkdownArgs): string {
   const impactList = adjustedImpacts
     .map((i) => `- **${i.sector}** — ${i.valueAtStake} (${i.severity}). ${i.description}`)
     .join('\n')
-  return `**Friction:** ${scenario.frictionLevel.toUpperCase()} · **Timeframe:** ${scenario.timeframe} · **Base probability:** ${scenario.probability}
+  return `**Friction:** ${scenario.frictionLevel.toUpperCase()} · **Timeframe:** ${scenario.timeframe} · **Base probability:** ${scenario.probability} · **Evidence reviewed:** ${scenario.lastReviewed}
 
 ${scenario.description}
 

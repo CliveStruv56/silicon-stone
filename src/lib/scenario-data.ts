@@ -28,6 +28,7 @@ export const SCENARIOS: Scenario[] = [
     timeframe: '2026-2028',
     probability: '15-25%',
     confidence: 'Medium',
+    lastReviewed: '2026-09-10',
     description: 'A Taiwan Strait shock remains the highest-severity technology value-chain scenario. The risk is no longer only front-end wafers: advanced packaging, HBM integration, freight insurance, and customer allocation would all become binding constraints.',
     impacts: [
       {
@@ -122,6 +123,7 @@ export const SCENARIOS: Scenario[] = [
     timeframe: '2026-2027',
     probability: '55-70%',
     confidence: 'High',
+    lastReviewed: '2026-09-10',
     description: 'The export-control scenario has already moved beyond the October 2022 baseline. The sharper 2026 risk is a rolling controls-and-retaliation cycle affecting AI accelerators, HBM, semiconductor equipment, EDA access, minerals, and customer due diligence.',
     impacts: [
       {
@@ -190,7 +192,7 @@ export const SCENARIOS: Scenario[] = [
         implication: 'The scenario is no longer hypothetical expansion of 2022 controls; it is an active rolling policy instrument.',
       },
       {
-        fact: 'January 2025 AI diffusion rules added advanced-computing and AI-model controls to the policy stack.',
+        fact: 'The January 2025 AI Diffusion Rule was rescinded in May 2025 before it took effect, replaced by case-by-case licensing and guidance — the controls stack is being rewritten, not only extended.',
         implication: 'AI value chains now need to track compute, model, cloud, and customer-location exposure together.',
       },
     ],
@@ -216,6 +218,7 @@ export const SCENARIOS: Scenario[] = [
     timeframe: '2026-2030',
     probability: '65-80%',
     confidence: 'High',
+    lastReviewed: '2026-09-10',
     description: 'EU semiconductor autonomy is real but uneven. Dresden, IMEC, equipment champions, and power electronics matter, but delays to flagship projects and limited leading-edge volume mean resilience improves first in automotive, industrial, R&D, and specialty nodes rather than frontier AI compute.',
     impacts: [
       {
@@ -284,7 +287,7 @@ export const SCENARIOS: Scenario[] = [
         implication: 'The policy direction is stable, but the practical question is which parts of the stack Europe can strengthen first.',
       },
       {
-        fact: 'ESMC Dresden is focused on 28/22nm and 16/12nm capacity for automotive, industrial, IoT, and telecom, while Intel Magdeburg has been delayed.',
+        fact: 'ESMC Dresden is focused on 28/22nm and 16/12nm capacity for automotive, industrial, IoT, and telecom, while Intel cancelled Magdeburg in July 2025.',
         implication: 'The near-term value is resilience in strategic mature and specialty nodes, not immediate independence in 2nm-class AI chips.',
       },
     ],
@@ -310,7 +313,8 @@ export const SCENARIOS: Scenario[] = [
     timeframe: '2026-2027',
     probability: '80-90%',
     confidence: 'High',
-    description: 'The AI Act scenario remains high-probability, but the operational risk is not a single cliff edge. Businesses must manage staged applicability, high-risk classification, GPAI duties, transparency rules, standards availability, notified-body capacity, and possible simplification adjustments.',
+    lastReviewed: '2026-09-10',
+    description: 'The AI Act scenario remains high-probability, but the operational risk is not a single cliff edge. Businesses must manage staged applicability, high-risk classification, GPAI duties, transparency rules, standards availability, notified-body capacity, and the Omnibus\'s revised timelines, now law.',
     impacts: [
       {
         sector: 'AI/Cloud',
@@ -404,6 +408,7 @@ export const SCENARIOS: Scenario[] = [
     timeframe: '2026-2030',
     probability: '25-40%',
     confidence: 'Medium',
+    lastReviewed: '2026-09-10',
     description: 'A full transatlantic technology split is less likely than persistent dual compliance. The live risk is a drift into incompatible operating assumptions: US innovation-first pressure, EU rights-and-competition enforcement, cloud/data sovereignty demands, and selective tariff or procurement leverage.',
     impacts: [
       {
