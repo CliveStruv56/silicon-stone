@@ -1,7 +1,7 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-09-09
+> Last Updated: 2026-09-10
 > Status: **Live in production at commit `8a20e438` (9 September 2026). Production build, full GitHub CI and five-page live link verification passed. Older test and audit counts remain dated history.**
 
 ## Start here — handover for 10 September 2026
@@ -719,6 +719,34 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### September 10, 2026 — Manufacturing Exposure Module page given the substance of a £3,500 offer
+
+The page had four deliverable bullets and three paragraphs. `ModulePage` now
+has four optional slots (`audience`, `method`, `context`, `coverage`) and the
+manufacturing page fills all of them: who buys it and at what moment (the free
+tool's nine sectors), a six-step method (inventory → resolve the sub-tier →
+score on the tool's four dimensions → stress-test against the five scenarios
+plus one built for the client → supplier questionnaire → prioritise), twelve
+deliverables drawn from the mapper's own paid-report specification, and a
+"Why the evidence matters now" block reading the Chips Act crisis-stage
+provisions (Art 25 information requests, Art 26(4) priority-rated orders
+limited to critical-sector users who can evidence mitigation, Annex IV), NIS2
+Art 21(2)(d) and the CRA SBOM duty as operating constraints, with the
+not-legal-advice line. Owner decisions recorded: the client sends the supplier
+questionnaire and S&S supports the conversation; no page or week counts; the
+scope floor stays unquantified; a written report, the register as a spreadsheet
+and a 30-day follow-up call are promised.
+
+New `RelatedCoverage` strip ("Coverage this draws on") sits after the enquiry
+form on all three module pages, each with four published articles and a
+category link, all slugs verified against production. The lists are typed into
+the pages for now. **Next step, owner-requested:** a field on the Sanity
+`article` schema naming which modules/advisories a piece appears under, so an
+editor places coverage without a deploy; the strip already takes plain
+`{title, href, note}` so the data source can swap. The advisory pages
+(`FocusedEngagementPage`) do not carry the strip yet — that lands with the
+schema work.
 
 ### September 9, 2026 — Tool and guide advisory paths completed and deployed
 

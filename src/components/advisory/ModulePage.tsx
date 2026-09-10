@@ -6,6 +6,8 @@ import { Header, Footer } from '@/components/layout'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { EngagementContactForm } from './EngagementContactForm'
+import { EngagementSteps } from './FocusedEngagementPage'
+import { RelatedCoverage } from './RelatedCoverage'
 
 type Props = {
   /** Catalogue id, so the page and `MODULES` cannot drift apart. */
@@ -18,6 +20,22 @@ type Props = {
   fromTool?: { name: string; href: string }
   scope: ReactNode
   contact: ComponentProps<typeof EngagementContactForm>
+  /**
+   * Who the module is for and the moment it is bought at. Rendered between
+   * "What it is" and the method, so the reader places themselves before they
+   * are told how the work is done.
+   */
+  audience?: ReactNode
+  /** The steps the work goes through, in order. Rendered as numbered steps. */
+  method?: { title: string; body: string }[]
+  /**
+   * Why the output matters beyond the engagement — typically the regulation
+   * that asks for the record the module produces. Takes a heading because the
+   * framing differs by module.
+   */
+  context?: { heading: string; body: ReactNode }
+  /** Published coverage under this offer; see `RelatedCoverage`. */
+  coverage?: ComponentProps<typeof RelatedCoverage>
 }
 
 /**
@@ -29,8 +47,17 @@ type Props = {
  * artwork and no "where it leads" band — so it gets its own template rather
  * than a fifth variant of `FocusedEngagementPage`. A sixth module comes off
  * this or the divergence starts again.
+ *
+ * The `audience`, `method`, `context` and `coverage` slots are optional
+ * because they were added for one module (Manufacturing Exposure, 2026-09-10)
+ * before the other two had content for them. They are slots on the template
+ * rather than sections on that page so the others gain them by filling in
+ * props, not by copying markup.
  */
-export function ModulePage({ name, price, lead, body, deliverables, fromTool, scope, contact }: Props) {
+export function ModulePage({
+  name, price, lead, body, deliverables, fromTool, scope, contact,
+  audience, method, context, coverage,
+}: Props) {
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
@@ -73,6 +100,26 @@ export function ModulePage({ name, price, lead, body, deliverables, fromTool, sc
           </div>
         </section>
 
+        {audience && (
+          <section aria-labelledby="audience-heading" className="border-t border-border-subtle">
+            <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
+              <div className="grid gap-6 lg:grid-cols-[1fr_2fr] lg:gap-12">
+                <h2 id="audience-heading" className="text-2xl font-semibold text-text-primary">Who it is for</h2>
+                <div className="max-w-3xl space-y-4 leading-relaxed text-text-muted">{audience}</div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {method && method.length > 0 && (
+          <section aria-labelledby="method-heading" className="border-t border-border-subtle">
+            <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
+              <h2 id="method-heading" className="mb-8 text-2xl font-semibold text-text-primary">How the work is done</h2>
+              <EngagementSteps steps={method} />
+            </div>
+          </section>
+        )}
+
         <section aria-labelledby="deliverables-heading" className="border-y border-border-subtle bg-stone-charcoal">
           <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
             <h2 id="deliverables-heading" className="mb-8 text-2xl font-semibold text-text-primary">What you receive</h2>
@@ -87,6 +134,17 @@ export function ModulePage({ name, price, lead, body, deliverables, fromTool, sc
           </div>
         </section>
 
+        {context && (
+          <section aria-labelledby="context-heading" className="border-b border-border-subtle">
+            <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
+              <div className="grid gap-6 lg:grid-cols-[1fr_2fr] lg:gap-12">
+                <h2 id="context-heading" className="text-2xl font-semibold text-text-primary">{context.heading}</h2>
+                <div className="max-w-3xl space-y-4 leading-relaxed text-text-muted">{context.body}</div>
+              </div>
+            </div>
+          </section>
+        )}
+
         <section aria-labelledby="scope-heading" className="border-b border-silicon-amber/30 bg-silicon-amber/5">
           <div className="mx-auto grid max-w-7xl gap-6 px-6 py-10 lg:grid-cols-[1fr_2fr] lg:gap-12 lg:px-8 lg:py-12">
             <div>
@@ -98,6 +156,8 @@ export function ModulePage({ name, price, lead, body, deliverables, fromTool, sc
         </section>
 
         <EngagementContactForm {...contact} />
+
+        {coverage && <RelatedCoverage {...coverage} />}
       </main>
       <Footer />
     </div>

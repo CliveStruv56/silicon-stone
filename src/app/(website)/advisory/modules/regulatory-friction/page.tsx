@@ -10,6 +10,36 @@ import { MODULES, offeringById } from '@/lib/offering'
 const offering = MODULES.find(m => m.id === 'regulatory-friction')!
 const guide = offeringById('us-executive-guide')
 
+/**
+ * Typed in for now; the intended source is a field on the Sanity article
+ * saying which offers it appears under. See `RelatedCoverage`.
+ */
+const COVERAGE = {
+  articles: [
+    {
+      title: 'EU AI Act: What 2 August 2026 Actually Requires (and What Moves to 2027–28)',
+      href: '/analysis/eu-ai-act-compliance-chasm-august-2026',
+      note: 'The transparency line, the penalty regime and the dates the heavy obligations actually moved to.',
+    },
+    {
+      title: 'GPAI Enforcement Activates 2 August — and the Signatory List Shows Who Is Betting Against Brussels',
+      href: '/analysis/gpai-enforcement-activates-2-august-and-the-signatory-list',
+      note: 'What the Code of Practice signatory list tells a US company entering Europe.',
+    },
+    {
+      title: 'CAIDA’s Sovereignty Tiers: Legal Architecture or Hyperscaler Licence to Stay?',
+      href: '/analysis/caidas-sovereignty-tiers-legal-architecture-or-hyperscaler',
+      note: 'The tiered cloud framework, and what qualifying as a sovereign provider does and does not require.',
+    },
+    {
+      title: 'The Collision Course: Trump’s Tariffs vs. EU Tech Enforcement',
+      href: '/analysis/tariff-enforcement-collision',
+      note: 'Where trade policy and enforcement pull a transatlantic operation in opposite directions.',
+    },
+  ],
+  more: { label: 'All Atlantic Drift coverage', href: '/analysis/category/atlantic-drift' },
+}
+
 export default function RegulatoryFrictionPage() {
   return (
     <ModulePage
@@ -46,6 +76,7 @@ export default function RegulatoryFrictionPage() {
         messagePlaceholder: 'Duplicated compliance work, a requirement blocking a launch, a transatlantic data question…',
         trustItems: [{ icon: Shield, title: 'Confidentiality first', body: 'All enquiries are treated with strict confidentiality.' }],
       }}
+      coverage={COVERAGE}
     />
   )
 }

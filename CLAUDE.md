@@ -824,6 +824,15 @@ Advisory dropdown. AI Bill of Materials is a Diagnostic deliverable and Sovereig
 Architecture Review is a Strategic Assessment scope option, neither separately
 priced. These changes shipped in `8a20e438` and its September 9 predecessors.
 
+`ModulePage` carries four optional slots (`audience`, `method`, `context`,
+`coverage`), added 2026-09-10 for the Manufacturing Exposure page. Fill the
+props; do not add a section to one module page. The `coverage` slot renders
+`RelatedCoverage` ("Coverage this draws on") after the enquiry form; its article
+lists are typed into the pages until the planned Sanity `article` field naming
+the offers a piece appears under exists. The Chips Act article numbers on the
+manufacturing page (23, 25, 26(4), Annex IV) are read from the pinned corpus
+under `corpus/regulatory/eu-chips-act/` — verify there before changing one.
+
 ## Publication dates (load-bearing — do not break)
 
 Every price has one source; so does every publication date. `publishedAt` is

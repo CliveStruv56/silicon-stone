@@ -8,6 +8,36 @@ import { MODULES } from '@/lib/offering'
 
 const offering = MODULES.find(m => m.id === 'scenario-impact')!
 
+/**
+ * Typed in for now; the intended source is a field on the Sanity article
+ * saying which offers it appears under. See `RelatedCoverage`.
+ */
+const COVERAGE = {
+  articles: [
+    {
+      title: 'Iran Conflict: How a Middle Eastern War Becomes a European Technology Supply Crisis',
+      href: '/analysis/iran-conflict-european-technology-supply-crisis',
+      note: 'A regional conflict traced through rare earths, specialty chemicals and MLCC supply to a European bill of materials.',
+    },
+    {
+      title: 'Europe’s Five Cards — and the Two It Will Actually Play: A Deployability Audit',
+      href: '/analysis/europes-five-cards-and-the-two-it-will-actually-play-a',
+      note: 'Which of Europe’s response levers to US tech coercion will scale, and which will not.',
+    },
+    {
+      title: 'Greenland’s Critical Minerals: The Transatlantic Scramble for Arctic Resources',
+      href: '/analysis/greenland-critical-minerals-transatlantic-scramble',
+      note: 'How the EU, UK and US are moving to secure mineral supply, and what that does to the scenarios.',
+    },
+    {
+      title: 'Atlantic Fault Lines Deepen: US Tech Policies Threaten EU Digital Autonomy',
+      href: '/analysis/atlantic-fault-lines-us-tech-policy-eu-autonomy',
+      note: 'Tariffs against allies and digital concessions demanded of the EU, read as an operating scenario.',
+    },
+  ],
+  more: { label: 'All Atlantic Drift coverage', href: '/analysis/category/atlantic-drift' },
+}
+
 export default function ScenarioImpactPage() {
   return (
     <ModulePage
@@ -40,6 +70,7 @@ export default function ScenarioImpactPage() {
         messagePlaceholder: 'An export control, a supplier failure, a jurisdictional change…',
         trustItems: [{ icon: Shield, title: 'Confidentiality first', body: 'All enquiries are treated with strict confidentiality.' }],
       }}
+      coverage={COVERAGE}
     />
   )
 }
