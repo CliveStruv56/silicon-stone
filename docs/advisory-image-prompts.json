@@ -3,9 +3,9 @@
   "artDirection": "Square premium editorial photography; grounded Atlantic atmosphere; textured stone and oak; slate blue, weathered teal and warm amber practical lighting; realistic optics and natural side light; central subject safe for square and 4:3 crops; no text, logos, globes or holographic overlays.",
   "images": [
     {
-      "file": "public/advisory/advisory-overview.webp",
-      "prompt": "A contemporary coastal research workspace overlooking a working Atlantic container port. Foreground an oak worktable with paper charts and an understated brass compass; distant cranes and infrastructure. Wide but composed, a sense of informed independent perspective.",
-      "source": "/Users/clivestruver/.codex/generated_images/01a0821e-3eaf-7a92-92e5-c4af72a80bcd/exec-1b4b3304-d111-4957-8919-44c5a95a09cb.png"
+      "file": "public/advisory/advisory-overview-v2.webp",
+      "prompt": "Owner-supplied 2026-09-10: a two-by-two grid of the four engagement heroes (Briefing, Diagnostic, Retainer, Assessment) on a cream ground with rounded dark tiles. Replaced the photographic coastal workspace: A contemporary coastal research workspace overlooking a working Atlantic container port. Foreground an oak worktable with paper charts and an understated brass compass; distant cranes and infrastructure. Wide but composed, a sense of informed independent perspective.",
+      "source": "Owner-supplied OVERVIEW_grid_4_matched.png (1600x1600, opaque, cream #f0ede6 gutters); resized to 1200x1200 WebP q85 with PIL."
     },
     {
       "file": "public/advisory/advisory-briefing.webp",
