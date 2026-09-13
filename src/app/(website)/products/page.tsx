@@ -191,7 +191,13 @@ export default function ProductsPage() {
 
         {/* Products Grid */}
         <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-4">
+          {/* Two rows of two, not four columns (owner request, 2026-09-13).
+              At four across the Toolkit's eight bullets set the row height
+              and the other three cards carried a third of their height as
+              empty space above the button. At half width each card is wide
+              enough to run its bullets in two columns, so the tallest card
+              is four rows of bullets rather than eight and the row evens out. */}
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
             {PRODUCTS.map(productCard).map(({ offering, presentation }) => {
               const Icon = presentation.icon
               return (
@@ -247,7 +253,7 @@ export default function ProductsPage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="flex-1 flex flex-col">
-                    <ul className="space-y-2 flex-1">
+                    <ul className="flex-1 grid grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-2">
                       {presentation.highlights.map((item) => (
                         <li key={item} className="flex items-start gap-2 text-sm text-text-muted">
                           <CheckCircle className="w-4 h-4 text-stone-teal flex-shrink-0 mt-0.5" />
@@ -261,8 +267,8 @@ export default function ProductsPage() {
                         </li>
                       ))}
                     </ul>
-                    <Link href={offering.href} className="mt-6">
-                      <Button className="w-full bg-surface-elevated text-text-primary hover:bg-surface-elevated/80">
+                    <Link href={offering.href} className="mt-6 self-start">
+                      <Button className="w-full sm:w-auto bg-surface-elevated text-text-primary hover:bg-surface-elevated/80">
                         {presentation.cta}
                         <ArrowRight className="w-4 h-4 ml-2" />
                       </Button>
