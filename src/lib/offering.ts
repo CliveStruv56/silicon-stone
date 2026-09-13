@@ -248,7 +248,7 @@ export const ENGAGEMENTS: Offering[] = [
     href: '/advisory/advisory-briefing',
     terms: [
       'Includes preparation from your Checker result and brief business context. Supporting-document review and wider investigations are scoped separately.',
-      'Credited in full toward your first month on the Drift Retainer if you proceed within 30 days.',
+      'Credited in full against any further work we do together.',
     ],
   },
   {
@@ -429,7 +429,7 @@ export const LADDER: Array<{
 }> = [
   { from: `${gbp(AMOUNTS.checklist)} Checklist Pack`, emphasis: `${gbp(AMOUNTS.toolkitDiscount)} off`, to: 'the AI Act Compliance Toolkit.' },
   { from: `${gbp(AMOUNTS.toolkitStandard)}+ Compliance Toolkit`, to: 'the evidence base a briefing starts from.' },
-  { from: `${gbp(AMOUNTS.advisoryBriefing)} Advisory Briefing`, emphasis: 'credited in full', to: 'to your first retainer month.' },
+  { from: `${gbp(AMOUNTS.advisoryBriefing)} Advisory Briefing`, emphasis: 'credited in full', to: 'against any further work we do together.' },
   { from: `Exposure Diagnostic — ${SCOPED_FEE}`, emphasis: 'credited', to: 'to your first retainer quarter.' },
 ]
 

@@ -45,7 +45,7 @@ export function AdvisoryBriefingEngagement({ coverage }: Props) {
         <p className="font-semibold text-text-primary">One AI system, one principal question, one fixed fee.</p>
         <p>Includes preparation from your Checker result and brief business context, the one-hour discussion and a short written follow-up.</p>
         <p>The Briefing interprets your result based on your account. It does not verify your system or vendor evidence, certify compliance or include supporting-document review. Document review and wider investigations are scoped and charged separately.</p>
-        <p>Further work is optional. If you choose a <Link href="/advisory/drift-retainer" className="text-stone-teal underline underline-offset-4">Drift Retainer</Link> within 30 days, the briefing fee is credited in full toward your first month.</p>
+        <p>Further work is optional. If we go on to work together, whether a specialist project, a diagnostic, an assessment or the <Link href="/advisory/drift-retainer" className="text-stone-teal underline underline-offset-4">Drift Retainer</Link>, the briefing fee is credited in full against that work.</p>
         {FREE_INTRO_WINDOW && <p className="text-sm">If you simply want to meet us first, a free 25-minute introductory conversation is available during our launch window. The paid Briefing is the working session on your question.</p>}
       </>}
       contact={{

@@ -106,9 +106,8 @@ export default async function PurchaseSuccessPage({
                 written follow-up.
               </p>
               <p className="mb-6 text-sm italic text-text-muted">
-                {gbp(AMOUNTS.advisoryBriefing)}. Credited in full toward your first month on the Drift Retainer if
-                you proceed within 30 days — so if we work together, the conversation was
-                free.
+                {gbp(AMOUNTS.advisoryBriefing)}. Credited in full against any further work we do together — so
+                if we work together, the conversation was free.
               </p>
               <Link href="/advisory#contact">
                 <Button className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90 font-semibold">

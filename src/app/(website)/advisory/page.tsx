@@ -189,17 +189,17 @@ export default function ServicesPage() {
                     It leads with the Advisory Briefing, not the Drift Retainer
                     (owner decision, 2026-09-10): the Briefing is the low-cost
                     way in for a new client, and its fee is credited in full
-                    to the first Retainer month, so the Retainer stays the
-                    destination without being the ask. A Checker result is not
+                    against any further work (owner decision, 2026-09-13: any
+                    engagement, not only the Retainer), so the Retainer stays
+                    the destination without being the ask. A Checker result is not
                     a precondition — it is something to suggest or run on the
                     25-minute call — so the copy must not read as one. */}
                 <p className="mt-6 border-l-2 border-silicon-amber/60 pl-4 leading-relaxed text-text-muted">
                   <strong className="font-semibold text-text-primary">Where to begin.</strong>{' '}
                   The Advisory Briefing takes one AI system and one principal question:
                   an hour’s discussion and a written follow-up with priorities, evidence
-                  gaps and next actions, for {gbp(AMOUNTS.advisoryBriefing)}. Proceed to
-                  the Drift Retainer within thirty days and the whole fee comes off your
-                  first month.
+                  gaps and next actions, for {gbp(AMOUNTS.advisoryBriefing)}. Go on to any
+                  further work with us and the whole fee comes off it.
                 </p>
 
                 {/* The page had no CTA above the fold at all — the first
