@@ -263,7 +263,7 @@ export const ENGAGEMENTS: Offering[] = [
     href: '/advisory/exposure-diagnostic',
     terms: [
       'European Procurement Readiness can be included in the agreed diagnostic scope or commissioned separately.',
-      'Fee credited toward your first quarter on the Drift Retainer.',
+      'Fee credited to your next advisory engagement with us.',
     ],
   },
   {
@@ -433,7 +433,7 @@ export const LADDER: Array<{
   { from: `${gbp(AMOUNTS.checklist)} Checklist Pack`, emphasis: `${gbp(AMOUNTS.toolkitDiscount)} off`, to: 'the AI Act Compliance Toolkit.' },
   { from: `${gbp(AMOUNTS.toolkitStandard)}+ Compliance Toolkit`, to: 'the evidence base a briefing starts from.' },
   { from: `${gbp(AMOUNTS.advisoryBriefing)} Advisory Briefing`, emphasis: 'credited in full', to: 'against any further work we do together.' },
-  { from: `Exposure Diagnostic — ${SCOPED_FEE}`, emphasis: 'credited', to: 'to your first retainer quarter.' },
+  { from: `Exposure Diagnostic — ${SCOPED_FEE}`, emphasis: 'credited', to: 'to your next advisory engagement with us.' },
 ]
 
 /**
