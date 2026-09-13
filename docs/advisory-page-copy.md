@@ -1,5 +1,7 @@
 # Advisory Page — Finished Copy
 
+> **Pricing update — 2026-09-13:** All advisory and specialist project prices now display “Fee agreed after scoping”, except the Advisory Briefing (£450). Product prices are unchanged. Retainer founding and annual-discount promotions are removed. This supersedes historical pricing below; use `src/lib/offering.ts` for current display values.
+
 > # ⚠ SUPERSEDED — updated 8 September 2026. Do not build from this file.
 >
 > This is a historical brief with obsolete prices, minimum terms, links and

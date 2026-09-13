@@ -3,7 +3,7 @@
  *
  * `/api/contact` writes an enquiry into Kit custom fields and tags the
  * subscriber. Until now that was the *only* thing it did: nobody was told. A
- * £2,500 Exposure Diagnostic enquiry landed in a subscriber's `message` custom
+ * Exposure Diagnostic enquiry landed in a subscriber's `message` custom
  * field and waited there until someone happened to open Kit. This module builds
  * the message that fixes that; `email.ts` sends it.
  *

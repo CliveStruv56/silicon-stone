@@ -114,7 +114,7 @@ other eight):
    redeploy (§1).
 8. Verify: one real £24 purchase end-to-end, tag checks in Kit, discount codes
    apply (§2). Announce `LAUNCH48` with its 48-hour window.
-9. After five retainer clients: `NEXT_PUBLIC_FOUNDING_OFFER_ACTIVE=false`.
+9. Advisory and specialist fees are agreed after scoping, except the £450 Advisory Briefing. Retainer founding and annual-discount promotions were removed on 2026-09-13.
 
 ## 0. Before launch day (prep)
 
@@ -472,8 +472,7 @@ pages on 2026-08-11. It was stale (four pages said 30 June, `/eu-exposure` said
 - [ ] `NEXT_PUBLIC_FREE_INTRO_END=<launch date + 90 days>` (ISO, e.g.
       `2026-10-19`) — the free-intro copy self-expires after that date; or flip
       `NEXT_PUBLIC_FREE_INTRO_WINDOW=false` manually.
-- [ ] Leave `NEXT_PUBLIC_FOUNDING_OFFER_ACTIVE=true` until five retainer
-      clients are signed, then set it to `false`.
+- [ ] Confirm scoped advisory fee wording; the founding-offer flag is retired.
 - [ ] Redeploy (env changes need a new deployment).
 
 - [ ] ⚠ **Checkout must capture express consent to immediate access.** Enable

@@ -3,8 +3,7 @@
 import type { ComponentProps } from 'react'
 import { Shield } from 'lucide-react'
 import { FocusedEngagementPage } from '@/components/advisory/FocusedEngagementPage'
-import { FOUNDING_OFFER_ACTIVE } from '@/lib/flags'
-import { AMOUNTS, gbp, priceOf } from '@/lib/offering'
+import { SCOPED_FEE } from '@/lib/offering'
 
 const INCLUDES = [
   { title: 'Monthly briefing', cadence: 'Every month', body: 'A concise written briefing you can forward to the board, plus a call: what has changed in technology and policy, and which decisions it affects.' },
@@ -59,16 +58,11 @@ export function DriftRetainerEngagement({ coverage }: Props) {
         </dl>
         <p className="mt-8 max-w-3xl border-l-2 border-stone-teal/40 pl-5 text-sm leading-relaxed text-text-muted">The analysis covers supply chains, policy and talent, using scenarios and thirty years of industry precedent to understand what a change means for your business.</p>
       </>}
-      price={`${priceOf('drift-retainer')}/month`}
+      price={SCOPED_FEE}
       pricing={<>
         <p className="font-semibold text-text-primary">Rolling monthly, with no minimum term.</p>
         <p>The retainer includes the Baseline Month and the ongoing support described above. You can finish after the first month, paying for that month only, or continue month by month.</p>
-        <p>Prefer annual? Twelve months for the price of ten — {gbp(AMOUNTS.driftRetainerAnnual)} a year.</p>
         <p>We work with a handful of client companies at a time so each relationship gets the attention it needs.</p>
-        {FOUNDING_OFFER_ACTIVE && <div className="border-t border-silicon-amber/30 pt-4 text-sm">
-          <p className="mb-1 font-semibold text-text-primary">Founding offer</p>
-          <p>The first five retainer clients join at {gbp(AMOUNTS.driftRetainerFounding)}/month for the first six months, then the standard monthly rate. The monthly option has no minimum term.</p>
-        </div>}
       </>}
       contact={{
         interest: 'Drift Retainer',

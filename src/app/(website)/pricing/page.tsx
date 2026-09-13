@@ -6,7 +6,7 @@ import { Header, Footer } from '@/components/layout'
 import { LadderBox } from '@/components/products/LadderBox'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { FOUNDING_OFFER_ACTIVE, FREE_INTRO_WINDOW, PRE_LAUNCH } from '@/lib/flags'
+import { FREE_INTRO_WINDOW, PRE_LAUNCH } from '@/lib/flags'
 import {
   AMOUNTS,
   ENGAGEMENTS,
@@ -21,8 +21,8 @@ import {
 
 const DESCRIPTION =
   `Everything Silicon and Stone offers and what it costs — free intelligence and tools, ` +
-  `digital products from ${gbp(AMOUNTS.checklist)}, and advisory engagements from ` +
-  `${gbp(AMOUNTS.advisoryBriefing)} to a standing retainer.`
+  `digital products from ${gbp(AMOUNTS.checklist)}, an Advisory Briefing for ` +
+  `${gbp(AMOUNTS.advisoryBriefing)}, and other advisory fees agreed after scoping.`
 
 export const metadata: Metadata = {
   title: 'Pricing | Silicon and Stone',
@@ -251,17 +251,6 @@ export default function PricingPage() {
               <OfferingRow key={offering.id} offering={offering} accent="amber" />
             ))}
           </div>
-
-          {FOUNDING_OFFER_ACTIVE && (
-            <div className="mt-6 rounded-lg border border-silicon-amber/40 bg-silicon-amber/10 p-5 text-sm leading-relaxed text-text-primary">
-              <strong className="font-semibold text-silicon-amber-strong">
-                Founding rate — five companies, launch only.
-              </strong>{' '}
-              The first five Drift Retainer clients join at{' '}
-              <strong className="font-semibold">{gbp(AMOUNTS.driftRetainerFounding)} a month for the first six months</strong>,
-              then the standard rate. Monthly retainers have no minimum term.
-            </div>
-          )}
         </Section>
 
         <Section
@@ -346,7 +335,6 @@ export default function PricingPage() {
               {[
                 'All prices in pounds sterling. Digital products include UK and EU VAT, collected by our merchant of record at checkout.',
                 'Advisory fees are quoted excluding VAT and invoiced on agreed terms; scope is fixed in writing before any work starts.',
-                '“From” means a floor, not an opening bid — the figure moves with scope, and we agree it on the call, not afterwards.',
                 'We sell no software and take no referral fees. No recommendation here is paid for by a vendor.',
                 'Credits are single-use, tied to the purchaser, and cannot be exchanged for cash.',
                 'Nothing here is legal advice. The Compliance Checker and the toolkit are structured judgement, not a substitute for counsel.',

@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { DigitalOmnibusContext } from '@/components/advisory/DigitalOmnibusContext'
 import { CheckCircle, Clock, Shield } from 'lucide-react'
 import { FocusedEngagementPage, EngagementSteps } from '@/components/advisory/FocusedEngagementPage'
-import { AMOUNTS, gbp } from '@/lib/offering'
+import { SCOPED_FEE } from '@/lib/offering'
 
 const REVIEW_AREAS = [
   { title: 'Systems and vendor evidence', body: 'What AI you run, what your vendors can prove and where the evidence is missing — down to component level, as an AI Bill of Materials.' },
@@ -101,7 +101,7 @@ export function ExposureDiagnosticEngagement({ coverage }: Props) {
         </p>
         <DigitalOmnibusContext>We use the relevant Digital Omnibus changes to examine your systems, roles and evidence. European Procurement Readiness forms part of the agreed diagnostic scope where relevant.</DigitalOmnibusContext>
       </>}
-      price={`From ${gbp(AMOUNTS.exposureDiagnostic)}`}
+      price={SCOPED_FEE}
       pricing={<>
         <p className="font-semibold text-text-primary">A fixed quote for the scope you agree.</p>
         <p>The fee covers the review, report and follow-up call. You know the boundary and the price before committing, and can use the findings independently.</p>

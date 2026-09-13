@@ -86,8 +86,8 @@ The owner approved these paths; keep them unless asked to change them:
 | Entry point | Primary paid next step |
 |---|---|
 | Compliance Checker | Advisory Briefing (£450) |
-| Policy Stress-Test | Regulatory Friction Assessment (from £3,500) |
-| US Executive’s Guide | Regulatory Friction Assessment (from £3,500); Exposure Diagnostic is secondary for broader systems/vendor reviews |
+| Policy Stress-Test | Regulatory Friction Assessment (Fee agreed after scoping) |
+| US Executive’s Guide | Regulatory Friction Assessment (Fee agreed after scoping); Exposure Diagnostic is secondary for broader systems/vendor reviews |
 | Supply Chain Mapper | Manufacturing Exposure Module |
 | Scenario Modeler | Scenario Impact Analysis |
 
@@ -154,8 +154,8 @@ on `main`; Vercel deployment `t4otA98cbAZPb9dnrCD9RnAMoe8m` completed.
 
 - Drift Retainer, Advisory Briefing and Exposure Diagnostic now share the order:
   intro → CTA → who it’s for → how it works → pricing → contact CTA/form.
-- Retainer is **£2,000/month, rolling monthly, no minimum term**. £20,000/year
-  and the existing founding offer remain. Fee-credit mentions and service
+- Retainer is **Fee agreed after scoping**, rolling monthly, no minimum term. Annual
+  and founding-rate promotions were removed on 2026-09-13. Fee-credit mentions and service
   cross-links were removed from the Retainer body only.
 - Five distinct advisory hero images are in `public/advisory/`. Dropdowns show
   no price amounts; **All prices** remains. Further dropdown work is unscoped.
@@ -422,9 +422,9 @@ All draft-generating formats use Claude at temperature 0.4. Drafts are created d
 | `/methodology` | ✅ | Forensic Technopolitics 3×2 matrix + Three Readings panel |
 | `/advisory` | ✅ | (renamed from `/services`, 301) The advisory **hub**: the four engagements as a chooser keyed on `Offering.question`, the three follow-on modules (`#modules`), `#retainer` summary block, contact form (Kit). The four-across tier grid was **deleted** on 2026-09-04 when each engagement got its own page |
 | `/advisory/advisory-briefing` | ✅ | £450, one hour plus written follow-up; shared focused layout since 2026-09-08 |
-| `/advisory/exposure-diagnostic` | ✅ | From £2,500, agreed scope; shared focused layout since 2026-09-08 |
-| `/advisory/drift-retainer` | ✅ | £2,000/month, rolling monthly with no minimum term (2026-09-08). `/advisory#retainer` still resolves — a summary block is kept on the hub under that id, and `engagement-pages.test.ts` guards it |
-| `/advisory/strategic-assessment` | ✅ | From £8,000 (2026-09-04) |
+| `/advisory/exposure-diagnostic` | ✅ | Fee agreed after scoping; shared focused layout since 2026-09-08 |
+| `/advisory/drift-retainer` | ✅ | Fee agreed after scoping, rolling monthly with no minimum term (2026-09-13). `/advisory#retainer` still resolves — a summary block is kept on the hub under that id, and `engagement-pages.test.ts` guards it |
+| `/advisory/strategic-assessment` | ✅ | Fee agreed after scoping (2026-09-13) |
 | `/eu-exposure` | ✅ | Retired paid-offer route; 301 to the free `/digital-omnibus` reference page |
 | `/us-executive-guide` | ✅ | Free guide (301 from `/atlantic-drift`); primary paid next step is Regulatory Friction Assessment, with Exposure Diagnostic secondary |
 | `/about` | ✅ | Credentials, principles, focus areas, Editorial Standards, products CTA |
@@ -568,11 +568,11 @@ Strategic Assessment keeps its existing structure. All five advisory pages
 | Engagement | Price | Summary | Where it lives |
 |---|---|---|---|
 | **Advisory Briefing** | **£450** / one AI system · one hour | One AI system and one principal question, prepared from the Compliance Checker result and brief business context, with a one-hour discussion and a written follow-up covering priorities, evidence gaps and next actions. Supporting-document review and wider investigation are separate. Credited **in full** to your first retainer month if you proceed within 30 days. | `/advisory/advisory-briefing` |
-| **The Exposure Diagnostic** | **From £2,500** (custom scope) | AI system + vendor-evidence review, dependency mapping, regulatory-friction read, 15–25pp report, 30-day follow-up. Fee credited to the first retainer quarter. **No refund guarantee** — the revision-or-50%-refund clause was withdrawn on 2026-09-04; the site's refund position now lives once, at `/terms`. | `/advisory/exposure-diagnostic` |
-| **The Drift Retainer** | **£2,000/month** — rolling monthly, no minimum term. £20,000/year annual. **Founding rate £1,500/mo for the first six months, first five clients** (`FOUNDING_OFFER_ACTIVE`). | The spine of the whole offering. Board-forwardable monthly briefing, a 90-minute working session on one live decision, "The Line" direct access between sessions, quarterly written exposure review on the 3×2 method. Opens with a Baseline Month — walk away after month one paying that month only. | `/advisory/drift-retainer` |
-| **Strategic Assessment** | **From £8,000**, then transitions to retainer | The deep one-off: multi-framework analysis, 40+pp report, board-ready presentation, implementation roadmap. Positioned as the framework-neutral decision document before buying governance software. | `/advisory/strategic-assessment` |
-| **Board-level / multi-entity engagement** | **£25,000–£50,000** | Bespoke, for a group, multi-jurisdiction exposure or a board mandate; settles into a Drift Retainer. | `/advisory` (bespoke band) |
-| **Specialist advisory projects** | **From £3,500 each** | Manufacturing Exposure Module, Scenario Impact Analysis and Regulatory Friction Assessment. Each is available as a standalone project after a free scoping conversation. Retainer clients are charged the separately agreed project fee in addition to the monthly fee. | `/advisory/modules/manufacturing-exposure`, `/advisory/modules/scenario-impact`, `/advisory/modules/regulatory-friction`; index at `/advisory#modules` |
+| **The Exposure Diagnostic** | **Fee agreed after scoping** | AI system + vendor-evidence review, dependency mapping, regulatory-friction read, 15–25pp report, 30-day follow-up. Fee credited to the first retainer quarter. **No refund guarantee** — the revision-or-50%-refund clause was withdrawn on 2026-09-04; the site's refund position now lives once, at `/terms`. | `/advisory/exposure-diagnostic` |
+| **The Drift Retainer** | **Fee agreed after scoping** — rolling monthly, no minimum term. | The spine of the whole offering. Board-forwardable monthly briefing, a 90-minute working session on one live decision, "The Line" direct access between sessions, quarterly written exposure review on the 3×2 method. Opens with a Baseline Month — walk away after month one paying that month only. | `/advisory/drift-retainer` |
+| **Strategic Assessment** | **Fee agreed after scoping**, then optionally transitions to retainer | The deep one-off: multi-framework analysis, 40+pp report, board-ready presentation, implementation roadmap. Positioned as the framework-neutral decision document before buying governance software. | `/advisory/strategic-assessment` |
+| **Board-level / multi-entity engagement** | **Fee agreed after scoping** | Bespoke, for a group, multi-jurisdiction exposure or a board mandate; settles into a Drift Retainer. | `/advisory` (bespoke band) |
+| **Specialist advisory projects** | **Fee agreed after scoping** | Manufacturing Exposure Module, Scenario Impact Analysis and Regulatory Friction Assessment. Each is available as a standalone project after a free scoping conversation. Retainer clients are charged the separately agreed project fee in addition to the monthly fee. | `/advisory/modules/manufacturing-exposure`, `/advisory/modules/scenario-impact`, `/advisory/modules/regulatory-friction`; index at `/advisory#modules` |
 | Free 25-minute intro conversation | Free during the first 90 days (`FREE_INTRO_WINDOW`) | The launch-window front door to the retainer. Distinct from the £450 Briefing, which is a working session. Exported as `FREE_INTRO_CONVERSATION` — kept out of `ENGAGEMENTS` so the catalogue never imports a flag — and rendered as the **first row of the advisory ladder** on `/pricing` since 2026-09-04, replacing the italic footnote it used to be. | `/advisory#contact` + `/pricing` |
 
 **Retired/scoped on 9 September:** Post-Omnibus Briefing is no longer sold;

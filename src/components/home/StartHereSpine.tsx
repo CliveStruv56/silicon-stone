@@ -5,7 +5,7 @@ import { ArrowRight } from 'lucide-react'
 import { StaggerContainer, StaggerItem } from '@/components/ui/StaggerContainer'
 import { ForensicCard } from '@/components/ui/ForensicCard'
 import { Badge } from '@/components/ui/badge'
-import { AMOUNTS, gbp } from '@/lib/offering'
+import { AMOUNTS, gbp, SCOPED_FEE } from '@/lib/offering'
 
 type Rung = {
   marker: string
@@ -44,7 +44,7 @@ const rungs: Rung[] = [
     tone: 'paid',
   },
   {
-    marker: `${gbp(AMOUNTS.driftRetainerMonthly)}/mo`,
+    marker: SCOPED_FEE,
     title: 'Retain',
     body: 'A standing read on the drift, so your leadership team is never blindsided. Diagnostics and assessments scope into an ongoing relationship.',
     cta: 'Explore Advisory',

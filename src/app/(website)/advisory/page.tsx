@@ -24,6 +24,7 @@ import {
 } from 'lucide-react'
 import {
   AMOUNTS,
+  SCOPED_FEE,
   ENGAGEMENTS as CATALOGUE_ENGAGEMENTS,
   MODULES,
   gbp,
@@ -39,8 +40,8 @@ import {
  * These were one field. It listed "Drift Retainer" alongside "Vendor
  * Dependency" and "Scenario Planning" — one engagement mixed in with five
  * subject areas — so it could answer neither question properly: three priced
- * tiers whose CTAs land on this very form (Advisory Briefing £450, Exposure
- * Diagnostic from £2,500, Strategic Assessment from £8,000) had no value at
+ * tiers whose CTAs land on this very form (Advisory Briefing, Exposure
+ * Diagnostic, Strategic Assessment) had no value at
  * all, and those leads reached Kit indistinguishable from a topic enquiry.
  *
  * `ENGAGEMENTS` is the ladder, in ascending order, and is what gets segmented
@@ -138,7 +139,7 @@ export default function ServicesPage() {
       setFormSubmitted(true)
       // The engagement rides as a prop. Without it this goal counted advisory
       // leads in one undifferentiated bucket, so there was no way to tell a
-      // £450 briefing enquiry from a £25,000 board mandate in analytics.
+      // briefing enquiry from a bespoke board mandate in analytics.
       window.plausible?.('Contact Form Submit', {
         props: { engagement: formData.engagement || 'Unspecified' },
       })
@@ -303,7 +304,7 @@ export default function ServicesPage() {
               </div>
               <div className="lg:justify-self-end lg:text-right">
                 <div className="font-mono text-2xl font-semibold text-text-primary">
-                  {gbp(AMOUNTS.driftRetainerMonthly)}<span className="text-text-muted">/month</span>
+                  {SCOPED_FEE}
                 </div>
                 <div className="mb-5 text-sm text-text-muted">
                   Rolling monthly, no minimum term
@@ -412,7 +413,7 @@ export default function ServicesPage() {
                 </div>
                 <div className="flex flex-shrink-0 flex-col items-start gap-3 lg:items-end">
                   <div className="font-mono text-lg font-semibold text-text-primary">
-                    {gbp(AMOUNTS.bespokeFloor)}–{gbp(AMOUNTS.bespokeCeiling)}
+                    {SCOPED_FEE}
                   </div>
                   <a
                     href="#contact"

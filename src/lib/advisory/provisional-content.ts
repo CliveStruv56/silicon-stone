@@ -5,8 +5,7 @@
  * and the Strategic Assessment actually run. The owner asked for a structure to
  * react to and will supply the real detail; until then none of it may reach a
  * customer, because a stated timeline is a commercial promise and an invented
- * one is a false description of a service someone is paying up to
- * `AMOUNTS.strategicAssessment` for.
+ * one is a false description of a paid service.
  *
  * `PROVISIONAL_CONTENT_APPROVED` is a hard-coded constant rather than an env
  * flag on purpose. An env flag could be switched on in Vercel while the text

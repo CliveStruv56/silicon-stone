@@ -64,11 +64,16 @@ describe('catalogue shape', () => {
       'ai-audit-checklist',
       'ai-act-toolkit',
       'advisory-briefing',
-      'exposure-diagnostic',
-      'drift-retainer',
-      'strategic-assessment',
     ]) {
       expect(priceOf(id), `priceOf('${id}')`).toMatch(/£/)
+    }
+  })
+
+  it('uses scoped fees for every advisory service except the briefing', () => {
+    for (const offering of [...ENGAGEMENTS, ...MODULES]) {
+      expect(priceOf(offering.id)).toBe(
+        offering.id === 'advisory-briefing' ? '£450' : 'Fee agreed after scoping',
+      )
     }
   })
 

@@ -22,7 +22,7 @@ import { EngagementContactForm } from '@/components/advisory/EngagementContactFo
 import { EngagementHero } from '@/components/advisory/EngagementHero'
 import { WhereItLeads } from '@/components/advisory/WhereItLeads'
 import { RelatedCoverage } from '@/components/advisory/RelatedCoverage'
-import { AMOUNTS, gbp } from '@/lib/offering'
+import { SCOPED_FEE } from '@/lib/offering'
 import {
   ASSESSMENT_REPORT_CONTENTS,
   ASSESSMENT_STAGES,
@@ -97,7 +97,7 @@ export function StrategicAssessmentEngagement({ coverage }: Props) {
           body="The Strategic Assessment gives your board a framework-neutral decision document instead: what you are actually required to do, what you genuinely need tooling for, and what you do not. It is vendor-agnostic because we sell no software and take no referral fees."
           inShort={
             <>
-              A board-ready decision document from {gbp(AMOUNTS.strategicAssessment)} —
+              A board-ready decision document —
               multi-framework analysis, a 40-page report, a presentation and an
               implementation roadmap, scoped to the decision in front of you.
             </>
@@ -109,7 +109,7 @@ export function StrategicAssessmentEngagement({ coverage }: Props) {
         />
 
         <AtAGlance
-          price={`From ${gbp(AMOUNTS.strategicAssessment)}`}
+          price={SCOPED_FEE}
           priceNote="Scoped to the decision in front of the board"
           points={[
             'Multi-framework analysis across everything in scope',
@@ -273,7 +273,7 @@ export function StrategicAssessmentEngagement({ coverage }: Props) {
           <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
             <div className="max-w-3xl">
               <h2 className="mb-4 text-2xl font-semibold text-text-primary">
-                From {gbp(AMOUNTS.strategicAssessment)}, scoped to the decision
+                {SCOPED_FEE}
               </h2>
               <p className="mb-4 leading-relaxed text-text-muted">
                 Scoped against the decision and the frameworks in play, and fixed before
@@ -290,7 +290,7 @@ export function StrategicAssessmentEngagement({ coverage }: Props) {
               </p>
               <p className="mt-4 leading-relaxed text-text-muted">
                 For a group, multi-jurisdiction exposure or a full board mandate, the
-                bespoke tier runs {gbp(AMOUNTS.bespokeFloor)}–{gbp(AMOUNTS.bespokeCeiling)} —{' '}
+                bespoke engagement is available. {SCOPED_FEE} —{' '}
                 <Link href="/advisory#contact" className="text-silicon-amber-strong hover:underline">
                   discuss an engagement
                 </Link>

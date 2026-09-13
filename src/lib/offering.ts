@@ -53,18 +53,6 @@ export const AMOUNTS = {
 
   /** Advisory. */
   advisoryBriefing: 450,
-  exposureDiagnostic: 2500,
-  driftRetainerMonthly: 2000,
-  /** Twelve months for the price of ten. */
-  driftRetainerAnnual: 20000,
-  /** Founding rate, first five clients, first six months. */
-  driftRetainerFounding: 1500,
-  strategicAssessment: 8000,
-  bespokeFloor: 25000,
-  bespokeCeiling: 50000,
-
-  /** Follow-on modules. */
-  moduleFloor: 3500,
 } as const
 
 /** Format an amount as sterling: 24 → "£24", 25000 → "£25,000". */
@@ -88,6 +76,9 @@ export const DERIVED = {
   /** Toolkit price after the Evidence Pack's credit. */
   toolkitAfterEvidencePack: AMOUNTS.toolkitStandard - AMOUNTS.evidencePack,
 } as const
+
+/** Public fee label for advisory engagements and specialist projects. */
+export const SCOPED_FEE = 'Fee agreed after scoping'
 
 export interface Offering {
   /** Stable key — used for nav lookups and React keys, never displayed. */
@@ -263,7 +254,7 @@ export const ENGAGEMENTS: Offering[] = [
   {
     id: 'exposure-diagnostic',
     name: 'The Exposure Diagnostic',
-    price: `From ${gbp(AMOUNTS.exposureDiagnostic)}`,
+    price: SCOPED_FEE,
     priceNote: 'custom scope',
     summary:
       'Where your dependency on specific vendors, models and jurisdictions becomes an operating constraint — with a 15–25 page report and a 30-day follow-up call.',
@@ -278,8 +269,8 @@ export const ENGAGEMENTS: Offering[] = [
   {
     id: 'drift-retainer',
     name: 'The Drift Retainer',
-    price: gbp(AMOUNTS.driftRetainerMonthly),
-    priceNote: 'per month · rolling monthly, no minimum term',
+    price: SCOPED_FEE,
+    priceNote: 'rolling monthly, no minimum term',
     summary:
       'The standing relationship. A board-forwardable monthly briefing, a working session on one live decision, direct access between sessions, and a quarterly written exposure review.',
     question: 'It keeps moving and we keep reacting.',
@@ -292,14 +283,13 @@ export const ENGAGEMENTS: Offering[] = [
     href: '/advisory/drift-retainer',
     terms: [
       'Rolling monthly with no minimum term, starting with a Baseline Month.',
-      `Twelve months for the price of ten — ${gbp(AMOUNTS.driftRetainerAnnual)} a year.`,
       'Limited to a handful of client companies at any time.',
     ],
   },
   {
     id: 'strategic-assessment',
     name: 'Strategic Assessment',
-    price: `From ${gbp(AMOUNTS.strategicAssessment)}`,
+    price: SCOPED_FEE,
     priceNote: 'then transitions to retainer',
     summary:
       'The deep one-off for a high-stakes decision: multi-framework analysis, a 40-page report, a board-ready presentation and an implementation roadmap.',
@@ -315,7 +305,7 @@ export const ENGAGEMENTS: Offering[] = [
   {
     id: 'board-level',
     name: 'Board-level and multi-entity engagements',
-    price: `${gbp(AMOUNTS.bespokeFloor)}–${gbp(AMOUNTS.bespokeCeiling)}`,
+    price: SCOPED_FEE,
     priceNote: 'bespoke',
     summary:
       'For a group, multi-jurisdiction exposure or a board-level mandate — scoped to the question, then settling into a Drift Retainer for ongoing oversight.',
@@ -329,8 +319,7 @@ export const ENGAGEMENTS: Offering[] = [
  *
  * Kept out of `ENGAGEMENTS` because it is gated on `FREE_INTRO_WINDOW`, and a
  * catalogue that imported a flag would hand every consumer of it a value that
- * silently changes on a date. `/pricing` decides whether to render it, exactly
- * as it already decides about the founding rate.
+ * silently changes on a date. `/pricing` decides whether to render it.
  */
 export const FREE_INTRO_CONVERSATION: Offering = {
   id: 'intro-conversation',
@@ -369,8 +358,8 @@ export const SISTER_PRODUCT: Offering = {
  * Work for retainer clients is separately scoped and charged at the project fee.
  * The owner expanded the range to five on 2026-09-10. Three have optional free
  * tool pairings; Procurement Readiness and Sovereign Architecture also remain
- * available within an agreed broader engagement. Their starting prices have
- * not been set. AI Bill of Materials remains within the Exposure Diagnostic.
+ * available within an agreed broader engagement. All project fees are agreed
+ * after scoping. AI Bill of Materials remains within the Exposure Diagnostic.
  * `MODULES` is retained as the internal catalogue name to preserve consumers.
  */
 export const MODULES: Offering[] = [
@@ -378,7 +367,7 @@ export const MODULES: Offering[] = [
     id: 'manufacturing-exposure',
     name: 'Manufacturing Exposure Module',
     question: 'Which supplier dependencies could interrupt our operations?',
-    price: `From ${gbp(AMOUNTS.moduleFloor)}`,
+    price: SCOPED_FEE,
     summary:
       'Semiconductor, cloud, supplier and operational dependencies mapped where they matter, with chokepoints and procurement questions.',
     href: '/advisory/modules/manufacturing-exposure',
@@ -388,7 +377,7 @@ export const MODULES: Offering[] = [
     id: 'scenario-impact',
     name: 'Scenario Impact Analysis',
     question: 'What would a geopolitical shock cost our business?',
-    price: `From ${gbp(AMOUNTS.moduleFloor)}`,
+    price: SCOPED_FEE,
     summary:
       'Custom geopolitical scenario modelling for your industry and geography, with value-at-stake quantified by business unit.',
     href: '/advisory/modules/scenario-impact',
@@ -398,7 +387,7 @@ export const MODULES: Offering[] = [
     id: 'regulatory-friction',
     name: 'Regulatory Friction Assessment',
     question: 'Where do EU and US requirements create cost or delay?',
-    price: `From ${gbp(AMOUNTS.moduleFloor)}`,
+    price: SCOPED_FEE,
     summary:
       'US versus EU compliance gap analysis, friction-scored for your operations, with a priority matrix and a transatlantic roadmap.',
     href: '/advisory/modules/regulatory-friction',
@@ -408,7 +397,7 @@ export const MODULES: Offering[] = [
     id: 'european-procurement-readiness',
     name: 'European Procurement Readiness',
     question: 'What do we need to satisfy a European buyer’s review?',
-    price: 'Fee agreed after scoping',
+    price: SCOPED_FEE,
     summary:
       'Buyer requirements mapped to your evidence, with gaps, response preparation and a prioritised plan for an agreed procurement process.',
     href: '/advisory/modules/european-procurement-readiness',
@@ -417,7 +406,7 @@ export const MODULES: Offering[] = [
     id: 'sovereign-architecture-review',
     name: 'Sovereign Architecture Review',
     question: 'How much control do we have over our technology stack?',
-    price: 'Fee agreed after scoping',
+    price: SCOPED_FEE,
     summary:
       'A map of hosting, access, key custody and exit constraints, with practical architecture options and a staged decision roadmap.',
     href: '/advisory/modules/sovereign-architecture',
@@ -441,7 +430,7 @@ export const LADDER: Array<{
   { from: `${gbp(AMOUNTS.checklist)} Checklist Pack`, emphasis: `${gbp(AMOUNTS.toolkitDiscount)} off`, to: 'the AI Act Compliance Toolkit.' },
   { from: `${gbp(AMOUNTS.toolkitStandard)}+ Compliance Toolkit`, to: 'the evidence base a briefing starts from.' },
   { from: `${gbp(AMOUNTS.advisoryBriefing)} Advisory Briefing`, emphasis: 'credited in full', to: 'to your first retainer month.' },
-  { from: `${gbp(AMOUNTS.exposureDiagnostic)}+ Exposure Diagnostic`, emphasis: 'credited', to: 'to your first retainer quarter.' },
+  { from: `Exposure Diagnostic — ${SCOPED_FEE}`, emphasis: 'credited', to: 'to your first retainer quarter.' },
 ]
 
 /**

@@ -1,5 +1,7 @@
 # Five specialist advisory projects
 
+> **Pricing update — 2026-09-13:** All advisory and specialist project prices now display “Fee agreed after scoping”, except the Advisory Briefing (£450). Product prices are unchanged. Retainer founding and annual-discount promotions are removed. This supersedes historical pricing below; use `src/lib/offering.ts` for current display values.
+
 ## Agreed direction
 
 The owner confirmed that these are scoped advisory projects and that European Procurement Readiness and Sovereign Architecture Review join the standalone range. This plan supersedes the three-project assumption in the visibility review.
