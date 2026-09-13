@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Header, Footer } from '@/components/layout'
 import { LadderBox } from '@/components/products/LadderBox'
 import { FollowOnBriefing } from '@/components/advisory/FollowOnBriefing'
+import { HowItFitsTogetherBand } from '@/components/offerings/HowItFitsTogetherBand'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -188,6 +189,9 @@ export default function ProductsPage() {
             </div>
           </div>
         </section>
+
+        {/* Beneath the urgency banner, not above it (owner decision, 2026-09-13). */}
+        <HowItFitsTogetherBand />
 
         {/* Products Grid */}
         <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">

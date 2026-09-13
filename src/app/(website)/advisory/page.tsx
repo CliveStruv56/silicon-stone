@@ -8,6 +8,7 @@ import { Header, Footer } from '@/components/layout'
 import { SpecialistProjects } from '@/components/advisory/SpecialistProjects'
 import { FeeLabel } from '@/components/advisory/FeeLabel'
 import { LadderBox } from '@/components/products/LadderBox'
+import { HowItFitsTogetherBand } from '@/components/offerings/HowItFitsTogetherBand'
 import { submitWithOfflineQueue } from '@/lib/offline/submit'
 import { BOOKING_URL, FREE_INTRO_WINDOW } from '@/lib/flags'
 import { Badge } from '@/components/ui/badge'
@@ -270,6 +271,8 @@ export default function ServicesPage() {
             </div>
           </div>
         </section>
+
+        <HowItFitsTogetherBand />
 
         {/* The Drift Retainer — the spine */}
         {/* The Drift Retainer moved to /advisory/drift-retainer on 2026-09-04.

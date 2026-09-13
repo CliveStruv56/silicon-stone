@@ -20,6 +20,7 @@ const footerNavigation = {
     { name: 'Tools', href: '/tools' },
     { name: 'Products', href: '/products' },
     { name: 'Pricing', href: '/pricing' },
+    { name: 'How it fits together', href: '/how-it-fits-together' },
     { name: 'Glossary', href: '/glossary' },
     { name: 'Methodology', href: '/methodology' },
     { name: 'About', href: '/about' },

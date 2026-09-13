@@ -228,6 +228,18 @@ export function buildEngagementBreadcrumbSchema(engagement: { name: string; path
   ])
 }
 
+/**
+ * Home → a top-level page (`/how-it-fits-together` first, 2026-09-13). Two
+ * levels because the page belongs to no section: it spans tools, products and
+ * advisory, which is why it is not nested under any of them.
+ */
+export function buildPageBreadcrumbSchema(page: { name: string; path: string }) {
+  return breadcrumbList([
+    { name: 'Home', path: '/' },
+    { name: page.name, path: page.path },
+  ])
+}
+
 export function buildBreadcrumbSchema(a: SchemaArticle) {
   const items: Array<{ name: string; url: string }> = [
     { name: 'Intelligence', url: absoluteUrl('/intelligence') },

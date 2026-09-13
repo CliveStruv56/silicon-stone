@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Header, Footer } from '@/components/layout'
 import { Badge } from '@/components/ui/badge'
 import { ToolsGrid } from '@/components/home/ToolsGrid'
+import { HowItFitsTogetherBand } from '@/components/offerings/HowItFitsTogetherBand'
 
 export const metadata: Metadata = {
     title: 'Interactive Tools | Silicon and Stone',
@@ -36,6 +37,8 @@ export default function ToolsPage() {
                         </div>
                     </div>
                 </section>
+
+                <HowItFitsTogetherBand />
 
                 <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8">
                     <ToolsGrid />

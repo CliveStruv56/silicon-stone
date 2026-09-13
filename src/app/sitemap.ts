@@ -29,6 +29,8 @@ const STATIC_ROUTES: Array<{
   { path: '/intelligence/series', changeFrequency: 'weekly', priority: 0.7 },
   { path: '/about', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/methodology', changeFrequency: 'monthly', priority: 0.7 },
+  // The offerings map — one page spanning tools, products and advisory.
+  { path: '/how-it-fits-together', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/glossary', changeFrequency: 'weekly', priority: 0.7 },
   { path: '/advisory', changeFrequency: 'monthly', priority: 0.6 },
   // All four advisory engagements own a page rather than an anchor. Each is
