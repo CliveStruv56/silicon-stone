@@ -43,7 +43,7 @@ export default function DigitalOmnibusPage() {
           <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-20">
             <p className="mb-5 text-sm text-stone-teal">A reference for business leaders</p>
             <h1 className="max-w-4xl text-4xl font-bold tracking-tight text-text-primary sm:text-5xl lg:text-6xl">Digital Omnibus</h1>
-            <p className="mt-4 text-2xl font-medium text-text-primary sm:text-3xl">What changes and what matters.</p>
+            <p className="mt-4 text-2xl font-medium text-silicon-amber-strong sm:text-3xl">What changes and what matters.</p>
             <p className="mt-6 max-w-3xl text-lg leading-relaxed text-text-muted">Europe is revising its digital rulebook. Some AI rules have changed; wider changes to data, privacy and cybersecurity are still being negotiated. Understanding the distinction helps you decide what to act on, what to prepare for and what to watch.</p>
             <p className="mt-5 max-w-3xl text-sm leading-relaxed text-text-muted">For leaders across the UK and EU, and US companies operating in or selling into Europe. This reference provides the shared regulatory context for our advisory work.</p>
             <p className="mt-8 text-sm text-text-muted">Reviewed <time dateTime={DIGITAL_OMNIBUS_REVIEWED}>9 September 2026</time> · Clive Struver, Silicon and Stone</p>
