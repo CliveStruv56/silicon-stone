@@ -159,9 +159,12 @@ describe('catalogue shape', () => {
   })
 
   it('emphasises only the ladder rungs that move money', () => {
-    // Rungs 2 and 4 are scope progressions. Bolding them would read as a
-    // discount that does not exist.
-    expect(LADDER.filter((rung) => rung.emphasis)).toHaveLength(3)
+    // Rung 2 is a scope progression. Bolding it would read as a discount
+    // that does not exist. (The Exposure Diagnostic rung was removed on
+    // 2026-09-13 when the owner withdrew its credit, so the ladder is three
+    // rungs, two of which move money.)
+    expect(LADDER).toHaveLength(3)
+    expect(LADDER.filter((rung) => rung.emphasis)).toHaveLength(2)
   })
 })
 

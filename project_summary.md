@@ -568,7 +568,7 @@ Strategic Assessment keeps its existing structure. All five advisory pages
 | Engagement | Price | Summary | Where it lives |
 |---|---|---|---|
 | **Advisory Briefing** | **£450** / one AI system · one hour | One AI system and one principal question, prepared from the Compliance Checker result and brief business context, with a one-hour discussion and a written follow-up covering priorities, evidence gaps and next actions. Supporting-document review and wider investigation are separate. Credited **in full** against any further work we do together (owner decision 2026-09-13; previously the first Retainer month within 30 days). | `/advisory/advisory-briefing` |
-| **The Exposure Diagnostic** | **Fee agreed after scoping** | AI system + vendor-evidence review, dependency mapping, regulatory-friction read, 15–25pp report, 30-day follow-up. Fee credited to your next advisory engagement (owner decision 2026-09-13; previously the first retainer quarter). **No refund guarantee** — the revision-or-50%-refund clause was withdrawn on 2026-09-04; the site's refund position now lives once, at `/terms`. | `/advisory/exposure-diagnostic` |
+| **The Exposure Diagnostic** | **Fee agreed after scoping** | AI system + vendor-evidence review, dependency mapping, regulatory-friction read, 15–25pp report, 30-day follow-up. No credit attaches to the fee (owner decision 2026-09-13; it was previously credited to the first retainer quarter). **No refund guarantee** — the revision-or-50%-refund clause was withdrawn on 2026-09-04; the site's refund position now lives once, at `/terms`. | `/advisory/exposure-diagnostic` |
 | **The Drift Retainer** | **Fee agreed after scoping** — rolling monthly, no minimum term. | The spine of the whole offering. Board-forwardable monthly briefing, a 90-minute working session on one live decision, "The Line" direct access between sessions, quarterly written exposure review on the 3×2 method. Opens with a Baseline Month — walk away after month one paying that month only. | `/advisory/drift-retainer` |
 | **Strategic Assessment** | **Fee agreed after scoping**, then optionally transitions to retainer | The deep one-off: multi-framework analysis, 40+pp report, board-ready presentation, implementation roadmap. Positioned as the framework-neutral decision document before buying governance software. | `/advisory/strategic-assessment` |
 | **Board-level / multi-entity engagement** | **Fee agreed after scoping** | Bespoke, for a group, multi-jurisdiction exposure or a board mandate; settles into a Drift Retainer. | `/advisory` (bespoke band) |
@@ -604,8 +604,9 @@ Drift Retainer page were removed, to simplify that page. Do not delete the
 services or abolish the credit policy based on that copy change.
 
 £24 Checklist → £20 off the Toolkit · £79+ Toolkit → the evidence base a
-briefing starts from · £450 Advisory Briefing → credited in full to month one ·
-Exposure Diagnostic → credited to your next advisory engagement with us.
+briefing starts from · £450 Advisory Briefing → credited in full against any
+further work we do together. (The Exposure Diagnostic rung was removed on
+2026-09-13 when the owner withdrew its credit.)
 
 **Source of truth**: every figure above is rendered from `src/lib/offering.ts`
 (`AMOUNTS` for the raw numbers, `DERIVED` for the sums of them). Two checks

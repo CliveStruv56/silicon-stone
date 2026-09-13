@@ -105,7 +105,7 @@ export function ExposureDiagnosticEngagement({ coverage }: Props) {
       pricing={<>
         <p className="font-semibold text-text-primary">A fixed quote for the scope you agree.</p>
         <p>The fee covers the review, report and follow-up call. You know the boundary and the price before committing, and can use the findings independently.</p>
-        <p>If you go on to further work with us, whether a <Link href="/advisory/drift-retainer" className="text-stone-teal underline underline-offset-4">Drift Retainer</Link> or another engagement, the diagnostic fee is credited to that next engagement. There is no obligation to continue.</p>
+        <p>Further work is optional. Many clients go on to a <Link href="/advisory/drift-retainer" className="text-stone-teal underline underline-offset-4">Drift Retainer</Link> for ongoing oversight; there is no obligation to continue.</p>
       </>}
       contact={{
         interest: 'Exposure Diagnostic',
