@@ -355,7 +355,9 @@ export const SISTER_PRODUCT: Offering = {
 }
 
 /**
- * Specialist advisory projects, available directly without a paid prerequisite.
+ * Specialist advisory projects. Since 2026-09-13 (owner decision) the pages say
+ * the work should ideally begin with an Advisory Briefing, whose fee is
+ * deducted in full from whichever project the client goes on to start.
  * Work for retainer clients is separately scoped and charged at the project fee.
  * The owner expanded the range to five on 2026-09-10. Three have optional free
  * tool pairings; Procurement Readiness and Sovereign Architecture also remain

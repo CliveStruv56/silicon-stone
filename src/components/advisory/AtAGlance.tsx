@@ -1,4 +1,5 @@
 import { ArrowRight, CheckCircle } from 'lucide-react'
+import { FeeLabel } from '@/components/advisory/FeeLabel'
 
 import { Button } from '@/components/ui/button'
 
@@ -31,7 +32,7 @@ export function AtAGlance({
             <div className="mb-2 font-mono text-xs uppercase tracking-wider text-text-muted">
               At a glance
             </div>
-            <div className="font-mono text-3xl font-semibold text-text-primary">{price}</div>
+            <FeeLabel as="div" price={price} />
             <div className="mt-1 text-sm text-text-muted">{priceNote}</div>
             <a href={ctaHref} className="mt-5 inline-block">
               <Button size="lg" className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90">

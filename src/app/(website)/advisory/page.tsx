@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Header, Footer } from '@/components/layout'
 import { SpecialistProjects } from '@/components/advisory/SpecialistProjects'
+import { FeeLabel } from '@/components/advisory/FeeLabel'
 import { LadderBox } from '@/components/products/LadderBox'
 import { submitWithOfflineQueue } from '@/lib/offline/submit'
 import { BOOKING_URL, FREE_INTRO_WINDOW } from '@/lib/flags'
@@ -303,9 +304,7 @@ export default function ServicesPage() {
                 </p>
               </div>
               <div className="lg:justify-self-end lg:text-right">
-                <div className="font-mono text-2xl font-semibold text-text-primary">
-                  {SCOPED_FEE}
-                </div>
+                <FeeLabel as="div" price={SCOPED_FEE} />
                 <div className="mb-5 text-sm text-text-muted">
                   Rolling monthly, no minimum term
                 </div>
@@ -412,9 +411,7 @@ export default function ServicesPage() {
                   </p>
                 </div>
                 <div className="flex flex-shrink-0 flex-col items-start gap-3 lg:items-end">
-                  <div className="font-mono text-lg font-semibold text-text-primary">
-                    {SCOPED_FEE}
-                  </div>
+                  <FeeLabel as="div" price={SCOPED_FEE} />
                   <a
                     href="#contact"
                     onClick={() => setFormData((prev) => ({ ...prev, engagement: 'Board-level engagement' }))}

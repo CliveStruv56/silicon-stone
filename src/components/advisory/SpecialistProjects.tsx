@@ -10,9 +10,11 @@ export function SpecialistProjects() {
         <div className="mb-8 max-w-3xl">
           <h2 id="specialist-projects-heading" className="mb-4 text-2xl font-semibold text-text-primary">Specialist advisory projects</h2>
           <p className="leading-relaxed text-text-muted">
-            A focused project for a defined business question. Commission directly,
-            or explore the question with a free tool first. No earlier purchase or
-            retainer is required. Scope and fees are agreed after a free conversation.
+            A focused project for a defined business question. Explore the question
+            with a free tool first if one fits. Ideally the work begins with an{' '}
+            <Link href="/advisory/advisory-briefing" className="text-stone-teal underline underline-offset-4">Advisory Briefing</Link>,
+            whose fee is deducted in full from whichever project you go on to start
+            with us. Scope and fees are agreed after a conversation.
           </p>
         </div>
         <div aria-hidden="true" className="hidden gap-8 border-b border-border-subtle px-6 pb-3 text-sm font-semibold text-text-muted lg:grid lg:grid-cols-[1fr_1.5fr_1fr]">

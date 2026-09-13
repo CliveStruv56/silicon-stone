@@ -257,7 +257,7 @@ export default function PricingPage() {
           id="modules"
           eyebrow="Engage"
           title="Specialist advisory projects"
-          intro="Standalone projects, scoped and priced after a free conversation. No previous paid engagement is required. For retainer clients, projects are separately scoped and charged at the agreed project fee, in addition to the monthly retainer."
+          intro="Standalone projects, scoped and priced after a conversation. Ideally each follows an Advisory Briefing, whose fee is deducted in full from whichever project you go on to start with us. For retainer clients, projects are separately scoped and charged at the agreed project fee, in addition to the monthly retainer."
         >
           <div>
             {MODULES.map((offering) => (

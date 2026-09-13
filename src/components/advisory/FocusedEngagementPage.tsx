@@ -1,4 +1,5 @@
 import type { ComponentProps, ReactNode } from 'react'
+import { FeeLabel } from '@/components/advisory/FeeLabel'
 
 import { Header, Footer } from '@/components/layout'
 import { EngagementContactForm } from './EngagementContactForm'
@@ -46,7 +47,7 @@ export function FocusedEngagementPage({ hero, audience, process, price, pricing,
           <div className="mx-auto grid max-w-7xl gap-6 px-6 py-10 lg:grid-cols-[1fr_2fr] lg:gap-12 lg:px-8 lg:py-12">
             <div>
               <h2 id="pricing-heading" className="mb-3 text-2xl font-semibold text-text-primary">Pricing</h2>
-              <p className="font-mono text-3xl font-semibold text-silicon-amber-strong">{price}</p>
+              <FeeLabel price={price} />
             </div>
             <div className="max-w-3xl space-y-4 leading-relaxed text-text-muted">{pricing}</div>
           </div>

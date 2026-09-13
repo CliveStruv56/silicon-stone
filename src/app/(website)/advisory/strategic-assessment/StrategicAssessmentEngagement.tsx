@@ -23,6 +23,7 @@ import { EngagementHero } from '@/components/advisory/EngagementHero'
 import { WhereItLeads } from '@/components/advisory/WhereItLeads'
 import { RelatedCoverage } from '@/components/advisory/RelatedCoverage'
 import { SCOPED_FEE } from '@/lib/offering'
+import { FeeLabel } from '@/components/advisory/FeeLabel'
 import {
   ASSESSMENT_REPORT_CONTENTS,
   ASSESSMENT_STAGES,
@@ -272,9 +273,7 @@ export function StrategicAssessmentEngagement({ coverage }: Props) {
         <section className="border-y border-silicon-amber/30 bg-silicon-amber/5">
           <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
             <div className="max-w-3xl">
-              <h2 className="mb-4 text-2xl font-semibold text-text-primary">
-                {SCOPED_FEE}
-              </h2>
+              <FeeLabel as="h2" price={SCOPED_FEE} className="mb-4" />
               <p className="mb-4 leading-relaxed text-text-muted">
                 Scoped against the decision and the frameworks in play, and fixed before
                 the work starts.

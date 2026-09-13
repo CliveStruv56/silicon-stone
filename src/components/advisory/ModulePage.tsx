@@ -1,4 +1,5 @@
 import type { ComponentProps, ReactNode } from 'react'
+import { FeeLabel } from '@/components/advisory/FeeLabel'
 import Link from 'next/link'
 import { CheckCircle } from 'lucide-react'
 
@@ -77,7 +78,7 @@ export function ModulePage({
               <Button asChild size="lg" className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90">
                 <a href="#contact">Discuss this project</a>
               </Button>
-              <span className="font-mono text-lg font-semibold text-silicon-amber-strong">{price}</span>
+              <FeeLabel as="span" price={price} />
             </div>
           </div>
         </section>
@@ -138,10 +139,10 @@ export function ModulePage({
           <div className="mx-auto grid max-w-7xl gap-6 px-6 py-10 lg:grid-cols-[1fr_2fr] lg:gap-12 lg:px-8 lg:py-12">
             <div>
               <h2 id="scope-heading" className="mb-3 text-2xl font-semibold text-text-primary">Scope and fee</h2>
-              <p className="font-mono text-3xl font-semibold text-silicon-amber-strong">{price}</p>
+              <FeeLabel price={price} />
             </div>
             <div className="max-w-3xl space-y-4 leading-relaxed text-text-muted">
-              <p>A standalone specialist engagement, scoped and priced after a free conversation. No previous paid engagement is required.</p>
+              <p>A standalone specialist engagement, scoped and priced after a conversation. Ideally the work begins with an <Link href="/advisory/advisory-briefing" className="text-stone-teal underline underline-offset-4">Advisory Briefing</Link>, which gives us the ground to scope this project well. The Briefing fee is deducted in full from this project, or from whichever project you go on to start with us.</p>
               {scope}
               <p>For <Link href="/advisory/drift-retainer" className="text-stone-teal underline underline-offset-4">Drift Retainer</Link> clients, this project is separately scoped and charged at the agreed project fee. It is additional to the monthly retainer.</p>
             </div>
