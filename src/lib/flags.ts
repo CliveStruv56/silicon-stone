@@ -6,10 +6,13 @@
  * - PRE_LAUNCH (default true): while true every product CTA is the
  *   "Request Early Access" Kit capture and no Lemon Squeezy checkout is
  *   invoked. Set NEXT_PUBLIC_PRE_LAUNCH=false at launch.
- * - FREE_INTRO_WINDOW (default true): the free 25-minute intro conversation is
- *   offered for the first 90 days post-launch. NEXT_PUBLIC_FREE_INTRO_END is
- *   the window's end date (ISO, e.g. 2026-12-31); once past, the flag reads
- *   false at the next build/render without an env change.
+ * - FREE_INTRO_WINDOW (default **false** since 2026-09-13, owner decision):
+ *   the "free 25-minute intro conversation, first ninety days" copy. It was
+ *   on by default from launch packaging until the owner retired the
+ *   launch-window wording everywhere. The 25-minute conversation itself is
+ *   still bookable (BOOKING_URL); only the "free during our launch window"
+ *   line and the intro row on /pricing are gated. NEXT_PUBLIC_FREE_INTRO_END
+ *   still bounds the window if the flag is ever turned back on.
  */
 
 function envFlag(value: string | undefined, defaultValue: boolean): boolean {
@@ -22,7 +25,7 @@ export const PRE_LAUNCH = envFlag(process.env.NEXT_PUBLIC_PRE_LAUNCH, true)
 const FREE_INTRO_END = process.env.NEXT_PUBLIC_FREE_INTRO_END || ''
 
 export const FREE_INTRO_WINDOW =
-  envFlag(process.env.NEXT_PUBLIC_FREE_INTRO_WINDOW, true) &&
+  envFlag(process.env.NEXT_PUBLIC_FREE_INTRO_WINDOW, false) &&
   (!FREE_INTRO_END || Date.now() < Date.parse(FREE_INTRO_END))
 
 /**

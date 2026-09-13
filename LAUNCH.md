@@ -469,9 +469,12 @@ pages on 2026-08-11. It was stale (four pages said 30 June, `/eu-exposure` said
       > announced or indexed: launch, or put the wording back, before promoting
       > anything. The labels live on `<EarlyAccessCTA label=…>` in
       > `products/ai-audit-checklist/page.tsx` and `products/ai-act-toolkit/page.tsx`.
-- [ ] `NEXT_PUBLIC_FREE_INTRO_END=<launch date + 90 days>` (ISO, e.g.
-      `2026-10-19`) — the free-intro copy self-expires after that date; or flip
-      `NEXT_PUBLIC_FREE_INTRO_WINDOW=false` manually.
+- [x] ~~`NEXT_PUBLIC_FREE_INTRO_END=<launch date + 90 days>`~~ — retired
+      2026-09-13: the owner removed the "free during our launch window" copy
+      everywhere, so `FREE_INTRO_WINDOW` now defaults to **false** in
+      `src/lib/flags.ts` and nothing needs setting. Set
+      `NEXT_PUBLIC_FREE_INTRO_WINDOW=true` (and optionally `_END`) only to
+      bring it back.
 - [ ] Confirm scoped advisory fee wording; the founding-offer flag is retired.
 - [ ] Redeploy (env changes need a new deployment).
 

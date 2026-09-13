@@ -314,20 +314,21 @@ export const ENGAGEMENTS: Offering[] = [
 ]
 
 /**
- * The free 25-minute intro conversation — the launch-window front door to the
- * advisory ladder.
+ * The free 25-minute intro conversation — the front door to the advisory
+ * ladder.
  *
- * Kept out of `ENGAGEMENTS` because it is gated on `FREE_INTRO_WINDOW`, and a
- * catalogue that imported a flag would hand every consumer of it a value that
- * silently changes on a date. `/pricing` decides whether to render it.
+ * Kept out of `ENGAGEMENTS` because it is gated on `FREE_INTRO_WINDOW` (off by
+ * default since 2026-09-13), and a catalogue that imported a flag would hand
+ * every consumer of it a value that silently changes. `/pricing` decides
+ * whether to render it.
  */
 export const FREE_INTRO_CONVERSATION: Offering = {
   id: 'intro-conversation',
   name: 'Intro conversation',
   price: 'Free',
-  priceNote: '25 minutes · launch window',
+  priceNote: '25 minutes',
   summary:
-    'A conversation, not a working session — where you are, what has prompted the question, and which rung of the ladder actually fits. Free for the first ninety days.',
+    'A conversation, not a working session — where you are, what has prompted the question, and which rung of the ladder actually fits.',
   href: '/advisory#contact',
   terms: [
     `Distinct from the ${gbp(AMOUNTS.advisoryBriefing)} Advisory Briefing: one AI system, one principal question, a one-hour discussion and a written follow-up.`,
