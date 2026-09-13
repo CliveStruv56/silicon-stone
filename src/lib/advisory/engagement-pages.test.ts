@@ -284,6 +284,25 @@ describe('follow-on module pages', () => {
   })
 
   /**
+   * Since 2026-09-13 the Briefing band sits ABOVE the module band on each of
+   * those three pages (owner request): the Briefing should ideally come
+   * first, and its fee is deducted from the project. Order is asserted on the
+   * source because a band rendered below the project would still satisfy a
+   * presence check while saying the opposite of the intended sequence.
+   */
+  it.each([
+    ['supply-chain-mapper', 'manufacturing-exposure'],
+    ['scenario-modeler', 'scenario-impact'],
+    ['policy-stress-test', 'regulatory-friction'],
+  ])('tools/%s places the Advisory Briefing above the %s module', (tool, moduleId) => {
+    const source = fs.readFileSync(path.join(APP_DIR, 'tools', tool, 'page.tsx'), 'utf8')
+    const briefingAt = source.indexOf('<FollowOnBriefing ')
+    const moduleAt = source.indexOf(`<FollowOnModule moduleId="${moduleId}" />`)
+    expect(briefingAt, 'FollowOnBriefing band not rendered').toBeGreaterThan(-1)
+    expect(briefingAt).toBeLessThan(moduleAt)
+  })
+
+  /**
    * The AI Bill of Materials was folded into the Exposure Diagnostic on
    * 2026-09-09. It kept its anchor because the phrase is searched for and was a
    * linkable destination for months, and `/products/ai-act-toolkit` points at

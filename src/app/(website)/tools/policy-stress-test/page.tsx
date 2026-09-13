@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Header, Footer } from '@/components/layout'
 import { FollowOnModule } from '@/components/advisory/FollowOnModule'
+import { FollowOnBriefing } from '@/components/advisory/FollowOnBriefing'
 import { EmailGateOverlay } from '@/components/tools/EmailGateOverlay'
 import { usePrintGate } from '@/components/tools/usePrintGate'
 import { CopyMarkdownButton } from '@/components/tools/CopyMarkdownButton'
@@ -884,6 +885,7 @@ export default function PolicyStressTestPage() {
             )}
           </AnimatePresence>
         </section>
+        <FollowOnBriefing toolName="Policy Stress-Test" />
         <FollowOnModule moduleId="regulatory-friction" />
       </main>
 

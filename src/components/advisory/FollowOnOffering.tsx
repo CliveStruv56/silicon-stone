@@ -4,12 +4,14 @@ import { Badge } from '@/components/ui/badge'
 import type { Offering } from '@/lib/offering'
 
 /** Shared treatment for the paid next step beneath a free tool. */
-export function FollowOnOffering({ offering, eyebrow, intro, note, ctaLabel }: {
+export function FollowOnOffering({ offering, eyebrow, intro, note, ctaLabel, summary }: {
   offering: Offering
   eyebrow: string
   intro: string
   note: string
   ctaLabel?: string
+  /** Replaces the catalogue summary where it would not read on this page. */
+  summary?: string
 }) {
   return (
     <section
@@ -35,7 +37,7 @@ export function FollowOnOffering({ offering, eyebrow, intro, note, ctaLabel }: {
           </Badge>
         </div>
         <p className="mt-4 max-w-3xl leading-relaxed text-text-primary">{intro}</p>
-        <p className="mt-3 max-w-3xl leading-relaxed text-text-muted">{offering.summary}</p>
+        <p className="mt-3 max-w-3xl leading-relaxed text-text-muted">{summary ?? offering.summary}</p>
         <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
           <Link
             href={offering.href}

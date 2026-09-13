@@ -8,6 +8,7 @@ import type { FeatureCollection, Feature, LineString } from 'geojson'
 import { Tooltip } from 'react-tooltip'
 import { Header, Footer } from '@/components/layout'
 import { FollowOnModule } from '@/components/advisory/FollowOnModule'
+import { FollowOnBriefing } from '@/components/advisory/FollowOnBriefing'
 import { EmailGateOverlay } from '@/components/tools/EmailGateOverlay'
 import { usePrintGate } from '@/components/tools/usePrintGate'
 import { CopyMarkdownButton } from '@/components/tools/CopyMarkdownButton'
@@ -907,6 +908,7 @@ export default function SupplyChainMapperPage() {
             the subscribe card and a button that sent the reader to the Drift
             Retainer, so the one call to action visible after the result pointed
             at the wrong product and the right one was a screen further down. */}
+        <FollowOnBriefing toolName="Supply Chain Mapper" />
         <FollowOnModule moduleId="manufacturing-exposure" />
 
         <section className="mx-auto max-w-7xl px-6 py-8 lg:px-8">

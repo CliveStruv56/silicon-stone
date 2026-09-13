@@ -22,7 +22,7 @@ export function FollowOnModule({ moduleId }: { moduleId: string }) {
       eyebrow="Specialist advisory · standalone projects"
       intro={journey.intro}
       ctaLabel={journey.actionLabel}
-      note="Free scoping conversation. No previous engagement required."
+      note="Scoped after a conversation. Ideally follows the Advisory Briefing above, whose fee is deducted in full from this project."
     />
   )
 }
