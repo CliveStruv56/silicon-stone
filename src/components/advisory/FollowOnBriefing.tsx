@@ -12,13 +12,24 @@ import { offeringById } from '@/lib/offering'
  * catalogue's summary opens "A review of your Compliance Checker result",
  * which on the Supply Chain Mapper page would be a non sequitur.
  */
-export function FollowOnBriefing({ toolName }: { toolName: string }) {
+export function FollowOnBriefing({
+  toolName,
+  eyebrow = 'Start here · before a specialist project',
+  intro,
+}: {
+  /** The free tool this band follows; names it in the intro. */
+  toolName?: string
+  eyebrow?: string
+  /** Full override for pages with no tool result to bring (e.g. /products). */
+  intro?: string
+}) {
   const briefing = offeringById('advisory-briefing')
+  const bring = toolName ? `Bring your ${toolName} result and one principal question` : 'Bring one principal question'
   return (
     <FollowOnOffering
       offering={briefing}
-      eyebrow="Start here · before a specialist project"
-      intro={`Ideally the work begins with an Advisory Briefing. Bring your ${toolName} result and one principal question; leave with priorities, evidence gaps and next actions in writing.`}
+      eyebrow={eyebrow}
+      intro={intro ?? `Ideally the work begins with an Advisory Briefing. ${bring}; leave with priorities, evidence gaps and next actions in writing.`}
       summary="One AI system, one principal question. A one-hour discussion with an independent adviser and a written follow-up."
       ctaLabel="Explore the Advisory Briefing"
       note="The Briefing fee is deducted in full from whichever project you go on to start with us."

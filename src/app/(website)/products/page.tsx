@@ -3,6 +3,7 @@ import Link from 'next/link'
 
 import { Header, Footer } from '@/components/layout'
 import { LadderBox } from '@/components/products/LadderBox'
+import { FollowOnBriefing } from '@/components/advisory/FollowOnBriefing'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -271,11 +272,22 @@ export default function ProductsPage() {
               )
             })}
           </div>
+        </section>
 
-          {/* The Ladder — every paid step credits toward the next (§2.4) */}
-          <div className="mt-10">
-            <LadderBox />
-          </div>
+        {/* The Advisory Briefing, between the products and the ladder (owner
+            request, 2026-09-13): the same band the three tool pages carry
+            above their specialist project, here with no tool result to bring
+            — the Toolkit is the evidence base a briefing starts from. Its own
+            full-bleed section, because FollowOnOffering carries its own
+            max-w-7xl container and border. */}
+        <FollowOnBriefing
+          eyebrow="Start here · from a product to advice"
+          intro="Ideally advisory work begins with an Advisory Briefing. Bring what the Toolkit or Checklist Pack has surfaced and one principal question; leave with priorities, evidence gaps and next actions in writing."
+        />
+
+        {/* The Ladder — every paid step credits toward the next (§2.4) */}
+        <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
+          <LadderBox />
         </section>
 
         {/* Sister product — WaymarkPath is adjacent to the Read → Use → Buy →
