@@ -821,8 +821,10 @@ Checker uses the shared panel with the **Advisory Briefing**, which stays in
 Homepage follow-on links go directly to these offering pages. Resolve names,
 prices and URLs from `offeringById()` in `src/lib/offering.ts`; do not retype
 catalogue entries. Module pages share `ModulePage.tsx`. Modules remain discoverable
-through `/advisory#modules`, `/pricing` and the footer; they are not in the
-Advisory dropdown. AI Bill of Materials is a Diagnostic deliverable and Sovereign
+through `/advisory#modules`, `/pricing` and the footer. The Advisory dropdown
+carries one of them by name, the Sovereign Architecture Review (owner request
+2026-09-13), resolved through `offeringById()`; the other four sit behind the
+"Specialist projects" anchor. AI Bill of Materials is a Diagnostic deliverable and Sovereign
 Architecture Review is a Strategic Assessment scope option, neither separately
 priced. These changes shipped in `8a20e438` and its September 9 predecessors.
 
