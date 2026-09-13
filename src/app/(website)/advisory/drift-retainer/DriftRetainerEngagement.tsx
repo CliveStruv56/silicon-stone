@@ -31,7 +31,6 @@ export function DriftRetainerEngagement({ coverage }: Props) {
         imageSrc: '/advisory/drift-retainer-v2.webp',
         imageAlt: 'An isometric sandstone watch-house with a verdigris roof on a stepped slate headland, its wide window glowing amber and an amber-lit stair to its door; below, four teal lanes curve past across the slab like shipping lanes seen from above, one small amber marker on the nearest',
         imageCaption: 'A clear view of what is changing around your business.',
-        showLaunchLine: true,
       }}
       audience={<>
         <p className="text-xl text-text-primary">For leadership teams making technology decisions in a changing environment.</p>

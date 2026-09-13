@@ -3,7 +3,6 @@ import { ArrowRight } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { FREE_INTRO_WINDOW } from '@/lib/flags'
 
 /** Shared introduction and CTA, with distinct artwork for each engagement. */
 export function EngagementHero({
@@ -18,7 +17,6 @@ export function EngagementHero({
   imageSrc,
   imageAlt,
   showRelatedLink = true,
-  showLaunchLine = false,
 }: {
   badge: string
   title: string
@@ -33,7 +31,6 @@ export function EngagementHero({
   imageAlt: string
   showRelatedLink?: boolean
   /** Only the Retainer runs the free-intro launch offer. */
-  showLaunchLine?: boolean
 }) {
   return (
     <section className="bg-slate-deep border-b border-border-subtle">
@@ -64,11 +61,6 @@ export function EngagementHero({
                 </a>
               )}
             </div>
-            {showLaunchLine && FREE_INTRO_WINDOW && (
-              <p className="mt-2 text-xs italic text-text-muted">
-                Free during our launch window — the first ninety days.
-              </p>
-            )}
           </div>
 
           <div className="relative">
