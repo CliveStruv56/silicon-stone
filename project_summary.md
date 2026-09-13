@@ -1,10 +1,77 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-09-10
-> Status: **Five standalone specialist advisory projects implemented and verified locally. Owner authorised commit and push; deployment verification is pending. Earlier deployment records below are history.**
+> Last Updated: 2026-09-13
+> Status: **Offerings map live at `/how-it-fits-together` (commit `20bbf735`, Vercel Ready). Twelve owner-directed copy and layout changes shipped the same day, each committed, pushed and deployed. Earlier deployment records below are history.**
 
-## Current work — five standalone specialist projects
+## Current work — 13 September 2026: the offerings map and a day of owner-directed copy
+
+**The offerings map is live** at `/how-it-fits-together` (commit
+[`20bbf735`](https://github.com/CliveStruv56/silicon-stone/commit/20bbf735);
+production deployment Ready). It began as a review artifact built from the
+owner's `Product Grid.xlsx` (flow map + chooser matrix, **no prices**), was
+iterated four times with the owner, and then rebuilt for the site as the map
+alone. It is **drawn from the catalogue, not retyped**: `src/lib/offerings-map.ts`
+resolves every box through `offeringById()` / `MODULES` / `ENGAGEMENTS` /
+`PRODUCTS` and reads each tool's lane from `TOOL_JOURNEYS`;
+`src/components/offerings/OfferingsMap.tsx` holds only geometry, with row
+positions derived from array index. Every box links to its page; below `md`
+the same boxes render as a stacked list. Its one prominent entry is
+`HowItFitsTogetherBand` beneath the hero on `/tools`, `/advisory` and
+`/products` (below the amber urgency banner there; teal so two bands do not
+read as one). Footer Engage column and sitemap carry it; the header menus
+deliberately do not. `src/lib/offerings-map.test.ts` holds every box to a
+real, indexed page, each tool lane to a project or the Briefing, no price on
+the page, and the band to those three pages.
+
+Drawing conventions settled with the owner: five stages Read → Use → Talk →
+Commission → Stay; the Advisory Briefing as the gate every path passes
+through; one cyan for every arrow and stripe, amber stripes on the core
+engagements and the board-level box only; a dotted lane through the Briefing
+from each tool to its project; each self-serve product with its own arrow into
+the Briefing; no words on any arrow; no legend; no intelligence-archive box.
+The intro conversation box reads "free · 25 minutes" — it is free; only the
+launch-window framing was retired. The review artifact (with the chooser
+table) stays at the URL recorded in the auto-memory.
+
+**Owner-directed changes shipped the same day**, each its own commit on `main`:
+
+- **Briefing credit** now "credited in full against any further work we do
+  together" in all five places it was stated (`80381a61`); the old "first
+  Retainer month within 30 days" is gone.
+- **Exposure Diagnostic credit withdrawn** (`e1932fc6`, correcting `a4e190a0`):
+  the ladder loses its Diagnostic rung outright, and the catalogue term and
+  the Diagnostic page stop promising a credit.
+- **Specialist projects say the Briefing should ideally come first** and that
+  its fee is deducted in full from whichever project the client starts, on the
+  module pages, the hub's projects section, `/pricing` and the catalogue
+  comment (`00c1c333`). "No previous paid engagement required" is gone. The
+  tool-page module band's note says the same.
+- **`FeeLabel`** renders "Fee agreed after scoping" one way everywhere on the
+  advisory pages: small, monospace, burnt amber. A real price keeps the figure
+  treatment (`00c1c333`).
+- **Advisory Briefing band above the specialist-project band** on the Supply
+  Chain Mapper, Scenario Modeler and Policy Stress-Test pages (`f96d532d`), and
+  **on `/products` above the ladder** (`8087d33b`). `FollowOnBriefing` takes an
+  optional tool name and intro; `FollowOnOffering` takes a summary override
+  because the catalogue summary opens "A review of your Compliance Checker
+  result".
+- **Launch-window copy retired everywhere**: `FREE_INTRO_WINDOW` now defaults
+  to `false` (`48087e84`, after `9eab9fc7` removed the line under the Retainer
+  hero button). Production carries no env override. The 25-minute conversation
+  stays bookable and free.
+- **Sovereign Architecture Review in the Advisory dropdown** (`3eb25c27`),
+  resolved through `offeringById()`; the other four projects stay behind the
+  "Specialist projects" anchor.
+- **Digital Omnibus subheading** in burnt amber (`9b7c7963`).
+- **Product cards two by two** with two-column bullets (`6fec86d7`), because
+  four across left a third of three cards empty.
+
+Every commit passed lint, the type check, the targeted vitest files and the
+operator-manual guard; the map page and both bands were checked in a browser
+at desktop and phone width (light theme; dark relies on the site tokens).
+
+## Earlier session — 10 September 2026: five standalone specialist projects
 
 The owner confirmed five scoped advisory projects, explicitly reconfirming the
 scope after delayed clarification answers: Manufacturing Exposure Module,
@@ -420,6 +487,7 @@ All draft-generating formats use Claude at temperature 0.4. Drafts are created d
 | `/authors/[slug]` | ✅ | Author page with that author's articles |
 | `/glossary` | ✅ | Defined terms; `DefinedTermSet` JSON-LD |
 | `/methodology` | ✅ | Forensic Technopolitics 3×2 matrix + Three Readings panel |
+| `/how-it-fits-together` | ✅ | **The offerings map** (2026-09-13): one SVG flow chart drawn from the catalogue — five stages, the Briefing as the gate, every box a link, stacked list below `md`, no prices. Reached from `HowItFitsTogetherBand` beneath the hero on `/tools`, `/advisory` and `/products`, the footer and the sitemap; not the header |
 | `/advisory` | ✅ | (renamed from `/services`, 301) The advisory **hub**: the four engagements as a chooser keyed on `Offering.question`, the three follow-on modules (`#modules`), `#retainer` summary block, contact form (Kit). The four-across tier grid was **deleted** on 2026-09-04 when each engagement got its own page |
 | `/advisory/advisory-briefing` | ✅ | £450, one hour plus written follow-up; shared focused layout since 2026-09-08 |
 | `/advisory/exposure-diagnostic` | ✅ | Fee agreed after scoping; shared focused layout since 2026-09-08 |
@@ -572,8 +640,8 @@ Strategic Assessment keeps its existing structure. All five advisory pages
 | **The Drift Retainer** | **Fee agreed after scoping** — rolling monthly, no minimum term. | The spine of the whole offering. Board-forwardable monthly briefing, a 90-minute working session on one live decision, "The Line" direct access between sessions, quarterly written exposure review on the 3×2 method. Opens with a Baseline Month — walk away after month one paying that month only. | `/advisory/drift-retainer` |
 | **Strategic Assessment** | **Fee agreed after scoping**, then optionally transitions to retainer | The deep one-off: multi-framework analysis, 40+pp report, board-ready presentation, implementation roadmap. Positioned as the framework-neutral decision document before buying governance software. | `/advisory/strategic-assessment` |
 | **Board-level / multi-entity engagement** | **Fee agreed after scoping** | Bespoke, for a group, multi-jurisdiction exposure or a board mandate; settles into a Drift Retainer. | `/advisory` (bespoke band) |
-| **Specialist advisory projects** | **Fee agreed after scoping** | Manufacturing Exposure Module, Scenario Impact Analysis and Regulatory Friction Assessment. Each is available as a standalone project after a free scoping conversation. Retainer clients are charged the separately agreed project fee in addition to the monthly fee. | `/advisory/modules/manufacturing-exposure`, `/advisory/modules/scenario-impact`, `/advisory/modules/regulatory-friction`; index at `/advisory#modules` |
-| Free 25-minute intro conversation | Free during the first 90 days (`FREE_INTRO_WINDOW`) | The launch-window front door to the retainer. Distinct from the £450 Briefing, which is a working session. Exported as `FREE_INTRO_CONVERSATION` — kept out of `ENGAGEMENTS` so the catalogue never imports a flag — and rendered as the **first row of the advisory ladder** on `/pricing` since 2026-09-04, replacing the italic footnote it used to be. | `/advisory#contact` + `/pricing` |
+| **Specialist advisory projects** | **Fee agreed after scoping** | Five: Manufacturing Exposure Module, Scenario Impact Analysis, Regulatory Friction Assessment, European Procurement Readiness, Sovereign Architecture Review. Since 2026-09-13 the pages say the work should **ideally begin with an Advisory Briefing**, whose fee is deducted in full from whichever project the client goes on to start (the earlier "no previous paid engagement required" is gone). Retainer clients are charged the separately agreed project fee in addition to the monthly fee. | `/advisory/modules/*`; index at `/advisory#modules`; Sovereign Architecture also in the Advisory dropdown |
+| Free 25-minute intro conversation | Free (`FREE_INTRO_WINDOW` defaults to **false** since 2026-09-13, so the "launch window / first ninety days" copy and the `/pricing` row no longer render; the conversation itself is still free and bookable) | The front door to the ladder. Distinct from the £450 Briefing, which is a working session. Exported as `FREE_INTRO_CONVERSATION` — kept out of `ENGAGEMENTS` so the catalogue never imports a flag — and rendered as the **first row of the advisory ladder** on `/pricing` since 2026-09-04, replacing the italic footnote it used to be. | `/advisory#contact` + `/pricing` |
 
 **Retired/scoped on 9 September:** Post-Omnibus Briefing is no longer sold;
 `/eu-exposure` redirects to free `/digital-omnibus`. European Procurement Readiness
@@ -788,6 +856,23 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### September 13, 2026 — the offerings map, and twelve owner-directed changes
+
+See the "Current work — 13 September 2026" section at the top for the full
+account. In brief, in commit order: Briefing credit reworded (`80381a61`);
+Sovereign Architecture Review added to the Advisory dropdown (`3eb25c27`);
+launch-window line removed under the Retainer hero button (`9eab9fc7`) and
+then the `FREE_INTRO_WINDOW` default flipped to false (`48087e84`); Digital
+Omnibus subheading in burnt amber (`9b7c7963`); specialist projects say the
+Briefing ideally comes first and `FeeLabel` unifies the scoped-fee label
+(`00c1c333`); Diagnostic credit reworded then withdrawn, ladder rung removed
+(`a4e190a0`, `e1932fc6`); Briefing band above the project band on three tool
+pages (`f96d532d`) and above the ladder on `/products` (`8087d33b`); product
+cards two by two (`6fec86d7`); `/how-it-fits-together` with the band on three
+pages, footer and sitemap (`20bbf735`). One lesson worth keeping: the owner
+retired the *launch-window framing* of the intro conversation, not the word
+"free" — the conversation is free, and the map says so.
 
 ### September 10, 2026 (Products) — WaymarkPath card carries the real seven-stage ribbon
 
@@ -8560,7 +8645,17 @@ left unset, being optional by design. | Resolved |
 
 ## 11. What's Next (Current Priorities)
 
-### Current owner thread — specialist project positioning, 10 September 2026
+### Current owner thread — the offerings map, 13 September 2026
+
+The map is live and the day's copy decisions are all shipped (see the top of
+this document). Open, and only if the owner raises them: whether the map's
+"every path passes here" gate wording should soften to match the pages'
+"ideally begins with a Briefing"; the dark theme of `/how-it-fits-together`
+has not been eyeballed in a browser (it uses the site tokens throughout);
+`WaymarkPath` is deliberately absent from the page. Do not add a legend,
+per-tool lane colours, words on arrows or prices back to the map.
+
+### Previous owner thread — specialist project positioning, 10 September 2026
 
 Start with the handover at the top and deployed commit `f1ceb8ad`. The Tools →
 specialist-project route and the Compliance Checker → Advisory Briefing journey
