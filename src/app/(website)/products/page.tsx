@@ -61,6 +61,7 @@ type Presentation = {
   iconColor: string
   iconBg: string
   highlights: string[]
+  examples?: Record<string, string>
   cta: string
 }
 
@@ -106,6 +107,13 @@ const PRESENTATION: Record<string, Presentation> = {
       'Three scenarios with action points',
       '90-day action checklist',
     ],
+    examples: {
+      'AI landscape analysis by sector': 'For example, predictive maintenance in manufacturing, credit decisioning in finance, and document review in professional services — the applications, vendors and adoption patterns to watch.',
+      'Regulatory exposure assessment': 'The questions each use case raises: risk classification, human oversight, supplier documentation and procurement evidence. See which issues your team needs to investigate first.',
+      'Geopolitical risk specific to your industry': 'Explore reliance on overseas cloud providers, access to advanced chips and the consequences of changing trade rules for your suppliers and operating costs.',
+      'Three scenarios with action points': 'Low, medium and high friction: how changes in regulation, supplier access or costs could affect your sector, with warning signs and practical responses for each.',
+      '90-day action checklist': 'Turn the analysis into next steps: map critical suppliers, request missing evidence, review contracts and assign owners to the decisions your team needs to make.',
+    },
     cta: 'View Sector Reports',
   },
 }
@@ -118,6 +126,12 @@ const PRESENTATION: Record<string, Presentation> = {
 function productCard(offering: Offering) {
   return { offering, presentation: PRESENTATION[offering.id] ?? NEUTRAL }
 }
+
+// Feature the Toolkit first here; the shared catalogue still supplies every
+// product and retains its price order for the pricing page.
+const productCards = PRODUCTS.map(productCard).sort(
+  (a, b) => Number(b.offering.id === 'ai-act-toolkit') - Number(a.offering.id === 'ai-act-toolkit'),
+)
 
 export default function ProductsPage() {
   return (
@@ -164,14 +178,10 @@ export default function ProductsPage() {
 
         {/* Products Grid */}
         <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
-          {/* Two rows of two, not four columns (owner request, 2026-09-13).
-              At four across the Toolkit's eight bullets set the row height
-              and the other three cards carried a third of their height as
-              empty space above the button. At half width each card is wide
-              enough to run its bullets in two columns, so the tallest card
-              is four rows of bullets rather than eight and the row evens out. */}
+          {/* Toolkit first on desktop and mobile. Examples give the sector
+              panel comparable depth; both actions stay aligned at the bottom. */}
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-            {PRODUCTS.map(productCard).map(({ offering, presentation }) => {
+            {productCards.map(({ offering, presentation }) => {
               const Icon = presentation.icon
               return (
                 <Card key={offering.id} className="card-interactive h-full bg-stone-charcoal border-border-subtle flex flex-col">
@@ -230,7 +240,12 @@ export default function ProductsPage() {
                       {presentation.highlights.map((item) => (
                         <li key={item} className="flex items-start gap-2 text-sm text-text-muted">
                           <CheckCircle className="w-4 h-4 text-stone-teal flex-shrink-0 mt-0.5" />
-                          {item}
+                          <div>
+                            <span className={presentation.examples?.[item] ? 'font-medium text-text-primary' : undefined}>{item}</span>
+                            {presentation.examples?.[item] && (
+                              <p className="mt-1 leading-relaxed">{presentation.examples[item]}</p>
+                            )}
+                          </div>
                         </li>
                       ))}
                       {offering.terms?.map((term) => (
@@ -261,7 +276,7 @@ export default function ProductsPage() {
             max-w-7xl container and border. */}
         <FollowOnBriefing
           eyebrow="Start here · from a product to advice"
-          intro="Ideally advisory work begins with an Advisory Briefing. Bring what the Toolkit or Checklist Pack has surfaced; leave with priorities, evidence gaps and next actions in writing."
+          intro="Ideally advisory work begins with an Advisory Briefing. Bring what the Toolkit has surfaced; leave with priorities, evidence gaps and next actions in writing."
         />
 
         {/* The Ladder — every paid step credits toward the next (§2.4) */}
