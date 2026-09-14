@@ -168,7 +168,7 @@ export function StrategicAssessmentEngagement({ coverage }: Props) {
             the page, as it does on the other three engagements. */}
         <EngagementHero
           badge="The deep one-off · for a high-stakes decision"
-          title="Before the board commits: what do you need, and what do you control?"
+          title="What do you need, and what do you control?"
           lead="AI governance platforms are sold at four figures a month, and sovereignty is sold as a hosting region. Both decisions are usually made from a vendor’s own framing of the problem, because that is the only framing on the table."
           body="The Strategic Assessment gives your board a framework-neutral decision document instead: what you are actually required to do, what you genuinely need tooling for, and where control of your technology stack — hosting, administrative access, key custody, exit — really sits. It is vendor-agnostic because we sell no software and take no referral fees."
           inShort={
@@ -201,7 +201,7 @@ export function StrategicAssessmentEngagement({ coverage }: Props) {
         <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
           <div className="max-w-3xl">
             <div className="mb-3 font-mono text-xs uppercase tracking-wider text-text-muted">
-              Why it is worth paying for
+              Independence
             </div>
             <h2 className="mb-4 text-2xl font-semibold text-text-primary">
               We have nothing to sell you afterwards.
@@ -309,9 +309,6 @@ export function StrategicAssessmentEngagement({ coverage }: Props) {
 
         {/* Keep the anchor: the Review had two URLs of its own and both 301 here. */}
         <section id="sovereign-architecture-review" className="scroll-mt-24 mx-auto max-w-7xl px-6 pb-10 lg:px-8 lg:pb-12">
-          <div className="mb-3 font-mono text-xs uppercase tracking-wider text-text-muted">
-            Included — not sold separately
-          </div>
           <h2 className="text-2xl font-semibold text-text-primary">Sovereign Architecture Review</h2>
           <p className="mt-4 max-w-3xl leading-relaxed text-text-muted">
             A hosting location alone does not describe control. Where control of the stack
@@ -339,7 +336,7 @@ export function StrategicAssessmentEngagement({ coverage }: Props) {
         {/* Scope boundaries — carried in from the Review. */}
         <section className="mx-auto max-w-7xl px-6 pb-10 lg:px-8 lg:pb-12">
           <div className="max-w-3xl rounded-lg border border-border-subtle bg-stone-charcoal p-6 lg:p-8">
-            <h2 className="mb-3 text-xl font-semibold text-text-primary">What it does not include</h2>
+            <h2 className="mb-3 text-xl font-semibold text-text-primary">Scope boundaries</h2>
             <p className="mb-4 text-sm leading-relaxed text-text-muted">
               The assessment is based on supplied documentation and technical discussions.
               Findings distinguish evidenced controls from assumptions, and any further
