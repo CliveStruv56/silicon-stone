@@ -1335,25 +1335,31 @@ not part of the publishing pipeline, and they are documented separately.
 
 ### Where readers go next
 
-Each tool has an amber panel linking to its paid follow-on. The homepage’s
-“Take it further” links go directly to the same offering pages:
+Each tool ends in amber panels linking to its paid follow-ons, stacked in the
+order a reader would take them. The homepage’s “Take it further” links go
+directly to the same offering pages:
 
-| Free entry point | Paid follow-on |
+| Free entry point | Paid follow-ons, in order |
 |---|---|
-| Compliance Checker | [Advisory Briefing](https://siliconandstone.com/advisory/advisory-briefing) |
-| Policy Stress-Test | [Regulatory Friction Assessment](https://siliconandstone.com/advisory/modules/regulatory-friction) |
-| Supply Chain Mapper | [Manufacturing Exposure Module](https://siliconandstone.com/advisory/modules/manufacturing-exposure) |
-| Scenario Modeler | [Scenario Impact Analysis](https://siliconandstone.com/advisory/modules/scenario-impact) |
+| Compliance Checker | [AI Act Compliance Toolkit](https://siliconandstone.com/products/ai-act-toolkit) (since 14 September 2026), then [Advisory Briefing](https://siliconandstone.com/advisory/advisory-briefing) |
+| Policy Stress-Test | Advisory Briefing, then [Regulatory Friction Assessment](https://siliconandstone.com/advisory/modules/regulatory-friction) |
+| Supply Chain Mapper | Advisory Briefing, then [Manufacturing Exposure Module](https://siliconandstone.com/advisory/modules/manufacturing-exposure) |
+| Scenario Modeler | Advisory Briefing, then [Scenario Impact Analysis](https://siliconandstone.com/advisory/modules/scenario-impact) |
 
 The [US Executive’s Guide](https://siliconandstone.com/us-executive-guide) also
 makes Regulatory Friction Assessment its primary paid next step. Exposure
 Diagnostic is secondary for a broader systems/vendor review. The assessment links
-back to the guide for background. The three modules are also listed on Advisory
-and Pricing; the footer’s Modules link opens the Advisory index.
+back to the guide for background. The **four** specialist projects (those three
+plus European Procurement Readiness) are listed on Advisory and Pricing; the
+footer’s Specialist projects link opens the Advisory index. The Sovereign
+Architecture Review is not a fifth: since 14 September 2026 it is part of the
+Strategic Assessment and is not sold separately.
 
-The Briefing is a one-question advisory engagement, not a fourth module. The
-checker’s self-service recommendations remain available. Prices and destinations
-come from `src/lib/offering.ts`; consult the live pages when quoting them.
+The Briefing is a one-question advisory engagement, not a specialist project, and
+the Toolkit band is Checker-only — it is an AI Act product and the other three
+tools are not about the Act. The checker’s self-service recommendations remain
+available. Prices and destinations come from `src/lib/offering.ts`; consult the
+live pages when quoting them.
 
 ### Compliance Checker v2
 
