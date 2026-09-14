@@ -41,7 +41,7 @@ export interface MapBox {
   note: string[]
   /** Left stripe. Cyan is the path; amber marks the core engagements. */
   stripe?: 'cyan' | 'amber'
-  /** Dashed outline: not yet on sale, or bespoke. */
+  /** Dashed outline: not yet on sale. */
   dashed?: boolean
 }
 
@@ -146,10 +146,8 @@ const CORE_NOTES: Record<string, string[]> = {
 export const CORE_ENGAGEMENTS: MapBox[] = ENGAGEMENTS.filter(
   (e) => e.id !== 'advisory-briefing' && e.id !== 'drift-retainer',
 ).map((e) =>
-  fromOffering(e, CORE_NOTES[e.id] ?? [], {
-    stripe: 'amber',
-    dashed: e.href.includes('#'),
-  }),
+  // Solid like its neighbours (owner, 2026-09-14): bespoke is not "not yet on sale".
+  fromOffering(e, CORE_NOTES[e.id] ?? [], { stripe: 'amber' }),
 )
 
 /* ---------- Stage 5 · Stay ---------- */
