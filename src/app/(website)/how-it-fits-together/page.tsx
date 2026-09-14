@@ -30,10 +30,10 @@ export default function HowItFitsTogetherPage() {
               Everything Silicon &amp; Stone does sits on one path. You{' '}
               <strong className="font-medium text-text-primary">read</strong> the analysis,{' '}
               <strong className="font-medium text-text-primary">use</strong> a free tool that turns it into
-              a result about you, <strong className="font-medium text-text-primary">talk</strong> it through
-              in an Advisory Briefing, then{' '}
-              <strong className="font-medium text-text-primary">commission</strong> the piece of work your
-              question calls for. Every one-off piece of work can settle into the standing
+              a result about you, <strong className="font-medium text-text-primary">discuss</strong> it in an
+              Advisory Briefing, then{' '}
+              <strong className="font-medium text-text-primary">commission</strong> the advisory piece of
+              work your question calls for. Every one-off piece of work can settle into the standing
               relationship, the Drift Retainer.
             </p>
           </div>

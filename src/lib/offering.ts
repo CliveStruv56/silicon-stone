@@ -243,7 +243,7 @@ export const ENGAGEMENTS: Offering[] = [
     price: gbp(AMOUNTS.advisoryBriefing),
     priceNote: 'one AI system · one hour',
     summary:
-      'One AI system, one principal question. A review of your Compliance Checker result, a one-hour discussion and a written follow-up with priorities, evidence gaps and next actions.',
+      'The output of a tool or product, or one of your AI systems. A one-hour discussion and a written follow-up with priorities, evidence gaps and next actions.',
     question: 'What does this result mean for our AI system?',
     href: '/advisory/advisory-briefing',
     terms: [
