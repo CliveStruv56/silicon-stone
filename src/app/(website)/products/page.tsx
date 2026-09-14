@@ -163,7 +163,9 @@ export default function ProductsPage() {
               </div>
 
               <div className="relative">
-                <div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-border-subtle lg:aspect-square">
+                {/* 95% of the column: about a tenth less area than the
+                    Advisory hero's full-width panel (owner request, 2026-09-14). */}
+                <div className="relative mx-auto aspect-[4/3] w-[95%] overflow-hidden rounded-lg border border-border-subtle lg:aspect-square">
                   <Image
                     src="/products/digital-products-hero.webp"
                     alt="An isometric stone slab carved with a keyboard, a scroll and a ledger, a glowing circuit running up to a lens held over a crack in the rock, and a row of teal server blocks behind"
