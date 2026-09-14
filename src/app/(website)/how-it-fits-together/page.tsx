@@ -62,10 +62,6 @@ export default function HowItFitsTogetherPage() {
               Explore the {BRIEFING.name}
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
-            <p className="text-sm text-text-muted">
-              The map carries no prices. Every fee is on the{' '}
-              <Link href="/pricing" className="text-stone-teal underline underline-offset-4">pricing page</Link>.
-            </p>
           </div>
         </section>
       </main>
