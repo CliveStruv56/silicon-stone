@@ -8,7 +8,7 @@ Implemented 9 September 2026 following the owner's decision to retire the Post-O
 - Audience: business leaders across the UK and EU, plus US companies operating in or selling into Europe.
 - Free reference, with no POB price or enquiry form. Tailored work goes through existing engagements.
 - European Procurement Readiness is part of the relevant agreed Exposure Diagnostic or Strategic Assessment scope. The separate catalogue entry and add-on price are retired.
-- Advisory Briefing, Exposure Diagnostic, Strategic Assessment and Sovereign Architecture Review each explain how they apply the shared context.
+- Advisory Briefing, Exposure Diagnostic and Strategic Assessment each explain how they apply the shared context. (The Sovereign Architecture Review was combined into the Strategic Assessment on 2026-09-14 and no longer has a page of its own.)
 - Intelligence navigation and footer provide enduring discovery. The homepage timetable links directly to the reference timeline. One relevant featured story at a time gets a contextual background link, based on its title, excerpt or slug. Generic AI and sovereignty mentions do not trigger it.
 
 ## Design

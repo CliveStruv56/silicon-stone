@@ -807,7 +807,7 @@ SESSION_SECRET=<long random secret, 32+ characters>
 | Series library + one series | `src/app/(website)/intelligence/series/page.tsx`, `.../series/[slug]/page.tsx` |
 | Series logic (part numbers, neighbours, progress) | `src/lib/series.ts` — pure, tested; the position in `entries` is the part number |
 | Series UI | `src/components/series/` (Strip, Nav, PartList, ResumeButton, ProgressTracker) |
-| Advisory engagement template | `src/components/advisory/FocusedEngagementPage.tsx` owns the Briefing/Diagnostic/Retainer layout, using `EngagementHero`, `EngagementSteps` and `EngagementContactForm`. Strategic Assessment still uses `AtAGlance`, `WhereItLeads` and `AdvisoryPracticeBand` with the shared hero/form. |
+| Advisory engagement template | `src/components/advisory/FocusedEngagementPage.tsx` owns the Briefing/Diagnostic/Retainer layout, using `EngagementHero`, `EngagementSteps` and `EngagementContactForm`. Strategic Assessment keeps its own layout — `AtAGlance`, `WhereItLeads` and the shared hero/form; `AdvisoryPracticeBand` was deleted 2026-09-10 — and since 2026-09-14 carries the Sovereign Architecture Review's sections. |
 | Advisory hero assets | `public/advisory/*.webp`; generation prompts and original local paths in `docs/advisory-image-prompts.json` |
 | WaymarkPath content | `src/lib/waymarkpath.ts` (single source for the seven capabilities) + `src/components/waymarkpath/` |
 | Advisory page | `src/app/(website)/advisory/page.tsx` |
@@ -904,6 +904,26 @@ gateway artwork stays.
 
 **Specialist projects are four again.** Catalogue count unchanged in priced
 terms — the Review never carried a price after 9 September.
+
+**Four owner-directed copy changes followed the same evening** (`d7af63c5`,
+`a2bf7675`), after screenshots of the built page: the hero title is "What do
+you need, and what do you control?" — the first shortening still wrapped to
+four lines in the half-width hero column, which a screenshot showed and a word
+count had not; the "Included — not sold separately" label above the sovereign
+section is gone; "Why it is worth paying for" is now "Independence"; and "What
+it does not include" is now "Scope boundaries", chosen from four options each
+and matching the specialist project pages' language.
+
+### September 14, 2026 — Products hub hero artwork
+
+The Products hub was the one section hub without hero artwork. It now carries
+the owner's isometric render (`public/products/digital-products-hero.webp`,
+48 KB, converted from `Images/ss_digital_products_hero_900x675.jpg`) in the
+same two-column hero as the Advisory hub and the engagement pages — copy left,
+artwork right with a scrim caption. One file serves both themes because its
+ground is charcoal. Sized to **92.5% of its column** after two owner-directed
+reductions (`daca4d6e` → `d313642e` → `4ac575ef`), each shown as a screenshot
+before the next.
 
 ### September 13, 2026 — the offerings map, and twelve owner-directed changes
 

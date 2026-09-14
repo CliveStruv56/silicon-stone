@@ -1,5 +1,7 @@
 # Five specialist advisory projects
 
+> **Scope update — 2026-09-14:** The Sovereign Architecture Review was combined into the Strategic Assessment (owner decision) and is no longer sold separately. Its control map, options appraisal, audience and scope exclusions now live on `/advisory/strategic-assessment`; the standalone page is deleted and both of its former URLs 301 to the `#sovereign-architecture-review` anchor. **Four** specialist projects remain. The Sovereign sections below are historical.
+
 > **Pricing update — 2026-09-13:** All advisory and specialist project prices now display “Fee agreed after scoping”, except the Advisory Briefing (£450). Product prices are unchanged. Retainer founding and annual-discount promotions are removed. This supersedes historical pricing below; use `src/lib/offering.ts` for current display values.
 
 ## Agreed direction
