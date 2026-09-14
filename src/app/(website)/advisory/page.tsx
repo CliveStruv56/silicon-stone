@@ -405,7 +405,7 @@ export default function ServicesPage() {
                     Bespoke · enterprise
                   </div>
                   <h3 className="mb-2 text-xl font-semibold text-text-primary">
-                    Board-level and multi-entity engagements
+                    Board-level and bespoke engagements
                   </h3>
                   <p className="text-sm leading-relaxed text-text-muted">
                     For a group, multi-jurisdiction exposure, or a board-level mandate — a

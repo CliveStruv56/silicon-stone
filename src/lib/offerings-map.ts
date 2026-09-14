@@ -118,7 +118,7 @@ export const BRIEFING = offeringById('advisory-briefing')
 export const INTRO: MapBox = {
   name: FREE_INTRO_CONVERSATION.name,
   href: FREE_INTRO_CONVERSATION.href,
-  note: [`free · ${FREE_INTRO_CONVERSATION.priceNote} · not sure which rung?`],
+  note: [`Free · ${FREE_INTRO_CONVERSATION.priceNote}`],
   dashed: true,
 }
 

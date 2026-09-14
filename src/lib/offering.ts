@@ -303,7 +303,7 @@ export const ENGAGEMENTS: Offering[] = [
   },
   {
     id: 'board-level',
-    name: 'Board-level and multi-entity engagements',
+    name: 'Board-level and bespoke engagements',
     price: SCOPED_FEE,
     priceNote: 'bespoke',
     summary:

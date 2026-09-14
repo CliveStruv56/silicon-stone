@@ -43,7 +43,12 @@ const COL = {
   stay: { x: 1298, w: 190 },
 } as const
 const W = 1508
-const TOP = 90
+// The intro conversation sits above the Briefing (owner, 2026-09-14), so the
+// content row starts low enough to leave room for it in the gate column.
+const INTRO_EYEBROW_Y = 72
+const INTRO_Y = 80
+const INTRO_H = 50
+const TOP = 170
 const TOOL_H = 46
 const PITCH = 54
 const READ_H = 62
@@ -62,14 +67,15 @@ const selfServeY = (i: number) => selfServeSub + 10 + i * 64
 
 const projectSub = TOP + 20
 const projectY = (i: number) => TOP + PITCH + i * PITCH
-const coreSub = projectY(SPECIALIST_PROJECTS.length) + 36
+// One heading over the whole column since 2026-09-14: the specialist projects
+// and the three broader engagements are all core engagements. The two groups
+// keep their spacing and stripes; only the second sub-label went.
 const CORE_H = 58
-const coreY = (i: number) => coreSub + 12 + i * (CORE_H + 24)
+const coreY = (i: number) => projectY(SPECIALIST_PROJECTS.length) + 16 + i * (CORE_H + 24)
 const coreBottom = coreY(CORE_ENGAGEMENTS.length - 1) + CORE_H
 
 const gateBottom = Math.max(coreBottom, selfServeY(SELF_SERVE.length - 1) + TOOL_H + 40)
-const introY = gateBottom + 36
-const H = introY + 60 + 24
+const H = gateBottom + 30
 
 const mid = (y: number, h: number) => y + h / 2
 
@@ -131,8 +137,8 @@ function Sub({ x, y, children }: { x: number; y: number; children: string }) {
 
 /** The gate (amber) and the destination (teal): tall boxes with a title mid-way. */
 function Pillar({
-  x, w, title, lines, foot, tone, href, eyebrow,
-}: { x: number; w: number; title: string[]; lines: string[]; foot: string[]; tone: 'amber' | 'teal'; href: string; eyebrow: string }) {
+  x, w, title, lines, foot, tone, href, eyebrow, eyebrowY = TOP - 8,
+}: { x: number; w: number; title: string[]; lines: string[]; foot: string[]; tone: 'amber' | 'teal'; href: string; eyebrow: string; eyebrowY?: number }) {
   const cx = x + w / 2
   const centre = TOP + (gateBottom - TOP) / 2
   const fill = tone === 'amber' ? 'fill-silicon-amber/10 stroke-silicon-amber' : 'fill-stone-teal/10 stroke-stone-teal'
@@ -142,7 +148,7 @@ function Pillar({
     <a href={href} className="group focus:outline-none" aria-label={title.join(' ')}>
       <rect x={x} y={TOP} width={w} height={gateBottom - TOP} rx={10} className={fill} strokeWidth={1.5} />
       {/* Sits above the box, level with the column sub-labels (owner request, 2026-09-14). */}
-      <text x={cx} y={TOP - 8} fontSize={10.5} letterSpacing="0.1em" textAnchor="middle" className="fill-text-muted font-mono">{eyebrow}</text>
+      <text x={cx} y={eyebrowY} fontSize={10.5} letterSpacing="0.1em" textAnchor="middle" className="fill-text-muted font-mono">{eyebrow}</text>
       {title.map((t, i) => (
         <text key={t} x={cx} y={centre - 32 + i * 24} fontSize={21} fontWeight={600} textAnchor="middle" className={`${titleFill} font-display group-hover:underline`}>{t}</text>
       ))}
@@ -178,7 +184,7 @@ export function OfferingsMap() {
           viewBox={`0 0 ${W} ${H}`}
           className="block h-auto w-full min-w-[960px]"
           role="img"
-          aria-label="Flow chart: free reading leads to four Interactive Forensic Tools and three self-serve products; every one feeds the Advisory Briefing, which leads into five specialist projects, the Exposure Diagnostic, the Strategic Assessment or a board-level engagement; every one of those settles into the Drift Retainer."
+          aria-label="Flow chart: free reading leads to four Interactive Forensic Tools and three self-serve products; every one feeds the Advisory Briefing, which leads into eight core engagements, from five specialist projects to board-level work; every one of those settles into the Drift Retainer."
         >
           <defs>
             <marker id="offerings-map-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -189,8 +195,8 @@ export function OfferingsMap() {
           <StageHeader x={COL.read.x} eyebrow="STAGE 1 · FREE" title="Read" />
           <StageHeader x={COL.use.x} eyebrow="STAGE 2 · SELF-SERVE" title="Use" />
           <StageHeader x={COL.gate.x} eyebrow="STAGE 3 · TOUCHSTONE" title="Discuss" />
-          <StageHeader x={COL.commission.x} eyebrow="STAGE 4 · ONE-OFF" title="Commission" />
-          <StageHeader x={COL.stay.x} eyebrow="STAGE 5 · STANDING" title="Stay" />
+          <StageHeader x={COL.commission.x} eyebrow="STAGE 4 · DELIVER" title="Advisory" />
+          <StageHeader x={COL.stay.x} eyebrow="STAGE 5 · BESPOKE" title="Retain" />
 
           {/* Stage 1 */}
           {READ.map((box, i) => (
@@ -227,7 +233,7 @@ export function OfferingsMap() {
           })}
           <Pillar
             x={COL.gate.x} w={COL.gate.w} tone="amber" href={BRIEFING.href}
-            eyebrow="EVERY PATH PASSES HERE"
+            eyebrow="EVERY PATH PASSES HERE" eyebrowY={INTRO_EYEBROW_Y}
             title={['Advisory', 'Briefing']}
             lines={['the output of a tool', 'or product, or one of', 'your AI systems', 'one hour, then a written', 'follow-up with priorities']}
             foot={['fee credited against', 'your first engagement']}
@@ -238,11 +244,11 @@ export function OfferingsMap() {
           {SELF_SERVE.map((box, i) => (
             <Arrow key={`in-${box.href}`} x1={useR + 4} y1={mid(selfServeY(i), TOOL_H)} x2={gateL - 4} y2={mid(selfServeY(i), TOOL_H)} />
           ))}
-          <Box box={INTRO} x={COL.gate.x} y={introY} w={COL.gate.w} h={60} />
-          <Arrow x1={COL.gate.x + COL.gate.w / 2} y1={introY - 4} x2={COL.gate.x + COL.gate.w / 2} y2={gateBottom + 6} dashed />
+          <Box box={INTRO} x={COL.gate.x} y={INTRO_Y} w={COL.gate.w} h={INTRO_H} />
+          <Arrow x1={COL.gate.x + COL.gate.w / 2} y1={INTRO_Y + INTRO_H + 4} x2={COL.gate.x + COL.gate.w / 2} y2={TOP - 6} dashed />
 
           {/* Stage 4 */}
-          <Sub x={COL.commission.x} y={projectSub}>SPECIALIST PROJECTS · ONE AT A TIME</Sub>
+          <Sub x={COL.commission.x} y={projectSub}>CORE ENGAGEMENTS</Sub>
           {SPECIALIST_PROJECTS.map((box, i) => (
             <g key={box.href}>
               <Box box={box} x={COL.commission.x} y={projectY(i)} w={COL.commission.w} h={TOOL_H} />
@@ -250,7 +256,6 @@ export function OfferingsMap() {
               <Arrow x1={comR + 4} y1={mid(projectY(i), TOOL_H)} x2={COL.stay.x - 4} y2={mid(projectY(i), TOOL_H)} />
             </g>
           ))}
-          <Sub x={COL.commission.x} y={coreSub}>CORE ENGAGEMENTS</Sub>
           {CORE_ENGAGEMENTS.map((box, i) => (
             <g key={box.href}>
               <Box box={box} x={COL.commission.x} y={coreY(i)} w={COL.commission.w} h={CORE_H} />
@@ -287,23 +292,20 @@ export function OfferingsMap() {
           tone="amber"
           groups={[{
             boxes: [
+              INTRO,
               { name: 'The output of a tool or product, or one of your AI systems', href: BRIEFING.href, note: ['one hour, then a written follow-up with priorities'], stripe: 'amber' },
               { name: 'Every path passes here', href: BRIEFING.href, note: ['fee credited against your first engagement'], stripe: 'amber' },
-              INTRO,
             ],
           }]}
         />
         <StackedStage
-          eyebrow="Stage 4 · one-off"
-          title="Commission"
-          groups={[
-            { label: 'Specialist projects · one at a time', boxes: SPECIALIST_PROJECTS },
-            { label: 'Core engagements', boxes: CORE_ENGAGEMENTS },
-          ]}
+          eyebrow="Stage 4 · deliver"
+          title="Advisory"
+          groups={[{ label: 'Core engagements', boxes: [...SPECIALIST_PROJECTS, ...CORE_ENGAGEMENTS] }]}
         />
         <StackedStage
-          eyebrow="Stage 5 · standing"
-          title="Stay: the Drift Retainer"
+          eyebrow="Stage 5 · bespoke"
+          title="Retain: the Drift Retainer"
           tone="teal"
           groups={[{ boxes: [{ name: 'Everything settles here', href: RETAINER.href, note: ['a monthly briefing, a working session on one live decision, a quarterly exposure review · rolling monthly, no minimum term'], stripe: 'cyan' }] }]}
         />
@@ -313,8 +315,9 @@ export function OfferingsMap() {
         Arrows run left to right. Each tool sits level with the project built on it, and the
         dotted line through the Briefing follows that lane across; the Compliance Checker&rsquo;s
         lane ends at the Briefing, where its result is reviewed. The three self-serve products
-        feed the Briefing directly. Amber stripes mark the core engagements. Every box in stage
-        four has an arrow into the Retainer. Every box is a link.
+        feed the Briefing directly. Amber stripes mark the Exposure Diagnostic, the Strategic
+        Assessment and board-level work. Every box in stage four has an arrow into the Retainer.
+        Every box is a link.
       </figcaption>
     </figure>
   )
