@@ -22,9 +22,12 @@ import {
  *
  * Conventions the owner settled on 2026-09-13, after four rounds on the
  * artifact: one colour for every arrow; no words on any arrow; the Briefing
- * drawn as the gate every path passes through; a dotted line through the gate
- * from each tool to the project built on it; each self-serve product with its
- * own arrow into the Briefing; amber stripes on the core engagements only.
+ * drawn as the touchstone every path passes through; each self-serve product
+ * with its own arrow into the Briefing; amber stripes on the three broadest
+ * engagements only. The dotted lane from each tool through the Briefing to
+ * its project, and the caption under the drawing, were removed on 2026-09-14
+ * (owner: "I don't want to be too prescriptive"). `MapTool.leadsTo` survives
+ * for the tests and any future use.
  *
  * Below `md` the SVG gives way to a stacked list of the same boxes.
  */
@@ -173,12 +176,6 @@ export function OfferingsMap() {
   const comR = COL.commission.x + COL.commission.w
   const useR = COL.use.x + COL.use.w
 
-  /** Row (mid y) of the specialist project a tool leads to, if it leads to one. */
-  const projectRowFor = (offeringId: string) => {
-    const j = SPECIALIST_PROJECTS.findIndex((p) => p.id === offeringId)
-    return j === -1 ? null : mid(projectY(j), TOOL_H)
-  }
-
   return (
     <figure className="m-0">
       {/* ---- desktop: the drawing ---- */}
@@ -217,23 +214,7 @@ export function OfferingsMap() {
             <Box key={box.href} box={box} x={COL.use.x} y={selfServeY(i)} w={COL.use.w} h={TOOL_H} />
           ))}
 
-          {/* Stage 3: dotted lanes first so the gate sits over them */}
-          {TOOLS.map((tool, i) => {
-            const py = projectRowFor(tool.leadsTo.id)
-            if (py === null) return null
-            return (
-              <path
-                key={`lane-${tool.slug}`}
-                d={`M${gateL},${mid(toolY(i), TOOL_H)} L${gateR},${py}`}
-                // Fainter than the arrows so it reads as a trace, not a route; a
-                // shade stronger on dark, where the amber-tinted gate fill was
-                // swallowing it (owner request, 2026-09-14).
-                className="stroke-silicon-cyan fill-none opacity-55 dark:opacity-80"
-                strokeWidth={2}
-                strokeDasharray="3 4"
-              />
-            )
-          })}
+          {/* Stage 3 */}
           <Pillar
             x={COL.gate.x} w={COL.gate.w} tone="amber" href={BRIEFING.href}
             eyebrow="EVERY PATH PASSES HERE"
@@ -314,14 +295,6 @@ export function OfferingsMap() {
         />
       </ol>
 
-      <figcaption className="mt-3 max-w-3xl text-sm text-text-muted">
-        Arrows run left to right. The dotted line through the Briefing runs from each tool to
-        the project built on it; the Compliance Checker&rsquo;s lane ends at the Briefing, where
-        its result is reviewed. The three self-serve products and the free intro conversation
-        feed the Briefing directly. Amber stripes mark the Exposure Diagnostic, the Strategic
-        Assessment and board-level work. Every box in stage four has an arrow into the Retainer.
-        Every box is a link.
-      </figcaption>
     </figure>
   )
 }

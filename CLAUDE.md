@@ -839,8 +839,9 @@ there); the footer Engage column and the sitemap carry it too, the header
 menus deliberately do not. `src/lib/offerings-map.test.ts` holds every box to a
 real, indexed page and the band to those three pages. Conventions settled after
 four rounds on the artifact: one cyan for every arrow, no words on any arrow,
-amber stripes on the core engagements only, a dotted lane through the Briefing
-from each tool to its project. Do not add a legend or per-tool colours back.
+amber stripes on the three broadest engagements only, no caption under the
+drawing and no dotted lane through the Briefing (both removed 2026-09-14 as
+too prescriptive). Do not add a legend or per-tool colours back.
 
 `ModulePage` carries four optional slots (`audience`, `method`, `context`,
 `coverage`), added 2026-09-10 for the Manufacturing Exposure page. Fill the
