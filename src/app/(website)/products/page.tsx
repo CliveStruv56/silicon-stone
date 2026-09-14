@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 
 import { Header, Footer } from '@/components/layout'
@@ -142,17 +143,43 @@ export default function ProductsPage() {
         {/* Hero */}
         <section className="bg-slate-deep border-b border-border-subtle">
           <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
-            <div className="max-w-3xl">
-              <Badge variant="outline" className="mb-4 border-silicon-amber text-silicon-amber-strong">
-                Digital Products
-              </Badge>
-              <h1 className="text-4xl font-bold text-text-primary sm:text-5xl mb-6">
-                Practical Resources for Compliance and Strategy
-              </h1>
-              <p className="text-xl text-text-muted leading-relaxed">
-                Know which systems you use, what role you play, what your vendors
-                can prove, and what should trigger reassessment.
-              </p>
+            {/* Same two-column hero as the Advisory hub and the engagement
+                pages: copy on the left, artwork on the right with a scrim
+                caption. The artwork is one render used on both themes — its
+                ground is charcoal, so unlike the Advisory grid it needs no
+                light-theme twin. */}
+            <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-center lg:gap-12">
+              <div>
+                <Badge variant="outline" className="mb-4 border-silicon-amber text-silicon-amber-strong">
+                  Digital Products
+                </Badge>
+                <h1 className="text-4xl font-bold text-text-primary sm:text-5xl mb-6">
+                  Practical Resources for Compliance and Strategy
+                </h1>
+                <p className="text-xl text-text-muted leading-relaxed">
+                  Know which systems you use, what role you play, what your vendors
+                  can prove, and what should trigger reassessment.
+                </p>
+              </div>
+
+              <div className="relative">
+                <div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-border-subtle lg:aspect-square">
+                  <Image
+                    src="/products/digital-products-hero.webp"
+                    alt="An isometric stone slab carved with a keyboard, a scroll and a ledger, a glowing circuit running up to a lens held over a crack in the rock, and a row of teal server blocks behind"
+                    fill
+                    priority
+                    sizes="(min-width: 1024px) 50vw, 100vw"
+                    className="object-cover object-center"
+                  />
+                  {/* Gradient scrim for caption legibility */}
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-scrim-ink via-scrim-ink/70 to-transparent p-5 pt-16">
+                    <p className="text-sm italic text-balance text-white/90 [text-shadow:0_1px_8px_rgba(0,0,0,0.7)]">
+                      The register, the checklist and the evidence, worked on the same slab.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
