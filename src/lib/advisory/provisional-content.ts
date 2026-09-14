@@ -79,38 +79,13 @@ export const DIAGNOSTIC_STAGES: EngagementStage[] = [
  * DRAFT — the Strategic Assessment's shape. Six weeks is an estimate; the
  * board presentation and the 40+ page report are real listed deliverables.
  */
-export const ASSESSMENT_STAGES: EngagementStage[] = [
-  {
-    when: 'Before we start',
-    title: 'Scoping and mandate',
-    detail:
-      'What decision is this assessment for, and who signs it off. A board-ready document needs to know which board and which question before the work starts.',
-  },
-  {
-    when: 'Weeks 1–2',
-    title: 'Discovery',
-    detail:
-      'Systems, vendors, contracts and the governance you already run — plus interviews across the functions that would carry whatever the board decides.',
-  },
-  {
-    when: 'Weeks 3–4',
-    title: 'Multi-framework analysis',
-    detail:
-      'Your position read against each framework in scope, with the overlaps and the genuine conflicts separated — the second of which is where the cost usually sits.',
-  },
-  {
-    when: 'Week 5',
-    title: 'Draft and challenge',
-    detail:
-      'A draft you can argue with before it is finished. An assessment that first appears in its final form at a board meeting is one nobody has stress-tested.',
-  },
-  {
-    when: 'Week 6',
-    title: 'Board presentation and roadmap',
-    detail:
-      'The report, the presentation, and an implementation roadmap sequenced by what has to be true first.',
-  },
-]
+/*
+ * The Strategic Assessment's stage plan is no longer here. The owner approved
+ * it on 2026-09-14, merged with the Sovereign Architecture Review's method,
+ * and it now renders unconditionally as `ASSESSMENT_PROCESS` in
+ * `StrategicAssessmentEngagement.tsx`. Only the report chapter list below
+ * remains provisional for that page.
+ */
 
 /**
  * DRAFT — indicative report contents. The page count and the executive summary
@@ -130,6 +105,7 @@ export const ASSESSMENT_REPORT_CONTENTS: string[] = [
   'Executive summary and the recommendation, stated plainly',
   'Framework-by-framework position, with overlaps and conflicts separated',
   'The requirements analysis — what you actually need any tooling to do',
+  'Architecture and control map, with the evidence gaps marked',
   'Options appraisal, vendor-agnostic',
   'Implementation roadmap, sequenced by dependency',
   'Board presentation pack',

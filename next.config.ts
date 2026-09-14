@@ -74,9 +74,12 @@ const nextConfig: NextConfig = {
       { source: '/analysis', destination: '/intelligence', statusCode: 301 },
       { source: '/briefings', destination: '/intelligence', statusCode: 301 },
       { source: '/eu-exposure', destination: '/digital-omnibus', statusCode: 301 },
-      // The standalone project has a fresh canonical URL. The assessment
-      // retains its old anchor and a link for browsers caching the former 301.
-      { source: '/advisory/modules/sovereign-architecture-review', destination: '/advisory/modules/sovereign-architecture', statusCode: 301 },
+      // The Sovereign Architecture Review was combined into the Strategic
+      // Assessment on 2026-09-14. Both URLs it ever had — the module page of
+      // 2026-09-09 and the standalone page of 2026-09-10 — land on the
+      // anchored section, which the assessment keeps for that reason.
+      { source: '/advisory/modules/sovereign-architecture-review', destination: '/advisory/strategic-assessment#sovereign-architecture-review', statusCode: 301 },
+      { source: '/advisory/modules/sovereign-architecture', destination: '/advisory/strategic-assessment#sovereign-architecture-review', statusCode: 301 },
       { source: '/services', destination: '/advisory', statusCode: 301 },
       { source: '/products/ai-audit-checklist', destination: '/products/ai-act-toolkit', statusCode: 301 },
       { source: '/products/briefings', destination: '/products/sector-reports', statusCode: 301 },

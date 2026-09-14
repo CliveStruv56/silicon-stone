@@ -821,12 +821,18 @@ Checker uses the shared panel with the **Advisory Briefing**, which stays in
 Homepage follow-on links go directly to these offering pages. Resolve names,
 prices and URLs from `offeringById()` in `src/lib/offering.ts`; do not retype
 catalogue entries. Module pages share `ModulePage.tsx`. Modules remain discoverable
-through `/advisory#modules`, `/pricing` and the footer. The Advisory dropdown
-carries one of them by name, the Sovereign Architecture Review (owner request
-2026-09-13), resolved through `offeringById()`; the other four sit behind the
-"Specialist projects" anchor. AI Bill of Materials is a Diagnostic deliverable and Sovereign
-Architecture Review is a Strategic Assessment scope option, neither separately
-priced. These changes shipped in `8a20e438` and its September 9 predecessors.
+through `/advisory#modules`, `/pricing` and the footer, all four of them behind
+the "Specialist projects" anchor in the Advisory dropdown. AI Bill of Materials
+is a Diagnostic deliverable. **The Sovereign Architecture Review is part of the
+Strategic Assessment and is not sold separately** (owner decision 2026-09-14,
+combining the two): its control map, options appraisal, audience and scope
+exclusions live on `/advisory/strategic-assessment`, the engagement's process
+section is owner-approved and renders unconditionally, and both URLs the Review
+ever had 301 to the `#sovereign-architecture-review` anchor. It had been a
+module (2026-09-09), a scope option (the same day) and a standalone page
+(2026-09-10) — the tests in `engagement-pages.test.ts` hold the current shape,
+so do not re-add it to `MODULES` or the dropdown without a fresh decision.
+These changes shipped in `8a20e438` and its September 9 predecessors.
 
 **The offerings map lives at `/how-it-fits-together`** (since 2026-09-13) and is
 drawn from the catalogue, not by hand: `src/lib/offerings-map.ts` resolves every

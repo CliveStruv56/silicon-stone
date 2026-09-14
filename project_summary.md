@@ -1,10 +1,26 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-09-13
-> Status: **Offerings map live at `/how-it-fits-together` (commit `20bbf735`, Vercel Ready). Twelve owner-directed copy and layout changes shipped the same day, each committed, pushed and deployed. Earlier deployment records below are history.**
+> Last Updated: 2026-09-14
+> Status: **Sovereign Architecture Review combined into the Strategic Assessment (owner decision 2026-09-14); specialist projects back to four. Products hub given hero artwork. Earlier deployment records below are history.**
 
-## Current work — 13 September 2026: the offerings map and a day of owner-directed copy
+## Current work — 14 September 2026: one Strategic Assessment, Products hero artwork
+
+**The Sovereign Architecture Review is now part of the Strategic Assessment and
+is not sold separately.** The owner chose the combination from a plan with six
+decisions (same name and URL; a two-question hero framing — what the board
+should commit to, and how much of the stack it actually controls; the merged
+process goes live; no standalone availability; the dropdown points at the
+combined page; the existing gateway artwork stays). The Review's substance —
+control map, options appraisal, audience, scope exclusions — moved onto
+`/advisory/strategic-assessment`; the standalone page is deleted and both URLs
+it ever had 301 to the kept `#sovereign-architecture-review` anchor. See §9.
+
+**The Products hub has hero artwork** (`public/products/digital-products-hero.webp`),
+in the same two-column shape as the Advisory hub, sized to 92.5% of its column
+after two owner-directed reductions.
+
+## Earlier session — 13 September 2026: the offerings map and a day of owner-directed copy
 
 **The offerings map is live** at `/how-it-fits-together` (commit
 [`20bbf735`](https://github.com/CliveStruv56/silicon-stone/commit/20bbf735);
@@ -634,9 +650,9 @@ Strategic Assessment keeps its existing structure. All five advisory pages
 | **Advisory Briefing** | **£450** / one AI system · one hour | One AI system and one principal question, prepared from the Compliance Checker result and brief business context, with a one-hour discussion and a written follow-up covering priorities, evidence gaps and next actions. Supporting-document review and wider investigation are separate. Credited **in full** against any further work we do together (owner decision 2026-09-13; previously the first Retainer month within 30 days). | `/advisory/advisory-briefing` |
 | **The Exposure Diagnostic** | **Fee agreed after scoping** | AI system + vendor-evidence review, dependency mapping, regulatory-friction read, 15–25pp report, 30-day follow-up. No credit attaches to the fee (owner decision 2026-09-13; it was previously credited to the first retainer quarter). **No refund guarantee** — the revision-or-50%-refund clause was withdrawn on 2026-09-04; the site's refund position now lives once, at `/terms`. | `/advisory/exposure-diagnostic` |
 | **The Drift Retainer** | **Fee agreed after scoping** — rolling monthly, no minimum term. | The spine of the whole offering. Board-forwardable monthly briefing, a 90-minute working session on one live decision, "The Line" direct access between sessions, quarterly written exposure review on the 3×2 method. Opens with a Baseline Month — walk away after month one paying that month only. | `/advisory/drift-retainer` |
-| **Strategic Assessment** | **Fee agreed after scoping**, then optionally transitions to retainer | The deep one-off: multi-framework analysis, 40+pp report, board-ready presentation, implementation roadmap. Positioned as the framework-neutral decision document before buying governance software. | `/advisory/strategic-assessment` |
+| **Strategic Assessment** | **Fee agreed after scoping**, then optionally transitions to retainer | The deep one-off, framed on two questions since 2026-09-14: what the board should commit to, and how much of the stack it actually controls. Multi-framework analysis, architecture and control map (hosting, admin access, key custody, exit), vendor-agnostic options appraisal, 40+pp report, board-ready presentation, staged roadmap. **Includes the Sovereign Architecture Review, which is not sold separately.** Six-week process is owner-approved and live. | `/advisory/strategic-assessment` |
 | **Board-level / bespoke engagement** | **Fee agreed after scoping** | Bespoke, for a group, multi-jurisdiction exposure or a board mandate; settles into a Drift Retainer. | `/advisory` (bespoke band) |
-| **Specialist advisory projects** | **Fee agreed after scoping** | Five: Manufacturing Exposure Module, Scenario Impact Analysis, Regulatory Friction Assessment, European Procurement Readiness, Sovereign Architecture Review. Since 2026-09-13 the pages say the work should **ideally begin with an Advisory Briefing**, whose fee is deducted in full from whichever project the client goes on to start (the earlier "no previous paid engagement required" is gone). Retainer clients are charged the separately agreed project fee in addition to the monthly fee. | `/advisory/modules/*`; index at `/advisory#modules`; Sovereign Architecture also in the Advisory dropdown |
+| **Specialist advisory projects** | **Fee agreed after scoping** | Four since 2026-09-14: Manufacturing Exposure Module, Scenario Impact Analysis, Regulatory Friction Assessment, European Procurement Readiness (the Sovereign Architecture Review was combined into the Strategic Assessment that day). Since 2026-09-13 the pages say the work should **ideally begin with an Advisory Briefing**, whose fee is deducted in full from whichever project the client goes on to start (the earlier "no previous paid engagement required" is gone). Retainer clients are charged the separately agreed project fee in addition to the monthly fee. | `/advisory/modules/*`; index at `/advisory#modules` |
 | Free 25-minute intro conversation | Free (`FREE_INTRO_WINDOW` defaults to **false** since 2026-09-13, so the "launch window / first ninety days" copy and the `/pricing` row no longer render; the conversation itself is still free and bookable) | The front door to the ladder. Distinct from the £450 Briefing, which is a working session. Exported as `FREE_INTRO_CONVERSATION` — kept out of `ENGAGEMENTS` so the catalogue never imports a flag — and rendered as the **first row of the advisory ladder** on `/pricing` since 2026-09-04, replacing the italic footnote it used to be. | `/advisory#contact` + `/pricing` |
 
 **Retired/scoped on 9 September:** Post-Omnibus Briefing is no longer sold;
@@ -847,6 +863,47 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### September 14, 2026 — Sovereign Architecture Review combined into the Strategic Assessment
+
+**Third time this pairing has moved, and the first time the substance moved
+with it.** On 9 September the Review was folded into the Assessment as a
+four-bullet scope option; on 10 September it was re-established as a standalone
+project page. The owner asked today for one advisory product built from the key
+points of both, saw the plan, and settled six decisions: keep the name and URL;
+frame the hero on two questions (what the board should commit to, and how much
+of the stack it actually controls); put the merged process live; no standalone
+availability; the Advisory dropdown points at the combined page; the existing
+gateway artwork stays.
+
+- **What the Assessment gained.** Six deliverables in place of four — the
+  architecture and control map and the vendor-agnostic options appraisal are
+  new, and the roadmap now names the technical validation still outstanding.
+  A "Who it is for" section and a "What it does not include" box (no
+  penetration testing, code audit, certification, migration delivery or legal
+  opinion), both carried in from the Review. The independence argument now
+  covers hosting as well as governance software. The fee section states the
+  Advisory Briefing credit, which the specialist project pages already did.
+- **The process is live.** The six-week stage plan had sat behind
+  `PROVISIONAL_CONTENT_APPROVED = false` since 4 September. Merged with the
+  Review's three-step method and approved by the owner, it renders
+  unconditionally as `ASSESSMENT_PROCESS` in the page component; the draft was
+  removed from `provisional-content.ts`. The report chapter list there is still
+  gated.
+- **What went.** The standalone page directory, the `MODULES` entry, the
+  named dropdown item, the sitemap row and the offerings-map note. Pricing, the
+  hub enquiry form, llms.txt and the coverage checkbox list follow the
+  catalogue. Sanity was checked first: no article was placed under the Review,
+  so nothing was orphaned.
+- **Both former URLs 301 to the anchor** — `/advisory/modules/sovereign-architecture-review`
+  and `/advisory/modules/sovereign-architecture`. The anchor guard in
+  `engagement-pages.test.ts` stays; the five-project assertion is now four,
+  the standalone-route test is replaced by one asserting both redirects, the
+  absence of the page directory, and that neither the Assessment page nor the
+  header links to a module URL.
+
+**Specialist projects are four again.** Catalogue count unchanged in priced
+terms — the Review never carried a price after 9 September.
 
 ### September 13, 2026 — the offerings map, and twelve owner-directed changes
 

@@ -5,7 +5,6 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/layout/ThemeToggle'
-import { offeringById } from '@/lib/offering'
 
 // `sister` marks an entry that is adjacent to the ladder rather than a rung on
 // it — WaymarkPath is a separate product, not a fourth thing to buy here. It
@@ -66,14 +65,11 @@ const primaryNavigation: NavItem[] = [
       { name: 'Advisory Briefing', href: '/advisory/advisory-briefing' },
       { name: 'The Exposure Diagnostic', href: '/advisory/exposure-diagnostic' },
       { name: 'The Drift Retainer', href: '/advisory/drift-retainer' },
+      // The Sovereign Architecture Review sat here by name from 2026-09-13
+      // until 2026-09-14, when it was combined into the Strategic Assessment
+      // (owner decision). The Assessment entry above is now that combined
+      // page; the four specialist projects stay behind the hub anchor.
       { name: 'Strategic Assessment', href: '/advisory/strategic-assessment' },
-      // The one specialist project surfaced by name (owner request,
-      // 2026-09-13). Resolved from the catalogue so the label and URL cannot
-      // drift from the module page; the other four stay behind the hub anchor.
-      {
-        name: offeringById('sovereign-architecture-review').name,
-        href: offeringById('sovereign-architecture-review').href,
-      },
       { name: 'Specialist projects', href: '/advisory#modules' },
     ],
   },

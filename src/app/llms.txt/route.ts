@@ -31,7 +31,7 @@ const CORE_PAGES: Array<{ title: string; path: string; note: string }> = [
   { title: 'Series', path: '/intelligence/series', note: 'Ordered reading paths — the analysis in the sequence the argument was built, not by date or impact.' },
   { title: 'Glossary', path: '/glossary', note: 'Defined terms across AI regulation, semiconductor supply chains and digital sovereignty.' },
   { title: 'Interactive tools', path: '/tools', note: 'AI Act compliance checker, supply-chain mapper, policy stress-test, scenario modeler.' },
-  { title: 'Advisory', path: '/advisory', note: 'Strategic advisory for AI governance and technology dependency — four core engagements and five independently commissioned specialist projects.' },
+  { title: 'Advisory', path: '/advisory', note: 'Strategic advisory for AI governance and technology dependency — four core engagements and four independently commissioned specialist projects.' },
   { title: 'Advisory Briefing', path: '/advisory/advisory-briefing', note: 'The output of a tool or product, or one of your AI systems: a one-hour discussion and a written follow-up. Document review is scoped separately.' },
   { title: 'Exposure Diagnostic', path: '/advisory/exposure-diagnostic', note: 'Where dependency on specific vendors, models and jurisdictions becomes an operating constraint.' },
   { title: 'Drift Retainer', path: '/advisory/drift-retainer', note: 'The standing relationship: monthly briefing, working session, and a quarterly exposure review.' },

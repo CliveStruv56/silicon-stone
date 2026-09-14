@@ -45,7 +45,6 @@ const STATIC_ROUTES: Array<{
   { path: '/advisory/modules/scenario-impact', changeFrequency: 'monthly', priority: 0.5 },
   { path: '/advisory/modules/regulatory-friction', changeFrequency: 'monthly', priority: 0.5 },
   { path: '/advisory/modules/european-procurement-readiness', changeFrequency: 'monthly', priority: 0.5 },
-  { path: '/advisory/modules/sovereign-architecture', changeFrequency: 'monthly', priority: 0.5 },
   { path: '/digital-omnibus', changeFrequency: 'monthly', priority: 0.7 },
   // US-inbound lead magnet — the guide behind the EU Exposure Briefing (D1).
   { path: '/us-executive-guide', changeFrequency: 'monthly', priority: 0.6 },

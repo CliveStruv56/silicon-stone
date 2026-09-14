@@ -5,7 +5,7 @@ import { buildEngagementBreadcrumbSchema } from '@/lib/seo'
 import { ENGAGEMENTS } from '@/lib/offering'
 
 const description =
-  'Before you commit to AI governance software, know what you actually need it to do. A framework-neutral, vendor-agnostic decision document for the board: multi-framework analysis, a 40-page report, a board-ready presentation and an implementation roadmap.'
+  'Before the board commits, two questions: what do you actually need, and how much of your stack do you actually control? A framework-neutral, vendor-agnostic decision document: multi-framework analysis, an architecture and control map covering hosting, access, key custody and exit, a 40-page report, a board-ready presentation and a staged roadmap. Includes the Sovereign Architecture Review.'
 
 export const metadata: Metadata = {
   title: 'Strategic Assessment — A Board-Ready AI Governance Decision | Silicon and Stone',

@@ -256,13 +256,22 @@ export const ENGAGEMENTS: Offering[] = [
     price: SCOPED_FEE,
     priceNote: 'then transitions to retainer',
     summary:
-      'The deep one-off for a high-stakes decision: multi-framework analysis, a 40-page report, a board-ready presentation and an implementation roadmap.',
+      'The deep one-off for a high-stakes decision: multi-framework analysis, an architecture and control map, a 40-page report, a board-ready presentation and a staged roadmap.',
     question: 'The board has to decide.',
-    /** Own page since 2026-09-04 — see the Exposure Diagnostic note above. */
+    /**
+     * Own page since 2026-09-04 — see the Exposure Diagnostic note above.
+     *
+     * Absorbed the Sovereign Architecture Review on 2026-09-14 (owner
+     * decision): the control map, options appraisal, audience and scope
+     * exclusions that lived on the standalone project page are now part of
+     * this engagement, and the Review is not sold separately. The standalone
+     * page had been re-established on 2026-09-10 after a first fold-in on
+     * 2026-09-09; this time the Review's substance came with it.
+     */
     href: '/advisory/strategic-assessment',
     terms: [
+      'Includes the Sovereign Architecture Review — hosting, administrative access, key custody and exit constraints — where control of the stack is part of the decision. It is not sold separately.',
       'European Procurement Readiness can be included in the agreed assessment scope or commissioned separately.',
-      'A Sovereign Architecture Review can be included in the agreed assessment scope or commissioned separately.',
       'Framework-neutral and vendor-agnostic — we sell no software and take no referral fees.',
     ],
   },
@@ -323,11 +332,13 @@ export const SISTER_PRODUCT: Offering = {
  * the work should ideally begin with an Advisory Briefing, whose fee is
  * deducted in full from whichever project the client goes on to start.
  * Work for retainer clients is separately scoped and charged at the project fee.
- * The owner expanded the range to five on 2026-09-10. Three have optional free
- * tool pairings; Procurement Readiness and Sovereign Architecture also remain
- * available within an agreed broader engagement. All project fees are agreed
- * after scoping. AI Bill of Materials remains within the Exposure Diagnostic.
- * `MODULES` is retained as the internal catalogue name to preserve consumers.
+ * The owner expanded the range to five on 2026-09-10 and back to four on
+ * 2026-09-14, when the Sovereign Architecture Review was combined into the
+ * Strategic Assessment. Three have optional free tool pairings; Procurement
+ * Readiness also remains available within an agreed broader engagement. All
+ * project fees are agreed after scoping. AI Bill of Materials remains within
+ * the Exposure Diagnostic. `MODULES` is retained as the internal catalogue
+ * name to preserve consumers.
  */
 export const MODULES: Offering[] = [
   {
@@ -368,15 +379,6 @@ export const MODULES: Offering[] = [
     summary:
       'Buyer requirements mapped to your evidence, with gaps, response preparation and a prioritised plan for an agreed procurement process.',
     href: '/advisory/modules/european-procurement-readiness',
-  },
-  {
-    id: 'sovereign-architecture-review',
-    name: 'Sovereign Architecture Review',
-    question: 'How much control do we have over our technology stack?',
-    price: SCOPED_FEE,
-    summary:
-      'A map of hosting, access, key custody and exit constraints, with practical architecture options and a staged decision roadmap.',
-    href: '/advisory/modules/sovereign-architecture',
   },
 ]
 

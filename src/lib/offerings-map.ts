@@ -131,7 +131,6 @@ const MODULE_NOTES: Record<string, string> = {
   'scenario-impact': 'custom scenarios, value-at-stake by business unit',
   'regulatory-friction': 'US vs EU gap analysis, friction-scored, transatlantic roadmap',
   'european-procurement-readiness': 'buyer requirements mapped to your evidence',
-  'sovereign-architecture-review': 'hosting, access, key custody, exit constraints',
 }
 
 export const SPECIALIST_PROJECTS: MapBox[] = MODULES.map((m) =>
@@ -140,7 +139,7 @@ export const SPECIALIST_PROJECTS: MapBox[] = MODULES.map((m) =>
 
 const CORE_NOTES: Record<string, string[]> = {
   'exposure-diagnostic': ['where dependency becomes an operating constraint', 'includes the AI Bill of Materials'],
-  'strategic-assessment': ['the deep one-off when the board has to decide', 'Sovereign Architecture Review as a scope option'],
+  'strategic-assessment': ['the deep one-off when the board has to decide', 'includes the Sovereign Architecture Review'],
   'board-level': ['bespoke · scoped to the question'],
 }
 
