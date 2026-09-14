@@ -238,7 +238,7 @@ export default function PricingPage() {
           id="advisory"
           eyebrow="Engage"
           title="Advisory engagements"
-          intro="From one AI system and one principal question to a broader review or a standing relationship. Choose the scope you need; further engagements are optional."
+          intro="From one hour on a result or a single AI system to a broader review or a standing relationship. Choose the scope you need; further engagements are optional."
         >
           <div>
             {/* The ladder ascends from nothing, so the free conversation is its

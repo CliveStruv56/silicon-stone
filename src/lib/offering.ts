@@ -241,13 +241,13 @@ export const ENGAGEMENTS: Offering[] = [
     id: 'advisory-briefing',
     name: 'Advisory Briefing',
     price: gbp(AMOUNTS.advisoryBriefing),
-    priceNote: 'one AI system · one hour',
+    priceNote: 'one hour · written follow-up',
     summary:
       'The output of a tool or product, or one of your AI systems. A one-hour discussion and a written follow-up with priorities, evidence gaps and next actions.',
     question: 'What does this result mean for our AI system?',
     href: '/advisory/advisory-briefing',
     terms: [
-      'Includes preparation from your Checker result and brief business context. Supporting-document review and wider investigations are scoped separately.',
+      'Includes preparation from your result or system description and brief business context. Supporting-document review and wider investigations are scoped separately.',
       'Credited in full against any further work we do together.',
     ],
   },
@@ -330,7 +330,7 @@ export const FREE_INTRO_CONVERSATION: Offering = {
     'A conversation, not a working session — where you are, what has prompted the question, and which rung of the ladder actually fits.',
   href: '/advisory#contact',
   terms: [
-    `Distinct from the ${gbp(AMOUNTS.advisoryBriefing)} Advisory Briefing: one AI system, one principal question, a one-hour discussion and a written follow-up.`,
+    `Distinct from the ${gbp(AMOUNTS.advisoryBriefing)} Advisory Briefing: a one-hour discussion of your result or AI system and a written follow-up.`,
   ],
 }
 

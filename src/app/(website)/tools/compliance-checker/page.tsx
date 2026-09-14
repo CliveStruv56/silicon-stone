@@ -925,8 +925,8 @@ export default function ComplianceCheckerPage() {
                   <CardContent className="space-y-4">
                     <div className="border-b border-border-subtle pb-4">
                       <p className="mb-3 text-sm text-text-primary">
-                        Need to understand this result? One AI system, one principal question,
-                        a one-hour discussion and a written follow-up.
+                        Need to understand this result? A one-hour discussion of it and a
+                        written follow-up with priorities.
                       </p>
                       <Button asChild className="w-full bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90">
                         <Link href={briefing.href}>Advisory Briefing · {briefing.price}</Link>

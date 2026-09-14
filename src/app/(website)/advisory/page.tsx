@@ -198,9 +198,9 @@ export default function ServicesPage() {
                     25-minute call — so the copy must not read as one. */}
                 <p className="mt-6 border-l-2 border-silicon-amber/60 pl-4 leading-relaxed text-text-muted">
                   <strong className="font-semibold text-text-primary">Where to begin.</strong>{' '}
-                  The Advisory Briefing takes one AI system and one principal question:
-                  an hour’s discussion and a written follow-up with priorities, evidence
-                  gaps and next actions, for {gbp(AMOUNTS.advisoryBriefing)}. Go on to any
+                  The Advisory Briefing takes the output of a tool or product, or one of
+                  your AI systems: an hour’s discussion and a written follow-up with
+                  priorities, evidence gaps and next actions, for {gbp(AMOUNTS.advisoryBriefing)}. Go on to any
                   further work with us and the whole fee comes off it.
                 </p>
 

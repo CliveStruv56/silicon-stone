@@ -292,7 +292,7 @@ export default function ProductsPage() {
             max-w-7xl container and border. */}
         <FollowOnBriefing
           eyebrow="Start here · from a product to advice"
-          intro="Ideally advisory work begins with an Advisory Briefing. Bring what the Toolkit or Checklist Pack has surfaced and one principal question; leave with priorities, evidence gaps and next actions in writing."
+          intro="Ideally advisory work begins with an Advisory Briefing. Bring what the Toolkit or Checklist Pack has surfaced; leave with priorities, evidence gaps and next actions in writing."
         />
 
         {/* The Ladder — every paid step credits toward the next (§2.4) */}

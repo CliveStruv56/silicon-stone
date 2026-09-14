@@ -5,10 +5,10 @@ import { buildEngagementBreadcrumbSchema } from '@/lib/seo'
 import { ENGAGEMENTS } from '@/lib/offering'
 
 const description =
-  'One AI system, one principal question. A review of your Compliance Checker result, a one-hour discussion and a written follow-up with priorities, evidence gaps and next actions.'
+  'The output of a tool or product, or one of your AI systems. A one-hour discussion and a written follow-up with priorities, evidence gaps and next actions.'
 
 export const metadata: Metadata = {
-  title: 'Advisory Briefing — One AI System, One Question | Silicon and Stone',
+  title: 'Advisory Briefing — One Hour, One Written Follow-Up | Silicon and Stone',
   description,
   alternates: { canonical: '/advisory/advisory-briefing' },
   openGraph: { title: 'The Advisory Briefing', description, type: 'website' },

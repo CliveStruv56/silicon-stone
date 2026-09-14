@@ -24,13 +24,13 @@ export function FollowOnBriefing({
   intro?: string
 }) {
   const briefing = offeringById('advisory-briefing')
-  const bring = toolName ? `Bring your ${toolName} result and one principal question` : 'Bring one principal question'
+  const bring = toolName ? `Bring your ${toolName} result` : 'Bring your result, or one of your AI systems'
   return (
     <FollowOnOffering
       offering={briefing}
       eyebrow={eyebrow}
       intro={intro ?? `Ideally the work begins with an Advisory Briefing. ${bring}; leave with priorities, evidence gaps and next actions in writing.`}
-      summary="One AI system, one principal question. A one-hour discussion with an independent adviser and a written follow-up."
+      summary="The output of a tool or product, or one of your AI systems. A one-hour discussion with an independent adviser and a written follow-up."
       ctaLabel="Explore the Advisory Briefing"
       note="The Briefing fee is deducted in full from whichever project you go on to start with us."
     />
