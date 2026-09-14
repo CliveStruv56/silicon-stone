@@ -40,9 +40,11 @@ import { ToolSubscribeCard } from '@/components/tools/ToolSubscribeCard'
 import { complianceCheckerMarkdown } from '@/lib/tools-markdown'
 import { FollowOnOffering } from '@/components/advisory/FollowOnOffering'
 import { TOOL_JOURNEYS } from '@/lib/tool-journeys'
-import { AMOUNTS, gbp, offeringById } from '@/lib/offering'
+import { AMOUNTS, DERIVED, gbp, offeringById } from '@/lib/offering'
+import { TOOLKIT_TERMS } from '@/lib/toolkit'
 
 const briefing = offeringById('advisory-briefing')
+const toolkit = offeringById('ai-act-toolkit')
 
 function values(value: AssessmentValue | undefined): string[] {
   if (!value) return []
@@ -1119,6 +1121,20 @@ export default function ComplianceCheckerPage() {
             </motion.div>
           )}
         </section>
+        {/* The self-service step before the advised one (owner request,
+            2026-09-14): the Toolkit band sits above the Briefing band, in the
+            same amber treatment the other tool pages use for their stacked
+            follow-ons. Checker only — the Toolkit is an AI Act product and the
+            other three tools are not about the Act. */}
+        <FollowOnOffering
+          offering={toolkit}
+          priceLabel={`From ${gbp(AMOUNTS.toolkitStandard)}`}
+          eyebrow="Take your result further"
+          intro="Your Checker result is a first pass over one system. The Toolkit is what you work the whole estate through: assess gaps, catalogue every AI system, classify risk, score supplier dependencies and build an evidence-backed action plan."
+          summary={null}
+          ctaLabel="Explore the Toolkit"
+          note={`Professional adds a ${TOOLKIT_TERMS.reviewMinutes}-minute live review of up to ${['zero', 'one', 'two', 'three', 'four', 'five'][TOOLKIT_TERMS.reviewSystems] ?? TOOLKIT_TERMS.reviewSystems} systems. Start with Standard and upgrade for the ${gbp(DERIVED.toolkitProfessionalUpgrade)} difference.`}
+        />
         <FollowOnOffering
           offering={briefing}
           eyebrow="Understand your Compliance Checker result"

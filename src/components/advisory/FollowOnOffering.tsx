@@ -4,14 +4,25 @@ import { Badge } from '@/components/ui/badge'
 import type { Offering } from '@/lib/offering'
 
 /** Shared treatment for the paid next step beneath a free tool. */
-export function FollowOnOffering({ offering, eyebrow, intro, note, ctaLabel, summary }: {
+export function FollowOnOffering({ offering, eyebrow, intro, note, ctaLabel, summary, priceLabel }: {
   offering: Offering
   eyebrow: string
   intro: string
   note: string
   ctaLabel?: string
-  /** Replaces the catalogue summary where it would not read on this page. */
-  summary?: string
+  /**
+   * Replaces the catalogue summary where it would not read on this page.
+   * `null` drops the line: the Checker's Toolkit band says the same thing in
+   * its intro, and the two read as a repeat.
+   */
+  summary?: string | null
+  /**
+   * Replaces the catalogue price in the badge. The Toolkit has two editions
+   * and `offering.price` is the Standard figure alone, which reads as the
+   * only price; "From £79" is what the Checker's results panel already says.
+   * Build it from the catalogue (`gbp(AMOUNTS.x)`), never as a literal.
+   */
+  priceLabel?: string
 }) {
   return (
     <section
@@ -33,11 +44,13 @@ export function FollowOnOffering({ offering, eyebrow, intro, note, ctaLabel, sum
             {offering.name}
           </h2>
           <Badge variant="outline" className="font-mono text-[12px] text-text-primary border-border-subtle">
-            {offering.price}
+            {priceLabel ?? offering.price}
           </Badge>
         </div>
         <p className="mt-4 max-w-3xl leading-relaxed text-text-primary">{intro}</p>
-        <p className="mt-3 max-w-3xl leading-relaxed text-text-muted">{summary ?? offering.summary}</p>
+        {summary !== null && (
+          <p className="mt-3 max-w-3xl leading-relaxed text-text-muted">{summary ?? offering.summary}</p>
+        )}
         <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
           <Link
             href={offering.href}
