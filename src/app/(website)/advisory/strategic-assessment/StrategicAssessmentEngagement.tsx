@@ -168,7 +168,7 @@ export function StrategicAssessmentEngagement({ coverage }: Props) {
             the page, as it does on the other three engagements. */}
         <EngagementHero
           badge="The deep one-off · for a high-stakes decision"
-          title="Before the board commits, two questions: what do you actually need, and how much do you actually control?"
+          title="Before the board commits: what do you need, and what do you control?"
           lead="AI governance platforms are sold at four figures a month, and sovereignty is sold as a hosting region. Both decisions are usually made from a vendor’s own framing of the problem, because that is the only framing on the table."
           body="The Strategic Assessment gives your board a framework-neutral decision document instead: what you are actually required to do, what you genuinely need tooling for, and where control of your technology stack — hosting, administrative access, key custody, exit — really sits. It is vendor-agnostic because we sell no software and take no referral fees."
           inShort={
