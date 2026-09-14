@@ -23,7 +23,6 @@ export const SUBSCRIBE_TAG_IDS: Record<string, string | undefined> = {
   WaymarkPath_Early_Access: process.env.CONVERTKIT_WAYMARKPATH_TAG_ID,
   // Early access + product tier requested (pre-launch capture)
   'early-access': process.env.CONVERTKIT_EARLY_ACCESS_TAG_ID,
-  'tier-checklist': process.env.CONVERTKIT_TIER_CHECKLIST_TAG_ID,
   'tier-toolkit-standard': process.env.CONVERTKIT_TIER_TOOLKIT_STANDARD_TAG_ID,
   'tier-toolkit-professional': process.env.CONVERTKIT_TIER_TOOLKIT_PROFESSIONAL_TAG_ID,
   'tier-sector-reports': process.env.CONVERTKIT_TIER_SECTOR_REPORTS_TAG_ID,
@@ -39,7 +38,6 @@ export const SUBSCRIBE_TAG_IDS: Record<string, string | undefined> = {
 
 /** Buyer tags applied by the Lemon Squeezy order_created webhook only. */
 export const BUYER_TAG_IDS: Record<string, string | undefined> = {
-  'buyer-checklist': process.env.CONVERTKIT_BUYER_CHECKLIST_TAG_ID,
   'buyer-toolkit-standard': process.env.CONVERTKIT_BUYER_TOOLKIT_STANDARD_TAG_ID,
   'buyer-toolkit-pro': process.env.CONVERTKIT_BUYER_TOOLKIT_PRO_TAG_ID,
 }

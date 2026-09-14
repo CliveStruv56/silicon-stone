@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  currentGateProduct,
   resolveCategoryGateFallback,
   resolveGate,
   resolveUpsellProduct,
@@ -118,7 +119,7 @@ describe('resolveUpsellProduct', () => {
     // is deterministic; the article's own category order must not flip it.
     expect(
       resolveUpsellProduct(null, ['ai-act'], [CHECKLIST, TOOLKIT])?.slug,
-    ).toBe('ai-audit-checklist')
+    ).toBe('ai-act-toolkit')
   })
 
   it('returns null when nothing matches, so auto can fall through', () => {
@@ -128,6 +129,23 @@ describe('resolveUpsellProduct', () => {
   it('prefers an explicit product over any topic match', () => {
     expect(
       resolveUpsellProduct(CHECKLIST, ['ai-act'], [TOOLKIT])?.slug,
-    ).toBe('ai-audit-checklist')
+    ).toBe('ai-act-toolkit')
+  })
+})
+
+
+describe('consolidated toolkit article recommendations', () => {
+  it('replaces a retired checkout and price while preserving topic matching', () => {
+    const product = currentGateProduct({ ...CHECKLIST, checkoutUrl: 'https://old.example/checkout' })
+    expect(product).toMatchObject({ slug: 'ai-act-toolkit', priceLabel: 'From £79', topics: ['ai-act'] })
+    expect(product.checkoutUrl).not.toBe('https://old.example/checkout')
+  })
+  it('preserves newsletter copy when an editor retains an old product reference', () => {
+    expect(resolve({ gate: { mode: 'email', product: CHECKLIST, headline: 'Custom newsletter' } })).toMatchObject({ mode: 'email', headline: 'Custom newsletter' })
+  })
+  it('discards retired explicit sales copy', () => {
+    expect(resolve({ gate: { mode: 'commerce', product: CHECKLIST, headline: 'Old checklist', ctaLabel: 'Buy for £24' }, upsellProduct: CHECKLIST })).toMatchObject({
+      mode: 'commerce', headline: 'Go deeper: AI Act Compliance Toolkit', ctaLabel: 'Get it — From £79',
+    })
   })
 })

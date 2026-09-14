@@ -1,136 +1,60 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-
 import { Header, Footer } from '@/components/layout'
 import { Button } from '@/components/ui/button'
-import { CheckCircle, Mail, ArrowRight } from 'lucide-react'
-import { AMOUNTS, DERIVED, gbp } from '@/lib/offering'
+import { Mail } from 'lucide-react'
+import { DERIVED, gbp } from '@/lib/offering'
 
 export const metadata: Metadata = {
-  title: 'Order Confirmed | Silicon and Stone',
-  description: 'Your order is confirmed. Check your email for download links.',
+  title: 'Your Toolkit Next Steps | Silicon and Stone',
+  description: 'Download your toolkit and prepare for your Professional implementation review.',
   robots: { index: false, follow: false },
 }
 
-/**
- * Post-purchase return page (spec §3.3). Each Lemon Squeezy product's
- * redirect/receipt URL points here with ?product={sku}. Delivery itself is
- * LS's built-in file-delivery email — this page confirms and shows the
- * next-rung offer for the SKU bought.
- */
-const SKUS = {
-  checklist: {
-    name: 'AI Audit Checklist Pack',
-  },
-  'toolkit-standard': {
-    name: 'AI Act Compliance Toolkit — Standard',
-  },
-  'toolkit-pro': {
-    name: 'AI Act Compliance Toolkit — Professional',
-  },
-} as const
-
-type Sku = keyof typeof SKUS
-
-export default async function PurchaseSuccessPage({
-  searchParams,
-}: {
+/** Informational return page only: a query string is never proof of purchase. */
+export default async function PurchaseSuccessPage({ searchParams }: {
   searchParams: Promise<{ product?: string }>
 }) {
   const { product } = await searchParams
-  const sku: Sku | null = product && product in SKUS ? (product as Sku) : null
-  const isToolkit = sku === 'toolkit-standard' || sku === 'toolkit-pro'
-
+  const professional = product === 'toolkit-pro'
+  const standard = product === 'toolkit-standard'
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-
       <main className="flex-1">
-        {/* Confirmation */}
         <section className="bg-slate-deep border-b border-border-subtle">
-          <div className="mx-auto max-w-3xl px-6 py-14 lg:px-8 lg:py-20 text-center">
-            <CheckCircle className="mx-auto mb-5 h-14 w-14 text-stone-teal" />
-            <h1 className="mb-4 text-3xl font-bold text-text-primary sm:text-4xl">
-              {sku ? `Thank you — your ${SKUS[sku].name} is on its way.` : 'Thank you — your order is confirmed.'}
-            </h1>
-            <p className="mx-auto flex max-w-xl items-center justify-center gap-2 text-lg text-text-muted">
-              <Mail className="h-5 w-5 flex-shrink-0 text-silicon-amber-strong" />
-              Check your email for your download links — they arrive within a few
-              minutes from Lemon Squeezy, our payment provider.
-            </p>
+          <div className="mx-auto max-w-3xl px-6 py-14 lg:px-8">
+            <Mail className="mb-5 h-10 w-10 text-stone-teal" />
+            <h1 className="mb-4 text-3xl font-bold text-text-primary">{professional ? 'Your Professional toolkit: next steps' : standard ? 'Your Standard toolkit: next steps' : 'Your product: next steps'}</h1>
+            <p className="text-lg text-text-muted">Once your purchase is complete, Lemon Squeezy emails your receipt and download links. Your receipt confirms the edition you purchased.</p>
           </div>
         </section>
-
-        {/* Next rung by SKU */}
-        {sku === 'checklist' && (
-          <section className="mx-auto max-w-3xl px-6 py-12 lg:px-8">
-            <div className="rounded-xl border border-stone-teal/30 bg-stone-charcoal p-8">
-              <div className="mb-4 font-mono text-xs uppercase tracking-wider text-stone-teal">
-                Your next step
-              </div>
-              <h2 className="mb-3 text-2xl font-semibold text-text-primary">
-                Your {gbp(AMOUNTS.toolkitDiscount)} Toolkit credit is in your delivery email
-              </h2>
-              <p className="mb-6 text-text-muted">
-                Alongside your download links you&rsquo;ll find a {gbp(AMOUNTS.toolkitDiscount)} discount
-                code for the full AI Act Compliance Toolkit (valid 90 days). Use it at
-                checkout and the complete compliance framework is{' '}
-                {gbp(DERIVED.toolkitAfterDiscount)} instead of {gbp(AMOUNTS.toolkitStandard)}.
-              </p>
-              <div className="mb-6 rounded-lg border border-border-subtle bg-slate-deep p-4 text-sm text-text-muted">
-                Total investment for audit + toolkit:{' '}
-                <span className="font-mono text-silicon-amber-strong">{gbp(DERIVED.bundleTotal)}</span>{' '}
-                (vs {gbp(DERIVED.bundleSeparately)} separately)
-              </div>
-              <Link href="/products/ai-act-toolkit">
-                <Button className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90 font-semibold">
-                  View the AI Act Compliance Toolkit
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-            </div>
-          </section>
-        )}
-
-        {isToolkit && (
-          <section className="mx-auto max-w-3xl px-6 py-12 lg:px-8">
-            <div className="rounded-xl border border-silicon-amber/30 bg-stone-charcoal p-8">
-              <div className="mb-4 font-mono text-xs uppercase tracking-wider text-silicon-amber-strong">
-                Your next step
-              </div>
-              <h2 className="mb-3 text-2xl font-semibold text-text-primary">
-                Want it applied to your situation? Book an Advisory Briefing — {gbp(AMOUNTS.advisoryBriefing)}
-              </h2>
-              <p className="mb-4 text-text-muted">
-                A one-hour working session: your tool results, your specific question, a
-                written follow-up.
-              </p>
-              <p className="mb-6 text-sm italic text-text-muted">
-                {gbp(AMOUNTS.advisoryBriefing)}. Credited in full against any further work we do together — so
-                if we work together, the conversation was free.
-              </p>
-              <Link href="/advisory#contact">
-                <Button className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90 font-semibold">
-                  Book an Advisory Briefing
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-            </div>
-          </section>
-        )}
-
-        {/* Fallbacks + housekeeping */}
-        <section className="mx-auto max-w-3xl px-6 pb-14 lg:px-8 text-center">
-          <p className="text-sm text-text-muted">
-            No email after 15 minutes? Check spam, then write to us via the{' '}
-            <Link href="/advisory#contact" className="text-stone-teal hover:underline">
-              contact form
-            </Link>{' '}
-            and we&rsquo;ll sort it.
-          </p>
-        </section>
+        <div className="mx-auto max-w-3xl px-6 py-12 lg:px-8 space-y-8">
+          {(standard || professional) && (
+            <section>
+              <h2 className="text-2xl font-semibold text-text-primary mb-3">Start with the quick assessment</h2>
+              <p className="text-text-muted">Open the handbook’s quick-start instructions and your workbook. Catalogue your systems, assess suppliers and assign actions using the same system references throughout. Both editions include 12 months of updated files and quarterly update emails.</p>
+            </section>
+          )}
+          {professional && (
+            <section className="rounded-xl border border-stone-teal bg-stone-charcoal p-6">
+              <h2 className="text-2xl font-semibold text-text-primary mb-3">Your live implementation review is included</h2>
+              <p className="text-text-muted mb-4">Book one 45-minute Zoom discussion within 90 days of purchase, covering up to three AI systems. Submit the relevant workbook entries securely at least three working days beforehand. Clive prepares in advance and sends a written action summary afterwards.</p>
+              <p className="text-sm text-text-muted mb-5">Booking and private file submission are being prepared for launch. Instructions will be supplied after your purchase is verified; no confidential files should be sent through the contact form.</p>
+              <Button asChild className="bg-stone-teal text-ink-on-accent hover:bg-stone-teal/90"><Link href="/products/ai-act-toolkit/review">Prepare for your review</Link></Button>
+            </section>
+          )}
+          {standard && (
+            <section className="rounded-xl border border-border-subtle bg-stone-charcoal p-6">
+              <h2 className="text-2xl font-semibold text-text-primary mb-3">Want to discuss your findings?</h2>
+              <p className="text-text-muted mb-5">Upgrade to Professional for the {gbp(DERIVED.toolkitProfessionalUpgrade)} difference: secure workbook submission, advance preparation, a 45-minute live review of up to three systems and a personalised written action summary.</p>
+              <Button asChild variant="outline"><Link href="/products/ai-act-toolkit/review#upgrade">Arrange a Professional upgrade</Link></Button>
+            </section>
+          )}
+          <p className="text-sm text-text-muted">No delivery email after 15 minutes? Check spam, then <Link href="/advisory#contact" className="text-stone-teal hover:underline">contact us</Link> with your order reference. Never include your payment card details or confidential workbook contents.</p>
+          <Link href="/products/ai-act-toolkit" className="inline-block text-stone-teal hover:underline">View the complete toolkit →</Link>
+        </div>
       </main>
-
       <Footer />
     </div>
   )

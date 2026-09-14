@@ -6,7 +6,7 @@
 > £275), each product needs a **redirect URL** to
 > `/products/success?product={sku}`, the `order_created` webhook now **tags
 > buyers in Kit** (no longer a stub) via `LEMONSQUEEZY_VARIANT_ID_*` env vars,
-> and two **discount codes** (`LAUNCH48`, £20/90-day) are required. This doc
+> and Standard buyers may upgrade for the **£196 difference** after receipt verification. The separate Checklist SKU and its discount are retired. This doc
 > remains for the Intelligence Series / licence-key (Model B) background only.
 
 Everything on the code side is built and verified. This is the manual checklist
@@ -29,8 +29,7 @@ layer — but the **checkout** lives in LS):
 
 | Product | Price | Delivery model | Licence keys |
 |---|---|---|---|
-| AI Audit Checklist Pack | £24 | Download (Model A) | off |
-| AI Act Compliance Toolkit | from £79 | Download (Model A) | off |
+| AI Act Compliance Toolkit — Standard / Professional | £79 / £275 | Download; Professional adds a live review | off |
 | Sector Reports | from £39 | Download (Model A) | off |
 
 > These prices are mirrored from `src/lib/offering.ts` (`AMOUNTS`). If you
@@ -80,9 +79,10 @@ LEMONSQUEEZY_WEBHOOK_SECRET=...     # signing secret (step 4)
 NEXT_PUBLIC_LEMONSQUEEZY_SERIES_URL=...   # Intelligence Series checkout URL (for the overlay)
 ```
 
-The three existing product checkout URLs already live in env
-(`NEXT_PUBLIC_LEMONSQUEEZY_TOOLKIT_STANDARD_URL`, `..._PROFESSIONAL_URL`,
-`..._CHECKLIST_URL`) and stay as they are.
+The two Toolkit checkout URLs live in env
+(`NEXT_PUBLIC_LEMONSQUEEZY_TOOLKIT_STANDARD_URL`, `..._PROFESSIONAL_URL`).
+The retired Checklist checkout must not be configured. See
+`toolkit-professional-review-setup.md` for booking and secure file-request placeholders.
 
 Idempotency uses the existing Upstash/KV integration
 (`KV_REST_API_URL` / `KV_REST_API_TOKEN`) — already configured; nothing to add.

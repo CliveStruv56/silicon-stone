@@ -78,6 +78,7 @@ const nextConfig: NextConfig = {
       // retains its old anchor and a link for browsers caching the former 301.
       { source: '/advisory/modules/sovereign-architecture-review', destination: '/advisory/modules/sovereign-architecture', statusCode: 301 },
       { source: '/services', destination: '/advisory', statusCode: 301 },
+      { source: '/products/ai-audit-checklist', destination: '/products/ai-act-toolkit', statusCode: 301 },
       { source: '/products/briefings', destination: '/products/sector-reports', statusCode: 301 },
       // The free guide moved off /atlantic-drift, which collided with the
       // content category of the same name and with the Atlantic Drift

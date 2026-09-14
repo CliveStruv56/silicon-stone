@@ -133,7 +133,10 @@ async function main() {
   // can still be selected by the article gate, and would be sold at a price no
   // page shows.
   const known = new Set(SANITY_PRODUCTS.map((p) => p.documentId))
-  const unknown = published.filter((doc) => !known.has(doc._id)).map((doc) => doc._id)
+  // Retained legacy references are normalised by currentGateProduct; they are
+  // not separate offers. They may be archived in Studio after reference migration.
+  const retired = new Set(['product-ai-audit-checklist'])
+  const unknown = published.filter((doc) => !known.has(doc._id) && !retired.has(doc._id)).map((doc) => doc._id)
 
   // Drafts are advisory: they are not what the site serves, but a drifted one
   // becomes a live mismatch the moment somebody hits Publish.

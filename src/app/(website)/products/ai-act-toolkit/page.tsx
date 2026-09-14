@@ -1,374 +1,178 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-
 import { Header, Footer } from '@/components/layout'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { AdvisoryNextStep } from '@/components/products/AdvisoryNextStep'
 import { EarlyAccessCTA } from '@/components/products/EarlyAccessCTA'
 import { isConfiguredCheckout } from '@/lib/checkout'
 import { PRE_LAUNCH } from '@/lib/flags'
-import {
-  Shield,
-  CheckCircle,
-  FileSpreadsheet,
-  FileText,
-  Clock,
-  BookOpen,
-  ListChecks,
-  FileCheck2,
-  CalendarClock,
-} from 'lucide-react'
-import { AMOUNTS, gbp } from '@/lib/offering'
+import { AMOUNTS, DERIVED, gbp } from '@/lib/offering'
+import { PROFESSIONAL_STEPS, TOOLKIT_FEATURES, TOOLKIT_WORKFLOW } from '@/lib/toolkit'
+import { CheckCircle, FileSpreadsheet, FileText, Users } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'AI Act Compliance Toolkit | Silicon and Stone',
-  description: 'The complete compliance toolkit for European businesses navigating the EU AI Act. Risk classification, checklists, templates, and action plans.',
+  description: 'Assess AI gaps, catalogue systems, score supplier dependencies and build an action plan. Standard toolkit or Professional with a live implementation review.',
+  alternates: { canonical: '/products/ai-act-toolkit' },
 }
 
-const sections = [
-  {
-    icon: BookOpen,
-    title: 'Executive Summary',
-    pages: '3-4 pages',
-    description: 'Plain-language overview of what the AI Act requires, who it applies to, and key dates. Written for someone with 10 minutes who needs the essentials — the section that gets forwarded to board members.',
-  },
-  {
-    icon: Shield,
-    title: 'Risk Classification Decision Tree',
-    pages: '6-8 pages',
-    description: 'Visual flowchart walking you through determining the risk category of each AI system. Yes/no questions lead to clear classifications: Prohibited, High-Risk, Limited Risk, or Minimal Risk. Includes worked examples from common business scenarios.',
-  },
-  {
-    icon: ListChecks,
-    title: 'Compliance Requirements by Risk Category',
-    pages: '10-12 pages',
-    description: 'For each risk category, a detailed breakdown of obligations: technical documentation, quality management, conformity assessments, human oversight, accuracy standards, and post-market monitoring. Each with plain-language explanation and article cross-references.',
-  },
-  {
-    icon: FileCheck2,
-    title: 'The Compliance Checklist',
-    pages: '8-10 pages',
-    description: 'Structured tick-box checklist a compliance officer can work through system by system. Organised by risk category and obligation type. Each item has status, owner, and target date fields. The section people print and pin to their wall.',
-  },
-  {
-    icon: FileText,
-    title: 'Template Documents',
-    pages: '8-10 pages',
-    description: 'Ready-to-adapt templates: AI Systems Register, Transparency Notice, Internal AI Governance Policy, and Vendor Assessment Questionnaire. Save weeks of drafting time.',
-  },
-  {
-    icon: CalendarClock,
-    title: 'Timeline and Action Plan',
-    pages: '4-5 pages',
-    description: 'Visual timeline of phased implementation milestones, with the legal status of each date made explicit. Includes a suggested 90-day action plan for organisations starting from scratch today.',
-  },
-]
-
-const checkoutUrls = {
-  standard: process.env.NEXT_PUBLIC_LEMONSQUEEZY_TOOLKIT_STANDARD_URL,
-  professional: process.env.NEXT_PUBLIC_LEMONSQUEEZY_TOOLKIT_PROFESSIONAL_URL,
+function PurchaseCTA({ professional = false }: { professional?: boolean }) {
+  const url = professional
+    ? process.env.NEXT_PUBLIC_LEMONSQUEEZY_TOOLKIT_PROFESSIONAL_URL
+    : process.env.NEXT_PUBLIC_LEMONSQUEEZY_TOOLKIT_STANDARD_URL
+  const tier = professional ? 'Professional' : 'Standard'
+  const amount = professional ? AMOUNTS.toolkitProfessional : AMOUNTS.toolkitStandard
+  const className = professional
+    ? 'border-stone-teal text-stone-teal hover:bg-stone-teal/10'
+    : 'bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90 font-semibold'
+  const variant = professional ? 'outline' : 'default'
+  return !PRE_LAUNCH && isConfiguredCheckout(url) ? (
+    <Button size="lg" variant={variant} className={className} asChild>
+      <a href={url} target="_blank" rel="noopener noreferrer" className={`plausible-event-name=Buy+Toolkit+${tier}`}>
+        Buy {tier} — {gbp(amount)}
+      </a>
+    </Button>
+  ) : (
+    <EarlyAccessCTA
+      tierTag={professional ? 'tier-toolkit-professional' : 'tier-toolkit-standard'}
+      label={`Notify me — ${tier}`}
+      submitLabel="Notify me at this address"
+      variant={variant}
+      buttonClassName={className}
+    />
+  )
 }
 
 export default function AIActToolkitPage() {
-  // Buy buttons go live only when pre-launch mode is off AND the Lemon Squeezy
-  // checkout URL is configured; otherwise the tier shows the early-access
-  // capture (PRE_LAUNCH, spec §0.3).
-  const standardBuyable = !PRE_LAUNCH && isConfiguredCheckout(checkoutUrls.standard)
-  const professionalBuyable = !PRE_LAUNCH && isConfiguredCheckout(checkoutUrls.professional)
-
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-
       <main className="flex-1">
-        {/* Hero */}
         <section className="bg-slate-deep border-b border-border-subtle">
           <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div>
-                <Badge className="mb-4 bg-accent-fill text-ink-on-accent">
-                  Flagship Product
-                </Badge>
-                <h1 className="text-4xl font-bold text-text-primary sm:text-5xl mb-6">
-                  AI Act Compliance Toolkit
-                </h1>
+                <Badge className="mb-4 bg-accent-fill text-ink-on-accent">One complete toolkit</Badge>
+                <h1 className="text-4xl font-bold text-text-primary sm:text-5xl mb-6">AI Act Compliance Toolkit</h1>
                 <p className="text-xl text-text-muted leading-relaxed mb-6">
-                  Everything a European business needs to understand and act on AI Act
-                  obligations. Catalogue systems, classify risk, collect vendor evidence,
-                  and set review triggers.
+                  Find your AI systems, assess compliance gaps and supplier dependencies,
+                  and build an evidence-backed action plan.
                 </p>
-                <div className="flex items-center gap-4 mb-8">
-                  <div className="text-3xl font-mono font-bold text-silicon-amber-strong">{gbp(AMOUNTS.toolkitStandard)}</div>
-                  <div className="text-sm text-text-muted">
-                    Standard Package<br />
-                    PDF + Spreadsheets
-                  </div>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-3">
-                  {standardBuyable ? (
-                    <Button size="lg" className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90 font-semibold" asChild>
-                      <a href={checkoutUrls.standard} target="_blank" rel="noopener noreferrer" className="plausible-event-name=Buy+Toolkit+Standard">
-                        Buy Standard — {gbp(AMOUNTS.toolkitStandard)}
-                      </a>
-                    </Button>
-                  ) : (
-                    <EarlyAccessCTA
-                      tierTag="tier-toolkit-standard"
-                      label="Buy Now — Standard"
-                      submitLabel="Notify me at this address"
-                      buttonClassName="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90 font-semibold"
-                    />
-                  )}
-                  {professionalBuyable ? (
-                    <Button size="lg" variant="outline" className="border-stone-teal text-stone-teal hover:bg-stone-teal/10" asChild>
-                      <a href={checkoutUrls.professional} target="_blank" rel="noopener noreferrer" className="plausible-event-name=Buy+Toolkit+Professional">
-                        Buy Professional — {gbp(AMOUNTS.toolkitProfessional)}
-                      </a>
-                    </Button>
-                  ) : (
-                    <EarlyAccessCTA
-                      tierTag="tier-toolkit-professional"
-                      label="Buy Now — Professional"
-                      submitLabel="Notify me at this address"
-                      variant="outline"
-                      buttonClassName="border-stone-teal text-stone-teal hover:bg-stone-teal/10"
-                    />
-                  )}
-                </div>
-                <p className="text-xs text-text-muted mt-3">
-                  Professional includes a 30-minute video walkthrough.
+                <p className="text-text-muted mb-8">
+                  For internal teams responsible for AI governance, operations and procurement.
+                  The audit checklist, vendor scorecard and board summary are all included.
                 </p>
+                <div className="flex flex-wrap gap-6 mb-6">
+                  <div><div className="text-sm text-text-muted">Standard</div><div className="text-3xl font-mono font-bold text-silicon-amber-strong">{gbp(AMOUNTS.toolkitStandard)}</div></div>
+                  <div><div className="text-sm text-text-muted">Professional</div><div className="text-3xl font-mono font-bold text-stone-teal">{gbp(AMOUNTS.toolkitProfessional)}</div></div>
+                </div>
+                <div className="flex flex-wrap gap-3"><PurchaseCTA /><PurchaseCTA professional /></div>
+                <p className="text-sm text-text-muted mt-4">One-off purchase. Both editions include 12 months of updated files and quarterly update emails.</p>
               </div>
-
               <div className="bg-stone-charcoal border border-border-subtle rounded-xl p-8">
-                <div className="text-sm font-mono text-silicon-amber-strong uppercase tracking-wider mb-4">
-                  What You Get
-                </div>
-                <ul className="space-y-3">
-                  <li className="flex items-start gap-3 text-text-primary">
-                    <FileText className="w-5 h-5 text-stone-teal flex-shrink-0 mt-0.5" />
-                    <span>45-60 page PDF guide with decision trees, checklists, and templates</span>
-                  </li>
-                  <li className="flex items-start gap-3 text-text-primary">
-                    <FileSpreadsheet className="w-5 h-5 text-stone-teal flex-shrink-0 mt-0.5" />
-                    <span>AI Systems Register spreadsheet with conditional formatting</span>
-                  </li>
-                  <li className="flex items-start gap-3 text-text-primary">
-                    <FileSpreadsheet className="w-5 h-5 text-stone-teal flex-shrink-0 mt-0.5" />
-                    <span>Compliance Tracker with dashboard and progress calculation</span>
-                  </li>
-                  <li className="flex items-start gap-3 text-text-primary">
-                    <Clock className="w-5 h-5 text-stone-teal flex-shrink-0 mt-0.5" />
-                    <span>Quarterly update emails as new guidance is published</span>
-                  </li>
+                <h2 className="text-lg font-semibold text-text-primary mb-5">Your working toolkit</h2>
+                <ul className="space-y-4 text-text-primary">
+                  <li className="flex gap-3"><FileText className="w-5 h-5 text-stone-teal shrink-0 mt-0.5" /><span>PDF handbook with a quick-start route, classification guidance, checklists and worked examples.</span></li>
+                  <li className="flex gap-3"><FileSpreadsheet className="w-5 h-5 text-stone-teal shrink-0 mt-0.5" /><span>One Excel workbook for assessment, systems, suppliers, actions and progress.</span></li>
+                  <li className="flex gap-3"><FileText className="w-5 h-5 text-stone-teal shrink-0 mt-0.5" /><span>Four editable templates, including a one-page board risk summary.</span></li>
+                  <li className="flex gap-3"><Users className="w-5 h-5 text-stone-teal shrink-0 mt-0.5" /><span>Professional adds preparation, a 45-minute live review of up to three systems and a written action summary.</span></li>
                 </ul>
-                <div className="mt-6 pt-4 border-t border-border-subtle">
-                  <div className="text-sm font-mono text-text-muted uppercase tracking-wider mb-2">
-                    Professional Package Also Includes
-                  </div>
-                  <p className="text-sm text-text-primary">
-                    30-minute video walkthrough recorded by the author, explaining how to apply
-                    each section to your specific situation.
-                  </p>
-                </div>
+                <Link href="#professional" className="inline-block mt-6 text-stone-teal hover:underline">How the Professional review works →</Link>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Urgency */}
-        <section className="bg-silicon-amber/10 border-b border-silicon-amber/20">
-          <div className="mx-auto max-w-7xl px-6 py-4 lg:px-8">
-            <div className="flex items-center gap-3">
-              <Shield className="w-5 h-5 text-silicon-amber-strong flex-shrink-0" />
-              <p className="text-sm text-text-primary">
-                <span className="font-semibold text-silicon-amber-strong">AI Act implementation is phased.</span>
-                {' '}Transparency obligations have applied since 2 August 2026. The Digital Omnibus on AI — Regulation (EU) 2026/1744, in force 27 July 2026 — moves standalone high-risk to 2 December 2027 and embedded high-risk to 2 August 2028. The evidence work continues.{' '}
-                <Link href="/digital-omnibus" className="font-medium text-silicon-amber-strong underline">
-                  Read the Digital Omnibus explanation and timeline.
-                </Link>
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* What's Inside */}
-        <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
-          <h2 className="text-2xl font-semibold text-text-primary mb-4">
-            What&apos;s Inside
-          </h2>
-          <p className="text-text-muted mb-8 max-w-3xl">
-            Six sections designed to take you from &ldquo;we know the AI Act exists&rdquo; to
-            &ldquo;we have a compliance plan with owners and deadlines.&rdquo;
-          </p>
-
+        <section id="included" className="mx-auto max-w-7xl px-6 py-12 lg:px-8 scroll-mt-24">
+          <h2 className="text-2xl font-semibold text-text-primary mb-3">Everything included in Standard and Professional</h2>
+          <p className="text-text-muted mb-8 max-w-3xl">Start with a quick assessment, then keep working in the same register and action plan as your evidence develops.</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {sections.map((section, idx) => {
-              const Icon = section.icon
-              return (
-                <Card key={section.title} className="bg-stone-charcoal border-border-subtle">
-                  <CardHeader className="pb-2">
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm font-mono text-silicon-amber-strong">0{idx + 1}</span>
-                      <Icon className="w-5 h-5 text-stone-teal" />
-                    </div>
-                    <CardTitle className="text-lg text-text-primary mt-2">
-                      {section.title}
-                    </CardTitle>
-                    <div className="text-xs font-mono text-text-muted">{section.pages}</div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-text-muted">{section.description}</p>
-                  </CardContent>
-                </Card>
-              )
-            })}
-          </div>
-        </section>
-
-        {/* Pricing — published two-tier price table (spec §2.1) */}
-        <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
-          <h2 className="text-2xl font-semibold text-text-primary mb-6">
-            Two Tiers, One Toolkit
-          </h2>
-          <div className="overflow-x-auto rounded-lg border border-border-subtle">
-            <table className="w-full min-w-[560px] text-left text-sm">
-              <thead className="bg-stone-charcoal">
-                <tr className="border-b border-border-subtle">
-                  <th scope="col" className="px-4 py-3 font-semibold text-text-primary">Tier</th>
-                  <th scope="col" className="px-4 py-3 font-semibold text-text-primary">Contents</th>
-                  <th scope="col" className="px-4 py-3 font-semibold text-text-primary">Price</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-b border-border-subtle">
-                  <td className="whitespace-nowrap px-4 py-4 align-top font-semibold text-text-primary">Standard</td>
-                  <td className="px-4 py-4 align-top text-text-muted">
-                    45–60 page PDF guide with decision trees, checklists and templates;
-                    AI Systems Register spreadsheet; Compliance Tracker with dashboard;
-                    quarterly update emails
-                  </td>
-                  <td className="whitespace-nowrap px-4 py-4 align-top font-mono font-bold text-silicon-amber-strong">{gbp(AMOUNTS.toolkitStandard)}</td>
-                </tr>
-                <tr>
-                  <td className="whitespace-nowrap px-4 py-4 align-top font-semibold text-text-primary">Professional</td>
-                  <td className="px-4 py-4 align-top text-text-muted">
-                    Everything in Standard,{' '}
-                    <strong className="font-semibold text-text-primary">
-                      plus a 30-minute video walkthrough
-                    </strong>{' '}
-                    recorded by the author — how to apply each section to your specific
-                    situation
-                  </td>
-                  <td className="whitespace-nowrap px-4 py-4 align-top font-mono font-bold text-silicon-amber-strong">{gbp(AMOUNTS.toolkitProfessional)}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <Separator className="mx-auto max-w-7xl bg-border-subtle" />
-
-        {/* Who It's For */}
-        <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
-          <h2 className="text-2xl font-semibold text-text-primary mb-8">
-            Who This Is For
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                role: 'Compliance Officers',
-                description: 'You know the AI Act is coming but haven\'t had time to map every obligation to your systems. The checklist and register give you a structured starting point.',
-              },
-              {
-                role: 'Operations Directors',
-                description: 'Your teams use AI tools daily. You need to understand which ones create compliance obligations and what documentation is required.',
-              },
-              {
-                role: 'CTOs & Technology Leads',
-                description: 'You\'re evaluating AI vendors and need a framework for assessing compliance risk before deepening commitments.',
-              },
-            ].map((persona) => (
-              <div key={persona.role} className="space-y-2">
-                <h3 className="font-semibold text-text-primary">{persona.role}</h3>
-                <p className="text-sm text-text-muted">{persona.description}</p>
-              </div>
+            {TOOLKIT_FEATURES.map((feature, index) => (
+              <Card key={feature.title} className="bg-stone-charcoal border-border-subtle">
+                <CardHeader className="pb-2">
+                  <span className="text-sm font-mono text-silicon-amber-strong">0{index + 1}</span>
+                  <CardTitle className="text-lg text-text-primary">{feature.title}</CardTitle>
+                </CardHeader>
+                <CardContent><p className="text-sm text-text-muted">{feature.description}</p></CardContent>
+              </Card>
             ))}
           </div>
         </section>
 
-        {/* Pricing CTA */}
-        <section className="bg-stone-charcoal/50">
-          <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
-            <div className="text-center max-w-2xl mx-auto">
-              <h2 className="text-2xl font-bold text-text-primary mb-4">
-                Build Your Evidence Trail
-              </h2>
-              <p className="text-text-muted mb-8">
-                Start with a structured record of systems, roles, vendors, evidence gaps,
-                owners, and review triggers. Use formal counsel where your findings require it.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
-                {standardBuyable ? (
-                  <Button size="lg" className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90 font-semibold" asChild>
-                    <a href={checkoutUrls.standard} target="_blank" rel="noopener noreferrer">
-                      Buy Standard — {gbp(AMOUNTS.toolkitStandard)}
-                    </a>
-                  </Button>
-                ) : (
-                  <EarlyAccessCTA
-                    tierTag="tier-toolkit-standard"
-                    label="Buy Now — Standard"
-                    submitLabel="Notify me at this address"
-                    buttonClassName="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90 font-semibold"
-                  />
-                )}
-                {professionalBuyable ? (
-                  <Button size="lg" variant="outline" className="border-stone-teal text-stone-teal hover:bg-stone-teal/10" asChild>
-                    <a href={checkoutUrls.professional} target="_blank" rel="noopener noreferrer">
-                      Buy Professional — {gbp(AMOUNTS.toolkitProfessional)}
-                    </a>
-                  </Button>
-                ) : (
-                  <EarlyAccessCTA
-                    tierTag="tier-toolkit-professional"
-                    label="Buy Now — Professional"
-                    submitLabel="Notify me at this address"
-                    variant="outline"
-                    buttonClassName="border-stone-teal text-stone-teal hover:bg-stone-teal/10"
-                  />
-                )}
-              </div>
-              <p className="text-sm text-text-muted">
-                Not sure yet?{' '}
-                <Link href="/products/ai-audit-checklist" className="text-stone-teal hover:underline">
-                  Start with the Audit Checklist Pack ({gbp(AMOUNTS.checklist)})
-                </Link>
-                {' '}and get a {gbp(AMOUNTS.toolkitDiscount)} discount on this toolkit.
-              </p>
-              <p className="mt-3 text-sm text-text-muted">
-                Need the systems register built and evidenced for you?{' '}
-                <Link href="/advisory/exposure-diagnostic#ai-bill-of-materials" className="text-stone-teal hover:underline">
-                  The Exposure Diagnostic
-                </Link>
-                {' '}can go to component level and hand you an AI Bill of Materials: every model,
-                dataset, wrapper and API version-tracked, with provenance and licence status.
-              </p>
-              <div className="flex items-center justify-center gap-6 mt-8 text-xs text-text-muted">
-                <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> Digital delivery</span>
-                <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> Quarterly updates</span>
-                <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-stone-teal" /> EU VAT handled</span>
-              </div>
-            </div>
+        <section className="bg-stone-charcoal/50 border-y border-border-subtle">
+          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
+            <h2 className="text-2xl font-semibold text-text-primary mb-6">From first assessment to a leadership briefing</h2>
+            <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {TOOLKIT_WORKFLOW.map(([title, description], index) => (
+                <li key={title} className="border-l-2 border-stone-teal pl-4">
+                  <div className="font-semibold text-text-primary"><span className="font-mono text-stone-teal mr-2">{index + 1}.</span>{title}</div>
+                  <p className="text-sm text-text-muted mt-2">{description}</p>
+                </li>
+              ))}
+            </ol>
+            <p className="mt-6 text-sm text-text-muted">Use the <Link href="/digital-omnibus" className="text-stone-teal hover:underline">AI Act timeline and Digital Omnibus guide</Link> alongside the dated source references in your toolkit.</p>
           </div>
         </section>
 
+        <section id="pricing" className="mx-auto max-w-7xl px-6 py-12 lg:px-8 scroll-mt-24">
+          <h2 className="text-2xl font-semibold text-text-primary mb-6">Two editions, one complete toolkit</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="rounded-xl border border-border-subtle bg-stone-charcoal p-6 sm:p-8">
+              <h3 className="text-xl font-semibold text-text-primary">Standard</h3>
+              <p className="text-3xl font-mono text-silicon-amber-strong my-3">{gbp(AMOUNTS.toolkitStandard)}</p>
+              <p className="text-text-muted mb-5">Run the assessment and build your organisation’s plan.</p>
+              <ul className="space-y-3 text-sm text-text-primary mb-6">
+                <li>Complete handbook, workbook and four editable templates</li>
+                <li>Worked examples and a 90-day implementation plan</li>
+                <li>12 months of updated files and quarterly update emails</li>
+                <li>Internal use across your organisation</li>
+              </ul>
+              <PurchaseCTA />
+            </div>
+            <div className="rounded-xl border border-stone-teal bg-stone-charcoal p-6 sm:p-8">
+              <h3 className="text-xl font-semibold text-text-primary">Professional</h3>
+              <p className="text-3xl font-mono text-stone-teal my-3">{gbp(AMOUNTS.toolkitProfessional)}</p>
+              <p className="text-text-muted mb-5">Work through your findings with Clive and agree your team’s next steps.</p>
+              <ul className="space-y-3 text-sm text-text-primary mb-6">
+                <li>Everything in Standard</li>
+                <li>Secure advance workbook submission and preparation</li>
+                <li>One 45-minute live Zoom review of up to three AI systems</li>
+                <li>Personalised written priorities and action summary</li>
+              </ul>
+              <PurchaseCTA professional />
+            </div>
+          </div>
+          <p className="text-text-muted mt-6">Start with Standard and upgrade to Professional for the {gbp(DERIVED.toolkitProfessionalUpgrade)} difference. <Link href="/products/ai-act-toolkit/review#upgrade" className="text-stone-teal hover:underline">How to upgrade →</Link></p>
+        </section>
+
+        <section id="professional" className="bg-stone-charcoal/50 border-y border-border-subtle scroll-mt-24">
+          <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
+            <h2 className="text-2xl font-semibold text-text-primary mb-3">Your Professional implementation review</h2>
+            <p className="text-text-muted mb-8 max-w-3xl">A focused discussion for the people leading AI governance internally. Bring the colleagues responsible for the systems you want to discuss.</p>
+            <ol className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {PROFESSIONAL_STEPS.map((step, index) => (
+                <li key={step.title} className="rounded-lg border border-border-subtle p-6">
+                  <h3 className="font-semibold text-text-primary"><span className="text-stone-teal mr-2">{index + 1}.</span>{' '}{step.title}</h3>
+                  <p className="text-sm text-text-muted mt-2">{step.description}</p>
+                </li>
+              ))}
+            </ol>
+            <p className="mt-6 text-sm text-text-muted">The review covers one organisation and the selected systems. It helps you interpret and prioritise your work; it does not certify compliance. Further investigation or implementation is scoped separately.</p>
+            <Link href="/products/ai-act-toolkit/review" className="inline-block mt-4 text-stone-teal hover:underline">Review preparation and secure submission details →</Link>
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
+          <h2 className="text-2xl font-semibold text-text-primary mb-4">Keep the files. Stay current for 12 months.</h2>
+          <p className="text-text-muted max-w-3xl mb-4">Both editions include updated files and quarterly emails explaining changes for 12 months from purchase. Material corrections are shared when ready. You keep the files you receive; an optional renewal extends access to future updates. Professional includes one live review with the initial purchase.</p>
+          <p className="text-sm text-text-muted max-w-3xl mb-8">The toolkit supports internal governance and evidence gathering. Use qualified legal counsel for decisions requiring legal advice. <Link href="/terms" className="text-stone-teal hover:underline">Read the product terms.</Link></p>
+          <div className="flex flex-wrap gap-3"><PurchaseCTA /><PurchaseCTA professional /></div>
+          <p className="flex items-center gap-2 mt-5 text-sm text-text-muted"><CheckCircle className="w-4 h-4 text-stone-teal" /> One product, from first assessment to a practical action plan.</p>
+        </section>
         <AdvisoryNextStep />
       </main>
-
       <Footer />
     </div>
   )

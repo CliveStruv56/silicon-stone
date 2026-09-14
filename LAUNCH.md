@@ -103,17 +103,16 @@ other eight):
    then delete the subscriber, to prove the whole path rather than its parts.
 2. ~~Confirm `CONVERTKIT_FORM_ID` is the intended form~~ — **done 2026-08-24**,
    it is the only form and is now named "Silicon and Stone Briefing". Remaining:
-   create the 14 Kit tags and paste IDs into Vercel env (§0 Kit table). **The
+   create the 12 Kit tags and paste IDs into Vercel env (§0 Kit table). **The
    tags do not exist in Kit yet**; creating them is the whole of this step.
-3. Create the 3 LS products in test mode: files attached, redirect URLs to
+3. Create one consolidated Toolkit product with Standard and Professional variants in test mode: files attached, redirect URLs to
    `/products/success?product={sku}`, checkout links + variant IDs into env (§0 LS).
 4. Configure the LS webhook with `order_created` + signing secret (§0 webhook).
-5. Create the `LAUNCH48` and £20/90-day discount codes; test in LS test mode (§0 discounts).
+5. Configure verified Standard → Professional upgrades for the £196 difference; retire the checklist credit and obsolete launch-video promotion (§0 upgrades).
 6. Set `NEXT_PUBLIC_BOOKING_URL` and the real `NEXT_PUBLIC_LINKEDIN_URL` (§0 misc).
 7. Launch day: `NEXT_PUBLIC_PRE_LAUNCH=false`, set `NEXT_PUBLIC_FREE_INTRO_END`,
    redeploy (§1).
-8. Verify: one real £24 purchase end-to-end, tag checks in Kit, discount codes
-   apply (§2). Announce `LAUNCH48` with its 48-hour window.
+8. Verify both Toolkit variants end-to-end and their buyer tags in Kit (§2). Confirm Professional booking and secure submission are ready before enabling its checkout.
 9. Advisory and specialist fees are agreed after scoping, except the £450 Advisory Briefing. Retainer founding and annual-discount promotions were removed on 2026-09-13.
 
 ## 0. Before launch day (prep)
@@ -146,7 +145,6 @@ other eight):
   | Kit tag | Env var |
   |---|---|
   | early-access | `CONVERTKIT_EARLY_ACCESS_TAG_ID` |
-  | tier-checklist | `CONVERTKIT_TIER_CHECKLIST_TAG_ID` |
   | tier-toolkit-standard | `CONVERTKIT_TIER_TOOLKIT_STANDARD_TAG_ID` |
   | tier-toolkit-professional | `CONVERTKIT_TIER_TOOLKIT_PROFESSIONAL_TAG_ID` |
   | tier-sector-reports | `CONVERTKIT_TIER_SECTOR_REPORTS_TAG_ID` |
@@ -156,7 +154,6 @@ other eight):
   | tool-supply-chain-mapper | `CONVERTKIT_TOOL_SUPPLY_CHAIN_MAPPER_TAG_ID` |
   | tool-scenario-modeler | `CONVERTKIT_TOOL_SCENARIO_MODELER_TAG_ID` |
   | tool-policy-stress-test | `CONVERTKIT_TOOL_POLICY_STRESS_TEST_TAG_ID` |
-  | buyer-checklist | `CONVERTKIT_BUYER_CHECKLIST_TAG_ID` |
   | buyer-toolkit-standard | `CONVERTKIT_BUYER_TOOLKIT_STANDARD_TAG_ID` |
   | buyer-toolkit-pro | `CONVERTKIT_BUYER_TOOLKIT_PRO_TAG_ID` |
 
@@ -164,39 +161,44 @@ other eight):
       `/v1/subscribe` handler must accept the new `tags: string[]` field and
       apply the same tag mapping — the site forwards `tags` verbatim.
 - [ ] Post-purchase sequences (built in Kit, out of the site's scope) trigger
-      off the three `buyer-*` tags.
+      off the two Toolkit `buyer-*` tags.
 
 ### Lemon Squeezy — products
 
-Create **three one-time products** (LS is Merchant of Record — UK/EU VAT is
-handled by LS; there is deliberately no tax logic in the site):
+Create **one Toolkit product with two one-time variants** (Standard and Professional).
+Sector Reports remains a waitlist until its files are ready. LS is Merchant of
+Record; there is deliberately no tax logic in the site:
 
 The files are **already built** and live in `deliverables/dist/` (gitignored —
 regenerate with `deliverables/src/assemble-toolkit.mjs` and
 `build-spreadsheets.mjs`; the sources are committed):
 
-- [ ] **AI Audit Checklist Pack — £24.** Attach `Quick Compliance Gap
-      Analysis.pdf`, `Board-Ready Risk Summary.pdf`, `Vendor Dependency
-      Scorecard.xlsx`, `AI Systems Inventory Template.xlsx` (the 2 PDFs +
-      2 spreadsheets) so LS's native order email delivers them.
-- [ ] **AI Act Compliance Toolkit — Standard — £79.** Attach `AI Act Compliance
-      Toolkit.pdf` + `AI Systems Register.xlsx` + `Compliance Tracker.xlsx`.
-- [ ] **AI Act Compliance Toolkit — Professional — £275.** Same three files plus
-      the 30-minute video walkthrough — **not yet recorded**; this is the only
-      product asset still missing (file or unlisted link in the delivery note).
+- [ ] **AI Act Compliance Toolkit — Standard — £79.** Attach the consolidated
+      handbook, one coordinated Excel workbook and four editable templates with
+      PDF reference copies. Both editions include the former checklist assets:
+      gap assessment, vendor dependency scorecard, inventory examples and board
+      summary. Reconcile the assessment scoring and detailed task coverage before
+      releasing the merged files; see `docs/ai-act-compliance-toolkit.md`.
+- [ ] **AI Act Compliance Toolkit — Professional — £275.** Same complete toolkit,
+      plus review preparation instructions. Includes advance workbook review,
+      one 45-minute Zoom discussion of up to three systems in one organisation,
+      and a personalised written action summary. No recorded video.
+- [ ] Both variants: one-off payment, internal organisational use, 12 months of
+      updated files and quarterly update emails. Keep received files; optional
+      renewal for later updates, no automatic renewal or extra review.
+- [ ] Complete `docs/toolkit-professional-review-setup.md` before enabling the
+      Professional checkout. Booking and secure submission currently have visible
+      placeholders at `/products/ai-act-toolkit/review`, as requested by the owner.
 - [ ] Set each product's **receipt / redirect ("Continue") URL**. Use the **bare
       apex** — `src/lib/site.ts` makes the apex canonical and `www` 308s to it
       (reversed from the June decision on 2026-08-06), so a `www` URL adds a
       redirect hop through the payment callback:
-  - Checklist → `https://siliconandstone.com/products/success?product=checklist`
   - Toolkit Standard → `https://siliconandstone.com/products/success?product=toolkit-standard`
   - Toolkit Professional → `https://siliconandstone.com/products/success?product=toolkit-pro`
 - [ ] Copy each **checkout link** into:
-  - `NEXT_PUBLIC_LEMONSQUEEZY_CHECKLIST_URL`
   - `NEXT_PUBLIC_LEMONSQUEEZY_TOOLKIT_STANDARD_URL`
   - `NEXT_PUBLIC_LEMONSQUEEZY_TOOLKIT_PROFESSIONAL_URL`
 - [ ] Copy each **variant ID** (Products → variant → ID) into:
-  - `LEMONSQUEEZY_VARIANT_ID_CHECKLIST`
   - `LEMONSQUEEZY_VARIANT_ID_TOOLKIT_STANDARD`
   - `LEMONSQUEEZY_VARIANT_ID_TOOLKIT_PRO`
 - [ ] Set `LEMONSQUEEZY_STORE_ID`, `LEMONSQUEEZY_API_KEY`.
@@ -212,7 +214,6 @@ one extra click between a reader and a payment.
 
 - [ ] In Studio → Products, paste the same three checkout links into
       **Lemon Squeezy checkout URL** on the matching document:
-  - `product-ai-audit-checklist` ← the checklist link
   - `product-ai-act-toolkit` ← the **Standard** link (the gate advertises
     "From £79", so Standard is the right target)
   - `product-sector-reports` — leave blank until the reports exist. Its
@@ -332,22 +333,17 @@ Check the live state at any time with `npx sanity hook list`, or in full
       (The route verifies HMAC signatures and is idempotent; on
       `order_created` it tags the buyer in Kit by variant ID.)
 
-### Lemon Squeezy — discount codes
+### Lemon Squeezy — Standard to Professional upgrades
 
-LS supports discount codes natively (Store → Discounts → New discount):
-
-- [ ] **`LAUNCH48`** — fixed amount **£70 off**, restricted to the **Toolkit
-      Professional** variant only (Professional at the Standard £79 price).
-      Set **start/expiry dates spanning exactly 48 hours** from the launch
-      announcement. Buy links already go through LS checkout, so the code
-      field is available at checkout.
-- [ ] **Per-buyer £20 Toolkit credit** — fixed amount **£20 off**, restricted
-      to the **Toolkit Standard and Professional** variants, **expires 90 days**
-      after creation (matches the "valid 90 days" site copy). Generate the code
-      (single generic code or LS "generate unique codes") and include it in the
-      **Checklist Pack's delivery email/download note** so every checklist buyer
-      receives it with their files.
-- [ ] Test both codes apply cleanly in LS **test mode** checkout.
+- [ ] Retire the separate Checklist SKU and its credit. Do not create the obsolete
+      `LAUNCH48` promotion: the Professional package now includes personal time.
+- [ ] Verify the Standard receipt before arranging a £196 upgrade. Use a buyer-specific
+      checkout/discount restricted to that verified buyer; do not publish a reusable
+      discounted checkout link. A Professional order supplies the same toolkit plus
+      one review. The original update period continues; the review booking window
+      starts on the upgrade date.
+- [ ] Include `/products/ai-act-toolkit/review#upgrade` in Standard delivery instructions.
+- [ ] Test that a buyer without a verified Standard purchase cannot obtain the upgrade.
 
 ### Resend — enquiry notifications
 
@@ -453,7 +449,6 @@ pages on 2026-08-11. It was stale (four pages said 30 June, `/eu-exposure` said
       and one date, on every page, not five drifting ones. Consider sourcing it
       from a single constant so it cannot diverge again. Removed from:
       - `src/app/(website)/products/page.tsx` (hero, under the sub-heading)
-      - `src/app/(website)/products/ai-audit-checklist/page.tsx` (under the first CTA)
       - `src/app/(website)/products/ai-act-toolkit/page.tsx` (under the price table — this said "under the guarantee" until 2026-09-04, when `GuaranteeNote` was deleted)
       - `src/app/(website)/advisory/page.tsx`
       - `src/app/(website)/eu-exposure/page.tsx`
@@ -468,7 +463,7 @@ pages on 2026-08-11. It was stale (four pages said 30 June, `/eu-exposure` said
       > so nobody meets them). That reasoning expires the moment the site is
       > announced or indexed: launch, or put the wording back, before promoting
       > anything. The labels live on `<EarlyAccessCTA label=…>` in
-      > `products/ai-audit-checklist/page.tsx` and `products/ai-act-toolkit/page.tsx`.
+      > `products/ai-act-toolkit/page.tsx`. The former checklist route is a permanent redirect.
 - [x] ~~`NEXT_PUBLIC_FREE_INTRO_END=<launch date + 90 days>`~~ — retired
       2026-09-13: the owner removed the "free during our launch window" copy
       everywhere, so `FREE_INTRO_WINDOW` now defaults to **false** in
@@ -494,22 +489,21 @@ pages on 2026-08-11. It was stale (four pages said 30 June, `/eu-exposure` said
 
 ## 2. Launch day — verification
 
-- [ ] Switch LS out of test mode. Run **one real £24 Checklist purchase**:
-  - LS delivery email arrives with the right files **and the £20 code**;
-  - redirect lands on `/products/success?product=checklist` showing the
-    £20-credit + "£83 total vs £103" block;
-  - the buyer appears in Kit tagged `buyer-checklist` (webhook worked);
-  - refund the test order in LS if desired.
-- [ ] Test-mode (or real) purchases of both Toolkit variants: delivery email +
-      `/products/success?product=toolkit-standard|toolkit-pro` showing the
-      Advisory Briefing offer + Kit tags `buyer-toolkit-standard` /
-      `buyer-toolkit-pro`.
+- [ ] Test both Toolkit variants before switching LS out of test mode:
+  - the correct toolkit files arrive in the delivery email;
+  - Standard returns to `/products/success?product=toolkit-standard` with the upgrade route;
+  - Professional returns to `/products/success?product=toolkit-pro` with its included review;
+  - the buyer receives `buyer-toolkit-standard` or `buyer-toolkit-pro` in Kit;
+  - booking, verified private submission and deletion have been tested for Professional;
+  - update emails/files stop at the end of the 12-month entitlement unless renewed.
+- [ ] Confirm the old checklist URL permanently redirects to the Toolkit and that no
+      separate Checklist purchase or credit is offered in navigation, pricing or the map.
 - [ ] Open a published article tagged `ai-act` (e.g.
       `/analysis/welcome-to-silicon-and-stone`), scroll to the end-of-article
       gate, and confirm it reads "Go deeper: AI Act Compliance Toolkit / Get it
       — From £79" **and that the CTA now opens LS checkout**, not the product
-      page. If it still goes to `/products/ai-act-toolkit`, the Sanity
-      `checkoutUrl` above was not filled in.
+      page. If it still goes to `/products/ai-act-toolkit`, the canonical
+      `NEXT_PUBLIC_LEMONSQUEEZY_TOOLKIT_STANDARD_URL` needs checking.
 - [ ] Run a tool (e.g. Compliance Checker) to the results screen, subscribe via
       the results block, confirm the subscriber lands in Kit tagged
       `tool-compliance-checker`.
@@ -529,8 +523,6 @@ pages on 2026-08-11. It was stale (four pages said 30 June, `/eu-exposure` said
       > the replacement in Kit/Plausible — silently stops tagging signups and
       > stops recording the goal. The mismatch with the page's URL is
       > deliberate and costs nothing but a moment's confusion in reporting.
-- [ ] `LAUNCH48` announced with its 48-hour window; verify it applies at
-      checkout on Professional.
 
 ## 3. Optional Plausible goals (new events fired by this release)
 

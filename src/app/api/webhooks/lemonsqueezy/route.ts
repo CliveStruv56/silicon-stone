@@ -27,7 +27,6 @@ const MAX_BODY_BYTES = 100_000
 function buyerTagForVariant(variantId: number | string | undefined): keyof typeof BUYER_TAG_IDS | null {
   const id = variantId === undefined || variantId === null ? '' : String(variantId)
   if (!id) return null
-  if (id === process.env.LEMONSQUEEZY_VARIANT_ID_CHECKLIST) return 'buyer-checklist'
   if (id === process.env.LEMONSQUEEZY_VARIANT_ID_TOOLKIT_STANDARD) return 'buyer-toolkit-standard'
   if (id === process.env.LEMONSQUEEZY_VARIANT_ID_TOOLKIT_PRO) return 'buyer-toolkit-pro'
   return null
@@ -36,7 +35,7 @@ function buyerTagForVariant(variantId: number | string | undefined): keyof typeo
 /**
  * order_created fulfilment (spec §3.2): delivery itself is Lemon Squeezy's
  * built-in file-delivery email — our only job is to tag the buyer in Kit
- * (buyer-checklist / buyer-toolkit-standard / buyer-toolkit-pro) so
+ * (buyer-toolkit-standard / buyer-toolkit-pro) so
  * post-purchase sequences can run from Kit. Throws on transient Kit failures
  * so the caller releases the delivery claim and LS retries.
  */

@@ -65,7 +65,7 @@ const readStart = TOP + Math.max(0, (toolsBlockH - (READ.length * READ_PITCH - (
 const readY = (i: number) => readStart + i * READ_PITCH
 
 const selfServeSub = TOP + toolsBlockH + 40
-const selfServeY = (i: number) => selfServeSub + 12 + i * 64
+const selfServeY = (i: number) => selfServeSub + 12 + i * 76
 // The free intro conversation sits under the products, beside the Briefing
 // (owner, 2026-09-14), set a little apart so it does not read as a product.
 const introY = selfServeY(SELF_SERVE.length) + 14
@@ -184,7 +184,7 @@ export function OfferingsMap() {
           viewBox={`0 0 ${W} ${H}`}
           className="block h-auto w-full min-w-[960px]"
           role="img"
-          aria-label="Flow chart: free reading leads to four Interactive Forensic Tools and three self-serve products; every one feeds the Advisory Briefing, which leads into eight core engagements, from five specialist projects to board-level work; every one of those settles into the Drift Retainer."
+          aria-label="Flow chart: free reading leads to four Interactive Forensic Tools and two products, including the consolidated toolkit with an optional live review; these can lead to the Advisory Briefing, which leads into eight core engagements, from five specialist projects to board-level work; every one of those settles into the Drift Retainer."
         >
           <defs>
             <marker id="offerings-map-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -211,13 +211,13 @@ export function OfferingsMap() {
           ))}
           <Sub x={COL.use.x} y={selfServeSub}>SELF-SERVE PRODUCTS</Sub>
           {SELF_SERVE.map((box, i) => (
-            <Box key={box.href} box={box} x={COL.use.x} y={selfServeY(i)} w={COL.use.w} h={TOOL_H} />
+            <Box key={box.href} box={box} x={COL.use.x} y={selfServeY(i)} w={COL.use.w} h={62} />
           ))}
 
           {/* Stage 3 */}
           <Pillar
             x={COL.gate.x} w={COL.gate.w} tone="amber" href={BRIEFING.href}
-            eyebrow="EVERY PATH PASSES HERE"
+            eyebrow="FOR FURTHER DISCUSSION"
             title={['Advisory', 'Briefing']}
             lines={['the output of a tool', 'or product, or one of', 'your AI systems', 'one hour, then a written', 'follow-up with priorities']}
             foot={['fee credited against', 'your first engagement']}
@@ -226,7 +226,7 @@ export function OfferingsMap() {
             <Arrow key={`in-${tool.slug}`} x1={useR + 4} y1={mid(toolY(i), TOOL_H)} x2={gateL - 4} y2={mid(toolY(i), TOOL_H)} />
           ))}
           {SELF_SERVE.map((box, i) => (
-            <Arrow key={`in-${box.href}`} x1={useR + 4} y1={mid(selfServeY(i), TOOL_H)} x2={gateL - 4} y2={mid(selfServeY(i), TOOL_H)} />
+            <Arrow key={`in-${box.href}`} x1={useR + 4} y1={mid(selfServeY(i), 62)} x2={gateL - 4} y2={mid(selfServeY(i), 62)} />
           ))}
           <Box box={INTRO} x={COL.use.x} y={introY} w={COL.use.w} h={TOOL_H} />
           <Arrow x1={useR + 4} y1={mid(introY, TOOL_H)} x2={gateL - 4} y2={mid(introY, TOOL_H)} dashed />
@@ -278,7 +278,7 @@ export function OfferingsMap() {
           groups={[{
             boxes: [
               { name: 'The output of a tool or product, or one of your AI systems', href: BRIEFING.href, note: ['one hour, then a written follow-up with priorities'], stripe: 'amber' },
-              { name: 'Every path passes here', href: BRIEFING.href, note: ['fee credited against your first engagement'], stripe: 'amber' },
+              { name: 'For further discussion', href: BRIEFING.href, note: ['fee credited against your first engagement'], stripe: 'amber' },
             ],
           }]}
         />

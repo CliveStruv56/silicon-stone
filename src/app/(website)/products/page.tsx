@@ -13,7 +13,6 @@ import { FlowRibbon } from '@/components/waymarkpath'
 import { WAYMARKPATH_POSITIONING } from '@/lib/waymarkpath'
 import {
   Shield,
-  ClipboardCheck,
   FileText,
   ArrowRight,
   CheckCircle,
@@ -76,20 +75,6 @@ const NEUTRAL: Presentation = {
 }
 
 const PRESENTATION: Record<string, Presentation> = {
-  'ai-audit-checklist': {
-    badge: 'Quick Start',
-    badgeColor: 'bg-stone-teal text-ink-on-accent',
-    icon: ClipboardCheck,
-    iconColor: 'text-stone-teal',
-    iconBg: 'bg-stone-teal/10',
-    highlights: [
-      'AI Systems Inventory spreadsheet',
-      'Vendor Dependency Scorecard',
-      'Quick Compliance Gap Analysis',
-      'Board-Ready Risk Summary template',
-    ],
-    cta: 'View Checklist Pack',
-  },
   'ai-act-toolkit': {
     badge: 'Flagship',
     badgeColor: 'bg-accent-fill text-ink-on-accent',
@@ -97,12 +82,14 @@ const PRESENTATION: Record<string, Presentation> = {
     iconColor: 'text-silicon-amber-strong',
     iconBg: 'bg-silicon-amber/10',
     highlights: [
-      'Risk classification decision tree',
+      'Quick-start gap assessment and risk classification',
+      'Vendor questionnaire and dependency scorecard',
       'Compliance checklist by risk category',
-      'Template documents and policies',
+      'Editable policies and board-ready risk summary',
       'AI Systems Register spreadsheet',
       'Compliance Tracker spreadsheet',
-      'Phased implementation action plan',
+      '90-day implementation plan and worked examples',
+      '12 months of updated files and quarterly emails',
     ],
     cta: 'View Toolkit',
   },

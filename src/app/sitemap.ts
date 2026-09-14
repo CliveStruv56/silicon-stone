@@ -53,7 +53,6 @@ const STATIC_ROUTES: Array<{
   // Every price on one page — a common direct search, so it earns its own entry.
   { path: '/pricing', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/products/ai-act-toolkit', changeFrequency: 'monthly', priority: 0.6 },
-  { path: '/products/ai-audit-checklist', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/products/sector-reports', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/tools', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/tools/compliance-checker', changeFrequency: 'monthly', priority: 0.5 },

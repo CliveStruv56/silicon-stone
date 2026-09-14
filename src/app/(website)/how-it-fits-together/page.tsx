@@ -27,14 +27,11 @@ export default function HowItFitsTogetherPage() {
               How it fits together
             </h1>
             <p className="mt-6 max-w-3xl text-lg leading-relaxed text-text-muted">
-              Everything Silicon &amp; Stone does sits on one path. You{' '}
-              <strong className="font-medium text-text-primary">read</strong> the analysis,{' '}
-              <strong className="font-medium text-text-primary">use</strong> a free tool that turns it into
-              a result about you, <strong className="font-medium text-text-primary">discuss</strong> it in an
-              Advisory Briefing, then{' '}
-              <strong className="font-medium text-text-primary">commission</strong> the advisory piece of
-              work your question calls for. Every one-off piece of work can settle into the standing
-              relationship, the Drift Retainer.
+              Start with the analysis, a free tool or the AI Act Compliance Toolkit.
+              The toolkit combines assessment, supplier scoring and an action plan;
+              Professional includes a live implementation review with your team.
+              An Advisory Briefing helps frame further work, from a focused project
+              to the standing relationship of the Drift Retainer.
             </p>
           </div>
         </section>
@@ -43,7 +40,7 @@ export default function HowItFitsTogetherPage() {
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <p className="font-mono text-xs uppercase tracking-[0.14em] text-text-muted">The map</p>
             <h2 id="map-heading" className="mb-6 mt-1 text-2xl font-semibold text-text-primary">
-              One path, one touchstone, five stages
+              From first assessment to ongoing support
             </h2>
           </div>
           {/* The figure alone breaks out to 1600px so the drawing scales down

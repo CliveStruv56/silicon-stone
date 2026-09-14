@@ -1,3 +1,5 @@
+import { AMOUNTS, gbp, offeringById } from './offering'
+
 /**
  * Shared types + resolution for the end-of-article Gate (P3-1/P3-3).
  *
@@ -68,6 +70,25 @@ export type ResolvedGate =
       href: string
     }
 
+/** Resolve retained CMS references to the consolidated offer before rendering. */
+export function currentGateProduct(product: GateProduct): GateProduct {
+  if (!['ai-audit-checklist', 'ai-act-toolkit'].includes(product.slug) &&
+      !['/products/ai-audit-checklist', '/products/ai-act-toolkit'].includes(product.productPath)) return product
+  const toolkit = offeringById('ai-act-toolkit')
+  return {
+    ...product,
+    name: toolkit.name,
+    slug: toolkit.id,
+    productPath: toolkit.href,
+    priceLabel: `From ${gbp(AMOUNTS.toolkitStandard)}`,
+    blurb: toolkit.summary,
+    badge: 'Complete toolkit',
+    deliveryModel: 'download',
+    // Do not reuse a retired SKU's checkout URL from Sanity.
+    checkoutUrl: process.env.NEXT_PUBLIC_LEMONSQUEEZY_TOOLKIT_STANDARD_URL || null,
+  }
+}
+
 const DEFAULT_LEAD_HREF = '/advisory#contact'
 
 /**
@@ -84,17 +105,17 @@ export function resolveUpsellProduct(
   articleCategorySlugs: string[],
   products: GateProduct[],
 ): GateProduct | null {
-  if (explicit) return explicit
+  if (explicit) return currentGateProduct(explicit)
 
   const wanted = new Set(articleCategorySlugs)
   return (
-    products.find((p) => (p.topics || []).some((slug) => wanted.has(slug))) || null
+    products.map(currentGateProduct).find((p) => (p.topics || []).some((slug) => wanted.has(slug))) || null
   )
 }
 
 /** The product flagged as the site-wide default upsell, if any. */
 export function findDefaultProduct(products: GateProduct[]): GateProduct | null {
-  return products.find((p) => p.isDefault) || null
+  return products.map(currentGateProduct).find((p) => p.isDefault) || null
 }
 
 /**
@@ -136,6 +157,8 @@ export function resolveGate(params: {
   emailFallback: { headline: string; body: string }
 }): ResolvedGate {
   const { gate, upsellProduct, defaultProduct, categoryFallback, emailFallback } = params
+  const retiredGate = gate?.product?.slug === 'ai-audit-checklist' ||
+    gate?.product?.productPath === '/products/ai-audit-checklist'
   const mode: GateMode = gate?.mode || 'auto'
 
   if (mode === 'none') return { mode: 'none' }
@@ -147,18 +170,21 @@ export function resolveGate(params: {
     ctaLabel: gate?.ctaLabel || 'Subscribe',
   })
 
-  const commerceGate = (product: GateProduct): ResolvedGate => ({
-    mode: 'commerce',
-    headline: gate?.headline || `Go deeper: ${product.name}`,
-    body:
-      gate?.body ||
-      product.blurb ||
-      'A practical companion to what you just read — built for the same decisions.',
-    ctaLabel:
-      gate?.ctaLabel ||
-      (product.priceLabel ? `Get it — ${product.priceLabel}` : 'View product'),
-    product,
-  })
+  const commerceGate = (candidate: GateProduct): ResolvedGate => {
+    const product = currentGateProduct(candidate)
+    // Only commerce copy belongs to the retired offer. Preserve separately
+    // authored newsletter/lead copy when an editor changes the gate mode.
+    const copy = retiredGate ? null : gate
+    return {
+      mode: 'commerce',
+      headline: copy?.headline || `Go deeper: ${product.name}`,
+      body: copy?.body || product.blurb ||
+        'A practical companion to what you just read — built for the same decisions.',
+      ctaLabel: copy?.ctaLabel ||
+        (product.priceLabel ? `Get it — ${product.priceLabel}` : 'View product'),
+      product,
+    }
+  }
 
   const leadGate = (): ResolvedGate => ({
     mode: 'lead',

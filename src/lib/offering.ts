@@ -13,7 +13,7 @@
  *     `gbp(AMOUNTS.x)` or one of the `DERIVED` figures, even inside prose. A
  *     sentence like "£83 for both rather than £103" is arithmetic on two other
  *     prices, and hand-written arithmetic is exactly what goes stale first.
- *  2. **The one copy that cannot import this** is Sanity: the three `product`
+ *  2. **The one copy that cannot import this** is Sanity: the active `product`
  *     documents carry their own `priceLabel`, edited in Studio, and drive the
  *     end-of-article gate. Change a product price here and change it there too.
  *     `SANITY_PRODUCTS` below declares what those documents must say.
@@ -25,7 +25,7 @@
  *                                 quoting product prices at the
  *                                 article-drafting model on the day it was
  *                                 written.
- *   `npm run test:sanity-prices`  fetches the three documents and fails CI when
+ *   `npm run test:sanity-prices`  fetches the active documents and fails CI when
  *                                 a published one disagrees with
  *                                 `SANITY_PRODUCTS`.
  *
@@ -42,13 +42,10 @@ import { WAYMARKPATH_POSITIONING } from './waymarkpath'
  */
 export const AMOUNTS = {
   /** Products. */
-  checklist: 24,
   toolkitStandard: 79,
   toolkitProfessional: 275,
   sectorReport: 39,
   sectorReportTrio: 99,
-  /** The credit the Checklist Pack ships against the Toolkit. */
-  toolkitDiscount: 20,
 
   /** Advisory. */
   advisoryBriefing: 450,
@@ -65,13 +62,7 @@ export function gbp(amount: number): string {
  * claiming an £83 bundle after either half of it moved.
  */
 export const DERIVED = {
-  /** Toolkit price after applying the Checklist Pack's credit. */
-  toolkitAfterDiscount: AMOUNTS.toolkitStandard - AMOUNTS.toolkitDiscount,
-  /** Checklist + discounted Toolkit — what the ladder actually costs. */
-  bundleTotal:
-    AMOUNTS.checklist + (AMOUNTS.toolkitStandard - AMOUNTS.toolkitDiscount),
-  /** The same two bought cold. */
-  bundleSeparately: AMOUNTS.checklist + AMOUNTS.toolkitStandard,
+  toolkitProfessionalUpgrade: AMOUNTS.toolkitProfessional - AMOUNTS.toolkitStandard,
 } as const
 
 /** Public fee label for advisory engagements and specialist projects. */
@@ -181,17 +172,6 @@ export const FREE_OFFERINGS: Offering[] = [
  */
 export const PRODUCTS: Offering[] = [
   {
-    id: 'ai-audit-checklist',
-    name: 'AI Audit Checklist Pack',
-    price: gbp(AMOUNTS.checklist),
-    summary:
-      'The first paid step. Systems inventory, vendor dependency scorecard, quick gap analysis and a board-ready risk summary.',
-    href: '/products/ai-audit-checklist',
-    terms: [
-      `Includes a ${gbp(AMOUNTS.toolkitDiscount)} discount code for the Compliance Toolkit, valid 90 days — ${gbp(DERIVED.bundleTotal)} for both rather than ${gbp(DERIVED.bundleSeparately)}.`,
-    ],
-  },
-  {
     id: 'sector-reports',
     name: 'Sector Reports',
     price: gbp(AMOUNTS.sectorReport),
@@ -210,11 +190,12 @@ export const PRODUCTS: Offering[] = [
       { label: 'Professional', price: gbp(AMOUNTS.toolkitProfessional) },
     ],
     summary:
-      'The governance toolkit: risk-classification decision tree, checklists by risk category, template policies, a Systems Register and a Compliance Tracker, against the phased AI Act timetable.',
+      'One toolkit to assess gaps, catalogue AI systems, classify risk, score supplier dependencies and build an evidence-backed action plan.',
     href: '/products/ai-act-toolkit',
     terms: [
-      'Professional adds a 30-minute video walkthrough applying each section to a business like yours.',
-      'The evidence base an advisory briefing starts from.',
+      'Both editions include the complete toolkit, worked examples, editable templates, updated files and quarterly update emails for 12 months.',
+      'Professional adds secure advance workbook submission, preparation, a 45-minute live review of up to three systems and a personalised written action summary.',
+      `Start with Standard and upgrade to Professional for the ${gbp(DERIVED.toolkitProfessionalUpgrade)} difference.`,
     ],
   },
 ]
@@ -413,13 +394,13 @@ export const LADDER: Array<{
   emphasis?: string
   to: string
 }> = [
-  { from: `${gbp(AMOUNTS.checklist)} Checklist Pack`, emphasis: `${gbp(AMOUNTS.toolkitDiscount)} off`, to: 'the AI Act Compliance Toolkit.' },
-  { from: `${gbp(AMOUNTS.toolkitStandard)}+ Compliance Toolkit`, to: 'the evidence base a briefing starts from.' },
+  { from: `${gbp(AMOUNTS.toolkitStandard)} Standard Toolkit`, emphasis: `${gbp(DERIVED.toolkitProfessionalUpgrade)} to upgrade`, to: 'Professional, including a 45-minute live implementation review.' },
+  { from: `${gbp(AMOUNTS.toolkitProfessional)} Professional Toolkit`, to: 'agreed priorities and next steps for your internal team.' },
   { from: `${gbp(AMOUNTS.advisoryBriefing)} Advisory Briefing`, emphasis: 'credited in full', to: 'against any further work we do together.' },
 ]
 
 /**
- * What the three Sanity `product` documents must say.
+ * What the active Sanity `product` documents must say.
  *
  * These documents are authored in Studio and drive the end-of-article upsell
  * gate, so they are the one copy of a price that cannot import this module.
@@ -438,12 +419,6 @@ export const SANITY_PRODUCTS: Array<{
   priceLabel: string
   productPath: string
 }> = [
-  {
-    documentId: 'product-ai-audit-checklist',
-    name: 'AI Audit Checklist Pack',
-    priceLabel: gbp(AMOUNTS.checklist),
-    productPath: '/products/ai-audit-checklist',
-  },
   {
     documentId: 'product-ai-act-toolkit',
     name: 'AI Act Compliance Toolkit',

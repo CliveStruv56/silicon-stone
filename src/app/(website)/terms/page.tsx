@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 
 import { Header, Footer } from '@/components/layout'
 import { Badge } from '@/components/ui/badge'
+import { DERIVED, gbp } from '@/lib/offering'
 
 export const metadata: Metadata = {
   title: 'Terms of Service | Silicon and Stone',
@@ -56,9 +57,8 @@ export default function TermsPage() {
             <div>
               <h2 className="text-xl font-semibold text-text-primary mb-3">Digital Products</h2>
               <p className="text-text-muted leading-relaxed mb-3">
-                Our digital products (toolkits, checklists, briefings) are delivered electronically
-                upon purchase. By purchasing a digital product, you receive a personal,
-                non-transferable licence to use the materials within your organisation.
+                Our digital products (toolkits and briefings) are delivered electronically
+                upon purchase. By purchasing a digital product, you receive a non-transferable licence to use the materials within your organisation.
               </p>
               <ul className="space-y-2 text-text-muted">
                 <li className="flex items-start gap-2">
@@ -74,6 +74,14 @@ export default function TermsPage() {
                   <span>Content may not be used to create competing products or services</span>
                 </li>
               </ul>
+            </div>
+
+            <div>
+              <h2 className="text-xl font-semibold text-text-primary mb-3">AI Act Compliance Toolkit Editions</h2>
+              <p className="text-text-muted leading-relaxed mb-3">Standard and Professional include the complete toolkit for internal use within one organisation. Colleagues may use and adapt the materials together. Neither edition grants resale or reuse rights across unrelated client organisations.</p>
+              <p className="text-text-muted leading-relaxed mb-3">Both are one-off purchases with 12 months of updated files and quarterly update emails from purchase. Material corrections are distributed when ready. You keep the files received. Access to later updates can be renewed optionally; there is no automatic renewal. An update renewal does not include another live review.</p>
+              <p className="text-text-muted leading-relaxed mb-3">Professional includes advance review of the submitted workbook entries, one 45-minute live discussion covering up to three AI systems in one organisation, and a personalised written action summary. Book within 90 days of purchase and submit the selected material securely at least three working days before the meeting. The review supports implementation and prioritisation; it is not a full audit or certification of compliance. Additional work is agreed separately.</p>
+              <p className="text-text-muted leading-relaxed">Standard buyers can upgrade for the {gbp(DERIVED.toolkitProfessionalUpgrade)} difference after their original purchase is verified. The upgrade adds one review; the original 12-month update period continues. The review booking period starts on the upgrade purchase date.</p>
             </div>
 
             <div>

@@ -97,24 +97,19 @@ interface CtaTarget {
   blurb: string
 }
 
-const CHECKLIST_PACK: CtaTarget = {
-  label: `AI Audit Checklist Pack — ${gbp(AMOUNTS.checklist)}`,
-  href: '/products/ai-audit-checklist',
-  blurb: 'Inventory, vendor scorecard, gap analysis, and a board-ready summary. The do-something-today step.',
+const TOOLKIT_REVIEW: CtaTarget = {
+  label: `Toolkit Professional — ${gbp(AMOUNTS.toolkitProfessional)}`,
+  href: '/products/ai-act-toolkit#professional',
+  blurb: 'The complete toolkit plus secure workbook submission and a 45-minute live review of up to three systems.',
 }
 
 const COMPLIANCE_TOOLKIT: CtaTarget = {
   label: `AI Act Compliance Toolkit — from ${gbp(AMOUNTS.toolkitStandard)}`,
   href: '/products/ai-act-toolkit',
-  blurb: 'Risk classification, checklists by category, template policies, and the systems register.',
+  blurb: 'Gap assessment, systems register, vendor scorecard, editable templates and an action plan.',
 }
 
-/**
- * Vary the next step by outcome. Pushing the flagship toolkit at someone whose
- * drafting assistant came back minimal-risk is the fastest way to teach them
- * the result was not really read — so the cheaper pack leads there, and the
- * toolkit leads only where the work is genuinely toolkit-shaped.
- */
+/** Offer the complete toolkit, with a live implementation review for more involved work. */
 function resultCta(classification: string, role: string): { primary: CtaTarget; secondary: CtaTarget } {
   const heavyweight =
     role === 'Provider' ||
@@ -124,8 +119,8 @@ function resultCta(classification: string, role: string): { primary: CtaTarget; 
     classification === 'Prohibited from 2 December 2026'
 
   return heavyweight
-    ? { primary: COMPLIANCE_TOOLKIT, secondary: CHECKLIST_PACK }
-    : { primary: CHECKLIST_PACK, secondary: COMPLIANCE_TOOLKIT }
+    ? { primary: TOOLKIT_REVIEW, secondary: COMPLIANCE_TOOLKIT }
+    : { primary: COMPLIANCE_TOOLKIT, secondary: TOOLKIT_REVIEW }
 }
 
 /**

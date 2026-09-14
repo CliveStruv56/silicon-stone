@@ -506,7 +506,7 @@ All draft-generating formats use Claude at temperature 0.4. Drafts are created d
 | `/tools/policy-stress-test` | ✅ | US vs EU regulatory friction scoring (email-gated; bridge → Advisory) |
 | `/products` | ✅ | Products hub: Checklist Pack first, Toolkit follow-on, Sector Reports |
 | `/products/ai-act-toolkit` | ✅ | Sales page: £79/£275 pricing tiers |
-| `/products/ai-audit-checklist` | ✅ | Sales page: £24 gateway product |
+| `/products/ai-audit-checklist` | ✅ | Permanent redirect to the consolidated Toolkit |
 | `/products/sector-reports` | ✅ | (renamed from `/products/briefings`, 301) Coming Soon with email capture |
 | `/products/success` | ✅ | Post-checkout delivery page |
 | `/tools/compliance-checker/provisions[/[article]]` | ✅ | The pinned AI Act corpus, one statically prerendered page per provision |
@@ -603,30 +603,24 @@ price there and here together, or the ladder starts lying.
 
 ### 5.2 Paid — Buy (self-service digital products)
 
-These three are the only `product` documents in Sanity (`product-ai-audit-checklist`,
-`product-ai-act-toolkit`, `product-sector-reports`) and the only SKUs the
-end-of-article gate can sell. All **three** rows below appear on `/products` and
-`/pricing`: since 2026-09-04 `/products` maps `PRODUCTS` rather than retyping
-it, which is how the Evidence Pack — in the catalogue, on `/pricing` and in this
-table, but absent from the products page — came back. **The Evidence Pack was
-withdrawn entirely on 2026-09-14** (owner request): catalogue entry, `AMOUNTS`
-key, the `toolkitAfterEvidencePack` credit, the dark teaser under the Checker
-report and its `NEXT_PUBLIC_EVIDENCE_PACK_ENABLED` flag are all gone. The prices never drifted
-there, because they were interpolated from `AMOUNTS`; the *list* drifted, and no
-price guard was ever going to catch that.
+The catalogue now contains two products: Sector Reports and the consolidated
+AI Act Compliance Toolkit. The separate Checklist Pack was merged into both
+Toolkit editions on 2026-09-14. Its URL permanently redirects to the Toolkit;
+retained Sanity checklist references are normalised to the current Toolkit before
+rendering, including its price, description and canonical checkout.
 
 | Product | Price | Summary | Where it lives |
 |---|---|---|---|
-| **AI Audit Checklist Pack** | **£24** | The gateway SKU. Systems inventory sheet, vendor dependency scorecard, quick gap analysis, board-ready risk summary. Ships a **£20 Toolkit discount code** (90 days) — so Checklist + Toolkit is £83 rather than £103. | `/products/ai-audit-checklist` |
-| **AI Act Compliance Toolkit** | **From £79** — Standard £79, Professional £275 | The flagship. Risk-classification decision tree, checklists by risk category, template policies, AI Systems Register + Compliance Tracker, phased action plan. Professional adds a 30-minute video walkthrough. | `/products/ai-act-toolkit` |
-| **Sector Reports** | **£39 each, or 3 for £99** | 15–20pp briefings per industry (Manufacturing, Financial Services, Professional Services, Public Sector): AI landscape, AI Act exposure, geopolitical risk, three scenarios, 90-day checklist. | `/products/sector-reports` |
+| **AI Act Compliance Toolkit** | **Standard £79 / Professional £275** | Complete gap assessment, systems register, classification guidance, vendor questionnaire and dependency scorecard, editable policies and board summary, action tracker, worked examples and 90-day plan. Both include 12 months of updated files and quarterly emails. Professional adds secure advance workbook submission, preparation, a 45-minute live review covering up to three systems, and a written action summary. | `/products/ai-act-toolkit` |
+| **Sector Reports** | **£39 each, or 3 for £99** | Industry briefings; waitlist until the first report is ready. | `/products/sector-reports` |
 
-**Status — all three:** `NEXT_PUBLIC_PRE_LAUNCH` is still `true`, so every "Buy"
-button is an `EarlyAccessCTA` email capture into Kit (`early-access` + a
-`tier-*` tag), not a checkout. Sector Reports is additionally pre-product: the
-page is a waitlist, and its Sanity `topics` were deliberately cleared on
-2026-08-15 so the `auto` article gate can never select a SKU with nothing to
-sell (restore them when the first report is on sale — see `LAUNCH.md`).
+Standard buyers can upgrade for the £196 difference after receipt verification.
+Professional is for internal teams, with one review per purchase; book within
+90 days and submit three working days ahead. No prerecorded video. The public
+review page has explicit booking and secure-submission placeholders because the
+owner has not selected providers. See `docs/toolkit-professional-review-setup.md`.
+The site remains pre-launch: do not enable Professional checkout until those
+services and the consolidated delivery files are ready.
 
 ### 5.3 Paid — Engage (advisory)
 
@@ -741,7 +735,6 @@ CONVERTKIT_TOOL_LEAD_TAG_ID=<id>    # Optional: tag for tool email captures
 # Payments (Lemon Squeezy checkout URLs)
 NEXT_PUBLIC_LEMONSQUEEZY_TOOLKIT_STANDARD_URL=<url>       # Toolkit Standard £79
 NEXT_PUBLIC_LEMONSQUEEZY_TOOLKIT_PROFESSIONAL_URL=<url>   # Toolkit Professional £275
-NEXT_PUBLIC_LEMONSQUEEZY_CHECKLIST_URL=<url>              # Checklist Pack £24
 
 # Analytics
 NEXT_PUBLIC_PLAUSIBLE_DOMAIN=siliconandstone.com          # Enables Plausible tracking

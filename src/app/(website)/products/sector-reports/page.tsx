@@ -206,8 +206,8 @@ export default function BriefingsProductPage() {
                   AI Act Compliance Toolkit
                 </Link>
                 {' '}&bull;{' '}
-                <Link href="/products/ai-audit-checklist" className="text-stone-teal hover:underline">
-                  AI Audit Checklist Pack
+                <Link href="/products/ai-act-toolkit#included" className="text-stone-teal hover:underline">
+                  Toolkit gap assessment and vendor scorecard
                 </Link>
               </p>
             </div>

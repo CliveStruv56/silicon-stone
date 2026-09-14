@@ -36,9 +36,9 @@ const rungs: Rung[] = [
     tone: 'free',
   },
   {
-    marker: `From ${gbp(AMOUNTS.checklist)}`,
+    marker: `From ${gbp(AMOUNTS.toolkitStandard)}`,
     title: 'Buy',
-    body: 'Practical Tools for Compliance and Strategy',
+    body: 'The complete AI Act Compliance Toolkit, with a live implementation review in Professional.',
     cta: 'See Products',
     href: '/products',
     tone: 'paid',

@@ -53,7 +53,6 @@ const primaryNavigation: NavItem[] = [
     name: 'Products',
     href: '/products',
     children: [
-      { name: 'AI Audit Checklist Pack', href: '/products/ai-audit-checklist' },
       { name: 'AI Act Compliance Toolkit', href: '/products/ai-act-toolkit' },
       { name: 'Sector Reports', href: '/products/sector-reports', note: 'Coming soon' },
       { name: 'All products', href: '/products' },

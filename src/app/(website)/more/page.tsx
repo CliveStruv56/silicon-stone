@@ -33,7 +33,7 @@ const sections = [
   {
     name: 'Products',
     href: '/products',
-    description: 'Toolkits, checklists, and sector reports.',
+    description: 'The complete AI Act Compliance Toolkit and sector reports.',
     icon: Package,
   },
   {

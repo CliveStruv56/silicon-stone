@@ -53,7 +53,7 @@ export default function PrivacyPage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-stone-teal mt-1">-</span>
-                  <span><strong className="text-text-primary">Digital product purchases:</strong> Transaction data is processed by our payment provider (Payhip). We do not store payment card details.</span>
+                  <span><strong className="text-text-primary">Digital product purchases:</strong> Transaction data is processed by our payment provider (Lemon Squeezy). We do not store payment card details.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-stone-teal mt-1">-</span>
@@ -116,6 +116,12 @@ export default function PrivacyPage() {
                   <span><strong className="text-text-primary">Sanity:</strong> Content management. Their privacy policy is available at sanity.io/legal/privacy.</span>
                 </li>
               </ul>
+            </div>
+
+            <div>
+              <h2 className="text-xl font-semibold text-text-primary mb-3">Toolkit Professional Review Materials</h2>
+              <p className="text-text-muted leading-relaxed mb-3">Professional buyers may submit selected workbook entries, company context and review questions to prepare their implementation discussion. These materials are used to prepare and deliver the review, with access restricted to Clive and the service providers needed to deliver it. Remove credentials and unnecessary personal data before submitting.</p>
+              <p className="text-text-muted leading-relaxed">Booking and private file submission are not yet open. The selected providers and their privacy information will be identified before those services open. Workbooks will be deleted from the review service 30 days after the meeting. The public website and general contact form do not accept review workbooks.</p>
             </div>
 
             <div>

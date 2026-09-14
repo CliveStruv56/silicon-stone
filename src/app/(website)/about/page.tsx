@@ -336,7 +336,7 @@ export default function AboutPage() {
               </h3>
               <p className="text-text-muted text-sm mb-4 max-w-xl mx-auto">
                 Our analysis is also available as practical digital products —
-                compliance toolkits, audit checklists, and sector briefings.
+                the complete AI Act Compliance Toolkit and sector briefings.
               </p>
               <Link href="/products" className="text-sm text-stone-teal hover:underline">
                 View Products &rarr;

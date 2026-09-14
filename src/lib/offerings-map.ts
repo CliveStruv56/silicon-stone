@@ -96,16 +96,15 @@ export const TOOLS: MapTool[] = (
   leadsTo: TOOL_JOURNEYS[slug].offering,
 }))
 
-const PRODUCT_NOTES: Record<string, string> = {
-  'ai-audit-checklist': 'inventory, scorecard, gap analysis',
-  'ai-act-toolkit': 'the evidence base a briefing starts from',
+const PRODUCT_NOTES: Record<string, string[]> = {
+  'ai-act-toolkit': ['Standard: the complete toolkit', 'Professional: adds a live review'],
 }
 
 /** Products a reader can buy or join a waitlist for; anything not yet on sale is left off. */
 export const SELF_SERVE: MapBox[] = PRODUCTS.filter((p) => p.status !== 'Not yet on sale').map((p) =>
   fromOffering(
     p,
-    [p.status ?? p.priceTiers?.map((t) => t.label).join(' or ') ?? PRODUCT_NOTES[p.id] ?? ''].filter(Boolean),
+    p.status ? [p.status] : PRODUCT_NOTES[p.id] ?? [],
     { dashed: Boolean(p.status) },
   ),
 )

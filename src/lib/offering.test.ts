@@ -21,17 +21,9 @@ import { AMOUNTS, DERIVED, ENGAGEMENTS, LADDER, MODULES, PRODUCTS, gbp, priceOf 
  */
 
 describe('derived figures', () => {
-  it('discounts the toolkit by the credit the checklist ships', () => {
-    expect(DERIVED.toolkitAfterDiscount).toBe(59)
-    expect(DERIVED.toolkitAfterDiscount).toBe(
-      AMOUNTS.toolkitStandard - AMOUNTS.toolkitDiscount,
-    )
-  })
-
-  it('prices the ladder below the two bought cold', () => {
-    expect(DERIVED.bundleTotal).toBe(83)
-    expect(DERIVED.bundleSeparately).toBe(103)
-    expect(DERIVED.bundleSeparately - DERIVED.bundleTotal).toBe(AMOUNTS.toolkitDiscount)
+  it('charges only the difference for a Professional upgrade', () => {
+    expect(DERIVED.toolkitProfessionalUpgrade).toBe(196)
+    expect(AMOUNTS.toolkitStandard + DERIVED.toolkitProfessionalUpgrade).toBe(AMOUNTS.toolkitProfessional)
   })
 
 })
@@ -55,7 +47,6 @@ describe('catalogue shape', () => {
     // priceOf(). A rename in the catalogue silently blanks a nav price note,
     // so the coupling is asserted rather than trusted.
     for (const id of [
-      'ai-audit-checklist',
       'ai-act-toolkit',
       'advisory-briefing',
     ]) {
@@ -153,10 +144,8 @@ describe('catalogue shape', () => {
   })
 
   it('emphasises only the ladder rungs that move money', () => {
-    // Rung 2 is a scope progression. Bolding it would read as a discount
-    // that does not exist. (The Exposure Diagnostic rung was removed on
-    // 2026-09-13 when the owner withdrew its credit, so the ladder is three
-    // rungs, two of which move money.)
+    // The Standard upgrade and advisory credit move money. The Professional
+    // outcome describes what the team receives and carries no discount.
     expect(LADDER).toHaveLength(3)
     expect(LADDER.filter((rung) => rung.emphasis)).toHaveLength(2)
   })
