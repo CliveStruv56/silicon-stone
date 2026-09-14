@@ -914,6 +914,22 @@ section is gone; "Why it is worth paying for" is now "Independence"; and "What
 it does not include" is now "Scope boundaries", chosen from four options each
 and matching the specialist project pages' language.
 
+### September 14, 2026 — Toolkit band on the Compliance Checker
+
+The Checker now stacks two amber follow-on bands beneath the tool (owner
+request): the **AI Act Compliance Toolkit** above the Advisory Briefing — the
+self-service step before the advised one. Eyebrow "Take your result further",
+a "From £79" badge, one "Explore the Toolkit" button, a footnote naming the
+45-minute Professional review of up to three systems and the £196 upgrade
+difference; every figure from `AMOUNTS`, `DERIVED` and `TOOLKIT_TERMS`. The
+owner settled five questions first: "From £79" rather than both tiers; the
+drafted wording minus "on your own"; one button; the same amber as the other
+tool pages' stacked bands; Checker only, because the Toolkit is an AI Act
+product and the other three tools are not about the Act. `FollowOnOffering`
+gained `priceLabel` (the catalogue price is the Standard figure alone) and
+`summary={null}` (the grey summary line repeated the intro, spotted in the
+screenshot). Verified on production after deploy (`c795bb16`).
+
 ### September 14, 2026 — Products hub hero artwork
 
 The Products hub was the one section hub without hero artwork. It now carries

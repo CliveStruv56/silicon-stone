@@ -811,7 +811,10 @@ wraps it for the three `MODULES`, using `Offering.fromTool`. The Compliance
 Checker uses the shared panel with the **Advisory Briefing**, which stays in
 `ENGAGEMENTS`; do not create a fourth module to make that pairing work.
 
-- Compliance Checker → Advisory Briefing (also the results advisory link).
+- Compliance Checker → Advisory Briefing (also the results advisory link),
+  with an **AI Act Compliance Toolkit band directly above it** since
+  2026-09-14 — Checker only, `FollowOnOffering` with `priceLabel` and
+  `summary={null}`; the other three tools are not about the Act.
 - Policy Stress-Test → Regulatory Friction Assessment.
 - Supply Chain Mapper → Manufacturing Exposure Module.
 - Scenario Modeler → Scenario Impact Analysis.
