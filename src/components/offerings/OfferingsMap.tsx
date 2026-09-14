@@ -208,10 +208,12 @@ export function OfferingsMap() {
               <path
                 key={`lane-${tool.slug}`}
                 d={`M${gateL},${mid(toolY(i), TOOL_H)} L${gateR},${py}`}
-                className="stroke-silicon-cyan fill-none"
+                // Fainter than the arrows so it reads as a trace, not a route; a
+                // shade stronger on dark, where the amber-tinted gate fill was
+                // swallowing it (owner request, 2026-09-14).
+                className="stroke-silicon-cyan fill-none opacity-55 dark:opacity-80"
                 strokeWidth={2}
                 strokeDasharray="3 4"
-                opacity={0.55}
               />
             )
           })}
