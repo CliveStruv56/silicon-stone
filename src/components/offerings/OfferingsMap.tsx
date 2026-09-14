@@ -30,19 +30,24 @@ import {
  */
 
 // ---- geometry (SVG user units) ----
+// Sized up on 2026-09-14 (owner: "a bit larger so it's easier to read"):
+// type 13/11 → 15/12.5, boxes 40 → 46 tall, and the figure breaks out of
+// the page's max-w-7xl into a 1600px container so the scale-down is smaller.
 const COL = {
-  read: { x: 20, w: 200 },
-  use: { x: 290, w: 220 },
-  gate: { x: 580, w: 140 },
-  commission: { x: 800, w: 320 },
-  stay: { x: 1190, w: 180 },
+  read: { x: 20, w: 230 },
+  use: { x: 306, w: 236 },
+  gate: { x: 604, w: 150 },
+  commission: { x: 816, w: 360 },
+  stay: { x: 1238, w: 190 },
 } as const
-const W = 1400
-const TOP = 84
-const TOOL_H = 40
-const PITCH = 48
-const READ_H = 44
-const READ_PITCH = 56
+const W = 1448
+const TOP = 90
+const TOOL_H = 46
+const PITCH = 54
+const READ_H = 50
+const READ_PITCH = 62
+const LABEL = 15
+const NOTE = 12.5
 
 // Tools block: y positions and its overall height, used to centre the Read column.
 const toolY = (i: number) => TOP + i * PITCH
@@ -51,25 +56,25 @@ const readStart = TOP + Math.max(0, (toolsBlockH - (READ.length * READ_PITCH - (
 const readY = (i: number) => readStart + i * READ_PITCH
 
 const selfServeSub = TOP + toolsBlockH + 40
-const selfServeY = (i: number) => selfServeSub + 10 + i * 58
+const selfServeY = (i: number) => selfServeSub + 10 + i * 64
 
 const projectSub = TOP + 20
 const projectY = (i: number) => TOP + PITCH + i * PITCH
 const coreSub = projectY(SPECIALIST_PROJECTS.length) + 36
-const CORE_H = 52
+const CORE_H = 58
 const coreY = (i: number) => coreSub + 12 + i * (CORE_H + 24)
 const coreBottom = coreY(CORE_ENGAGEMENTS.length - 1) + CORE_H
 
 const gateBottom = Math.max(coreBottom, selfServeY(SELF_SERVE.length - 1) + TOOL_H + 40)
 const introY = gateBottom + 36
-const H = introY + 56 + 24
+const H = introY + 60 + 24
 
 const mid = (y: number, h: number) => y + h / 2
 
 // ---- pieces ----
 
 function Box({
-  box, x, y, w, h, labelSize = 13,
+  box, x, y, w, h, labelSize = LABEL,
 }: { box: MapBox; x: number; y: number; w: number; h: number; labelSize?: number }) {
   const stripeClass = box.stripe === 'amber' ? 'fill-silicon-amber' : 'fill-silicon-cyan'
   return (
@@ -85,11 +90,11 @@ function Box({
         strokeDasharray={box.dashed ? '4 3' : undefined}
       />
       {box.stripe && <rect x={x} y={y} width={4} height={h} className={stripeClass} />}
-      <text x={x + (box.stripe ? 14 : 12)} y={y + 18} fontSize={labelSize} fontWeight={500} className="fill-text-primary">
+      <text x={x + (box.stripe ? 14 : 12)} y={y + 20} fontSize={labelSize} fontWeight={500} className="fill-text-primary">
         {box.name}
       </text>
       {box.note.map((line, i) => (
-        <text key={line} x={x + (box.stripe ? 14 : 12)} y={y + 32 + i * 13} fontSize={11} className="fill-text-muted">
+        <text key={line} x={x + (box.stripe ? 14 : 12)} y={y + 36 + i * 14.5} fontSize={NOTE} className="fill-text-muted">
           {line}
         </text>
       ))}
@@ -112,14 +117,14 @@ function Arrow({ x1, y1, x2, y2, dashed = false }: { x1: number; y1: number; x2:
 function StageHeader({ x, eyebrow, title }: { x: number; eyebrow: string; title: string }) {
   return (
     <>
-      <text x={x} y={26} fontSize={10} letterSpacing="0.14em" className="fill-text-muted font-mono">{eyebrow}</text>
-      <text x={x} y={50} fontSize={18} fontWeight={600} className="fill-text-primary font-display">{title}</text>
+      <text x={x} y={26} fontSize={11} letterSpacing="0.14em" className="fill-text-muted font-mono">{eyebrow}</text>
+      <text x={x} y={52} fontSize={20} fontWeight={600} className="fill-text-primary font-display">{title}</text>
     </>
   )
 }
 
 function Sub({ x, y, children }: { x: number; y: number; children: string }) {
-  return <text x={x} y={y} fontSize={10} letterSpacing="0.1em" className="fill-text-muted font-mono">{children}</text>
+  return <text x={x} y={y} fontSize={11} letterSpacing="0.1em" className="fill-text-muted font-mono">{children}</text>
 }
 
 /** The gate (amber) and the destination (teal): tall boxes with a title mid-way. */
@@ -134,16 +139,16 @@ function Pillar({
   return (
     <a href={href} className="group focus:outline-none" aria-label={title.join(' ')}>
       <rect x={x} y={TOP} width={w} height={gateBottom - TOP} rx={10} className={fill} strokeWidth={1.5} />
-      <text x={cx} y={TOP + 24} fontSize={10} letterSpacing="0.1em" textAnchor="middle" className="fill-text-muted font-mono">{eyebrow}</text>
+      <text x={cx} y={TOP + 24} fontSize={10.5} letterSpacing="0.1em" textAnchor="middle" className="fill-text-muted font-mono">{eyebrow}</text>
       {title.map((t, i) => (
-        <text key={t} x={cx} y={centre - 20 + i * 22} fontSize={19} fontWeight={600} textAnchor="middle" className={`${titleFill} font-display group-hover:underline`}>{t}</text>
+        <text key={t} x={cx} y={centre - 22 + i * 24} fontSize={21} fontWeight={600} textAnchor="middle" className={`${titleFill} font-display group-hover:underline`}>{t}</text>
       ))}
       {lines.map((l, i) => (
-        <text key={l} x={cx} y={centre + 26 + i * 16} fontSize={11} textAnchor="middle" className="fill-text-muted">{l}</text>
+        <text key={l} x={cx} y={centre + 28 + i * 17} fontSize={NOTE} textAnchor="middle" className="fill-text-muted">{l}</text>
       ))}
-      <line x1={x + 20} y1={gateBottom - 54} x2={x + w - 20} y2={gateBottom - 54} className={rule} strokeWidth={1} opacity={0.6} />
+      <line x1={x + 20} y1={gateBottom - 58} x2={x + w - 20} y2={gateBottom - 58} className={rule} strokeWidth={1} opacity={0.6} />
       {foot.map((l, i) => (
-        <text key={l} x={cx} y={gateBottom - 34 + i * 16} fontSize={11} textAnchor="middle" className="fill-text-muted">{l}</text>
+        <text key={l} x={cx} y={gateBottom - 37 + i * 17} fontSize={NOTE} textAnchor="middle" className="fill-text-muted">{l}</text>
       ))}
     </a>
   )
@@ -230,7 +235,7 @@ export function OfferingsMap() {
           {SELF_SERVE.map((box, i) => (
             <Arrow key={`in-${box.href}`} x1={useR + 4} y1={mid(selfServeY(i), TOOL_H)} x2={gateL - 4} y2={mid(selfServeY(i), TOOL_H)} />
           ))}
-          <Box box={INTRO} x={COL.gate.x} y={introY} w={COL.gate.w} h={56} />
+          <Box box={INTRO} x={COL.gate.x} y={introY} w={COL.gate.w} h={60} />
           <Arrow x1={COL.gate.x + COL.gate.w / 2} y1={introY - 4} x2={COL.gate.x + COL.gate.w / 2} y2={gateBottom + 6} dashed />
 
           {/* Stage 4 */}

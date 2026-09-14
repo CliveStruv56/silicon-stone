@@ -39,12 +39,18 @@ export default function HowItFitsTogetherPage() {
           </div>
         </section>
 
-        <section aria-labelledby="map-heading" className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
-          <p className="font-mono text-xs uppercase tracking-[0.14em] text-text-muted">The map</p>
-          <h2 id="map-heading" className="mb-6 mt-1 text-2xl font-semibold text-text-primary">
-            One path, one gate, five stages
-          </h2>
-          <OfferingsMap />
+        <section aria-labelledby="map-heading" className="py-10 lg:py-12">
+          <div className="mx-auto max-w-7xl px-6 lg:px-8">
+            <p className="font-mono text-xs uppercase tracking-[0.14em] text-text-muted">The map</p>
+            <h2 id="map-heading" className="mb-6 mt-1 text-2xl font-semibold text-text-primary">
+              One path, one gate, five stages
+            </h2>
+          </div>
+          {/* The figure alone breaks out to 1600px so the drawing scales down
+              less on a desktop; the headings stay on the page's column. */}
+          <div className="mx-auto max-w-[1600px] px-6 lg:px-8">
+            <OfferingsMap />
+          </div>
         </section>
 
         <section className="border-t border-silicon-amber/30 bg-silicon-amber/5">
