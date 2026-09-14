@@ -43,7 +43,7 @@ export default function HowItFitsTogetherPage() {
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <p className="font-mono text-xs uppercase tracking-[0.14em] text-text-muted">The map</p>
             <h2 id="map-heading" className="mb-6 mt-1 text-2xl font-semibold text-text-primary">
-              One path, one gate, five stages
+              One path, one touchstone, five stages
             </h2>
           </div>
           {/* The figure alone breaks out to 1600px so the drawing scales down
