@@ -97,17 +97,20 @@ export const TOOLS: MapTool[] = (
 }))
 
 const PRODUCT_NOTES: Record<string, string[]> = {
-  'ai-act-toolkit': ['Standard: the complete toolkit', 'Professional: adds a live review'],
+  'ai-act-toolkit': ['Standard: the complete toolkit', 'Professional: 45-minute live review', 'up to 3 systems + action summary'],
+  'sector-reports': ['sector analysis, scenarios, actions'],
 }
 
 /** Products a reader can buy or join a waitlist for; anything not yet on sale is left off. */
-export const SELF_SERVE: MapBox[] = PRODUCTS.filter((p) => p.status !== 'Not yet on sale').map((p) =>
-  fromOffering(
+export const SELF_SERVE: MapBox[] = PRODUCTS
+  .filter((p) => p.status !== 'Not yet on sale')
+  // Match the products page: the consolidated Toolkit comes first.
+  .sort((a, b) => Number(b.id === 'ai-act-toolkit') - Number(a.id === 'ai-act-toolkit'))
+  .map((p) => fromOffering(
     p,
-    p.status ? [p.status] : PRODUCT_NOTES[p.id] ?? [],
+    [...(p.status ? [p.status] : []), ...(PRODUCT_NOTES[p.id] ?? [])],
     { dashed: Boolean(p.status) },
-  ),
-)
+  ))
 
 /* ---------- Stage 3 · Discuss (the touchstone) ---------- */
 

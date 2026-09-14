@@ -147,7 +147,7 @@ export default function ProductsPage() {
                 Digital Products
               </Badge>
               <h1 className="text-4xl font-bold text-text-primary sm:text-5xl mb-6">
-                Practical Tools for Compliance and Strategy
+                Practical Resources for Compliance and Strategy
               </h1>
               <p className="text-xl text-text-muted leading-relaxed">
                 Know which systems you use, what role you play, what your vendors

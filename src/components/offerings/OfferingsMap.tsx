@@ -65,7 +65,8 @@ const readStart = TOP + Math.max(0, (toolsBlockH - (READ.length * READ_PITCH - (
 const readY = (i: number) => readStart + i * READ_PITCH
 
 const selfServeSub = TOP + toolsBlockH + 40
-const selfServeY = (i: number) => selfServeSub + 12 + i * 76
+const PRODUCT_H = 78
+const selfServeY = (i: number) => selfServeSub + 12 + i * (PRODUCT_H + 14)
 // The free intro conversation sits under the products, beside the Briefing
 // (owner, 2026-09-14), set a little apart so it does not read as a product.
 const introY = selfServeY(SELF_SERVE.length) + 14
@@ -211,7 +212,7 @@ export function OfferingsMap() {
           ))}
           <Sub x={COL.use.x} y={selfServeSub}>SELF-SERVE PRODUCTS</Sub>
           {SELF_SERVE.map((box, i) => (
-            <Box key={box.href} box={box} x={COL.use.x} y={selfServeY(i)} w={COL.use.w} h={62} />
+            <Box key={box.href} box={box} x={COL.use.x} y={selfServeY(i)} w={COL.use.w} h={PRODUCT_H} />
           ))}
 
           {/* Stage 3 */}
@@ -226,7 +227,7 @@ export function OfferingsMap() {
             <Arrow key={`in-${tool.slug}`} x1={useR + 4} y1={mid(toolY(i), TOOL_H)} x2={gateL - 4} y2={mid(toolY(i), TOOL_H)} />
           ))}
           {SELF_SERVE.map((box, i) => (
-            <Arrow key={`in-${box.href}`} x1={useR + 4} y1={mid(selfServeY(i), 62)} x2={gateL - 4} y2={mid(selfServeY(i), 62)} />
+            <Arrow key={`in-${box.href}`} x1={useR + 4} y1={mid(selfServeY(i), PRODUCT_H)} x2={gateL - 4} y2={mid(selfServeY(i), PRODUCT_H)} />
           ))}
           <Box box={INTRO} x={COL.use.x} y={introY} w={COL.use.w} h={TOOL_H} />
           <Arrow x1={useR + 4} y1={mid(introY, TOOL_H)} x2={gateL - 4} y2={mid(introY, TOOL_H)} dashed />
