@@ -15,7 +15,6 @@ import {
   Shield,
   ClipboardCheck,
   FileText,
-  FileSearch,
   ArrowRight,
   CheckCircle,
   type LucideIcon,
@@ -44,8 +43,9 @@ export const metadata: Metadata = {
  * `PRODUCTS` in `src/lib/offering.ts`, which this page now maps.
  *
  * It retyped the whole list until 2026-09-04, and the failure that predicts had
- * already happened — the Compliance Checker Evidence Pack was on `/pricing`, in
- * the catalogue and in `project_summary.md` §5.2, and simply absent here. The
+ * already happened — the Compliance Checker Evidence Pack (since withdrawn)
+ * was on `/pricing`, in the catalogue and in `project_summary.md` §5.2, and
+ * simply absent here. The
  * prices never drifted, because they were interpolated from `AMOUNTS`; the
  * *list* drifted, which no price guard was ever going to catch. It is the same
  * defect the footer hit when it retyped the engagements and duplicated the
@@ -121,30 +121,12 @@ const PRESENTATION: Record<string, Presentation> = {
     ],
     cta: 'View Sector Reports',
   },
-  'evidence-pack': {
-    badge: 'Not yet on sale',
-    badgeColor: 'bg-surface-elevated text-text-muted',
-    icon: FileSearch,
-    iconColor: 'text-stone-teal',
-    iconBg: 'bg-stone-teal/10',
-    // Deliberately does not restate the summary above it — the card renders
-    // `offering.summary` and then these, so a bullet repeating it reads as
-    // padding. Same reason the checklist's credit line is left to `terms`.
-    highlights: [
-      'Components 4–11 of the report: the reasoning, not just the verdict',
-      'Article-by-article provisions, quoted from the pinned consolidated text',
-      'The vendor questions to send, with the anchor each one rests on',
-      'A record you can put in front of a buyer or an auditor',
-    ],
-    cta: 'See the Compliance Checker',
-  },
 }
 
 /**
- * The one card that links outward rather than to `/products/<slug>`: the
- * Evidence Pack is sold against a Compliance Checker result, so its `href` in
- * the catalogue points at the tool. Read the link off the offering rather than
- * rebuilding it from a slug, or this card 404s.
+ * Read the link off the offering rather than rebuilding it from a slug: a
+ * product sold against a tool result (the withdrawn Evidence Pack was one)
+ * links to the tool, not to `/products/<slug>`.
  */
 function productCard(offering: Offering) {
   return { offering, presentation: PRESENTATION[offering.id] ?? NEUTRAL }

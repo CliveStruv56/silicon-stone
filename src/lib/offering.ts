@@ -47,7 +47,6 @@ export const AMOUNTS = {
   toolkitProfessional: 275,
   sectorReport: 39,
   sectorReportTrio: 99,
-  evidencePack: 39,
   /** The credit the Checklist Pack ships against the Toolkit. */
   toolkitDiscount: 20,
 
@@ -73,8 +72,6 @@ export const DERIVED = {
     AMOUNTS.checklist + (AMOUNTS.toolkitStandard - AMOUNTS.toolkitDiscount),
   /** The same two bought cold. */
   bundleSeparately: AMOUNTS.checklist + AMOUNTS.toolkitStandard,
-  /** Toolkit price after the Evidence Pack's credit. */
-  toolkitAfterEvidencePack: AMOUNTS.toolkitStandard - AMOUNTS.evidencePack,
 } as const
 
 /** Public fee label for advisory engagements and specialist projects. */
@@ -177,11 +174,10 @@ export const FREE_OFFERINGS: Offering[] = [
  * the flagship: a price list sorted by anything other than price is a price
  * list you have to read twice.
  *
- * The two £39 products tie, and Sector Reports is deliberately first of them —
- * it is a product line awaiting its first report, where the Evidence Pack is
- * not on sale at all. `offering.test.ts` asserts the ordering is non-decreasing,
- * so inserting a new SKU in the wrong place fails rather than quietly landing
- * mid-list.
+ * `offering.test.ts` asserts the ordering is non-decreasing, so inserting a new
+ * SKU in the wrong place fails rather than quietly landing mid-list. (The
+ * Compliance Checker Evidence Pack, a £39 SKU that was never on sale, was
+ * removed from the catalogue on 2026-09-14 at the owner's request.)
  */
 export const PRODUCTS: Offering[] = [
   {
@@ -204,18 +200,6 @@ export const PRODUCTS: Offering[] = [
       '15–20 page briefings per industry: AI landscape, regulatory exposure, geopolitical risk, three scenarios and a 90-day checklist.',
     href: '/products/sector-reports',
     status: 'Waitlist — first report in preparation',
-  },
-  {
-    id: 'evidence-pack',
-    name: 'Compliance Checker Evidence Pack',
-    price: gbp(AMOUNTS.evidencePack),
-    summary:
-      'The full written evidence pack behind your Compliance Checker result — every claim string-matched against the pinned statute before you see it.',
-    href: '/tools/compliance-checker',
-    terms: [
-      `The ${gbp(AMOUNTS.evidencePack)} credits against the ${gbp(AMOUNTS.toolkitStandard)} Toolkit, making that upgrade ${gbp(DERIVED.toolkitAfterEvidencePack)}.`,
-    ],
-    status: 'Not yet on sale',
   },
   {
     id: 'ai-act-toolkit',

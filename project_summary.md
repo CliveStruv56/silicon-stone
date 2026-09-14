@@ -605,10 +605,13 @@ price there and here together, or the ladder starts lying.
 
 These three are the only `product` documents in Sanity (`product-ai-audit-checklist`,
 `product-ai-act-toolkit`, `product-sector-reports`) and the only SKUs the
-end-of-article gate can sell. All **four** rows below appear on `/products` and
+end-of-article gate can sell. All **three** rows below appear on `/products` and
 `/pricing`: since 2026-09-04 `/products` maps `PRODUCTS` rather than retyping
 it, which is how the Evidence Pack — in the catalogue, on `/pricing` and in this
-table, but absent from the products page — came back. The prices never drifted
+table, but absent from the products page — came back. **The Evidence Pack was
+withdrawn entirely on 2026-09-14** (owner request): catalogue entry, `AMOUNTS`
+key, the `toolkitAfterEvidencePack` credit, the dark teaser under the Checker
+report and its `NEXT_PUBLIC_EVIDENCE_PACK_ENABLED` flag are all gone. The prices never drifted
 there, because they were interpolated from `AMOUNTS`; the *list* drifted, and no
 price guard was ever going to catch that.
 
@@ -617,9 +620,8 @@ price guard was ever going to catch that.
 | **AI Audit Checklist Pack** | **£24** | The gateway SKU. Systems inventory sheet, vendor dependency scorecard, quick gap analysis, board-ready risk summary. Ships a **£20 Toolkit discount code** (90 days) — so Checklist + Toolkit is £83 rather than £103. | `/products/ai-audit-checklist` |
 | **AI Act Compliance Toolkit** | **From £79** — Standard £79, Professional £275 | The flagship. Risk-classification decision tree, checklists by risk category, template policies, AI Systems Register + Compliance Tracker, phased action plan. Professional adds a 30-minute video walkthrough. | `/products/ai-act-toolkit` |
 | **Sector Reports** | **£39 each, or 3 for £99** | 15–20pp briefings per industry (Manufacturing, Financial Services, Professional Services, Public Sector): AI landscape, AI Act exposure, geopolitical risk, three scenarios, 90-day checklist. | `/products/sector-reports` |
-| **Compliance Checker Evidence Pack** | **£39** (credits £39 against the £79 Toolkit → £40 upgrade) | Components 4–11 of the Compliance Checker report. **Built dark** behind `NEXT_PUBLIC_EVIDENCE_PACK_ENABLED` (default `false`); checkout and single-use code issuance are unbuilt. | `EvidencePackTeaser.tsx` via `ReportGate` |
 
-**Status — all four:** `NEXT_PUBLIC_PRE_LAUNCH` is still `true`, so every "Buy"
+**Status — all three:** `NEXT_PUBLIC_PRE_LAUNCH` is still `true`, so every "Buy"
 button is an `EarlyAccessCTA` email capture into Kit (`early-access` + a
 `tier-*` tag), not a checkout. Sector Reports is additionally pre-product: the
 page is a waitlist, and its Sanity `topics` were deliberately cleared on
@@ -722,10 +724,6 @@ AI_MONTHLY_BUDGET_USD=                     # Optional: monthly model-spend ceili
                                            # ceiling. When SET and the usage ledger
                                            # is unreadable, generation blocks — by
                                            # design, not a bug.
-NEXT_PUBLIC_EVIDENCE_PACK_ENABLED=false    # £39 Evidence Pack + £39→£79 credit.
-                                           # Defaults FALSE; blocked on the Lemon
-                                           # Squeezy store. Enabling it surfaces the
-                                           # offer but checkout is not built.
 # SESSION_SECRET (below) is also required here — it signs report links.
 
 # AI Act rule pack (Compliance Checker)
@@ -818,7 +816,7 @@ SESSION_SECRET=<long random secret, 32+ characters>
 | Intake UI (Art 50(1) disclosure + review screen) | `src/components/tools/ComplianceIntake.tsx` |
 | **Report generation + citation verifier** | `src/lib/report/` (`schema.ts` rejects, `verify.ts` checks, `generate.ts` calls) |
 | Report API (202 + poll) | `src/app/api/tools/compliance-checker/report/` |
-| Report UI (gate, view, dark paid teaser) | `src/components/tools/ReportGate.tsx`, `ReportView.tsx`, `EvidencePackTeaser.tsx` |
+| Report UI (gate, view) | `src/components/tools/ReportGate.tsx`, `ReportView.tsx` |
 | Report permanent link (signed token) | `src/app/(website)/tools/compliance-checker/report/[id]/` |
 | Email capture + `onEmailCaptured` seam | `src/lib/report/capture.ts` |
 | Monthly model-spend ceiling | `src/lib/model-budget.ts` |

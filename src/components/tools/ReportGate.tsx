@@ -9,7 +9,6 @@ import { CONSENT_TEXT } from '@/lib/report/email'
 import type { AssessmentAnswers } from '@/lib/ai-act-assessment'
 import type { ReportRecord } from '@/lib/report/record'
 import { ReportView } from './ReportView'
-import { EvidencePackTeaser } from './EvidencePackTeaser'
 
 /**
  * The email gate.
@@ -106,7 +105,6 @@ export function ReportGate({ answers }: { answers: AssessmentAnswers }) {
     return (
       <div className="space-y-4">
         <ReportView record={record} />
-        <EvidencePackTeaser />
         {link && (
           <p className="text-center text-xs text-text-muted">
             Keep this report:{' '}

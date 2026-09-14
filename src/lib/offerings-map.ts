@@ -101,7 +101,7 @@ const PRODUCT_NOTES: Record<string, string> = {
   'ai-act-toolkit': 'the evidence base a briefing starts from',
 }
 
-/** Products a reader can buy or join a waitlist for; the unreleased Evidence Pack is left off. */
+/** Products a reader can buy or join a waitlist for; anything not yet on sale is left off. */
 export const SELF_SERVE: MapBox[] = PRODUCTS.filter((p) => p.status !== 'Not yet on sale').map((p) =>
   fromOffering(
     p,

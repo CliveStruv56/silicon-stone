@@ -35,21 +35,6 @@ export const FREE_INTRO_WINDOW =
 export const BOOKING_URL = process.env.NEXT_PUBLIC_BOOKING_URL || ''
 
 /**
- * The £39 Evidence Pack — components 4–11 of the Compliance Checker report,
- * plus the £39 credit against the £79 toolkit.
- *
- * Default FALSE, unlike every other flag here. It stays dark until the Lemon
- * Squeezy store exists: the credit is a single-use code scoped to a SKU, and
- * advertising a paid upgrade that cannot be bought is worse than not mentioning
- * it. Turning this on is not sufficient on its own — checkout and code issuance
- * have to be built first. See LAUNCH.md and project_summary.md §11.
- */
-export const EVIDENCE_PACK_ENABLED = envFlag(
-  process.env.NEXT_PUBLIC_EVIDENCE_PACK_ENABLED,
-  false,
-)
-
-/**
  * The Compliance Checker v2 rebuild (`docs/# EU AI Act Compliance Checker v2 —
  * Impl.md`). Default FALSE, and it stays false until the §20 release acceptance
  * criteria pass.

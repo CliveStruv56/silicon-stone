@@ -34,12 +34,6 @@ describe('derived figures', () => {
     expect(DERIVED.bundleSeparately - DERIVED.bundleTotal).toBe(AMOUNTS.toolkitDiscount)
   })
 
-  it('credits the evidence pack in full against the toolkit', () => {
-    expect(DERIVED.toolkitAfterEvidencePack).toBe(40)
-    expect(DERIVED.toolkitAfterEvidencePack).toBe(
-      AMOUNTS.toolkitStandard - AMOUNTS.evidencePack,
-    )
-  })
 })
 
 describe('gbp', () => {
@@ -86,7 +80,7 @@ describe('catalogue shape', () => {
      * assertion rather than a comment — a new SKU appended to the end would
      * otherwise land after the £79 whatever it costs.
      *
-     * Ties are allowed: Sector Reports and the Evidence Pack are both £39.
+     * Ties are allowed.
      */
     const amounts = PRODUCTS.map((product) => {
       const parsed = Number(product.price.replace(/[^\d.]/g, ''))
@@ -127,9 +121,9 @@ describe('catalogue shape', () => {
   it('gives every product a card on the products page', () => {
     /**
      * `/products` retyped its own product list until 2026-09-04, and the
-     * failure that predicts had already happened: the Compliance Checker
-     * Evidence Pack was in this catalogue, on `/pricing` and in
-     * `project_summary.md` §5.2, and simply absent from the products page. No
+     * failure that predicts had already happened: the (since withdrawn)
+     * Compliance Checker Evidence Pack was in this catalogue, on `/pricing` and
+     * in `project_summary.md` §5.2, and simply absent from the products page. No
      * price guard caught it, because no price had drifted — the *list* had.
      *
      * The page now maps `PRODUCTS`, so a product can no longer vanish. What it
