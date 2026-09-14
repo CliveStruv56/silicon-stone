@@ -43,7 +43,7 @@ const COL = {
   stay: { x: 1298, w: 190 },
 } as const
 const W = 1528
-const TOP = 90
+const TOP = 110
 const TOOL_H = 46
 const PITCH = 54
 const READ_H = 62
