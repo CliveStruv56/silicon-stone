@@ -62,7 +62,7 @@ function fromOffering(
 /* ---------- Stage 1 · Read (free) ---------- */
 
 export const READ: MapBox[] = [
-  fromOffering(offeringById('newsletters'), ['two newsletters, Thursday and Tuesday']),
+  fromOffering(offeringById('newsletters'), ['Tuesday and Thursday']),
   fromOffering(offeringById('us-executive-guide'), ['European sovereignty for US companies']),
   { name: 'Digital Omnibus guide', href: '/digital-omnibus', note: ['what changes and what matters'] },
 ]
@@ -110,7 +110,7 @@ export const SELF_SERVE: MapBox[] = PRODUCTS.filter((p) => p.status !== 'Not yet
   ),
 )
 
-/* ---------- Stage 3 · Talk (the gate) ---------- */
+/* ---------- Stage 3 · Discuss (the touchstone) ---------- */
 
 export const BRIEFING = offeringById('advisory-briefing')
 

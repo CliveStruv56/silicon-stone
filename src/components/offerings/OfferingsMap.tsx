@@ -33,19 +33,21 @@ import {
 // Sized up on 2026-09-14 (owner: "a bit larger so it's easier to read"):
 // type 13/11 → 15/12.5, boxes 40 → 46 tall, and the figure breaks out of
 // the page's max-w-7xl into a 1600px container so the scale-down is smaller.
+// Read column widened 230 → 290 and its boxes 50 → 62 tall the same day: the
+// newsletter name overran the box at the larger type size.
 const COL = {
-  read: { x: 20, w: 230 },
-  use: { x: 306, w: 236 },
-  gate: { x: 604, w: 150 },
-  commission: { x: 816, w: 360 },
-  stay: { x: 1238, w: 190 },
+  read: { x: 20, w: 290 },
+  use: { x: 366, w: 236 },
+  gate: { x: 664, w: 150 },
+  commission: { x: 876, w: 360 },
+  stay: { x: 1298, w: 190 },
 } as const
-const W = 1448
+const W = 1508
 const TOP = 90
 const TOOL_H = 46
 const PITCH = 54
-const READ_H = 50
-const READ_PITCH = 62
+const READ_H = 62
+const READ_PITCH = 76
 const LABEL = 15
 const NOTE = 12.5
 
@@ -139,12 +141,13 @@ function Pillar({
   return (
     <a href={href} className="group focus:outline-none" aria-label={title.join(' ')}>
       <rect x={x} y={TOP} width={w} height={gateBottom - TOP} rx={10} className={fill} strokeWidth={1.5} />
-      <text x={cx} y={TOP + 24} fontSize={10.5} letterSpacing="0.1em" textAnchor="middle" className="fill-text-muted font-mono">{eyebrow}</text>
+      {/* Sits above the box, level with the column sub-labels (owner request, 2026-09-14). */}
+      <text x={cx} y={TOP - 8} fontSize={10.5} letterSpacing="0.1em" textAnchor="middle" className="fill-text-muted font-mono">{eyebrow}</text>
       {title.map((t, i) => (
-        <text key={t} x={cx} y={centre - 22 + i * 24} fontSize={21} fontWeight={600} textAnchor="middle" className={`${titleFill} font-display group-hover:underline`}>{t}</text>
+        <text key={t} x={cx} y={centre - 32 + i * 24} fontSize={21} fontWeight={600} textAnchor="middle" className={`${titleFill} font-display group-hover:underline`}>{t}</text>
       ))}
       {lines.map((l, i) => (
-        <text key={l} x={cx} y={centre + 28 + i * 17} fontSize={NOTE} textAnchor="middle" className="fill-text-muted">{l}</text>
+        <text key={l} x={cx} y={centre + 18 + i * 17} fontSize={NOTE} textAnchor="middle" className="fill-text-muted">{l}</text>
       ))}
       <line x1={x + 20} y1={gateBottom - 58} x2={x + w - 20} y2={gateBottom - 58} className={rule} strokeWidth={1} opacity={0.6} />
       {foot.map((l, i) => (
@@ -184,8 +187,8 @@ export function OfferingsMap() {
           </defs>
 
           <StageHeader x={COL.read.x} eyebrow="STAGE 1 · FREE" title="Read" />
-          <StageHeader x={COL.use.x} eyebrow="STAGE 2 · FREE · SELF-SERVE" title="Use" />
-          <StageHeader x={COL.gate.x} eyebrow="STAGE 3 · THE GATE" title="Talk" />
+          <StageHeader x={COL.use.x} eyebrow="STAGE 2 · SELF-SERVE" title="Use" />
+          <StageHeader x={COL.gate.x} eyebrow="STAGE 3 · TOUCHSTONE" title="Discuss" />
           <StageHeader x={COL.commission.x} eyebrow="STAGE 4 · ONE-OFF" title="Commission" />
           <StageHeader x={COL.stay.x} eyebrow="STAGE 5 · STANDING" title="Stay" />
 
@@ -226,7 +229,7 @@ export function OfferingsMap() {
             x={COL.gate.x} w={COL.gate.w} tone="amber" href={BRIEFING.href}
             eyebrow="EVERY PATH PASSES HERE"
             title={['Advisory', 'Briefing']}
-            lines={['one AI system', 'one principal question', 'one hour, then a written', 'follow-up with priorities']}
+            lines={['the output of a tool', 'or product, or one of', 'your AI systems', 'one hour, then a written', 'follow-up with priorities']}
             foot={['fee credited against', 'your first engagement']}
           />
           {TOOLS.map((tool, i) => (
@@ -271,7 +274,7 @@ export function OfferingsMap() {
       <ol className="grid gap-3 md:hidden" aria-label="The same map, stacked for narrow screens">
         <StackedStage eyebrow="Stage 1 · free" title="Read" groups={[{ boxes: READ }]} />
         <StackedStage
-          eyebrow="Stage 2 · free · self-serve"
+          eyebrow="Stage 2 · self-serve"
           title="Use"
           groups={[
             { label: 'Interactive Forensic Tools', boxes: TOOLS },
@@ -279,12 +282,12 @@ export function OfferingsMap() {
           ]}
         />
         <StackedStage
-          eyebrow="Stage 3 · the gate"
-          title="Talk: the Advisory Briefing"
+          eyebrow="Stage 3 · Touchstone"
+          title="Discuss: the Advisory Briefing"
           tone="amber"
           groups={[{
             boxes: [
-              { name: 'One AI system, one principal question', href: BRIEFING.href, note: ['one hour, then a written follow-up with priorities'], stripe: 'amber' },
+              { name: 'The output of a tool or product, or one of your AI systems', href: BRIEFING.href, note: ['one hour, then a written follow-up with priorities'], stripe: 'amber' },
               { name: 'Every path passes here', href: BRIEFING.href, note: ['fee credited against your first engagement'], stripe: 'amber' },
               INTRO,
             ],
