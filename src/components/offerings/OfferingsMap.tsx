@@ -144,8 +144,8 @@ function Sub({ x, y, children }: { x: number; y: number; children: string }) {
 
 /** The gate (amber) and the destination (teal): tall boxes with a title mid-way. */
 function Pillar({
-  x, w, title, lines, foot, tone, href, eyebrow,
-}: { x: number; w: number; title: string[]; lines: string[]; foot: string[]; tone: 'amber' | 'teal'; href: string; eyebrow: string }) {
+  x, w, title, lines, foot, tone, href,
+}: { x: number; w: number; title: string[]; lines: string[]; foot: string[]; tone: 'amber' | 'teal'; href: string }) {
   const cx = x + w / 2
   const centre = TOP + (gateBottom - TOP) / 2
   const fill = tone === 'amber' ? 'fill-silicon-amber/10 stroke-silicon-amber' : 'fill-stone-teal/10 stroke-stone-teal'
@@ -154,8 +154,6 @@ function Pillar({
   return (
     <a href={href} className="group focus:outline-none" aria-label={title.join(' ')}>
       <rect x={x} y={TOP} width={w} height={gateBottom - TOP} rx={10} className={fill} strokeWidth={1.5} />
-      {/* Sits above the box, level with the column sub-labels (owner request, 2026-09-14). */}
-      <text x={cx} y={SUB_Y} fontSize={SUB} letterSpacing="0.1em" textAnchor="middle" className="fill-text-muted font-mono">{eyebrow}</text>
       {title.map((t, i) => (
         <text key={t} x={cx} y={centre - 32 + i * 24} fontSize={21} fontWeight={600} textAnchor="middle" className={`${titleFill} font-display group-hover:underline`}>{t}</text>
       ))}
@@ -218,7 +216,6 @@ export function OfferingsMap() {
           {/* Stage 3 */}
           <Pillar
             x={COL.gate.x} w={COL.gate.w} tone="amber" href={BRIEFING.href}
-            eyebrow="FOR FURTHER DISCUSSION"
             title={['Advisory', 'Briefing']}
             lines={['the output of a tool', 'or product, or one of', 'your AI systems', 'one hour, then a written', 'follow-up with priorities']}
             foot={['fee credited against', 'your first engagement']}
@@ -252,7 +249,6 @@ export function OfferingsMap() {
           {/* Stage 5 */}
           <Pillar
             x={COL.stay.x} w={COL.stay.w} tone="teal" href={RETAINER.href}
-            eyebrow="EVERYTHING SETTLES HERE"
             title={['The Drift', 'Retainer']}
             lines={['the standing relationship', 'a monthly briefing, a working', 'session on one live decision,', 'a quarterly exposure review']}
             foot={['rolling monthly', 'no minimum term']}
@@ -278,8 +274,7 @@ export function OfferingsMap() {
           tone="amber"
           groups={[{
             boxes: [
-              { name: 'The output of a tool or product, or one of your AI systems', href: BRIEFING.href, note: ['one hour, then a written follow-up with priorities'], stripe: 'amber' },
-              { name: 'For further discussion', href: BRIEFING.href, note: ['fee credited against your first engagement'], stripe: 'amber' },
+              { name: 'The output of a tool or product, or one of your AI systems', href: BRIEFING.href, note: ['one hour, then a written follow-up with priorities', 'fee credited against your first engagement'], stripe: 'amber' },
             ],
           }]}
         />
@@ -292,7 +287,7 @@ export function OfferingsMap() {
           eyebrow="Stage 5 · bespoke"
           title="Retain: the Drift Retainer"
           tone="teal"
-          groups={[{ boxes: [{ name: 'Everything settles here', href: RETAINER.href, note: ['a monthly briefing, a working session on one live decision, a quarterly exposure review · rolling monthly, no minimum term'], stripe: 'cyan' }] }]}
+          groups={[{ boxes: [{ name: RETAINER.name, href: RETAINER.href, note: ['a monthly briefing, a working session on one live decision, a quarterly exposure review · rolling monthly, no minimum term'], stripe: 'cyan' }] }]}
         />
       </ol>
 
