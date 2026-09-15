@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
-import { ArrowDown, ArrowRight, CheckCircle } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import { Header, Footer } from '@/components/layout'
 import { Badge } from '@/components/ui/badge'
 import { EarlyAccessCTA } from '@/components/products/EarlyAccessCTA'
@@ -46,7 +46,7 @@ export default async function SectorReportPage({ params }: Props) {
               <Link href="/products/sector-reports" className="hover:underline">Sector Reports</Link><span aria-hidden="true">/</span>
               <span aria-current="page">{report.title}</span>
             </nav>
-            <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-16">
+            <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-12">
               <div>
                 <Badge variant="outline" className="mb-5 border-stone-teal/40 text-stone-teal">Preview available</Badge>
                 <h1 className="max-w-3xl text-4xl font-bold leading-tight text-text-primary sm:text-5xl">{report.title}</h1>
@@ -56,23 +56,36 @@ export default async function SectorReportPage({ params }: Props) {
                   <div><dt className="text-text-muted">Evidence cut-off</dt><dd className="mt-1 font-medium text-text-primary"><time dateTime={edition.evidenceCutoff}>{reportDate(edition.evidenceCutoff)}</time></dd></div>
                   {edition.pageCount && <div><dt className="text-text-muted">PDF length</dt><dd className="mt-1 font-medium text-text-primary">{edition.pageCount} pages</dd></div>}
                 </dl>
-                <div className="mt-8 flex flex-wrap gap-5 text-sm font-medium text-stone-teal">
-                  <a href="#executive-summary" className="inline-flex items-center gap-2 hover:underline">Read the preview <ArrowDown aria-hidden="true" className="h-4 w-4" /></a>
-                  <a href="#contents" className="inline-flex items-center gap-2 hover:underline">Explore the full contents <ArrowDown aria-hidden="true" className="h-4 w-4" /></a>
+                <div className="mt-7 grid gap-6 border-t border-border-subtle pt-6 sm:grid-cols-2">
+                  <section aria-labelledby="summary-snippet-heading">
+                    <h2 id="summary-snippet-heading" className="text-lg font-semibold text-text-primary">Executive Summary</h2>
+                    <p className="mt-2 text-sm leading-relaxed text-text-muted">{edition.thesis}</p>
+                    <a href="#executive-summary" aria-label="More details: Executive Summary" className="mt-3 inline-flex items-center gap-2 rounded-md border border-stone-teal/40 px-3 py-2 text-sm font-medium text-stone-teal hover:bg-stone-teal/10 focus-visible:outline-2 focus-visible:outline-offset-4">
+                      More details <ArrowRight aria-hidden="true" className="h-4 w-4" />
+                    </a>
+                  </section>
+                  <section aria-labelledby="contents-snippet-heading">
+                    <h2 id="contents-snippet-heading" className="text-lg font-semibold text-text-primary">Inside the report</h2>
+                    <p className="mt-2 text-sm leading-relaxed text-text-muted">{report.highlights.slice(0, 2).join('. ')}. Explore every chapter, market table and evidence section.</p>
+                    <a href="#contents" aria-label="More details: full report contents" className="mt-3 inline-flex items-center gap-2 rounded-md border border-stone-teal/40 px-3 py-2 text-sm font-medium text-stone-teal hover:bg-stone-teal/10 focus-visible:outline-2 focus-visible:outline-offset-4">
+                      More details <ArrowRight aria-hidden="true" className="h-4 w-4" />
+                    </a>
+                  </section>
                 </div>
               </div>
               <aside className="self-start rounded-lg border border-border-subtle bg-stone-charcoal p-6" aria-label="Report purchase information">
-                {report.slug === 'ai-and-european-manufacturing' && edition.number === 1 && <Image src="/reports/manufacturing-edition-1-cover.webp" alt="Cover of AI and European Manufacturing, Edition 1, October 2026" width={595} height={842} sizes="176px" className="mx-auto mb-6 h-auto w-44 border border-border-subtle shadow-sm" />}
-                <h2 className="text-xl font-semibold text-text-primary">One report. A year of updates.</h2>
-                <p className="mt-6 text-3xl font-semibold text-text-primary">{gbp(AMOUNTS.sectorReport)}</p>
-                <ul className="mt-5 space-y-4 text-sm text-text-muted">
-                  {['Current report as a PDF', 'Monthly updates for 12 months', 'Emailed links for one named reader', 'One payment; optional renewal'].map(item => (
-                    <li key={item} className="flex gap-2"><CheckCircle aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-stone-teal" />{item}</li>
-                  ))}
-                </ul>
-                <p className="mt-2 text-sm text-text-muted">Includes 12 months of monthly updates. Purchases open at launch.</p>
-                <div className="mt-4"><EarlyAccessCTA tierTag="tier-sector-reports" label="Notify me at launch" size="default" buttonClassName="w-full bg-stone-teal text-ink-on-accent hover:bg-stone-teal/90" /></div>
-                <p className="mt-3 text-xs leading-relaxed text-text-muted">Join the newsletter for report launch news. The preview is free to read below.</p>
+                <div className="flex items-start gap-4">
+                  {report.slug === 'ai-and-european-manufacturing' && edition.number === 1 && <Image src="/reports/manufacturing-edition-1-cover.webp" alt="Cover of AI and European Manufacturing, Edition 1, October 2026" width={595} height={842} sizes="88px" className="h-auto w-22 shrink-0 border border-border-subtle shadow-sm" />}
+                  <div className="min-w-0">
+                    <h2 className="text-lg font-semibold text-text-primary">One report. A year of updates.</h2>
+                    <p className="mt-3 text-3xl font-semibold text-text-primary">{gbp(AMOUNTS.sectorReport)}</p>
+                  </div>
+                </div>
+                <p className="mt-5 text-sm leading-relaxed text-text-muted">Current PDF and monthly updates for 12 months, emailed to one named reader.</p>
+                <p className="mt-3 text-sm leading-relaxed text-text-muted">One payment. Optional renewal, with no automatic renewal.</p>
+                <p className="mt-4 text-sm text-text-muted">Purchases open at launch.</p>
+                <div className="mt-3"><EarlyAccessCTA tierTag="tier-sector-reports" label="Notify me at launch" size="default" buttonClassName="w-full bg-stone-teal text-ink-on-accent hover:bg-stone-teal/90" /></div>
+                <p className="mt-3 text-xs leading-relaxed text-text-muted">Join the newsletter for report launch news.</p>
               </aside>
             </div>
           </div>
