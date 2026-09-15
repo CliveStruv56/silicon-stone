@@ -3,17 +3,17 @@
 import { useCallback, useEffect, useState } from "react";
 import { track } from "@/lib/track";
 import { useStandalone } from "@/lib/pwa/useStandalone";
+import {
+  DISMISSED_AT_KEY,
+  SESSION_COUNT_KEY,
+  SESSION_FLAG_KEY,
+  isInstallPromptEligible,
+} from "@/lib/pwa/install-eligibility";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
-
-const SESSION_COUNT_KEY = "ss:session-count";
-const SESSION_FLAG_KEY = "ss:session-counted";
-const DISMISSED_AT_KEY = "ss:install-dismissed-at";
-const MIN_SESSIONS = 2;
-const RENAG_WINDOW_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 
 function isIos() {
   const ua = window.navigator.userAgent;
@@ -24,7 +24,7 @@ function isIos() {
   );
 }
 
-/** Session count ≥ threshold, and not dismissed within the re-nag window. */
+/** Counts this session once, then asks the pure rule whether the card may show. */
 function passesValueThreshold(): boolean {
   try {
     let count = Number(localStorage.getItem(SESSION_COUNT_KEY) ?? "0");
@@ -33,11 +33,21 @@ function passesValueThreshold(): boolean {
       count += 1;
       localStorage.setItem(SESSION_COUNT_KEY, String(count));
     }
-    const dismissedAt = Number(localStorage.getItem(DISMISSED_AT_KEY) ?? "0");
-    if (dismissedAt && Date.now() - dismissedAt < RENAG_WINDOW_MS) return false;
-    return count >= MIN_SESSIONS;
+    return isInstallPromptEligible({
+      sessionCount: count,
+      dismissedAt: localStorage.getItem(DISMISSED_AT_KEY),
+      now: Date.now(),
+    });
   } catch {
     return false;
+  }
+}
+
+function recordDismissal() {
+  try {
+    localStorage.setItem(DISMISSED_AT_KEY, String(Date.now()));
+  } catch {
+    /* ignore */
   }
 }
 
@@ -45,7 +55,9 @@ function passesValueThreshold(): boolean {
  * Branded add-to-home-screen card. Never shows on a first visit: the deferred
  * `beforeinstallprompt` is only surfaced from the second session onwards
  * (Chromium), and iOS — which has no install event — gets manual share-sheet
- * instructions under the same threshold. Dismissal sticks for 30 days.
+ * instructions under the same threshold. A dismissal holds for 90 days: "Not
+ * now", the close control and cancelling Chrome's own install dialog all
+ * record it.
  *
  * It is also held back until the reader has scrolled past the first screen. The
  * card is `position: fixed`, so wherever it is anchored it lands on top of the
@@ -116,11 +128,7 @@ export function InstallPrompt() {
   }, [standalone]);
 
   const dismiss = useCallback(() => {
-    try {
-      localStorage.setItem(DISMISSED_AT_KEY, String(Date.now()));
-    } catch {
-      /* ignore */
-    }
+    recordDismissal();
     setMode("hidden");
   }, []);
 
@@ -129,6 +137,9 @@ export function InstallPrompt() {
     await deferred.prompt();
     const { outcome } = await deferred.userChoice;
     if (outcome === "accepted") track("PWA Install");
+    // Cancelling the browser's dialog is a "no" too. Left unrecorded, the card
+    // came straight back on the next page load as if nothing had been said.
+    else recordDismissal();
     setDeferred(null);
     setMode("hidden");
   }, [deferred]);

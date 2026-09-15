@@ -878,6 +878,20 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### September 15, 2026 — Install prompt: a dismissal now holds for 90 days
+
+The add-to-home-screen card re-asked every 30 days after "Not now", so a daily
+reader (the owner) saw it return each month and read that as the card ignoring
+the answer. The stored dismissal on production was checked in the owner's Chrome
+before touching anything: recorded 10 September, honoured on a fresh load, so
+the persistence path itself was sound and the window was the cause. Two
+changes: the re-nag window is **90 days** (owner decision; the rule now lives in
+`src/lib/pwa/install-eligibility.ts`, pure and tested with the clock injected —
+values written under the old scheme are the same epoch strings and still
+count), and cancelling Chrome's **native** install dialog after pressing "Add"
+now records a dismissal too; before, that path wrote nothing, so the card came
+straight back on the next page load. The second-session threshold is unchanged.
+
 ### September 15, 2026 — Project review; Next.js image-optimizer RCE patched
 
 **The review** (`docs/review-report-2026-09-15.md`; brief in
@@ -8258,7 +8272,8 @@ Impression`, `Email Capture`, `Product View`, `Advisory Lead`, `Push Opt In`.
   generated worker gitignored; SW disabled in dev.
 - **P0-5**: `src/lib/track.ts` (Plausible event helper), `useStandalone()` hook,
   branded InstallPrompt (2nd-session threshold, iOS share-sheet fallback,
-  30-day dismissal, `PWA+Install` goal) mounted in the (website) layout.
+  dismissal — 30-day re-nag until 2026-09-15, 90 days since — `PWA+Install`
+  goal) mounted in the (website) layout.
 - **P0-6**: `scripts/pwa-checks.ts` + `npm run test:pwa` CI job asserting
   manifest/SW/offline/icons (replaces the spec's Lighthouse PWA gate — that
   category was removed in Lighthouse v12).
