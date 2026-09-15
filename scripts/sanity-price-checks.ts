@@ -31,8 +31,11 @@
  */
 
 import { createClient } from '@sanity/client'
+import { loadEnvConfig } from '@next/env'
 
 import { SANITY_PRODUCTS } from '../src/lib/offering'
+
+loadEnvConfig(process.cwd())
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET

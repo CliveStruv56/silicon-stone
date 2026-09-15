@@ -642,7 +642,7 @@ rendering, including its price, description and canonical checkout.
 | Product | Price | Summary | Where it lives |
 |---|---|---|---|
 | **AI Act Compliance Toolkit** | **Standard £79 / Professional £275** | Complete gap assessment, systems register, classification guidance, vendor questionnaire and dependency scorecard, editable policies and board summary, action tracker, worked examples and 90-day plan. Both include 12 months of updated files and quarterly emails. Professional adds secure advance workbook submission, preparation, a 45-minute live review covering up to three systems, and a written action summary. | `/products/ai-act-toolkit` |
-| **Sector Reports** | **£39 each, or 3 for £99** | Industry briefings; waitlist until the first report is ready. | `/products/sector-reports` |
+| **Sector Reports** | **£149 per report** | One named reader; current PDF and monthly updates for 12 months, optional renewal. Manufacturing preview available; checkout pending. | `/products/sector-reports` |
 
 Standard buyers can upgrade for the £196 difference after receipt verification.
 Professional is for internal teams, with one review per purchase; book within

@@ -1,0 +1,510 @@
+{
+  "slug": "ai-and-european-manufacturing",
+  "title": "AI and European Manufacturing",
+  "description": "Explore the EU and UK regulatory landscape, the vendors bringing AI to the shop floor, and dependencies on magnets, chips, cloud and model access. Includes workforce pressures, three scenarios to 2028, and implications for operations, compliance and market entry.",
+  "highlights": [
+    "EU regulation and a dedicated UK chapter",
+    "Industrial AI vendors, adoption evidence and supply-chain risks",
+    "Talent, historical lessons and three scenarios to 2028",
+    "Market tables, evidence notes and a review trigger calendar"
+  ],
+  "audiences": [
+    {
+      "title": "Operations and supply-chain directors",
+      "description": "What could stop the line, change a purchasing decision or put a supplier at risk."
+    },
+    {
+      "title": "Legal and compliance officers",
+      "description": "The instruments, company roles, evidence requirements and dates to investigate."
+    },
+    {
+      "title": "Founders and executives entering Europe",
+      "description": "What European market entry involves, with the EU and UK compared."
+    }
+  ],
+  "relatedArticleSlugs": [
+    "iran-conflict-european-technology-supply-crisis",
+    "helium-scarcity-semiconductor-production",
+    "semiconductor-testing-bottleneck-ai-accelerators",
+    "korean-memory-fab-capacity-squeeze-2027"
+  ],
+  "edition": {
+    "label": "October 2026",
+    "number": 1,
+    "evidenceCutoff": "2026-09-15",
+    "thesis": "Europe is regulating factory AI faster than its factories are adopting it — and doing so on top of a supply chain it does not control.",
+    "summaryOpening": "European manufacturers face a compliance calendar for artificial intelligence that runs two to three years ahead of measured adoption on the shop floor. The first of its obligations is already live; the heaviest arrive between January 2027 and August 2028. At the same time, the inputs that any adoption depends on — permanent magnets, mature-node chips, AI accelerators and, since June 2026, the frontier models themselves — sit under licensing regimes in Beijing and Washington that Brussels can monitor but not override. Europe's record with programmes of this kind suggests the regulation will arrive on time and the sovereign alternatives will not.",
+    "contents": [
+      {
+        "title": "Front matter",
+        "entries": [
+          {
+            "title": "About this edition",
+            "depth": 0
+          },
+          {
+            "title": "How to read this guide",
+            "depth": 0
+          },
+          {
+            "title": "Executive summary",
+            "depth": 0
+          },
+          {
+            "title": "What this means, by reader",
+            "depth": 1
+          },
+          {
+            "title": "Market context: who supplies AI to European plants, and what it runs on",
+            "depth": 0
+          },
+          {
+            "title": "The six Stone Truths of this edition",
+            "depth": 0
+          },
+          {
+            "title": "EU obligations timeline, September 2026 → August 2028",
+            "depth": 0
+          },
+          {
+            "title": "UK timeline",
+            "depth": 0
+          },
+          {
+            "title": "Evidence notes — Executive summary and market context",
+            "depth": 0
+          }
+        ]
+      },
+      {
+        "title": "Part I — The EU regulatory stack as it lands on a manufacturer",
+        "entries": [
+          {
+            "title": "Sector card — Machinery and Mittelstand engineering",
+            "depth": 0
+          },
+          {
+            "title": "1. Six questions a director must answer",
+            "depth": 0
+          },
+          {
+            "title": "2. The AI Act as amended by the Digital Omnibus",
+            "depth": 0
+          },
+          {
+            "title": "2.1 The calendar",
+            "depth": 1
+          },
+          {
+            "title": "2.2 The machinery move",
+            "depth": 1
+          },
+          {
+            "title": "2.3 \"Safety component\" narrowed",
+            "depth": 1
+          },
+          {
+            "title": "2.4 What was not carved out: AI that manages workers",
+            "depth": 1
+          },
+          {
+            "title": "2.5 When a manufacturer becomes a provider",
+            "depth": 1
+          },
+          {
+            "title": "2.6 The plant operator's list",
+            "depth": 1
+          },
+          {
+            "title": "2.7 Industrial chatbots and copilots",
+            "depth": 1
+          },
+          {
+            "title": "2.8 Guidance, standards and delegated acts",
+            "depth": 1
+          },
+          {
+            "title": "2.9 Penalties",
+            "depth": 1
+          },
+          {
+            "title": "3. The Machinery Regulation",
+            "depth": 0
+          },
+          {
+            "title": "3.1 Compulsory certification for learning safety functions",
+            "depth": 1
+          },
+          {
+            "title": "3.2 Software integrity and tamper-evidence",
+            "depth": 1
+          },
+          {
+            "title": "3.3 Digital instructions",
+            "depth": 1
+          },
+          {
+            "title": "3.4 Harmonised standards",
+            "depth": 1
+          },
+          {
+            "title": "4. The Cyber Resilience Act",
+            "depth": 0
+          },
+          {
+            "title": "5. The network-security directive (NIS2)",
+            "depth": 0
+          },
+          {
+            "title": "6. The Data Act",
+            "depth": 0
+          },
+          {
+            "title": "7. The revised Product Liability Directive",
+            "depth": 0
+          },
+          {
+            "title": "8. Sustainability due diligence and reporting after Omnibus I",
+            "depth": 0
+          },
+          {
+            "title": "9. The carbon border adjustment mechanism",
+            "depth": 0
+          },
+          {
+            "title": "10. Export controls on dual-use items",
+            "depth": 0
+          },
+          {
+            "title": "11. The standards gap",
+            "depth": 0
+          },
+          {
+            "title": "12. The Tech Sovereignty Package",
+            "depth": 0
+          },
+          {
+            "title": "13. Role matrix — ten industrial scenarios",
+            "depth": 0
+          },
+          {
+            "title": "14. Conflicts and overlaps",
+            "depth": 0
+          },
+          {
+            "title": "Methodology audit — Part I",
+            "depth": 0
+          },
+          {
+            "title": "Three lenses",
+            "depth": 0
+          },
+          {
+            "title": "Evidence notes — Part I",
+            "depth": 0
+          }
+        ]
+      },
+      {
+        "title": "Part II — The United Kingdom",
+        "entries": [
+          {
+            "title": "1. The shape of the divergence",
+            "depth": 0
+          },
+          {
+            "title": "2. Product safety and machinery",
+            "depth": 0
+          },
+          {
+            "title": "3. Cyber",
+            "depth": 0
+          },
+          {
+            "title": "4. Data",
+            "depth": 0
+          },
+          {
+            "title": "5. Liability",
+            "depth": 0
+          },
+          {
+            "title": "6. Supply chain and sustainability",
+            "depth": 0
+          },
+          {
+            "title": "7. Adoption evidence",
+            "depth": 0
+          },
+          {
+            "title": "8. Export controls and investment screening",
+            "depth": 0
+          },
+          {
+            "title": "9. Side-by-side: eleven instrument pairs",
+            "depth": 0
+          },
+          {
+            "title": "10. What a UK manufacturer must still do for the EU market",
+            "depth": 0
+          },
+          {
+            "title": "Methodology audit — Part II",
+            "depth": 0
+          },
+          {
+            "title": "Three lenses",
+            "depth": 0
+          },
+          {
+            "title": "Evidence notes — Part II",
+            "depth": 0
+          }
+        ]
+      },
+      {
+        "title": "Part III — Supply-chain risk",
+        "entries": [
+          {
+            "title": "Sector card — Chemicals, pharma and process",
+            "depth": 0
+          },
+          {
+            "title": "Sector card — Electronics and defence-adjacent",
+            "depth": 0
+          },
+          {
+            "title": "1. Rare earths and permanent magnets",
+            "depth": 0
+          },
+          {
+            "title": "2. Legacy-node and industrial semiconductors",
+            "depth": 0
+          },
+          {
+            "title": "3. AI accelerators and the software layer",
+            "depth": 0
+          },
+          {
+            "title": "4. Automation and software vendor concentration",
+            "depth": 0
+          },
+          {
+            "title": "5. Chemicals and pharma",
+            "depth": 0
+          },
+          {
+            "title": "6. Chinese industrial competition",
+            "depth": 0
+          },
+          {
+            "title": "7. Logistics",
+            "depth": 0
+          },
+          {
+            "title": "8. Three scenarios to 2028",
+            "depth": 0
+          },
+          {
+            "title": "Methodology audit — Part III",
+            "depth": 0
+          },
+          {
+            "title": "Three lenses",
+            "depth": 0
+          },
+          {
+            "title": "Evidence notes — Part III",
+            "depth": 0
+          }
+        ]
+      },
+      {
+        "title": "Part IV — Talent",
+        "entries": [
+          {
+            "title": "1. Three shortages, not one",
+            "depth": 0
+          },
+          {
+            "title": "2. The synchronised demographic cliff",
+            "depth": 0
+          },
+          {
+            "title": "3. Policy responses",
+            "depth": 0
+          },
+          {
+            "title": "4. Where AI talent sits",
+            "depth": 0
+          },
+          {
+            "title": "5. Does shop-floor AI replace missing workers, or require new ones?",
+            "depth": 0
+          },
+          {
+            "title": "Methodology audit — Part IV",
+            "depth": 0
+          },
+          {
+            "title": "Three lenses",
+            "depth": 0
+          },
+          {
+            "title": "Evidence notes — Part IV",
+            "depth": 0
+          }
+        ]
+      },
+      {
+        "title": "Part V — The Long-Memory Filter",
+        "entries": [
+          {
+            "title": "1. Industrie 4.0",
+            "depth": 0
+          },
+          {
+            "title": "2. The 2021–23 semiconductor shortage",
+            "depth": 0
+          },
+          {
+            "title": "3. GAIA-X, Catena-X, Manufacturing-X",
+            "depth": 0
+          },
+          {
+            "title": "4. The Chips Act's 20%",
+            "depth": 0
+          },
+          {
+            "title": "5. Lisbon, Europe 2020 and Draghi",
+            "depth": 0
+          },
+          {
+            "title": "6. Earlier attempts at sovereign technology",
+            "depth": 0
+          },
+          {
+            "title": "7. Seven patterns the filter surfaces",
+            "depth": 0
+          },
+          {
+            "title": "Methodology audit — Part V",
+            "depth": 0
+          },
+          {
+            "title": "Three lenses",
+            "depth": 0
+          },
+          {
+            "title": "Evidence notes — Part V",
+            "depth": 0
+          }
+        ]
+      },
+      {
+        "title": "Part VI — Forensic Technopolitics matrix and Stone Truth",
+        "entries": [
+          {
+            "title": "Supply Chain × Scenario Modelling",
+            "depth": 0
+          },
+          {
+            "title": "Supply Chain × Long-Memory",
+            "depth": 0
+          },
+          {
+            "title": "Policy × Scenario Modelling",
+            "depth": 0
+          },
+          {
+            "title": "Policy × Long-Memory",
+            "depth": 0
+          },
+          {
+            "title": "Talent × Scenario Modelling",
+            "depth": 0
+          },
+          {
+            "title": "Talent × Long-Memory",
+            "depth": 0
+          },
+          {
+            "title": "Stone Truth — Edition 1",
+            "depth": 0
+          },
+          {
+            "title": "Closing strip",
+            "depth": 0
+          }
+        ]
+      },
+      {
+        "title": "Appendix A — Market tables",
+        "entries": [
+          {
+            "title": "A.1 Incumbent industrial software and automation",
+            "depth": 0
+          },
+          {
+            "title": "A.2 Robotics",
+            "depth": 0
+          },
+          {
+            "title": "A.3 European models with industrial positioning",
+            "depth": 0
+          },
+          {
+            "title": "A.4 The US dependency layer",
+            "depth": 0
+          },
+          {
+            "title": "A.5 Adoption evidence",
+            "depth": 0
+          },
+          {
+            "title": "A.6 Pharma and process regulatory instruments for AI",
+            "depth": 0
+          }
+        ]
+      },
+      {
+        "title": "Appendix B — Claim ledger summary",
+        "entries": [
+          {
+            "title": "Carried-forward facts flagged for re-verification before Edition 2",
+            "depth": 0
+          },
+          {
+            "title": "Thin-evidence entries (by chapter)",
+            "depth": 0
+          }
+        ]
+      },
+      {
+        "title": "Closing reference sections",
+        "entries": [
+          {
+            "title": "Review Trigger Calendar",
+            "depth": 0
+          },
+          {
+            "title": "Corrections and superseded positions",
+            "depth": 0
+          },
+          {
+            "title": "Glossary of instruments",
+            "depth": 0
+          },
+          {
+            "title": "Sources by evidence class",
+            "depth": 0
+          }
+        ]
+      }
+    ],
+    "evidenceNote": "Sources, evidence limitations and carried-forward claims are identified in the report.",
+    "nextEditionNote": "The next edition is planned for November 2026, with an evidence cut-off of 10 November.",
+    "changes": [],
+    "pageCount": 60
+  }
+}

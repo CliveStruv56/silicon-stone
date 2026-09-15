@@ -4,6 +4,8 @@ import { series } from './series'
 import { author } from './author'
 import { category } from './category'
 import { product } from './product'
+import { sectorReport } from './sectorReport'
+import { sectorReportEdition } from './sectorReportEdition'
 import { persona } from './persona'
 import { siteSettings } from './siteSettings'
 import { youtubeScript } from './youtubeScript'
@@ -23,6 +25,8 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     author,
     category,
     product,
+    sectorReport,
+    sectorReportEdition,
     persona,
     siteSettings,
     youtubeScript,

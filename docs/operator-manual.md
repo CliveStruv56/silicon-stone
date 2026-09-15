@@ -744,13 +744,22 @@ Under **Content**, in order:
 1. **Site Settings** (singleton)
 2. **Image Library** — browse by collection, all images, manage collections
 3. **Knowledge** — see §11
-4. **Article · Series · Author · Category · Product · Persona · YouTube Script ·
-   Glossary Term**
+4. **Article · Series · Author · Category · Product · Sector report · Sector report edition ·
+   Persona · YouTube Script · Glossary Term**
 
 **Series** sits directly under Article because that is the order the types are
 registered in, not because anyone placed it there — the sidebar renders the
 remainder of the types in registration order. See §10 for what a series is and
 how to build one.
+
+### Monthly sector report previews
+
+**Sector report** holds the permanent product identity, public preview switch and selected
+article promotions. **Sector report edition** holds each month's contents and opening
+summary. Publish an edition, then select it as the report's **Current edition**.
+These are public preview fields: never upload the full paid PDF or paste its body here.
+See [Sector report operations](sector-reports-operations.md) for the monthly workflow
+and the separate purchase-delivery work still required before checkout opens.
 
 ### The article's three tabs
 

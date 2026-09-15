@@ -44,8 +44,7 @@ export const AMOUNTS = {
   /** Products. */
   toolkitStandard: 79,
   toolkitProfessional: 275,
-  sectorReport: 39,
-  sectorReportTrio: 99,
+  sectorReport: 149,
 
   /** Advisory. */
   advisoryBriefing: 450,
@@ -172,16 +171,6 @@ export const FREE_OFFERINGS: Offering[] = [
  */
 export const PRODUCTS: Offering[] = [
   {
-    id: 'sector-reports',
-    name: 'Sector Reports',
-    price: gbp(AMOUNTS.sectorReport),
-    priceNote: `each · or three for ${gbp(AMOUNTS.sectorReportTrio)}`,
-    summary:
-      '15–20 page briefings per industry: AI landscape, regulatory exposure, geopolitical risk, three scenarios and a 90-day checklist.',
-    href: '/products/sector-reports',
-    status: 'Waitlist — first report in preparation',
-  },
-  {
     id: 'ai-act-toolkit',
     name: 'AI Act Compliance Toolkit',
     price: gbp(AMOUNTS.toolkitStandard),
@@ -196,6 +185,21 @@ export const PRODUCTS: Offering[] = [
       'Both editions include the complete toolkit, worked examples, editable templates, updated files and quarterly update emails for 12 months.',
       'Professional adds secure advance workbook submission, preparation, a 45-minute live review of up to three systems and a personalised written action summary.',
       `Start with Standard and upgrade to Professional for the ${gbp(DERIVED.toolkitProfessionalUpgrade)} difference.`,
+    ],
+  },
+  {
+    id: 'sector-reports',
+    name: 'Sector Reports',
+    price: gbp(AMOUNTS.sectorReport),
+    priceNote: 'per report · includes 12 months of monthly updates',
+    summary:
+      'In-depth guides to industrial AI adoption, regulation and geopolitical risk. Explore the full contents and opening summary of AI and European Manufacturing.',
+    href: '/products/sector-reports',
+    status: 'First report preview available',
+    terms: [
+      'One payment covers the current PDF and monthly editions released during the next 12 months.',
+      'One named reader; emailed PDF links. Team use is priced separately.',
+      'Optional renewal, with no automatic renewal.',
     ],
   },
 ]

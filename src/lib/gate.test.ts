@@ -26,6 +26,25 @@ const CHECKLIST: GateProduct = {
 
 const EMAIL_FALLBACK = { headline: 'Subscribe', body: 'The newsletter.' }
 
+describe('sector report previews', () => {
+  it('replaces stale report checkout and price copy with the current preview offer', () => {
+    const product = currentGateProduct({
+      name: 'Sector Reports', slug: 'sector-reports', productPath: '/products/sector-reports',
+      priceLabel: 'From £39', checkoutUrl: 'https://old-store.lemonsqueezy.com/buy/old-report',
+    })
+    const gate = resolveGate({
+      gate: { mode: 'commerce', ctaLabel: 'Buy three for £99', body: 'A 90-day checklist' },
+      upsellProduct: product, emailFallback: EMAIL_FALLBACK,
+    })
+    expect(gate.mode).toBe('commerce')
+    if (gate.mode !== 'commerce') throw new Error('Expected report preview')
+    expect(gate.product.checkoutUrl).toBeNull()
+    expect(gate.product.priceLabel).toContain('£149')
+    expect(gate.ctaLabel).toBe('View contents and preview')
+    expect(gate.body).not.toContain('90-day')
+  })
+})
+
 const resolve = (
   overrides: Partial<Parameters<typeof resolveGate>[0]> = {},
 ) =>

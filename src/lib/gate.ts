@@ -72,6 +72,15 @@ export type ResolvedGate =
 
 /** Resolve retained CMS references to the consolidated offer before rendering. */
 export function currentGateProduct(product: GateProduct): GateProduct {
+  if (product.slug === 'sector-reports' || product.productPath.startsWith('/products/sector-reports')) {
+    return {
+      ...product,
+      priceLabel: `${gbp(AMOUNTS.sectorReport)} · 12 months of monthly updates`,
+      checkoutUrl: null,
+      badge: 'Preview available',
+      blurb: 'Explore the report contents and opening Executive Summary. One payment covers one named reader, with monthly PDF updates for 12 months and optional renewal.',
+    }
+  }
   if (!['ai-audit-checklist', 'ai-act-toolkit'].includes(product.slug) &&
       !['/products/ai-audit-checklist', '/products/ai-act-toolkit'].includes(product.productPath)) return product
   const toolkit = offeringById('ai-act-toolkit')
@@ -172,16 +181,17 @@ export function resolveGate(params: {
 
   const commerceGate = (candidate: GateProduct): ResolvedGate => {
     const product = currentGateProduct(candidate)
+    const isReport = product.productPath.startsWith('/products/sector-reports')
     // Only commerce copy belongs to the retired offer. Preserve separately
     // authored newsletter/lead copy when an editor changes the gate mode.
-    const copy = retiredGate ? null : gate
+    const copy = retiredGate || isReport ? null : gate
     return {
       mode: 'commerce',
       headline: copy?.headline || `Go deeper: ${product.name}`,
       body: copy?.body || product.blurb ||
         'A practical companion to what you just read — built for the same decisions.',
       ctaLabel: copy?.ctaLabel ||
-        (product.priceLabel ? `Get it — ${product.priceLabel}` : 'View product'),
+        (isReport ? 'View contents and preview' : product.priceLabel ? `Get it — ${product.priceLabel}` : 'View product'),
       product,
     }
   }

@@ -46,6 +46,9 @@ import {
   type SeriesRef,
 } from '@/lib/series'
 import { absoluteUrl } from '@/lib/site'
+import { getSectorReports } from '@/lib/sector-reports-server'
+import { reportForArticle, sectorReportPath } from '@/lib/sector-reports'
+import { SectorReportPromotion } from '@/components/products/SectorReportPromotion'
 import {
   buildArticleSchema,
   buildBreadcrumbSchema,
@@ -257,9 +260,10 @@ function splitBodyForCapture(
 
 export default async function ArticlePage({ params }: Props) {
   const { slug } = await params
-  const [{ data: article }, { data: upsellProducts }] = await Promise.all([
+  const [{ data: article }, { data: upsellProducts }, reports] = await Promise.all([
     sanityFetch({ query: ARTICLE_QUERY, params: { slug } }),
     sanityFetch({ query: UPSELL_PRODUCTS_QUERY }),
+    getSectorReports(),
   ])
 
   if (!article) {
@@ -267,6 +271,7 @@ export default async function ArticlePage({ params }: Props) {
   }
 
   const readingTime = getReadingTime(article.body || [])
+  const relatedReport = reportForArticle(reports, slug)
   const showGlossaryToggle = hasGlossaryAnnotations(article.body || [])
   const primaryPersona = article.personas?.[0]
   const hasIntelligenceFields = article.intelligenceTier || article.impactScore || article.stoneTruth
@@ -718,6 +723,9 @@ export default async function ArticlePage({ params }: Props) {
 
           {/* End-of-article gate (P3-1): newsletter, product upsell, or lead —
               mode + copy from Sanity, never blocking the body above. */}
+          {relatedReport && article.gate?.mode !== 'none' &&
+            !(resolvedGate.mode === 'commerce' && resolvedGate.product.productPath === sectorReportPath(relatedReport.slug)) &&
+            <SectorReportPromotion report={relatedReport} />}
           <Gate gate={resolvedGate} intelligenceTier={article.intelligenceTier} />
 
           {/* Related Articles - semantic similarity via Pinecone */}

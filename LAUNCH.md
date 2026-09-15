@@ -216,13 +216,16 @@ one extra click between a reader and a payment.
       **Lemon Squeezy checkout URL** on the matching document:
   - `product-ai-act-toolkit` ← the **Standard** link (the gate advertises
     "From £79", so Standard is the right target)
-  - `product-sector-reports` — leave blank until the reports exist. Its
+  - `product-sector-reports` — keep checkout blank until report fulfilment is ready.
+    The manufacturing preview is implemented at the agreed £149 price, including
+    12 months of updates for one reader. Explicit preview invitations now appear
+    on selected articles, separate from their existing gates. See
+    `docs/sector-reports-operations.md` for monthly publishing and remaining delivery work. Its
     `topics` were **deliberately cleared on 2026-08-15** so the automatic
     upsell can never select it: with topics set, three published articles
     advertised "Get it — From £39" for a product whose page is a waitlist.
-    **Restore `semiconductors`, `us-technopolitics` and `atlantic-drift` when
-    the first sector report is actually on sale** — until then those articles
-    correctly fall back to the newsletter gate.
+    Review topic matching at sales launch; keep broad automatic mappings empty
+    for now. Editors select relevant articles on the Sector report record.
 - [ ] **Do not retype a `priceLabel` in Studio.** `npm run test:sanity-prices`
       fails CI when a published product document's `priceLabel`, `name` or
       `productPath` disagrees with `SANITY_PRODUCTS` in `src/lib/offering.ts`.

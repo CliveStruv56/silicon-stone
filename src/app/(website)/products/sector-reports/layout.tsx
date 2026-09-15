@@ -1,10 +1,9 @@
 import type { Metadata } from 'next'
 
-// Metadata lives in a server layout because the page itself is a Client Component.
 export const metadata: Metadata = {
   title: 'Sector Reports | Silicon and Stone',
   description:
-    'Subscription sector intelligence: forensic analysis of AI regulation, semiconductors, and digital sovereignty for industry leaders.',
+    'Preview AI and European Manufacturing: full contents and an Executive Summary excerpt. Sector reports include monthly updates for 12 months with one payment.',
   alternates: { canonical: '/products/sector-reports' },
 }
 

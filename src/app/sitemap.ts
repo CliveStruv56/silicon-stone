@@ -8,6 +8,8 @@ import {
 } from '@/sanity/lib/queries'
 import { absoluteUrl } from '@/lib/site'
 import { RULE_PACK } from '@/lib/rulepack'
+import { getSectorReports } from '@/lib/sector-reports-server'
+import { sectorReportPath } from '@/lib/sector-reports'
 
 /**
  * Dynamic sitemap.xml — enumerates the public site for crawlers and AI engines.
@@ -67,7 +69,7 @@ const STATIC_ROUTES: Array<{
 ]
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [{ data: articles }, { data: categories }, { data: authors }, { data: seriesList }] =
+  const [{ data: articles }, { data: categories }, { data: authors }, { data: seriesList }, reports] =
     await Promise.all([
       sanityFetch({
         query: SITEMAP_ARTICLES_QUERY,
@@ -89,6 +91,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         perspective: 'published',
         stega: false,
       }),
+      getSectorReports(),
     ])
 
   const staticEntries: MetadataRoute.Sitemap = STATIC_ROUTES.map((route) => ({
@@ -156,6 +159,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     ...staticEntries,
+    ...reports.map(report => ({
+      url: absoluteUrl(sectorReportPath(report.slug)),
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
+    })),
     ...provisionEntries,
     ...articleEntries,
     ...seriesEntries,

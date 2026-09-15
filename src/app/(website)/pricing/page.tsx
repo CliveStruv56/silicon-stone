@@ -21,7 +21,7 @@ import {
 
 const DESCRIPTION =
   `Everything Silicon and Stone offers and what it costs — free intelligence and tools, ` +
-  `digital products from ${gbp(AMOUNTS.sectorReport)}, an Advisory Briefing for ` +
+  `digital products from ${gbp(AMOUNTS.toolkitStandard)}, an Advisory Briefing for ` +
   `${gbp(AMOUNTS.advisoryBriefing)}, and other advisory fees agreed after scoping.`
 
 export const metadata: Metadata = {
