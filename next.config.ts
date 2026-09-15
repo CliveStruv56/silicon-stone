@@ -63,6 +63,11 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'cdn.sanity.io',
+        // Scoped to THIS project's dataset. Without the pathname the
+        // optimiser accepts any Sanity project's public asset, which turned
+        // GHSA-2xp9-vwfh-vxw4 (RCE via a crafted AVIF, fixed in next 15.5.24)
+        // into a path anyone with a free Sanity project could reach.
+        pathname: '/images/3q59mpd7/production/**',
       },
     ],
   },

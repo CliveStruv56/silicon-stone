@@ -64,15 +64,24 @@ React 19 bundle. Do NOT run a blind `npm update` / `npm install <pkg>@latest`:
   together.
 - The Sanity `apiVersion` is sourced from `NEXT_PUBLIC_SANITY_API_VERSION`
   (default `2026-01-13`); keep all clients/scripts on that single value.
-- **Three `overrides` exist for security patches, and one of them deliberately
-  contradicts a declared range.** `next@15.5.23` declares `sharp: ^0.34.3`, but
-  every `sharp` below `0.35.0` carries four inherited libvips CVEs and npm
-  offers only `next@16` as the fix — which `CLAUDE.md` forbids. So `sharp` is
-  overridden to `^0.35.3`, and that was verified rather than assumed: Next's
-  image optimizer was exercised against a real Sanity asset and returns a
+- **Three `overrides` exist for security patches.** `sharp` is overridden to
+  `^0.35.4` (libheif advisory GHSA-rgj7-g3m4-5g8c; libheif is the HEIF/AVIF
+  decoder). Until `next@15.5.24` that override contradicted Next's declared
+  `sharp: ^0.34.3`; `15.5.24+` declares `^0.34.3 || ^0.35.4`, so it no longer
+  does — keep it anyway, because npm otherwise resolves the lower range. Every
+  move of the override has been verified rather than assumed: Next's image
+  optimizer is exercised against a real Sanity asset and must return a
   correctly resized image on the plain path and a WebP on the browser `Accept`
   path. `nanoid@^3.3.18` and `ws@^8.21.3` are ordinary patches. Re-verify the
   image path if the `sharp` override moves again.
+- **Patch releases inside the v15 line are allowed and expected.** `next@15.5.23`
+  carried GHSA-2xp9-vwfh-vxw4, an unauthenticated RCE in the image optimizer via
+  a crafted AVIF, fixed in `15.5.24`; the ceiling forbids `next@16`, not
+  `15.5.x`. The `cdn.sanity.io` remote pattern in `next.config.ts` carries a
+  `pathname` scoped to this project's dataset for the same reason: without it
+  the optimizer fetched any Sanity project's public asset, so an attacker
+  needed only a free Sanity project of their own to reach that code path.
+  Re-read `npm audit` at every review instead of trusting the prose here.
 - **Do NOT run `npm audit fix --force`.** It proposes `next@16`, `sanity@6` and
   `next-sanity@13`, every one of which the ceilings above forbid. The remaining
   audit findings all sit under the `sanity` CLI/export toolchain, which never

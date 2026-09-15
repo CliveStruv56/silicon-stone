@@ -1,8 +1,22 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-09-14
-> Status: **Sovereign Architecture Review combined into the Strategic Assessment (owner decision 2026-09-14); specialist projects back to four. Products hub given hero artwork. Earlier deployment records below are history.**
+> Last Updated: 2026-09-15
+> Status: **Quarterly project review written (`docs/review-report-2026-09-15.md`, brief in `docs/next-phase-brief-2026-09-15.md`); its one critical finding — an unauthenticated RCE in Next's image optimizer — patched the same day (`next@15.5.25`, `sharp` override `^0.35.4`, Sanity remote pattern scoped to this dataset) and the image path re-verified. The brief's remaining tasks are the next phase. Earlier deployment records below are history.**
+
+## Current work — 15 September 2026: project review, and the Next.js image-optimizer patch
+
+**The second full project review** (the first was 9 June) found the engineering
+side in strong shape — 82 test files, every June finding closed bar HSTS
+`preload` — and the commercial side still open: no Lemon Squeezy store, zero
+Kit tags, no booking link. Its one critical finding was in the framework:
+`next@15.5.23` carried GHSA-2xp9-vwfh-vxw4, an unauthenticated RCE in the image
+optimizer via a crafted AVIF, and `next.config.ts` allowed **any** Sanity
+project's asset through that optimizer because the `cdn.sanity.io` pattern had
+no `pathname`. Both are fixed (see §9). The brief's fourteen tasks — audit
+residue, the twelve documented contradictions the review verified, restructuring
+the two handover documents, report email delivery for the Checker, and the
+owner runbook for the store and tags — are what comes next.
 
 ## Current work — 14 September 2026: one Strategic Assessment, Products hero artwork
 
@@ -863,6 +877,40 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### September 15, 2026 — Project review; Next.js image-optimizer RCE patched
+
+**The review** (`docs/review-report-2026-09-15.md`; brief in
+`docs/next-phase-brief-2026-09-15.md`) ran the suites, eleven guard scripts and
+`npm audit`, and three parallel audits — security, code quality, progress
+against the documents. Headline numbers: 478 commits and +179k lines since
+June; 1,584 tests where there were none; 36 audit findings (3 critical) against
+a documented baseline of 13 moderate. Code scope ~90% built; owner-side scope
+~25–30%. Twelve places where a document contradicts the code were verified and
+listed for the next session rather than fixed today.
+
+**FIX-001 shipped the same day.** `next` 15.5.23 → **15.5.25** (the patch line
+stays inside the v15 ceiling; `eslint-config-next` moved with it), the `sharp`
+override `^0.35.3` → **`^0.35.4`** (libheif, the HEIF/AVIF decoder), and the
+`cdn.sanity.io` remote pattern gained `pathname: '/images/3q59mpd7/production/**'`.
+The pathname is the part that mattered: without it `/_next/image` fetched any
+Sanity project's public asset, so reaching the vulnerable decode path needed
+only a free Sanity project of the attacker's own, not write access to ours.
+
+- **Verified against the built app, not assumed.** Own-project asset on the
+  plain path → 200, PNG resized to 640×349; with a browser `Accept` → 200,
+  WebP 640×349; the same asset under a different project id → 400; own project,
+  different dataset → 400. `npm audit` no longer lists `next` or `sharp`
+  (34 remain, all major-gated or dev/build-time; NEXT-001 clears the
+  non-major set). Suites: lint, typecheck, 1,584 tests, build (128 pages),
+  `test:security`, `test:manual` all green. `next-sanity` moved 11.6.12 → 11.6.13
+  as a transitive patch; still v11.
+- **`CLAUDE.md` dependency section rewritten** to say the override no longer
+  contradicts a declared range (`15.5.24+` declares `^0.34.3 || ^0.35.4`), that
+  patch releases inside v15 are expected, and why the pattern carries a
+  `pathname`. It also now says to re-read `npm audit` at every review instead of
+  trusting the prose — the "all under the Sanity CLI" sentence had been false
+  for some time with nothing to say so.
 
 ### September 14, 2026 — Sovereign Architecture Review combined into the Strategic Assessment
 
