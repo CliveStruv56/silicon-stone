@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { BUYER_TAGS, SUBSCRIBE_TAGS, tagIdsFrom } from './kit-tags'
 import { KIT_TIMEOUT_MS } from './timeouts'
 
 /**
@@ -13,34 +14,14 @@ const KIT_API = 'https://api.kit.com/v4'
 const KIT_API_KEY = process.env.CONVERTKIT_API_KEY || ''
 
 /**
- * Tags the public /api/subscribe route may apply, mapped to their Kit tag-ID
- * env vars. Legacy PascalCase tags predate the one-list/tag architecture and
- * are kept for existing callers.
+ * Tags the public /api/subscribe route may apply, name → Kit tag ID. The
+ * registry (`kit-tags.ts`) is the single list of names and env vars; this is
+ * it read against the environment once at module load.
  */
-export const SUBSCRIBE_TAG_IDS: Record<string, string | undefined> = {
-  // Legacy
-  Tool_Lead: process.env.CONVERTKIT_TOOL_LEAD_TAG_ID,
-  WaymarkPath_Early_Access: process.env.CONVERTKIT_WAYMARKPATH_TAG_ID,
-  // Early access + product tier requested (pre-launch capture)
-  'early-access': process.env.CONVERTKIT_EARLY_ACCESS_TAG_ID,
-  'tier-toolkit-standard': process.env.CONVERTKIT_TIER_TOOLKIT_STANDARD_TAG_ID,
-  'tier-toolkit-professional': process.env.CONVERTKIT_TIER_TOOLKIT_PROFESSIONAL_TAG_ID,
-  'tier-sector-reports': process.env.CONVERTKIT_TIER_SECTOR_REPORTS_TAG_ID,
-  // Source segments (landing pages)
-  'atlantic-drift': process.env.CONVERTKIT_ATLANTIC_DRIFT_TAG_ID,
-  'eu-exposure': process.env.CONVERTKIT_EU_EXPOSURE_TAG_ID,
-  // Tool results subscribe blocks
-  'tool-compliance-checker': process.env.CONVERTKIT_TOOL_COMPLIANCE_CHECKER_TAG_ID,
-  'tool-supply-chain-mapper': process.env.CONVERTKIT_TOOL_SUPPLY_CHAIN_MAPPER_TAG_ID,
-  'tool-scenario-modeler': process.env.CONVERTKIT_TOOL_SCENARIO_MODELER_TAG_ID,
-  'tool-policy-stress-test': process.env.CONVERTKIT_TOOL_POLICY_STRESS_TEST_TAG_ID,
-}
+export const SUBSCRIBE_TAG_IDS: Record<string, string | undefined> = tagIdsFrom(SUBSCRIBE_TAGS, process.env)
 
 /** Buyer tags applied by the Lemon Squeezy order_created webhook only. */
-export const BUYER_TAG_IDS: Record<string, string | undefined> = {
-  'buyer-toolkit-standard': process.env.CONVERTKIT_BUYER_TOOLKIT_STANDARD_TAG_ID,
-  'buyer-toolkit-pro': process.env.CONVERTKIT_BUYER_TOOLKIT_PRO_TAG_ID,
-}
+export const BUYER_TAG_IDS: Record<string, string | undefined> = tagIdsFrom(BUYER_TAGS, process.env)
 
 export function kitConfigured(): boolean {
   return Boolean(KIT_API_KEY)

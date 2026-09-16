@@ -5,8 +5,10 @@ import { notFound } from 'next/navigation'
 import { ArrowRight } from 'lucide-react'
 import { Header, Footer } from '@/components/layout'
 import { Badge } from '@/components/ui/badge'
+import { BuyButton } from '@/components/products/BuyButton'
 import { EarlyAccessCTA } from '@/components/products/EarlyAccessCTA'
 import { ReportUpdates } from '@/components/products/ReportUpdates'
+import { sectorReportCheckoutUrl } from '@/lib/checkout'
 import { getSectorReport, getSectorReports } from '@/lib/sector-reports-server'
 import { reportDate, sectorReportPath } from '@/lib/sector-reports'
 import { AMOUNTS, gbp } from '@/lib/offering'
@@ -34,6 +36,10 @@ export default async function SectorReportPage({ params }: Props) {
   const report = await getSectorReport((await params).slug)
   if (!report) notFound()
   const { edition } = report
+  // Null until the store exists AND PRE_LAUNCH is off; the page then sells
+  // instead of collecting launch notifications.
+  const buyUrl = sectorReportCheckoutUrl(report.slug)
+  const buyLabel = `Buy this report — ${gbp(AMOUNTS.sectorReport)}`
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -48,7 +54,7 @@ export default async function SectorReportPage({ params }: Props) {
             </nav>
             <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-12">
               <div>
-                <Badge variant="outline" className="mb-5 border-stone-teal/40 text-stone-teal">Preview available</Badge>
+                <Badge variant="outline" className="mb-5 border-stone-teal/40 text-stone-teal">{buyUrl ? 'Available now' : 'Preview available'}</Badge>
                 <h1 className="max-w-3xl text-4xl font-bold leading-tight text-text-primary sm:text-5xl">{report.title}</h1>
                 <p className="mt-5 max-w-2xl text-lg leading-relaxed text-text-muted">{report.description}</p>
                 <dl className="mt-8 flex flex-wrap gap-x-8 gap-y-4 text-sm">
@@ -83,9 +89,18 @@ export default async function SectorReportPage({ params }: Props) {
                 </div>
                 <p className="mt-5 text-sm leading-relaxed text-text-muted">Current PDF and monthly updates for 12 months, emailed to one named reader.</p>
                 <p className="mt-3 text-sm leading-relaxed text-text-muted">One payment. Optional renewal, with no automatic renewal.</p>
-                <p className="mt-4 text-sm text-text-muted">Purchases open at launch.</p>
-                <div className="mt-3"><EarlyAccessCTA tierTag="tier-sector-reports" label="Notify me at launch" size="default" buttonClassName="w-full bg-stone-teal text-ink-on-accent hover:bg-stone-teal/90" /></div>
-                <p className="mt-3 text-xs leading-relaxed text-text-muted">Join the newsletter for report launch news.</p>
+                {buyUrl ? (
+                  <>
+                    <div className="mt-5"><BuyButton url={buyUrl} label={buyLabel} event="Buy Sector Report" size="default" className="w-full bg-stone-teal text-ink-on-accent hover:bg-stone-teal/90" /></div>
+                    <p className="mt-3 text-xs leading-relaxed text-text-muted">Secure checkout by Lemon Squeezy, which issues the receipt and handles VAT. The PDF link arrives by email; monthly editions follow for 12 months.</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="mt-4 text-sm text-text-muted">Purchases open at launch.</p>
+                    <div className="mt-3"><EarlyAccessCTA tierTag="tier-sector-reports" label="Notify me at launch" size="default" buttonClassName="w-full bg-stone-teal text-ink-on-accent hover:bg-stone-teal/90" /></div>
+                    <p className="mt-3 text-xs leading-relaxed text-text-muted">Join the newsletter for report launch news.</p>
+                  </>
+                )}
               </aside>
             </div>
           </div>
@@ -133,10 +148,12 @@ export default async function SectorReportPage({ params }: Props) {
             {edition.changes && edition.changes.length > 0 && <div className="mt-8 max-w-3xl"><h3 className="text-xl font-semibold text-text-primary">What changed in this edition</h3><ul className="mt-4 list-disc space-y-2 pl-5 text-text-muted">{edition.changes.map(change => <li key={change}>{change}</li>)}</ul></div>}
             {edition.nextEditionNote && <p className="mt-5 text-sm text-text-muted">{edition.nextEditionNote}</p>}
             <div className="mt-8 flex flex-wrap items-center gap-5">
-              <EarlyAccessCTA tierTag="tier-sector-reports" label="Notify me at launch" size="default" buttonClassName="bg-stone-teal text-ink-on-accent hover:bg-stone-teal/90" />
+              {buyUrl
+                ? <BuyButton url={buyUrl} label={buyLabel} event="Buy Sector Report" size="default" className="bg-stone-teal text-ink-on-accent hover:bg-stone-teal/90" />
+                : <EarlyAccessCTA tierTag="tier-sector-reports" label="Notify me at launch" size="default" buttonClassName="bg-stone-teal text-ink-on-accent hover:bg-stone-teal/90" />}
               <Link href="/products/sector-reports" className="inline-flex items-center gap-2 text-sm text-stone-teal hover:underline">Browse sector reports <ArrowRight aria-hidden="true" className="h-4 w-4" /></Link>
             </div>
-            <p className="mt-3 text-xs text-text-muted">Launch notifications are part of our newsletter. Unsubscribe at any time.</p>
+            <p className="mt-3 text-xs text-text-muted">{buyUrl ? 'One payment, one named reader. Optional renewal, with no automatic renewal.' : 'Launch notifications are part of our newsletter. Unsubscribe at any time.'}</p>
           </div>
         </section>
       </main>

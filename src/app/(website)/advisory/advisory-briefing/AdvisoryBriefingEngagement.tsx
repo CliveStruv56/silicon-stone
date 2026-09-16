@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { DigitalOmnibusContext } from '@/components/advisory/DigitalOmnibusContext'
 import { Shield } from 'lucide-react'
 import { FocusedEngagementPage, EngagementSteps } from '@/components/advisory/FocusedEngagementPage'
+import { BuyButton } from '@/components/products/BuyButton'
+import { CHECKOUT_URLS, liveCheckoutUrl } from '@/lib/checkout'
 import { FREE_INTRO_WINDOW } from '@/lib/flags'
 import { AMOUNTS, gbp } from '@/lib/offering'
 
@@ -14,6 +16,10 @@ type Props = {
 }
 
 export function AdvisoryBriefingEngagement({ coverage }: Props) {
+  // The only engagement with a fixed fee, so the only one that can be bought
+  // outright. Null while PRE_LAUNCH is on or the store link is unset; the
+  // enquiry form stays either way for anyone who wants to confirm fit first.
+  const buyUrl = liveCheckoutUrl(CHECKOUT_URLS.advisoryBriefing)
   return (
     <FocusedEngagementPage
       hero={{
@@ -22,7 +28,8 @@ export function AdvisoryBriefingEngagement({ coverage }: Props) {
         lead: 'Understand what a tool or product has surfaced, or one of your AI systems, and what it means for your business.',
         body: 'Bring your result and the question it raises. We review it before the call, then use a one-hour discussion to clarify the assumptions, identify the priorities and help you decide what to do next.',
         inShort: 'A review of your result or system, a one-hour discussion and a written follow-up with priorities, evidence gaps and practical next steps.',
-        ctaLabel: 'Request a briefing',
+        ctaLabel: buyUrl ? 'Book a briefing' : 'Request a briefing',
+        ctaHref: buyUrl ? '#pricing' : '#contact',
         imageSrc: '/advisory/advisory-briefing.webp',
         imageAlt: 'An isometric walled stone enclosure on a slate slab, a lit stepped plinth at its centre, with an amber path leading in through one gate and teal circuit lines running out',
         imageCaption: 'One question, set down inside a clear boundary.',
@@ -48,6 +55,12 @@ export function AdvisoryBriefingEngagement({ coverage }: Props) {
         <p>Further work is optional. If we go on to work together, whether a specialist project, a diagnostic, an assessment or the <Link href="/advisory/drift-retainer" className="text-stone-teal underline underline-offset-4">Drift Retainer</Link>, the briefing fee is credited in full against that work.</p>
         {FREE_INTRO_WINDOW && <p className="text-sm">If you simply want to meet us first, a free 25-minute introductory conversation is available during our launch window. The paid Briefing is the working session on your question.</p>}
       </>}
+      purchase={buyUrl && (
+        <div className="pt-2">
+          <BuyButton url={buyUrl} label={`Book a briefing — ${gbp(AMOUNTS.advisoryBriefing)}`} event="Buy Advisory Briefing" className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90 font-semibold" />
+          <p className="mt-3 text-sm">Secure checkout by Lemon Squeezy, which issues the receipt and handles VAT. After payment you choose a time and send your result. If you would rather confirm the fit first, use the <a href="#contact" className="text-stone-teal underline underline-offset-4">form below</a>.</p>
+        </div>
+      )}
       contact={{
         interest: 'Advisory Briefing',
         plausibleEvent: 'Engagement Enquiry',

@@ -12,6 +12,12 @@ type Props = {
   process: ReactNode
   price: string
   pricing: ReactNode
+  /**
+   * A checkout control rendered beneath the pricing prose, for the one
+   * engagement with a fixed fee. Null or omitted renders nothing; the page
+   * then reads exactly as it did when every engagement was enquiry-only.
+   */
+  purchase?: ReactNode
   contact: ComponentProps<typeof EngagementContactForm>
   /**
    * Articles placed under this engagement in Studio (`article.appearsUnder`),
@@ -22,7 +28,7 @@ type Props = {
 }
 
 /** The agreed reading order for Briefing, Diagnostic and Retainer. */
-export function FocusedEngagementPage({ hero, audience, process, price, pricing, contact, coverage }: Props) {
+export function FocusedEngagementPage({ hero, audience, process, price, pricing, purchase, contact, coverage }: Props) {
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
@@ -43,13 +49,16 @@ export function FocusedEngagementPage({ hero, audience, process, price, pricing,
           </div>
         </section>
 
-        <section aria-labelledby="pricing-heading" className="border-b border-silicon-amber/30 bg-silicon-amber/5">
+        <section id="pricing" aria-labelledby="pricing-heading" className="scroll-mt-24 border-b border-silicon-amber/30 bg-silicon-amber/5">
           <div className="mx-auto grid max-w-7xl gap-6 px-6 py-10 lg:grid-cols-[1fr_2fr] lg:gap-12 lg:px-8 lg:py-12">
             <div>
               <h2 id="pricing-heading" className="mb-3 text-2xl font-semibold text-text-primary">Pricing</h2>
               <FeeLabel price={price} />
             </div>
-            <div className="max-w-3xl space-y-4 leading-relaxed text-text-muted">{pricing}</div>
+            <div className="max-w-3xl space-y-4 leading-relaxed text-text-muted">
+              {pricing}
+              {purchase}
+            </div>
           </div>
         </section>
 

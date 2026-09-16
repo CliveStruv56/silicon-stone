@@ -1,5 +1,14 @@
 # LAUNCH.md — launch-day checklist
 
+> **Payments and Kit setup moved (2026-09-15):** the ordered owner guide is
+> `docs/owner-setup-lemonsqueezy-kit.md`, written from `src/lib/kit-tags.ts`,
+> `src/lib/lemonsqueezy-variants.ts` and `src/lib/checkout.ts`. Four products
+> are now wired (Toolkit Standard and Professional, the Manufacturing sector
+> report, the Advisory Briefing), the Kit registry holds 17 tags and
+> `npm run test:kit-tags` checks the live account against it. The Kit and Lemon
+> Squeezy sections below are kept for history; where they disagree with the
+> guide, the guide is right.
+
 Pre-launch packaging spec, implemented 2026-07-19. While `NEXT_PUBLIC_PRE_LAUNCH`
 is unset or `true`, every product CTA is a "Request Early Access" capture into
 Kit and no Lemon Squeezy checkout is invoked anywhere. This file is the ordered
@@ -137,37 +146,25 @@ other eight):
       env var (Vercel, all environments). A missing ID never breaks subscribe —
       that tag is just skipped:
 
-  **Status 2026-08-20: none of these tags exist in Kit.** The account holds
-  only "New contact" and "Imported March 31st, 2026", and four of the env vars
-  below are set (two of those to placeholder strings). Create the tag, then
-  paste its ID.
-
-  | Kit tag | Env var |
-  |---|---|
-  | early-access | `CONVERTKIT_EARLY_ACCESS_TAG_ID` |
-  | tier-toolkit-standard | `CONVERTKIT_TIER_TOOLKIT_STANDARD_TAG_ID` |
-  | tier-toolkit-professional | `CONVERTKIT_TIER_TOOLKIT_PROFESSIONAL_TAG_ID` |
-  | tier-sector-reports | `CONVERTKIT_TIER_SECTOR_REPORTS_TAG_ID` |
-  | atlantic-drift | `CONVERTKIT_ATLANTIC_DRIFT_TAG_ID` |
-  | eu-exposure | `CONVERTKIT_EU_EXPOSURE_TAG_ID` |
-  | tool-compliance-checker | `CONVERTKIT_TOOL_COMPLIANCE_CHECKER_TAG_ID` |
-  | tool-supply-chain-mapper | `CONVERTKIT_TOOL_SUPPLY_CHAIN_MAPPER_TAG_ID` |
-  | tool-scenario-modeler | `CONVERTKIT_TOOL_SCENARIO_MODELER_TAG_ID` |
-  | tool-policy-stress-test | `CONVERTKIT_TOOL_POLICY_STRESS_TEST_TAG_ID` |
-  | buyer-toolkit-standard | `CONVERTKIT_BUYER_TOOLKIT_STANDARD_TAG_ID` |
-  | buyer-toolkit-pro | `CONVERTKIT_BUYER_TOOLKIT_PRO_TAG_ID` |
+  **Superseded 2026-09-15:** the list is now `src/lib/kit-tags.ts` (17 tags,
+  including the two legacy PascalCase ones, the contact tag and four buyer
+  tags) and `npm run test:kit-tags -- --create` creates them and prints the
+  env lines. See `docs/owner-setup-lemonsqueezy-kit.md` §3.
 
 - [ ] If the Railway backend proxy is live (`BACKEND_API_URL` set), its
       `/v1/subscribe` handler must accept the new `tags: string[]` field and
       apply the same tag mapping — the site forwards `tags` verbatim.
 - [ ] Post-purchase sequences (built in Kit, out of the site's scope) trigger
-      off the two Toolkit `buyer-*` tags.
+      off the four `buyer-*` tags.
 
 ### Lemon Squeezy — products
 
+> **Superseded 2026-09-15:** three products, four one-time variants — see
+> `docs/owner-setup-lemonsqueezy-kit.md` §6. The Manufacturing sector report
+> and the Advisory Briefing are purchasable as of that date (owner decision).
+
 Create **one Toolkit product with two one-time variants** (Standard and Professional).
-Sector Reports remains a waitlist until its files are ready. LS is Merchant of
-Record; there is deliberately no tax logic in the site:
+LS is Merchant of Record; there is deliberately no tax logic in the site:
 
 The files are **already built** and live in `deliverables/dist/` (gitignored —
 regenerate with `deliverables/src/assemble-toolkit.mjs` and

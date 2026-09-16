@@ -1,5 +1,10 @@
 # Lemon Squeezy setup (P3-0)
 
+> **Superseded again (2026-09-15): follow `docs/owner-setup-lemonsqueezy-kit.md`.**
+> That guide covers four variants (the Manufacturing sector report and the
+> Advisory Briefing joined the two Toolkit tiers), the 17-tag Kit registry and
+> the test-mode checklist. The prices in the table below are stale.
+>
 > **Superseded for launch (2026-07-19): follow `LAUNCH.md` at the repo root.**
 > The pre-launch packaging release changed the store shape this doc describes:
 > the Toolkit is now **two one-time variants** (Standard £79 / Professional

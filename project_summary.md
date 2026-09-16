@@ -2,7 +2,7 @@
 
 > **Session Handoff Document**
 > Last Updated: 2026-09-15
-> Status: **Quarterly project review written (`docs/review-report-2026-09-15.md`, brief in `docs/next-phase-brief-2026-09-15.md`); its one critical finding — an unauthenticated RCE in Next's image optimizer — patched the same day (`next@15.5.25`, `sharp` override `^0.35.4`, Sanity remote pattern scoped to this dataset) and the image path re-verified. The brief's remaining tasks are the next phase. Earlier deployment records below are history.**
+> Status: **Payments wired end to end for four products (Toolkit ×2, Manufacturing report, Advisory Briefing) behind the pre-launch flag; owner setup guide at `docs/owner-setup-lemonsqueezy-kit.md`; Kit tag registry + `test:kit-tags`. Same day: quarterly project review written (`docs/review-report-2026-09-15.md`, brief in `docs/next-phase-brief-2026-09-15.md`); its one critical finding — an unauthenticated RCE in Next's image optimizer — patched the same day (`next@15.5.25`, `sharp` override `^0.35.4`, Sanity remote pattern scoped to this dataset) and the image path re-verified. The brief's remaining tasks are the next phase. Earlier deployment records below are history.**
 
 ## Current work — 15 September 2026: project review, and the Next.js image-optimizer patch
 
@@ -709,10 +709,15 @@ keep it that way: `src/lib/offering.test.ts` fails on any hard-coded `£` in
 `product` document disagrees with `SANITY_PRODUCTS`. There is no longer an
 unguarded copy of a price anywhere.
 
-**Checkout note**: Lemon Squeezy is the intended merchant of record for 5.2.
-Until its URLs and variant IDs are configured (`LAUNCH.md` §0), product buttons
-open the early-access capture rather than a checkout, and the Sanity products'
-`checkoutUrl` fields are all null so the article gate links to the product page.
+**Checkout note**: Lemon Squeezy is the merchant of record for everything sold
+outright: the two Toolkit tiers, the Manufacturing sector report (£149) and the
+Advisory Briefing (£450) — four one-time variants, four buyer tags
+(`src/lib/lemonsqueezy-variants.ts`). Until the store exists and
+`NEXT_PUBLIC_PRE_LAUNCH` is `false`, every Buy surface falls back to its
+capture or enquiry form (`liveCheckoutUrl()` in `src/lib/checkout.ts` is the one
+gate), and the Sanity products' `checkoutUrl` fields are null so the article
+gate links to the product page. The owner guide is
+`docs/owner-setup-lemonsqueezy-kit.md`.
 
 ---
 
@@ -877,6 +882,35 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### September 15, 2026 — Every product purchasable through Lemon Squeezy; Kit tag registry; the owner setup guide
+
+Owner decisions: the Manufacturing sector report and the £450 Advisory
+Briefing go on sale alongside the two Toolkit tiers; tags are created through
+the Kit API; booking runs on Cal.com. **Code:** `src/lib/checkout.ts` now holds
+the four `NEXT_PUBLIC_LEMONSQUEEZY_*_URL` links and `liveCheckoutUrl()`, the
+single place both launch gates (flag and placeholder) are checked; the two
+sector-report pages, the article gate and the Briefing's pricing block render a
+shared `BuyButton` when it returns a URL and their old capture or enquiry CTA
+when it does not; `/products/success` knows four `product=` values and shows
+the Cal.com link after a Professional or Briefing purchase. The webhook's
+variant map moved to `src/lib/lemonsqueezy-variants.ts` (pure, tested) with
+two new buyer tags. `src/lib/kit-tags.ts` is the registry of all 17 Kit tags
+and their env vars; `kit.ts` derives its maps from it, and
+`npm run test:kit-tags` (`scripts/kit-tags.ts`) checks the live account and,
+with `--create`, creates what is missing and prints the env lines. **Found on
+the way:** the production Kit key is marked *sensitive* in Vercel, so
+`vercel env pull` returns `[SENSITIVE]` and the tag step has to be run by the
+owner with the key in their shell; production still holds three retired
+Checklist variables and `example.com` placeholders for both Toolkit links; and
+Lemon Squeezy's activation review "typically" declines stores selling services,
+which is a risk for the Briefing variant alone (recorded in the guide §1).
+**Sector-report entitlement** is deliberately the minimal version: the buyer
+tag is the mailing segment, the 12-month cut-off is applied by hand from the
+order date; the durable design in `docs/sector-reports-operations.md` stands.
+Verified in a browser on the dev build in both states: pre-launch pages
+unchanged; with the flag off and dummy links, Buy buttons on the report,
+index, Briefing and Toolkit pages and the booking link on the success page.
 
 ### September 15, 2026 — Install prompt: a dismissal now holds for 90 days
 

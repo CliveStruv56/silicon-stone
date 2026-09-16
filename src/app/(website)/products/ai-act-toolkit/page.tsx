@@ -6,8 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { AdvisoryNextStep } from '@/components/products/AdvisoryNextStep'
 import { EarlyAccessCTA } from '@/components/products/EarlyAccessCTA'
-import { isConfiguredCheckout } from '@/lib/checkout'
-import { PRE_LAUNCH } from '@/lib/flags'
+import { CHECKOUT_URLS, liveCheckoutUrl } from '@/lib/checkout'
 import { AMOUNTS, DERIVED, gbp } from '@/lib/offering'
 import { PROFESSIONAL_STEPS, TOOLKIT_FEATURES, TOOLKIT_WORKFLOW } from '@/lib/toolkit'
 import { CheckCircle, FileSpreadsheet, FileText, Users } from 'lucide-react'
@@ -19,16 +18,14 @@ export const metadata: Metadata = {
 }
 
 function PurchaseCTA({ professional = false }: { professional?: boolean }) {
-  const url = professional
-    ? process.env.NEXT_PUBLIC_LEMONSQUEEZY_TOOLKIT_PROFESSIONAL_URL
-    : process.env.NEXT_PUBLIC_LEMONSQUEEZY_TOOLKIT_STANDARD_URL
+  const url = liveCheckoutUrl(professional ? CHECKOUT_URLS.toolkitProfessional : CHECKOUT_URLS.toolkitStandard)
   const tier = professional ? 'Professional' : 'Standard'
   const amount = professional ? AMOUNTS.toolkitProfessional : AMOUNTS.toolkitStandard
   const className = professional
     ? 'border-stone-teal text-stone-teal hover:bg-stone-teal/10'
     : 'bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90 font-semibold'
   const variant = professional ? 'outline' : 'default'
-  return !PRE_LAUNCH && isConfiguredCheckout(url) ? (
+  return url ? (
     <Button size="lg" variant={variant} className={className} asChild>
       <a href={url} target="_blank" rel="noopener noreferrer" className={`plausible-event-name=Buy+Toolkit+${tier}`}>
         Buy {tier} — {gbp(amount)}

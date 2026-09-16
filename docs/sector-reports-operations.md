@@ -23,6 +23,23 @@ The initial seed command is `npx tsx scripts/seed-sector-report.ts`; add `--writ
 
 ## Purchaser delivery — remaining launch work
 
+> **Owner decision 2026-09-15: the report goes on sale before the entitlement
+> store exists.** What ships instead, and what it does not do:
+>
+> - Checkout is a one-time Lemon Squeezy variant; the current PDF is the
+>   variant's attached file, so Lemon Squeezy's own receipt email delivers it.
+> - The signed `order_created` webhook applies the Kit tag
+>   `buyer-sector-report-manufacturing` (per report, never shared). That tag is
+>   outside the public subscribe allow-list, so it is evidence of a paid order —
+>   it is still a mailing segment, not an entitlement record.
+> - Monthly editions are a Kit broadcast to that tag; the 12-month cut-off is
+>   read from the Lemon Squeezy order date and applied by hand each month
+>   (`docs/owner-setup-lemonsqueezy-kit.md` §12).
+> - Not built: durable per-buyer entitlements, download-time eligibility checks,
+>   automated expiry, renewal handling. Items 2 to 5 below remain the design for
+>   that; item 6 has been done (`currentGateProduct` now opens the checkout once
+>   both launch gates clear).
+
 The local environment contains no Lemon Squeezy configuration, and no sale date has been supplied. The existing webhook handles toolkit buyer tags, not report entitlements. The public pages therefore use launch notifications. No paid download route, annual buyer entitlement store or monthly delivery automation was added in the preview implementation.
 
 Before enabling report checkout:

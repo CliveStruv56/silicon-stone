@@ -12,6 +12,7 @@ import {
   kitConfigured,
   tagSubscriber,
 } from '@/lib/kit'
+import { buyerTagForVariant } from '@/lib/lemonsqueezy-variants'
 
 // Node runtime (HMAC via node:crypto) and never cached — this is a signed,
 // side-effecting endpoint.
@@ -21,22 +22,10 @@ export const dynamic = 'force-dynamic'
 const MAX_BODY_BYTES = 100_000
 
 /**
- * Map an LS variant ID to the Kit buyer tag for that SKU. Variant IDs are
- * env-configured (LEMONSQUEEZY_VARIANT_ID_*, see LAUNCH.md) — never hard-coded.
- */
-function buyerTagForVariant(variantId: number | string | undefined): keyof typeof BUYER_TAG_IDS | null {
-  const id = variantId === undefined || variantId === null ? '' : String(variantId)
-  if (!id) return null
-  if (id === process.env.LEMONSQUEEZY_VARIANT_ID_TOOLKIT_STANDARD) return 'buyer-toolkit-standard'
-  if (id === process.env.LEMONSQUEEZY_VARIANT_ID_TOOLKIT_PRO) return 'buyer-toolkit-pro'
-  return null
-}
-
-/**
  * order_created fulfilment (spec §3.2): delivery itself is Lemon Squeezy's
  * built-in file-delivery email — our only job is to tag the buyer in Kit
- * (buyer-toolkit-standard / buyer-toolkit-pro) so
- * post-purchase sequences can run from Kit. Throws on transient Kit failures
+ * (see `lemonsqueezy-variants.ts` for the variant → tag map) so post-purchase
+ * sequences and the sector-report monthly editions can run from Kit. Throws on transient Kit failures
  * so the caller releases the delivery claim and LS retries.
  */
 async function tagBuyerInKit(data: unknown): Promise<void> {

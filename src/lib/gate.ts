@@ -1,4 +1,5 @@
 import { AMOUNTS, gbp, offeringById } from './offering'
+import { CHECKOUT_URLS, liveCheckoutUrl, MANUFACTURING_REPORT_SLUG, sectorReportCheckoutUrl } from './checkout'
 
 /**
  * Shared types + resolution for the end-of-article Gate (P3-1/P3-3).
@@ -76,8 +77,11 @@ export function currentGateProduct(product: GateProduct): GateProduct {
     return {
       ...product,
       priceLabel: `${gbp(AMOUNTS.sectorReport)} · 12 months of monthly updates`,
-      checkoutUrl: null,
-      badge: 'Preview available',
+      // The generic Sector Reports product backs one report today. Its checkout
+      // opens only once both launch gates clear; until then the gate links to
+      // the preview. Never reuse a stale CMS checkout URL here.
+      checkoutUrl: sectorReportCheckoutUrl(MANUFACTURING_REPORT_SLUG),
+      badge: sectorReportCheckoutUrl(MANUFACTURING_REPORT_SLUG) ? 'Available now' : 'Preview available',
       blurb: 'Explore the report contents and opening Executive Summary. One payment covers one named reader, with monthly PDF updates for 12 months and optional renewal.',
     }
   }
@@ -94,7 +98,7 @@ export function currentGateProduct(product: GateProduct): GateProduct {
     badge: 'Complete toolkit',
     deliveryModel: 'download',
     // Do not reuse a retired SKU's checkout URL from Sanity.
-    checkoutUrl: process.env.NEXT_PUBLIC_LEMONSQUEEZY_TOOLKIT_STANDARD_URL || null,
+    checkoutUrl: liveCheckoutUrl(CHECKOUT_URLS.toolkitStandard),
   }
 }
 
@@ -191,7 +195,9 @@ export function resolveGate(params: {
       body: copy?.body || product.blurb ||
         'A practical companion to what you just read — built for the same decisions.',
       ctaLabel: copy?.ctaLabel ||
-        (isReport ? 'View contents and preview' : product.priceLabel ? `Get it — ${product.priceLabel}` : 'View product'),
+        (isReport
+          ? product.checkoutUrl ? `Buy the report — ${gbp(AMOUNTS.sectorReport)}` : 'View contents and preview'
+          : product.priceLabel ? `Get it — ${product.priceLabel}` : 'View product'),
       product,
     }
   }
