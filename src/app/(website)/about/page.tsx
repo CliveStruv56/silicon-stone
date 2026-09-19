@@ -173,19 +173,6 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* EU–Japan capability note (D2) */}
-        <section className="mx-auto max-w-7xl px-6 pt-10 lg:px-8 lg:pt-12">
-          <div className="max-w-3xl rounded-lg border border-border-subtle bg-stone-charcoal/50 p-6">
-            <div className="mb-2 font-mono text-xs uppercase tracking-wider text-stone-teal">
-              The fourth leg
-            </div>
-            <p className="text-lg leading-relaxed text-text-primary/90">
-              Thirty years across Europe, the US and Japan — including a working grasp of the
-              EU–Japan digital partnership and DFFT that few US-facing advisers can offer.
-            </p>
-          </div>
-        </section>
-
         {/* Why the Edge */}
         <section id="edge" className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
           <div className="max-w-3xl">

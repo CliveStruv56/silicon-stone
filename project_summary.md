@@ -883,6 +883,14 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### September 19, 2026 — /about: "The fourth leg" panel removed
+
+Owner request. The bordered EU–Japan capability note (D2, added in the
+offering-architecture work) between the hero and "Why the Edge?" is gone from
+`src/app/(website)/about/page.tsx`. "Why the Edge?" carries its own top padding,
+so nothing else moved. The EU–Japan line appended to the author bio in Sanity at
+the same time as D2 is untouched — that was not part of the request.
+
 ### September 19, 2026 — TypeSafe / Jev: a measured trial, nothing wired in
 
 The owner installed the `typesafe` plugin and asked whether Jev (a model that
