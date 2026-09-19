@@ -1,0 +1,97 @@
+{
+  "_readme": "Labelled topics for `npm run jev:eval -- --set routing`. `regulatory` is whether the drafting model should be handed statute at all; `expected` is which corpora it should be routed to (empty = none of the six); `alsoAcceptable` lists corpora that would not be wrong. The labels are an editorial judgement — edit them. Published articles are added at run time, unlabelled.",
+  "topics": [
+    {
+      "topic": "Fine-tuning costs for open-weight language models",
+      "why": "trap: 'fine' is a REGULATORY_TERMS substring",
+      "regulatory": false,
+      "expected": []
+    },
+    {
+      "topic": "A refined definition of reasoning in frontier models",
+      "why": "trap: 'refined' and 'definition' both contain 'fine'",
+      "regulatory": false,
+      "expected": []
+    },
+    {
+      "topic": "How the internal audit function should report on cloud spend",
+      "why": "trap: 'audit' is ordinary business English",
+      "regulatory": false,
+      "expected": []
+    },
+    {
+      "topic": "Commissioning a new fab: construction timelines and tooling lead times",
+      "why": "trap: 'commission' substring; industrial, not legal",
+      "regulatory": false,
+      "expected": []
+    },
+    {
+      "topic": "TSMC Dresden fab workforce shortages and the semiconductor talent pipeline",
+      "why": "documented failure in src/lib/regulatory/format.ts — a labour story that pulled 11KB of Chips Act",
+      "regulatory": false,
+      "expected": []
+    },
+    {
+      "topic": "Privacy-preserving machine learning: a technical primer on federated learning",
+      "why": "trap: 'privacy' as an engineering term",
+      "regulatory": false,
+      "expected": []
+    },
+    {
+      "topic": "Nvidia quarterly earnings and data centre demand",
+      "why": "control: plainly not regulatory",
+      "regulatory": false,
+      "expected": []
+    },
+    {
+      "topic": "Cloud switching charges and interoperability for data processing services",
+      "why": "documented in gate.ts — Data Act Chapter VI with no general legal word in it",
+      "regulatory": true,
+      "expected": ["eu-data-act"]
+    },
+    {
+      "topic": "What the Digital Omnibus changes for GDPR consent and cookie rules",
+      "why": "'digital omnibus' is listed under eu-ai-act, so a GDPR piece is routed to the AI Act",
+      "regulatory": true,
+      "expected": ["gdpr"],
+      "alsoAcceptable": ["eu-ai-act"]
+    },
+    {
+      "topic": "Article 10 of the AI Act: data governance when training sets contain personal data",
+      "why": "'personal data' routes to GDPR although the piece is about the AI Act",
+      "regulatory": true,
+      "expected": ["eu-ai-act"],
+      "alsoAcceptable": ["gdpr"]
+    },
+    {
+      "topic": "Incident reporting deadlines for essential entities under NIS2",
+      "why": "control: single instrument, named",
+      "regulatory": true,
+      "expected": ["nis2"]
+    },
+    {
+      "topic": "What manufacturers of smart home devices must do about security patches and vulnerability handling before 2027",
+      "why": "Cyber Resilience Act by subject matter, never named",
+      "regulatory": true,
+      "expected": ["eu-cyber-resilience-act"]
+    },
+    {
+      "topic": "European subsidies for first-of-a-kind chip plants and the crisis-stage priority orders",
+      "why": "Chips Act by subject matter",
+      "regulatory": true,
+      "expected": ["eu-chips-act"]
+    },
+    {
+      "topic": "DORA ICT risk rules for banks and their critical third-party providers",
+      "why": "regulatory, but the instrument is not one of the six corpora",
+      "regulatory": true,
+      "expected": []
+    },
+    {
+      "topic": "US export controls on advanced GPUs and additions to the entity list",
+      "why": "regulatory, non-EU, none of the six",
+      "regulatory": true,
+      "expected": []
+    }
+  ]
+}

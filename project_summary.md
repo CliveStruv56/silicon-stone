@@ -1,7 +1,7 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-09-15
+> Last Updated: 2026-09-19
 > Status: **Payments wired end to end for four products (Toolkit ×2, Manufacturing report, Advisory Briefing) behind the pre-launch flag; owner setup guide at `docs/owner-setup-lemonsqueezy-kit.md`; Kit tag registry + `test:kit-tags`. Same day: quarterly project review written (`docs/review-report-2026-09-15.md`, brief in `docs/next-phase-brief-2026-09-15.md`); its one critical finding — an unauthenticated RCE in Next's image optimizer — patched the same day (`next@15.5.25`, `sharp` override `^0.35.4`, Sanity remote pattern scoped to this dataset) and the image path re-verified. The brief's remaining tasks are the next phase. Earlier deployment records below are history.**
 
 ## Current work — 15 September 2026: project review, and the Next.js image-optimizer patch
@@ -882,6 +882,34 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### September 19, 2026 — TypeSafe / Jev: a measured trial, nothing wired in
+
+The owner installed the `typesafe` plugin and asked whether Jev (a model that
+returns yes/no probabilities, picks and scores — no prose, no reasons) could add
+value. **Owner's line: no reader, client or enquirer text goes to TypeSafe** (US
+processor, hosting region undisclosed). Three of the four tools have no free text
+at all, so the trial points at text the publication wrote and at public statute.
+`scripts/jev/client.ts` is one bounded `fetch`, model pinned to `jev-1.13.0`,
+loud on a missing key or any non-200; `npm run jev:eval -- --set
+routing|relevance|content [--repeat n] [--mutate]` is read-only and nothing under
+`src/` calls it. Key: `TYPESAFE_API_KEY` in `.env.local`.
+**Routing** (Jev vs `looksRegulatory()`): on 15 labelled topics the keyword gate
+got 6 right, Jev 14 — but the fixture was written to hit the gate's known
+weaknesses, so the 16 published articles are the fairer sample: the gate routes
+the semiconductor-testing and helium pieces to the Chips Act on the word
+"semiconductor" and fires on the substring `bis `; Jev does neither. Drift across
+identical calls ≤ 0.03, ~1.1 s per call. A bare 0.5 cut is unstable (CAIDA's GDPR
+score went 49% → 50% between runs) — an integration needs a margin, and the
+owner's labels on the 16 articles to set it.
+**Content** (does each authored `basis` say what its Article says?): the mutation
+run passed (0/53 "supports" against the wrong Article) and the real run found the
+Article 5(1)(h) defect fixed in the entry below — but flagged 42 of 53, so as
+configured it is too noisy to keep. It needs the single legal sentence judged
+against the specific paragraph, and vendor questions dropped.
+**Relevance** set: built, not yet run. **Not doing:** replacing Haiku in the v1
+intake, enquiry triage, anything where a probability decides a tier, duty or
+citation. Plan and assessment: `~/.claude/plans/please-check-out-how-foamy-platypus.md`.
 
 ### September 19, 2026 — Compliance Checker v1: Article 5(1) carve-outs stated point by point
 
