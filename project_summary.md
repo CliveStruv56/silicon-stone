@@ -883,6 +883,30 @@ SESSION_SECRET=<long random secret, 32+ characters>
 
 ## 9. Recent Changes
 
+### September 19, 2026 — Compliance Checker v1: Article 5(1) carve-outs stated point by point
+
+One sentence served all ten points of Article 5(1) on the v1 result card:
+"Article 5(1) prohibits this practice outright… no risk-management measure that
+makes it lawful". The pinned Article does not say that of every point. **(h)**
+prohibits real-time remote biometric identification "unless and in so far as"
+it is strictly necessary for three law-enforcement objectives, and 5(2)–(3) lay
+down an authorisation route — so the sentence was wrong there. **(d)**, **(f)**,
+**(g)** and **(bb)** each carve something out in their own text, and the card
+said nothing of it. `ART5_POINT_LIMITS` in `src/lib/ai-act-rules.ts` now holds a
+verbatim-quoted sentence per limited point, `art5Basis()` builds (h) differently
+because its exception qualifies the prohibition itself, and the vendor question
+no longer says "nothing the vendor says makes it lawful" (under (f) the vendor's
+intended purpose is what the exception turns on). Authored `basis` lives in
+TypeScript, so **no pack version bump**. Four new tests read the pinned
+`article-5.txt`: the parse finds every point the pack lists, the map covers
+exactly the points whose text carries a carve-out, each quotation is verbatim
+from *its own* point, and no result prose says "outright". All four
+mutation-tested. Verified on the built card in a browser walk.
+**Not reviewed by a solicitor** — the (h) paragraph most deserves it. **Open:**
+the dark v2 checker carries the same "prohibited outright" prose in
+`compliance-v2/legal-content/propositions.ts` (points d, g) and
+`engine/article-5.ts`; untouched.
+
 ### September 15, 2026 — Every product purchasable through Lemon Squeezy; Kit tag registry; the owner setup guide
 
 Owner decisions: the Manufacturing sector report and the £450 Advisory

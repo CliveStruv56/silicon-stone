@@ -1680,6 +1680,47 @@ function sizeReliefActions(answers: AssessmentAnswers, penaltyRelief: RuleItem):
 }
 
 /**
+ * What each point of Article 5(1) says about its own reach, where it says
+ * anything. Every quotation is verbatim from the pinned `article-5.txt`.
+ *
+ * Until 2026-09-19 one sentence served all ten points: "Article 5(1) prohibits
+ * this practice outright… no risk-management measure that makes it lawful".
+ * That is false of point (h), which prohibits the use "unless and in so far as"
+ * it is strictly necessary for three objectives and then lays down an
+ * authorisation route in 5(2) and (3); and it overstated (d), (f), (g) and (bb),
+ * each of which carves something out in its own text.
+ *
+ * Keyed by point and kept in TypeScript for the reason `basis` is: authored
+ * explanation, not pack content, so no version bump. `ai-act-rules.test.ts`
+ * reads the pinned Article and fails if a point whose text carries a carve-out
+ * has no entry here — a future consolidation that adds one goes red, not quiet.
+ *
+ * None of these is a reason to carry on. Each says so, because a reader who has
+ * just been told to stop will read an exception as permission.
+ */
+export const ART5_POINT_LIMITS: Record<string, string> = {
+  d: 'The point carves out one case: it “shall not apply to AI systems used to support the human assessment of the involvement of a person in a criminal activity, which is already based on objective and verifiable facts directly linked to a criminal activity”. Whether your system is that case is for the review to establish in writing. It is not a reason to continue meanwhile.',
+  f: 'The point applies “except where the use of the AI system is intended to be put in place or into the market for medical or safety reasons”. The exception turns on intended purpose and is narrow. It is a question for the legal review, not a reason to continue meanwhile.',
+  g: 'The point states that it “does not cover any labelling or filtering of lawfully acquired biometric datasets, such as images, based on biometric data or categorizing of biometric data in the area of law enforcement”. Categorising individual people to infer the listed characteristics is outside that carve-out.',
+  h: '“unless and in so far as such use is strictly necessary for” one of three listed law-enforcement objectives. Even then, Article 5(2) and (3) require safeguards under national law, a fundamental rights impact assessment, registration in the EU database and, save in duly justified urgency, prior authorisation by a judicial or independent administrative authority. Outside that authorised route there is no conformity assessment, documentation or risk-management measure that makes the use lawful.',
+  bb: 'The point excepts cases “where a ‘without right’ defence applies under national law”, which is a matter for counsel in the Member State concerned.',
+}
+
+/**
+ * The legal basis for a prohibition in force. Point (h) is built differently
+ * because its exception qualifies the prohibition itself, so the usual closing
+ * sentence — that nothing makes the use lawful — would be wrong appended to it.
+ */
+function art5Basis(practice: Art5Practice): string {
+  const limit = ART5_POINT_LIMITS[practice.point]
+  if (practice.point === 'h') {
+    return `Article 5(1)(h) prohibits this use, and has done since ${practice.appliesFrom}, ${limit}`
+  }
+  const shared = `Article 5(1)(${practice.point}) prohibits this practice, and has done since ${practice.appliesFrom}. A prohibition is not a requirement you can satisfy: there is no conformity assessment route, no documentation that cures it, and no risk-management measure that makes a prohibited use lawful.`
+  return limit ? `${shared} ${limit}` : shared
+}
+
+/**
  * The practice is passed whole rather than as a label so each item can carry its
  * own point-level anchor — `Article 5(1)(f)` rather than a generic `Article 5`.
  * The "stop" item's id is per-point for the same reason: two selected practices
@@ -1702,7 +1743,7 @@ function prohibitedFinding(practice: Art5Practice): Omit<RuleFinding, 'id' | 'ti
         kind: 'duty',
         article: `Article 5(1)(${practice.point})`,
         corpusArticle: '5',
-        basis: `Article 5(1) prohibits this practice outright, and has done since ${practice.appliesFrom}. A prohibition is not a requirement you can satisfy: there is no conformity assessment route, no documentation that cures it, and no risk-management measure that makes it lawful.`,
+        basis: art5Basis(practice),
         inPractice:
           'This is the one result in the tool that warrants a call to a lawyer today rather than a plan. Prohibited-practice infringements also carry the highest penalty ceiling in the Regulation.',
       },
@@ -1720,7 +1761,7 @@ function prohibitedFinding(practice: Art5Practice): Omit<RuleFinding, 'id' | 'ti
         question: `Is this system designed, marketed, or technically capable of the use we have flagged — ${label}?`,
         article: `Article 5(1)(${practice.point})`,
         corpusArticle: '5',
-        why: `Article 5(1) prohibits this practice outright, and has done since ${practice.appliesFrom}. Nothing the vendor says makes it lawful — but a written answer is the first thing your legal review will ask for, and a vendor that markets the capability has told you where the risk sits.`,
+        why: `Article 5(1)(${practice.point}) prohibits this practice, and has done since ${practice.appliesFrom}. A vendor’s assurance does not make a prohibited use lawful. A written answer is still the first thing your legal review will ask for, and a vendor that markets the capability has told you where the risk sits.`,
       },
     ],
     adjacentRisks: [],
@@ -1754,7 +1795,12 @@ function futureProhibitedFinding(practice: Art5Practice): Omit<RuleFinding, 'id'
         kind: 'duty',
         article: `Article 5(1)(${practice.point})`,
         corpusArticle: '5',
-        basis: `Inserted by Regulation (EU) 2026/1744 and prohibited from ${practice.appliesFrom}. It is not prohibited today, which is why this is a date to finish work against rather than an instruction to stop now — but a prohibition admits no compliance route, so there is nothing to build towards except stopping.`,
+        basis: [
+          `Inserted by Regulation (EU) 2026/1744 and prohibited from ${practice.appliesFrom}. It is not prohibited today, which is why this is a date to finish work against rather than an instruction to stop now — but a prohibition admits no compliance route, so there is nothing to build towards except stopping.`,
+          ART5_POINT_LIMITS[practice.point],
+        ]
+          .filter(Boolean)
+          .join(' '),
         inPractice:
           'Work back from the date. A redesign that lands the week before leaves no room for the safeguards below to be tested.',
       },

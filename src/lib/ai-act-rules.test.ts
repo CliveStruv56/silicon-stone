@@ -1,11 +1,15 @@
+import * as fs from 'node:fs'
+import * as path from 'node:path'
 import { describe, expect, it } from 'vitest'
 import {
   ANNEX_III_APPLIES_FROM,
+  ART5_POINT_LIMITS,
   evaluateRuleLibrary,
   type ResultItem,
   type ResultVendorQuestion,
 } from './ai-act-rules'
 import { RULE_PACK } from './rulepack'
+import { corpusContainsQuote } from './rulepack/normalise'
 import { articleNumberFrom } from './report/verify'
 
 import type { AssessmentAnswers } from './ai-act-assessment'
@@ -907,5 +911,85 @@ describe('result items', () => {
       expect(owner ?? item.id, `"${item.question}" is emitted under two ids`).toBe(item.id)
       byText.set(item.question, item.id)
     }
+  })
+})
+
+/**
+ * Article 5(1) is ten points and five of them limit their own reach. One
+ * sentence once served all ten — "prohibits this practice outright… no
+ * risk-management measure that makes it lawful" — which is false of point (h)
+ * and overstated four others. It was found on 2026-09-19 by reading the claim
+ * against the pinned Article, which nothing in this suite had ever done.
+ *
+ * This reads the Article, so it fails the day a consolidation adds a carve-out
+ * nobody wrote up. The parse asserts its own anchors first: a splitter that
+ * silently stopped finding points would make the comparison below pass on two
+ * empty sets.
+ */
+describe('Article 5(1) carve-outs are stated, point by point', () => {
+  const article5 = fs.readFileSync(
+    path.join(process.cwd(), 'rulepack/versions', RULE_PACK.manifest.version, 'corpus/article-5.txt'),
+    'utf8',
+  )
+
+  // Paragraph 1 only: from the "1." marker to the "1a." marker. Sub-points
+  // (i)–(iii) belong to the point above them, and Article 5(1) stops at (h), so
+  // a roman numeral can never be a point of its own.
+  const start = article5.search(/^1\.$/m)
+  const end = article5.search(/^1a\.$/m)
+  const points = new Map<string, string>()
+  let current: string | null = null
+  for (const line of article5.slice(start, end).split('\n')) {
+    const marker = line.trim().match(/^\(([a-z]{1,2})\)$/)
+    if (marker && !/^(i|ii|iii|iv|v)$/.test(marker[1])) {
+      current = marker[1]
+      points.set(current, '')
+    } else if (current) {
+      points.set(current, `${points.get(current)} ${line}`)
+    }
+  }
+
+  const CARVE_OUT = /except where|shall not apply|does not cover|unless and in so far/
+
+  it('finds every point the pack lists — the parse is not blind', () => {
+    expect(start, 'no "1." paragraph marker in article-5.txt').toBeGreaterThan(-1)
+    expect(end, 'no "1a." paragraph marker in article-5.txt').toBeGreaterThan(start)
+    expect([...points.keys()].sort()).toEqual(RULE_PACK.prohibitedPractices.map((p) => p.point).sort())
+  })
+
+  it('has an entry for exactly the points whose text limits its own reach', () => {
+    const limited = [...points].filter(([, body]) => CARVE_OUT.test(body)).map(([point]) => point)
+    expect(limited.length, 'no carve-out found anywhere — the pattern went blind').toBeGreaterThan(0)
+    expect(Object.keys(ART5_POINT_LIMITS).sort()).toEqual(limited.sort())
+  })
+
+  it('quotes each carve-out verbatim from that point, not from a neighbour', () => {
+    for (const [point, limit] of Object.entries(ART5_POINT_LIMITS)) {
+      const quotes = [...limit.matchAll(/“([^”]+)”/g)].map((match) => match[1])
+      expect(quotes.length, `point (${point}) quotes nothing`).toBeGreaterThan(0)
+      for (const quote of quotes) {
+        expect(corpusContainsQuote(points.get(point) ?? '', quote), `(${point}): “${quote}”`).toBe(true)
+      }
+    }
+  })
+
+  it('never calls a prohibition "outright", and says what (h) actually says', () => {
+    const screen = RULE_PACK.prohibitedPractices.map((p) => `art5-${p.point}`)
+    const result = evaluateRuleLibrary({ eu_scope: ['eu-org'], origin: 'third-party', prohibited_screen: screen })
+    const prose = [
+      ...result.actions.map((item) => item.basis),
+      ...result.vendorQuestions.map((item) => item.why),
+    ]
+    expect(prose.filter((entry) => /outright/i.test(entry))).toEqual([])
+
+    const h = result.actions.find((item) => item.id === 'stop-prohibited-use-h')
+    expect(h?.basis).toContain('unless and in so far as')
+    expect(h?.basis).not.toContain('makes a prohibited use lawful')
+    for (const point of ['d', 'f', 'g']) {
+      const item = result.actions.find((entry) => entry.id === `stop-prohibited-use-${point}`)
+      expect(item?.basis, `(${point})`).toContain(ART5_POINT_LIMITS[point])
+    }
+    const bb = result.actions.find((item) => item.id === 'plan-withdrawal-bb')
+    expect(bb?.basis).toContain(ART5_POINT_LIMITS.bb)
   })
 })
