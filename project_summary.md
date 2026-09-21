@@ -902,6 +902,23 @@ canonical in the root layout, and every indexable page takes one from its own
 Mutation-tested both ways. **Owner follow-up:** "Validate fix" in Search
 Console's Pages report once deployed.
 
+**What Search Console actually said (read in the owner's Chrome, property six
+weeks old):** 52 indexed, 62 not — 39 "Discovered, currently not indexed" (never
+crawled: `/about`, every advisory page, 20 provision pages, two articles), 15
+"Crawled, currently not indexed" (mostly CSS, fonts and OG images — noise), 6
+redirects, 1 noindex, 1 alternate-canonical. **The homepage itself is "Crawled —
+currently not indexed"** (last crawl 7 Sept), and the referring pages Google
+lists for it are the category pages and `/privacy` — the ones that were claiming
+to be it. Consistent with the canonical defect; not proven to be the cause.
+Sitemap reads clean (86 URLs, 19 Sept). Three months: 7 clicks, 1.21K
+impressions, average position 17.5; the queries are "compliance checker", AI Act
+Article 50, and CELEX numbers landing on the provision pages.
+**Same day, two small discovery fixes:** an RSS `<link rel="alternate">` in the
+root `<head>` (a plain tag, because a page-level `alternates` replaces the
+inherited object whole), and honest `lastModified` on the 28 provision URLs (the
+pack's `provenance.retrieved`) and the author pages (`_updatedAt`). Static
+routes still carry none on purpose — an invented date is worse than no date.
+
 ### September 19, 2026 — /about: "The fourth leg" panel removed
 
 Owner request. The bordered EU–Japan capability note (D2, added in the

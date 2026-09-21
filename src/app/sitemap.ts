@@ -106,11 +106,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
    * reads statute from disk, and the sitemap has no business importing it just to
    * enumerate keys. The manifest is already bundled.
    *
-   * These change only when the pack version changes, which is a deploy.
+   * These change only when the pack version changes, which is a deploy — so the
+   * day the pack was retrieved is the honest `lastModified`. The static routes
+   * above deliberately carry none: a date invented at build time is worse than
+   * no date, because Google stops trusting `lastmod` site-wide once it is wrong.
    */
   const provisionEntries: MetadataRoute.Sitemap = Object.keys(RULE_PACK.manifest.corpus).map(
     (article) => ({
       url: absoluteUrl(`/tools/compliance-checker/provisions/${article}`),
+      lastModified: RULE_PACK.manifest.provenance.retrieved,
       changeFrequency: 'yearly' as const,
       priority: 0.4,
     })
@@ -150,9 +154,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }))
 
   const authorEntries: MetadataRoute.Sitemap = (
-    (authors ?? []) as Array<{ slug: string }>
+    (authors ?? []) as Array<{ slug: string; _updatedAt?: string | null }>
   ).map((author) => ({
     url: absoluteUrl(`/authors/${author.slug}`),
+    lastModified: author._updatedAt || undefined,
     changeFrequency: 'weekly',
     priority: 0.5,
   }))

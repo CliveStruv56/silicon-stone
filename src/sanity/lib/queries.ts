@@ -466,7 +466,8 @@ export const AUTHOR_PAGE_QUERY = defineQuery(`
 // Author slugs — for generateStaticParams on /authors/[slug]
 export const AUTHOR_SLUGS_QUERY = defineQuery(`
   *[_type == "author" && defined(slug.current)]{
-    "slug": slug.current
+    "slug": slug.current,
+    _updatedAt
   }
 `)
 

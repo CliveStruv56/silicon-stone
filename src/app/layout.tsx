@@ -99,6 +99,16 @@ export default function RootLayout({
               "if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',window.__ssThemeColor);}else{window.__ssThemeColor();}})();",
           }}
         />
+        {/* Feed discovery. A plain tag rather than `metadata.alternates.types`:
+            a page that sets its own `alternates` (every one does, for its
+            canonical) replaces the inherited object whole, so the feed link
+            would survive only on the pages that least need it. */}
+        <link
+          rel="alternate"
+          type="application/rss+xml"
+          title="Silicon and Stone"
+          href={`${SITE_URL}/rss.xml`}
+        />
         {process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN && (
           <Script
             defer
