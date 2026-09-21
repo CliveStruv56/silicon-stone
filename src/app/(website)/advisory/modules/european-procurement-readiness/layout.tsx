@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { JsonLd } from '@/components/seo/JsonLd'
-import { buildEngagementBreadcrumbSchema } from '@/lib/seo'
+import { buildEngagementBreadcrumbSchema, buildServiceSchema } from '@/lib/seo'
 import { offeringById } from '@/lib/offering'
 
 const offering = offeringById('european-procurement-readiness')
@@ -15,5 +15,15 @@ export const metadata: Metadata = {
 }
 
 export default function ProcurementReadinessLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <><JsonLd data={buildEngagementBreadcrumbSchema({ name: offering.name, path: offering.href })} />{children}</>
+  return (
+    <>
+      <JsonLd
+        data={[
+          buildEngagementBreadcrumbSchema({ name: offering.name, path: offering.href }),
+          buildServiceSchema(offering),
+        ]}
+      />
+      {children}
+    </>
+  )
 }

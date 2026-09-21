@@ -4,6 +4,7 @@ import {
   SITEMAP_ARTICLES_QUERY,
   SITEMAP_CATEGORIES_QUERY,
   AUTHOR_SLUGS_QUERY,
+  GLOSSARY_SLUGS_QUERY,
   SERIES_SLUGS_QUERY,
 } from '@/sanity/lib/queries'
 import { absoluteUrl } from '@/lib/site'
@@ -69,7 +70,7 @@ const STATIC_ROUTES: Array<{
 ]
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [{ data: articles }, { data: categories }, { data: authors }, { data: seriesList }, reports] =
+  const [{ data: articles }, { data: categories }, { data: authors }, { data: seriesList }, { data: glossary }, reports] =
     await Promise.all([
       sanityFetch({
         query: SITEMAP_ARTICLES_QUERY,
@@ -88,6 +89,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }),
       sanityFetch({
         query: SERIES_SLUGS_QUERY,
+        perspective: 'published',
+        stega: false,
+      }),
+      sanityFetch({
+        query: GLOSSARY_SLUGS_QUERY,
         perspective: 'published',
         stega: false,
       }),
@@ -162,6 +168,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5,
   }))
 
+  // One entry per glossary term. "What is X" is the narrowest question the site
+  // answers, and a term had no URL of its own until 2026-09-21.
+  const glossaryEntries: MetadataRoute.Sitemap = (
+    (glossary ?? []) as Array<{ slug: string; _updatedAt?: string | null }>
+  ).map((term) => ({
+    url: absoluteUrl(`/glossary/${term.slug}`),
+    lastModified: term._updatedAt || undefined,
+    changeFrequency: 'monthly',
+    priority: 0.5,
+  }))
+
   return [
     ...staticEntries,
     ...reports.map(report => ({
@@ -174,5 +191,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...seriesEntries,
     ...categoryEntries,
     ...authorEntries,
+    ...glossaryEntries,
   ]
 }

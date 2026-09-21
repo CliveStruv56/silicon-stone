@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  mentionsTerm,
   filterGlossaryTerms,
   glossaryLetter,
   glossarySearchScore,
@@ -48,3 +49,28 @@ describe('glossary helpers', () => {
   })
 })
 
+
+describe('mentionsTerm', () => {
+  const dataAct = { name: 'Data Act', acronym: null, fullName: null, aliases: null }
+  const cra = { name: 'Cyber Resilience Act', acronym: 'CRA', fullName: null, aliases: ['EU CRA'] }
+
+  it('needs the whole phrase, not its words scattered through the text', () => {
+    // The GROQ prefilter is tokenised and passes this; the page must not.
+    expect(mentionsTerm('The data shows the AI Act is biting.', dataAct)).toBe(false)
+    expect(mentionsTerm('Under the Data Act, switching is a right.', dataAct)).toBe(true)
+    expect(mentionsTerm('under the data act, switching', dataAct)).toBe(true)
+  })
+
+  it('matches an acronym case-sensitively and on word boundaries', () => {
+    expect(mentionsTerm('The CRA applies from 2027.', cra)).toBe(true)
+    expect(mentionsTerm('A sacrament of democracy.', cra)).toBe(false)
+    expect(mentionsTerm('They cra the numbers.', cra)).toBe(false)
+    expect(mentionsTerm('(CRA)', cra)).toBe(true)
+  })
+
+  it('reads aliases, and survives regex metacharacters in a name', () => {
+    expect(mentionsTerm('the EU CRA timetable', { ...cra, acronym: null })).toBe(true)
+    const odd = { name: 'C++ (language)', acronym: null, fullName: null, aliases: null }
+    expect(mentionsTerm('written in C++ (language) mostly', odd)).toBe(true)
+  })
+})

@@ -1,5 +1,6 @@
 import { SITE_URL, absoluteUrl } from '@/lib/site'
 import type { GlossaryTerm } from '@/lib/glossary'
+import { gbp, type Offering } from '@/lib/offering'
 
 /**
  * Schema.org builders for article pages. Pure functions over the article query
@@ -275,13 +276,15 @@ export function buildGlossarySchema(terms: GlossaryTerm[]) {
     name: 'Silicon and Stone glossary',
     url,
     description: 'Plain-language definitions for technology policy, AI and semiconductor analysis.',
+    // Each term has a page of its own; `@id` and `url` match what
+    // `buildDefinedTermSchema` emits there, so the two describe one entity.
     hasDefinedTerm: terms.map((term) => ({
       '@type': 'DefinedTerm',
-      '@id': `${url}#${term.slug}`,
+      '@id': `${url}/${term.slug}#term`,
       name: term.acronym || term.name,
       ...(term.acronym ? { alternateName: term.name } : {}),
       description: term.definition,
-      url: `${url}#${term.slug}`,
+      url: `${url}/${term.slug}`,
       inDefinedTermSet: { '@id': `${url}#term-set` },
     })),
   }
@@ -320,4 +323,116 @@ export function buildPersonProfileSchema(author: SchemaAuthor) {
       worksFor: { '@id': `${SITE_URL}/#organization` },
     },
   }
+}
+
+const ORGANIZATION_REF = { '@id': `${SITE_URL}/#organization` }
+
+/**
+ * `Service` for an advisory engagement or specialist project, from its
+ * catalogue entry.
+ *
+ * **A price appears only where the catalogue holds a figure.** Since September
+ * 2026 every engagement bar the Advisory Briefing is priced after a scoping
+ * conversation, and structured data is the one copy of a price no reader sees —
+ * so it is the copy most likely to go on quoting a withdrawn figure. `amount`
+ * must therefore format to exactly the `price` the page displays, or this
+ * throws at build. A scoped-fee offering cannot be given an `offers` block at
+ * all, by construction rather than by care.
+ */
+export function buildServiceSchema(offering: Offering, amount?: number) {
+  if (amount !== undefined && gbp(amount) !== offering.price) {
+    throw new Error(
+      `buildServiceSchema: ${gbp(amount)} is not the displayed price of "${offering.id}" (${offering.price})`
+    )
+  }
+  const url = absoluteUrl(offering.href)
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    '@id': `${url}#service`,
+    name: offering.name,
+    description: offering.summary,
+    url,
+    serviceType: 'Strategic advisory',
+    provider: ORGANIZATION_REF,
+    ...(amount !== undefined
+      ? { offers: { '@type': 'Offer', price: amount, priceCurrency: 'GBP', url } }
+      : {}),
+  }
+}
+
+/** A free interactive tool. Free is a fact about all four, not a price claim. */
+export function buildToolSchema(tool: { name: string; description: string; path: string }) {
+  const url = absoluteUrl(tool.path)
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    '@id': `${url}#app`,
+    name: tool.name,
+    description: tool.description,
+    url,
+    applicationCategory: 'BusinessApplication',
+    operatingSystem: 'Any',
+    browserRequirements: 'Requires JavaScript',
+    isAccessibleForFree: true,
+    offers: { '@type': 'Offer', price: 0, priceCurrency: 'GBP' },
+    provider: ORGANIZATION_REF,
+  }
+}
+
+/**
+ * `Legislation` for one pinned AI Act provision. Every value is read from the
+ * pack manifest by the caller — identifier, consolidation date, source URL — so
+ * the markup cannot claim a different text from the one the page renders.
+ */
+export function buildProvisionSchema(p: {
+  label: string
+  title: string
+  path: string
+  instrument: string
+  celex: string
+  sourceUrl: string
+  consolidatedAs: string
+}) {
+  const url = absoluteUrl(p.path)
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Legislation',
+    '@id': `${url}#provision`,
+    name: `${p.label}: ${p.title}`,
+    url,
+    inLanguage: 'en',
+    legislationJurisdiction: 'EU',
+    legislationIdentifier: p.celex,
+    legislationDateVersion: p.consolidatedAs,
+    isPartOf: {
+      '@type': 'Legislation',
+      name: p.instrument,
+      legislationIdentifier: p.celex,
+      url: p.sourceUrl,
+    },
+  }
+}
+
+/** One glossary term on its own page, tied back to the set on `/glossary`. */
+export function buildDefinedTermSchema(term: GlossaryTerm) {
+  const set = absoluteUrl('/glossary')
+  const url = absoluteUrl(`/glossary/${term.slug}`)
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'DefinedTerm',
+    '@id': `${url}#term`,
+    name: term.acronym || term.name,
+    ...(term.acronym ? { alternateName: term.name } : {}),
+    description: term.definition,
+    url,
+    inDefinedTermSet: { '@id': `${set}#term-set` },
+  }
+}
+
+export function buildGlossaryTermBreadcrumbSchema(term: { name: string; slug: string }) {
+  return breadcrumbList([
+    { name: 'Glossary', path: '/glossary' },
+    { name: term.name, path: `/glossary/${term.slug}` },
+  ])
 }

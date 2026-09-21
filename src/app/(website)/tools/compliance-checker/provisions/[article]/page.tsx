@@ -6,6 +6,8 @@ import { Header, Footer } from '@/components/layout'
 import { Badge } from '@/components/ui/badge'
 import { coveredArticles, provisionLabel, readArticleForDisplay } from '@/lib/rulepack/corpus'
 import { RULE_PACK } from '@/lib/rulepack'
+import { JsonLd } from '@/components/seo/JsonLd'
+import { buildProvisionSchema } from '@/lib/seo'
 
 /**
  * One Article of the AI Act, as pinned to this rule pack.
@@ -67,6 +69,19 @@ export default async function ProvisionPage({
 
   return (
     <div className="min-h-screen flex flex-col">
+      {/* Every value is the manifest's own, so the markup cannot describe a
+          different consolidation from the text rendered beneath it. */}
+      <JsonLd
+        data={buildProvisionSchema({
+          label: `AI Act ${provisionLabel(article)}`,
+          title: provision.title,
+          path: `/tools/compliance-checker/provisions/${article}`,
+          instrument: manifest.provenance.instrument,
+          celex: manifest.provenance.celex,
+          sourceUrl: manifest.provenance.url,
+          consolidatedAs: manifest.corpusCutOff,
+        })}
+      />
       <Header />
       <main className="flex-1 bg-background">
         <section className="mx-auto max-w-3xl px-6 py-10">

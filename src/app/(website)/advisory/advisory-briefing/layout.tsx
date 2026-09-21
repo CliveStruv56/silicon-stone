@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 
 import { JsonLd } from '@/components/seo/JsonLd'
-import { buildEngagementBreadcrumbSchema } from '@/lib/seo'
-import { ENGAGEMENTS } from '@/lib/offering'
+import { buildEngagementBreadcrumbSchema, buildServiceSchema } from '@/lib/seo'
+import { AMOUNTS, ENGAGEMENTS } from '@/lib/offering'
 
 const description =
   'The output of a tool or product, or one of your AI systems. A one-hour discussion and a written follow-up with priorities, evidence gaps and next actions.'
@@ -33,10 +33,10 @@ export default function AdvisoryBriefingLayout({
   return (
     <>
       <JsonLd
-        data={buildEngagementBreadcrumbSchema({
-          name: engagement.name,
-          path: engagement.href,
-        })}
+        data={[
+          buildEngagementBreadcrumbSchema({ name: engagement.name, path: engagement.href }),
+          buildServiceSchema(engagement, AMOUNTS.advisoryBriefing),
+        ]}
       />
       {children}
     </>

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 import { JsonLd } from '@/components/seo/JsonLd'
-import { buildEngagementBreadcrumbSchema } from '@/lib/seo'
+import { buildEngagementBreadcrumbSchema, buildServiceSchema } from '@/lib/seo'
 import { MODULES } from '@/lib/offering'
 
 const description =
@@ -28,7 +28,10 @@ export default function RegulatoryFrictionLayout({
   return (
     <>
       <JsonLd
-        data={buildEngagementBreadcrumbSchema({ name: offering.name, path: offering.href })}
+        data={[
+          buildEngagementBreadcrumbSchema({ name: offering.name, path: offering.href }),
+          buildServiceSchema(offering),
+        ]}
       />
       {children}
     </>

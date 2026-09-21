@@ -919,6 +919,26 @@ inherited object whole), and honest `lastModified` on the 28 provision URLs (the
 pack's `provenance.retrieved`) and the author pages (`_updatedAt`). Static
 routes still carry none on purpose — an invented date is worse than no date.
 
+**Same day: 75 glossary term pages, and structured data on the commercial
+pages.** Every term now has `/glossary/[term]` — definition (the same Sanity
+field the directory and the popover render), aliases, primary source, related
+terms, and "Analysis that uses this term". The article list is prefiltered in
+GROQ (`match` is tokenised, so "Data Act" alone would list every article) and
+decided by `mentionsTerm()` in `src/lib/glossary.ts`: whole phrase, word
+boundaries, acronyms case-sensitive. The inline popover in every article now
+links to the term page rather than a fragment, and the pages are in the sitemap
+with `_updatedAt`. **Structured data, to the owner's pricing rule of this date —
+advisory is priced after a discussion, only the Advisory Briefing publishes a
+figure:** `buildServiceSchema()` on all eight advisory layouts throws unless the
+amount it is given formats to the offering's displayed price, so a scoped-fee
+engagement cannot carry an `Offer`; `structured-data.test.ts` asserts exactly
+one layout passes an amount (mutation-tested). **No Product markup until the
+Lemon Squeezy store is live** — the same test fails on it, and that assertion
+is the thing to remove at launch. Tools get free `WebApplication` markup;
+the 28 provision pages get `Legislation` with CELEX and consolidation date read
+from the pack manifest. **Still owed by the owner:** the organisation's profile
+URLs for `ORG_SAME_AS` on the homepage (not created yet).
+
 ### September 19, 2026 — /about: "The fourth leg" panel removed
 
 Owner request. The bordered EU–Japan capability note (D2, added in the

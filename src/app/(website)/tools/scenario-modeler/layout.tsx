@@ -1,4 +1,7 @@
 import type { Metadata } from 'next'
+
+import { JsonLd } from '@/components/seo/JsonLd'
+import { buildToolSchema } from '@/lib/seo'
 import { SCENARIOS } from '@/lib/scenario-data'
 
 // Metadata lives in a server layout because the page itself is a Client Component.
@@ -14,5 +17,16 @@ export default function ScenarioModelerLayout({
 }: {
   children: React.ReactNode
 }) {
-  return children
+  return (
+    <>
+      <JsonLd
+        data={buildToolSchema({
+          name: 'Scenario Modeler',
+          description: String(metadata.description),
+          path: '/tools/scenario-modeler',
+        })}
+      />
+      {children}
+    </>
+  )
 }

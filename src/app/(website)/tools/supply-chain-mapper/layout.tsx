@@ -1,5 +1,8 @@
 import type { Metadata } from 'next'
 
+import { JsonLd } from '@/components/seo/JsonLd'
+import { buildToolSchema } from '@/lib/seo'
+
 // Metadata lives in a server layout because the page itself is a Client Component.
 export const metadata: Metadata = {
   title: 'Supply Chain Mapper | Silicon and Stone',
@@ -13,5 +16,16 @@ export default function SupplyChainMapperLayout({
 }: {
   children: React.ReactNode
 }) {
-  return children
+  return (
+    <>
+      <JsonLd
+        data={buildToolSchema({
+          name: 'Supply Chain Mapper',
+          description: String(metadata.description),
+          path: '/tools/supply-chain-mapper',
+        })}
+      />
+      {children}
+    </>
+  )
 }

@@ -142,7 +142,9 @@ export function GlossaryDirectory({ terms }: { terms: GlossaryTerm[] }) {
                             </div>
                           )}
                           <h3 className="font-statement text-lg font-semibold leading-snug text-text-primary">
-                            {term.fullName || term.name}
+                            <Link href={`/glossary/${term.slug}`} className="hover:text-stone-teal">
+                              {term.fullName || term.name}
+                            </Link>
                           </h3>
                           <span className="mt-2 inline-flex rounded-full border border-border-subtle px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.08em] text-text-muted">
                             {GLOSSARY_KIND_LABELS[term.kind]}
@@ -169,7 +171,7 @@ export function GlossaryDirectory({ terms }: { terms: GlossaryTerm[] }) {
                               {term.relatedTerms.map((related) => (
                                 <Link
                                   key={related._id}
-                                  href={`/glossary#${related.slug}`}
+                                  href={`/glossary/${related.slug}`}
                                   className="text-stone-teal hover:text-silicon-amber-strong"
                                 >
                                   {related.acronym || related.name}

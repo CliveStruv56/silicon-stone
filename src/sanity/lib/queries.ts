@@ -215,6 +215,51 @@ export const GLOSSARY_TERMS_QUERY = defineQuery(`
   }
 `)
 
+// One term, for its own page at /glossary/[term]. Same projection as the
+// directory so the two surfaces cannot show different definitions.
+export const GLOSSARY_TERM_QUERY = defineQuery(`
+  *[_type == "glossaryTerm" && slug.current == $slug][0] {
+    _id,
+    name,
+    "slug": slug.current,
+    acronym,
+    fullName,
+    aliases,
+    kind,
+    definition,
+    sourceUrl,
+    reviewedAt,
+    relatedTerms[]->{
+      _id,
+      name,
+      "slug": slug.current,
+      acronym,
+      kind
+    }
+  }
+`)
+
+export const GLOSSARY_SLUGS_QUERY = defineQuery(`
+  *[_type == "glossaryTerm" && defined(slug.current)] {
+    "slug": slug.current,
+    _updatedAt
+  }
+`)
+
+// Candidate articles for a term page. `match` is tokenised — "Data Act" would
+// match any body containing both words anywhere — so this is only a prefilter;
+// `mentionsTerm()` in src/lib/glossary.ts makes the actual decision on the text.
+export const GLOSSARY_TERM_ARTICLES_QUERY = defineQuery(`
+  *[_type == "article" && defined(slug.current) && !(_id in path("drafts.**"))
+    && pt::text(body) match $needles]
+  | order(coalesce(publishedAt, _updatedAt) desc) {
+    title,
+    "slug": slug.current,
+    excerpt,
+    "text": pt::text(body)
+  }
+`)
+
 export const SEARCH_GLOSSARY_QUERY = defineQuery(`
   *[_type == "glossaryTerm" && defined(slug.current) && (
     name match $query + "*" ||

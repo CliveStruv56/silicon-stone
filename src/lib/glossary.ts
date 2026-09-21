@@ -77,3 +77,32 @@ export function glossaryLetter(term: GlossaryTerm): string {
   return /^[A-Z]$/.test(first) ? first : '#'
 }
 
+
+/** Every string a reader might see this term written as. */
+export function termNeedles(
+  term: Pick<GlossaryTerm, 'name' | 'acronym' | 'fullName' | 'aliases'>
+): string[] {
+  const values = [term.acronym, term.name, term.fullName, ...(term.aliases ?? [])]
+    .filter((value): value is string => Boolean(value && value.trim()))
+    .map((value) => value.trim())
+  return [...new Set(values)]
+}
+
+/**
+ * Does this text actually use the term?
+ *
+ * Whole phrases on word boundaries, because the GROQ prefilter is tokenised and
+ * would otherwise list every article under "Data Act". The acronym is matched
+ * case-sensitively — "CRA" is a term, "cra" inside a word is not, and an
+ * all-caps needle matched loosely finds English words ("AID", "ACT").
+ */
+export function mentionsTerm(
+  text: string,
+  term: Pick<GlossaryTerm, 'name' | 'acronym' | 'fullName' | 'aliases'>
+): boolean {
+  return termNeedles(term).some((needle) => {
+    const escaped = needle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const flags = needle === term.acronym ? 'u' : 'iu'
+    return new RegExp(`(?<![\\p{L}\\p{N}])${escaped}(?![\\p{L}\\p{N}])`, flags).test(text)
+  })
+}

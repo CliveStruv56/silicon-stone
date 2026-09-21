@@ -1,5 +1,8 @@
 import type { Metadata } from 'next'
 
+import { JsonLd } from '@/components/seo/JsonLd'
+import { buildToolSchema } from '@/lib/seo'
+
 // Metadata lives in a server layout because the page itself is a Client Component.
 export const metadata: Metadata = {
   title: 'AI Act Compliance Checker | Silicon and Stone',
@@ -13,5 +16,16 @@ export default function ComplianceCheckerLayout({
 }: {
   children: React.ReactNode
 }) {
-  return children
+  return (
+    <>
+      <JsonLd
+        data={buildToolSchema({
+          name: 'AI Act Compliance Checker',
+          description: String(metadata.description),
+          path: '/tools/compliance-checker',
+        })}
+      />
+      {children}
+    </>
+  )
 }
