@@ -57,10 +57,15 @@ async function fetchTerm(slug: string): Promise<GlossaryTerm | null> {
   return (data as GlossaryTerm | null) ?? null
 }
 
-/** "GPAI — General-purpose AI", or just the name where there is no acronym. */
+/**
+ * "CRA — Cyber Resilience Act", or just the name where there is no acronym.
+ *
+ * Headed by `name`, not `fullName` as the directory is: for a law the full name
+ * is its number ("Regulation (EU) 2024/2847"), and nobody arrives here having
+ * searched for that. The formal name is shown beneath instead.
+ */
 function displayName(term: GlossaryTerm): string {
-  const long = term.fullName || term.name
-  return term.acronym && term.acronym !== long ? `${term.acronym} — ${long}` : long
+  return term.acronym && term.acronym !== term.name ? `${term.acronym} — ${term.name}` : term.name
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -113,8 +118,11 @@ export default async function GlossaryTermPage({ params }: Props) {
               </div>
             )}
             <h1 className={`${term.acronym ? 'mt-2' : 'mt-8'} text-4xl font-semibold text-text-primary sm:text-5xl`}>
-              {term.fullName || term.name}
+              {term.name}
             </h1>
+            {term.fullName && term.fullName !== term.name && (
+              <p className="mt-3 text-lg text-text-muted">{term.fullName}</p>
+            )}
             <span className="mt-5 inline-flex rounded-full border border-border-subtle px-2.5 py-0.5 font-mono text-[11px] uppercase tracking-[0.08em] text-text-muted">
               {GLOSSARY_KIND_LABELS[term.kind]}
             </span>
