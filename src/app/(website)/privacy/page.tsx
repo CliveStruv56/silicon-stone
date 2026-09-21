@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 export const metadata: Metadata = {
   title: 'Privacy Policy | Silicon and Stone',
   description: 'How Silicon and Stone handles your data. GDPR-compliant privacy practices.',
+  alternates: { canonical: '/privacy' },
 }
 
 export default function PrivacyPage() {

@@ -7,6 +7,7 @@ import { DERIVED, gbp } from '@/lib/offering'
 export const metadata: Metadata = {
   title: 'Terms of Service | Silicon and Stone',
   description: 'Terms of service for Silicon and Stone website, digital products, and advisory services.',
+  alternates: { canonical: '/terms' },
 }
 
 export default function TermsPage() {

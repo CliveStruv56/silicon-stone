@@ -25,6 +25,7 @@ export const metadata: Metadata = {
   title: 'Silicon and Stone | Forensic Technopolitics for the Senior Leaders Defining the AI Power Shift',
   description:
     'Independent, decision-grade intelligence for UK and European leaders managing AI governance, technology dependency, and operational resilience.',
+  alternates: { canonical: '/' },
 }
 
 // Organization `sameAs` — entity-authority signal for the homepage JSON-LD (F9).

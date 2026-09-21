@@ -11,6 +11,10 @@ import { formatDate } from '@/lib/format'
 export const metadata: Metadata = {
   title: 'Search | Silicon and Stone',
   description: 'Search our archive of forensic technopolitics analysis.',
+  alternates: { canonical: '/search' },
+  // Result pages are an unbounded set of thin, query-shaped URLs. Links on them
+  // are still worth following; the pages themselves are not worth indexing.
+  robots: { index: false, follow: true },
 }
 
 // Sanity Types (Simplified)

@@ -49,6 +49,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${category.title} | Analysis | Silicon and Stone`,
     description: category.description || `Articles about ${category.title}`,
+    alternates: { canonical: `/analysis/category/${slug}` },
   }
 }
 

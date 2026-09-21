@@ -30,9 +30,11 @@ export const metadata: Metadata = {
   description:
     "Independent, decision-grade intelligence for UK and European leaders managing AI governance, technology dependency, and operational resilience.",
   metadataBase: new URL(SITE_URL),
-  alternates: {
-    canonical: "/",
-  },
+  // No `alternates.canonical` here, on purpose. Metadata is inherited, so a
+  // canonical declared at the root is handed to every page that forgets its
+  // own — and "/" on a category page tells Google it is a copy of the
+  // homepage. A missing canonical is harmless; a wrong one deindexes the page.
+  // Each page declares its own; `src/lib/canonical.test.ts` holds that.
   openGraph: {
     title: "Silicon and Stone | Forensic Technopolitics",
     description:

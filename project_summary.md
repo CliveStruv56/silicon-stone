@@ -1,7 +1,7 @@
 # Silicon & Stone - Integrated Platform Summary
 
 > **Session Handoff Document**
-> Last Updated: 2026-09-19
+> Last Updated: 2026-09-21
 > Status: **Payments wired end to end for four products (Toolkit ×2, Manufacturing report, Advisory Briefing) behind the pre-launch flag; owner setup guide at `docs/owner-setup-lemonsqueezy-kit.md`; Kit tag registry + `test:kit-tags`. Same day: quarterly project review written (`docs/review-report-2026-09-15.md`, brief in `docs/next-phase-brief-2026-09-15.md`); its one critical finding — an unauthenticated RCE in Next's image optimizer — patched the same day (`next@15.5.25`, `sharp` override `^0.35.4`, Sanity remote pattern scoped to this dataset) and the image path re-verified. The brief's remaining tasks are the next phase. Earlier deployment records below are history.**
 
 ## Current work — 15 September 2026: project review, and the Next.js image-optimizer patch
@@ -882,6 +882,25 @@ SESSION_SECRET=<long random secret, 32+ characters>
 ---
 
 ## 9. Recent Changes
+
+### September 21, 2026 — canonicals: eleven pages were telling Google they were the homepage
+
+Prompted by a Search Console note. The URL in the owner's screenshot
+(`http://siliconandstone.com/`, "Page with redirect") was benign — the insecure
+address 308s to HTTPS and is rightly not indexed. The real defect was beside it:
+`src/app/layout.tsx` declared `alternates: { canonical: '/' }`, metadata is
+inherited, and every page that set no canonical of its own served
+`<link rel="canonical" href="https://siliconandstone.com">` — all eight
+`/analysis/category/*` pages, `/privacy`, `/terms` and `/search`, confirmed on
+production. The category pages, `/privacy` and `/terms` are in the sitemap.
+Nothing failed anywhere.
+**Fix:** the root canonical is removed (a missing canonical is harmless, a wrong
+one deindexes), the homepage and each affected page declare their own, and
+`/search` is `noindex, follow`. `src/lib/canonical.test.ts` holds it: no
+canonical in the root layout, and every indexable page takes one from its own
+`page.tsx` or the `layout.tsx` in the same directory, never from further up.
+Mutation-tested both ways. **Owner follow-up:** "Validate fix" in Search
+Console's Pages report once deployed.
 
 ### September 19, 2026 — /about: "The fourth leg" panel removed
 
