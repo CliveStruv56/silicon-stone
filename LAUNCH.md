@@ -489,8 +489,16 @@ pages on 2026-08-11. It was stale (four pages said 30 June, `/eu-exposure` said
 
 ## 2. Launch day — verification
 
-- [ ] Test both Toolkit variants before switching LS out of test mode:
-  - the correct toolkit files arrive in the delivery email;
+- [ ] Test both Toolkit variants before switching LS out of test mode. Everything
+      below except the first bullet can be proven in test mode before the store
+      is activated — Lemon Squeezy sends webhooks and the redirect exactly as in
+      live mode. **File downloads are disabled for all test-mode purchases**,
+      so the file check needs one real live-mode order per variant after
+      activation; it is not something test mode missed. Test-mode products do
+      not carry over: use "Copy to Live Mode", attach the real files, then
+      re-copy the **live** checkout links, variant IDs and API key — the
+      test-mode ones are different values.
+  - the correct toolkit files arrive in the delivery email (**live mode only**);
   - Standard returns to `/products/success?product=toolkit-standard` with the upgrade route;
   - Professional returns to `/products/success?product=toolkit-pro` with its included review;
   - the buyer receives `buyer-toolkit-standard` or `buyer-toolkit-pro` in Kit;
