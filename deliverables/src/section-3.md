@@ -8,11 +8,11 @@ The entries below are an operational aid, not legal advice. Use them to scope wo
 
 ### 3.1 Prohibited practices — confirm absence and document the check
 
-The eight prohibited practices in **Article 5** have been enforceable since **2 February 2025**. They include, among others, subliminal or purposefully manipulative techniques that cause significant harm, exploitation of vulnerabilities (age, disability, socio-economic situation), social scoring leading to unjustified detrimental treatment, certain predictive-policing-by-profiling uses, untargeted scraping of facial images to build recognition databases, emotion inference in the workplace and education (outside narrow medical or safety cases), and most real-time remote biometric identification in publicly accessible spaces for law-enforcement purposes.
+The eight prohibited practices in **Article 5** have been enforceable since **2 February 2025**. They include, among others, subliminal or purposefully manipulative techniques that cause significant harm, exploitation of vulnerabilities (age, disability, socio-economic situation), social scoring leading to unjustified detrimental treatment, certain predictive-policing-by-profiling uses, untargeted scraping of facial images to build recognition databases, emotion inference in the workplace and education (outside narrow medical or safety cases), and most real-time remote biometric identification in publicly accessible spaces for law-enforcement purposes. The 2026 Digital Omnibus added two more, applying from **2 December 2026**: placing on the market, putting into service or using AI to generate or manipulate realistic intimate or sexually explicit imagery of an identifiable person without their explicit consent, and AI that generates child sexual abuse material (Art 5(1)(ba) and (bb)). Checklist rows P-09 and P-10 cover them.
 
 For the overwhelming majority of commercial organisations, the obligation here is short and negative: **you must satisfy yourself that none of your AI systems fall within Article 5, and you must be able to evidence that you checked.** This is not optional housekeeping. Where a prohibited use is found, no amount of documentation or oversight cures it — the system must be withdrawn. The penalties attached to Article 5 breaches are the highest in the regime (up to €35 million or 7% of total worldwide annual turnover, whichever is greater).
 
-**What evidence demonstrates compliance:** a dated screening record covering each system in your inventory, mapping its actual function against the eight categories, signed off by a named accountable owner, and refreshed when a system's purpose materially changes. A one-line "no prohibited uses" assertion is not evidence; a structured screen that shows the reasoning is. Keep it with the system inventory described in Section 2.
+**What evidence demonstrates compliance:** a dated screening record covering each system in your inventory, mapping its actual function against each prohibited category, signed off by a named accountable owner, and refreshed when a system's purpose materially changes. A one-line "no prohibited uses" assertion is not evidence; a structured screen that shows the reasoning is. Keep it with the system inventory described in Section 2.
 
 > The prohibited-practice screen is the cheapest compliance artefact you will ever produce and the most expensive one to be caught without. It costs a morning. Its absence, after an incident, reads as wilful blindness.
 
@@ -123,7 +123,7 @@ Deployers carry a lighter but non-trivial set of duties. They apply on the same 
 
 ### 3.4 Limited Risk — Article 50 transparency
 
-Limited-risk systems are not subject to the high-risk engineering stack. Their single obligation is **transparency**, and it is the first substantive duty most organisations will actually feel, because **Article 50 takes effect on 2 August 2026** — the same date as the penalty and governance framework, and well before any high-risk obligation bites.
+Limited-risk systems are not subject to the high-risk engineering stack. Their single obligation is **transparency**, and it is the first substantive duty most organisations will actually feel, because **Article 50 has applied since 2 August 2026** — the same date as the penalty and governance framework, and well before any high-risk obligation bites.
 
 **What it requires.**
 
@@ -133,7 +133,7 @@ Limited-risk systems are not subject to the high-risk engineering stack. Their s
 
 **Who owes it.** Provider and deployer respectively, as above. **When.** 2 Aug 2026. **What evidence demonstrates it.** The disclosure UI or label as actually presented to users; the technical marking/watermarking applied to generated output; and a record of the deployer-side disclosures for deep-fake or public-interest content.
 
-> Article 50 is the obligation that will surprise most organisations, because it arrives in August 2026 while attention is fixed on a high-risk deadline that does not land until December 2027. If you run a customer chatbot or publish AI-generated content, your first real EU AI Act compliance task is a disclosure line, not a conformity assessment.
+> Article 50 is the obligation that surprises most organisations, because it arrived in August 2026 while attention is fixed on a high-risk deadline that does not land until December 2027. If you run a customer chatbot or publish AI-generated content, your first real EU AI Act compliance task is a disclosure line, not a conformity assessment.
 
 ### 3.5 Minimal Risk
 
@@ -178,7 +178,7 @@ Where two dates appear, the earlier applies to standalone Annex III systems and 
 
 ### 3.8 A note on sequencing
 
-The matrix repays one observation. The obligations that arrive **first** — Articles 4 and 5 (already live) and Article 50 (August 2026) — are the cheapest to satisfy and the ones most organisations overlook because the conversation has fixated on high-risk engineering. The obligations that arrive **last** — the Article 9–17 stack — are expensive but do not bite until December 2027 at the earliest. A defensible programme front-loads the screening, literacy and transparency work that is already enforceable or imminent, and uses the runway to 2027–2028 to build the high-risk evidence base in order. Inverting that sequence — polishing a risk-management file while the chatbot still fails to disclose itself — is a common and avoidable error.
+The matrix repays one observation. The obligations that arrive **first** — Articles 4 and 5 (live since 2025) and Article 50 (live since August 2026) — are the cheapest to satisfy and the ones most organisations overlook because the conversation has fixated on high-risk engineering. The obligations that arrive **last** — the Article 9–17 stack — are expensive but do not bite until December 2027 at the earliest. A defensible programme front-loads the screening, literacy and transparency work that is already enforceable or imminent, and uses the runway to 2027–2028 to build the high-risk evidence base in order. Inverting that sequence — polishing a risk-management file while the chatbot still fails to disclose itself — is a common and avoidable error.
 
 ### 3.9 SME and Small Mid-Cap proportionality
 

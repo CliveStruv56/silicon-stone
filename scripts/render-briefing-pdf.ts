@@ -266,6 +266,15 @@ const BRAND_CSS = `
     font-size: 9.5pt;
     page-break-inside: avoid;
   }
+  /* Opt-in for long tables (wrap in <div class="flow">): break between rows
+     rather than pushing the whole table to the next page and leaving a
+     mostly empty one behind. Header row repeats on each page. */
+  .flow table { page-break-inside: auto; }
+  .flow tr { break-inside: avoid; }
+  .flow thead { display: table-header-group; }
+  /* Checklist tables lead with a "☐ A-01" ID column that must not wrap. */
+  .checklist th:first-child,
+  .checklist td:first-child { white-space: nowrap; }
   th, td {
     text-align: left;
     padding: 2mm 3mm;
@@ -308,11 +317,16 @@ const BRAND_CSS = `
     margin-bottom: 2mm;
   }
 
-  /* Hard page break */
+  /* Hard page break. The marker renders no box and the break lands on the
+     element after it: a zero-height div with page-break-after could itself
+     spill onto a fresh page when the content before it filled the last one
+     exactly, and then break again — a blank page. */
   .pagebreak,
   div.pagebreak {
-    page-break-after: always;
-    height: 0;
+    display: none;
+  }
+  .pagebreak + * {
+    break-before: page;
   }
 
   /* Links */

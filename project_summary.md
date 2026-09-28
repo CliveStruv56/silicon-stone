@@ -872,7 +872,7 @@ SESSION_SECRET=<long random secret, 32+ characters>
 | Context profiles | `context/core/` |
 | Business overview | `business-overview.json` |
 | Strategy docs | `docs/` |
-| **Paid product deliverables (sources)** | `deliverables/src/` — build with `node deliverables/src/assemble-toolkit.mjs` and `build-spreadsheets.mjs` |
+| **Paid product deliverables (sources)** | `deliverables/src/` — build the whole AI Act Toolkit bundle with `npm run build:toolkit` (`deliverables/src/toolkit/`; see `docs/ai-act-compliance-toolkit.md`) |
 | Built deliverables (gitignored, regenerable) | `deliverables/dist/` — never copy these back into `docs/` (pointer: `docs/ai-act-compliance-toolkit.md`) |
 | Plausible types | `src/types/plausible.d.ts` |
 | Favicon | `src/app/icon.svg` |

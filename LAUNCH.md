@@ -166,18 +166,16 @@ other eight):
 Create **one Toolkit product with two one-time variants** (Standard and Professional).
 LS is Merchant of Record; there is deliberately no tax logic in the site:
 
-The files are **already built** and live in `deliverables/dist/` (gitignored —
-regenerate with `deliverables/src/assemble-toolkit.mjs` and
-`build-spreadsheets.mjs`; the sources are committed):
+The files are built by `npm run build:toolkit` into `deliverables/dist/`
+(gitignored — the sources in `deliverables/src/` are committed). The
+consolidated bundle exists as of 2026-09-28; its legal content still needs the
+primary-source verification in `docs/ai-act-compliance-toolkit.md` before sale:
 
-- [ ] **AI Act Compliance Toolkit — Standard — £79.** Attach the consolidated
-      handbook, one coordinated Excel workbook and four editable templates with
-      PDF reference copies. Both editions include the former checklist assets:
-      gap assessment, vendor dependency scorecard, inventory examples and board
-      summary. Reconcile the assessment scoring and detailed task coverage before
-      releasing the merged files; see `docs/ai-act-compliance-toolkit.md`.
+- [ ] **AI Act Compliance Toolkit — Standard — £79.** Attach everything in
+      `deliverables/dist/AI Act Compliance Toolkit/`: the handbook PDF, the one
+      workbook, the four `.docx` templates and their four PDF reference copies.
 - [ ] **AI Act Compliance Toolkit — Professional — £275.** Same complete toolkit,
-      plus review preparation instructions. Includes advance workbook review,
+      plus `deliverables/dist/Professional only/Professional review — next steps.pdf`. Includes advance workbook review,
       one 45-minute Zoom discussion of up to three systems in one organisation,
       and a personalised written action summary. No recorded video.
 - [ ] Both variants: one-off payment, internal organisational use, 12 months of

@@ -21,10 +21,11 @@ Much early commentary described a single "August 2026 cliff" on which the AI Act
 | **2 February 2025** | Prohibited practices (Art 5) banned; AI-literacy duty (Art 4) in force |
 | **2 August 2025** | General-purpose AI (GPAI) model rules apply |
 | **2 August 2026** | Transparency duties (Art 50); penalties and governance framework operational |
+| **2 December 2026** | Two further prohibitions (Art 5(1)(ba) and (bb)): non-consensual intimate imagery and child sexual abuse material. Deadline for machine-readable marking by generative systems placed on the market before 2 August 2026 |
 | **2 December 2027** | Standalone high-risk systems (Annex III) — full obligations apply |
 | **2 August 2028** | Embedded / product-safety high-risk systems (Annex I) — full obligations apply |
 
-The practical reading is precise and matters for how you spend the next two years. The obligations already in force or imminent — confirming nothing prohibited is running, training staff to a baseline, and disclosing AI interactions by August 2026 — are cheap and frequently overlooked. The expensive high-risk obligations do not bite until December 2027 at the earliest, which is runway to build the evidence properly rather than reason to defer starting.
+The practical reading is precise and matters for how you spend the next two years. The obligations already in force — confirming nothing prohibited is running, training staff to a baseline, and disclosing AI interactions, which has been required since 2 August 2026 — are cheap and frequently overlooked. The expensive high-risk obligations do not bite until December 2027 at the earliest, which is runway to build the evidence properly rather than reason to defer starting.
 
 > The August 2026 date is real, but it is a transparency-and-penalties date, not a high-risk date. Your first compliance task is more likely a disclosure line on a chatbot than a conformity assessment.
 
@@ -34,16 +35,16 @@ The penalty ceilings are deliberately severe. Breaching the Article 5 prohibitio
 
 ### How to use this toolkit
 
-This document is built to be worked through in order, and then kept:
+The toolkit is three things used together: this handbook, one Excel workbook, and four editable Word templates (each with a PDF reference copy). Start with the **quick-start assessment** at the front of this handbook — its twenty questions are also the Assessment tab of the workbook, which scores them for you. Then work through the handbook in order, and keep it:
 
 - **Section 2 — Decision Tree.** Classify each system: in scope, your role, its tier. Start here, system by system.
 - **Section 3 — Requirements by Risk Category.** The obligations behind each classification, by article and by role, with the date each applies.
-- **Section 4 — The Compliance Checklist.** A working, printable checklist with owner, date, status, and evidence fields. The part you pin to the wall.
-- **Section 5 — Template Documents.** Ready-to-adapt register schema, transparency notice, governance policy, and vendor questionnaire.
+- **Section 4 — The Compliance Checklist.** A working, printable checklist. Every row has an ID (A-01, P-01, B-01 …) that the workbook uses too.
+- **Section 5 — Using the Register and templates.** The register fields explained, and how to adapt the governance policy, transparency notice, vendor questionnaire and board summary.
 - **Section 6 — Timeline and Action Plan.** The staged calendar plus a 90-day plan for an organisation starting today.
 - **Appendix — Glossary and Resources.** Plain-language definitions and the official sources.
 
-Two companion spreadsheets — the **AI Systems Register** and the **Compliance Tracker** — turn the register schema and checklist into live, auditable records. Use them; a regulator asks for a register first.
+The **workbook** turns all of this into live, auditable records: the assessment, one AI Systems Register, supplier dependency scores, the checklist as a Requirements tab, an action tracker and a dashboard, all joined by the same system, supplier and requirement IDs. Use it; a regulator asks for a register first.
 
 ### The lens behind the toolkit
 
@@ -65,7 +66,8 @@ The 2026 Digital Omnibus replaced the original single deadline with a phased sch
 | :---- | :---- | :---- |
 | **2 Feb 2025** | Prohibited practices banned; AI-literacy duty live | Screen every system against Art 5 now; train staff to a baseline. Already enforceable. |
 | **2 Aug 2025** | GPAI model rules apply | Relevant if you build or substantially fine-tune a general-purpose model. |
-| **2 Aug 2026** | Transparency (Art 50); penalties & governance framework | Disclose AI interactions; label synthetic content; have an accountable owner and the penalty regime live. |
+| **2 Aug 2026** | Transparency (Art 50); penalties & governance framework | Disclose AI interactions; label synthetic content; have an accountable owner. Applying now. |
+| **2 Dec 2026** | Two further prohibitions; legacy generative-content marking | Screen for the two new Art 5 practices (checklist P-09, P-10); providers of generative systems already on the market by 2 Aug 2026 mark output machine-readably (B-12). |
 | **2 Dec 2027** | Standalone high-risk (Annex III) | Full provider/deployer obligations for hiring, credit, education, biometrics and the rest. |
 | **2 Aug 2028** | Embedded high-risk (Annex I) | Full obligations for AI that is a safety component of a regulated product. |
 
@@ -79,23 +81,23 @@ For an organisation beginning today with no formal AI governance. The aim of the
 
 #### Days 1–30 — See the estate
 
-- **Stand up the AI Systems Register** (Section 5 schema; companion spreadsheet). One row per system.
+- **Stand up the AI Systems Register** on the workbook’s Register tab (fields explained in Section 5). One row per system.
 - **Find the systems.** Survey every department, including AI features inside CRM, office, and vendor-managed software, and tools adopted without approval. Most teams find more than they expected.
 - **Run the prohibited-practice screen** (Art 5) across everything found. Anything matching is a stop-now item, not a planning item. Document the check and its reasoning.
 - **Assign a named AI governance owner** with authority over the estate and a reporting line to leadership.
-- **Brief the board** on initial exposure using the one-page summary (gateway pack template).
+- **Brief the board** on initial exposure using the Board-Ready Risk Summary template and the workbook Dashboard.
 
 #### Days 31–60 — Classify and disclose
 
 - **Classify each system** through the Section 2 decision tree: in scope, role, tier. Record role (watch Art 25), tier, Annex basis, and the date its obligations apply.
 - **Start the AI-literacy programme** (Art 4) — proportionate training for staff who operate or rely on AI, with attendance recorded.
-- **Scope the August 2026 transparency work** (Art 50): list chatbots and generative/synthetic-content systems; draft the disclosure lines and content labels; update transparency notices. This is the next hard deadline — treat it as the priority delivery.
-- **Begin vendor assessment** for material suppliers using the Section 5 questionnaire; record HQ and data location; score dependency.
+- **Close the transparency work** (Art 50), which has applied since 2 August 2026: list chatbots and generative/synthetic-content systems; put the disclosure lines and content labels in place; publish the transparency notice. Anything still open here is already overdue — treat it as the priority delivery.
+- **Begin vendor assessment** for material suppliers using the Vendor Assessment Questionnaire template; record replies, HQ, data location and dependency scores on the workbook’s Suppliers tab.
 
 #### Days 61–90 — Govern and plan the high-risk runway
 
-- **Adopt the Internal AI Governance Policy** (Section 5) at executive level, including the approval gate so no new system enters use without a register entry.
-- **Populate the Compliance Tracker** from the Section 4 checklist; assign owners and target dates.
+- **Adopt the Internal AI Governance Policy** (template; guidance in Section 5) at executive level, including the approval gate so no new system enters use without a register entry.
+- **Raise actions in the workbook** against the Section 4 checklist IDs, system by system; assign owners, due dates and evidence locations.
 - **Build the high-risk roadmap.** For each high-risk system, map the Art 9–17 (provider) or Art 26–27 (deployer) obligations onto a timeline working back from 2 Dec 2027 (Annex III) or 2 Aug 2028 (Annex I). The technical-documentation and data-governance work is long-lead; start it in 2026.
 - **Set the review cadence** (quarterly is defensible) and book the first review.
 
@@ -103,7 +105,8 @@ For an organisation beginning today with no formal AI governance. The aim of the
 
 Beyond the first quarter, fix these as standing checkpoints:
 
-- **Before 2 Aug 2026:** transparency disclosures live; governance owner and policy in place; literacy programme running.
+- **Now:** transparency disclosures live (required since 2 Aug 2026); governance owner and policy in place; literacy programme running.
+- **Before 2 Dec 2026:** the two new prohibitions screened (P-09, P-10); legacy generative systems marking output machine-readably (B-12).
 - **Through 2026–2027:** high-risk evidence base under construction — risk-management files, data-governance records, technical documentation, instructions for use.
 - **Before 2 Dec 2027:** standalone high-risk systems conformity-assessed, registered, and operating under documented human oversight; deployer FRIAs completed where required.
 - **Before 2 Aug 2028:** embedded high-risk (product-safety) systems brought into the same state.
@@ -146,13 +149,13 @@ Each checkpoint is a register query, not a memory test — which is the point of
 
 **Notified body.** An independent organisation designated to carry out third-party conformity assessments where the Act requires them.
 
-**Prohibited practice (Art 5).** A use banned outright — including workplace/education emotion inference, social scoring, untargeted facial scraping, and certain manipulative or biometric uses. Banned since 2 February 2025.
+**Prohibited practice (Art 5).** A use banned outright — including workplace/education emotion inference, social scoring, untargeted facial scraping, and certain manipulative or biometric uses. Banned since 2 February 2025; two further practices (non-consensual intimate imagery and child sexual abuse material) banned from 2 December 2026.
 
 **Provider.** An actor that develops a system and places it on the market or puts it into service under its own name or trademark. Carries the heaviest obligations.
 
 **Substantial modification (Art 25).** A change to a high-risk system, or to its intended purpose, significant enough that the modifying party becomes its provider in law.
 
-**Transparency obligations (Art 50).** Duties to disclose AI interaction and to mark AI-generated or manipulated content. Apply from 2 August 2026.
+**Transparency obligations (Art 50).** Duties to disclose AI interaction and to mark AI-generated or manipulated content. Have applied since 2 August 2026.
 
 ### Resources
 
@@ -161,7 +164,7 @@ Each checkpoint is a register query, not a memory test — which is the point of
 - **National competent authority:** identify and bookmark the market-surveillance authority for each member state in which you operate.
 - **Regulatory sandboxes:** member states are establishing AI regulatory sandboxes; SMEs and small mid-caps have priority, reduced-cost access.
 - **ISO/IEC 42001 (AI management systems):** the international AIMS standard, useful as a technical baseline for internal AI governance and as supporting evidence.
-- **Companion deliverables:** the *AI Systems Register* and *Compliance Tracker* spreadsheets, and — for a lighter first pass — the *AI Audit Checklist Pack*.
+- **This toolkit’s files:** the workbook (assessment, register, suppliers, requirements, actions and dashboard) and four editable Word templates with PDF reference copies. Updated files arrive for twelve months from purchase.
 
 ---
 
