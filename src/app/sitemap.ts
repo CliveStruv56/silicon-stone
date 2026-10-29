@@ -61,6 +61,9 @@ const STATIC_ROUTES: Array<{
   // Index of the pinned AI Act provisions. The 19 Article pages beneath it are
   // generated below from the pack manifest rather than listed here.
   { path: '/tools/compliance-checker/provisions', changeFrequency: 'monthly', priority: 0.5 },
+  // Reader-facing explainers built on the same pinned pack.
+  { path: '/tools/compliance-checker/faq', changeFrequency: 'monthly', priority: 0.5 },
+  { path: '/tools/compliance-checker/iso-42001', changeFrequency: 'monthly', priority: 0.5 },
   { path: '/tools/policy-stress-test', changeFrequency: 'monthly', priority: 0.5 },
   { path: '/tools/scenario-modeler', changeFrequency: 'monthly', priority: 0.5 },
   { path: '/tools/supply-chain-mapper', changeFrequency: 'monthly', priority: 0.5 },

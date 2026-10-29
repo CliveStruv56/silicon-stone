@@ -70,8 +70,15 @@ export default function ProvisionsIndexPage() {
           <div className="mt-10 space-y-3 rounded-lg border border-border-subtle bg-stone-charcoal p-6 text-sm text-text-muted">
             <p>
               <strong className="text-text-primary">Coverage is partial and deliberate.</strong> These
-              are the {provisions.length} Articles the checker cites. An Article that is absent is one
-              we do not quote — not one that does not apply to you.
+              are the {provisions.length} provisions the checker and its{' '}
+              <Link href="/tools/compliance-checker/faq" className="text-silicon-amber-strong hover:underline">
+                FAQ
+              </Link>{' '}
+              and{' '}
+              <Link href="/tools/compliance-checker/iso-42001" className="text-silicon-amber-strong hover:underline">
+                ISO/IEC 42001 crosswalk
+              </Link>{' '}
+              cite. A provision that is absent is one we do not quote — not one that does not apply to you.
             </p>
             <p>
               <strong className="text-text-primary">These are consolidated texts and have no legal

@@ -31,6 +31,8 @@ const CORE_PAGES: Array<{ title: string; path: string; note: string }> = [
   { title: 'Series', path: '/intelligence/series', note: 'Ordered reading paths — the analysis in the sequence the argument was built, not by date or impact.' },
   { title: 'Glossary', path: '/glossary', note: 'Defined terms across AI regulation, semiconductor supply chains and digital sovereignty.' },
   { title: 'Interactive tools', path: '/tools', note: 'AI Act compliance checker, supply-chain mapper, policy stress-test, scenario modeler.' },
+  { title: 'EU AI Act FAQ', path: '/tools/compliance-checker/faq', note: 'Scope for non-EU companies, provider or deployer, post-Omnibus high-risk dates, penalties — each answer quotes the consolidated statute verbatim.' },
+  { title: 'ISO/IEC 42001 to EU AI Act crosswalk', path: '/tools/compliance-checker/iso-42001', note: 'What an ISO/IEC 42001 AI management system already evidences under the AI Act, what the Act adds, and the duties with no counterpart.' },
   { title: 'Advisory', path: '/advisory', note: 'Strategic advisory for AI governance and technology dependency — four core engagements and four independently commissioned specialist projects.' },
   { title: 'Advisory Briefing', path: '/advisory/advisory-briefing', note: 'The output of a tool or product, or one of your AI systems: a one-hour discussion and a written follow-up. Document review is scoped separately.' },
   { title: 'Exposure Diagnostic', path: '/advisory/exposure-diagnostic', note: 'Where dependency on specific vendors, models and jurisdictions becomes an operating constraint.' },

@@ -196,9 +196,10 @@ commercial site carries the
 EUR-Lex "consolidated text, no legal value, only the OJ is authentic" notice and
 the EU source acknowledgement; that is not decoration.
 
-Corpus coverage is partial: **27 Articles plus Annex III**. Annex III arrived
+Corpus coverage is partial: **30 Articles plus Annex III**. Annex III arrived
 2026-08-18; Articles 10, 14, 15, 16 and 43 on 2026-08-19 in pack `2026-08-19`;
-Articles 4, 27 and 86 the same day in pack `2026-08-19b`. All from the same CELEX
+Articles 4, 27 and 86 the same day in pack `2026-08-19b`; Articles 2, 25 and 40
+on 2026-10-29 in pack `2026-10-29`, for the explainers below. All from the same CELEX
 and with `corpusCutOff` unmoved at `2026-07-27` — the same consolidation, just
 more of it read out of it. **The `b` suffix is deliberate**: two packs were cut
 on 2026-08-19, and dating the second `2026-08-20` would put a false date on the
@@ -219,6 +220,41 @@ order rather than an error, so annexes are sorted separately and appended.
 The report generator only supplies Articles the pack covers, so an `uncovered`
 verdict means the model cited outside its evidence, not merely that coverage is
 thin.
+
+## AI Act explainers: the FAQ and the ISO/IEC 42001 crosswalk
+
+`/tools/compliance-checker/faq` and `/tools/compliance-checker/iso-42001` are
+server pages over `src/lib/ai-act-explainers/`. They are authored explanation,
+not engine output, but they quote statute on public pages, so they keep the
+Checker's rule: **no quotation reaches a screen unverified.** Every
+`StatuteCitation` is string-matched against the pinned corpus by
+`explainers.test.ts`, and `StatuteQuote` verifies again at render and shows a
+note in place of any extract that fails. Four things not to undo:
+
+- **No date is typed into an answer.** Dates come from `packDate()`; the test
+  fails on any date in the prose that is in neither the pack timeline nor
+  `HARMONISED_STANDARDS`. It cannot catch a *real* pack date attached to the
+  wrong duty (mutation-tested: "high-risk from 2 August 2026" passes, because
+  that is Article 50's date), so the high-risk dates answer is pinned
+  separately and the rest is a reviewer's job.
+- **ISO/IEC 42001 is named, never quoted.** It is copyright ISO/IEC. Rows cite
+  clauses and Annex A *areas* by number with our own labels; control-level
+  numbering is the part summaries most often get wrong. `fit` is a judgement
+  and the page says so.
+- **Nothing says 42001 gives a presumption of conformity.** Only a harmonised
+  standard cited in the Official Journal does (Article 40). The first,
+  EN 18286:2026 (quality management, including post-market monitoring), was
+  cited by Implementing Decision (EU) 2026/2274 on 14 October 2026.
+  `harmonised-standards.ts` holds that list by hand with a `checkedAt` date,
+  because it is outside the pack and cannot be corpus-verified. When the next
+  decision lands, add it, re-read the crosswalk rows it touches, and move
+  `checkedAt` — never move the date without re-reading.
+- **Pack `2026-10-29` was sliced, not fetched.** The session that cut it had no
+  route to Cellar. Articles 2, 25 and 40 were sliced from the regulatory lane's
+  committed `source.txt` with the fetch script's own slice rule, after showing
+  that rule reproduces all nine previously fetched Articles byte for byte. The
+  manifest changelog records it and gives the one-line command that confirms it
+  from a machine that can reach Cellar.
 
 ## Compliance Checker v2 (in build, behind a flag)
 
