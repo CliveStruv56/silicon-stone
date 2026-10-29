@@ -450,6 +450,17 @@ export default function ComplianceCheckerPage() {
                 </Link>{' '}
                 is readable here in the pinned text.
               </p>
+              <p className="mt-4 max-w-3xl leading-relaxed text-text-muted">
+                Questions before you start?{' '}
+                <Link href="/tools/compliance-checker/faq" className="text-stone-teal underline underline-offset-4">
+                  Read the answers, with the statute quoted
+                </Link>
+                . Already certified to ISO/IEC 42001?{' '}
+                <Link href="/tools/compliance-checker/iso-42001" className="text-stone-teal underline underline-offset-4">
+                  See what carries over to the Act
+                </Link>
+                .
+              </p>
               {GENERAL_APPLICATION && NEXT_DATED_STEP && (
                 <p className="mt-4 max-w-3xl leading-relaxed text-text-muted">
                   The Article 50 transparency duties and the penalty regime have applied since{' '}
