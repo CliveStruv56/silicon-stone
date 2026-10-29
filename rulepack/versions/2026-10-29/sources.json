@@ -1,0 +1,110 @@
+{
+  "overview": {
+    "label": "European Commission AI Act overview",
+    "article": "AI Act overview",
+    "publisher": "European Commission",
+    "url": "https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai"
+  },
+  "omnibus": {
+    "label": "Regulation (EU) 2026/1744 (Digital Omnibus on AI), in force 27 July 2026",
+    "article": "Article 5(1)",
+    "publisher": "Official Journal of the European Union",
+    "url": "https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng"
+  },
+  "article2": {
+    "label": "AI Act Service Desk: Article 2 territorial scope",
+    "article": "Article 2",
+    "publisher": "European Commission AI Act Service Desk",
+    "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-2"
+  },
+  "article5": {
+    "label": "AI Act Service Desk: Article 5 prohibited AI practices",
+    "article": "Article 5",
+    "publisher": "European Commission AI Act Service Desk",
+    "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-5"
+  },
+  "article6": {
+    "label": "AI Act Service Desk: Article 6 high-risk classification",
+    "article": "Article 6",
+    "publisher": "European Commission AI Act Service Desk",
+    "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-6"
+  },
+  "article9": {
+    "label": "AI Act Service Desk: Article 9 risk management system",
+    "article": "Article 9",
+    "publisher": "European Commission AI Act Service Desk",
+    "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-9"
+  },
+  "article11": {
+    "label": "AI Act Service Desk: Article 11 technical documentation",
+    "article": "Article 11",
+    "publisher": "European Commission AI Act Service Desk",
+    "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-11"
+  },
+  "article12": {
+    "label": "AI Act Service Desk: Article 12 record-keeping",
+    "article": "Article 12",
+    "publisher": "European Commission AI Act Service Desk",
+    "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-12"
+  },
+  "article13": {
+    "label": "AI Act Service Desk: Article 13 transparency and information provision",
+    "article": "Article 13",
+    "publisher": "European Commission AI Act Service Desk",
+    "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-13"
+  },
+  "article19": {
+    "label": "AI Act Service Desk: Article 19 automatically generated logs",
+    "article": "Article 19",
+    "publisher": "European Commission AI Act Service Desk",
+    "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-19"
+  },
+  "annex3": {
+    "label": "AI Act Service Desk: Annex III high-risk areas",
+    "article": "Annex III",
+    "publisher": "European Commission AI Act Service Desk",
+    "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/annex-3"
+  },
+  "article26": {
+    "label": "AI Act Service Desk: Article 26 deployer obligations",
+    "article": "Article 26",
+    "publisher": "European Commission AI Act Service Desk",
+    "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-26"
+  },
+  "article49": {
+    "label": "AI Act Service Desk: Article 49 registration",
+    "article": "Article 49",
+    "publisher": "European Commission AI Act Service Desk",
+    "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-49"
+  },
+  "article50": {
+    "label": "AI Act Service Desk: Article 50 transparency obligations",
+    "article": "Article 50",
+    "publisher": "European Commission AI Act Service Desk",
+    "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-50"
+  },
+  "article51": {
+    "label": "AI Act Service Desk: Article 51 GPAI systemic risk",
+    "article": "Article 51",
+    "publisher": "European Commission AI Act Service Desk",
+    "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-51"
+  },
+  "article72": {
+    "label": "AI Act Service Desk: Article 72 post-market monitoring",
+    "article": "Article 72",
+    "publisher": "European Commission AI Act Service Desk",
+    "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-72"
+  },
+  "article99": {
+    "label": "AI Act Service Desk: Article 99 penalties",
+    "article": "Article 99",
+    "publisher": "European Commission AI Act Service Desk",
+    "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-99"
+  },
+  "gdpr": {
+    "label": "ICO: Data protection impact assessments",
+    "article": "GDPR DPIA due diligence",
+    "publisher": "Information Commissioner’s Office",
+    "url": "https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/accountability-and-governance/data-protection-impact-assessments-dpias/"
+  }
+}

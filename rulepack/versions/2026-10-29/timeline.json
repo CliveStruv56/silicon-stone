@@ -1,0 +1,58 @@
+[
+  {
+    "date": "2 February 2025",
+    "label": "Prohibited practices and AI literacy",
+    "detail": "The eight original Article 5(1) prohibitions, and the Article 4 AI literacy duty.",
+    "status": "in-force",
+    "basis": "Article 113, third paragraph, point (a)"
+  },
+  {
+    "date": "2 August 2025",
+    "label": "GPAI obligations and governance",
+    "detail": "General-purpose AI model duties and the governance architecture.",
+    "status": "in-force",
+    "basis": "Article 113, third paragraph, point (b)"
+  },
+  {
+    "date": "2 August 2026",
+    "label": "Article 50 transparency, GPAI enforcement, and penalties",
+    "detail": "These are in force now. The Omnibus did not move them.",
+    "status": "in-force",
+    "basis": "Article 113, second paragraph"
+  },
+  {
+    "date": "2 December 2026",
+    "label": "New prohibitions, and machine-readable marking",
+    "detail": "Article 5(1)(ba) and (bb) — non-consensual intimate imagery and CSAM generation — begin to apply, together with the Article 5(1a) and (1b) qualifiers. Providers of systems generating synthetic audio, image, video, or text placed on the market before 2 August 2026 must comply with Article 50(2) by the same date.",
+    "status": "upcoming",
+    "basis": "Article 113, third paragraph, point (a); Article 111(4)"
+  },
+  {
+    "date": "2 August 2027",
+    "label": "National regulatory sandboxes operational",
+    "detail": "Article 57(1). Extended by the Omnibus from the original 2 August 2026 — this is a separate provision from the Annex III application date, and was not left unchanged.",
+    "status": "upcoming",
+    "basis": "Article 57(1)"
+  },
+  {
+    "date": "2 December 2027",
+    "label": "Standalone high-risk systems",
+    "detail": "Chapter III Sections 1–3 for AI systems classified as high-risk under Article 6(2) and Annex III, deferred by Regulation (EU) 2026/1744.",
+    "status": "upcoming",
+    "basis": "Article 113, third paragraph, point (c)(i)"
+  },
+  {
+    "date": "2 August 2028",
+    "label": "Embedded product-safety high-risk systems",
+    "detail": "Chapter III Sections 1–3 for AI systems classified as high-risk under Article 6(1) and Annex I, deferred by Regulation (EU) 2026/1744.",
+    "status": "upcoming",
+    "basis": "Article 113, third paragraph, point (c)(ii)"
+  },
+  {
+    "date": "2 August 2030",
+    "label": "Legacy high-risk systems intended for use by public authorities",
+    "detail": "Providers and deployers of high-risk systems intended to be used by public authorities, placed on the market before the Chapter III application date, must take the necessary steps to comply by this date.",
+    "status": "upcoming",
+    "basis": "Article 111(2)"
+  }
+]

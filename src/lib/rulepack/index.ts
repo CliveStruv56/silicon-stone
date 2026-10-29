@@ -18,6 +18,11 @@ import sources2026_08_19b from '../../../rulepack/versions/2026-08-19b/sources.j
 import timeline2026_08_19b from '../../../rulepack/versions/2026-08-19b/timeline.json'
 import penalties2026_08_19b from '../../../rulepack/versions/2026-08-19b/penalties.json'
 import rules2026_08_19b from '../../../rulepack/versions/2026-08-19b/rules.json'
+import manifest2026_10_29 from '../../../rulepack/versions/2026-10-29/manifest.json'
+import sources2026_10_29 from '../../../rulepack/versions/2026-10-29/sources.json'
+import timeline2026_10_29 from '../../../rulepack/versions/2026-10-29/timeline.json'
+import penalties2026_10_29 from '../../../rulepack/versions/2026-10-29/penalties.json'
+import rules2026_10_29 from '../../../rulepack/versions/2026-10-29/rules.json'
 
 /**
  * The versioned rule pack: the legal payload behind the AI Act triage engine,
@@ -169,12 +174,35 @@ const PACKS: Record<string, RulePack> = {
     prohibitedPractices: rules2026_08_19b.prohibitedPractices as PackProhibitedPractice[],
     ruleAnchors: rules2026_08_19b.ruleAnchors as Record<string, PackRuleAnchor>,
   },
+  /**
+   * Adds Articles 2, 25 and 40 to the corpus: scope, the value chain, and
+   * harmonised standards. Nothing in the engine reads them. They exist for the
+   * reader-facing FAQ and ISO/IEC 42001 crosswalk under
+   * /tools/compliance-checker, whose answers to "does this reach a company
+   * outside the EU", "does building on someone else's model make us a
+   * provider" and "does 42001 certification make us compliant" turn on exactly
+   * these provisions, and would otherwise have quoted statute unverified.
+   *
+   * The three files were sliced from the regulatory lane's committed text of
+   * the same CELEX rather than fetched, because the session had no route to
+   * Cellar; the manifest changelog records how that was shown to be
+   * byte-identical to what the fetch script writes. Data files and the
+   * twenty-eight carried-over corpus files are unchanged from 2026-08-19b.
+   */
+  '2026-10-29': {
+    manifest: manifest2026_10_29 as PackManifest,
+    sources: sources2026_10_29 as Record<string, PackSource>,
+    timeline: timeline2026_10_29 as PackTimelineEntry[],
+    penalties: penalties2026_10_29 as PackPenaltyTier[],
+    prohibitedPractices: rules2026_10_29.prohibitedPractices as PackProhibitedPractice[],
+    ruleAnchors: rules2026_10_29.ruleAnchors as Record<string, PackRuleAnchor>,
+  },
 }
 
 export const AVAILABLE_RULE_PACK_VERSIONS = Object.keys(PACKS).sort()
 
 /** The version served when nothing is pinned. Never "latest" — see below. */
-const DEFAULT_RULE_PACK_VERSION = '2026-08-19b'
+const DEFAULT_RULE_PACK_VERSION = '2026-10-29'
 
 /**
  * The pinned version. Deliberately an explicit version string, never a
