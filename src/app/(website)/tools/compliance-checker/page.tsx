@@ -463,8 +463,13 @@ export default function ComplianceCheckerPage() {
               </p>
               {GENERAL_APPLICATION && NEXT_DATED_STEP && (
                 <p className="mt-4 max-w-3xl leading-relaxed text-text-muted">
-                  The Article 50 transparency duties and the penalty regime have applied since{' '}
-                  {GENERAL_APPLICATION.date}. The next dated step is {NEXT_DATED_STEP.date}:{' '}
+                  {/* Not "the penalty regime": Chapter XII has applied since
+                      2 August 2025 (Article 113, third paragraph, point (b)).
+                      What this date added is Article 101, the Commission's
+                      fines on GPAI providers, which that point excepts. */}
+                  The Article 50 transparency duties have applied since{' '}
+                  {GENERAL_APPLICATION.date}, and with them the Commission’s power to fine
+                  providers of general-purpose AI models. The next dated step is {NEXT_DATED_STEP.date}:{' '}
                   {NEXT_DATED_STEP.label.charAt(0).toLowerCase() + NEXT_DATED_STEP.label.slice(1)}.
                   The result tells you which line your system sits on.
                 </p>
