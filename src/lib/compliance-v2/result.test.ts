@@ -355,7 +355,7 @@ describe('the whole result', () => {
   it('carries its version stamps and its disclaimer', () => {
     const result = evaluate('hrScreeningProfiling')
     expect(result.schemaVersion).toBe('2')
-    expect(result.rulepackVersion).toBe('2026-08-19b')
+    expect(result.rulepackVersion).toBe('2026-10-29')
     expect(result.assessedAt).toBe(ASSESSED_AT)
     expect(result.disclaimer).toMatch(/not legal advice/)
     expect(result.disclaimer).toMatch(/identifies that uncertainty/)
