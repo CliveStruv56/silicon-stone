@@ -512,6 +512,19 @@ instrument's last review — automation can break silently, `prebuild` cannot. T
 watcher exists to make that review a two-minute "nothing changed, restamp"
 rather than a research task, which is what makes six instruments sustainable.
 
+**The cliff now has three weeks' notice** (since 2026-10-30). Before that, a
+green watcher every Monday said nothing about an approaching `reviewBy`, and all
+six instruments came within 12 days of failing every build before anyone
+noticed. `src/lib/regulatory/review-due.ts` is the single definition of *due*
+(`REVIEW_WARNING_DAYS = 21`) and *lapsed*; `reg:check` warns from it and still
+fails only on lapse, and the weekly workflow runs `npm run reg:review-due`,
+which opens or updates an issue labelled `regulatory-review-due` (its own label,
+so it never absorbs a drift report) and closes it once nothing is due. Its exit
+codes are a contract: 0 nothing due, 2 due, anything else fails the run — a
+broken watcher must never read as "nothing due". `reg:hash` keeps an existing
+`reviewBy`, so restamping is a hand edit plus a changelog line saying what was
+checked.
+
 A new **AI Act** consolidation is not a simple re-fetch: `reg:check` asserts its
 `consolidatedAs` equals the rule pack's `corpusCutOff`, so the pack version must
 move with it and every pinned citation be re-verified. `reg:drift` says so in
