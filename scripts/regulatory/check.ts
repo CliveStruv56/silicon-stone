@@ -8,7 +8,9 @@
  * in a build log is a warning nobody reads.
  *
  *   1. HASH      the committed text still matches its recorded sha256.
- *   2. FRESHNESS today is not past the instrument's reviewBy date.
+ *   2. FRESHNESS today is not past the instrument's reviewBy date. Within
+ *                REVIEW_WARNING_DAYS of it, a passing run also warns; the
+ *                weekly workflow turns the same verdict into an issue.
  *   3. VINTAGE   for the AI Act, the corpus consolidation matches the rule pack's
  *                corpusCutOff — so the editorial lane and the Compliance Checker
  *                can never quote two different vintages of the same Article.
@@ -28,6 +30,7 @@ import {
   hashSource,
   type ManifestInstrument,
 } from '../../src/lib/regulatory/meta'
+import { REVIEW_WARNING_DAYS, reviewStatus } from '../../src/lib/regulatory/review-due'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 
@@ -76,6 +79,7 @@ function main(): void {
   manifest.normalisation = NORMALISATION_VERSION
 
   const problems: string[] = []
+  const dueSoon: string[] = []
   const now = today()
   const rulePack = rulePackCorpusCutOff()
 
@@ -115,10 +119,14 @@ function main(): void {
       )
     }
 
-    // 2. FRESHNESS
-    if (!recorded.reviewBy) {
+    // 2. FRESHNESS — the verdict comes from review-due.ts, which the weekly
+    // workflow also reads, so "lapsed" and "due" mean the same thing in both.
+    const review = reviewStatus(recorded.reviewBy, now)
+    if (review.state === 'missing') {
       problems.push(`${corpusId}: manifest entry has no reviewBy date.`)
-    } else if (now > recorded.reviewBy) {
+    } else if (review.state === 'due') {
+      dueSoon.push(`${corpusId}: review due by ${recorded.reviewBy} (${review.daysLeft} day(s) left)`)
+    } else if (review.state === 'lapsed') {
       problems.push(
         `${corpusId}: review lapsed on ${recorded.reviewBy} (today ${now}). ` +
           `Re-check the instrument upstream, then bump reviewBy AND write what you ` +
@@ -160,6 +168,16 @@ function main(): void {
   console.log(`regulatory corpus OK: ${summary}`)
   if (rulePack) {
     console.log(`  vintage matches rule pack ${rulePack.version} (corpusCutOff ${rulePack.corpusCutOff})`)
+  }
+  // A courtesy, not the mechanism: per the header, nobody reads build logs. The
+  // weekly regulatory-drift workflow raises the same list as an issue, which is
+  // what actually gets seen. This line only saves a lookup for whoever is here.
+  if (dueSoon.length > 0) {
+    console.warn(
+      `\n  WARNING: within ${REVIEW_WARNING_DAYS} days of the review date — the build fails the day after:`,
+    )
+    for (const line of dueSoon) console.warn(`    - ${line}`)
+    console.warn('  Run npm run reg:drift, then bump reviewBy and write what you checked into the changelog.')
   }
 }
 
