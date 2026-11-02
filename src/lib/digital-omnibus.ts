@@ -1,5 +1,5 @@
 /** Editorial review date, not the date the visitor happens to open the page. */
-export const DIGITAL_OMNIBUS_REVIEWED = '2026-09-09'
+export const DIGITAL_OMNIBUS_REVIEWED = '2026-11-02'
 
 export const OMNIBUS_SOURCES = {
   overview: { title: 'European Commission: the two Digital Omnibus tracks', url: 'https://digital-strategy.ec.europa.eu/en/policies/digital-rulebook' },
@@ -9,6 +9,7 @@ export const OMNIBUS_SOURCES = {
   proposal: { title: 'European Parliament: broader Digital Omnibus procedure', url: 'https://oeil.europarl.europa.eu/oeil/en/procedure-file?reference=2025%2F0360%28COD%29' },
   package: { title: 'European Commission: data, privacy and cybersecurity proposals', url: 'https://digital-strategy.ec.europa.eu/en/faqs/digital-package' },
   privacy: { title: 'EDPB and EDPS: support for simplification and concerns over privacy changes', url: 'https://www.edpb.europa.eu/news/digital-omnibus-edpb-and-edps-support-simplification-and-competitiveness-while-raising-key_en' },
+  councilPosition: { title: 'Council: position on the data, privacy and cyber reporting Omnibus', url: 'https://www.consilium.europa.eu/en/press/press-releases/2026/10/21/digital-rulebook-council-agrees-position-to-simplify-data-protection-privacy-and-cyber-reporting-rules/' },
   agreement: { title: 'Council: political agreement on the AI Omnibus', url: 'https://www.consilium.europa.eu/en/press/press-releases/2026/05/07/artificial-intelligence-council-and-parliament-agree-to-simplify-and-streamline-rules/' },
   scope: { title: 'AI Act Service Desk: Article 2, scope', url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-2' },
 }
@@ -17,6 +18,7 @@ export const OMNIBUS_HISTORY = [
   { date: '19 November 2025', title: 'Two proposals introduced', detail: 'The Commission proposes changes to the AI Act and, in a separate legislative file, to data, privacy and cybersecurity rules.', source: 'overview' },
   { date: '7 May 2026', title: 'Political agreement on AI announced', detail: 'Parliament and Council negotiators agree the AI changes. Political agreement precedes formal adoption and entry into force.', source: 'agreement' },
   { date: '27 July 2026', title: 'AI Omnibus enters into force', detail: 'Regulation (EU) 2026/1744 changes the AI Act. The broader Digital Omnibus remains a separate proposal.', source: 'enacted' },
+  { date: '21 October 2026', title: 'Council agrees its position on the broader package', detail: 'The Council settles its negotiating mandate on the data, privacy and cyber reporting proposal. Negotiations with Parliament start only once Parliament adopts its own position, so this is not an agreed text.', source: 'councilPosition' },
 ] as const
 
 export const OMNIBUS_APPLICATIONS = [
