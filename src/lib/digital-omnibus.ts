@@ -18,7 +18,7 @@ export const OMNIBUS_HISTORY = [
   { date: '19 November 2025', title: 'Two proposals introduced', detail: 'The Commission proposes changes to the AI Act and, in a separate legislative file, to data, privacy and cybersecurity rules.', source: 'overview' },
   { date: '7 May 2026', title: 'Political agreement on AI announced', detail: 'Parliament and Council negotiators agree the AI changes. Political agreement precedes formal adoption and entry into force.', source: 'agreement' },
   { date: '27 July 2026', title: 'AI Omnibus enters into force', detail: 'Regulation (EU) 2026/1744 changes the AI Act. The broader Digital Omnibus remains a separate proposal.', source: 'enacted' },
-  { date: '21 October 2026', title: 'Council agrees its position on the broader package', detail: 'The Council settles its negotiating mandate on the data, privacy and cyber reporting proposal. Negotiations with Parliament start only once Parliament adopts its own position, so this is not an agreed text.', source: 'councilPosition' },
+  { date: '21 October 2026', title: 'Council agrees its position on the broader package', detail: 'The Council's Permanent Representatives Committee approves its negotiating mandate on the data, privacy and cyber reporting proposal. Negotiations with Parliament start only once Parliament adopts its own position, so this is not an agreed text.', source: 'councilPosition' },
 ] as const
 
 export const OMNIBUS_APPLICATIONS = [
