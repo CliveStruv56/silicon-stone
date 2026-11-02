@@ -8,11 +8,13 @@ import { preflightArticle, hasBlocker, type PreflightDocument } from '@/lib/publ
 import { publishedAtPatch } from '@/lib/published-at'
 import { sendToTopic, pushSendConfigured } from '@/lib/push/send'
 import { getRedis } from '@/lib/redis'
+import { isFreshPublication } from '@/lib/standfirst-publish'
+import { STANDFIRST_TIMEOUT_MS } from '@/lib/timeouts'
 
 /**
  * Publish-time side effects that are not indexing.
  *
- * Three jobs, deliberately in one route: all fire on exactly the same event, and
+ * Four jobs, deliberately in one route: all fire on exactly the same event, and
  * each extra webhook is another thing configured only in the Sanity dashboard
  * with no record in this repo. One is enough.
  *
@@ -35,7 +37,12 @@ import { getRedis } from '@/lib/redis'
  *   3. **The Audit-tier deep-dive push notification.** Readers can subscribe to
  *      "New Audit-tier Deep Dives" and, until now, nothing ever sent one.
  *
- * The three are independent: any can fail without touching the others, and no
+ *   4. **Telling Standfirst.** It reads the article with its own token and
+ *      prepares the broadcast, so it needs only the id and type. This route
+ *      fans out because the site's Sanity plan has no spare webhook. Only a
+ *      recent publication is forwarded: see `standfirst-publish.ts`.
+ *
+ * The four are independent: any can fail without touching the others, and no
  * failure is reported as an error to Sanity, because a retry would not help and
  * would re-run the parts that worked.
  *
@@ -178,6 +185,23 @@ async function notifyOnce(doc: PublishedArticle): Promise<string> {
   }
 }
 
+async function notifyStandfirst(doc: PublishedArticle, type: string): Promise<string> {
+  const url = process.env.STANDFIRST_HOOK_URL
+  const secret = process.env.STANDFIRST_HOOK_SECRET
+  if (!url || !secret) return 'not configured'
+  if (!isFreshPublication(doc.publishedAt, new Date())) return 'not a new publication'
+
+  const body = JSON.stringify({ _id: doc._id, _type: type })
+  const signature = 'sha256=' + crypto.createHmac('sha256', secret).update(body).digest('hex')
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', 'x-standfirst-signature': signature },
+    body,
+    signal: AbortSignal.timeout(STANDFIRST_TIMEOUT_MS),
+  })
+  return res.ok ? 'queued' : `answered ${res.status}`
+}
+
 export async function POST(request: NextRequest) {
   const ip = getClientIp(request)
   try {
@@ -280,6 +304,17 @@ export async function POST(request: NextRequest) {
     push = 'failed'
   }
 
-  console.info(`[on-publish] ${_id} — date: ${stamped}; audit: ${audit}; push: ${push}`)
-  return NextResponse.json({ ok: true, id: _id, publishedAt: stamped, audit, push })
+  // --- 4. Standfirst -------------------------------------------------------
+  let standfirst = 'skipped'
+  try {
+    standfirst = await notifyStandfirst(doc, _type)
+  } catch (error) {
+    console.error('[on-publish] Standfirst failed:', error)
+    standfirst = 'failed'
+  }
+
+  console.info(
+    `[on-publish] ${_id} — date: ${stamped}; audit: ${audit}; push: ${push}; standfirst: ${standfirst}`,
+  )
+  return NextResponse.json({ ok: true, id: _id, publishedAt: stamped, audit, push, standfirst })
 }

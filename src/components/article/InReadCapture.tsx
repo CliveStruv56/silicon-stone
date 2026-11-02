@@ -11,7 +11,7 @@ import { submitWithOfflineQueue } from '@/lib/offline/submit'
  * Atlantic Drift in-read email capture (P3-2). Rendered inside the article
  * body, partway through — so it only appears after the reader has consumed the
  * value, never as an entry wall. Suppressed per-device once dismissed or
- * subscribed (localStorage); Kit dedupes on its side for anyone already on the
+ * subscribed (localStorage); Standfirst dedupes on its side for anyone already on the
  * list who clears storage. On by default per article (`inReadCapture`).
  */
 
@@ -77,7 +77,10 @@ export function InReadCapture() {
     setErrorMsg('')
 
     try {
-      const result = await submitWithOfflineQueue('/api/subscribe', { email })
+      const result = await submitWithOfflineQueue('/api/subscribe', {
+        email,
+        tags: ['source-article-inread'],
+      })
       if (result.queued) {
         setStatus('queued')
         setEmail('')
@@ -123,8 +126,7 @@ export function InReadCapture() {
 
       {status === 'success' ? (
         <p className="text-sm text-stone-teal">
-          <span className="font-medium">You&apos;re in.</span> The next briefing on the widening
-          US–EU regulatory gap lands in your inbox.
+          <span className="font-medium">Almost there.</span> Check your inbox to confirm.
         </p>
       ) : status === 'queued' ? (
         <p className="text-sm text-stone-teal">

@@ -18,7 +18,7 @@ import {
  * avoiding for fifteen lines of HTTP.
  *
  * **This is advisory, exactly like the draft-time editorial guards.** The
- * enquiry has already been written to Kit by the time we get here. An email
+ * enquiry has already been written to Standfirst by the time we get here. An email
  * that fails must never turn a submitted enquiry into an error page for the
  * visitor — so every path returns a status instead of throwing, and the caller
  * logs it.
@@ -41,7 +41,7 @@ export function emailConfigured(): boolean {
 /**
  * Email the owner about one enquiry. Returns what happened; never throws.
  *
- * `outcome` is whether the enquiry actually reached Kit — see
+ * `outcome` is whether the enquiry actually reached Standfirst — see
  * `enquiry-notification.ts` for why that changes the subject line rather than
  * only the body.
  */

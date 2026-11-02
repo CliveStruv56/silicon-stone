@@ -4,7 +4,7 @@
  * change + redeploy, never a code edit.
  *
  * - PRE_LAUNCH (default true): while true every product CTA is the
- *   "Request Early Access" Kit capture and no Lemon Squeezy checkout is
+ *   "Request Early Access" capture and no Lemon Squeezy checkout is
  *   invoked. Set NEXT_PUBLIC_PRE_LAUNCH=false at launch.
  * - FREE_INTRO_WINDOW (default **false** since 2026-09-13, owner decision):
  *   the "free 25-minute intro conversation, first ninety days" copy. It was

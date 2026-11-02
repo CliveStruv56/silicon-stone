@@ -1,3 +1,5 @@
+> **Superseded for Kit (2 November 2026).** Kit is closed. Signups, enquiries and buyer tags go to Standfirst: ignore every Kit step here. `src/lib/standfirst-signups.ts` and `.env.example` hold the current setup.
+
 # Owner setup: Lemon Squeezy and Kit, end to end
 
 **Written 15 September 2026, from the code as it stands that day.** This is the

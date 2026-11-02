@@ -891,6 +891,7 @@ export default function PolicyStressTestPage() {
 
       <Footer />
       <EmailGateOverlay
+        tool="policy-stress-test"
         isOpen={showGate}
         onUnlock={unlock}
         onDismiss={dismiss}

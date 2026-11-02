@@ -1,16 +1,13 @@
 /**
  * The owner-facing notification for an advisory enquiry.
  *
- * `/api/contact` writes an enquiry into Kit custom fields and tags the
- * subscriber. Until now that was the *only* thing it did: nobody was told. A
- * Exposure Diagnostic enquiry landed in a subscriber's `message` custom
- * field and waited there until someone happened to open Kit. This module builds
- * the message that fixes that; `email.ts` sends it.
+ * `/api/contact` records an enquiry on a Standfirst contact. On its own that
+ * tells nobody, so this module builds the owner's email; `email.ts` sends it.
  *
  * Two decisions worth keeping:
  *
  *  1. **The email carries the whole enquiry, not a "you have a new enquiry"
- *     ping.** It is the backstop copy. When the Kit write fails — the one case
+ *     ping.** It is the backstop copy. When the Standfirst write fails — the one case
  *     where the enquiry would otherwise be lost outright — the notification is
  *     the only surviving record of it, so it has to be complete enough to act
  *     on and to re-enter by hand.
@@ -53,7 +50,7 @@ export function singleLine(value: string, max = 120): string {
   return value.replace(/\s+/g, ' ').trim().slice(0, max)
 }
 
-/** How the enquiry fared in Kit (directly, or via the Railway proxy). */
+/** How the enquiry fared in Standfirst. */
 export type StorageOutcome = 'stored' | 'failed'
 
 /**
@@ -77,7 +74,7 @@ export function buildEnquiryNotification(
 
   const lines = [
     failed
-      ? 'THIS ENQUIRY WAS NOT SAVED. The Kit write failed, so this email is the\n' +
+      ? 'THIS ENQUIRY WAS NOT SAVED. The Standfirst write failed, so this email is the\n' +
         'only copy. Re-enter it by hand or reply to the sender directly.'
       : 'A new enquiry came in through the site.',
     '',
@@ -91,8 +88,8 @@ export function buildEnquiryNotification(
     '',
     '—',
     failed
-      ? 'Saved to Kit: NO — this copy is the record.'
-      : 'Saved to Kit: yes. Reply to this email to answer the sender.',
+      ? 'Saved to Standfirst: NO — this copy is the record.'
+      : 'Saved to Standfirst: yes. Reply to this email to answer the sender.',
   ]
 
   return { subject, text: lines.join('\n'), replyTo: enquiry.email }

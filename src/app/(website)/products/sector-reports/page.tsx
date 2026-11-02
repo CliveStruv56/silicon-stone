@@ -76,7 +76,7 @@ export default async function SectorReportsPage() {
           <div className="mt-10 max-w-xl">
             <h2 className="text-xl font-semibold text-text-primary">{anyOnSale ? 'Hear when the next sector is ready' : 'Hear when purchases open'}</h2>
             <p className="mt-3 mb-5 text-sm leading-relaxed text-text-muted">{anyOnSale ? 'Join the newsletter for new sector previews and edition news. Unsubscribe at any time.' : 'Join the newsletter for report launch news and new sector previews. Unsubscribe at any time.'}</p>
-            <EarlyAccessCTA tierTag="tier-sector-reports" label={anyOnSale ? 'Notify me' : 'Notify me at launch'} size="default" buttonClassName="bg-stone-teal text-ink-on-accent hover:bg-stone-teal/90" />
+            <EarlyAccessCTA tierTag="interest-sector-reports" label={anyOnSale ? 'Notify me' : 'Notify me at launch'} size="default" buttonClassName="bg-stone-teal text-ink-on-accent hover:bg-stone-teal/90" />
           </div>
         </section>
         <AdvisoryNextStep />

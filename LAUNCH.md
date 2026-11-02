@@ -1,3 +1,5 @@
+> **Kit is closed (2 November 2026).** Ignore the Kit items below; the site connects to Standfirst. See `.env.example`.
+
 # LAUNCH.md — launch-day checklist
 
 > **Payments and Kit setup moved (2026-09-15):** the ordered owner guide is

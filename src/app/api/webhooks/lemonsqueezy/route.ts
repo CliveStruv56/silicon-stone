@@ -6,12 +6,7 @@ import {
   releaseWebhookDelivery,
   deliveryKey,
 } from '@/lib/lemonsqueezy'
-import {
-  BUYER_TAG_IDS,
-  ensureSubscriber,
-  kitConfigured,
-  tagSubscriber,
-} from '@/lib/kit'
+import { upsertContact } from '@/lib/standfirst'
 import { buyerTagForVariant } from '@/lib/lemonsqueezy-variants'
 
 // Node runtime (HMAC via node:crypto) and never cached — this is a signed,
@@ -23,12 +18,13 @@ const MAX_BODY_BYTES = 100_000
 
 /**
  * order_created fulfilment (spec §3.2): delivery itself is Lemon Squeezy's
- * built-in file-delivery email — our only job is to tag the buyer in Kit
- * (see `lemonsqueezy-variants.ts` for the variant → tag map) so post-purchase
- * sequences and the sector-report monthly editions can run from Kit. Throws on transient Kit failures
- * so the caller releases the delivery claim and LS retries.
+ * built-in file-delivery email — our only job is to tag the buyer in Standfirst
+ * (see `lemonsqueezy-variants.ts` for the variant → tag map). A purchase is not
+ * newsletter consent, so the buyer is recorded without being subscribed. Throws
+ * on any failure, so the caller releases the delivery claim and LS retries. A
+ * stopgap: Stripe replaces Lemon Squeezy.
  */
-async function tagBuyerInKit(data: unknown): Promise<void> {
+async function tagBuyer(data: unknown): Promise<void> {
   const attributes = (data as { attributes?: Record<string, unknown> } | undefined)?.attributes
   const email =
     typeof attributes?.user_email === 'string' ? attributes.user_email.trim().toLowerCase() : ''
@@ -42,20 +38,14 @@ async function tagBuyerInKit(data: unknown): Promise<void> {
     })
     return
   }
-  if (!kitConfigured()) {
-    console.error('[ls-webhook] Kit not configured; cannot tag buyer')
-    return
-  }
-  const tagId = BUYER_TAG_IDS[tagName]
-  if (!tagId) {
-    console.warn(`[ls-webhook] no Kit tag ID configured for ${tagName}; skipping`)
-    return
-  }
-
-  const subscriberId = await ensureSubscriber(email)
-  if (!subscriberId) throw new Error('Kit ensureSubscriber failed')
-  const tagged = await tagSubscriber(tagId, subscriberId)
-  if (!tagged) throw new Error(`Kit tagSubscriber failed for ${tagName}`)
+  const result = await upsertContact({
+    email,
+    subscribe: false,
+    tags: [tagName],
+    source: 'lemon-squeezy',
+    consent: { basis: 'legitimate_interest', wording: `Purchased ${tagName} through Lemon Squeezy.` },
+  })
+  if (!result.ok) throw new Error(`Standfirst tagging failed for ${tagName}: ${result.reason}`)
   console.info(`[ls-webhook] tagged buyer as ${tagName}`)
 }
 
@@ -114,8 +104,8 @@ export async function POST(request: NextRequest) {
     switch (eventName) {
       case 'order_created':
         // File delivery is LS's native order email (Model A) — nothing custom.
-        // Our side tags the buyer in Kit for post-purchase sequences.
-        await tagBuyerInKit(payload.data)
+        // Our side tags the buyer in Standfirst.
+        await tagBuyer(payload.data)
         break
       case 'license_key_created':
         // TODO(P3-5): record the issued key so the post-checkout redirect can

@@ -64,20 +64,13 @@ export default function AtlanticDriftPage() {
     setErrorMsg('')
 
     try {
-      // Same site-wide Kit form; `atlantic-drift` is the source segment tag —
-      // never a separate subscription (spec §1.2).
-      //
-      // The tag keeps its old name even though the page moved to
-      // /us-executive-guide, and that is a settled decision (2026-08-11), not
-      // an oversight — do not "tidy" it. It is an EXTERNAL identifier: it
-      // resolves through CONVERTKIT_ATLANTIC_DRIFT_TAG_ID (src/lib/kit.ts) to
-      // a tag that already exists in Kit with subscribers attached. Renaming
-      // it here silently stops tagging until a replacement tag and env var
-      // exist. Same for the Plausible goal below, which is matched by exact
-      // name in the dashboard. See LAUNCH.md §2.
+      // Its own Standfirst form, which holds the guide as a lead magnet. Asking
+      // for the guide is not subscribing to a list. The Plausible goal below
+      // keeps its old name because the dashboard matches it exactly.
       const result = await submitWithOfflineQueue('/api/subscribe', {
         email,
-        tags: ['atlantic-drift'],
+        signup: 'us-executive-guide',
+        tags: ['source-us-executive-guide'],
       })
       if (result.queued) {
         setStatus('queued')

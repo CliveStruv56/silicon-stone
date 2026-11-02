@@ -44,12 +44,12 @@ import {
  * subject areas — so it could answer neither question properly: three priced
  * tiers whose CTAs land on this very form (Advisory Briefing, Exposure
  * Diagnostic, Strategic Assessment) had no value at
- * all, and those leads reached Kit indistinguishable from a topic enquiry.
+ * all, and those leads arrived indistinguishable from a topic enquiry.
  *
  * `ENGAGEMENTS` is the ladder, in ascending order, and is what gets segmented
  * on — so the strings are exact-match tags, not prose. "Drift Retainer" keeps
  * its historic wording rather than the page's "The Drift Retainer" so any
- * existing Kit segment still matches. Specialist choices use catalogue names.
+ * existing segment still matches. Specialist choices use catalogue names.
  */
 const ENGAGEMENTS = [
   'Advisory Briefing',
@@ -112,7 +112,7 @@ export default function ServicesPage() {
     try {
       // The form asks two questions; the wire contract carries one `interest`
       // field, and `/api/contact` proxies a fixed five-field body to the
-      // Railway backend. So the engagement — the value Kit segments on — takes
+      // Railway backend. So the engagement — the value Standfirst segments on — takes
       // `interest` alone and stays an exact-match string, and the optional
       // subject rides in as a labelled first line of the message rather than
       // being blended into the tag or posted as a field the backend would
@@ -208,7 +208,7 @@ export default function ServicesPage() {
                     actionable element sat inside the Retainer card. The free
                     call stays the primary step because it is the lowest
                     friction; it preselects the Briefing so the lead reaches
-                    Kit tagged with the engagement the hero just named. */}
+                    Standfirst tagged with the engagement the hero just named. */}
                 <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
                   <a
                     href="#contact"

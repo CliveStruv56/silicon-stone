@@ -87,7 +87,10 @@ function EmailGate({ gate }: { gate: Extract<ResolvedGate, { mode: 'email' }> })
     setErrorMsg('')
 
     try {
-      const result = await submitWithOfflineQueue('/api/subscribe', { email })
+      const result = await submitWithOfflineQueue('/api/subscribe', {
+        email,
+        tags: ['source-article-gate'],
+      })
       if (result.queued) {
         setStatus('queued')
         setEmail('')
@@ -114,7 +117,7 @@ function EmailGate({ gate }: { gate: Extract<ResolvedGate, { mode: 'email' }> })
 
       {status === 'success' ? (
         <div className="text-stone-teal text-sm">
-          <span className="font-medium">Confirmed.</span> You&apos;ll receive your first briefing shortly.
+          <span className="font-medium">Almost there.</span> Check your inbox to confirm.
         </div>
       ) : status === 'queued' ? (
         <div className="text-stone-teal text-sm">

@@ -6,7 +6,7 @@ import { CheckCircle } from 'lucide-react'
 import { submitWithOfflineQueue } from '@/lib/offline/submit'
 
 interface EarlyAccessCTAProps {
-  /** Tier tag applied in Kit alongside `early-access` (e.g. tier-toolkit-standard). */
+  /** Interest tag applied alongside `interest-early-access` (e.g. interest-toolkit-standard). */
   tierTag: string
   label?: string
   /**
@@ -24,7 +24,8 @@ interface EarlyAccessCTAProps {
 
 /**
  * Pre-launch product CTA (PRE_LAUNCH=true): "Request Early Access" capture
- * into Kit, tagged `early-access` + the tier requested. Replaces the old
+ * into Standfirst's early-access form, tagged with the tier requested. It is
+ * not a newsletter signup. Replaces the old
  * fallback link to /advisory#contact. Swaps in place from button to a compact
  * email form so it can sit anywhere a Buy button would.
  */
@@ -49,7 +50,8 @@ export function EarlyAccessCTA({
     try {
       const result = await submitWithOfflineQueue('/api/subscribe', {
         email,
-        tags: ['early-access', tierTag],
+        signup: 'early-access',
+        tags: ['interest-early-access', tierTag],
       })
       if (result.queued) {
         setStatus('queued')

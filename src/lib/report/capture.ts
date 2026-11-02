@@ -1,6 +1,8 @@
 import 'server-only'
 
 import { getRedis } from '@/lib/redis'
+import { upsertContact } from '@/lib/standfirst'
+import { toolSourceTag } from '@/lib/standfirst-signups'
 import { CONSENT_TEXT_VERSION } from './email'
 
 /**
@@ -16,7 +18,7 @@ import { CONSENT_TEXT_VERSION } from './email'
  * These records pair an email address with a description of the sender's AI
  * systems. That is commercially sensitive in a way a newsletter list is not —
  * hence the retention note below, and hence nothing here is exported to a third
- * party by default.
+ * party without an opt-in.
  */
 
 export interface CapturedEmail {
@@ -47,16 +49,20 @@ function captureKey(reportId: string): string {
 const CAPTURE_INDEX = 'sas:checker:capture:index'
 
 /**
- * The integration point for a list platform.
+ * Send people who opted in to Standfirst, through the briefing's double opt-in.
  *
- * TODO: wire to list platform. It is a no-op by design — this build deliberately
- * integrates with nothing, so that the decision about where these addresses go
- * is made deliberately rather than inherited from whatever was convenient. Any
- * implementation must respect `marketingOptIn`: a false there means the address
- * may be used to deliver the report and nothing else.
+ * A false `marketingOptIn` means the address may be used to deliver the report
+ * and nothing else, so that person never leaves this store. Only the address
+ * and its source are sent: the description of their AI systems stays here.
  */
 export async function onEmailCaptured(record: CapturedEmail): Promise<void> {
-  void record
+  if (!record.marketingOptIn) return
+  const result = await upsertContact({
+    email: record.email,
+    formSlug: 'briefing',
+    tags: ['list-briefing', toolSourceTag(record.source)],
+  })
+  if (!result.ok) throw new Error(`Standfirst signup failed: ${result.reason}`)
 }
 
 export async function captureEmail(record: CapturedEmail): Promise<boolean> {

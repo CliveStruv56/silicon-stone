@@ -927,6 +927,7 @@ export default function SupplyChainMapperPage() {
 
       <Footer />
       <EmailGateOverlay
+        tool="supply-chain-mapper"
         isOpen={showGate}
         onUnlock={unlock}
         onDismiss={dismiss}

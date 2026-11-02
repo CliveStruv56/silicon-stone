@@ -64,11 +64,11 @@ first use.
 | Research, drafting, guards, publishing | **Live** | The core pipeline works end to end. |
 | Article vector index + related articles | **Live** | Fires automatically on publish. |
 | Knowledge capture over MCP | **Live**, behind one flag | Works from Claude Code and `curl`. See §11. |
-| Kit (ConvertKit) subscribe | **Live** | Subscribers arrive. |
+| Standfirst signups | **Built, not yet live** | Signups, enquiries and buyer tags go to Standfirst once the `STANDFIRST_*` variables are set on Vercel. |
 | Series (ordered reading paths) | **Live** | Build and publish one today (§10). Readers reach it from `/intelligence`, the homepage, the Intelligence menu and the footer. Edits reach the live site the same way article edits do — see *Why you reload once* in §10. |
-| Kit **tags** | **Not configured** | The account holds two tags; the code maps ~18. Subscribes succeed but arrive **untagged** — no segmentation. A missing tag ID is skipped by design, so nothing errors. |
-| Kit sending address | **Unverified** | You cannot reliably send until this is done. |
-| Broadcast / "email this article" | **Does not exist** | There is no route. Sending is manual, in Kit. |
+| Tags | **Automatic** | Standfirst creates `list-`, `source-` and `interest-` tags on first use; `src/lib/standfirst-signups.ts` holds the list. |
+| Sending address | **Verified** | `news.siliconandstone.com`, in Standfirst. |
+| Broadcast / "email this article" | **In Standfirst** | A new publication is forwarded from `/api/on-publish`, and Standfirst prepares the broadcast by its Sanity settings. |
 | Substack | **Manual only** | No integration of any kind. |
 | Web Push | **Live** (21 Aug 2026) | VAPID keys are configured on production, verified. Publishing an **Audit-tier** article notifies the "New Audit-tier Deep Dives" subscribers, once per article ever. Nothing fires for other tiers, and the AI Act deadline topic is still sent by hand. Subscriber numbers start from zero — nobody could subscribe before the keys existed. |
 | Lemon Squeezy / checkout | **No store** | `NEXT_PUBLIC_PRE_LAUNCH` defaults true, which suppresses every checkout link. Product gates link to the product page instead. ⚠ When the store does open, the checkout **must** ask the buyer to confirm they want immediate access and understand it ends their 14-day cancellation right — `/terms` states the right is lost on download *on that condition*, and without the consent step the site is describing a position it does not have. Launch-blocking; see `LAUNCH.md`. |
@@ -1067,19 +1067,20 @@ many subscribers exist.
 
 Nothing announces the article. Specifically:
 
-- **No newsletter is sent.** There is no broadcast endpoint in the codebase at all.
-  You send it from Kit by hand.
+- **The newsletter is sent from Standfirst**, not from this site. A publication
+  within the last 72 hours is forwarded to it; what happens next is set under
+  Settings → Sanity there.
 - **Push fires only for Audit-tier articles**, and only once VAPID keys are set
   (see `LAUNCH.md`). Nothing announces a Pulse, a Signal or a Guide.
 - **Substack is entirely manual.** There is no integration.
 
 The intended human sequence is: publish on the site first with its own canonical
-URL → confirm it is indexed → then post the Substack teaser → then send the Kit
-email. Publishing elsewhere first costs you the canonical.
+URL → confirm it is indexed → then post the Substack teaser → then send the
+email from Standfirst. Publishing elsewhere first costs you the canonical.
 
-**Before you can send at all**, two owner setup jobs are outstanding: the Kit tags
-do not exist (so nothing is segmented), and the Kit sending address is unverified.
-See `LAUNCH.md`.
+**Lists:** Stone Briefing (Tuesday) and Practical Move (Friday) are one
+subscription, `list-briefing`. The Silicon and Stone Update (Wednesday) is
+`list-newsletter`, and is also posted on LinkedIn by hand.
 
 ---
 

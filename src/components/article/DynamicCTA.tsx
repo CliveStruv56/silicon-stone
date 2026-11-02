@@ -31,7 +31,10 @@ export function DynamicCTA({
     setErrorMsg('')
 
     try {
-      const result = await submitWithOfflineQueue('/api/subscribe', { email })
+      const result = await submitWithOfflineQueue('/api/subscribe', {
+        email,
+        tags: ['source-article-cta'],
+      })
       if (result.queued) {
         setStatus('queued')
         setEmail('')
@@ -83,7 +86,7 @@ export function DynamicCTA({
 
       {status === 'success' ? (
         <div className="text-stone-teal text-sm">
-          <span className="font-medium">Confirmed.</span> You&apos;ll receive your first briefing shortly.
+          <span className="font-medium">Almost there.</span> Check your inbox to confirm.
         </div>
       ) : status === 'queued' ? (
         <div className="text-stone-teal text-sm">

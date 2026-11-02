@@ -78,10 +78,19 @@ async function main() {
   const contactRouteSource = fs.readFileSync('src/app/api/contact/route.ts', 'utf-8')
   const loginActionSource = fs.readFileSync('src/app/(auth)/login/actions.ts', 'utf-8')
   const durableLimiterSource = fs.readFileSync('src/lib/durable-rate-limit.ts', 'utf-8')
-  assert.match(subscribeRouteSource, /BACKEND_API_URL is configured but BACKEND_API_KEY is missing/)
-  assert.match(contactRouteSource, /BACKEND_API_URL is configured but BACKEND_API_KEY is missing/)
-  assert.match(subscribeRouteSource, /Backend subscribe proxy failed/)
-  assert.match(contactRouteSource, /Backend contact proxy failed/)
+  const standfirstSource = fs.readFileSync('src/lib/standfirst.ts', 'utf-8')
+  const signupsSource = fs.readFileSync('src/lib/standfirst-signups.ts', 'utf-8')
+  assert.match(standfirstSource, /^import 'server-only'/, 'the Standfirst key must stay server-side')
+  assert.match(standfirstSource, /process\.env\.STANDFIRST_API_KEY/)
+  assert.doesNotMatch(standfirstSource, /NEXT_PUBLIC_/, 'the Standfirst key must never be a public variable')
+  assert.match(subscribeRouteSource, /if \(!result\.ok\)/, 'a refused signup must not be reported as a success')
+  assert.match(contactRouteSource, /^\s+subscribe: false,$/m, 'an enquiry must never subscribe anyone')
+  assert.match(signupsSource, /export const PUBLIC_TAGS/)
+  assert.doesNotMatch(
+    signupsSource.slice(signupsSource.indexOf('PUBLIC_TAGS:'), signupsSource.indexOf('const MAX_TAGS')),
+    /'(buyer|list)-/,
+    'buyer and list tags must stay off the public allow-list',
+  )
   assert.match(subscribeRouteSource, /JSON\.parse\(raw\)/)
   assert.match(contactRouteSource, /JSON\.parse\(raw\)/)
   assert.match(subscribeRouteSource, /checkDurableRateLimit\("subscribe"/)
