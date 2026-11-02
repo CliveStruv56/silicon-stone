@@ -19,7 +19,7 @@ import { BOOKING_URL, FREE_INTRO_WINDOW } from '@/lib/flags'
  * surface and the Plausible goal, all of which are easy to get subtly wrong and
  * impossible to notice from a screenshot.
  *
- * `interest` is the value Kit segments on, so it must be an exact-match string
+ * `interest` is the value Standfirst segments on, so it must be an exact-match string
  * from `ENGAGEMENTS` in `src/app/(website)/advisory/page.tsx`. It is a prop
  * rather than a free-text field because a dedicated page already knows which
  * engagement the reader is asking about — making them re-declare it in a second

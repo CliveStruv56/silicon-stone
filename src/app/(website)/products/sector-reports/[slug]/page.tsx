@@ -97,7 +97,7 @@ export default async function SectorReportPage({ params }: Props) {
                 ) : (
                   <>
                     <p className="mt-4 text-sm text-text-muted">Purchases open at launch.</p>
-                    <div className="mt-3"><EarlyAccessCTA tierTag="tier-sector-reports" label="Notify me at launch" size="default" buttonClassName="w-full bg-stone-teal text-ink-on-accent hover:bg-stone-teal/90" /></div>
+                    <div className="mt-3"><EarlyAccessCTA tierTag="interest-sector-reports" label="Notify me at launch" size="default" buttonClassName="w-full bg-stone-teal text-ink-on-accent hover:bg-stone-teal/90" /></div>
                     <p className="mt-3 text-xs leading-relaxed text-text-muted">Join the newsletter for report launch news.</p>
                   </>
                 )}
@@ -150,7 +150,7 @@ export default async function SectorReportPage({ params }: Props) {
             <div className="mt-8 flex flex-wrap items-center gap-5">
               {buyUrl
                 ? <BuyButton url={buyUrl} label={buyLabel} event="Buy Sector Report" size="default" className="bg-stone-teal text-ink-on-accent hover:bg-stone-teal/90" />
-                : <EarlyAccessCTA tierTag="tier-sector-reports" label="Notify me at launch" size="default" buttonClassName="bg-stone-teal text-ink-on-accent hover:bg-stone-teal/90" />}
+                : <EarlyAccessCTA tierTag="interest-sector-reports" label="Notify me at launch" size="default" buttonClassName="bg-stone-teal text-ink-on-accent hover:bg-stone-teal/90" />}
               <Link href="/products/sector-reports" className="inline-flex items-center gap-2 text-sm text-stone-teal hover:underline">Browse sector reports <ArrowRight aria-hidden="true" className="h-4 w-4" /></Link>
             </div>
             <p className="mt-3 text-xs text-text-muted">{buyUrl ? 'One payment, one named reader. Optional renewal, with no automatic renewal.' : 'Launch notifications are part of our newsletter. Unsubscribe at any time.'}</p>

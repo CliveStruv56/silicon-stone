@@ -75,8 +75,8 @@ export const PINECONE_TIMEOUT_MS = 15_000
  */
 export const UPSTASH_TIMEOUT_MS = 3_000
 
-/** Kit (ConvertKit): newsletter subscribe, contact tagging, buyer tagging. */
-export const KIT_TIMEOUT_MS = 15_000
+/** Standfirst: newsletter signups, enquiries, buyer tagging, publish hook. */
+export const STANDFIRST_TIMEOUT_MS = 15_000
 
 /** Lemon Squeezy licence validation and activation. */
 export const LEMONSQUEEZY_TIMEOUT_MS = 15_000

@@ -1,5 +1,5 @@
 /**
- * Which Kit buyer tag an order earns, by Lemon Squeezy variant. Variant IDs
+ * Which Standfirst buyer tag an order earns, by Lemon Squeezy variant. Variant IDs
  * are numbers Lemon Squeezy assigns when the owner creates each variant, so
  * they live in env (LEMONSQUEEZY_VARIANT_ID_*), never in code. Pure so the
  * mapping is testable without the server-only webhook module around it.

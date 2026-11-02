@@ -71,7 +71,7 @@ describe('buildEnquiryNotification', () => {
     it('tells the reader this copy is the only record', () => {
       const { text } = buildEnquiryNotification(base, 'failed')
       expect(text).toContain('WAS NOT SAVED')
-      expect(text).toContain('Saved to Kit: NO')
+      expect(text).toContain('Saved to Standfirst: NO')
     })
 
     it('still carries the full message, which is the whole reason to send it', () => {

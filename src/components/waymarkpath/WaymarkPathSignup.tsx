@@ -14,14 +14,14 @@ import { submitWithOfflineQueue } from '@/lib/offline/submit'
  * hero form silently turned the closing CTA into a success panel. Each instance
  * now owns its state.
  *
- * The Kit tag and the Plausible goal are exact strings configured outside this
+ * The Plausible goal is an exact string configured outside this
  * repo. `src/components/products/EarlyAccessCTA.tsx` looks like the right thing
- * to reuse here and is not: it posts `tags: ['early-access', tierTag]` and
+ * to reuse here and is not: it posts its own tier tags and
  * fires `Early Access Request`, which would quietly retire this product's own
- * goal. Do not consolidate them without changing both consoles first.
+ * goal. Do not consolidate them without changing that goal first.
  */
 
-const KIT_TAG = 'WaymarkPath_Early_Access'
+const INTEREST_TAG = 'interest-waymarkpath'
 const PLAUSIBLE_GOAL = 'WaymarkPath Signup'
 
 interface WaymarkPathSignupProps {
@@ -43,7 +43,8 @@ export function WaymarkPathSignup({ id, className = '' }: WaymarkPathSignupProps
     try {
       const result = await submitWithOfflineQueue('/api/subscribe', {
         email,
-        tag: KIT_TAG,
+        signup: 'early-access',
+        tags: [INTEREST_TAG],
       })
       if (result.queued) {
         setStatus('queued')

@@ -33,7 +33,7 @@ function PurchaseCTA({ professional = false }: { professional?: boolean }) {
     </Button>
   ) : (
     <EarlyAccessCTA
-      tierTag={professional ? 'tier-toolkit-professional' : 'tier-toolkit-standard'}
+      tierTag={professional ? 'interest-toolkit-professional' : 'interest-toolkit-standard'}
       label={`Notify me — ${tier}`}
       submitLabel="Notify me at this address"
       variant={variant}

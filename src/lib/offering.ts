@@ -129,10 +129,10 @@ export const FREE_OFFERINGS: Offering[] = [
   },
   {
     id: 'newsletters',
-    name: 'Atlantic Drift & the Stone Briefing',
+    name: 'Silicon and Stone Update & the Stone Briefing',
     price: 'Free',
     summary:
-      'Thursday: the drift in your supply chains and procurement. Tuesday: structural analysis of the AI power shift.',
+      'Tuesday: the Stone Briefing, structural analysis of the AI power shift. Wednesday: the Silicon and Stone Update. Friday: the Practical Move, what to do about it.',
     href: '/intelligence',
   },
   {

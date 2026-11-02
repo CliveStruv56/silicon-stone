@@ -1,4 +1,4 @@
-import { BarChart3, DollarSign, FileText, Users, Zap, Youtube } from "lucide-react";
+import { BarChart3, DollarSign, FileText, Users, Youtube } from "lucide-react";
 import { getUsageSummary } from "@/lib/usage";
 import {
     getContentStats,
@@ -7,7 +7,6 @@ import {
     TIER_LABELS,
     YT_STATUS_LABELS,
 } from "@/lib/metrics/content";
-import { getKitStats } from "@/lib/metrics/kit";
 import {
     StatCard,
     BarList,
@@ -35,10 +34,9 @@ function toBars(record: Record<string, number>, labels: Record<string, string>):
 }
 
 export default async function AnalyticsPage() {
-    const [usage, content, kit] = await Promise.all([
+    const [usage, content] = await Promise.all([
         getUsageSummary("mtd"),
         getContentStats(),
-        getKitStats(),
     ]);
 
     const personas = personaBreakdown(content);
@@ -172,35 +170,10 @@ export default async function AnalyticsPage() {
                 )}
             </section>
 
-            {/* ── Audience ─────────────────────────────────────────────── */}
-            <section className="space-y-5">
-                <div className="flex items-center gap-3">
-                    <Zap className="w-6 h-6 text-secondary-foreground" />
-                    <h2 className="text-2xl font-bold">Audience</h2>
-                    <span className="text-sm text-muted-foreground">Kit / newsletter</span>
-                </div>
-
-                {!kit.available ? (
-                    <NotConfigured>Kit metrics unavailable{kit.note ? ` — ${kit.note}.` : "."}</NotConfigured>
-                ) : (
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                        <StatCard
-                            label="Subscribers"
-                            value={kit.subscribers !== null ? formatNumber(kit.subscribers) : "—"}
-                            accent="text-primary"
-                        />
-                        <StatCard
-                            label="Net new (last 90d)"
-                            value={kit.netNewSubscribers !== null ? formatNumber(kit.netNewSubscribers) : "—"}
-                        />
-                    </div>
-                )}
-            </section>
-
             {/* Phase 2 channels */}
             <section>
                 <NotConfigured>
-                    Coming next: YouTube, LinkedIn, and Substack channel metrics, plus Kit broadcast open/click rates.
+                    Coming next: YouTube, LinkedIn, and Substack channel metrics. Subscriber and broadcast numbers are in Standfirst.
                 </NotConfigured>
             </section>
         </main>

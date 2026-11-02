@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getClientIp } from "@/lib/rate-limit";
 import { checkDurableRateLimit } from "@/lib/durable-rate-limit";
-import { redactForLog } from "@/lib/utils";
-import { BACKEND_TIMEOUT_MS, KIT_TIMEOUT_MS } from "@/lib/timeouts";
 import { notifyEnquiry } from "@/lib/email";
 import type { Enquiry } from "@/lib/enquiry-notification";
+import { upsertContact } from "@/lib/standfirst";
+import { ENQUIRY_TAG } from "@/lib/standfirst-signups";
 
-const KIT_API_KEY = process.env.CONVERTKIT_API_KEY || "";
-const KIT_FORM_ID = process.env.CONVERTKIT_FORM_ID || "";
 const MAX_BODY_BYTES = 10_000;
 const MAX_FIELD_LENGTHS = {
   name: 120,
@@ -22,99 +20,9 @@ function normalizeField(value: unknown, maxLength: number): string {
   return value.trim().slice(0, maxLength);
 }
 
-function getBackendApiUrl() {
-  const value = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_API_URL || "";
-  return value.replace(/\/$/, "");
-}
-
-function getBackendHeaders() {
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-    Accept: "application/json",
-  };
-
-  if (process.env.BACKEND_API_KEY) {
-    headers["X-Backend-Api-Key"] = process.env.BACKEND_API_KEY;
-  }
-
-  return headers;
-}
-
-async function proxyContact(body: {
-  name: string;
-  email: string;
-  company: string;
-  interest: string;
-  message: string;
-}) {
-  // Contact goes DIRECT to Kit by default. The Railway proxy is opt-in via
-  // CONTACT_VIA_BACKEND=true only, exactly as subscribe has been since
-  // 2026-07-19 — and for exactly the same reason, found the hard way.
-  //
-  // Subscribe got this escape hatch when the backend's newsletter service was
-  // discovered unconfigured in production. Contact did not, so it kept
-  // proxying unconditionally to a `/v1/contact` that answers
-  // 503 "Newsletter service not configured" on every request: `_kit_env()` in
-  // `backend/main.py` raises when its CONVERTKIT_API_KEY or CONVERTKIT_FORM_ID
-  // is empty, and Railway's copies are separate from Vercel's. Newsletter
-  // signups worked throughout; every advisory and EU-exposure enquiry failed
-  // and was stored nowhere. Found 2026-08-24 by the enquiry notification, on
-  // its first live run.
-  //
-  // BACKEND_API_URL itself must stay set — it also powers usage tracking, deep
-  // research and briefings. Re-enable this only once the backend has Kit
-  // configured and a live enquiry has been proven end to end.
-  if (process.env.CONTACT_VIA_BACKEND !== "true") return null;
-
-  const backendApiUrl = getBackendApiUrl();
-  if (!backendApiUrl) return null;
-
-  if (!process.env.BACKEND_API_KEY) {
-    console.error("BACKEND_API_URL is configured but BACKEND_API_KEY is missing");
-    return NextResponse.json(
-      { error: "Backend shared key is not configured" },
-      { status: 503 }
-    );
-  }
-
-  try {
-    const response = await fetch(`${backendApiUrl}/v1/contact`, {
-      method: "POST",
-      headers: getBackendHeaders(),
-      body: JSON.stringify(body),
-      cache: "no-store",
-      signal: AbortSignal.timeout(BACKEND_TIMEOUT_MS),
-    });
-
-    const responseBody = await response.json().catch(() => ({}));
-
-    if (response.status < 500 || response.status === 503) {
-      return NextResponse.json(responseBody, { status: response.status });
-    }
-
-    console.error("Railway contact proxy error:", response.status, redactForLog(responseBody));
-    return NextResponse.json(
-      { error: "Backend contact proxy error", status: response.status },
-      { status: 502 }
-    );
-  } catch (error) {
-    console.error("Railway contact proxy failed:", error);
-    return NextResponse.json(
-      { error: "Backend contact proxy failed" },
-      { status: 502 }
-    );
-  }
-}
-
 /**
  * Email the owner, then return the response the visitor was always going to
- * get. Every exit *after* validation goes through here, both the Railway proxy
- * path and the direct-to-Kit one.
- *
- * That "both" is the whole point, and it is easy to get wrong: production has
- * `BACKEND_API_URL` set, so `proxyContact()` handles the enquiry and returns
- * before the Kit code below ever runs. A notification wired into the Kit path
- * alone would be dead code in the only environment that matters.
+ * get. Every exit *after* validation goes through here.
  *
  * The response is passed through untouched. `notifyEnquiry` never throws, so a
  * mail outage cannot turn a saved enquiry into an error page — but the outcome
@@ -217,91 +125,30 @@ export async function POST(request: NextRequest) {
 
     enquiry = { name, email, company, interest, message };
 
-    const railwayResponse = await proxyContact(enquiry);
-    if (railwayResponse) {
-      return await withNotification(enquiry, railwayResponse);
-    }
+    // An enquiry is not newsletter consent: `subscribe: false` records the
+    // person without adding them to any list, and they get no marketing mail.
+    const result = await upsertContact({
+      email,
+      firstName: name,
+      subscribe: false,
+      tags: [ENQUIRY_TAG],
+      source: "services-contact-form",
+      fields: { company, interest, message },
+      consent: {
+        basis: "legitimate_interest",
+        wording: "Sent an enquiry through the website contact form.",
+        ip,
+        userAgent: request.headers.get("user-agent") ?? undefined,
+      },
+    });
 
-    if (!KIT_API_KEY || !KIT_FORM_ID) {
-      console.error("Missing CONVERTKIT_API_KEY or CONVERTKIT_FORM_ID");
+    if (!result.ok) {
       return await withNotification(
         enquiry,
-        NextResponse.json(
-          { error: "Contact service not configured" },
-          { status: 503 }
-        )
+        result.reason === "not_configured"
+          ? NextResponse.json({ error: "Contact service not configured" }, { status: 503 })
+          : NextResponse.json({ error: "Failed to send inquiry. Please try again." }, { status: 502 })
       );
-    }
-
-    // Create subscriber in ConvertKit with custom fields for the inquiry
-    const createResponse = await fetch(
-      `https://api.kit.com/v4/subscribers`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Kit-Api-Key": KIT_API_KEY,
-        },
-        signal: AbortSignal.timeout(KIT_TIMEOUT_MS),
-        body: JSON.stringify({
-          first_name: name,
-          email_address: email,
-          fields: {
-            company: company || "",
-            interest: interest || "",
-            message: message || "",
-            source: "services-contact-form",
-          },
-        }),
-      }
-    );
-
-    if (!createResponse.ok) {
-      const errorText = await createResponse.text();
-      console.error("ConvertKit create subscriber error:", createResponse.status, redactForLog(errorText));
-      return await withNotification(
-        enquiry,
-        NextResponse.json(
-          { error: "Failed to send inquiry. Please try again." },
-          { status: 502 }
-        )
-      );
-    }
-
-    // Also add them to the form so they get the welcome sequence
-    const subscriberData = await createResponse.json();
-    const subscriberId = subscriberData.subscriber?.id;
-
-    if (subscriberId) {
-      await fetch(
-        `https://api.kit.com/v4/forms/${KIT_FORM_ID}/subscribers/${subscriberId}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Kit-Api-Key": KIT_API_KEY,
-          },
-          signal: AbortSignal.timeout(KIT_TIMEOUT_MS),
-          body: JSON.stringify({}),
-        }
-      );
-
-      // Tag with contact-inquiry if tag ID is configured
-      const tagId = process.env.CONVERTKIT_CONTACT_TAG_ID;
-      if (tagId) {
-        await fetch(
-          `https://api.kit.com/v4/tags/${tagId}/subscribers/${subscriberId}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-Kit-Api-Key": KIT_API_KEY,
-            },
-            signal: AbortSignal.timeout(KIT_TIMEOUT_MS),
-            body: JSON.stringify({}),
-          }
-        );
-      }
     }
 
     return await withNotification(enquiry, NextResponse.json({ success: true }));

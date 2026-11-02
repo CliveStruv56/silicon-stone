@@ -6,8 +6,11 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { submitWithOfflineQueue } from '@/lib/offline/submit'
 
+type List = 'briefing' | 'newsletter'
+
 export function SubscribeCTA() {
   const [email, setEmail] = useState('')
+  const [list, setList] = useState<List>('briefing')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'queued' | 'error'>('idle')
 
   const [errorMsg, setErrorMsg] = useState('')
@@ -18,7 +21,11 @@ export function SubscribeCTA() {
     setErrorMsg('')
 
     try {
-      const result = await submitWithOfflineQueue('/api/subscribe', { email })
+      const result = await submitWithOfflineQueue('/api/subscribe', {
+        email,
+        signup: list,
+        tags: ['source-home'],
+      })
       if (result.queued) {
         setStatus('queued')
         setEmail('')
@@ -60,7 +67,7 @@ export function SubscribeCTA() {
             lineHeight: 1.15,
           }}
         >
-          The Silicon &amp; Stone briefing — two editions a week, free.
+          The Silicon &amp; Stone briefing, free.
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -70,6 +77,9 @@ export function SubscribeCTA() {
           <br />
           <strong className="text-silicon-amber-strong font-medium">Friday:</strong>
           {' '}the Practical Move — what to do about it.
+          <br />
+          <strong className="text-silicon-amber-strong font-medium">Wednesday:</strong>
+          {' '}the Silicon and Stone Update, a separate newsletter.
         </p>
 
         <div className="my-8 max-w-xl mx-auto text-center">
@@ -94,6 +104,27 @@ export function SubscribeCTA() {
               <span aria-hidden="true">○</span>
               Get the briefing
             </div>
+            <fieldset className="mb-3 flex flex-col gap-1 text-sm text-text-muted sm:flex-row sm:gap-5">
+              <legend className="sr-only">Choose what to receive</legend>
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="subscribe-list"
+                  checked={list === 'briefing'}
+                  onChange={() => setList('briefing')}
+                />
+                Stone Briefing and Practical Move
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="subscribe-list"
+                  checked={list === 'newsletter'}
+                  onChange={() => setList('newsletter')}
+                />
+                Silicon and Stone Update
+              </label>
+            </fieldset>
             <form onSubmit={handleSubmit} className="flex gap-2">
               <input
                 type="email"

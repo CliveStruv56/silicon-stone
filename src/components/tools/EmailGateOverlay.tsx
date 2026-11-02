@@ -12,10 +12,12 @@ interface EmailGateOverlayProps {
   onUnlock: () => void
   onDismiss: () => void
   toolName: string
+  /** Tool slug for the source tag, e.g. `policy-stress-test`. */
+  tool: string
   resultLabel?: string
 }
 
-export function EmailGateOverlay({ isOpen, onUnlock, onDismiss, toolName, resultLabel = "your results" }: EmailGateOverlayProps) {
+export function EmailGateOverlay({ isOpen, onUnlock, onDismiss, toolName, tool, resultLabel = "your results" }: EmailGateOverlayProps) {
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
@@ -68,7 +70,7 @@ export function EmailGateOverlay({ isOpen, onUnlock, onDismiss, toolName, result
       // reconnect (P2-6) — the gate still unlocks; the email was captured.
       const result = await submitWithOfflineQueue('/api/subscribe', {
         email,
-        tag: 'Tool_Lead',
+        tags: [`source-tool-${tool}`],
       })
 
       if (!result.queued) {

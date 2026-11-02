@@ -62,7 +62,7 @@ function fromOffering(
 /* ---------- Stage 1 · Read (free) ---------- */
 
 export const READ: MapBox[] = [
-  fromOffering(offeringById('newsletters'), ['Tuesday and Thursday']),
+  fromOffering(offeringById('newsletters'), ['Tuesday, Wednesday and Friday']),
   fromOffering(offeringById('us-executive-guide'), ['European sovereignty for US companies']),
   { name: 'Digital Omnibus guide', href: '/digital-omnibus', note: ['what changes and what matters'] },
 ]

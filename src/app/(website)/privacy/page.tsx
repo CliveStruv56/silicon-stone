@@ -46,7 +46,7 @@ export default function PrivacyPage() {
               <ul className="space-y-2 text-text-muted">
                 <li className="flex items-start gap-2">
                   <span className="text-stone-teal mt-1">-</span>
-                  <span><strong className="text-text-primary">Newsletter subscribers:</strong> Email address, and optionally your name. Stored by our email service provider (ConvertKit/Kit).</span>
+                  <span><strong className="text-text-primary">Newsletter subscribers:</strong> Email address, and optionally your name. Stored in Standfirst, our email system, with a record of when and how you consented, including your IP address and browser details.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-stone-teal mt-1">-</span>
@@ -106,7 +106,7 @@ export default function PrivacyPage() {
               <ul className="space-y-2 text-text-muted">
                 <li className="flex items-start gap-2">
                   <span className="text-stone-teal mt-1">-</span>
-                  <span><strong className="text-text-primary">ConvertKit (Kit):</strong> Email newsletter management. Their privacy policy is available at kit.com/privacy.</span>
+                  <span><strong className="text-text-primary">Standfirst:</strong> Email list and newsletter management, hosted on Railway in the EU. Email is sent through Amazon Simple Email Service. Amazon&apos;s privacy notice is available at aws.amazon.com/privacy.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-stone-teal mt-1">-</span>

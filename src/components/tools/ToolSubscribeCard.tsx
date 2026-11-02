@@ -6,14 +6,14 @@ import { Button } from '@/components/ui/button'
 import { submitWithOfflineQueue } from '@/lib/offline/submit'
 
 interface ToolSubscribeCardProps {
-  /** Tool slug used for the Kit tag, e.g. `compliance-checker` → tag `tool-compliance-checker`. */
+  /** Tool slug for the source tag, e.g. `compliance-checker` → `source-tool-compliance-checker`. */
   tool: string
 }
 
 /**
  * Subscribe block for tool results screens (§1.3). Shown after results render —
- * never gating them — and posts to the same site-wide Kit form with a
- * `tool-{name}` tag. Dismissible for the session.
+ * never gating them — and signs up to the briefing with a
+ * `source-tool-{name}` tag. Dismissible for the session.
  */
 export function ToolSubscribeCard({ tool }: ToolSubscribeCardProps) {
   const [dismissed, setDismissed] = useState(false)
@@ -31,7 +31,7 @@ export function ToolSubscribeCard({ tool }: ToolSubscribeCardProps) {
     try {
       const result = await submitWithOfflineQueue('/api/subscribe', {
         email,
-        tags: [`tool-${tool}`],
+        tags: [`source-tool-${tool}`],
       })
       if (result.queued) {
         setStatus('queued')
