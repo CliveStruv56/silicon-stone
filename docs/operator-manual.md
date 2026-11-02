@@ -745,12 +745,22 @@ Under **Content**, in order:
 2. **Image Library** — browse by collection, all images, manage collections
 3. **Knowledge** — see §11
 4. **Article · Series · Author · Category · Product · Sector report · Sector report edition ·
-   Persona · YouTube Script · Glossary Term**
+   Persona · YouTube Script · Glossary Term · AI Terms Watch item**
 
 **Series** sits directly under Article because that is the order the types are
 registered in, not because anyone placed it there — the sidebar renders the
 remainder of the types in registration order. See §10 for what a series is and
 how to build one.
+
+### AI Terms Watch items
+
+An **AI Terms Watch item** (`termsChange`) is written by the terms-tracker's
+publisher when you set a row in the Notion "Terms changes" queue to Approved;
+you do not create them by hand. Each one appears at `/terms-watch` and in the
+next Tuesday Stone Briefing, through the Standfirst projection. To move an item
+to a different issue, change **Stone Briefing issue** (`briefingWeek`) to that
+Tuesday. Never paste full terms text into one: quotes are limited to three of
+30 words each, and the full text stays in the tracker's own database.
 
 ### Monthly sector report previews
 

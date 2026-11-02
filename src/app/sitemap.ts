@@ -6,11 +6,13 @@ import {
   AUTHOR_SLUGS_QUERY,
   GLOSSARY_SLUGS_QUERY,
   SERIES_SLUGS_QUERY,
+  TERMS_CHANGE_SLUGS_QUERY,
 } from '@/sanity/lib/queries'
 import { absoluteUrl } from '@/lib/site'
 import { RULE_PACK } from '@/lib/rulepack'
 import { getSectorReports } from '@/lib/sector-reports-server'
 import { sectorReportPath } from '@/lib/sector-reports'
+import { isTermsWatchProvider, TERMS_WATCH_PROVIDERS, termsChangePath } from '@/lib/terms-watch'
 
 /**
  * Dynamic sitemap.xml — enumerates the public site for crawlers and AI engines.
@@ -35,6 +37,8 @@ const STATIC_ROUTES: Array<{
   // The offerings map — one page spanning tools, products and advisory.
   { path: '/how-it-fits-together', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/glossary', changeFrequency: 'weekly', priority: 0.7 },
+  // AI Terms Watch. The six provider pages and every item are enumerated below.
+  { path: '/terms-watch', changeFrequency: 'daily', priority: 0.7 },
   { path: '/advisory', changeFrequency: 'monthly', priority: 0.6 },
   // All four advisory engagements own a page rather than an anchor. Each is
   // high-value and searched for by name, so they rank alongside /advisory
@@ -73,7 +77,7 @@ const STATIC_ROUTES: Array<{
 ]
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [{ data: articles }, { data: categories }, { data: authors }, { data: seriesList }, { data: glossary }, reports] =
+  const [{ data: articles }, { data: categories }, { data: authors }, { data: seriesList }, { data: glossary }, reports, { data: termsChanges }] =
     await Promise.all([
       sanityFetch({
         query: SITEMAP_ARTICLES_QUERY,
@@ -101,6 +105,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         stega: false,
       }),
       getSectorReports(),
+      sanityFetch({
+        query: TERMS_CHANGE_SLUGS_QUERY,
+        perspective: 'published',
+        stega: false,
+      }),
     ])
 
   const staticEntries: MetadataRoute.Sitemap = STATIC_ROUTES.map((route) => ({
@@ -182,6 +191,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5,
   }))
 
+  const termsWatchEntries: MetadataRoute.Sitemap = [
+    ...TERMS_WATCH_PROVIDERS.map(({ id }) => ({
+      url: absoluteUrl(`/terms-watch/${id}`),
+      changeFrequency: 'weekly' as const,
+      priority: 0.5,
+    })),
+    ...((termsChanges ?? []) as Array<{ provider: string; slug: string; _updatedAt?: string | null }>)
+      .filter((change) => isTermsWatchProvider(change.provider))
+      .map((change) => ({
+        url: absoluteUrl(termsChangePath(change.provider, change.slug)),
+        lastModified: change._updatedAt || undefined,
+        changeFrequency: 'monthly' as const,
+        priority: 0.5,
+      })),
+  ]
+
   return [
     ...staticEntries,
     ...reports.map(report => ({
@@ -195,5 +220,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...categoryEntries,
     ...authorEntries,
     ...glossaryEntries,
+    ...termsWatchEntries,
   ]
 }

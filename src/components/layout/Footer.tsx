@@ -15,6 +15,7 @@ const footerNavigation = {
     { name: 'Atlantic Drift', href: '/analysis/category/atlantic-drift' },
     { name: 'AI Act & Compliance', href: '/analysis/category/ai-act' },
     { name: 'Semiconductors', href: '/analysis/category/semiconductors' },
+    { name: 'AI Terms Watch', href: '/terms-watch' },
   ],
   engage: [
     { name: 'Tools', href: '/tools' },

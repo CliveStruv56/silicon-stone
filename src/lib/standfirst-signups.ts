@@ -44,6 +44,7 @@ export const PUBLIC_TAGS: readonly string[] = [
   'source-tool-supply-chain-mapper',
   'source-tool-scenario-modeler',
   'source-tool-policy-stress-test',
+  'source-terms-watch',
   'interest-early-access',
   'interest-toolkit-standard',
   'interest-toolkit-professional',

@@ -8,7 +8,15 @@ import { submitWithOfflineQueue } from '@/lib/offline/submit'
 
 type List = 'briefing' | 'newsletter'
 
-export function SubscribeCTA() {
+/**
+ * `sourceTag` must be in PUBLIC_TAGS (src/lib/standfirst-signups.ts) or the
+ * route drops it. `briefingOnly` hides the list choice where the page is about
+ * something only the Stone Briefing carries.
+ */
+export function SubscribeCTA({
+  sourceTag = 'source-home',
+  briefingOnly = false,
+}: { sourceTag?: string; briefingOnly?: boolean } = {}) {
   const [email, setEmail] = useState('')
   const [list, setList] = useState<List>('briefing')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'queued' | 'error'>('idle')
@@ -24,7 +32,7 @@ export function SubscribeCTA() {
       const result = await submitWithOfflineQueue('/api/subscribe', {
         email,
         signup: list,
-        tags: ['source-home'],
+        tags: [sourceTag],
       })
       if (result.queued) {
         setStatus('queued')
@@ -104,6 +112,7 @@ export function SubscribeCTA() {
               <span aria-hidden="true">○</span>
               Get the briefing
             </div>
+            {!briefingOnly && (
             <fieldset className="mb-3 flex flex-col gap-1 text-sm text-text-muted sm:flex-row sm:gap-5">
               <legend className="sr-only">Choose what to receive</legend>
               <label className="flex items-center gap-2">
@@ -125,6 +134,7 @@ export function SubscribeCTA() {
                 The AI View
               </label>
             </fieldset>
+            )}
             <form onSubmit={handleSubmit} className="flex gap-2">
               <input
                 type="email"
