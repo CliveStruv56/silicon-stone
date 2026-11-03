@@ -10,6 +10,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet'
 import { PersonaFilter } from '@/components/briefings/PersonaFilter'
 import { SeriesPromo } from '@/components/series/SeriesPromo'
 import type { SeriesPromoItem } from '@/lib/series'
+import type { RouteData } from '@/lib/learn/types'
 import { PersonaIntro } from '@/components/briefings/PersonaIntro'
 import { ThreeReadings } from '@/components/ThreeReadings'
 import { DynamicCTA } from '@/components/article'
@@ -368,10 +369,13 @@ export function IntelligenceFeed({
   initialArticles,
   series,
   initialFilters,
+  learnRoutes,
 }: {
   initialArticles: Article[]
   series?: SeriesPromoItem[]
   initialFilters?: FeedFilters
+  /** Silicon & Stone Learning routes by persona slug; shown for the selected persona. */
+  learnRoutes?: Record<string, RouteData>
 }) {
   const [articles, setArticles] = useState<Article[]>(initialArticles)
   const [loading, setLoading] = useState(initialArticles.length === 0)
@@ -620,6 +624,7 @@ export function IntelligenceFeed({
           selectedPersona={selectedPersona}
           onPersonaSelect={selectPersonaFromCards}
           personaCounts={personaCounts}
+          learnRoutes={learnRoutes}
         />
 
         {/* Feed Filters — stacked pills on desktop, compact trigger + bottom

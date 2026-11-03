@@ -112,7 +112,22 @@ export const SELF_SERVE: MapBox[] = PRODUCTS
     { dashed: Boolean(p.status) },
   ))
 
-/* ---------- Stage 3 · Discuss (the touchstone) ---------- */
+/* ---------- Stage 3 · Learn (courses) ---------- */
+
+/**
+ * Silicon & Stone Learning, between Use and Discuss (docs/learn/plan.md): the
+ * natural step from trying a tool to talking to us. Drawn as one pillar; these
+ * boxes are its entry points, for the stacked phone rendering and the tests.
+ */
+export const LEARN = offeringById('learn')
+
+export const LEARN_BOXES: MapBox[] = [
+  fromOffering(LEARN, ['Silicon to Sovereignty: from the chip to the boardroom'], { stripe: 'cyan' }),
+  { name: 'Free orientation', href: '/learn/start', note: ['30 minutes, free for everyone'] },
+  { name: 'In-house training', href: '/learn/teams', note: ['a board briefing to a two-day workshop'] },
+]
+
+/* ---------- Stage 4 · Discuss (the touchstone) ---------- */
 
 export const BRIEFING = offeringById('advisory-briefing')
 
@@ -124,7 +139,7 @@ export const INTRO: MapBox = {
   dashed: true,
 }
 
-/* ---------- Stage 4 · Commission ---------- */
+/* ---------- Stage 5 · Commission ---------- */
 
 const MODULE_NOTES: Record<string, string> = {
   'manufacturing-exposure': 'dependencies mapped, chokepoints, procurement questions',
@@ -151,7 +166,7 @@ export const CORE_ENGAGEMENTS: MapBox[] = ENGAGEMENTS.filter(
   fromOffering(e, CORE_NOTES[e.id] ?? [], { stripe: 'amber' }),
 )
 
-/* ---------- Stage 5 · Stay ---------- */
+/* ---------- Stage 6 · Stay ---------- */
 
 export const RETAINER = offeringById('drift-retainer')
 
@@ -161,6 +176,7 @@ export function allMapBoxes(): MapBox[] {
     ...READ,
     ...TOOLS,
     ...SELF_SERVE,
+    ...LEARN_BOXES,
     fromOffering(BRIEFING, []),
     INTRO,
     ...SPECIALIST_PROJECTS,

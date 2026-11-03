@@ -23,6 +23,8 @@ export type GlossaryTerm = {
   sourceUrl?: string | null
   reviewedAt?: string | null
   relatedTerms?: Array<Pick<GlossaryTerm, '_id' | 'name' | 'slug' | 'acronym' | 'kind'>> | null
+  /** The Silicon & Stone Learning course that teaches this term (GLOSSARY_TERM_QUERY only). */
+  taughtIn?: { code: string; title: string; slug: string } | null
 }
 
 export const GLOSSARY_KIND_LABELS: Record<GlossaryKind, string> = {

@@ -122,6 +122,9 @@ export const ARTICLE_QUERY = defineQuery(`
     //
     // NOTE: no backticks in comments inside these template literals -- one
     // terminates the string and the whole file stops parsing.
+    // Silicon & Stone Learning courses on this topic; the footer shows the first
+    // that resolves. Weak references, so a draft course simply does not appear.
+    "relatedCourses": relatedCourses[]->{ _id, code, title, "slug": slug.current, promise, duration, status, statusMonth },
     "series": *[_type == "series" && defined(slug.current) && references(^._id)]{
       _id,
       title,
@@ -229,6 +232,7 @@ export const GLOSSARY_TERM_QUERY = defineQuery(`
     definition,
     sourceUrl,
     reviewedAt,
+    "taughtIn": taughtIn->{ code, title, "slug": slug.current },
     relatedTerms[]->{
       _id,
       name,
@@ -748,5 +752,12 @@ export const COURSE_BY_CODE_QUERY = defineQuery(`
 export const PERSONA_ROUTES_QUERY = defineQuery(`
   *[_type == "learnRoute" && defined(personaSlug) && !(_id in path("drafts.**"))] | order(order asc) {
     title, "slug": slug.current, personaSlug, ${COURSE_SLOTS}
+  }
+`)
+
+/** The homepage Learn band: three named tracks, in release order. */
+export const LEARN_BAND_QUERY = defineQuery(`
+  *[_type == "track" && slug.current in $slugs && !(_id in path("drafts.**"))] | order(order asc) {
+    title, "slug": slug.current, opens, intro, "courseCount": count(courses)
   }
 `)

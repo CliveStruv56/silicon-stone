@@ -721,6 +721,25 @@ gate links to the product page. The owner guide is
 
 ---
 
+### 5.6 Learn — Silicon & Stone Learning (waitlist since 3 November 2026)
+
+The programme **Silicon to Sovereignty**: 31 courses, six levels (0–5), seven tracks,
+a rung between Use and Discuss. Source: `docs/learn/plan.md` and `catalogue.md`.
+Nothing is on sale yet; every page collects a waitlist sign-up.
+
+Prices agreed 3 November 2026 as **bands**, typed in `AMOUNTS` and rendered through
+`LEARN_PRICES` (`src/lib/offering.ts`); exact per-track figures go there as each
+track opens. Level 0 is free. Single self-serve course £95–195; self-serve track
+£295–495; live cohort track £595–795, founding places about £350–475; EU AI Act Core
+sold with the Toolkit Standard for £49 more; sovereignty capstone £950, founding £650,
+credited against a Strategic Assessment within 60 days. In-house: on scoping.
+Charities and not-for-profits get a discount; the rate (30% suggested) is not yet
+confirmed, so no figure is published.
+
+Release order: Foundations January 2027, EU AI Act Core March, Infrastructure and
+sovereignty April, Practitioner June, electives from August, Security September,
+capstone November 2027. Self-serve platform decision due around April 2027.
+
 ## 6. Environment Configuration
 
 ### Required `.env.local` Variables

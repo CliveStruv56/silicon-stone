@@ -5,21 +5,30 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/layout/ThemeToggle'
+import { TRACK_LABELS, TRACK_SLUGS } from '@/lib/learn/model'
 
 // `sister` marks an entry that is adjacent to the ladder rather than a rung on
 // it — WaymarkPath is a separate product, not a fourth thing to buy here. It
 // renders in the indigo the rest of the site reserves for that cross-link
 // (--sister-indigo), so the dropdown does not read as if we sell it.
-type NavChild = { name: string; href: string; note?: string; sister?: boolean }
+type NavChild = { name: string; href: string; note?: string; sister?: boolean; group?: string }
 
 type NavItem = {
   name: string
   href: string
   children?: NavChild[]
+  /**
+   * Render the desktop dropdown as columns, one per `group`. Only Learn uses
+   * it: seven tracks plus four section pages do not fit one readable column.
+   * Mobile ignores it and lists the children in order.
+   */
+  mega?: boolean
 }
 
 // Primary navigation reads the commitment ladder left → right: free → paid.
-// Read (Intelligence) → Use (Tools) → Buy (Products) → Engage (Advisory).
+// Read (Intelligence) → Use (Tools) → Learn → Buy (Products) → Engage (Advisory).
+// Learn sits between Use and Buy, as it sits between Use and Discuss on
+// /how-it-fits-together.
 const primaryNavigation: NavItem[] = [
   {
     name: 'Intelligence',
@@ -46,6 +55,20 @@ const primaryNavigation: NavItem[] = [
       { name: 'Supply Chain Mapper', href: '/tools/supply-chain-mapper' },
       { name: 'Scenario Modeler', href: '/tools/scenario-modeler' },
       { name: 'Policy Stress-Test', href: '/tools/policy-stress-test' },
+    ],
+  },
+  {
+    name: 'Learn',
+    href: '/learn',
+    mega: true,
+    children: [
+      { name: 'Silicon to Sovereignty', href: '/learn', group: 'Silicon & Stone Learning' },
+      { name: 'Free orientation', href: '/learn/start', note: 'Free', group: 'Silicon & Stone Learning' },
+      { name: 'Release schedule', href: '/learn/schedule', group: 'Silicon & Stone Learning' },
+      { name: 'In-house training', href: '/learn/teams', group: 'Silicon & Stone Learning' },
+      // Read from the code-owned track list, so a renamed track cannot leave
+      // a menu entry pointing at a page that no longer exists.
+      ...TRACK_SLUGS.map((slug) => ({ name: TRACK_LABELS[slug], href: `/learn/paths/${slug}`, group: 'Tracks' })),
     ],
   },
   {
@@ -83,11 +106,22 @@ const secondaryNavigation: NavItem[] = [
 ]
 
 
+/** Children in their groups, preserving the order each group first appears. */
+function groupChildren(children: NavChild[]): Array<[string, NavChild[]]> {
+  const groups = new Map<string, NavChild[]>()
+  for (const child of children) {
+    const key = child.group ?? ''
+    groups.set(key, [...(groups.get(key) ?? []), child])
+  }
+  return [...groups.entries()]
+}
+
 // Detail routes get a mobile back affordance (P1-4); the fallback target is
 // used when the page was deep-linked and there is no history to go back to.
 function backFallback(pathname: string): string | null {
   if (/^\/analysis\/.+/.test(pathname)) return '/intelligence'
   if (/^\/products\/.+/.test(pathname)) return '/products'
+  if (/^\/learn\/.+/.test(pathname)) return '/learn'
   return null
 }
 
@@ -186,6 +220,23 @@ export function Header() {
     return item.children?.some((child) => matchesHref(child.href)) ?? false
   }
 
+  const renderDesktopChild = (child: NavChild) => (
+    <Link
+      key={child.href + child.name}
+      href={child.href}
+      className={`block rounded-md px-3 py-2 text-sm transition-colors hover:bg-surface-elevated hover:text-text-primary whitespace-nowrap ${
+        child.sister ? 'text-sister-indigo' : 'text-text-muted'
+      }`}
+    >
+      {child.name}
+      {child.note && (
+        <span className="ml-2 font-mono text-[12px] uppercase tracking-[0.08em] text-text-muted/60">
+          {child.note}
+        </span>
+      )}
+    </Link>
+  )
+
   const renderDesktopItem = (item: NavItem, secondary = false) => (
     <div key={item.name} className="relative group">
       <Link
@@ -204,23 +255,23 @@ export function Header() {
       {item.children && item.children.length > 0 && (
         <div className="absolute left-0 top-full pt-0 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto group-focus-within:opacity-100 group-focus-within:pointer-events-auto transition-opacity duration-150">
           <div className="pt-2">
-            <div className="rounded-lg bg-stone-charcoal p-2 shadow-xl ring-1 ring-border-subtle">
-              {item.children.map((child) => (
-                <Link
-                  key={child.name}
-                  href={child.href}
-                  className={`block rounded-md px-3 py-2 text-sm transition-colors hover:bg-surface-elevated hover:text-text-primary whitespace-nowrap ${
-                    child.sister ? 'text-sister-indigo' : 'text-text-muted'
-                  }`}
-                >
-                  {child.name}
-                  {child.note && (
-                    <span className="ml-2 font-mono text-[12px] uppercase tracking-[0.08em] text-text-muted/60">
-                      {child.note}
-                    </span>
-                  )}
-                </Link>
-              ))}
+            <div
+              className={`rounded-lg bg-stone-charcoal p-2 shadow-xl ring-1 ring-border-subtle ${
+                // A grid has no intrinsic width the way a column of nowrap links
+                // does: without an explicit one it collapses to the trigger's.
+                item.mega ? 'grid w-[32rem] grid-cols-2 gap-x-2' : ''
+              }`}
+            >
+              {item.mega
+                ? groupChildren(item.children).map(([group, children]) => (
+                    <div key={group}>
+                      <p className="whitespace-nowrap px-3 pb-1 pt-2 font-mono text-[11px] uppercase tracking-[0.1em] text-silicon-amber-strong">
+                        {group}
+                      </p>
+                      {children.map(renderDesktopChild)}
+                    </div>
+                  ))
+                : item.children.map(renderDesktopChild)}
             </div>
           </div>
         </div>

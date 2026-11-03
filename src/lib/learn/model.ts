@@ -54,14 +54,14 @@ export function statusLabel(status: CourseStatus, month?: string | null): string
 
 /* ------------------------------------------------------------------ tracks */
 
-/** Track slugs, in programme order. `/learn/paths/<slug>`. */
+/** Track slugs, in release order (the `order` field on each track). `/learn/paths/<slug>`. */
 export const TRACK_SLUGS = [
   'foundations',
-  'infrastructure-and-sovereignty',
   'eu-ai-act',
+  'infrastructure-and-sovereignty',
   'practitioner',
-  'security',
   'electives',
+  'security',
   'capstone',
 ] as const
 export type TrackSlug = (typeof TRACK_SLUGS)[number]

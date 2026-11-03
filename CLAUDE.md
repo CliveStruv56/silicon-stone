@@ -760,6 +760,40 @@ walking the pages in a browser, not by the suite.
 dashboard, not this repo (see `LAUNCH.md`). Scoped to articles only, a series
 edit invalidates nothing and the page sits stale with no error anywhere.
 
+## Silicon & Stone Learning (`/learn` — waitlist, load-bearing)
+
+The course programme *Silicon to Sovereignty*. Plan of record: `docs/learn/plan.md`;
+catalogue: `docs/learn/catalogue.md`; build brief: `docs/learn/lbuild.md`.
+
+- **Content in Sanity, rules in code.** `course`, `track`, `level`, `learnRoute`
+  hold the catalogue so a status badge changes without a deploy.
+  `src/lib/learn/model.ts` owns what a Studio edit must not break: the four
+  statuses, the track and route slugs, and the exercise tools. The slugs are
+  code-owned because the waitlist's tag allow-list is built from them.
+- **No price in Sanity.** A track carries a `priceKey`; the figures are bands in
+  `AMOUNTS`, rendered through `LEARN_PRICES`. Level 0 is free whatever its track
+  (`priceForCourse`). Course structured data carries no `offers`.
+- **Ordered lists are weak refs, projected positionally**, exactly as
+  `series.entries`: `courses[]{ _key, "course": @->{…} }`, never `courses[]->`.
+- **Learn pages fetch with `stega: false`.** They compare statuses and slugs, and
+  the client has no `studioUrl`: `stega: true` threw `config.studioUrl must be
+  defined` and blanked the course page, which a status-code check missed because
+  the error boundary returns 200. A browser walk-through caught it.
+- **The waitlist is its own route** (`/api/learn/waitlist`) with its own tag family,
+  `learn-` (a sixth prefix beside `list-`/`source-`/`interest-`/`buyer-`/`topic-`).
+  It signs up through the Standfirst form `learn-waitlist`, which must exist in the
+  workspace. **The Stone Briefing is a separate consent**: only a literal `true`
+  from its unticked box signs up through the `briefing` form. A team answer
+  emails the owner through `notifyEnquiry()` and never fails the request.
+  `security-checks.ts` asserts all three; the tests were mutation-tested.
+- **Tool pages link to courses through `/learn/code/<code>`**, a noindex redirect,
+  because they are Client Components and a slug is a Studio edit away from moving.
+- **Article 4 copy.** Regulation (EU) 2026/1744 rewrote Article 4 on 27 July 2026;
+  it has applied since 2 February 2025. Nothing may describe the original
+  "sufficient level" duty — `catalogue-seed.test.ts` fails on the phrase in the seed.
+- **The /how-it-fits-together map has six stages**; Learn is stage 3, drawn as a
+  pillar the Use→Discuss arrows pass through.
+
 ## The advisory pages come off one template (do not hand-roll a fifth)
 
 Each of the four engagements has its own page under `src/app/(website)/advisory/`,

@@ -1,5 +1,6 @@
 'use client'
 
+import { ToolCourseLink } from '@/components/learn/ToolCourseLink'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -1116,6 +1117,8 @@ export default function ComplianceCheckerPage() {
                   getMarkdown={() => complianceCheckerMarkdown(result, answers, assessmentQuestions)}
                 />
               </div>
+
+              <ToolCourseLink tool="compliance-checker" />
 
               <ToolSubscribeCard tool="compliance-checker" />
             </motion.div>

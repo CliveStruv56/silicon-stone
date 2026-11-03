@@ -6,6 +6,8 @@ import {
   AUTHOR_SLUGS_QUERY,
   GLOSSARY_SLUGS_QUERY,
   SERIES_SLUGS_QUERY,
+  TRACK_SLUGS_QUERY,
+  COURSE_SLUGS_QUERY,
 } from '@/sanity/lib/queries'
 import { absoluteUrl } from '@/lib/site'
 import { RULE_PACK } from '@/lib/rulepack'
@@ -34,6 +36,11 @@ const STATIC_ROUTES: Array<{
   { path: '/methodology', changeFrequency: 'monthly', priority: 0.7 },
   // The offerings map — one page spanning tools, products and advisory.
   { path: '/how-it-fits-together', changeFrequency: 'monthly', priority: 0.7 },
+  // Silicon & Stone Learning. Tracks and courses are dynamic, below.
+  { path: '/learn', changeFrequency: 'weekly', priority: 0.8 },
+  { path: '/learn/start', changeFrequency: 'monthly', priority: 0.7 },
+  { path: '/learn/schedule', changeFrequency: 'weekly', priority: 0.6 },
+  { path: '/learn/teams', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/glossary', changeFrequency: 'weekly', priority: 0.7 },
   { path: '/advisory', changeFrequency: 'monthly', priority: 0.6 },
   // All four advisory engagements own a page rather than an anchor. Each is
@@ -70,7 +77,16 @@ const STATIC_ROUTES: Array<{
 ]
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [{ data: articles }, { data: categories }, { data: authors }, { data: seriesList }, { data: glossary }, reports] =
+  const [
+    { data: articles },
+    { data: categories },
+    { data: authors },
+    { data: seriesList },
+    { data: glossary },
+    reports,
+    { data: tracks },
+    { data: courses },
+  ] =
     await Promise.all([
       sanityFetch({
         query: SITEMAP_ARTICLES_QUERY,
@@ -98,6 +114,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         stega: false,
       }),
       getSectorReports(),
+      sanityFetch({ query: TRACK_SLUGS_QUERY, perspective: 'published', stega: false }),
+      sanityFetch({ query: COURSE_SLUGS_QUERY, perspective: 'published', stega: false }),
     ])
 
   const staticEntries: MetadataRoute.Sitemap = STATIC_ROUTES.map((route) => ({
@@ -179,8 +197,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5,
   }))
 
+  // Learn tracks and courses. A course page carries its status badge, so it
+  // changes when a track opens; weekly, ranked with the series hubs.
+  const learnEntries: MetadataRoute.Sitemap = [
+    ...((tracks ?? []) as Array<{ slug: string; _updatedAt?: string | null }>).map((track) => ({
+      url: absoluteUrl(`/learn/paths/${track.slug}`),
+      lastModified: track._updatedAt || undefined,
+      changeFrequency: 'weekly' as const,
+      priority: 0.6,
+    })),
+    ...((courses ?? []) as Array<{ slug: string; _updatedAt?: string | null }>).map((course) => ({
+      url: absoluteUrl(`/learn/courses/${course.slug}`),
+      lastModified: course._updatedAt || undefined,
+      changeFrequency: 'weekly' as const,
+      priority: 0.6,
+    })),
+  ]
+
   return [
     ...staticEntries,
+    ...learnEntries,
     ...reports.map(report => ({
       url: absoluteUrl(sectorReportPath(report.slug)),
       changeFrequency: 'monthly' as const,

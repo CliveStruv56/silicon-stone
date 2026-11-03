@@ -1,5 +1,6 @@
 'use client'
 
+import { ToolCourseLink } from '@/components/learn/ToolCourseLink'
 import { useState, useMemo, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -879,6 +880,8 @@ export default function PolicyStressTestPage() {
                     </Button>
                   </Link>
                 </div>
+
+                <ToolCourseLink tool="policy-stress-test" />
 
                 <ToolSubscribeCard tool="policy-stress-test" />
               </motion.div>

@@ -16,7 +16,8 @@ import {
   AdvisoryBand,
 } from '@/components/home'
 import { sanityFetch } from '@/sanity/lib/live'
-import { SITE_SETTINGS_QUERY, ARTICLES_BY_TIER_QUERY } from '@/sanity/lib/queries'
+import { SITE_SETTINGS_QUERY, ARTICLES_BY_TIER_QUERY, LEARN_BAND_QUERY } from '@/sanity/lib/queries'
+import { LearnBand, LEARN_BAND_TRACKS, type LearnBandTrack } from '@/components/learn/LearnBand'
 import { getSeriesPromo } from '@/lib/series-promo'
 import { SeriesPromo } from '@/components/series/SeriesPromo'
 import { SITE_URL, absoluteUrl } from '@/lib/site'
@@ -39,7 +40,7 @@ const ORG_SAME_AS: string[] = [
 ]
 
 export default async function Home() {
-  const [settingsRes, pulseRes, briefingRes, auditRes, series] = await Promise.all([
+  const [settingsRes, pulseRes, briefingRes, auditRes, series, learnRes] = await Promise.all([
     sanityFetch({ query: SITE_SETTINGS_QUERY }),
     sanityFetch({ query: ARTICLES_BY_TIER_QUERY, params: { tier: 'pulse', limit: 1 } }),
     sanityFetch({ query: ARTICLES_BY_TIER_QUERY, params: { tier: 'briefing', limit: 1 } }),
@@ -48,7 +49,13 @@ export default async function Home() {
     // fails closed to an empty list, so a Sanity blip costs the band and not
     // the homepage.
     getSeriesPromo(),
+    // Same rule as the series promo: a failed fetch costs the Learn band, never
+    // the homepage.
+    sanityFetch({ query: LEARN_BAND_QUERY, params: { slugs: LEARN_BAND_TRACKS }, stega: false }).catch(() => ({
+      data: [],
+    })),
   ])
+  const learnTracks = (learnRes.data ?? []) as LearnBandTrack[]
 
   const siteSettings = settingsRes.data
   const pulseArticle = pulseRes.data?.[0] ?? null
@@ -172,6 +179,7 @@ export default async function Home() {
 
         {/* 8. Tool Gallery — Use, with take-it-further bridges */}
         <ToolsGallery />
+        {learnTracks.length > 0 && <LearnBand tracks={learnTracks} />}
 
         {/* 9. Products band — Buy */}
         <ProductsBand />

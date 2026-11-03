@@ -373,6 +373,13 @@ export function PersonaCompass() {
                   onDeactivate={() => setActive(null)}
                 />
               ))}
+              {/* One line, not a link per row: each row is already a link, and
+                  a second line under every row made the section taller than the
+                  redesign allowed. Picking a persona on /intelligence shows that
+                  persona's full route. */}
+              <Link href="/learn#routes" className="mt-1 pl-4 text-sm text-stone-teal hover:underline">
+                Each of these readers has a course route in Silicon & Stone Learning →
+              </Link>
             </div>
           </StaggerItem>
 

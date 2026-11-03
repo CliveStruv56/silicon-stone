@@ -1,5 +1,6 @@
 'use client'
 
+import { ToolCourseLink } from '@/components/learn/ToolCourseLink'
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
@@ -912,6 +913,7 @@ export default function SupplyChainMapperPage() {
         <FollowOnModule moduleId="manufacturing-exposure" />
 
         <section className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
+          <ToolCourseLink tool="supply-chain-mapper" />
           <ToolSubscribeCard tool="supply-chain-mapper" />
 
           {/* CTA — kept at the owner's request, pointed at the module. */}

@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Linkedin } from 'lucide-react'
 
 import { ENGAGEMENTS } from '@/lib/offering'
+import { TRACK_LABELS, TRACK_SLUGS } from '@/lib/learn/model'
 
 // TODO(owner): replace with company/founder LinkedIn URL (via
 // NEXT_PUBLIC_LINKEDIN_URL or this fallback).
@@ -50,6 +51,18 @@ const footerNavigation = {
     // Not an engagement — the free guide that feeds them.
     { name: 'US Executive’s Guide', href: '/us-executive-guide' },
   ],
+  /**
+   * Silicon & Stone Learning. Section pages first, then three tracks in release
+   * order rather than all seven: the column must stay the height of its
+   * neighbours, and the hub lists every track.
+   */
+  learn: [
+    { name: 'Silicon to Sovereignty', href: '/learn' },
+    { name: 'Free orientation', href: '/learn/start' },
+    ...TRACK_SLUGS.slice(0, 3).map((slug) => ({ name: TRACK_LABELS[slug], href: `/learn/paths/${slug}` })),
+    { name: 'Release schedule', href: '/learn/schedule' },
+    { name: 'In-house training', href: '/learn/teams' },
+  ],
   company: [
     { name: 'Contact', href: '/advisory#contact' },
     { name: 'Privacy', href: '/privacy' },
@@ -61,7 +74,7 @@ export function Footer() {
   return (
     <footer className="border-t border-border-subtle bg-footer-bg">
       <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-4 lg:grid-cols-5">
+        <div className="grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-6">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1 space-y-4">
             <Link href="/" className="inline-block">
@@ -109,6 +122,23 @@ export function Footer() {
             <ul className="mt-4 space-y-2">
               {footerNavigation.engage.map((item) => (
                 <li key={item.name}>
+                  <Link
+                    href={item.href}
+                    className="text-sm text-text-muted hover:text-stone-teal transition-colors"
+                  >
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Learn */}
+          <div>
+            <h3 className="text-sm font-semibold text-text-primary">Learn</h3>
+            <ul className="mt-4 space-y-2">
+              {footerNavigation.learn.map((item) => (
+                <li key={item.href}>
                   <Link
                     href={item.href}
                     className="text-sm text-text-muted hover:text-stone-teal transition-colors"

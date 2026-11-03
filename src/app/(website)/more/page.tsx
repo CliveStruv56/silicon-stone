@@ -10,6 +10,7 @@ import {
   Layers,
   Tag,
   Compass,
+  GraduationCap,
 } from 'lucide-react'
 import { Header, Footer } from '@/components/layout'
 import { ThemeToggle } from '@/components/layout/ThemeToggle'
@@ -29,6 +30,12 @@ const sections = [
     href: '/intelligence/series',
     description: 'Reading paths — the analysis in the order the argument was built.',
     icon: Layers,
+  },
+  {
+    name: 'Learn',
+    href: '/learn',
+    description: 'Silicon to Sovereignty: courses from the chip to the boardroom. Waitlist open.',
+    icon: GraduationCap,
   },
   {
     name: 'Products',

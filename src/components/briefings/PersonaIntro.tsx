@@ -6,6 +6,8 @@ import { ForensicCard } from '@/components/ui/ForensicCard'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { PERSONAS, BRIEFINGS_PERSONA_ORDER, type PersonaSlug } from '@/lib/personas'
+import { PersonaRoutePanel } from '@/components/learn/PersonaRoutePanel'
+import type { RouteData } from '@/lib/learn/types'
 
 // Avatar ring colour per persona accent token. Literal strings so Tailwind
 // picks them up at build time.
@@ -29,6 +31,12 @@ interface PersonaIntroProps {
   onPersonaSelect?: (persona: string | null) => void
   /** Matching-article counts by persona slug, as computed by the host feed. */
   personaCounts?: Record<string, number>
+  /**
+   * Silicon & Stone Learning routes, keyed by persona slug. When the selected
+   * persona has one, it is shown under the cards. Read from Sanity
+   * (`learnRoute.personaSlug`) by the host page.
+   */
+  learnRoutes?: Record<string, RouteData>
 }
 
 /**
@@ -42,7 +50,10 @@ export function PersonaIntro({
   selectedPersona = null,
   onPersonaSelect,
   personaCounts,
+  learnRoutes,
 }: PersonaIntroProps = {}) {
+  const selectedRoute = selectedPersona ? learnRoutes?.[selectedPersona] : undefined
+  const selectedName = selectedPersona ? PERSONAS[selectedPersona as keyof typeof PERSONAS]?.name : undefined
   const interactive = Boolean(onPersonaSelect)
 
   return (
@@ -159,8 +170,9 @@ export function PersonaIntro({
                 </StaggerItem>
               )
             })}
-          </div>
+                    </div>
         </StaggerContainer>
+        {selectedRoute && selectedName && <PersonaRoutePanel personaName={selectedName} route={selectedRoute} />}
       </div>
     </section>
   )

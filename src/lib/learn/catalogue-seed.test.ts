@@ -59,6 +59,8 @@ describe('the catalogue seed', () => {
 
   it('labels the waitlist options exactly as the seeded documents are titled', () => {
     for (const t of SEED_TRACKS) expect(TRACK_LABELS[t.slug], t.slug).toBe(t.title)
+    // The menu, the form and the hub list tracks in one order.
+    expect([...SEED_TRACKS].sort((a, b) => a.order - b.order).map((t) => t.slug)).toEqual([...TRACK_SLUGS])
     for (const r of SEED_ROUTES) expect(ROUTE_LABELS[r.slug], r.slug).toBe(r.title)
   })
 

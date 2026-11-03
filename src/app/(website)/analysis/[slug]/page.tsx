@@ -49,6 +49,7 @@ import { absoluteUrl } from '@/lib/site'
 import { getSectorReports } from '@/lib/sector-reports-server'
 import { reportForArticle, sectorReportPath } from '@/lib/sector-reports'
 import { SectorReportPromotion } from '@/components/products/SectorReportPromotion'
+import { RelatedCourseCard } from '@/components/learn/RelatedCourseCard'
 import {
   buildArticleSchema,
   buildBreadcrumbSchema,
@@ -720,6 +721,11 @@ export default async function ArticlePage({ params }: Props) {
               next={seriesNeighbours.next}
             />
           )}
+
+          {/* The Silicon & Stone Learning course on this topic, if Studio names
+              one. After the series (a reader mid-path is offered the next part
+              first) and before any commerce ask. */}
+          <RelatedCourseCard courses={article.relatedCourses} />
 
           {/* End-of-article gate (P3-1): newsletter, product upsell, or lead —
               mode + copy from Sanity, never blocking the body above. */}

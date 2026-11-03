@@ -154,6 +154,16 @@ export default async function GlossaryTermPage({ params }: Props) {
             {term.reviewedAt && <span>Reviewed {term.reviewedAt}</span>}
           </div>
 
+          {term.taughtIn?.slug && (
+            <p className="mt-8 text-sm text-text-muted">
+              Taught in{' '}
+              <Link href={`/learn/courses/${term.taughtIn.slug}`} className="text-stone-teal hover:underline">
+                course {term.taughtIn.code}, {term.taughtIn.title}
+              </Link>
+              , part of Silicon &amp; Stone Learning.
+            </p>
+          )}
+
           {term.relatedTerms && term.relatedTerms.length > 0 && (
             <div className="mt-12">
               <h2 className="font-mono text-xs font-semibold uppercase tracking-[0.12em] text-text-muted">

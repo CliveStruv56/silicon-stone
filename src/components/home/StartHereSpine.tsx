@@ -5,7 +5,7 @@ import { ArrowRight } from 'lucide-react'
 import { StaggerContainer, StaggerItem } from '@/components/ui/StaggerContainer'
 import { ForensicCard } from '@/components/ui/ForensicCard'
 import { Badge } from '@/components/ui/badge'
-import { AMOUNTS, gbp, SCOPED_FEE } from '@/lib/offering'
+import { AMOUNTS, gbp, LEARN_OFFERING, SCOPED_FEE } from '@/lib/offering'
 
 type Rung = {
   marker: string
@@ -16,8 +16,10 @@ type Rung = {
   tone: 'free' | 'paid'
 }
 
-// The commitment ladder, made visible in the first screen: Read → Use → Buy → Engage.
-// Rungs 1–2 are free (cool/teal accent); rungs 3–4 are paid (warm/amber accent).
+// The commitment ladder, made visible in the first screen: Read → Use → Learn → Buy → Engage.
+// Rungs 1–3 are free to start (cool/teal accent); rungs 4–5 are paid (warm/amber accent).
+// Learn is free to start because the waitlist and the Level 0 orientation are;
+// its paid tracks are priced on their own pages, not on this card.
 const rungs: Rung[] = [
   {
     marker: 'Free',
@@ -33,6 +35,14 @@ const rungs: Rung[] = [
     body: 'Apply it to your own situation. Four interactive tools that turn the analysis into a result about you.',
     cta: 'Open the Tools',
     href: '/tools',
+    tone: 'free',
+  },
+  {
+    marker: LEARN_OFFERING.status ?? 'Waitlist open',
+    title: 'Learn',
+    body: 'Courses that start at the chip and finish at the boardroom. A free orientation first, then one track at a time from January 2027.',
+    cta: 'See the courses',
+    href: LEARN_OFFERING.href,
     tone: 'free',
   },
   {
@@ -70,17 +80,17 @@ export function StartHereSpine() {
                 Start here
               </Badge>
               <h2 id="start-here-heading" className="sr-only">
-                Four ways to use Silicon &amp; Stone
+                Five ways to use Silicon &amp; Stone
               </h2>
               <p className="text-lg italic text-text-primary/90 leading-relaxed">
-                Four ways to use Silicon &amp; Stone — from a free read to a standing
+                Five ways to use Silicon &amp; Stone — from a free read to a standing
                 advisory relationship. Most people start at the top and move down as the
                 stakes rise.
               </p>
             </div>
           </StaggerItem>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             {rungs.map((rung) => {
               const isFree = rung.tone === 'free'
               const accentText = isFree ? 'text-stone-teal' : 'text-silicon-amber-strong'

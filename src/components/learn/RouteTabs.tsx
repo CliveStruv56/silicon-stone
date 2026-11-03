@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 
 import { StatusBadge } from './StatusBadge'
@@ -19,6 +19,18 @@ import { coursePath, resolvedCourses, totalTime, type RouteData } from '@/lib/le
 export function RouteTabs({ routes }: { routes: RouteData[] }) {
   const [active, setActive] = useState(0)
   const tabs = useRef<Array<HTMLButtonElement | null>>([])
+  const section = useRef<HTMLDivElement>(null)
+
+  // `/learn#route-<slug>` opens that tab: the persona panels on /intelligence
+  // link here. Read after mount, because the hash never reaches the server.
+  useEffect(() => {
+    const slug = window.location.hash.match(/^#route-(.+)$/)?.[1]
+    if (!slug) return
+    const index = routes.findIndex((r) => r.slug === slug)
+    if (index < 0) return
+    setActive(index)
+    section.current?.scrollIntoView({ block: 'start' })
+  }, [routes])
 
   if (routes.length === 0) return null
 
@@ -48,7 +60,7 @@ export function RouteTabs({ routes }: { routes: RouteData[] }) {
   const time = totalTime(resolvedCourses(slots))
 
   return (
-    <div>
+    <div ref={section} className="scroll-mt-24">
       <div role="tablist" aria-label="Routes by role" className="flex flex-wrap gap-2">
         {routes.map((r, index) => (
           <button

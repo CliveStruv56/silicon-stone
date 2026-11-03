@@ -761,6 +761,28 @@ These are public preview fields: never upload the full paid PDF or paste its bod
 See [Sector report operations](sector-reports-operations.md) for the monthly workflow
 and the separate purchase-delivery work still required before checkout opens.
 
+### Silicon & Stone Learning: courses, tracks, levels and routes
+
+**Course**, **Track**, **Level** and **Learn route** drive every page under `/learn`.
+They were seeded from `docs/learn/catalogue.md` by `npm run learn:seed` (dry run by
+default; `--write` creates only what is missing, so it never overwrites an edit).
+
+- **Opening a track.** Change each course's **Status** (Open, Founding cohort,
+  Coming with a month, In development). The badges on the hub, the track page and
+  every route follow on publish. A course marked Coming must carry a month.
+- **Order is position.** A track's and a route's course lists are drag-to-reorder;
+  the position is the step number, as in a series.
+- **No prices in Studio.** A track's **Price band** picks a band from the code
+  catalogue (`src/lib/offering.ts`). Changing a figure is a code change.
+- **Track and route slugs are a fixed list**, because the waitlist tags are built
+  from them. A new track needs a code change first.
+- **Related courses** on an article puts a course card in its footer; **Taught in**
+  on a glossary term links the term page to its course.
+
+Waitlist sign-ups go to Standfirst through the form `learn-waitlist`, which must
+exist there, with `learn-*` tags. A "for my team" answer also emails the enquiry
+address.
+
 ### The article's three tabs
 
 **Content** — everything you author.

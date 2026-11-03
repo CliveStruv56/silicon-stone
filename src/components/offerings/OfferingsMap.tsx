@@ -3,6 +3,8 @@ import {
   BRIEFING,
   CORE_ENGAGEMENTS,
   INTRO,
+  LEARN,
+  LEARN_BOXES,
   READ,
   RETAINER,
   SELF_SERVE,
@@ -38,14 +40,18 @@ import {
 // the page's max-w-7xl into a 1600px container so the scale-down is smaller.
 // Read column widened 230 → 290 and its boxes 50 → 62 tall the same day: the
 // newsletter name overran the box at the larger type size.
+// The Learn pillar arrived on 2026-11-03 (docs/learn/plan.md: "insert Learn
+// as a new stage between Use and Discuss"). Everything right of Use moved
+// 232 units right and the canvas widened by the same.
 const COL = {
   read: { x: 20, w: 290 },
   use: { x: 366, w: 236 },
-  gate: { x: 664, w: 150 },
-  commission: { x: 876, w: 360 },
-  stay: { x: 1298, w: 190 },
+  learn: { x: 664, w: 170 },
+  gate: { x: 896, w: 150 },
+  commission: { x: 1108, w: 360 },
+  stay: { x: 1530, w: 190 },
 } as const
-const W = 1528
+const W = 1760
 const TOP = 110
 const TOOL_H = 46
 const PITCH = 54
@@ -145,12 +151,17 @@ function Sub({ x, y, children }: { x: number; y: number; children: string }) {
 /** The gate (amber) and the destination (teal): tall boxes with a title mid-way. */
 function Pillar({
   x, w, title, lines, foot, tone, href,
-}: { x: number; w: number; title: string[]; lines: string[]; foot: string[]; tone: 'amber' | 'teal'; href: string }) {
+}: { x: number; w: number; title: string[]; lines: string[]; foot: string[]; tone: 'amber' | 'teal' | 'cyan'; href: string }) {
   const cx = x + w / 2
   const centre = TOP + (gateBottom - TOP) / 2
-  const fill = tone === 'amber' ? 'fill-silicon-amber/10 stroke-silicon-amber' : 'fill-stone-teal/10 stroke-stone-teal'
-  const titleFill = tone === 'amber' ? 'fill-silicon-amber-strong' : 'fill-stone-teal'
-  const rule = tone === 'amber' ? 'stroke-silicon-amber' : 'stroke-stone-teal'
+  // Class strings written out in full: Tailwind cannot see interpolated names.
+  const fill = {
+    amber: 'fill-silicon-amber/10 stroke-silicon-amber',
+    teal: 'fill-stone-teal/10 stroke-stone-teal',
+    cyan: 'fill-silicon-cyan/10 stroke-silicon-cyan',
+  }[tone]
+  const titleFill = { amber: 'fill-silicon-amber-strong', teal: 'fill-stone-teal', cyan: 'fill-silicon-cyan' }[tone]
+  const rule = { amber: 'stroke-silicon-amber', teal: 'stroke-stone-teal', cyan: 'stroke-silicon-cyan' }[tone]
   return (
     <a href={href} className="group focus:outline-none" aria-label={title.join(' ')}>
       <rect x={x} y={TOP} width={w} height={gateBottom - TOP} rx={10} className={fill} strokeWidth={1.5} />
@@ -174,6 +185,15 @@ export function OfferingsMap() {
   const comL = COL.commission.x
   const comR = COL.commission.x + COL.commission.w
   const useR = COL.use.x + COL.use.w
+  const learnL = COL.learn.x
+  const learnR = COL.learn.x + COL.learn.w
+  /** Use → Learn → Discuss on one row: two segments either side of the pillar. */
+  const throughLearn = (key: string, y: number, dashed = false) => (
+    <g key={key}>
+      <Arrow x1={useR + 4} y1={y} x2={learnL - 4} y2={y} dashed={dashed} />
+      <Arrow x1={learnR + 4} y1={y} x2={gateL - 4} y2={y} dashed={dashed} />
+    </g>
+  )
 
   return (
     <figure className="m-0">
@@ -183,7 +203,7 @@ export function OfferingsMap() {
           viewBox={`0 0 ${W} ${H}`}
           className="block h-auto w-full min-w-[960px]"
           role="img"
-          aria-label="Flow chart: free reading leads to four Interactive Forensic Tools and two products, including the consolidated toolkit with an optional live review; these can lead to the Advisory Briefing, which leads into eight core engagements, from five specialist projects to board-level work; every one of those settles into the Drift Retainer."
+          aria-label="Flow chart: free reading leads to four Interactive Forensic Tools and two products, including the consolidated toolkit with an optional live review; then Silicon & Stone Learning, courses from the chip to the boardroom; these can lead to the Advisory Briefing, which leads into eight core engagements, from five specialist projects to board-level work; every one of those settles into the Drift Retainer."
         >
           <defs>
             <marker id="offerings-map-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -193,9 +213,10 @@ export function OfferingsMap() {
 
           <StageHeader x={COL.read.x} eyebrow="STAGE 1 · FREE" title="Read" />
           <StageHeader x={COL.use.x} eyebrow="STAGE 2 · SELF-SERVE" title="Use" />
-          <StageHeader x={COL.gate.x} eyebrow="STAGE 3 · TOUCHSTONE" title="Discuss" />
-          <StageHeader x={COL.commission.x} eyebrow="STAGE 4 · DELIVER" title="Advisory" />
-          <StageHeader x={COL.stay.x} eyebrow="STAGE 5 · BESPOKE" title="Retain" />
+          <StageHeader x={COL.learn.x} eyebrow="STAGE 3 · COURSES" title="Learn" />
+          <StageHeader x={COL.gate.x} eyebrow="STAGE 4 · TOUCHSTONE" title="Discuss" />
+          <StageHeader x={COL.commission.x} eyebrow="STAGE 5 · DELIVER" title="Advisory" />
+          <StageHeader x={COL.stay.x} eyebrow="STAGE 6 · BESPOKE" title="Retain" />
 
           {/* Stage 1 */}
           {READ.map((box, i) => (
@@ -215,21 +236,25 @@ export function OfferingsMap() {
 
           {/* Stage 3 */}
           <Pillar
+            x={COL.learn.x} w={COL.learn.w} tone="cyan" href={LEARN.href}
+            title={['Silicon & Stone', 'Learning']}
+            lines={['Silicon to Sovereignty', 'courses from the chip', 'to the boardroom,', 'one track at a time', 'from January 2027']}
+            foot={['free orientation first', 'in-house for teams']}
+          />
+
+          {/* Stage 4 */}
+          <Pillar
             x={COL.gate.x} w={COL.gate.w} tone="amber" href={BRIEFING.href}
             title={['Advisory', 'Briefing']}
             lines={['the output of a tool', 'or product, or one of', 'your AI systems', 'one hour, then a written', 'follow-up with priorities']}
             foot={['fee credited against', 'your first engagement']}
           />
-          {TOOLS.map((tool, i) => (
-            <Arrow key={`in-${tool.slug}`} x1={useR + 4} y1={mid(toolY(i), TOOL_H)} x2={gateL - 4} y2={mid(toolY(i), TOOL_H)} />
-          ))}
-          {SELF_SERVE.map((box, i) => (
-            <Arrow key={`in-${box.href}`} x1={useR + 4} y1={mid(selfServeY(i), PRODUCT_H)} x2={gateL - 4} y2={mid(selfServeY(i), PRODUCT_H)} />
-          ))}
+          {TOOLS.map((tool, i) => throughLearn(`in-${tool.slug}`, mid(toolY(i), TOOL_H)))}
+          {SELF_SERVE.map((box, i) => throughLearn(`in-${box.href}`, mid(selfServeY(i), PRODUCT_H)))}
           <Box box={INTRO} x={COL.use.x} y={introY} w={COL.use.w} h={TOOL_H} />
-          <Arrow x1={useR + 4} y1={mid(introY, TOOL_H)} x2={gateL - 4} y2={mid(introY, TOOL_H)} dashed />
+          {throughLearn('in-intro', mid(introY, TOOL_H), true)}
 
-          {/* Stage 4 */}
+          {/* Stage 5 */}
           <Sub x={COL.commission.x} y={SUB_Y}>CORE ENGAGEMENTS</Sub>
           {SPECIALIST_PROJECTS.map((box, i) => (
             <g key={box.href}>
@@ -246,7 +271,7 @@ export function OfferingsMap() {
             </g>
           ))}
 
-          {/* Stage 5 */}
+          {/* Stage 6 */}
           <Pillar
             x={COL.stay.x} w={COL.stay.w} tone="teal" href={RETAINER.href}
             title={['The Drift', 'Retainer']}
@@ -269,7 +294,12 @@ export function OfferingsMap() {
           ]}
         />
         <StackedStage
-          eyebrow="Stage 3 · Touchstone"
+          eyebrow="Stage 3 · courses"
+          title="Learn: Silicon & Stone Learning"
+          groups={[{ boxes: LEARN_BOXES }]}
+        />
+        <StackedStage
+          eyebrow="Stage 4 · Touchstone"
           title="Discuss: the Advisory Briefing"
           tone="amber"
           groups={[{
@@ -279,12 +309,12 @@ export function OfferingsMap() {
           }]}
         />
         <StackedStage
-          eyebrow="Stage 4 · deliver"
+          eyebrow="Stage 5 · deliver"
           title="Advisory"
           groups={[{ label: 'Core engagements', boxes: [...SPECIALIST_PROJECTS, ...CORE_ENGAGEMENTS] }]}
         />
         <StackedStage
-          eyebrow="Stage 5 · bespoke"
+          eyebrow="Stage 6 · bespoke"
           title="Retain: the Drift Retainer"
           tone="teal"
           groups={[{ boxes: [{ name: RETAINER.name, href: RETAINER.href, note: ['a monthly briefing, a working session on one live decision, a quarterly exposure review · rolling monthly, no minimum term'], stripe: 'cyan' }] }]}

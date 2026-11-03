@@ -1,6 +1,8 @@
 import { client } from '@/sanity/lib/client'
 import { urlFor } from '@/sanity/lib/image'
 import { getSeriesPromo } from '@/lib/series-promo'
+import { PERSONA_ROUTES_QUERY } from '@/sanity/lib/queries'
+import type { RouteData } from '@/lib/learn/types'
 import { IntelligenceFeed, type Article } from './IntelligenceFeed'
 import { getPersonaParam, getTierParam, getTopicParam } from './filters'
 
@@ -58,6 +60,21 @@ async function getInitialArticles(): Promise<Article[]> {
   }
 }
 
+/**
+ * Silicon & Stone Learning routes keyed by persona. Fails closed to none: a
+ * Sanity blip costs the route panel, never the feed. This is a separate query,
+ * deliberately — the feed query above is one of four copies that must agree.
+ */
+async function getPersonaRoutes(): Promise<Record<string, RouteData>> {
+  try {
+    const routes = await client.fetch<RouteData[]>(PERSONA_ROUTES_QUERY)
+    return Object.fromEntries(routes.filter((r) => r.personaSlug).map((r) => [r.personaSlug as string, r]))
+  } catch (error) {
+    console.error('Error fetching Learn routes:', error instanceof Error ? error.message : 'unknown error')
+    return {}
+  }
+}
+
 export default async function IntelligencePage({
   searchParams,
 }: {
@@ -70,15 +87,17 @@ export default async function IntelligencePage({
   // Fetched here, on the server, rather than inside the client feed: the band
   // is the entry point to the series library, and a reader with no JavaScript
   // must still find it. Same reason the feed itself is server-rendered.
-  const [initialArticles, series] = await Promise.all([
+  const [initialArticles, series, learnRoutes] = await Promise.all([
     getInitialArticles(),
     getSeriesPromo(),
+    getPersonaRoutes(),
   ])
 
   return (
     <IntelligenceFeed
       initialArticles={initialArticles}
       series={series}
+      learnRoutes={learnRoutes}
       initialFilters={{
         persona: getPersonaParam(first(params.persona)),
         tier: getTierParam(first(params.tier)),

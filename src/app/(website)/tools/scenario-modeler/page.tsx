@@ -1,5 +1,6 @@
 'use client'
 
+import { ToolCourseLink } from '@/components/learn/ToolCourseLink'
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -968,6 +969,8 @@ export default function ScenarioModelerPage() {
                   </Button>
                 </Link>
               </div>
+
+              <ToolCourseLink tool="scenario-modeler" />
 
               <ToolSubscribeCard tool="scenario-modeler" />
             </motion.div>
