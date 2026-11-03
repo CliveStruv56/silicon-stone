@@ -157,7 +157,7 @@ export default async function GlossaryTermPage({ params }: Props) {
           {term.taughtIn?.slug && (
             <p className="mt-8 text-sm text-text-muted">
               Taught in{' '}
-              <Link href={`/learn/courses/${term.taughtIn.slug}`} className="text-stone-teal hover:underline">
+              <Link href={`/learn/courses/${term.taughtIn.slug}`} className="text-stone-teal underline underline-offset-2 hover:text-stone-teal/80">
                 course {term.taughtIn.code}, {term.taughtIn.title}
               </Link>
               , part of Silicon &amp; Stone Learning.

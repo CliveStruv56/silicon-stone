@@ -30,7 +30,7 @@ export default function LearnTeamsPage() {
           </p>
           <p className="mt-3 max-w-3xl text-sm text-text-muted">
             Where the work turns into a decision about your own systems, it leads naturally into{' '}
-            <Link href="/advisory" className="text-stone-teal hover:underline">
+            <Link href="/advisory" className="text-stone-teal underline underline-offset-2 hover:text-stone-teal/80">
               advisory
             </Link>
             .

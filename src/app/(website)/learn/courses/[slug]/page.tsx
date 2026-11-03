@@ -252,7 +252,7 @@ export default async function CoursePage({ params }: Props) {
               <p className="mt-4 text-sm text-text-muted">{price.note}</p>
               <p className="mt-3 text-sm text-text-muted">
                 Team and in-house prices are scoped on{' '}
-                <Link href="/learn/teams" className="text-stone-teal hover:underline">
+                <Link href="/learn/teams" className="text-stone-teal underline underline-offset-2 hover:text-stone-teal/80">
                   the in-house training page
                 </Link>
                 . {CHARITY_LINE}

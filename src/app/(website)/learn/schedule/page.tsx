@@ -41,7 +41,8 @@ export default async function LearnSchedulePage() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-4xl px-6 py-12 lg:px-8">
+        <section aria-labelledby="schedule-tracks" className="mx-auto max-w-4xl px-6 py-12 lg:px-8">
+          <h2 id="schedule-tracks" className="sr-only">Tracks, by opening month</h2>
           <ScheduleList tracks={hub?.tracks ?? []} showCourses />
         </section>
 
@@ -56,7 +57,7 @@ export default async function LearnSchedulePage() {
           <h2 className="mb-3 text-2xl font-semibold text-text-primary">Hear first</h2>
           <p className="mb-6 text-text-muted">
             Tick the tracks you want and you’ll hear about those openings first. Or{' '}
-            <Link href="/learn" className="text-stone-teal hover:underline">
+            <Link href="/learn" className="text-stone-teal underline underline-offset-2 hover:text-stone-teal/80">
               see the whole programme
             </Link>
             .

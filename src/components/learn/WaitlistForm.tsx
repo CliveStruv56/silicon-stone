@@ -120,7 +120,7 @@ export function WaitlistForm({
               {briefingOutcome === 'failed' && (
                 <p className="text-text-muted">
                   We couldn’t add you to the Stone Briefing just now. You can{' '}
-                  <Link href="/intelligence" className="text-stone-teal hover:underline">
+                  <Link href="/intelligence" className="text-stone-teal underline underline-offset-2 hover:text-stone-teal/80">
                     subscribe from the intelligence page
                   </Link>
                   .

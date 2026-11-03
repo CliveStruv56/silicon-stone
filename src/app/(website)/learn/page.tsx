@@ -141,7 +141,7 @@ export default async function LearnHubPage() {
               <>
                 {' '}
                 The{' '}
-                <Link href={coursePath(orientation.slug)} className="text-stone-teal hover:underline">
+                <Link href={coursePath(orientation.slug)} className="text-stone-teal underline underline-offset-2 hover:text-stone-teal/80">
                   free orientation
                 </Link>{' '}
                 goes to the list first.

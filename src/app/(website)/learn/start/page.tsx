@@ -76,7 +76,7 @@ export default async function LearnStartPage() {
             <h2 className="mb-3 text-2xl font-semibold text-text-primary">After the orientation</h2>
             <p className="mb-6 text-text-muted">
               The orientation is the first step into{' '}
-              <Link href={trackPath('foundations')} className="text-stone-teal hover:underline">
+              <Link href={trackPath('foundations')} className="text-stone-teal underline underline-offset-2 hover:text-stone-teal/80">
                 Foundations
               </Link>
               , the first track to open.
