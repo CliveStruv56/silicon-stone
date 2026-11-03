@@ -436,3 +436,85 @@ export function buildGlossaryTermBreadcrumbSchema(term: { name: string; slug: st
     { name: term.name, path: `/glossary/${term.slug}` },
   ])
 }
+
+/**
+ * FAQPage for a list of questions the page renders. Built from the same array
+ * the page shows (`LearnFaq`), so the structured data cannot claim an answer
+ * the reader cannot see.
+ */
+export function buildFaqSchema(items: ReadonlyArray<{ q: string; a: string }>) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: items.map((item) => ({
+      '@type': 'Question',
+      name: item.q,
+      acceptedAnswer: { '@type': 'Answer', text: item.a },
+    })),
+  }
+}
+
+/** Home → Learn → … for every page under /learn. The hub itself passes no trail. */
+export function buildLearnBreadcrumbSchema(trail: Array<{ name: string; path: string }> = []) {
+  return breadcrumbList([
+    { name: 'Home', path: '/' },
+    { name: 'Learn', path: '/learn' },
+    ...trail,
+  ])
+}
+
+/**
+ * A schema.org Course. **No `offers`**, deliberately: `structured-data.test.ts`
+ * forbids Offer markup anywhere until the store is live, and a course priced in
+ * bands has no single price to state. Cohort sessions, once dated in Studio,
+ * become `hasCourseInstance`.
+ */
+export function buildCourseSchema(course: {
+  code: string
+  title: string
+  slug: string
+  promise?: string
+  level?: number | null
+  durationMinutes?: number | null
+  cohortDates?: string[] | null
+}) {
+  const url = absoluteUrl(`/learn/courses/${course.slug}`)
+  const start = course.cohortDates?.length ? [...course.cohortDates].sort()[0] : null
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Course',
+    '@id': `${url}#course`,
+    name: course.title,
+    description: course.promise ? cleanDescription(course.promise) : undefined,
+    courseCode: course.code,
+    url,
+    inLanguage: 'en-GB',
+    provider: ORGANIZATION_REF,
+    isAccessibleForFree: course.level === 0,
+    ...(typeof course.durationMinutes === 'number' ? { timeRequired: `PT${course.durationMinutes}M` } : {}),
+    ...(start
+      ? {
+          hasCourseInstance: {
+            '@type': 'CourseInstance',
+            courseMode: 'online',
+            startDate: start,
+            location: { '@type': 'VirtualLocation', url },
+          },
+        }
+      : {}),
+  }
+}
+
+/** An ItemList of the courses a page lists, in the order it lists them. */
+export function buildCourseListSchema(courses: Array<{ code: string; title: string; slug: string }>) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: courses.map((course, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      url: absoluteUrl(`/learn/courses/${course.slug}`),
+      name: `${course.code} ${course.title}`,
+    })),
+  }
+}

@@ -10,8 +10,10 @@ import {
   COURSE_CODE,
   COURSE_STATUSES,
   EXERCISE_TOOLS,
+  ROUTE_LABELS,
   ROUTE_SLUGS,
   TOOL_COURSE,
+  TRACK_LABELS,
   TRACK_SLUGS,
   codeSlug,
   compareCodes,
@@ -53,6 +55,11 @@ describe('the catalogue seed', () => {
     expect(SEED_TRACKS.map((t) => t.slug).sort()).toEqual([...TRACK_SLUGS].sort())
     expect(SEED_ROUTES.map((r) => r.slug).sort()).toEqual([...ROUTE_SLUGS].sort())
     for (const track of SEED_TRACKS) expect(LEARN_PRICE_KEYS).toContain(track.priceKey)
+  })
+
+  it('labels the waitlist options exactly as the seeded documents are titled', () => {
+    for (const t of SEED_TRACKS) expect(TRACK_LABELS[t.slug], t.slug).toBe(t.title)
+    for (const r of SEED_ROUTES) expect(ROUTE_LABELS[r.slug], r.slug).toBe(r.title)
   })
 
   it('routes only through courses that exist, each once', () => {

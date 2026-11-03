@@ -28,7 +28,7 @@ const submissionQueue = new BackgroundSyncQueue("ss-submissions", {
   maxRetentionTime: 24 * 60,
 });
 
-const QUEUEABLE_SUBMISSIONS = new Set(["/api/subscribe", "/api/contact"]);
+const QUEUEABLE_SUBMISSIONS = new Set(["/api/subscribe", "/api/contact", "/api/learn/waitlist"]);
 
 // Custom routes run before defaultCache, overriding its generic handling
 // where the defaults are wrong for this site.

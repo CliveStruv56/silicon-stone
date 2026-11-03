@@ -92,6 +92,22 @@ async function main() {
     'buyer and list tags must stay off the public allow-list',
   )
   assert.match(subscribeRouteSource, /JSON\.parse\(raw\)/)
+
+  // The Learn waitlist (src/app/api/learn/waitlist) is the third public signup
+  // route. Same guarantees as /api/subscribe, plus its own tag family.
+  const learnRouteSource = fs.readFileSync('src/app/api/learn/waitlist/route.ts', 'utf-8')
+  const learnSignupsSource = fs.readFileSync('src/lib/learn/signups.ts', 'utf-8')
+  assert.match(learnRouteSource, /if \(!result\.ok\)/, 'a refused waitlist signup must not be reported as a success')
+  assert.match(learnRouteSource, /JSON\.parse\(raw\)/)
+  assert.match(learnRouteSource, /checkDurableRateLimit\("learnWaitlist"/)
+  assert.match(learnRouteSource, /formSlug: LEARN_FORM_SLUG/, 'the waitlist must go through its own double opt-in form')
+  assert.match(learnSignupsSource, /export const LEARN_TAGS/)
+  assert.doesNotMatch(
+    learnSignupsSource.slice(learnSignupsSource.indexOf('LEARN_TAGS:'), learnSignupsSource.indexOf('export const MAX_LEARN_TAGS')),
+    /(buyer|list)-/,
+    'buyer and list tags must stay off the Learn allow-list',
+  )
+  assert.match(learnSignupsSource, /body\.briefing === true/, 'Briefing consent must be an affirmative tick')
   assert.match(contactRouteSource, /JSON\.parse\(raw\)/)
   assert.match(subscribeRouteSource, /checkDurableRateLimit\("subscribe"/)
   assert.match(contactRouteSource, /checkDurableRateLimit\("contact"/)

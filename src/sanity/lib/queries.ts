@@ -662,3 +662,91 @@ export const BRIEFINGS_QUERY = defineQuery(`
     }
   }
 `)
+
+// ============================================================================
+// Silicon & Stone Learning (/learn)
+// ============================================================================
+//
+// Ordered course lists (track.courses, learnRoute.courses) are WEAK references
+// and are always projected positionally — `courses[]{ _key, "course": @->{…} }`,
+// never the collapsing `courses[]->{…}` — so a course still in draft keeps its
+// slot (and its step number on a route) instead of silently renumbering the rest.
+// Same rule, and the same reason, as SERIES_QUERY.
+
+const COURSE_CARD = `
+  _id,
+  code,
+  title,
+  "slug": slug.current,
+  promise,
+  duration,
+  durationMinutes,
+  status,
+  statusMonth,
+  "level": level->number,
+  "track": track->slug.current
+`
+
+const COURSE_SLOTS = `courses[]{ _key, "course": @->{ ${COURSE_CARD} } }`
+
+export const LEARN_HUB_QUERY = defineQuery(`{
+  "levels": *[_type == "level" && !(_id in path("drafts.**"))] | order(number asc) { number, title, summary },
+  "tracks": *[_type == "track" && !(_id in path("drafts.**"))] | order(order asc) {
+    _id, title, "slug": slug.current, order, intro, priceKey, opens, ${COURSE_SLOTS}
+  },
+  "routes": *[_type == "learnRoute" && !(_id in path("drafts.**"))] | order(order asc) {
+    _id, title, "slug": slug.current, personaSlug, bestSoldAs, ${COURSE_SLOTS}
+  },
+  "courses": *[_type == "course" && !(_id in path("drafts.**"))] { ${COURSE_CARD} }
+}`)
+
+export const TRACK_SLUGS_QUERY = defineQuery(`
+  *[_type == "track" && defined(slug.current) && !(_id in path("drafts.**"))] { "slug": slug.current, _updatedAt }
+`)
+
+export const TRACK_QUERY = defineQuery(`
+  *[_type == "track" && slug.current == $slug && !(_id in path("drafts.**"))][0] {
+    _id, title, "slug": slug.current, order, intro, priceKey, opens, ${COURSE_SLOTS},
+    "otherTracks": *[_type == "track" && slug.current != $slug && !(_id in path("drafts.**"))] | order(order asc) {
+      title, "slug": slug.current, opens
+    }
+  }
+`)
+
+export const COURSE_SLUGS_QUERY = defineQuery(`
+  *[_type == "course" && defined(slug.current) && !(_id in path("drafts.**"))] { "slug": slug.current, _updatedAt }
+`)
+
+export const COURSE_QUERY = defineQuery(`
+  *[_type == "course" && slug.current == $slug && !(_id in path("drafts.**"))][0] {
+    ${COURSE_CARD},
+    audience,
+    priorKnowledge,
+    outcomes,
+    modules[]{ _key, title, core, goDeeper },
+    exerciseTools,
+    exercise,
+    cohortDates,
+    selfServeFrom,
+    contentCheckedDate,
+    "levelTitle": level->title,
+    "trackDoc": track->{ title, "slug": slug.current, priceKey, opens, ${COURSE_SLOTS} },
+    "relatedArticles": relatedArticles[]->{ _id, title, "slug": slug.current, excerpt },
+    "nextCourse": nextCourse->{ ${COURSE_CARD} },
+    "routes": *[_type == "learnRoute" && references(^._id) && !(_id in path("drafts.**"))] | order(order asc) {
+      title, "slug": slug.current
+    }
+  }
+`)
+
+/** One course by code, for the quiet "learn to read this result" links. */
+export const COURSE_BY_CODE_QUERY = defineQuery(`
+  *[_type == "course" && code == $code && !(_id in path("drafts.**"))][0] { ${COURSE_CARD} }
+`)
+
+/** The recommended route for a site persona (Clara, Ian, …). */
+export const PERSONA_ROUTES_QUERY = defineQuery(`
+  *[_type == "learnRoute" && defined(personaSlug) && !(_id in path("drafts.**"))] | order(order asc) {
+    title, "slug": slug.current, personaSlug, ${COURSE_SLOTS}
+  }
+`)

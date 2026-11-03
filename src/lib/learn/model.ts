@@ -66,6 +66,21 @@ export const TRACK_SLUGS = [
 ] as const
 export type TrackSlug = (typeof TRACK_SLUGS)[number]
 
+/**
+ * The labels the waitlist form shows. Sanity holds each track's title too; the
+ * form cannot wait on a fetch to render its tick-boxes, so these are kept in
+ * step with the documents by `catalogue-seed.test.ts`.
+ */
+export const TRACK_LABELS: Record<TrackSlug, string> = {
+  foundations: 'Foundations',
+  'infrastructure-and-sovereignty': 'Infrastructure and sovereignty',
+  'eu-ai-act': 'EU AI Act Core',
+  practitioner: 'Practitioner',
+  security: 'Security',
+  electives: 'Advanced and sector electives',
+  capstone: 'Sovereignty capstone',
+}
+
 /* ------------------------------------------------------------------ routes */
 
 /**
@@ -84,6 +99,17 @@ export const ROUTE_SLUGS = [
   'moving-into-ai-governance',
 ] as const
 export type RouteSlug = (typeof ROUTE_SLUGS)[number]
+
+export const ROUTE_LABELS: Record<RouteSlug, string> = {
+  'board-and-executive': 'Board and executive',
+  'governance-and-compliance': 'Governance lead',
+  'sme-owner': 'SME owner',
+  'supply-chain-and-operations': 'Operations and supply chain',
+  technical: 'Technical, IT and security',
+  'privacy-and-legal': 'Privacy and legal',
+  'all-staff-literacy': 'All-staff literacy',
+  'moving-into-ai-governance': 'Moving into AI governance',
+}
 
 /* ------------------------------------------------------------- exercises */
 

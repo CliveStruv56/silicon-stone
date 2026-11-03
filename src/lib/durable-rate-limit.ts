@@ -40,6 +40,9 @@ const configs = {
   knowledgeReview: { limit: 60, window: '15 m', prefix: 'sas:knowledge-review' },
   subscribe: { limit: 10, window: '15 m', prefix: 'sas:subscribe' },
   contact: { limit: 5, window: '15 m', prefix: 'sas:contact' },
+  // The Learn waitlist: one or two Standfirst writes and, for a team answer, an
+  // owner email. Same budget as subscribe.
+  learnWaitlist: { limit: 10, window: '15 m', prefix: 'sas:learn-waitlist' },
   vectorize: { limit: 120, window: '1 m', prefix: 'sas:vectorize' },
   deepResearch: { limit: 3, window: '1 h', prefix: 'sas:deep-research' },
   // Generating a draft is five sequential metered model calls, and the admin
