@@ -276,6 +276,17 @@ export const article = defineType({
     }),
     defineField({
       group: 'content',
+      name: 'relatedCourses',
+      title: 'Related courses',
+      description:
+        'Silicon & Stone Learning courses that teach this topic. The first is shown as a card in the article footer.',
+      type: 'array',
+      // Weak: an article may point at a course that is still a draft.
+      of: [defineArrayMember({ type: 'reference', weak: true, to: [{ type: 'course' }], options: { disableNew: true } })],
+      validation: (rule) => rule.max(2),
+    }),
+    defineField({
+      group: 'content',
       name: 'appearsUnder',
       title: 'Show under offerings',
       description:

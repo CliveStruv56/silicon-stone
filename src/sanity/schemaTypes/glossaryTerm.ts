@@ -84,6 +84,15 @@ export const glossaryTerm = defineType({
       ],
       validation: (rule) => rule.unique(),
     }),
+    defineField({
+      name: 'taughtIn',
+      title: 'Taught in',
+      description: 'The Silicon & Stone Learning course that teaches this term. Shown on the term page.',
+      type: 'reference',
+      weak: true,
+      to: [{ type: 'course' }],
+      options: { disableNew: true },
+    }),
   ],
   orderings: [
     {

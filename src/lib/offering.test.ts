@@ -3,7 +3,20 @@ import path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
-import { AMOUNTS, DERIVED, ENGAGEMENTS, LADDER, MODULES, PRODUCTS, gbp, priceOf } from './offering'
+import {
+  AMOUNTS,
+  DERIVED,
+  ENGAGEMENTS,
+  LADDER,
+  LEARN_PRICES,
+  LEARN_PRICE_KEYS,
+  MODULES,
+  PRODUCTS,
+  gbp,
+  gbpRange,
+  offeringById,
+  priceOf,
+} from './offering'
 
 /**
  * The catalogue is the single source of truth for every price the site shows.
@@ -266,5 +279,34 @@ describe('no hard-coded prices outside the catalogue', () => {
             offenders.map((o) => `  ${o.file}:${o.line}  ${o.text}`).join('\n')
         : '',
     ).toEqual([])
+  })
+})
+
+describe('Learn price bands', () => {
+  it('gives every track price key a band, built from AMOUNTS', () => {
+    for (const key of LEARN_PRICE_KEYS) {
+      expect(LEARN_PRICES[key].standard, key).toBeTruthy()
+      expect(LEARN_PRICES[key].note, key).toBeTruthy()
+    }
+    expect(LEARN_PRICES['live-track'].standard).toContain(gbpRange(AMOUNTS.learnLiveTrackMin, AMOUNTS.learnLiveTrackMax))
+    expect(LEARN_PRICES.capstone.standard).toContain(gbp(AMOUNTS.learnCapstone))
+    expect(LEARN_PRICES.capstone.founding).toContain(gbp(AMOUNTS.learnCapstoneFounding))
+  })
+
+  it('keeps each band in order, and founding places below the live price', () => {
+    expect(AMOUNTS.learnCourseMin).toBeLessThan(AMOUNTS.learnCourseMax)
+    expect(AMOUNTS.learnSelfServeTrackMin).toBeLessThan(AMOUNTS.learnSelfServeTrackMax)
+    expect(AMOUNTS.learnLiveTrackMin).toBeLessThan(AMOUNTS.learnLiveTrackMax)
+    expect(AMOUNTS.learnFoundingTrackMax).toBeLessThan(AMOUNTS.learnLiveTrackMin)
+    expect(AMOUNTS.learnCapstoneFounding).toBeLessThan(AMOUNTS.learnCapstone)
+  })
+
+  it('formats a band with an en dash, and a degenerate band as one price', () => {
+    expect(gbpRange(595, 795)).toBe('£595–£795')
+    expect(gbpRange(49, 49)).toBe('£49')
+  })
+
+  it('resolves the Learn rung through the same lookup as everything else', () => {
+    expect(offeringById('learn').href).toBe('/learn')
   })
 })

@@ -43,6 +43,7 @@
     "sync-content:dry": "tsx scripts/sync-content.ts --dry-run",
     "sync-content:force": "tsx scripts/sync-content.ts --force",
     "glossary:seed": "tsx scripts/seed-glossary.ts",
+    "learn:seed": "tsx scripts/seed-learn.ts",
     "glossary:audit": "tsx scripts/glossary-audit.ts",
     "glossary:audit:published": "tsx scripts/glossary-audit.ts --published",
     "glossary:annotate": "tsx scripts/annotate-glossary.ts",

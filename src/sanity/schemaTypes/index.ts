@@ -17,6 +17,10 @@ import { knowledgeItem } from './knowledgeItem'
 import { knowledgeTopic } from './knowledgeTopic'
 import { researchRun } from './researchRun'
 import { glossaryTerm } from './glossaryTerm'
+import { course } from './course'
+import { track } from './track'
+import { level } from './level'
+import { learnRoute } from './learnRoute'
 
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
@@ -39,5 +43,11 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     // Legacy. Nothing new writes one; the migration reads them.
     knowledgeCandidate,
     glossaryTerm,
+    // Silicon & Stone Learning. All four are public reading content: the
+    // /learn pages render them to anonymous visitors.
+    course,
+    track,
+    level,
+    learnRoute,
   ],
 }

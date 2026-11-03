@@ -48,6 +48,24 @@ export const AMOUNTS = {
 
   /** Advisory. */
   advisoryBriefing: 450,
+
+  /**
+   * Learn (Silicon to Sovereignty). Agreed 3 November 2026 as *bands*, not
+   * per-track figures: exact prices are set as each track opens, and land here
+   * then. Every figure includes VAT. See `LEARN_PRICES` below and
+   * `docs/learn/plan.md` "Pricing and packaging".
+   */
+  learnCourseMin: 95,
+  learnCourseMax: 195,
+  learnSelfServeTrackMin: 295,
+  learnSelfServeTrackMax: 495,
+  learnLiveTrackMin: 595,
+  learnLiveTrackMax: 795,
+  learnFoundingTrackMin: 350,
+  learnFoundingTrackMax: 475,
+  learnToolkitBundleAddOn: 49,
+  learnCapstone: 950,
+  learnCapstoneFounding: 650,
 } as const
 
 /** Format an amount as sterling: 24 → "£24", 25000 → "£25,000". */
@@ -439,9 +457,80 @@ export const SANITY_PRODUCTS: Array<{
   },
 ]
 
+/** A price band, rendered "£595–£795". Both ends come from `AMOUNTS`. */
+export function gbpRange(min: number, max: number): string {
+  return min === max ? gbp(min) : `${gbp(min)}–${gbp(max)}`
+}
+
+/**
+ * How a Learn track is priced. Sanity's `track` documents carry one of these
+ * keys and **no figure**: the Studio copy of a price is the one copy that
+ * cannot import this module (see `SANITY_PRODUCTS` for what that costs), so for
+ * courses it was never created. Change a band here and every track, course and
+ * schedule page moves with it.
+ */
+export const LEARN_PRICE_KEYS = ['free', 'live-track', 'ai-act-core-bundle', 'electives', 'capstone'] as const
+export type LearnPriceKey = (typeof LEARN_PRICE_KEYS)[number]
+
+export interface LearnPrice {
+  /** Headline: what the track costs when it runs live. */
+  standard: string
+  /** The founding-cohort price, where there is one. */
+  founding?: string
+  /** What happens after the founding cohort, or what the price includes. */
+  note: string
+}
+
+const SINGLE_COURSE = gbpRange(AMOUNTS.learnCourseMin, AMOUNTS.learnCourseMax)
+const SELF_SERVE_TRACK = gbpRange(AMOUNTS.learnSelfServeTrackMin, AMOUNTS.learnSelfServeTrackMax)
+const LIVE_TRACK = gbpRange(AMOUNTS.learnLiveTrackMin, AMOUNTS.learnLiveTrackMax)
+const FOUNDING_TRACK = gbpRange(AMOUNTS.learnFoundingTrackMin, AMOUNTS.learnFoundingTrackMax)
+
+export const LEARN_PRICES: Record<LearnPriceKey, LearnPrice> = {
+  free: {
+    standard: 'Free',
+    note: 'The orientation courses are free for everyone. A per-seat staff licence for the AI literacy course is available to teams.',
+  },
+  'live-track': {
+    standard: `${LIVE_TRACK} for the live cohort`,
+    founding: `about ${FOUNDING_TRACK} for founding places`,
+    note: `Released self-serve after the founding cohort, at ${SELF_SERVE_TRACK} for the track or ${SINGLE_COURSE} per course. The exact price is set when the track opens.`,
+  },
+  'ai-act-core-bundle': {
+    standard: `${LIVE_TRACK} for the live cohort`,
+    founding: `about ${FOUNDING_TRACK} for founding places, with the Toolkit included`,
+    note: `Sold with the AI Act Compliance Toolkit Standard edition for ${gbp(AMOUNTS.learnToolkitBundleAddOn)} more. The exact price is set when the course opens.`,
+  },
+  electives: {
+    standard: `${SINGLE_COURSE} per course`,
+    note: 'Self-serve electives, priced by length. The exact price is set when each course is released.',
+  },
+  capstone: {
+    standard: `${gbp(AMOUNTS.learnCapstone)} per person`,
+    founding: `${gbp(AMOUNTS.learnCapstoneFounding)} for founding places`,
+    note: 'A half-day live session. The fee is credited against a Strategic Assessment started within 60 days.',
+  },
+}
+
+/**
+ * Silicon & Stone Learning, as one entry on the ladder. A rung between Use and
+ * Discuss on `/how-it-fits-together`; the homepage card and the footer resolve
+ * it through `offeringById('learn')` rather than retyping it.
+ */
+export const LEARN_OFFERING: Offering = {
+  id: 'learn',
+  name: 'Silicon & Stone Learning',
+  price: 'Free to join the list',
+  priceNote: 'courses open from January 2027',
+  summary:
+    'Silicon to Sovereignty: 31 courses that start at the chip and finish at the boardroom, opening one track at a time through 2027.',
+  href: '/learn',
+  status: 'Waitlist open',
+}
+
 /** Resolve a catalogue entry for links and calls to action; fail on a mistyped id. */
 export function offeringById(id: string): Offering {
-  const offering = [...FREE_OFFERINGS, ...PRODUCTS, ...ENGAGEMENTS, ...MODULES].find(o => o.id === id)
+  const offering = [...FREE_OFFERINGS, ...PRODUCTS, ...ENGAGEMENTS, ...MODULES, LEARN_OFFERING].find(o => o.id === id)
   if (!offering) throw new Error(`Unknown offering: ${id}`)
   return offering
 }
@@ -455,6 +544,7 @@ export function priceOf(id: string): string {
     ...MODULES,
     FREE_INTRO_CONVERSATION,
     SISTER_PRODUCT,
+    LEARN_OFFERING,
   ]
   return all.find((o) => o.id === id)?.price ?? ''
 }

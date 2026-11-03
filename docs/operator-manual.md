@@ -745,7 +745,7 @@ Under **Content**, in order:
 2. **Image Library** — browse by collection, all images, manage collections
 3. **Knowledge** — see §11
 4. **Article · Series · Author · Category · Product · Sector report · Sector report edition ·
-   Persona · YouTube Script · Glossary Term**
+   Persona · YouTube Script · Glossary Term · Course · Track · Level · Learn route**
 
 **Series** sits directly under Article because that is the order the types are
 registered in, not because anyone placed it there — the sidebar renders the
