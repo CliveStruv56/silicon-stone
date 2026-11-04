@@ -132,7 +132,7 @@ export const FREE_OFFERINGS: Offering[] = [
     name: 'Silicon and Stone Update & the Stone Briefing',
     price: 'Free',
     summary:
-      'Tuesday: the Stone Briefing, structural analysis of the AI power shift. Wednesday: the Silicon and Stone Update. Friday: the Practical Move, what to do about it.',
+      'Tuesday: the Stone Briefing, structural analysis of the AI power shift. Friday: the Practical Move, what to do about it. Thursday: the Silicon and Stone Update, a separate newsletter.',
     href: '/intelligence',
   },
   {

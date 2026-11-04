@@ -1079,7 +1079,7 @@ URL → confirm it is indexed → then post the Substack teaser → then send th
 email from Standfirst. Publishing elsewhere first costs you the canonical.
 
 **Lists:** Stone Briefing (Tuesday) and Practical Move (Friday) are one
-subscription, `list-briefing`. The Silicon and Stone Update (Wednesday) is
+subscription, `list-briefing`. The Silicon and Stone Update (Thursday) is
 `list-newsletter`, and is also posted on LinkedIn by hand.
 
 ---

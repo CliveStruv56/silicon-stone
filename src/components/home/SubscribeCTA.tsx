@@ -78,7 +78,7 @@ export function SubscribeCTA() {
           <strong className="text-silicon-amber-strong font-medium">Friday:</strong>
           {' '}the Practical Move — what to do about it.
           <br />
-          <strong className="text-silicon-amber-strong font-medium">Wednesday:</strong>
+          <strong className="text-silicon-amber-strong font-medium">Thursday:</strong>
           {' '}the Silicon and Stone Update, a separate newsletter.
         </p>
 
