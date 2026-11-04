@@ -89,7 +89,12 @@ export function buildArticleSchema(a: SchemaArticle) {
             '@type': 'Person',
             name: a.author.name,
             ...(a.author.slug
-              ? { url: absoluteUrl(`/authors/${a.author.slug}`) }
+              ? {
+                  // Same @id as the profile page's Person (see
+                  // buildPersonProfileSchema), so the two merge into one node.
+                  '@id': `${absoluteUrl(`/authors/${a.author.slug}`)}#person`,
+                  url: absoluteUrl(`/authors/${a.author.slug}`),
+                }
               : {}),
             ...(a.author.sameAs && a.author.sameAs.length
               ? { sameAs: a.author.sameAs }
