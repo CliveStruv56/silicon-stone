@@ -14,12 +14,18 @@ describe('resolveSignup', () => {
     })
   })
 
-  it('puts no list tag on an early-access request or a guide request', () => {
+  it('puts no list tag on an early-access request', () => {
     expect(resolveSignup({ signup: 'early-access', tags: ['interest-waymarkpath'] })).toEqual({
       formSlug: 'early-access',
       tags: ['interest-waymarkpath'],
     })
-    expect(resolveSignup({ signup: 'us-executive-guide' }).tags).toEqual([])
+  })
+
+  it('subscribes a guide request to the briefing list as well as the guide form', () => {
+    expect(resolveSignup({ signup: 'us-executive-guide', tags: ['source-us-executive-guide'] })).toEqual({
+      formSlug: 'us-executive-guide',
+      tags: ['list-briefing', 'source-us-executive-guide'],
+    })
   })
 
   it('falls back to the briefing for an unknown or inherited kind', () => {

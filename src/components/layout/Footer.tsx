@@ -3,9 +3,9 @@ import { Linkedin } from 'lucide-react'
 
 import { ENGAGEMENTS } from '@/lib/offering'
 
-// TODO(owner): replace with company/founder LinkedIn URL (via
-// NEXT_PUBLIC_LINKEDIN_URL or this fallback).
-const LINKEDIN_URL = process.env.NEXT_PUBLIC_LINKEDIN_URL || 'https://www.linkedin.com/'
+// Clive's profile (4 November 2026). NEXT_PUBLIC_LINKEDIN_URL overrides it, for
+// example with a company page later.
+const LINKEDIN_URL = process.env.NEXT_PUBLIC_LINKEDIN_URL || 'https://www.linkedin.com/in/clivestruver/'
 
 const footerNavigation = {
   intelligence: [

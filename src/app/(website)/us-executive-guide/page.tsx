@@ -64,9 +64,11 @@ export default function AtlanticDriftPage() {
     setErrorMsg('')
 
     try {
-      // Its own Standfirst form, which holds the guide as a lead magnet. Asking
-      // for the guide is not subscribing to a list. The Plausible goal below
-      // keeps its old name because the dashboard matches it exactly.
+      // Its own Standfirst form, which holds the guide as a lead magnet. The
+      // signup also puts the person on the briefing list (Clive, 4 November
+      // 2026), so the form's consent wording in Standfirst names both. The
+      // Plausible goal below keeps its old name because the dashboard matches
+      // it exactly.
       const result = await submitWithOfflineQueue('/api/subscribe', {
         email,
         signup: 'us-executive-guide',
@@ -272,18 +274,14 @@ export default function AtlanticDriftPage() {
                 Get the guide
               </h2>
               <p className="mb-4 max-w-2xl leading-relaxed text-text-muted">
-                Enter your email and the guide arrives in your inbox. This form
-                sends the guide only and does not subscribe you to anything else.
+                Enter your email and the guide arrives in your inbox. You will also
+                receive the Silicon &amp; Stone briefing — two editions a week, free,
+                read from the US side.
               </p>
               <p className="mb-6 max-w-2xl leading-relaxed text-text-muted">
-                If you also want the Silicon &amp; Stone briefing, free, read from
-                the US side: Tuesday is the Stone Briefing, structural analysis of
-                the AI power shift, and Friday is the Practical Move, what to do
-                about it. You can{' '}
-                <Link href="/#subscribe" className="underline underline-offset-2 hover:text-text-primary">
-                  subscribe separately
-                </Link>
-                {' '}and unsubscribe at any time.
+                Tuesday: the Stone Briefing — structural analysis of the AI power shift.
+                Friday: the Practical Move — what to do about it. Unsubscribe at any
+                time.
               </p>
 
               <div className="rounded-lg border border-silicon-amber/30 bg-silicon-amber/5 p-5">

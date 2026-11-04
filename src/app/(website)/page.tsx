@@ -29,13 +29,14 @@ export const metadata: Metadata = {
 }
 
 // Organization `sameAs` — entity-authority signal for the homepage JSON-LD (F9).
-// [AUTHOR: confirm exact profile URLs.] Add the live LinkedIn, Substack and X
-// profile URLs here; the array is omitted from the schema while empty.
-// YouTube is the channel-ID URL (Clive, 4 November 2026). Never use the
-// @siliconandstone handle: it belongs to an unrelated channel.
+// [AUTHOR: confirm exact profile URLs.] Add the live Substack and X profile
+// URLs here; the array is omitted from the schema while empty.
+// YouTube is the channel-ID URL and LinkedIn is Clive's profile (Clive, 4
+// November 2026). Never use the @siliconandstone YouTube handle: it belongs to
+// an unrelated channel.
 const ORG_SAME_AS: string[] = [
   'https://www.youtube.com/channel/UCblY0ToXY73DxCIgoLsOkXw',
-  // 'https://www.linkedin.com/company/…',
+  'https://www.linkedin.com/in/clivestruver/',
   // 'https://siliconandstone.substack.com',
   // 'https://x.com/…',
 ]
