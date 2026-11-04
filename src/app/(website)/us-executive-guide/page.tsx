@@ -64,9 +64,11 @@ export default function AtlanticDriftPage() {
     setErrorMsg('')
 
     try {
-      // Its own Standfirst form, which holds the guide as a lead magnet. Asking
-      // for the guide is not subscribing to a list. The Plausible goal below
-      // keeps its old name because the dashboard matches it exactly.
+      // Its own Standfirst form, which holds the guide as a lead magnet. The
+      // signup also puts the person on the briefing list (Clive, 4 November
+      // 2026), so the form's consent wording in Standfirst names both. The
+      // Plausible goal below keeps its old name because the dashboard matches
+      // it exactly.
       const result = await submitWithOfflineQueue('/api/subscribe', {
         email,
         signup: 'us-executive-guide',

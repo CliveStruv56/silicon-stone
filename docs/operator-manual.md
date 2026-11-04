@@ -1479,7 +1479,7 @@ that a caveat which no longer bites is worse than none at all.
 | [`knowledge-system-foundation.md`](knowledge-system-foundation.md) | The knowledge system's data model, states and dedup rules. |
 | [`compliance-checker-v2-state.md`](compliance-checker-v2-state.md) | How to run the checker rebuild, what is deliberately unfinished. |
 | [`editorial-assurance.md`](editorial-assurance.md) | The authority on retrieval thresholds. Do not restate them elsewhere. |
-| [`../LAUNCH.md`](../LAUNCH.md) | Owner setup — Kit tags, the store, discount codes. What is setup rather than operation. |
+| [`../LAUNCH.md`](../LAUNCH.md) | Owner setup — the store, discount codes (its Kit items are closed; the site uses Standfirst). What is setup rather than operation. |
 | [`../CLAUDE.md`](../CLAUDE.md) | The invariants. Nothing in this manual may contradict it. |
 
 ---

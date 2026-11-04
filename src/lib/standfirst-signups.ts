@@ -16,14 +16,17 @@
 /**
  * Every signup goes through a Standfirst form, whose slug must exist in the
  * workspace: the form owns the double opt-in, the consent wording and any lead
- * magnet. Only the first two are lists. The other two have their own forms
- * because asking for a launch notice or a guide is not asking for a newsletter.
+ * magnet. `early-access` has its own form and no list, because asking for a
+ * launch notice is not asking for a newsletter. `us-executive-guide` has its
+ * own form because it holds the guide as a lead magnet, and it also subscribes
+ * the person to the briefing (Clive, 4 November 2026), so its consent wording
+ * in Standfirst must name both.
  */
 export const SIGNUPS = {
   briefing: { formSlug: 'briefing', listTag: 'list-briefing' },
   newsletter: { formSlug: 'newsletter', listTag: 'list-newsletter' },
   'early-access': { formSlug: 'early-access', listTag: null },
-  'us-executive-guide': { formSlug: 'us-executive-guide', listTag: null },
+  'us-executive-guide': { formSlug: 'us-executive-guide', listTag: 'list-briefing' },
 } as const
 
 export type SignupKind = keyof typeof SIGNUPS
