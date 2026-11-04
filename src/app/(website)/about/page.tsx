@@ -103,7 +103,8 @@ const edgeFadeMask = {
   WebkitMaskComposite: 'source-in',
 } as const
 
-const linkedinUrl = process.env.NEXT_PUBLIC_LINKEDIN_URL
+// Clive's profile (4 November 2026); NEXT_PUBLIC_LINKEDIN_URL overrides it.
+const linkedinUrl = process.env.NEXT_PUBLIC_LINKEDIN_URL || 'https://www.linkedin.com/in/clivestruver/'
 
 export default function AboutPage() {
   return (
