@@ -17,7 +17,8 @@ deployment model.
   Post-Omnibus Briefing and the advisory refresh below it — owner decisions,
   validation and next-session work.
 - `LAUNCH.md` — the go-live runbook: launch flags to flip, Lemon Squeezy store
-  and discount-code setup, Kit tag mapping, and launch-day verification steps.
+  and discount-code setup, and launch-day verification steps. Its Kit items are
+  closed: signups, enquiries and buyers go to Standfirst.
 
 ## Getting Started
 

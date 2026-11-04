@@ -26,7 +26,6 @@ const backendOrigin = (() => {
 const connectSrc = [
   "'self'",
   'https://plausible.io',
-  'https://api.kit.com',
   'https://cdn.sanity.io',
   'https://*.api.sanity.io',
   'wss://*.api.sanity.io',
