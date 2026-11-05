@@ -183,7 +183,7 @@ export function OfferingsMap() {
           viewBox={`0 0 ${W} ${H}`}
           className="block h-auto w-full min-w-[960px]"
           role="img"
-          aria-label="Flow chart: free reading leads to four Interactive Forensic Tools and two products, including the consolidated toolkit with an optional live review; these can lead to the Advisory Briefing, which leads into eight core engagements, from five specialist projects to board-level work; every one of those settles into the Drift Retainer."
+          aria-label="Flow chart: free reading leads to four Interactive Forensic Tools and two products, including the consolidated toolkit with an optional live review; these can lead to the Advisory Briefing, which leads into eight core engagements, from specialist projects to board-level work; every one of those settles into the Drift Retainer."
         >
           <defs>
             <marker id="offerings-map-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">

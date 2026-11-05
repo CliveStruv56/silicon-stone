@@ -209,7 +209,7 @@ export function HeroSection({ settings }: HeroSectionProps) {
                             }}
                         >
                             <strong className="font-semibold text-white">In Europe, your supply chain is your liability.</strong>{' '}
-                            The model you embed, the API you call, the training data you never saw — under the AI Act and the Cyber Resilience Act, your buyer&apos;s regulator treats them as yours. We map that dependency graph before it becomes a liability.
+                            The model you embed, the API you call, the training data you never saw. If the EU AI Act covers your business, using AI you didn&apos;t build still gives you duties of your own. Which ones depends on whether you are the provider or the deployer, and on the system&apos;s risk level. We map that dependency graph before it becomes a liability.
                         </motion.p>
 
                         <motion.div
