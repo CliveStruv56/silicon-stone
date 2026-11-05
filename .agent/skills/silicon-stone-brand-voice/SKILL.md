@@ -147,7 +147,7 @@ Before any text ships, run it through:
 
 1. **The Stratfor filter**: would a Stratfor analyst say this without scoffing?
 2. **The Wired-feature filter**: would a Wired feature writer use this as a pull quote?
-3. **The thirty-years-inside filter**: does this sound like someone who's actually been in the rooms, or like someone reading about them?
+3. **The forty-years-inside filter**: does this sound like someone who's actually been in the rooms, or like someone reading about them?
 
 If the answer to any is "no," rewrite.
 

@@ -895,3 +895,7 @@ When sections ship, log them here in this format:
 - One shared component, so all four surfaces changed together — which is why it
   was worth asking before doing it.
 - Lint, suite (1,562), build (125 pages), test:manual, test:security.
+
+## 2026-11-05 — "Forty years" replaces "thirty years" site-wide
+
+Clive decided his experience is "forty years inside the technology industry" (Master's 1984, about 42 years). Updated About, homepage (hero, CredibilityBlock stat 30 to 40), Methodology Long-Memory Filter copy, Drift Retainer, layout metadata, llms.txt and the Standard Hook prompt. The "30-year cycle benchmark" method label is unchanged and flagged for decision.

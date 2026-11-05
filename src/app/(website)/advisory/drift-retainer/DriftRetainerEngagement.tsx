@@ -55,7 +55,7 @@ export function DriftRetainerEngagement({ coverage }: Props) {
             <dd className="text-sm leading-relaxed text-text-muted">{item.body}</dd>
           </div>)}
         </dl>
-        <p className="mt-8 max-w-3xl border-l-2 border-stone-teal/40 pl-5 text-sm leading-relaxed text-text-muted">The analysis covers supply chains, policy and talent, using scenarios and thirty years of industry precedent to understand what a change means for your business.</p>
+        <p className="mt-8 max-w-3xl border-l-2 border-stone-teal/40 pl-5 text-sm leading-relaxed text-text-muted">The analysis covers supply chains, policy and talent, using scenarios and forty years of industry precedent to understand what a change means for your business.</p>
       </>}
       price={SCOPED_FEE}
       pricing={<>

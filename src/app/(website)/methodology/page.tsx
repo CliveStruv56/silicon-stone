@@ -115,9 +115,9 @@ const methods = [
     id: 'long-memory-filter',
     title: 'Long-Memory Filter',
     tagline: 'The 30-year cycle benchmark',
-    description: 'Pattern-matching the current event against the last thirty years of industrial cycles. The 1986 US-Japan Semiconductor Agreement, the 1990s offshoring wave, the 2000s globalisation consensus. The lens that separates Silicon Hype from Stone Truth.',
+    description: 'Pattern-matching the current event against the last forty years of industrial cycles. The 1986 US-Japan Semiconductor Agreement, the 1990s offshoring wave, the 2000s globalisation consensus. The lens that separates Silicon Hype from Stone Truth.',
     details: [
-      'Pattern-matching against the last thirty years of industrial cycles',
+      'Pattern-matching against the last forty years of industrial cycles',
       'Identifying overconfident projections and hidden dependencies',
       'Separating temporary noise from structural change',
       'Calibrating urgency: what matters now vs. what can wait',
@@ -326,7 +326,7 @@ export default function MethodologyPage() {
             <p className="text-text-muted leading-relaxed">
               Both methods get applied across all three domains. Scenario modelling
               gives the reader a structured menu of futures. The Long-Memory Filter
-              compares the present to the last thirty years of industrial cycles so
+              compares the present to the last forty years of industrial cycles so
               that hype and structural change can be told apart.
             </p>
           </div>

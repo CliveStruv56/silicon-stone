@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 
 const aboutDescription =
-  'Analysis from the Edge: 30 years of technology industry experience, delivered from Scotland\'s Atlantic coast.'
+  'Analysis from the Edge: forty years of technology industry experience, delivered from Scotland\'s Atlantic coast.'
 
 export const metadata: Metadata = {
   title: 'About | Silicon and Stone',
@@ -124,7 +124,7 @@ export default function AboutPage() {
                   Analysis from the Edge
                 </h1>
                 <p className="text-xl text-text-muted leading-relaxed mb-6">
-                  Thirty years in technology. Now watching the industry from Scotland&apos;s Atlantic coast,
+                  Forty years in technology. Now watching the industry from Scotland&apos;s Atlantic coast,
                   where the perspective is longer and the noise is quieter.
                 </p>
                 <p className="text-text-muted leading-relaxed">
@@ -207,10 +207,10 @@ export default function AboutPage() {
         {/* The Long View - Timeline */}
         <section id="long-view" className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
           <h2 className="text-2xl font-semibold text-text-primary mb-8">
-            The Long View: 30 Years of Perspective
+            The Long View: Forty Years of Perspective
           </h2>
           <p className="text-text-muted mb-8 max-w-3xl">
-            Technology moves fast, but patterns repeat. Three decades of watching the industry
+            Technology moves fast, but patterns repeat. Forty years of watching the industry
             provides calibration that no amount of real-time data can replace.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

@@ -43,7 +43,7 @@ export function CredibilityBlock() {
                   <p className="text-xl lg:text-2xl leading-relaxed text-text-primary font-light">
                     Distilled from{' '}
                     <span className="text-silicon-amber-strong font-medium">
-                      three decades at the heart of the technology industry
+                      forty years at the heart of the technology industry
                     </span>{' '}
                     and observed from a small island sixty miles north of the
                     Scottish mainland.
@@ -59,7 +59,7 @@ export function CredibilityBlock() {
                     .
                   </p>
                   <p className="text-lg leading-relaxed text-text-muted">
-                    Decision-grade analysis from thirty years inside the
+                    Decision-grade analysis from forty years inside the
                     industry.{' '}
                     <em className="text-silicon-amber-strong font-medium">
                       Calibrated where the evidence supports it, hedged where
@@ -72,7 +72,7 @@ export function CredibilityBlock() {
                 <div className="lg:border-l lg:border-border-subtle lg:pl-8 space-y-6 lg:max-w-[220px]">
                   <div>
                     <div className="font-mono text-3xl font-bold text-silicon-amber-strong leading-none">
-                      30
+                      40
                     </div>
                     <div className="font-mono text-xs uppercase tracking-[0.10em] text-text-muted mt-2">
                       Years in Tech

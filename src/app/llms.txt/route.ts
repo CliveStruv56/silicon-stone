@@ -64,7 +64,7 @@ export async function GET() {
 
   const body = `# ${SITE_NAME}
 
-> Independent, decision-grade intelligence — "Forensic Technopolitics" — for UK and European senior leaders managing AI governance, technology dependency, and operational resilience. Calibrated analysis of the EU AI Act, semiconductor supply chains, and digital sovereignty, written from thirty years inside the technology industry and published from the edge of Europe.
+> Independent, decision-grade intelligence — "Forensic Technopolitics" — for UK and European senior leaders managing AI governance, technology dependency, and operational resilience. Calibrated analysis of the EU AI Act, semiconductor supply chains, and digital sovereignty, written from forty years inside the technology industry and published from the edge of Europe.
 
 ## Core pages
 ${corePages}
