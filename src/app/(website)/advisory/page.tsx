@@ -51,6 +51,9 @@ import {
  * its historic wording rather than the page's "The Drift Retainer" so any
  * existing segment still matches. Specialist choices use catalogue names.
  */
+/** Spelled-out counts for copy that must follow the MODULES catalogue length. */
+const NUMBER_WORDS: Record<number, string> = { 1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six', 7: 'seven', 8: 'eight' }
+
 const ENGAGEMENTS = [
   'Advisory Briefing',
   'Exposure Diagnostic',
@@ -348,7 +351,7 @@ export default function ServicesPage() {
               <p className="mt-4 text-text-muted">
                 Already know the issue?{' '}
                 <a href="#modules" className="text-stone-teal underline underline-offset-4">
-                  Compare the five specialist projects and their scope.
+                  Compare the {NUMBER_WORDS[MODULES.length] ?? MODULES.length} specialist projects and their scope.
                 </a>
               </p>
             </div>
