@@ -219,8 +219,15 @@ export default function AboutPage() {
             provides calibration that no amount of real-time data can replace.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-            {credentials.map((cred) => (
-              <Card key={cred.period} className="bg-stone-charcoal border-border-subtle">
+            {credentials.map((cred, i) => (
+              <Card
+                key={cred.period}
+                className={`bg-stone-charcoal border-border-subtle${
+                  i === credentials.length - 1 && credentials.length % 2 === 1
+                    ? ' md:col-span-2 lg:col-span-1'
+                    : ''
+                }`}
+              >
                 <CardContent className="p-6">
                   <div className="text-silicon-amber-strong font-mono font-bold text-lg mb-2">
                     {cred.period}
