@@ -75,17 +75,17 @@ export function SubscribeCTA() {
           <strong className="text-silicon-amber-strong font-medium">Tuesday:</strong>
           {' '}the Stone Briefing — structural analysis of the AI power shift.
           <br />
+          <strong className="text-silicon-amber-strong font-medium">Wednesday:</strong>
+          {' '}The AI View, a separate newsletter.
+          <br />
           <strong className="text-silicon-amber-strong font-medium">Friday:</strong>
           {' '}the Practical Move — what to do about it.
-          <br />
-          <strong className="text-silicon-amber-strong font-medium">Wednesday:</strong>
-          {' '}the Silicon and Stone Update, a separate newsletter.
         </p>
 
         <div className="my-8 max-w-xl mx-auto text-center">
           <hr className="border-border-subtle mb-6 w-24 mx-auto" />
           <p className="text-base italic text-text-muted">
-            The view from the edge is structurally clearer than the view from any centre.
+            The edge is where you see what the centre misses.
           </p>
         </div>
 
@@ -122,7 +122,7 @@ export function SubscribeCTA() {
                   checked={list === 'newsletter'}
                   onChange={() => setList('newsletter')}
                 />
-                Silicon and Stone Update
+                The AI View
               </label>
             </fieldset>
             <form onSubmit={handleSubmit} className="flex gap-2">
