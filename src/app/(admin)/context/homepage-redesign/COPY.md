@@ -54,7 +54,7 @@
 |---|---|
 | `eyebrow` | `Brand Position` |
 | `h2` | `The View from the Edge` |
-| `subhead` | `Clearer than the view from any centre.` |
+| `subhead` | `The edge is where you see what the centre misses.` |
 
 ### Body — three paragraphs
 
@@ -72,7 +72,7 @@
 | # | Number | Label | Description |
 |---|---|---|---|
 | 1 | `30` | `Years in Tech` | `From inside the industry, not observing it from outside.` |
-| 2 | `60 mi N` | `Beyond the Mainland` | `The edge is where you see what the centre misses.` |
+| 2 | `60 mi N` | `Beyond the Mainland` | `Written from Sanday, in the Orkney Islands.` |
 | 3 | `DECISION‑GRADE` *(non-breaking hyphen, U+2011)* | `Calibrated by Default` | `Hedged on purpose. Not pundit takes, not consensus reading.` |
 
 ---
