@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 
 const aboutDescription =
-  'Analysis from the Edge: forty years of technology industry experience, delivered from Scotland\'s Atlantic coast.'
+  'Analysis from the Edge: forty years of technology industry experience, delivered from an island in Orkney, sixty miles north of the Scottish mainland.'
 
 export const metadata: Metadata = {
   title: 'About | Silicon and Stone',
@@ -124,7 +124,7 @@ export default function AboutPage() {
                   Analysis from the Edge
                 </h1>
                 <p className="text-xl text-text-muted leading-relaxed mb-6">
-                  Forty years in technology. Now watching the industry from Scotland&apos;s Atlantic coast,
+                  Forty years in technology. Now watching the industry from an island in Orkney, sixty miles north of the Scottish mainland,
                   where the perspective is longer and the noise is quieter.
                 </p>
                 <p className="text-text-muted leading-relaxed">
@@ -189,7 +189,7 @@ export default function AboutPage() {
                 from the same sources.
               </p>
               <p className="text-text-muted leading-relaxed mb-4">
-                From Scotland&apos;s Atlantic coast, the signal-to-noise ratio is different. The hype
+                From an island in Orkney, the signal-to-noise ratio is different. The hype
                 cycles are visible but distant. The long-term patterns become clearer when you&apos;re
                 not caught up in the daily churn. And there&apos;s time to actually read the regulations,
                 trace the supply chains, and think through the second-order effects.

@@ -21,7 +21,7 @@ The site must revolve around the **Forensic Technopolitics** framework, not just
 | **Supply Chain Forensics** | Neon/Lithography chokepoints, critical materials analysis |
 | **Policy Stress-Testing** | Atlantic Drift Model, regulatory divergence analysis |
 | **Scenario Modeling** | Drift & disruption scenarios, future state planning |
-| **Signal Filtering** | 30-year cycle benchmark, experience-led pattern recognition |
+| **Signal Filtering** | 40-year cycle benchmark, experience-led pattern recognition |
 
 **Logic:** Every article must be presented as an output of these specific frameworks.
 
@@ -72,7 +72,7 @@ Methodology Audit
 [x] Supply Chain Forensics (Neon/Lithography Chokepoints)
 [x] Policy Stress-Testing (Atlantic Drift Model)
 [ ] Scenario-Based Modeling (Available in Deep Dive)
-[x] Long-Memory Filter (30-Year Cycle Benchmark)
+[x] Long-Memory Filter (40-Year Cycle Benchmark)
 ```
 
 ### Component B: Persona Filter & Dynamic CTA

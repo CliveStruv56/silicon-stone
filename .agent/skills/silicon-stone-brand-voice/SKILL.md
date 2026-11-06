@@ -47,7 +47,7 @@ No clever turns of phrase that prioritise wit over weight. The reader is a senio
 
 ### 3. Practitioner-grade, not pundit-grade
 
-Anchor every assertion to observable practice — what organisations actually do, what decisions actually get made, what calls Clive has actually been in the room for. The publication's defensible advantage is thirty years inside the technology industry, not theoretical fluency. If a sentence could appear in a McKinsey report, an FT comment piece, AND a Substack post — rewrite it. Make it sound like only Silicon and Stone could have written it.
+Anchor every assertion to observable practice — what organisations actually do, what decisions actually get made, what calls Clive has actually been in the room for. The publication's defensible advantage is forty years inside the technology industry, not theoretical fluency. If a sentence could appear in a McKinsey report, an FT comment piece, AND a Substack post — rewrite it. Make it sound like only Silicon and Stone could have written it.
 
 **Markers of practitioner register**: roadmap, deprecation, posture, cadence, leverage, decision layer, vendor-bound, architecture-bound, downstream of, structural event, swap-cost, league table.
 
@@ -80,7 +80,7 @@ The voice is intelligence-briefing register — sober, considered, weighty. It i
 - **Forensic Technopolitics** — the methodology
 - **Decision-grade**, **Calibrated by default**, **Hedged on purpose**
 - **an Outer Orkney isle**, **sixty miles north of mainland Scotland**, **the Atlantic edge**
-- **Thirty years inside the industry** (the credential)
+- **Forty years inside the industry** (the credential)
 - **Senior leaders** / **senior decision-makers** / **senior leaders in European industry** (the audience)
 
 ### Avoid (matches `voice-dna.json` `never_uses_phrases` + extends)

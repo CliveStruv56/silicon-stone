@@ -114,7 +114,7 @@ const methods = [
   {
     id: 'long-memory-filter',
     title: 'Long-Memory Filter',
-    tagline: 'The 30-year cycle benchmark',
+    tagline: 'The 40-year cycle benchmark',
     description: 'Pattern-matching the current event against the last forty years of industrial cycles. The 1986 US-Japan Semiconductor Agreement, the 1990s offshoring wave, the 2000s globalisation consensus. The lens that separates Silicon Hype from Stone Truth.',
     details: [
       'Pattern-matching against the last forty years of industrial cycles',
@@ -139,11 +139,11 @@ const methods = [
 
 const matrixCells = [
   { domain: 'Supply Chain', method: 'Scenario Modelling', slug: 'supply-chain-scenario-modelling', description: 'Three-tier futures for the physical chokepoints' },
-  { domain: 'Supply Chain', method: 'Long-Memory Filter', slug: 'supply-chain-long-memory-filter', description: '30-year cycle pattern-match on the physical layer' },
+  { domain: 'Supply Chain', method: 'Long-Memory Filter', slug: 'supply-chain-long-memory-filter', description: '40-year cycle pattern-match on the physical layer' },
   { domain: 'Policy', method: 'Scenario Modelling', slug: 'policy-scenario-modelling', description: 'Low / Medium / High friction across regulatory regimes' },
-  { domain: 'Policy', method: 'Long-Memory Filter', slug: 'policy-long-memory-filter', description: '30-year regulatory precedent and enforcement drift' },
+  { domain: 'Policy', method: 'Long-Memory Filter', slug: 'policy-long-memory-filter', description: '40-year regulatory precedent and enforcement drift' },
   { domain: 'Talent', method: 'Scenario Modelling', slug: 'talent-scenario-modelling', description: 'Capability-flow scenarios across the human layer' },
-  { domain: 'Talent', method: 'Long-Memory Filter', slug: 'talent-long-memory-filter', description: '30-year skill-density and migration cycles' },
+  { domain: 'Talent', method: 'Long-Memory Filter', slug: 'talent-long-memory-filter', description: '40-year skill-density and migration cycles' },
 ]
 
 function MethodologyCard({
