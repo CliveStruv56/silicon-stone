@@ -90,8 +90,7 @@ export function CredibilityBlock() {
                       Beyond the Mainland
                     </div>
                     <p className="text-xs text-text-muted leading-relaxed mt-2">
-                      The view from the edge is structurally clearer than the
-                      view from any centre.
+                      The edge is where you see what the centre misses.
                     </p>
                   </div>
                   <div className="h-px bg-border-subtle" />
