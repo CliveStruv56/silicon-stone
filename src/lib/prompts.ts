@@ -334,7 +334,7 @@ Use a YouTube title (under 70 characters) as "title" and a 2-sentence video desc
 Markdown structure for "content":
 
 ## 1. The Pulse (0:00 - 1:00)
-**Standard Hook:** A variation of: "I'm Clive. After forty years in the engine room of the technology industry, I now track the shifting fault lines of AI and semiconductor politics from the edge of Europe. Welcome to Silicon and Stone, where we cut through the tech noise to give decision-makers the actionable intelligence they need." — vary the wording slightly per episode.
+**Standard Hook:** A variation of: "I'm Clive. After forty years in the engine room of the technology industry, I now track the shifting fault lines of AI and semiconductor politics from the edge of Europe. Welcome to Silicon and Stone, where I help decision-makers make sense of AI, chips and the rules being written about both." — vary the wording slightly per episode.
 **Persona Tag:** State explicitly who this briefing is for (tie it to ${persona.role}).
 **Impact Score:** Assign a Systemic Friction or Risk score out of 10.
 **The Stone Truth:** A 3-sentence, sober bottom-line summary.

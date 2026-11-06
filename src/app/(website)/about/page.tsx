@@ -21,6 +21,11 @@ export const metadata: Metadata = {
 
 const credentials = [
   {
+    period: '1980s',
+    title: 'The Foundations',
+    description: 'A Master\'s in Digital Systems and Computer Science in 1984: automation and the basics of AI.',
+  },
+  {
     period: '1990s',
     title: 'The First Wave',
     description: 'Enterprise software and the client-server revolution. Watched companies bet everything on technologies that no longer exist.',
@@ -124,8 +129,8 @@ export default function AboutPage() {
                   Analysis from the Edge
                 </h1>
                 <p className="text-xl text-text-muted leading-relaxed mb-6">
-                  Forty years in technology. Now watching the industry from an island in Orkney, sixty miles north of the Scottish mainland,
-                  where the perspective is longer and the noise is quieter.
+                  Forty years in technology. Now watching the industry from an island in Orkney, sixty miles north of the Scottish mainland.
+                  Here the perspective is longer and the noise is quieter.
                 </p>
                 <p className="text-text-muted leading-relaxed">
                   Silicon and Stone combines deep technology industry experience with the clarity
@@ -213,7 +218,7 @@ export default function AboutPage() {
             Technology moves fast, but patterns repeat. Forty years of watching the industry
             provides calibration that no amount of real-time data can replace.
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
             {credentials.map((cred) => (
               <Card key={cred.period} className="bg-stone-charcoal border-border-subtle">
                 <CardContent className="p-6">
