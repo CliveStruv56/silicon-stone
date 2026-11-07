@@ -17,12 +17,14 @@ import type { StatuteCitation } from './types'
  * Three rules, all enforced by `explainers.test.ts`:
  *
  *  1. **Every quotation is verbatim** against the pinned corpus.
- *  2. **No date is written here.** Application dates come from the pack's
+ *  2. **No exact date is written here.** Application dates come from the pack's
  *     timeline through `packDate()`, which throws on a renamed entry, so a pack
  *     that moves a date moves this page with it. The test fails on any date in
- *     an answer that is not in the pack timeline or in `HARMONISED_STANDARDS` —
- *     a stale "August 2026" for the high-risk duties is exactly the error the
- *     page exists to correct, so it must not be able to make it.
+ *     an answer that is not in the pack timeline or in `HARMONISED_STANDARDS`.
+ *     The only hard-coded references are the original month-and-year dates
+ *     ("August 2026", "August 2027") in `high-risk-dates`, which name what the
+ *     Omnibus moved. They are history, not the current dates, and are not
+ *     exact day-month-year dates, so the guard does not match them.
  *  3. **Plain text only.** Answers render as paragraphs; `*emphasis*` would
  *     reach the reader as literal asterisks, as it once did on the result cards.
  *

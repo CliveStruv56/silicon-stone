@@ -225,13 +225,13 @@ export default function AtlanticDriftPage() {
               <strong className="text-text-primary">Applies since 2 August 2026:</strong>{' '}
               the Article 50 transparency duties and enforcement against providers of
               general-purpose AI models, including the Commission’s power to fine them.
-              Penalties (Chapter XII) have applied since 2 August 2025.
+              The rest of the penalties chapter (Chapter XII) has applied since 2 August 2025.
             </p>
             <p className="leading-relaxed text-text-muted">
               <strong className="text-text-primary">Adopted but pending:</strong> the heavy
               high-risk obligations were re-timed, not removed — standalone high-risk
               (Annex III) on 2 December 2027, embedded high-risk (Annex I) on 2 August 2028.
-              The re-timing is adopted, not yet settled law until publication, so treat the
+              The re-timing is law, in force since 27 July 2026, so treat the
               later dates as a planning horizon, not a reprieve. The work that actually takes
               time — the inventory, the vendor evidence — is not gated by any of these dates.
             </p>

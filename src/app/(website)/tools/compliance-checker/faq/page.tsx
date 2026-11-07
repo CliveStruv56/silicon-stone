@@ -57,7 +57,7 @@ export default function AiActFaqPage() {
           <p className="mt-3 text-text-muted">
             The questions we are asked most, answered in plain English. Every quotation beside an answer is a
             verbatim extract of the consolidated Regulation, checked against the same pinned text the Compliance
-            Checker uses, and every application date comes from that text rather than from memory.
+            Checker uses, and every current application date comes from that text rather than from memory.
           </p>
 
           <div className="mt-4 flex flex-wrap items-center gap-2">

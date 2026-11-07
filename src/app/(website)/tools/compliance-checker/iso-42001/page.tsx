@@ -143,7 +143,7 @@ export default function Iso42001CrosswalkPage() {
           </div>
 
           <div className="mt-8 rounded-lg border border-silicon-amber/40 bg-silicon-amber/5 p-5">
-            <h2 className="text-base font-semibold text-text-primary">Certification is not a presumption of conformity</h2>
+            <h2 className="text-base font-semibold text-text-primary">ISO/IEC 42001 certification is not a presumption of conformity</h2>
             <p className="mt-2 text-sm leading-relaxed text-text-primary">
               Under Article 40, a presumption of conformity comes from harmonised standards whose references are
               published in the Official Journal, and Article 41 gives the same effect to Commission common
