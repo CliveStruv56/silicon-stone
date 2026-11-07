@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { after } from 'next/server'
 import { Header, Footer } from '@/components/layout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -10,11 +9,12 @@ import SearchForm from './SearchForm'
 import { formatDate } from '@/lib/format'
 import { SITE_PAGES, type SitePageKind } from '@/lib/search/site-pages'
 import { normaliseQuery, searchSitePages } from '@/lib/search/keyword'
-import { recordZeroResult } from '@/lib/search/zero-results'
+import { RESULT_LABELS, contentTypeLabel } from '@/lib/search/labels'
+import ZeroResultReporter from './ZeroResultReporter'
 
 export const metadata: Metadata = {
   title: 'Search | Silicon and Stone',
-  description: 'Search our archive of forensic technopolitics analysis.',
+  description: 'Search tools, pages, analysis and glossary terms on Silicon and Stone.',
   alternates: { canonical: '/search' },
   // Result pages are an unbounded set of thin, query-shaped URLs. Links on them
   // are still worth following; the pages themselves are not worth indexing.
@@ -47,17 +47,10 @@ type SiteDocsResult = {
   products?: Array<{ _id: string; name: string; productPath: string; blurb?: string | null }>
 }
 
-/** One row in the "Tools & pages" group, whatever it came from. */
+/** One row in the "Tools and pages" group, whatever it came from. */
 type PageHit = { key: string; href: string; title: string; description?: string | null; label: string }
 
-const KIND_LABELS: Record<SitePageKind | 'author', string> = {
-  tool: 'Tool',
-  product: 'Product',
-  advisory: 'Advisory',
-  guide: 'Guide',
-  page: 'Page',
-  author: 'Author',
-}
+const KIND_LABELS: Record<SitePageKind | 'author', string> = RESULT_LABELS
 
 type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
@@ -127,12 +120,6 @@ export default async function SearchPage({ searchParams }: Props) {
 
   const total = pageHits.length + seriesResults.length + results.length + glossaryResults.length
 
-  // Record what readers looked for and did not find: the query text alone.
-  // after() so the write never delays the page.
-  if (query && total === 0) {
-    after(() => recordZeroResult(query))
-  }
-
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -150,15 +137,17 @@ export default async function SearchPage({ searchParams }: Props) {
         <section className="mx-auto max-w-7xl px-6 py-10 lg:px-8">
           {query ? (
             <div className="space-y-6 max-w-4xl mx-auto">
-              <div className="text-text-muted mb-4">
-                Found {total} results for <span className="text-text-primary font-semibold">&ldquo;{query}&rdquo;</span>
-              </div>
+              {total > 0 && (
+                <div className="text-text-muted mb-4">
+                  Found {total} {total === 1 ? 'result' : 'results'} for <span className="text-text-primary font-semibold">&ldquo;{query}&rdquo;</span>
+                </div>
+              )}
 
               {pageHits.length > 0 && (
                 <section aria-labelledby="page-results-heading">
                   <div className="mb-3 flex items-center gap-3">
                     <h2 id="page-results-heading" className="font-statement text-lg font-semibold text-text-primary">
-                      Tools &amp; pages
+                      Tools and pages
                     </h2>
                     <Badge variant="outline" className="font-mono text-xs text-text-muted">
                       {pageHits.length}
@@ -221,9 +210,9 @@ export default async function SearchPage({ searchParams }: Props) {
                                 {article.categories[0].title}
                               </Badge>
                             )}
-                            {article.contentType && (
+                            {contentTypeLabel(article.contentType) && (
                               <Badge variant="outline" className="text-[12px] text-text-muted border-text-muted/30">
-                                {article.contentType}
+                                {contentTypeLabel(article.contentType)}
                               </Badge>
                             )}
                           </div>
@@ -279,6 +268,8 @@ export default async function SearchPage({ searchParams }: Props) {
               {total === 0 && (
                 <div className="text-center py-10 bg-stone-charcoal/30 rounded-lg border border-border-subtle border-dashed">
                   <p className="text-text-muted">Nothing on the site matched those words.</p>
+                  {/* Logs the query once the reader has stopped on it. */}
+                  <ZeroResultReporter query={query} />
                 </div>
               )}
             </div>

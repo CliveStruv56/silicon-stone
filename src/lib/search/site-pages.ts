@@ -137,7 +137,7 @@ export const SITE_PAGES: readonly SitePage[] = [
     kind: 'advisory',
     description:
       'Independent AI and technopolitical advisory: an Advisory Briefing, broader assessments, an ongoing retainer and five standalone specialist projects. Agree the scope after a free conversation.',
-    keywords: ['advisory', 'advice', 'adviser', 'advisor', 'consulting', 'consultant', 'consultancy', 'help', 'hire', 'engagement', 'board'],
+    keywords: ['advisory', 'advice', 'adviser', 'advisor', 'consulting', 'consultant', 'consultancy', 'help', 'hire', 'engagement', 'board', 'boards', 'directors', 'decision-makers', 'ai risk', 'risk', 'governance', 'independent expert', 'who can help', 'help my board understand ai risk', 'brief the board'],
   },
   {
     path: '/advisory/advisory-briefing',
@@ -145,7 +145,7 @@ export const SITE_PAGES: readonly SitePage[] = [
     kind: 'advisory',
     description:
       'The output of a tool or product, or one of your AI systems. A one-hour discussion and a written follow-up with priorities, evidence gaps and next actions.',
-    keywords: ['briefing', 'call', 'session', 'one hour', 'consultation', 'advice'],
+    keywords: ['briefing', 'call', 'session', 'one hour', 'consultation', 'advice', 'talk to an expert', 'ai risk', 'board', 'explain', 'next steps'],
   },
   {
     path: '/advisory/exposure-diagnostic',
@@ -161,7 +161,7 @@ export const SITE_PAGES: readonly SitePage[] = [
     kind: 'advisory',
     description:
       'Before the board commits, two questions: what do you actually need, and how much of your stack do you actually control? A framework-neutral, vendor-agnostic decision document: multi-framework analysis, an architecture and control map covering hosting, access, key custody and exit, a 40-page report, a board-ready presentation and a staged roadmap. Includes the Sovereign Architecture Review.',
-    keywords: ['assessment', 'strategy', 'board', 'governance', 'sovereignty', 'sovereign architecture', 'roadmap'],
+    keywords: ['assessment', 'strategy', 'board', 'board-ready', 'directors', 'governance', 'ai governance', 'ai risk', 'board decision', 'sovereignty', 'sovereign architecture', 'roadmap'],
   },
   {
     path: '/advisory/drift-retainer',

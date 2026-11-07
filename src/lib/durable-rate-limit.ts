@@ -26,6 +26,13 @@ type RateLimitConfig = {
   limit: number
   window: `${number} ${'s' | 'm' | 'h' | 'd'}`
   prefix: string
+  /**
+   * Upstash's analytics records every identifier it sees (an IP, for most keys
+   * here) into hourly buckets that outlive the limit window. On by default, as
+   * it always was. Set false where the privacy page promises that nothing ties
+   * a request to the reader beyond the short-lived counter itself.
+   */
+  analytics?: boolean
 }
 
 const configs = {
@@ -84,7 +91,7 @@ const configs = {
   // Writes to the public search's zero-result log, keyed on the constant 'all'
   // (never on the reader). A global daily ceiling, so a script hammering
   // /search?q=… cannot flush the real entries out of the bounded log.
-  searchZeroLog: { limit: 500, window: '1 d', prefix: 'sas:search-zero-log' },
+  searchZeroLog: { limit: 500, window: '1 d', prefix: 'sas:search-zero-log', analytics: false },
 } satisfies Record<string, RateLimitConfig>
 
 export type DurableRateLimitKey = keyof typeof configs
@@ -128,7 +135,7 @@ function getLimiter(key: DurableRateLimitKey) {
   const limiter = new Ratelimit({
     redis: makeRedis(),
     limiter: Ratelimit.slidingWindow(config.limit, config.window),
-    analytics: true,
+    analytics: (config as RateLimitConfig).analytics ?? true,
     prefix: config.prefix,
   })
   limiters.set(key, limiter)
@@ -205,6 +212,11 @@ export async function checkDurableRateLimit(
     console.error('Durable rate limit unavailable; falling back to in-memory:', error)
     return inMemoryFallback(key, identifier)
   }
+}
+
+/** Whether a limiter's Upstash analytics (which stores identifiers) is on. */
+export function limiterRecordsAnalytics(key: DurableRateLimitKey): boolean {
+  return (configs[key] as RateLimitConfig).analytics ?? true
 }
 
 export function durableRateLimitConfigured() {

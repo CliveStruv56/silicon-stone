@@ -177,12 +177,14 @@ export default async function AnalyticsPage() {
                 <div className="flex items-center gap-3">
                     <Search className="w-6 h-6 text-secondary-foreground" />
                     <h2 className="text-2xl font-bold">Searches with no results</h2>
-                    <span className="text-sm text-muted-foreground">most searched first</span>
+                    <span className="text-sm text-muted-foreground">Most searched first</span>
                 </div>
                 <p className="text-sm text-muted-foreground max-w-3xl">
-                    Queries on /search that matched no page, article, series, author, product or glossary term.
-                    Only the words searched, a count and the date last searched are kept: nothing about who
-                    searched. Queries containing an email address or a long number are never recorded.
+                    Queries on /search that matched no tool, page, analysis, series, author, product or glossary
+                    term. A query is recorded once it has stayed on screen for three seconds. Only the words
+                    searched, a count and the date last searched are kept: nothing about who searched. Queries
+                    containing an @ or a run of six or more digits (spaces or dashes between them included) are
+                    never recorded.
                 </p>
 
                 {zeroResults === null ? (

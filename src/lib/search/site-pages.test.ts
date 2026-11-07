@@ -124,6 +124,7 @@ describe('keyword matching', () => {
     expect(top('supply chain')).toBe('/tools/supply-chain-mapper')
     expect(top('iso 42001')).toBe('/tools/compliance-checker/iso-42001')
     expect(top('compl')).toBe('/tools/compliance-checker')
+    expect(top('who can help my board understand AI risk')).toBe('/advisory')
   })
 
   it('requires every word to match', () => {

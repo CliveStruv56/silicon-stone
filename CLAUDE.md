@@ -958,7 +958,12 @@ Keyword search covers four sources, shown in this order: **Tools & pages**
   rate limiter's Upstash. No IP, no user agent, nothing about the reader;
   queries with an `@` or a run of six or more digits are never written; the log
   keeps at most 1,000 queries and accepts at most 500 new writes a day
-  (`searchZeroLog`, keyed on the constant `'all'`). Do not add request data to it.
+  (`searchZeroLog`, keyed on the constant `'all'`, with Upstash analytics off so
+  no identifier is stored). Do not add request data to it.
+- **Only settled searches are logged.** The box searches as you type, so every
+  prefix used to land in the log. `ZeroResultReporter` reports a zero-result
+  query only after it has stayed on screen for 3 seconds (`settle.ts`), through
+  the `reportZeroResult` server action. Never log from the page render again.
 
 ## Publication dates (load-bearing — do not break)
 
