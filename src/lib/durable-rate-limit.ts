@@ -81,6 +81,10 @@ const configs = {
   // several read calls per capture, and because the MCP spec's rate-limiting
   // requirement is per tool invocation, not per HTTP request.
   knowledgeMcp: { limit: 120, window: '15 m', prefix: 'sas:knowledge-mcp' },
+  // Writes to the public search's zero-result log, keyed on the constant 'all'
+  // (never on the reader). A global daily ceiling, so a script hammering
+  // /search?q=… cannot flush the real entries out of the bounded log.
+  searchZeroLog: { limit: 500, window: '1 d', prefix: 'sas:search-zero-log' },
 } satisfies Record<string, RateLimitConfig>
 
 export type DurableRateLimitKey = keyof typeof configs

@@ -551,8 +551,42 @@ export const SITE_SETTINGS_QUERY = defineQuery(`
 `)
 
 // Search
+// Series, authors and products for /search. One round trip; each list is short.
+// Products link to their own productPath and are de-duplicated against the
+// hand-built page registry (src/lib/search/site-pages.ts) on the page. No price
+// is selected: prices render from src/lib/offering.ts, never from a search hit.
+export const SEARCH_SITE_DOCS_QUERY = defineQuery(`{
+  "series": *[_type == "series" && defined(slug.current) && !(_id in path("drafts.**")) && (
+    title match $query + "*" ||
+    standfirst match $query + "*"
+  )] | order(title asc) [0...5] {
+    _id,
+    title,
+    "slug": slug.current,
+    standfirst
+  },
+  "authors": *[_type == "author" && defined(slug.current) && !(_id in path("drafts.**")) && (
+    name match $query + "*" ||
+    role match $query + "*"
+  )] | order(name asc) [0...3] {
+    _id,
+    name,
+    "slug": slug.current,
+    role
+  },
+  "products": *[_type == "product" && defined(productPath) && !(_id in path("drafts.**")) && (
+    name match $query + "*" ||
+    blurb match $query + "*"
+  )] | order(name asc) [0...5] {
+    _id,
+    name,
+    productPath,
+    blurb
+  }
+}`)
+
 export const SEARCH_ARTICLES_QUERY = defineQuery(`
-  *[_type == "article" && (
+  *[_type == "article" && !(_id in path("drafts.**")) && (
     title match $query + "*" ||
     excerpt match $query + "*" ||
     pt::text(body) match $query + "*"

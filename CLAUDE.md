@@ -937,6 +937,29 @@ article numbers on the
 manufacturing page (23, 25, 26(4), Annex IV) are read from the pinned corpus
 under `corpus/regulatory/eu-chips-act/` — verify there before changing one.
 
+## Site search (`/search`)
+
+Keyword search covers four sources, shown in this order: **Tools & pages**
+(the hand-built page registry `src/lib/search/site-pages.ts`, plus Sanity
+`product` docs and authors), **Analysis** (series, then articles), **Glossary**.
+
+- **The registry never writes copy.** Each `description` is copied verbatim
+  from its page's metadata or on-page text, and `site-pages.test.ts` fails if
+  it cannot find the sentence in that route's source. When a page's copy
+  changes, the test goes red: update the registry from the page, never the
+  other way round. Every path must also be a real `page.tsx`, not redirect, and
+  be in `sitemap.ts` STATIC_ROUTES. A new public page belongs in all three.
+- **Matching is explainable on purpose** (`src/lib/search/keyword.ts`): every
+  word must match (prefix, or a plural ending), title beats keyword beats
+  description. Long questions match nothing here; that is what search by
+  meaning is for.
+- **Zero-result log** (`src/lib/search/zero-results.ts`, shown on
+  `/analytics`): normalised query text, a count and a last-searched time, in the
+  rate limiter's Upstash. No IP, no user agent, nothing about the reader;
+  queries with an `@` or a run of six or more digits are never written; the log
+  keeps at most 1,000 queries and accepts at most 500 new writes a day
+  (`searchZeroLog`, keyed on the constant `'all'`). Do not add request data to it.
+
 ## Publication dates (load-bearing — do not break)
 
 Every price has one source; so does every publication date. `publishedAt` is

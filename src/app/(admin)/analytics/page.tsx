@@ -1,4 +1,5 @@
-import { BarChart3, DollarSign, FileText, Users, Youtube } from "lucide-react";
+import { BarChart3, DollarSign, FileText, Search, Users, Youtube } from "lucide-react";
+import { listZeroResults } from "@/lib/search/zero-results";
 import { getUsageSummary } from "@/lib/usage";
 import {
     getContentStats,
@@ -34,9 +35,10 @@ function toBars(record: Record<string, number>, labels: Record<string, string>):
 }
 
 export default async function AnalyticsPage() {
-    const [usage, content] = await Promise.all([
+    const [usage, content, zeroResults] = await Promise.all([
         getUsageSummary("mtd"),
         getContentStats(),
+        listZeroResults(50),
     ]);
 
     const personas = personaBreakdown(content);
@@ -167,6 +169,52 @@ export default async function AnalyticsPage() {
                             </div>
                         </div>
                     </>
+                )}
+            </section>
+
+            {/* ── Site search: what readers looked for and did not find ── */}
+            <section className="space-y-5">
+                <div className="flex items-center gap-3">
+                    <Search className="w-6 h-6 text-secondary-foreground" />
+                    <h2 className="text-2xl font-bold">Searches with no results</h2>
+                    <span className="text-sm text-muted-foreground">most searched first</span>
+                </div>
+                <p className="text-sm text-muted-foreground max-w-3xl">
+                    Queries on /search that matched no page, article, series, author, product or glossary term.
+                    Only the words searched, a count and the date last searched are kept: nothing about who
+                    searched. Queries containing an email address or a long number are never recorded.
+                </p>
+
+                {zeroResults === null ? (
+                    <NotConfigured>
+                        The log lives in Upstash, alongside the rate limiter. It needs
+                        <code className="font-mono"> UPSTASH_REDIS_REST_URL</code> (or Vercel&apos;s KV_* variables) to be set.
+                    </NotConfigured>
+                ) : zeroResults.length === 0 ? (
+                    <NotConfigured>Nothing logged yet.</NotConfigured>
+                ) : (
+                    <div className="rounded-xl border border-border bg-card overflow-hidden">
+                        <table className="w-full text-sm">
+                            <thead className="bg-muted/30 text-muted-foreground">
+                                <tr className="text-left">
+                                    <th className="px-4 py-2.5 font-medium">Query</th>
+                                    <th className="px-4 py-2.5 font-medium text-right">Searches</th>
+                                    <th className="px-4 py-2.5 font-medium text-right">Last searched</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {zeroResults.map((row) => (
+                                    <tr key={row.query} className="border-t border-border/60">
+                                        <td className="px-4 py-2.5 font-mono break-all">{row.query}</td>
+                                        <td className="px-4 py-2.5 text-right tabular-nums">{formatNumber(row.count)}</td>
+                                        <td className="px-4 py-2.5 text-right tabular-nums whitespace-nowrap">
+                                            {row.lastSeen ? row.lastSeen.slice(0, 10) : "—"}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 )}
             </section>
 
