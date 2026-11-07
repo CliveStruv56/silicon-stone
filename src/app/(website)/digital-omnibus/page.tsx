@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { Header, Footer } from '@/components/layout'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { AI_ACT_TIMELINE } from '@/lib/ai-act-timeline'
-import { DIGITAL_OMNIBUS_REVIEWED, OMNIBUS_SOURCES, OMNIBUS_HISTORY, OMNIBUS_APPLICATIONS } from '@/lib/digital-omnibus'
+import { DIGITAL_OMNIBUS_REVIEWED, DIGITAL_OMNIBUS_REVIEWED_LABEL, OMNIBUS_SOURCES, OMNIBUS_HISTORY, OMNIBUS_APPLICATIONS } from '@/lib/digital-omnibus'
 import { absoluteUrl } from '@/lib/site'
 
 const title = 'Digital Omnibus: What Changes and What Matters'
@@ -44,9 +44,9 @@ export default function DigitalOmnibusPage() {
             <p className="mb-5 text-sm text-stone-teal">A reference for business leaders</p>
             <h1 className="max-w-4xl text-4xl font-bold tracking-tight text-text-primary sm:text-5xl lg:text-6xl">Digital Omnibus</h1>
             <p className="mt-4 text-2xl font-medium text-silicon-amber-strong sm:text-3xl">What changes and what matters.</p>
-            <p className="mt-6 max-w-3xl text-lg leading-relaxed text-text-muted">Europe is revising its digital rulebook. Some AI rules have changed; wider changes to data, privacy and cybersecurity are still being negotiated. Understanding the distinction helps you decide what to act on, what to prepare for and what to watch.</p>
+            <p className="mt-6 max-w-3xl text-lg leading-relaxed text-text-muted">Europe is revising its digital rulebook. Some AI rules have changed; wider changes to data, privacy and cybersecurity are still moving through the legislative process. Understanding the distinction helps you decide what to act on, what to prepare for and what to watch.</p>
             <p className="mt-5 max-w-3xl text-sm leading-relaxed text-text-muted">For leaders across the UK and EU, and US companies operating in or selling into Europe. This reference provides the shared regulatory context for our advisory work.</p>
-            <p className="mt-8 text-sm text-text-muted">Reviewed <time dateTime={DIGITAL_OMNIBUS_REVIEWED}>9 September 2026</time> · Clive Struver, Silicon and Stone</p>
+            <p className="mt-8 text-sm text-text-muted">Reviewed <time dateTime={DIGITAL_OMNIBUS_REVIEWED}>{DIGITAL_OMNIBUS_REVIEWED_LABEL}</time> · Clive Struver, Silicon and Stone</p>
           </div>
         </section>
 
@@ -70,9 +70,9 @@ export default function DigitalOmnibusPage() {
                   <p className="mt-4 text-sm"><Source id="enacted">AI changes now in law</Source></p>
                 </div>
                 <div className="border-t-4 border-silicon-amber pt-5">
-                  <p className="mb-3 text-sm font-medium text-silicon-amber-strong">Under negotiation at this review</p>
+                  <p className="mb-3 text-sm font-medium text-silicon-amber-strong">Still in the legislative process at this review</p>
                   <h3 className="text-xl">Data, privacy and cybersecurity</h3>
-                  <p className="mt-3 leading-relaxed text-text-muted">The broader proposal includes changes to GDPR, the Data Act and incident reporting. Parliament’s procedure is awaiting a committee decision. Proposed simplifications should not be treated as permissions already available.</p>
+                  <p className="mt-3 leading-relaxed text-text-muted">The broader proposal includes changes to GDPR, the Data Act and incident reporting. The Council agreed its position on 21 October 2026. Parliament’s procedure is awaiting a committee decision. Proposed simplifications should not be treated as permissions already available.</p>
                   <p className="mt-4 text-sm"><Source id="proposal">Follow the legislative procedure</Source></p>
                 </div>
               </div>
@@ -80,9 +80,9 @@ export default function DigitalOmnibusPage() {
 
             <section id="timeline">
               <h2>Timeline and milestones</h2>
-              <p className="mt-4 leading-relaxed text-text-muted">First, how the AI changes became law. Then, the main application dates to read against your systems and your role.</p>
+              <p className="mt-4 leading-relaxed text-text-muted">First, how the AI changes became law and where the broader package stands. Then, the main application dates to read against your systems and your role.</p>
               <details className="mt-6 rounded-lg border border-border-subtle p-5">
-                <summary className="cursor-pointer font-medium text-text-primary">How we got here: November 2025 to July 2026</summary>
+                <summary className="cursor-pointer font-medium text-text-primary">How we got here: November 2025 to October 2026</summary>
                 <ol className="mt-5 space-y-5">
                   {OMNIBUS_HISTORY.map(event => <li key={event.date}>
                     <p className="text-sm text-stone-teal">{event.date}</p><h3 className="mt-1">{event.title}</h3>
@@ -102,7 +102,7 @@ export default function DigitalOmnibusPage() {
               <p className="mt-8 max-w-3xl text-sm leading-relaxed text-text-muted">These are the main milestones, not a universal deadline for every AI system. Classification, operator role and transitional provisions matter. The December 2026 marking transition concerns certain systems placed on the market before 2 August 2026. <Source id="legislation">Read the amending regulation.</Source></p>
               <div className="mt-8 border-l-2 border-silicon-amber pl-5">
                 <h3>The wider proposal: milestones still to come</h3>
-                <p className="mt-2 text-sm leading-relaxed text-text-muted">Watch for Parliament’s position, the Council position, agreement on a final text, formal adoption and publication. There is no confirmed application date recorded here for the broader package. <Source id="proposal">Check its current status.</Source></p>
+                <p className="mt-2 text-sm leading-relaxed text-text-muted">The Council agreed its position on 21 October 2026. Still to come: Parliament’s position, negotiations between Parliament and the Council, agreement on a final text, formal adoption and publication. There is no confirmed application date recorded here for the broader package. <Source id="councilPosition">Council press release.</Source> <Source id="proposal">Check the procedure’s current status.</Source></p>
               </div>
             </section>
 
@@ -111,7 +111,7 @@ export default function DigitalOmnibusPage() {
               <div className="mt-6 space-y-7 text-text-muted">
                 <div><h3>AI: implementation and oversight</h3><p className="mt-2 leading-relaxed">Alongside the high-risk timetable, the enacted changes address support for small mid-cap companies, testing and sandboxes, AI literacy, registration and AI Office supervision. A revised date is only one part of the assessment. <Source id="enacted">Commission summary of the enacted changes.</Source></p></div>
                 <div><h3>Data and privacy: proposed simplification</h3><p className="mt-2 leading-relaxed">The broader proposal would consolidate parts of the data framework into the Data Act, adjust aspects of cloud switching, and change elements of GDPR and cookie rules. These could affect data use, supplier contracts and portability; their final form remains unsettled. <Source id="package">What the Commission proposes.</Source></p></div>
-                <div><h3>Cybersecurity: a proposed reporting entry point</h3><p className="mt-2 leading-relaxed">A single entry point is proposed for overlapping incident reports under several EU laws. A simpler submission route would not itself remove the underlying reporting obligations. <Source id="package">Incident-reporting proposal.</Source></p></div>
+                <div><h3>Cybersecurity: a proposed reporting entry point</h3><p className="mt-2 leading-relaxed">The Commission proposed a single EU-level entry point for overlapping incident reports under several EU laws. The Council’s position would replace it with a national entry point in each Member State plus an EU-level information point that would not itself take incident notifications. A simpler submission route would not itself remove the underlying reporting obligations. <Source id="package">Incident-reporting proposal.</Source> <Source id="councilPosition">Council press release.</Source></p></div>
                 <div><h3>Where the debate matters</h3><p className="mt-2 leading-relaxed">The European data protection authorities support some simplifications but object to the proposed narrowing of the definition of personal data. Treat disputed provisions as something to monitor, rather than an assumption on which to redesign your data practices. <Source id="privacy">EDPB and EDPS assessment.</Source></p></div>
               </div>
             </section>
@@ -143,13 +143,14 @@ export default function DigitalOmnibusPage() {
 
             <section id="sources" className="!border-b-0">
               <h2>Sources and updates</h2>
-              <p className="mt-4 leading-relaxed text-text-muted">The status above was reviewed on 9 September 2026. Source links let you check subsequent developments. The business examples are Silicon and Stone’s interpretation; the legislation and official procedures establish the legal position.</p>
+              <p className="mt-4 leading-relaxed text-text-muted">The status above was reviewed on <time dateTime={DIGITAL_OMNIBUS_REVIEWED}>{DIGITAL_OMNIBUS_REVIEWED_LABEL}</time>. Source links let you check subsequent developments. The business examples are Silicon and Stone’s interpretation; the legislation and official procedures establish the legal position.</p>
               <ul className="mt-6 space-y-3 text-sm leading-relaxed">
                 {Object.entries(OMNIBUS_SOURCES).map(([id, source]) => <li key={id}><a href={source.url} className="text-stone-teal underline underline-offset-4">{source.title}</a></li>)}
               </ul>
               <div className="mt-8 rounded-lg bg-stone-charcoal p-5">
                 <h3>Review history</h3>
-                <p className="mt-2 text-sm leading-relaxed text-text-muted"><time dateTime={DIGITAL_OMNIBUS_REVIEWED}>9 September 2026</time> — Established the shared reference, separated enacted AI changes from the broader proposal, and checked the main application milestones against Commission guidance.</p>
+                <p className="mt-2 text-sm leading-relaxed text-text-muted"><time dateTime={DIGITAL_OMNIBUS_REVIEWED}>{DIGITAL_OMNIBUS_REVIEWED_LABEL}</time> — Added the Council’s 21 October position on the broader package and its change to the incident-reporting entry point.</p>
+                <p className="mt-2 text-sm leading-relaxed text-text-muted"><time dateTime="2026-09-09">9 September 2026</time> — Established the shared reference, separated enacted AI changes from the broader proposal, and checked the main application milestones against Commission guidance.</p>
               </div>
             </section>
           </div>
