@@ -42,7 +42,7 @@ export default function PrivacyPage() {
               <p className="text-text-muted leading-relaxed">
                 Silicon and Stone is an independent analysis and advisory service focused on
                 technology policy, AI regulation, semiconductor supply chains, and digital
-                sovereignty. We are based in OrkneyScotland, United Kingdom.
+                sovereignty. We are based in Orkney, Scotland, United Kingdom.
               </p>
             </div>
 
@@ -72,7 +72,11 @@ export default function PrivacyPage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-stone-teal mt-1">-</span>
-                  <span><strong className="text-text-primary">Site search:</strong> The words you search for are matched against our content, which is held at Sanity. They are also sent to OpenAI, which turns them into a numerical form that captures their meaning. That form, not the words, is compared with our search index at Pinecone to suggest related pages. Searches shorter than three characters, or containing an @ or a run of six or more digits, are not sent to OpenAI. A search repeated within a day may be answered from our cache without being sent again. When a search finds nothing and stays on screen for a few seconds, we keep the words searched for, how often, and the date last searched, so we can see what the site is missing. Searches containing an @ or a run of six or more digits are not kept. Nothing we keep links a search to you. The only thing tied to your connection is a short-lived counter, keyed on your IP address and deleted within about 20 minutes, that limits how often related pages can be requested.</span>
+                  <span><strong className="text-text-primary">Site search:</strong> When you search, the words are matched against our content, which is held at Sanity. The words are also sent to OpenAI, which converts them into a numerical form that captures their meaning. Only that numerical form, never the words, is compared with our search index at Pinecone to suggest related pages. Searches shorter than three characters, or containing an @ or a run of six or more digits, are not sent to OpenAI. A search repeated within a day may be answered from our cache without being sent again.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-stone-teal mt-1">-</span>
+                  <span><strong className="text-text-primary">Search logging:</strong> If a search finds nothing and stays on screen for three seconds, we keep the words searched for, how often they were searched, and the date last searched, so we can see what the site is missing. Searches containing an @ or a run of six or more digits are not kept. Nothing we keep links a search to you. The only thing tied to your connection is a short-lived counter, keyed on your IP address and normally deleted within about 20 minutes, that limits how often related pages can be requested.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-stone-teal mt-1">-</span>
@@ -116,7 +120,7 @@ export default function PrivacyPage() {
               <ul className="space-y-2 text-text-muted">
                 <li className="flex items-start gap-2">
                   <span className="text-stone-teal mt-1">-</span>
-                  <span><strong className="text-text-primary">Standfirst:</strong> Email list and newsletter management, hosted on Railway in the EU. Email is sent through Amazon Simple Email Service. Amazon&apos;s privacy notice is available at aws.amazon.com/privacy.</span>
+                  <span><strong className="text-text-primary">Standfirst:</strong> Email list and newsletter management, hosted on Railway in the EU. Email is sent through Amazon Simple Email Service. Amazon&rsquo;s privacy notice is available at aws.amazon.com/privacy.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-stone-teal mt-1">-</span>
@@ -140,7 +144,7 @@ export default function PrivacyPage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-stone-teal mt-1">-</span>
-                  <span><strong className="text-text-primary">Upstash:</strong> Stores the list of searches that found nothing, and the short-lived counters that limit how often related pages can be requested. Their privacy policy is available at upstash.com/trust/privacy.</span>
+                  <span><strong className="text-text-primary">Upstash:</strong> Stores the list of searches that found nothing, and counters, keyed on IP address, that limit how often related pages can be requested and how often the contact, newsletter sign-up and sign-in forms, the Compliance Checker and browser notification settings can be used. Their privacy policy is available at upstash.com/trust/privacy.</span>
                 </li>
               </ul>
             </div>
