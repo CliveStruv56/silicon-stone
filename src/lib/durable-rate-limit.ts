@@ -92,6 +92,17 @@ const configs = {
   // (never on the reader). A global daily ceiling, so a script hammering
   // /search?q=… cannot flush the real entries out of the bounded log.
   searchZeroLog: { limit: 500, window: '1 d', prefix: 'sas:search-zero-log', analytics: false },
+  // Public "search by meaning" (/api/search/related): one OpenAI embedding and
+  // two Pinecone queries per uncached request, with no login in front of it.
+  // Per reader: well above someone refining a few searches, far below a loop.
+  // Analytics off: the privacy page promises the IP-keyed counter is the only
+  // thing tied to a reader, and it expires about 20 minutes after the window.
+  publicSearch: { limit: 40, window: '10 m', prefix: 'sas:public-search', analytics: false },
+  // …and one global daily ceiling, keyed on the constant 'all'. It is the cost
+  // control, and it also protects the other Pinecone lanes: every lane shares
+  // one monthly read-unit allowance, so public search must never be able to
+  // spend it. 5,000 a day is 2,500 read units, about 7.5% of a 1M monthly cap.
+  publicSearchDaily: { limit: 5_000, window: '1 d', prefix: 'sas:public-search-daily', analytics: false },
 } satisfies Record<string, RateLimitConfig>
 
 export type DurableRateLimitKey = keyof typeof configs

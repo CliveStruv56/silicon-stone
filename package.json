@@ -27,6 +27,8 @@
     "knowledge:verify-index": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/verify-knowledge-index.ts",
     "knowledge:sync": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/knowledge-sync.ts",
     "knowledge:calibrate": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/knowledge-calibrate.ts",
+    "search:index-pages": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/index-site-pages.ts",
+    "search:probe": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/probe-site-search.ts",
     "articles:sync": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx src/scripts/sync-pinecone.ts",
     "test:regulatory-index": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/regulatory-index-checks.ts",
     "prebuild": "node scripts/gen-style-rules.mjs && node scripts/rulepack-check.mjs && tsx scripts/regulatory/check.ts && npm run test:checker-v2 && npm run test:manual",

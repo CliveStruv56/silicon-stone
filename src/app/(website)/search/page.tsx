@@ -11,6 +11,7 @@ import { SITE_PAGES, type SitePageKind } from '@/lib/search/site-pages'
 import { normaliseQuery, searchSitePages } from '@/lib/search/keyword'
 import { RESULT_LABELS, contentTypeLabel } from '@/lib/search/labels'
 import ZeroResultReporter from './ZeroResultReporter'
+import RelatedByMeaning from './RelatedByMeaning'
 
 export const metadata: Metadata = {
   title: 'Search | Silicon and Stone',
@@ -119,6 +120,14 @@ export default async function SearchPage({ searchParams }: Props) {
   }
 
   const total = pageHits.length + seriesResults.length + results.length + glossaryResults.length
+
+  // Everything already on the page, so "Related by meaning" only adds.
+  const shownPaths = [
+    ...pageHits.map((h) => h.href),
+    ...seriesResults.map((s) => `/intelligence/series/${s.slug}`),
+    ...results.map((a) => `/analysis/${a.slug}`),
+    ...glossaryResults.map((t) => `/glossary/${t.slug}`),
+  ]
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -272,6 +281,8 @@ export default async function SearchPage({ searchParams }: Props) {
                   <ZeroResultReporter query={query} />
                 </div>
               )}
+
+              <RelatedByMeaning query={query} exclude={shownPaths} afterEmpty={total === 0} />
             </div>
           ) : (
             <div className="text-center py-14 text-text-muted">

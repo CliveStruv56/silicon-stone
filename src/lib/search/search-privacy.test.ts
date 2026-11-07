@@ -14,7 +14,7 @@ const { reportZeroResult } = await import('@/app/(website)/search/actions')
 beforeEach(() => recordZeroResult.mockReset())
 
 /** Search limiters that must not leave identifiers behind in Upstash analytics. */
-const SEARCH_LIMITERS = ['searchZeroLog'] as const
+const SEARCH_LIMITERS = ['searchZeroLog', 'publicSearch', 'publicSearchDaily'] as const
 
 describe('what site search keeps about a reader', () => {
   it('turns Upstash analytics off for every search limiter', () => {

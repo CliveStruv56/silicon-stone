@@ -965,6 +965,35 @@ Keyword search covers four sources, shown in this order: **Tools & pages**
   query only after it has stayed on screen for 3 seconds (`settle.ts`), through
   the `reportZeroResult` server action. Never log from the page render again.
 
+**Search by meaning** (`/api/search/related`, rendered client-side as "Related
+by meaning" below the keyword results; it can only add to the page).
+
+- **Public search reads two namespaces of the article index and no others**:
+  the default (published articles) and `site-pages` (registry pages and
+  published glossary terms). The same index also holds **`ideas`**, written by
+  the external story-idea agent: it must never be readable from public search.
+  `PUBLIC_NAMESPACES` in `src/lib/search/site-index.ts` is the whole list, and
+  `semantic.test.ts` fails on any other namespace, a bare `index.query()` or a
+  `searchSimilar` call in the public path. Every article and glossary hit is
+  re-checked against Sanity's published perspective before it is returned.
+- `site-pages` is rebuilt by `npm run search:index-pages` (complete and
+  reconciling on every run; it writes to `site-pages` only). **Run it after
+  any change to `src/lib/search/site-pages.ts` is merged to main, and after
+  glossary terms are published, edited or deleted in Studio.** Nothing
+  re-indexes automatically yet, so until it is run, search by meaning serves
+  the old text (stale pages and unpublished terms are still filtered out).
+- `SEMANTIC_SCORE_FLOOR = 0.40`, measured with `npm run search:probe`.
+  Re-measure as the catalogue grows, as with the prior-coverage floor.
+- Cost controls: query capped at 100 characters, personal-looking queries never
+  embedded, `publicSearch` per IP (40 / 10 min), a CDN cache on successful
+  answers, and `publicSearchDaily` (5,000 a day, global). Every Pinecone lane
+  shares one monthly read-unit allowance, so the daily ceiling is what keeps
+  public search from starving `/create`, related articles and the admin search.
+  On Vercel the route declines when that ceiling cannot be read from Upstash.
+  All three search limiters run with Upstash analytics off, so the per-IP
+  counter (gone about 20 minutes after its window) is the only thing tied to a
+  reader. The privacy page says so; keep the two in step.
+
 ## Publication dates (load-bearing — do not break)
 
 Every price has one source; so does every publication date. `publishedAt` is
