@@ -9,14 +9,14 @@
   {
     "date": "2 August 2025",
     "label": "GPAI obligations and governance",
-    "detail": "General-purpose AI model duties and the governance architecture.",
+    "detail": "General-purpose AI model duties, the governance architecture, and the penalties chapter (Chapter XII), except Article 101.",
     "status": "in-force",
     "basis": "Article 113, third paragraph, point (b)"
   },
   {
     "date": "2 August 2026",
-    "label": "Article 50 transparency, GPAI enforcement, and penalties",
-    "detail": "These are in force now. The Omnibus did not move them.",
+    "label": "Article 50 transparency, and GPAI enforcement including Commission fines",
+    "detail": "Article 50 transparency duties apply, and the Commission's enforcement powers over providers of general-purpose AI models begin, including its power to fine them under Article 101. The rest of Chapter XII, penalties, has applied since 2 August 2025. The Omnibus did not move these dates.",
     "status": "in-force",
     "basis": "Article 113, second paragraph"
   },

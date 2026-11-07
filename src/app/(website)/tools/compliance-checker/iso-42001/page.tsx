@@ -145,14 +145,15 @@ export default function Iso42001CrosswalkPage() {
           <div className="mt-8 rounded-lg border border-silicon-amber/40 bg-silicon-amber/5 p-5">
             <h2 className="text-base font-semibold text-text-primary">Certification is not a presumption of conformity</h2>
             <p className="mt-2 text-sm leading-relaxed text-text-primary">
-              Under Article 40, a presumption of conformity comes only from harmonised standards whose references
-              are published in the Official Journal. ISO/IEC 42001 is not one of them. The harmonised standards
-              published so far:
+              Under Article 40, a presumption of conformity comes from harmonised standards whose references are
+              published in the Official Journal, and Article 41 gives the same effect to Commission common
+              specifications. ISO/IEC 42001 is neither. Harmonised standards whose references have been published
+              so far:
             </p>
             <ul className="mt-3 space-y-2 text-sm text-text-primary">
               {HARMONISED_STANDARDS.map((standard) => (
                 <li key={standard.reference}>
-                  <span className="font-mono">{standard.reference}</span>, published {standard.date}, covering{' '}
+                  <span className="font-mono">{standard.reference}</span>, reference published in the Official Journal on {standard.date}, covering{' '}
                   {standard.covers}.{' '}
                   <a href={standard.sourceUrl} className="text-silicon-amber-strong hover:underline" rel="noreferrer">
                     {standard.sourceLabel}
@@ -170,7 +171,7 @@ export default function Iso42001CrosswalkPage() {
           <h2 className="mt-12 text-2xl font-semibold text-text-primary">Where your 42001 work carries over</h2>
           <p className="mt-2 text-sm text-text-muted">
             The overlap ratings are this publication’s judgement of how much an operating 42001 system typically
-            evidences, not a legal conclusion. ISO/IEC 42001 elements are named by number, never quoted; the Annex A
+            evidences, not a legal conclusion. ISO/IEC 42001 elements are named by number and short title, and their text is never quoted; the Annex A
             areas are cited at area level.
           </p>
           <div className="mt-6 space-y-4">

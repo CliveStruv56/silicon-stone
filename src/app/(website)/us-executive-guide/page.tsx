@@ -222,9 +222,10 @@ export default function AtlanticDriftPage() {
               Operative now, versus adopted-but-pending
             </h2>
             <p className="mb-4 leading-relaxed text-text-muted">
-              <strong className="text-text-primary">In force since 2 August 2026:</strong>{' '}
-              the Article 50 transparency duties and the penalty and governance regime that
-              gives the Act teeth. This is the part that binds first.
+              <strong className="text-text-primary">Applies since 2 August 2026:</strong>{' '}
+              the Article 50 transparency duties and enforcement against providers of
+              general-purpose AI models, including the Commission’s power to fine them.
+              Penalties (Chapter XII) have applied since 2 August 2025.
             </p>
             <p className="leading-relaxed text-text-muted">
               <strong className="text-text-primary">Adopted but pending:</strong> the heavy

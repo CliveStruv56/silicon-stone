@@ -352,7 +352,7 @@ export const ISO_42001_CROSSWALK: CrosswalkRow[] = [
     fit: 'none',
     reuse: 'Your audit evidence feeds it, but a management-system certificate is not a conformity assessment of a product.',
     adds:
-      'Internal control under Annex VI for most Annex III systems, a notified body for biometrics unless harmonised standards are applied, and the sectoral procedure for Annex I products, followed by a declaration of conformity and the CE marking.',
+      'Internal control under Annex VI for most Annex III systems, a notified body for biometrics unless harmonised standards are applied, and the sectoral procedure for products under Section A of Annex I, followed by a declaration of conformity and the CE marking.',
   },
   {
     id: 'registration',

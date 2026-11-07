@@ -1004,7 +1004,7 @@ export default function ComplianceCheckerPage() {
                                 : 'w-fit border-stone-teal text-stone-teal'
                             }
                           >
-                            {entry.status === 'in-force' ? `In force — ${entry.date}` : entry.date}
+                            {entry.status === 'in-force' ? `Applies from ${entry.date}` : entry.date}
                           </Badge>
                         </div>
                         <p className="mt-2 text-sm text-text-muted">{entry.detail}</p>

@@ -29,6 +29,6 @@ export const HARMONISED_STANDARDS: ReadonlyArray<SourcedFact & { reference: stri
     date: '14 October 2026',
     sourceLabel: 'Commission Implementing Decision (EU) 2026/2274',
     sourceUrl: 'https://eur-lex.europa.eu/eli/dec_impl/2026/2274/oj',
-    checkedAt: '2026-10-29',
+    checkedAt: '2026-11-07',
   },
 ]
