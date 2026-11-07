@@ -170,7 +170,7 @@ fixed; it is only instrumented.
 regression — it is the signal that v2 fixed something, and the test must be moved
 into the v2 suite with its assertion inverted rather than deleted.
 
-The second most likely: **the rule pack is `2026-10-29` now** (it adds Articles
+The second most likely: **the rule pack is `2026-11-07` now** (`2026-10-29` is kept as cut; only the timeline differs) (it adds Articles
 2, 25 and 40 for the FAQ and ISO/IEC 42001 crosswalk; the engine does not read
 them), and every pack change is a version bump. `2026-08-10`, `2026-08-18`,
 `2026-08-19` and `2026-08-19b` are still

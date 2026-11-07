@@ -199,7 +199,8 @@ the EU source acknowledgement; that is not decoration.
 Corpus coverage is partial: **30 Articles plus Annex III**. Annex III arrived
 2026-08-18; Articles 10, 14, 15, 16 and 43 on 2026-08-19 in pack `2026-08-19`;
 Articles 4, 27 and 86 the same day in pack `2026-08-19b`; Articles 2, 25 and 40
-on 2026-10-29 in pack `2026-10-29`, for the explainers below. All from the same CELEX
+on 2026-10-29 in pack `2026-10-29`, for the explainers below; pack `2026-11-07` is the same
+plus a corrected timeline (the penalties chapter has applied since 2025, not 2 August 2026). All from the same CELEX
 and with `corpusCutOff` unmoved at `2026-07-27` — the same consolidation, just
 more of it read out of it. **The `b` suffix is deliberate**: two packs were cut
 on 2026-08-19, and dating the second `2026-08-20` would put a false date on the

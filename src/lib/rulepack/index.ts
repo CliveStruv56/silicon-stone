@@ -23,6 +23,11 @@ import sources2026_10_29 from '../../../rulepack/versions/2026-10-29/sources.jso
 import timeline2026_10_29 from '../../../rulepack/versions/2026-10-29/timeline.json'
 import penalties2026_10_29 from '../../../rulepack/versions/2026-10-29/penalties.json'
 import rules2026_10_29 from '../../../rulepack/versions/2026-10-29/rules.json'
+import manifest2026_11_07 from '../../../rulepack/versions/2026-11-07/manifest.json'
+import sources2026_11_07 from '../../../rulepack/versions/2026-11-07/sources.json'
+import timeline2026_11_07 from '../../../rulepack/versions/2026-11-07/timeline.json'
+import penalties2026_11_07 from '../../../rulepack/versions/2026-11-07/penalties.json'
+import rules2026_11_07 from '../../../rulepack/versions/2026-11-07/rules.json'
 
 /**
  * The versioned rule pack: the legal payload behind the AI Act triage engine,
@@ -197,12 +202,28 @@ const PACKS: Record<string, RulePack> = {
     prohibitedPractices: rules2026_10_29.prohibitedPractices as PackProhibitedPractice[],
     ruleAnchors: rules2026_10_29.ruleAnchors as Record<string, PackRuleAnchor>,
   },
+  /**
+   * Corrects the timeline of 2026-10-29, which was never deployed and is kept
+   * as cut. Its 2 August 2026 entry said the penalty regime began that day;
+   * Chapter XII has applied since 2 August 2025 and what began on 2 August 2026
+   * is Article 50 plus the Commission's Article 101 power to fine GPAI
+   * providers. Nothing else differs: corpus, penalties, rules and sources are
+   * byte-identical to 2026-10-29.
+   */
+  '2026-11-07': {
+    manifest: manifest2026_11_07 as PackManifest,
+    sources: sources2026_11_07 as Record<string, PackSource>,
+    timeline: timeline2026_11_07 as PackTimelineEntry[],
+    penalties: penalties2026_11_07 as PackPenaltyTier[],
+    prohibitedPractices: rules2026_11_07.prohibitedPractices as PackProhibitedPractice[],
+    ruleAnchors: rules2026_11_07.ruleAnchors as Record<string, PackRuleAnchor>,
+  },
 }
 
 export const AVAILABLE_RULE_PACK_VERSIONS = Object.keys(PACKS).sort()
 
 /** The version served when nothing is pinned. Never "latest" — see below. */
-const DEFAULT_RULE_PACK_VERSION = '2026-10-29'
+const DEFAULT_RULE_PACK_VERSION = '2026-11-07'
 
 /**
  * The pinned version. Deliberately an explicit version string, never a
