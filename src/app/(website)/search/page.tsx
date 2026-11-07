@@ -282,7 +282,7 @@ export default async function SearchPage({ searchParams }: Props) {
                 </div>
               )}
 
-              <RelatedByMeaning query={query} exclude={shownPaths} />
+              <RelatedByMeaning query={query} exclude={shownPaths} afterEmpty={total === 0} />
             </div>
           ) : (
             <div className="text-center py-14 text-text-muted">

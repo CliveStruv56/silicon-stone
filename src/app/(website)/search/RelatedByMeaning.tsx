@@ -16,8 +16,20 @@ const SETTLE_MS = 500
  * "Related by meaning": asked for after the keyword results have rendered, so
  * it can only ever add to the page. Anything already shown above is skipped.
  * Any failure (network, a limit, an upstream outage) renders nothing at all.
+ *
+ * `afterEmpty` is set when the keyword search found nothing. The section then
+ * follows "Nothing on the site matched those words." and is headed as a
+ * suggestion ("Closest in meaning") rather than as more of the same results.
  */
-export default function RelatedByMeaning({ query, exclude }: { query: string; exclude: string[] }) {
+export default function RelatedByMeaning({
+  query,
+  exclude,
+  afterEmpty = false,
+}: {
+  query: string
+  exclude: string[]
+  afterEmpty?: boolean
+}) {
   const [hits, setHits] = useState<Hit[]>([])
   const excludeKey = exclude.join('\n')
 
@@ -50,7 +62,7 @@ export default function RelatedByMeaning({ query, exclude }: { query: string; ex
     <section aria-labelledby="related-results-heading">
       <div className="mb-3 flex items-center gap-3">
         <h2 id="related-results-heading" className="font-statement text-lg font-semibold text-text-primary">
-          Related by meaning
+          {afterEmpty ? 'Closest in meaning' : 'Related by meaning'}
         </h2>
         <Badge variant="outline" className="font-mono text-xs text-text-muted">
           {hits.length}
