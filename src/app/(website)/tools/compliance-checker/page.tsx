@@ -450,10 +450,26 @@ export default function ComplianceCheckerPage() {
                 </Link>{' '}
                 is readable here in the pinned text.
               </p>
+              <p className="mt-4 max-w-3xl leading-relaxed text-text-muted">
+                Questions before you start?{' '}
+                <Link href="/tools/compliance-checker/faq" className="text-stone-teal underline underline-offset-4">
+                  Read the answers, with the statute quoted
+                </Link>
+                . Already certified to ISO/IEC 42001?{' '}
+                <Link href="/tools/compliance-checker/iso-42001" className="text-stone-teal underline underline-offset-4">
+                  See what carries over to the Act
+                </Link>
+                .
+              </p>
               {GENERAL_APPLICATION && NEXT_DATED_STEP && (
                 <p className="mt-4 max-w-3xl leading-relaxed text-text-muted">
-                  The Article 50 transparency duties and the penalty regime have applied since{' '}
-                  {GENERAL_APPLICATION.date}. The next dated step is {NEXT_DATED_STEP.date}:{' '}
+                  {/* Not "the penalty regime": Chapter XII has applied since
+                      2 August 2025 (Article 113, third paragraph, point (b)).
+                      What this date added is Article 101, the Commission's
+                      fines on GPAI providers, which that point excepts. */}
+                  The Article 50 transparency duties have applied since{' '}
+                  {GENERAL_APPLICATION.date}, and with them the Commission’s power to fine
+                  providers of general-purpose AI models. The next dated step is {NEXT_DATED_STEP.date}:{' '}
                   {NEXT_DATED_STEP.label.charAt(0).toLowerCase() + NEXT_DATED_STEP.label.slice(1)}.
                   The result tells you which line your system sits on.
                 </p>
@@ -988,7 +1004,7 @@ export default function ComplianceCheckerPage() {
                                 : 'w-fit border-stone-teal text-stone-teal'
                             }
                           >
-                            {entry.status === 'in-force' ? `In force — ${entry.date}` : entry.date}
+                            {entry.status === 'in-force' ? `Applies since ${entry.date}` : entry.date}
                           </Badge>
                         </div>
                         <p className="mt-2 text-sm text-text-muted">{entry.detail}</p>

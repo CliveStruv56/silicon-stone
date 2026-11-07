@@ -14,6 +14,7 @@
     "reg:check": "tsx scripts/regulatory/check.ts",
     "reg:hash": "tsx scripts/regulatory/check.ts --write",
     "reg:drift": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/regulatory/drift.ts",
+    "reg:review-due": "tsx scripts/regulatory/review-due.ts",
     "reg:ingest": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/regulatory/ingest.ts",
     "reg:ingest:dry": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/regulatory/ingest.ts --dry-run",
     "reg:probe": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/regulatory/probe-routed.ts",

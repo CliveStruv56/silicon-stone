@@ -149,7 +149,7 @@ export default function DigitalOmnibusPage() {
               </ul>
               <div className="mt-8 rounded-lg bg-stone-charcoal p-5">
                 <h3>Review history</h3>
-                <p className="mt-2 text-sm leading-relaxed text-text-muted"><time dateTime={DIGITAL_OMNIBUS_REVIEWED}>{DIGITAL_OMNIBUS_REVIEWED_LABEL}</time> — Added the Council’s 21 October position on the broader package and its change to the incident-reporting entry point.</p>
+                <p className="mt-2 text-sm leading-relaxed text-text-muted"><time dateTime={DIGITAL_OMNIBUS_REVIEWED}>{DIGITAL_OMNIBUS_REVIEWED_LABEL}</time> — Added the Council’s 21 October position on the broader package and its change to the incident-reporting entry point. Re-checked the AI Act application dates against the consolidated text and the Commission’s AI Act page, and corrected the 2 August 2026 milestone: penalties have applied since 2 August 2025, except the Commission’s fines on general-purpose AI model providers, which apply from 2 August 2026.</p>
                 <p className="mt-2 text-sm leading-relaxed text-text-muted"><time dateTime="2026-09-09">9 September 2026</time> — Established the shared reference, separated enacted AI changes from the broader proposal, and checked the main application milestones against Commission guidance.</p>
               </div>
             </section>

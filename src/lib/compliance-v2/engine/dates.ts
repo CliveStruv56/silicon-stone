@@ -48,7 +48,7 @@ export function packDate(label: string): ApplicationDate {
 /** The labels the engine depends on. Named so a pack rename fails in one place. */
 export const ANNEX_III_APPLIES = 'Standalone high-risk systems'
 export const ANNEX_I_APPLIES = 'Embedded product-safety high-risk systems'
-export const TRANSPARENCY_APPLIES = 'Article 50 transparency, GPAI enforcement, and penalties'
+export const TRANSPARENCY_APPLIES = 'Article 50 transparency, and GPAI enforcement including Commission fines'
 export const NEW_PROHIBITIONS_APPLY = 'New prohibitions, and machine-readable marking'
 
 /**
