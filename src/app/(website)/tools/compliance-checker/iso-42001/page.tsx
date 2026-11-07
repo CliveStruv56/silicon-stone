@@ -33,7 +33,7 @@ const PATH = '/tools/compliance-checker/iso-42001'
 export const metadata: Metadata = {
   title: 'ISO/IEC 42001 and the EU AI Act: what carries over | Silicon and Stone',
   description:
-    'An element-by-element crosswalk from ISO/IEC 42001 to the EU AI Act: what your AI management system already evidences, what the Act adds, and the duties with no counterpart in the standard.',
+    'From ISO/IEC 42001 to the EU AI Act, element by element: what your AI management system already evidences, what the Act adds, and what it leaves uncovered.',
   alternates: { canonical: PATH },
 }
 
@@ -163,14 +163,13 @@ export default function Iso42001CrosswalkPage() {
               ))}
             </ul>
             <p className="mt-3 text-xs text-text-muted">
-              This list is not part of the pinned rule pack, so it is not corpus-verified. It is kept by hand and
-              dated, and more standards are expected.
+              This list is kept by hand and dated; it is not checked against the quoted statute text.
             </p>
           </div>
 
           <h2 className="mt-12 text-2xl font-semibold text-text-primary">Where your 42001 work carries over</h2>
           <p className="mt-2 text-sm text-text-muted">
-            The overlap ratings are this publication’s judgement of how much an operating 42001 system typically
+            The overlap ratings are our judgement of how much an operating 42001 system typically
             evidences, not a legal conclusion. ISO/IEC 42001 elements are named by number and short title, and their text is never quoted; the Annex A
             areas are cited at area level.
           </p>
@@ -182,7 +181,7 @@ export default function Iso42001CrosswalkPage() {
 
           <h2 className="mt-12 text-2xl font-semibold text-text-primary">What ISO/IEC 42001 does not cover</h2>
           <p className="mt-2 text-sm text-text-muted">
-            Duties with no counterpart in the standard. A certificate gives you nothing toward these; each needs its
+            Duties with no counterpart in the standard. A certificate does not discharge any of them; each needs its
             own owner.
           </p>
           <div className="mt-6 space-y-4">
@@ -198,7 +197,7 @@ export default function Iso42001CrosswalkPage() {
             </Link>{' '}
             or read{' '}
             <Link href="/tools/compliance-checker/faq" className="text-silicon-amber-strong hover:underline">
-              the questions we are asked most
+              the common questions on the Act
             </Link>
             .
           </p>
@@ -224,7 +223,7 @@ export default function Iso42001CrosswalkPage() {
         <FollowOnOffering
           offering={briefing}
           eyebrow="Turn the crosswalk into a plan"
-          intro="Bring your Statement of Applicability and one AI system. The Advisory Briefing tells you which of these gaps are yours, and in what order to close them."
+          intro="Bring one AI system and a summary of your 42001 scope. The Advisory Briefing is prepared from that and gives you priorities, evidence gaps and next actions. Review of a Statement of Applicability or other documents is scoped separately."
           ctaLabel="Explore the Advisory Briefing"
           note="Prepared from your Compliance Checker result. Review of supporting documents is scoped separately."
         />

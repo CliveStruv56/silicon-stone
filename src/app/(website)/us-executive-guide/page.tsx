@@ -219,7 +219,7 @@ export default function AtlanticDriftPage() {
               <Clock className="h-4 w-4" /> The moving timeline
             </div>
             <h2 className="mb-4 text-2xl font-semibold text-text-primary">
-              Operative now, versus adopted-but-pending
+              Applying now, versus applying later
             </h2>
             <p className="mb-4 leading-relaxed text-text-muted">
               <strong className="text-text-primary">Applies since 2 August 2026:</strong>{' '}
@@ -228,7 +228,7 @@ export default function AtlanticDriftPage() {
               The rest of the penalties chapter (Chapter XII) has applied since 2 August 2025.
             </p>
             <p className="leading-relaxed text-text-muted">
-              <strong className="text-text-primary">Adopted but pending:</strong> the heavy
+              <strong className="text-text-primary">In law, applying later:</strong> the heavy
               high-risk obligations were re-timed, not removed — standalone high-risk
               (Annex III) on 2 December 2027, embedded high-risk (Annex I) on 2 August 2028.
               The re-timing is law, in force since 27 July 2026, so treat the

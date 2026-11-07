@@ -24,7 +24,7 @@ const PATH = '/tools/compliance-checker/faq'
 export const metadata: Metadata = {
   title: 'EU AI Act questions, answered from the statute | Silicon and Stone',
   description:
-    'Does the AI Act reach a US company? Are you a provider if you build on GPT or Claude? When do the high-risk duties apply after the Digital Omnibus? Answers with the statute quoted.',
+    'EU AI Act scope for US companies, provider or deployer roles, the high-risk dates after the Digital Omnibus on AI, and penalties, with the statute quoted.',
   // The parent layout's canonical points at the checker; inherited, it would
   // collapse this page into that one.
   alternates: { canonical: PATH },
@@ -55,7 +55,7 @@ export default function AiActFaqPage() {
 
           <h1 className="mt-6 text-3xl font-semibold text-text-primary">EU AI Act questions, answered from the statute</h1>
           <p className="mt-3 text-text-muted">
-            The questions we are asked most, answered in plain English. Every quotation beside an answer is a
+            Common questions about the EU AI Act, answered in plain English. Every quotation beside an answer is a
             verbatim extract of the consolidated Regulation, checked against the same pinned text the Compliance
             Checker uses, and every current application date comes from that text rather than from memory.
           </p>
@@ -118,7 +118,7 @@ export default function AiActFaqPage() {
           <div className="mt-6 space-y-3 rounded-lg border border-border-subtle bg-stone-charcoal p-6 text-sm text-text-muted">
             <p>
               <strong className="text-text-primary">This is explanation, not legal advice.</strong> The answers are
-              this publication’s reading of the consolidated text and have not been reviewed by counsel. Your own
+              our reading of the consolidated text and have not been reviewed by counsel. Your own
               position turns on facts about your systems that a general answer cannot know.
             </p>
             <p>

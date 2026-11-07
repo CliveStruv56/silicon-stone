@@ -17,7 +17,7 @@ import type { StatuteCitation } from './types'
  * Three rules, all enforced by `explainers.test.ts`:
  *
  *  1. **Every quotation is verbatim** against the pinned corpus.
- *  2. **No exact date is written here.** Application dates come from the pack's
+ *  2. **No exact date is written into an answer.** Application dates come from the pack's
  *     timeline through `packDate()`, which throws on a renamed entry, so a pack
  *     that moves a date moves this page with it. The test fails on any date in
  *     an answer that is not in the pack timeline or in `HARMONISED_STANDARDS`.
@@ -110,8 +110,8 @@ export const AI_ACT_FAQ: FaqEntry[] = [
     question: 'When do the high-risk obligations apply? We were told August 2026.',
     answer: [
       `August 2026 was the original date for the Annex III systems; AI in products under Annex I was originally due in August 2027. The Digital Omnibus on AI, Regulation (EU) 2026/1744, moved both. The core high-risk obligations, Chapter III Sections 1 to 3, now apply from ${annexIII} for systems that are high-risk under Annex III, the standalone use cases such as recruitment, credit scoring and education, and from ${annexI} for AI that is a safety component of a product covered by the sectoral legislation in Annex I.`,
-      'Guides written before the Omnibus give the old date. Planning against it pulls forward work that need not be rushed; overlooking what did start on that date is the more expensive mistake.',
-      `Because ${general} did matter: it is the Regulation's general date of application, when the Article 50 transparency duties began to apply, along with the Commission's power to fine providers of general-purpose AI models.`,
+      'Guides written before the Omnibus give the old date. Planning against it brings some work forward earlier than the Act requires, though the inventory and the vendor evidence still take time. In our reading, overlooking what already applies is the costlier mistake.',
+      `${general} did matter, though, for a different reason: it is the Regulation’s general date of application, when the Article 50 transparency duties began to apply, along with the Commission's power to fine providers of general-purpose AI models.`,
     ],
     citations: [
       {
@@ -130,7 +130,7 @@ export const AI_ACT_FAQ: FaqEntry[] = [
     id: 'what-applies-now',
     question: 'With the high-risk deadlines deferred, what do we have to do already?',
     answer: [
-      `More than most organisations assume. Since ${chapterI} the Article 5 prohibited practices have been banned outright, and every provider and deployer of any AI system, at any risk tier, has owed the Article 4 duty of AI literacy: measures to support the AI literacy of the people who operate and use AI on your behalf, taking into account their experience and the context the AI is used in. It does not require you to guarantee any particular level.`,
+      `Several duties already apply. Since ${chapterI} the Article 5 prohibited practices have been banned outright, and every provider and deployer of any AI system, at any risk tier, has owed the Article 4 duty of AI literacy: measures to support the AI literacy of the people who operate and use AI on your behalf, taking into account their experience and the context the AI is used in. It does not require you to guarantee any particular level.`,
       `Since ${gpai}, providers of general-purpose AI models have had their own obligations. Since ${general}, the Article 50 transparency duties have applied, and the Commission can fine providers of general-purpose AI models.`,
       `From ${newProhibitions}, two further prohibitions apply, and generative systems already on the market before ${general} must meet the Article 50(2) duty to mark their output as artificially generated.`,
     ],
@@ -187,9 +187,9 @@ export const AI_ACT_FAQ: FaqEntry[] = [
     question: 'We manufacture equipment with AI built into it. What changes for us?',
     answer: [
       `Your route is usually Annex I, and it runs on the later clock: ${annexI}. AI is high-risk on this route when it is a safety component of a product covered by the EU product legislation in Annex I, such as the rules on lifts, toys or medical devices, and that product needs a third-party conformity assessment.`,
-      'The Omnibus narrowed what counts as a safety component. AI used only for non-safety purposes such as user assistance, performance optimisation, efficiency or quality control does not qualify, unless its failure or malfunction would endanger health and safety.',
+      'The Digital Omnibus on AI narrowed what counts as a safety component. AI used only for non-safety purposes such as user assistance, performance optimisation, efficiency or quality control does not qualify, unless its failure or malfunction would endanger health and safety.',
       'For products under Section A of Annex I, the AI Act requirements are assessed inside the conformity procedure your sectoral legislation already requires, not in a second one, and where you place the product on the market under your own name, you are the provider of the AI system inside it.',
-      'Machinery is now different. The Omnibus moved the Machinery Regulation, (EU) 2023/1230, to Section B of Annex I, so for AI in machinery most of the AI Act does not apply directly: the Commission is to add the corresponding health and safety requirements to the Machinery Regulation by delegated act.',
+      'Machinery is now treated differently. The Digital Omnibus on AI moved the Machinery Regulation, (EU) 2023/1230, to Section B of Annex I, so for AI in machinery most of the AI Act does not apply directly: the Commission is to add the corresponding health and safety requirements to the Machinery Regulation by delegated act.',
     ],
     citations: [
       {
@@ -223,7 +223,7 @@ export const AI_ACT_FAQ: FaqEntry[] = [
     answer: [
       `As a deployer, from ${annexIII} on the Annex III route: use the system in line with the provider’s instructions, assign human oversight to people with the competence, training and authority to exercise it, monitor how it operates, and keep the logs it generates that are under your control for at least six months. If you are an employer using it at work, you must tell workers’ representatives and the affected workers first.`,
       `Some duties already apply. The Article 4 literacy duty has applied since ${chapterI}, and Article 86, which gives people affected by certain decisions based on a high-risk system’s output a right to an explanation from the deployer, has formally applied since ${general}, ahead of the Annex III classification rules it refers to.`,
-      'Your vendor’s evidence is now your problem too. The Compliance Checker lists the questions to put to them.',
+      'You will also need your vendor’s evidence. The Compliance Checker lists the questions to put to them.',
     ],
     citations: [
       {
@@ -299,8 +299,8 @@ export const AI_ACT_FAQ: FaqEntry[] = [
     id: 'iso-42001',
     question: 'We are certified to ISO/IEC 42001. Does that make us compliant with the AI Act?',
     answer: [
-      'No, although it is a strong start. ISO/IEC 42001 sets requirements for an AI management system across your organisation, and you can be certified against it. The AI Act sets requirements for each AI system, and several have no counterpart in the standard at all: classifying each system, conformity assessment, registration in the EU database, the prohibited practices and the transparency duties. Others, such as reporting serious incidents to the authorities, are covered only in part.',
-      `Under Articles 40 and 41, a presumption of conformity comes from harmonised standards whose references are published in the Official Journal, or from Commission common specifications, to the extent they cover the Act's requirements. ISO/IEC 42001 is neither. The first harmonised standard, ${firstStandard.reference}, had its reference published in the Official Journal on ${firstStandard.date} and covers ${firstStandard.covers}.`,
+      'No, although much of the evidence carries over. ISO/IEC 42001 sets requirements for an AI management system across your organisation, and you can be certified against it. The AI Act sets requirements for each AI system, and several have no counterpart in the standard at all: classifying each system, conformity assessment, registration in the EU database, the prohibited practices and the transparency duties. Others, such as reporting serious incidents to the authorities, are covered only in part.',
+      `Under Articles 40 and 41, a presumption of conformity comes from harmonised standards whose references are published in the Official Journal, or from Commission common specifications, to the extent they cover the Act’s requirements. ISO/IEC 42001 is neither. The first harmonised standard, ${firstStandard.reference}, had its reference published in the Official Journal on ${firstStandard.date} and covers ${firstStandard.covers}.`,
       'The crosswalk sets out, element by element, what your 42001 work already evidences and what the Act adds on top.',
     ],
     citations: [
