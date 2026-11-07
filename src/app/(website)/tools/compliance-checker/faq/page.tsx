@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { Header, Footer } from '@/components/layout'
 import { Badge } from '@/components/ui/badge'
 import { JsonLd } from '@/components/seo/JsonLd'
+import { ContentsPanel, BackToContents } from '@/components/tools/ContentsPanel'
 import { StatuteQuote } from '@/components/tools/StatuteQuote'
 import { FollowOnOffering } from '@/components/advisory/FollowOnOffering'
 import { AI_ACT_FAQ } from '@/lib/ai-act-explainers/faq'
@@ -69,17 +70,11 @@ export default function AiActFaqPage() {
             </Badge>
           </div>
 
-          <nav aria-label="Questions on this page" className="mt-8">
-            <ol className="space-y-2 text-sm">
-              {AI_ACT_FAQ.map((entry) => (
-                <li key={entry.id}>
-                  <a href={`#${entry.id}`} className="text-text-primary hover:text-silicon-amber-strong hover:underline">
-                    {entry.question}
-                  </a>
-                </li>
-              ))}
-            </ol>
-          </nav>
+          <ContentsPanel
+            heading="Questions on this page"
+            ariaLabel="Questions on this page"
+            groups={[{ items: AI_ACT_FAQ.map((entry) => ({ id: entry.id, label: entry.question })) }]}
+          />
 
           <div className="mt-10 divide-y divide-border-subtle">
             {AI_ACT_FAQ.map((entry) => (
@@ -111,6 +106,7 @@ export default function AiActFaqPage() {
                     </Link>
                   </p>
                 )}
+                <BackToContents label="Back to questions" />
               </article>
             ))}
           </div>

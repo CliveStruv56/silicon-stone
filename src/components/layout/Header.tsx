@@ -43,6 +43,8 @@ const primaryNavigation: NavItem[] = [
     href: '/tools',
     children: [
       { name: 'Compliance Checker', href: '/tools/compliance-checker' },
+      { name: 'AI Act FAQ', href: '/tools/compliance-checker/faq' },
+      { name: 'ISO 42001 crosswalk', href: '/tools/compliance-checker/iso-42001' },
       { name: 'Supply Chain Mapper', href: '/tools/supply-chain-mapper' },
       { name: 'Scenario Modeler', href: '/tools/scenario-modeler' },
       { name: 'Policy Stress-Test', href: '/tools/policy-stress-test' },

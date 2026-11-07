@@ -428,6 +428,22 @@ export default function ComplianceCheckerPage() {
                 A first-pass classification, the obligations that follow from it, and the evidence
                 to ask your vendor for — kept as an AI system record you can file.
               </p>
+              <nav aria-label="Related guides" className="mt-5 grid max-w-3xl gap-3 sm:grid-cols-2">
+                <Link
+                  href="/tools/compliance-checker/faq"
+                  className="rounded-lg border border-stone-teal/50 bg-stone-charcoal/60 p-4 transition-colors hover:border-stone-teal"
+                >
+                  <span className="block text-sm font-semibold text-text-primary">EU AI Act FAQ →</span>
+                  <span className="mt-1 block text-xs text-text-muted">Common questions, answered with the statute quoted.</span>
+                </Link>
+                <Link
+                  href="/tools/compliance-checker/iso-42001"
+                  className="rounded-lg border border-stone-teal/50 bg-stone-charcoal/60 p-4 transition-colors hover:border-stone-teal"
+                >
+                  <span className="block text-sm font-semibold text-text-primary">ISO 42001 crosswalk →</span>
+                  <span className="mt-1 block text-xs text-text-muted">What ISO/IEC 42001 work carries over to the Act, and what the Act adds.</span>
+                </Link>
+              </nav>
               {/* Counts and dates are read from the catalogue, the pack manifest
                   and the pinned timeline, never typed: a question added to the
                   walk or a date moved by a later pack must not leave this
