@@ -1,5 +1,8 @@
 /** Editorial review date, not the date the visitor happens to open the page. */
-export const DIGITAL_OMNIBUS_REVIEWED = '2026-11-02'
+export const DIGITAL_OMNIBUS_REVIEWED = '2026-11-07'
+
+/** The review date as shown on the page, always derived from the constant above. */
+export const DIGITAL_OMNIBUS_REVIEWED_LABEL = new Date(`${DIGITAL_OMNIBUS_REVIEWED}T00:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })
 
 export const OMNIBUS_SOURCES = {
   overview: { title: 'European Commission: the two Digital Omnibus tracks', url: 'https://digital-strategy.ec.europa.eu/en/policies/digital-rulebook' },

@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { Header, Footer } from '@/components/layout'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { AI_ACT_TIMELINE } from '@/lib/ai-act-timeline'
-import { DIGITAL_OMNIBUS_REVIEWED, OMNIBUS_SOURCES, OMNIBUS_HISTORY, OMNIBUS_APPLICATIONS } from '@/lib/digital-omnibus'
+import { DIGITAL_OMNIBUS_REVIEWED, DIGITAL_OMNIBUS_REVIEWED_LABEL, OMNIBUS_SOURCES, OMNIBUS_HISTORY, OMNIBUS_APPLICATIONS } from '@/lib/digital-omnibus'
 import { absoluteUrl } from '@/lib/site'
 
 const title = 'Digital Omnibus: What Changes and What Matters'
@@ -46,7 +46,7 @@ export default function DigitalOmnibusPage() {
             <p className="mt-4 text-2xl font-medium text-silicon-amber-strong sm:text-3xl">What changes and what matters.</p>
             <p className="mt-6 max-w-3xl text-lg leading-relaxed text-text-muted">Europe is revising its digital rulebook. Some AI rules have changed; wider changes to data, privacy and cybersecurity are still being negotiated. Understanding the distinction helps you decide what to act on, what to prepare for and what to watch.</p>
             <p className="mt-5 max-w-3xl text-sm leading-relaxed text-text-muted">For leaders across the UK and EU, and US companies operating in or selling into Europe. This reference provides the shared regulatory context for our advisory work.</p>
-            <p className="mt-8 text-sm text-text-muted">Reviewed <time dateTime={DIGITAL_OMNIBUS_REVIEWED}>2 November 2026</time> · Clive Struver, Silicon and Stone</p>
+            <p className="mt-8 text-sm text-text-muted">Reviewed <time dateTime={DIGITAL_OMNIBUS_REVIEWED}>{DIGITAL_OMNIBUS_REVIEWED_LABEL}</time> · Clive Struver, Silicon and Stone</p>
           </div>
         </section>
 
@@ -80,9 +80,9 @@ export default function DigitalOmnibusPage() {
 
             <section id="timeline">
               <h2>Timeline and milestones</h2>
-              <p className="mt-4 leading-relaxed text-text-muted">First, how the AI changes became law. Then, the main application dates to read against your systems and your role.</p>
+              <p className="mt-4 leading-relaxed text-text-muted">First, how the AI changes became law and where the broader package stands. Then, the main application dates to read against your systems and your role.</p>
               <details className="mt-6 rounded-lg border border-border-subtle p-5">
-                <summary className="cursor-pointer font-medium text-text-primary">How we got here: November 2025 to July 2026</summary>
+                <summary className="cursor-pointer font-medium text-text-primary">How we got here: November 2025 to October 2026</summary>
                 <ol className="mt-5 space-y-5">
                   {OMNIBUS_HISTORY.map(event => <li key={event.date}>
                     <p className="text-sm text-stone-teal">{event.date}</p><h3 className="mt-1">{event.title}</h3>
@@ -143,13 +143,13 @@ export default function DigitalOmnibusPage() {
 
             <section id="sources" className="!border-b-0">
               <h2>Sources and updates</h2>
-              <p className="mt-4 leading-relaxed text-text-muted">The status above was reviewed on 9 September 2026. Source links let you check subsequent developments. The business examples are Silicon and Stone’s interpretation; the legislation and official procedures establish the legal position.</p>
+              <p className="mt-4 leading-relaxed text-text-muted">The status above was reviewed on <time dateTime={DIGITAL_OMNIBUS_REVIEWED}>{DIGITAL_OMNIBUS_REVIEWED_LABEL}</time>. Source links let you check subsequent developments. The business examples are Silicon and Stone’s interpretation; the legislation and official procedures establish the legal position.</p>
               <ul className="mt-6 space-y-3 text-sm leading-relaxed">
                 {Object.entries(OMNIBUS_SOURCES).map(([id, source]) => <li key={id}><a href={source.url} className="text-stone-teal underline underline-offset-4">{source.title}</a></li>)}
               </ul>
               <div className="mt-8 rounded-lg bg-stone-charcoal p-5">
                 <h3>Review history</h3>
-                <p className="mt-2 text-sm leading-relaxed text-text-muted"><time dateTime={DIGITAL_OMNIBUS_REVIEWED}>2 November 2026</time> — Added the Council’s 21 October position on the broader package and its change to the incident-reporting entry point; re-checked the AI Act application dates against the Commission’s AI Act page.</p>
+                <p className="mt-2 text-sm leading-relaxed text-text-muted"><time dateTime={DIGITAL_OMNIBUS_REVIEWED}>{DIGITAL_OMNIBUS_REVIEWED_LABEL}</time> — Added the Council’s 21 October position on the broader package and its change to the incident-reporting entry point.</p>
                 <p className="mt-2 text-sm leading-relaxed text-text-muted"><time dateTime="2026-09-09">9 September 2026</time> — Established the shared reference, separated enacted AI changes from the broader proposal, and checked the main application milestones against Commission guidance.</p>
               </div>
             </section>
