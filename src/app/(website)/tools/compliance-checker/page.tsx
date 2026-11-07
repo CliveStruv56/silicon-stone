@@ -441,7 +441,7 @@ export default function ComplianceCheckerPage() {
                   className="rounded-lg border border-stone-teal/50 bg-stone-charcoal/60 p-4 transition-colors hover:border-stone-teal"
                 >
                   <span className="block text-sm font-semibold text-text-primary">ISO 42001 crosswalk →</span>
-                  <span className="mt-1 block text-xs text-text-muted">What carries over to the Act, and what it adds.</span>
+                  <span className="mt-1 block text-xs text-text-muted">What ISO/IEC 42001 work carries over to the Act, and what the Act adds.</span>
                 </Link>
               </nav>
               {/* Counts and dates are read from the catalogue, the pack manifest
