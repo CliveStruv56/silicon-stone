@@ -2,6 +2,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { Header, Footer } from '@/components/layout'
 import { Badge } from '@/components/ui/badge'
+import { ContentsPanel, BackToContents } from '@/components/tools/ContentsPanel'
 import { StatuteQuote } from '@/components/tools/StatuteQuote'
 import { FollowOnOffering } from '@/components/advisory/FollowOnOffering'
 import {
@@ -100,6 +101,7 @@ function Row({ row }: { row: CrosswalkRow }) {
       <div className="mt-4">
         <StatuteQuote citation={row.aiAct} />
       </div>
+      <BackToContents href="#sections" label="Back to elements" />
     </article>
   )
 }
@@ -141,6 +143,22 @@ export default function Iso42001CrosswalkPage() {
               {count('none')} with no counterpart
             </Badge>
           </div>
+
+          <ContentsPanel
+            id="sections"
+            heading="Elements on this page"
+            ariaLabel="Elements on this page"
+            groups={[
+              {
+                heading: 'Where your 42001 work carries over',
+                items: mapped.map((row) => ({ id: row.id, label: row.requirement })),
+              },
+              {
+                heading: 'What ISO/IEC 42001 does not cover',
+                items: gaps.map((row) => ({ id: row.id, label: row.requirement })),
+              },
+            ]}
+          />
 
           <div className="mt-8 rounded-lg border border-silicon-amber/40 bg-silicon-amber/5 p-5">
             <h2 className="text-base font-semibold text-text-primary">ISO/IEC 42001 certification is not a presumption of conformity</h2>
