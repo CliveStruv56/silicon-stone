@@ -111,7 +111,7 @@ export const AI_ACT_FAQ: FaqEntry[] = [
     answer: [
       `August 2026 was the original date for the Annex III systems; AI in products under Annex I was originally due in August 2027. The Digital Omnibus on AI, Regulation (EU) 2026/1744, moved both. The core high-risk obligations, Chapter III Sections 1 to 3, now apply from ${annexIII} for systems that are high-risk under Annex III, the standalone use cases such as recruitment, credit scoring and education, and from ${annexI} for AI that is a safety component of a product covered by the sectoral legislation in Annex I.`,
       'Guides written before the Omnibus give the old date. Planning against it brings some work forward earlier than the Act requires, though the inventory and the vendor evidence still take time. In our reading, overlooking what already applies is the costlier mistake.',
-      `${general} did matter, though, for a different reason: it is the Regulation’s general date of application, when the Article 50 transparency duties began to apply, along with the Commission's power to fine providers of general-purpose AI models.`,
+      `${general} did matter, though, for a different reason: it is the Regulation’s general date of application, when the Article 50 transparency duties began to apply, along with the Commission’s power to fine providers of general-purpose AI models.`,
     ],
     citations: [
       {

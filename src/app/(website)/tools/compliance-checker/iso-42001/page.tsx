@@ -225,7 +225,7 @@ export default function Iso42001CrosswalkPage() {
           eyebrow="Turn the crosswalk into a plan"
           intro="Bring one AI system and a summary of your 42001 scope. The Advisory Briefing is prepared from that and gives you priorities, evidence gaps and next actions. Review of a Statement of Applicability or other documents is scoped separately."
           ctaLabel="Explore the Advisory Briefing"
-          note="Prepared from your Compliance Checker result. Review of supporting documents is scoped separately."
+          note="Prepared from your Compliance Checker result or a description of your system."
         />
       </main>
       <Footer />
