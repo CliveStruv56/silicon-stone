@@ -28,6 +28,7 @@
     "knowledge:sync": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/knowledge-sync.ts",
     "knowledge:calibrate": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/knowledge-calibrate.ts",
     "search:index-pages": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/index-site-pages.ts",
+    "ratelimit:cleanup-analytics": "tsx scripts/cleanup-ratelimit-analytics.ts",
     "search:probe": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/probe-site-search.ts",
     "articles:sync": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx src/scripts/sync-pinecone.ts",
     "test:regulatory-index": "TSX_TSCONFIG_PATH=scripts/tsconfig.scripts.json tsx scripts/regulatory-index-checks.ts",

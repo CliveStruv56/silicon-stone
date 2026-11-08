@@ -994,6 +994,16 @@ by meaning" below the keyword results; it can only add to the page).
   are never expired. It is hard-coded off in `durable-rate-limit.ts` and
   `rate-limit-analytics.test.ts` fails if it comes back. The privacy page says
   the IP-keyed counters are short-lived; keep the two in step.
+- **Old analytics buckets are deleted once, by hand.** Analytics written
+  before the switch-off (`sas:<limiter>:events:<hour ms>`, IPs as members, no
+  expiry) stay in Upstash until removed. Clive approved deleting them after
+  PR #22 is deployed to production (2026-11-08). Run
+  `npm run ratelimit:cleanup-analytics` with production Upstash credentials:
+  it is a dry run by default (counts per prefix, oldest and newest hour, sample
+  key names; members are never read). Then, **only with Clive's go-ahead**,
+  `npm run ratelimit:cleanup-analytics -- --delete --expect <dry-run count>`,
+  which aborts if the count differs. Selection rules and their tests are in
+  `src/lib/ratelimit-analytics-cleanup.ts`; never replace it with KEYS or DEL.
 
 ## Publication dates (load-bearing — do not break)
 
