@@ -8,21 +8,12 @@ vi.mock('@/lib/search/zero-results', () => ({
   recordZeroResult: (...args: unknown[]) => recordZeroResult(...args),
 }))
 
-const { limiterRecordsAnalytics } = await import('@/lib/durable-rate-limit')
 const { reportZeroResult } = await import('@/app/(website)/search/actions')
 
 beforeEach(() => recordZeroResult.mockReset())
 
-/** Search limiters that must not leave identifiers behind in Upstash analytics. */
-const SEARCH_LIMITERS = ['searchZeroLog'] as const
-
 describe('what site search keeps about a reader', () => {
-  it('turns Upstash analytics off for every search limiter', () => {
-    for (const key of SEARCH_LIMITERS) expect(limiterRecordsAnalytics(key), key).toBe(false)
-    // Control: the default is unchanged for everything else.
-    expect(limiterRecordsAnalytics('login')).toBe(true)
-  })
-
+  // Rate-limit analytics is off for every limiter: see src/lib/rate-limit-analytics.test.ts.
   it('logs zero-result searches only through the settled reporter, never on render', () => {
     const page = fs.readFileSync('src/app/(website)/search/page.tsx', 'utf8')
     expect(page.includes('recordZeroResult')).toBe(false)

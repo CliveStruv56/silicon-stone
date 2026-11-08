@@ -24,6 +24,7 @@ dotenv.config({ path: path.join(process.cwd(), '.env.local') })
 
 import { Pinecone } from '@pinecone-database/pinecone'
 import { EMBEDDING_DIMENSIONS } from '../src/lib/embeddings'
+import { SITE_PAGES_NAMESPACE } from '../src/lib/search/site-index'
 
 async function main(): Promise<void> {
   const indexName = process.env.PINECONE_INDEX_NAME
@@ -90,7 +91,15 @@ async function main(): Promise<void> {
   // here means something else is sharing the index — which is how the original
   // one ended up holding an unrelated pipeline's records and became impossible
   // to recreate.
-  const foreign = Object.keys(stats.namespaces ?? {}).filter((ns) => ns !== '' && ns !== '__default__')
+  //
+  // One sharer is known and deliberate: the site-search lane's `site-pages`
+  // namespace (src/lib/search/site-index.ts), rebuilt by `search:index-pages`.
+  // It is reported separately so a genuinely foreign namespace stays visible.
+  const known = new Set(['', '__default__', SITE_PAGES_NAMESPACE])
+  if (stats.namespaces?.[SITE_PAGES_NAMESPACE]) {
+    console.log(`\n  site search: namespace ${SITE_PAGES_NAMESPACE} (pages and glossary terms, rebuilt by npm run search:index-pages)`)
+  }
+  const foreign = Object.keys(stats.namespaces ?? {}).filter((ns) => !known.has(ns))
   if (foreign.length > 0) {
     console.log(
       `\n  note: ${foreign.length} non-default namespace(s) present (${foreign.join(', ')}). ` +

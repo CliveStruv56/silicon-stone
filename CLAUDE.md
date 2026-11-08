@@ -958,12 +958,52 @@ Keyword search covers four sources, shown in this order: **Tools & pages**
   rate limiter's Upstash. No IP, no user agent, nothing about the reader;
   queries with an `@` or a run of six or more digits are never written; the log
   keeps at most 1,000 queries and accepts at most 500 new writes a day
-  (`searchZeroLog`, keyed on the constant `'all'`, with Upstash analytics off so
-  no identifier is stored). Do not add request data to it.
+  (`searchZeroLog`, keyed on the constant `'all'`). Do not add request data to it.
 - **Only settled searches are logged.** The box searches as you type, so every
   prefix used to land in the log. `ZeroResultReporter` reports a zero-result
   query only after it has stayed on screen for 3 seconds (`settle.ts`), through
   the `reportZeroResult` server action. Never log from the page render again.
+
+**Search by meaning** (`/api/search/related`, rendered client-side as "Related
+by meaning" below the keyword results; it can only add to the page).
+
+- **Public search reads two namespaces of the article index and no others**:
+  the default (published articles) and `site-pages` (registry pages and
+  published glossary terms). The same index also holds **`ideas`**, written by
+  the external story-idea agent: it must never be readable from public search.
+  `PUBLIC_NAMESPACES` in `src/lib/search/site-index.ts` is the whole list, and
+  `semantic.test.ts` fails on any other namespace, a bare `index.query()` or a
+  `searchSimilar` call in the public path. Every article and glossary hit is
+  re-checked against Sanity's published perspective before it is returned.
+- `site-pages` is rebuilt by `npm run search:index-pages` (complete and
+  reconciling on every run; it writes to `site-pages` only). **Run it after
+  any change to `src/lib/search/site-pages.ts` is merged to main, and after
+  glossary terms are published, edited or deleted in Studio.** Nothing
+  re-indexes automatically yet, so until it is run, search by meaning serves
+  the old text (stale pages and unpublished terms are still filtered out).
+- `SEMANTIC_SCORE_FLOOR = 0.40`, measured with `npm run search:probe`.
+  Re-measure as the catalogue grows, as with the prior-coverage floor.
+- Cost controls: query capped at 100 characters, personal-looking queries never
+  embedded, `publicSearch` per IP (40 / 10 min), a CDN cache on successful
+  answers, and `publicSearchDaily` (5,000 a day, global). Every Pinecone lane
+  shares one monthly read-unit allowance, so the daily ceiling is what keeps
+  public search from starving `/create`, related articles and the admin search.
+  On Vercel the route declines when that ceiling cannot be read from Upstash.
+  Upstash rate-limit analytics is off for **every** limiter (owner decision,
+  2026-11-07): it wrote each IP into `<prefix>:events:<hour>` buckets that
+  are never expired. It is hard-coded off in `durable-rate-limit.ts` and
+  `rate-limit-analytics.test.ts` fails if it comes back. The privacy page says
+  the IP-keyed counters are short-lived; keep the two in step.
+- **Old analytics buckets are deleted once, by hand.** Analytics written
+  before the switch-off (`sas:<limiter>:events:<hour ms>`, IPs as members, no
+  expiry) stay in Upstash until removed. Clive approved deleting them after
+  PR #22 is deployed to production (2026-11-08). Run
+  `npm run ratelimit:cleanup-analytics` with production Upstash credentials:
+  it is a dry run by default (counts per prefix, oldest and newest hour, sample
+  key names; members are never read). Then, **only with Clive's go-ahead**,
+  `npm run ratelimit:cleanup-analytics -- --delete --expect <dry-run count>`,
+  which aborts if the count differs. Selection rules and their tests are in
+  `src/lib/ratelimit-analytics-cleanup.ts`; never replace it with KEYS or DEL.
 
 ## Publication dates (load-bearing — do not break)
 

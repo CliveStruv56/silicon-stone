@@ -26,13 +26,6 @@ type RateLimitConfig = {
   limit: number
   window: `${number} ${'s' | 'm' | 'h' | 'd'}`
   prefix: string
-  /**
-   * Upstash's analytics records every identifier it sees (an IP, for most keys
-   * here) into hourly buckets that outlive the limit window. On by default, as
-   * it always was. Set false where the privacy page promises that nothing ties
-   * a request to the reader beyond the short-lived counter itself.
-   */
-  analytics?: boolean
 }
 
 const configs = {
@@ -91,7 +84,16 @@ const configs = {
   // Writes to the public search's zero-result log, keyed on the constant 'all'
   // (never on the reader). A global daily ceiling, so a script hammering
   // /search?q=… cannot flush the real entries out of the bounded log.
-  searchZeroLog: { limit: 500, window: '1 d', prefix: 'sas:search-zero-log', analytics: false },
+  searchZeroLog: { limit: 500, window: '1 d', prefix: 'sas:search-zero-log' },
+  // Public "search by meaning" (/api/search/related): one OpenAI embedding and
+  // two Pinecone queries per uncached request, with no login in front of it.
+  // Per reader: well above someone refining a few searches, far below a loop.
+  publicSearch: { limit: 40, window: '10 m', prefix: 'sas:public-search' },
+  // …and one global daily ceiling, keyed on the constant 'all'. It is the cost
+  // control, and it also protects the other Pinecone lanes: every lane shares
+  // one monthly read-unit allowance, so public search must never be able to
+  // spend it. 5,000 a day is 2,500 read units, about 7.5% of a 1M monthly cap.
+  publicSearchDaily: { limit: 5_000, window: '1 d', prefix: 'sas:public-search-daily' },
 } satisfies Record<string, RateLimitConfig>
 
 export type DurableRateLimitKey = keyof typeof configs
@@ -135,7 +137,13 @@ function getLimiter(key: DurableRateLimitKey) {
   const limiter = new Ratelimit({
     redis: makeRedis(),
     limiter: Ratelimit.slidingWindow(config.limit, config.window),
-    analytics: (config as RateLimitConfig).analytics ?? true,
+    // Never on, for any limiter (owner decision, 7 November 2026). Upstash's
+    // analytics writes every identifier it sees (an IP address, for most keys
+    // here) into hourly buckets under `<prefix>:events:<hour>` that are never
+    // expired, while the privacy page says the IP-keyed counters are
+    // short-lived. Not configurable per limiter, so a new one cannot turn it
+    // back on; `rate-limit-analytics.test.ts` fails if this changes.
+    analytics: false,
     prefix: config.prefix,
   })
   limiters.set(key, limiter)
@@ -214,10 +222,9 @@ export async function checkDurableRateLimit(
   }
 }
 
-/** Whether a limiter's Upstash analytics (which stores identifiers) is on. */
-export function limiterRecordsAnalytics(key: DurableRateLimitKey): boolean {
-  return (configs[key] as RateLimitConfig).analytics ?? true
-}
+/** Every limiter key, so tests can exercise the whole table. */
+export const DURABLE_RATE_LIMIT_KEYS = Object.keys(configs) as DurableRateLimitKey[]
+
 
 export function durableRateLimitConfigured() {
   return isConfigured()
