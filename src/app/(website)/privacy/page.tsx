@@ -76,7 +76,7 @@ export default function PrivacyPage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-stone-teal mt-1">-</span>
-                  <span><strong className="text-text-primary">Search logging:</strong> If a search finds nothing and stays on screen for three seconds, we keep the words searched for, how often they were searched, and the date last searched, so we can see what the site is missing. Searches containing an @ or a run of six or more digits are not kept. Nothing we keep links a search to you. The only thing tied to your connection is a short-lived counter, keyed on your IP address and normally deleted within about 20 minutes, that limits how often related pages can be requested.</span>
+                  <span><strong className="text-text-primary">Search logging:</strong> If a search finds nothing and stays on screen for three seconds, we keep the words searched for, how often they were searched, and the date last searched, so we can see what the site is missing. Searches containing an @ or a run of six or more digits are not kept. Nothing we keep links a search to you. Of what we keep from searches, the only thing tied to your connection is a short-lived counter, keyed on your IP address and normally deleted within about 20 minutes, that limits how often related pages can be requested.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-stone-teal mt-1">-</span>
@@ -144,7 +144,7 @@ export default function PrivacyPage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-stone-teal mt-1">-</span>
-                  <span><strong className="text-text-primary">Upstash:</strong> Stores the list of searches that found nothing, and counters, keyed on IP address, that limit how often related pages can be requested and how often the contact, newsletter sign-up and sign-in forms, the Compliance Checker and browser notification settings can be used. Their privacy policy is available at upstash.com/trust/privacy.</span>
+                  <span><strong className="text-text-primary">Upstash:</strong> Holds the list of searches that found nothing, and short-lived counters keyed on IP address, normally deleted within two hours. The counters limit how often related pages can be requested, and how often people can submit the contact, newsletter sign-up and sign-in forms, use the Compliance Checker, change browser notification settings, or use the tools our own team uses to publish and manage content. It also holds the Compliance Checker data described above and browser notification subscriptions. Their privacy policy is available at upstash.com/trust/privacy.</span>
                 </li>
               </ul>
             </div>

@@ -958,8 +958,7 @@ Keyword search covers four sources, shown in this order: **Tools & pages**
   rate limiter's Upstash. No IP, no user agent, nothing about the reader;
   queries with an `@` or a run of six or more digits are never written; the log
   keeps at most 1,000 queries and accepts at most 500 new writes a day
-  (`searchZeroLog`, keyed on the constant `'all'`, with Upstash analytics off so
-  no identifier is stored). Do not add request data to it.
+  (`searchZeroLog`, keyed on the constant `'all'`). Do not add request data to it.
 - **Only settled searches are logged.** The box searches as you type, so every
   prefix used to land in the log. `ZeroResultReporter` reports a zero-result
   query only after it has stayed on screen for 3 seconds (`settle.ts`), through
@@ -990,9 +989,11 @@ by meaning" below the keyword results; it can only add to the page).
   shares one monthly read-unit allowance, so the daily ceiling is what keeps
   public search from starving `/create`, related articles and the admin search.
   On Vercel the route declines when that ceiling cannot be read from Upstash.
-  All three search limiters run with Upstash analytics off, so the per-IP
-  counter (gone about 20 minutes after its window) is the only thing tied to a
-  reader. The privacy page says so; keep the two in step.
+  Upstash rate-limit analytics is off for **every** limiter (owner decision,
+  2026-11-07): it wrote each IP into `<prefix>:events:<hour>` buckets that
+  are never expired. It is hard-coded off in `durable-rate-limit.ts` and
+  `rate-limit-analytics.test.ts` fails if it comes back. The privacy page says
+  the IP-keyed counters are short-lived; keep the two in step.
 
 ## Publication dates (load-bearing — do not break)
 
