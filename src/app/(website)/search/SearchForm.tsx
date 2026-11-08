@@ -42,7 +42,7 @@ export default function SearchForm() {
         </div>
         <Input
           type="search"
-          placeholder="Search analysis and glossary terms..."
+          placeholder="Search tools, pages, analysis and terms…"
           className="pl-10 bg-stone-charcoal border-border-subtle focus:border-stone-teal text-text-primary w-full py-6 text-lg"
           value={term}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTerm(e.target.value)}
