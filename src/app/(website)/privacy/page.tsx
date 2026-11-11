@@ -4,6 +4,12 @@ import Link from 'next/link'
 import { Header, Footer } from '@/components/layout'
 import { Badge } from '@/components/ui/badge'
 
+/**
+ * The one place this page's date is set. Move it only when Clive has approved
+ * the changed wording.
+ */
+const LAST_UPDATED = 'November 2026'
+
 export const metadata: Metadata = {
   title: 'Privacy Policy | Silicon and Stone',
   description: 'How Silicon and Stone handles your data. GDPR-compliant privacy practices.',
@@ -24,7 +30,7 @@ export default function PrivacyPage() {
             <h1 className="text-4xl font-bold text-text-primary sm:text-5xl mb-4">
               Privacy Policy
             </h1>
-            <p className="text-text-muted">Last updated: March 2026</p>
+            <p className="text-text-muted">Last updated: {LAST_UPDATED}</p>
           </div>
         </section>
 
@@ -50,7 +56,7 @@ export default function PrivacyPage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-stone-teal mt-1">-</span>
-                  <span><strong className="text-text-primary">Contact form enquiries:</strong> Name, email, company (optional), area of interest, and your message. Stored by our email service provider.</span>
+                  <span><strong className="text-text-primary">Contact form enquiries:</strong> Name, email, company (optional), area of interest, and your message. Stored in Standfirst, our email system, with your IP address and browser details, and sent to us by email through Resend.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-stone-teal mt-1">-</span>
@@ -63,6 +69,14 @@ export default function PrivacyPage() {
                 <li className="flex items-start gap-2">
                   <span className="text-stone-teal mt-1">-</span>
                   <span><strong className="text-text-primary">Compliance Checker assessments:</strong> The interactive tools at <Link href="/tools" className="text-silicon-amber-strong hover:underline">/tools</Link> can be used without giving us anything. If you ask the AI Act Compliance Checker for a written report, we store the email address you give us, the report it generated, and a record of the consent wording you were shown. Your answers describe an AI system in your organisation, so treat them as commercially sensitive: we hold reports for 30 days and consent records for two years, we do not add the address to any mailing list unless you separately tick to say so, and we do not share either with anyone.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-stone-teal mt-1">-</span>
+                  <span><strong className="text-text-primary">Site search:</strong> When you search, the words are matched against our content, which is held at Sanity. The words are also sent to OpenAI, which converts them into a numerical form that captures their meaning. Only that numerical form, never the words, is compared with our search index at Pinecone to suggest related pages. Searches shorter than three characters, or containing an @ or a run of six or more digits, are not sent to OpenAI. A search repeated within a day may be answered from our cache without being sent again.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-stone-teal mt-1">-</span>
+                  <span><strong className="text-text-primary">Search logging:</strong> If a search finds nothing and stays on screen for three seconds, we keep the words searched for, how often they were searched, and the date last searched, so we can see what the site is missing. Searches containing an @ or a run of six or more digits are not kept. Nothing we keep links a search to you. Of what we keep from searches, the only thing tied to your connection is a short-lived counter, keyed on your IP address and normally deleted within about 20 minutes, that limits how often related pages can be requested.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-stone-teal mt-1">-</span>
@@ -106,7 +120,7 @@ export default function PrivacyPage() {
               <ul className="space-y-2 text-text-muted">
                 <li className="flex items-start gap-2">
                   <span className="text-stone-teal mt-1">-</span>
-                  <span><strong className="text-text-primary">Standfirst:</strong> Email list and newsletter management, hosted on Railway in the EU. Email is sent through Amazon Simple Email Service. Amazon&apos;s privacy notice is available at aws.amazon.com/privacy.</span>
+                  <span><strong className="text-text-primary">Standfirst:</strong> Email list and newsletter management, hosted on Railway in the EU. Email is sent through Amazon Simple Email Service. Amazon&rsquo;s privacy notice is available at aws.amazon.com/privacy.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-stone-teal mt-1">-</span>
@@ -115,6 +129,22 @@ export default function PrivacyPage() {
                 <li className="flex items-start gap-2">
                   <span className="text-stone-teal mt-1">-</span>
                   <span><strong className="text-text-primary">Sanity:</strong> Content management. Their privacy policy is available at sanity.io/legal/privacy.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-stone-teal mt-1">-</span>
+                  <span><strong className="text-text-primary">Resend:</strong> Sends us a copy of each contact form enquiry by email. Their privacy policy is available at resend.com/legal/privacy-policy.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-stone-teal mt-1">-</span>
+                  <span><strong className="text-text-primary">OpenAI:</strong> Turns search words into a numerical form so they can be matched by meaning. Their privacy policy is available at openai.com/policies/privacy-policy.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-stone-teal mt-1">-</span>
+                  <span><strong className="text-text-primary">Pinecone:</strong> Holds the search index that those numerical forms are compared with. Their privacy policy is available at pinecone.io/privacy.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-stone-teal mt-1">-</span>
+                  <span><strong className="text-text-primary">Upstash:</strong> Holds the list of searches that found nothing, and short-lived counters keyed on IP address, normally deleted within two hours. The counters limit how often related pages can be requested, and how often people can submit the contact, newsletter sign-up and sign-in forms, use the Compliance Checker, change browser notification settings, or use the tools our own team uses to publish and manage content. It also holds the Compliance Checker data described above and browser notification subscriptions. Their privacy policy is available at upstash.com/trust/privacy.</span>
                 </li>
               </ul>
             </div>

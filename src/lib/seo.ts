@@ -381,6 +381,26 @@ export function buildToolSchema(tool: { name: string; description: string; path:
 }
 
 /**
+ * `FAQPage` for a page of questions and plain-text answers. The caller passes
+ * exactly the text it renders, so the markup cannot answer differently from
+ * the page.
+ */
+export function buildFaqSchema(page: { path: string; items: Array<{ question: string; answer: string }> }) {
+  const url = absoluteUrl(page.path)
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    '@id': `${url}#faq`,
+    url,
+    mainEntity: page.items.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: { '@type': 'Answer', text: item.answer },
+    })),
+  }
+}
+
+/**
  * `Legislation` for one pinned AI Act provision. Every value is read from the
  * pack manifest by the caller — identifier, consolidation date, source URL — so
  * the markup cannot claim a different text from the one the page renders.

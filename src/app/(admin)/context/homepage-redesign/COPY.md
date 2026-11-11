@@ -26,7 +26,7 @@
 | `eyebrow` (badge) | `Forensic Technopolitics · the view from the edge` |
 | `headline` | `AI. Policy. Power. Leadership.` |
 | `subhead` | `Independent, decision-grade intelligence for UK and European leaders managing AI governance, technology dependency, and operational resilience.` |
-| `lede` | `Calibrated, decision-grade analysis from someone who spent thirty years inside the industry. Published twice a week from an Outer Orkney isle — sixty miles north of mainland Scotland — because the view from the edge is structurally clearer than the view from any centre.` |
+| `lede` | `Calibrated, decision-grade analysis from someone who spent thirty years inside the industry. Published twice a week from an Outer Orkney isle — sixty miles north of mainland Scotland — because the edge is where you see what the centre misses.` |
 | `primaryCtaLabel` | `Get the Atlantic Drift Briefing` |
 | `primaryCtaHref` | `/#subscribe` *(or wherever the lead-magnet capture lives)* |
 | `secondaryCtaLabel` | `Read the methodology` |
@@ -54,7 +54,7 @@
 |---|---|
 | `eyebrow` | `Brand Position` |
 | `h2` | `The View from the Edge` |
-| `subhead` | `Clearer than the view from any centre.` |
+| `subhead` | `The edge is where you see what the centre misses.` |
 
 ### Body — three paragraphs
 
@@ -72,7 +72,7 @@
 | # | Number | Label | Description |
 |---|---|---|---|
 | 1 | `30` | `Years in Tech` | `From inside the industry, not observing it from outside.` |
-| 2 | `60 mi N` | `Beyond the Mainland` | `The view from the edge is structurally clearer than the view from any centre.` |
+| 2 | `60 mi N` | `Beyond the Mainland` | `Written from Sanday, in the Orkney Islands.` |
 | 3 | `DECISION‑GRADE` *(non-breaking hyphen, U+2011)* | `Calibrated by Default` | `Hedged on purpose. Not pundit takes, not consensus reading.` |
 
 ---

@@ -345,7 +345,7 @@ Don't try to make everything perfect. The first thirty days is calibration — g
 - **The Matrix** — The 3×2 analytical grid: Supply Chain × Scenarios, Supply Chain × Long-Memory, Policy × Scenarios, Policy × Long-Memory, Talent × Scenarios, Talent × Long-Memory. Six cells.
 - **Atlantic Drift** — One of Silicon and Stone's content categories — covering US-EU regulatory divergence, transatlantic technology partnerships, the slow widening of the geopolitical gap. Also the title of the flagship lead-magnet PDF.
 - **Pax Silica** — Informal name for the US/Japan/South Korea/Taiwan/India semiconductor alliance that solidified in February 2026. The first major worked example in the methodology paper. Europe is not a member; the implications are significant.
-- **The Edge Position** — The deliberate brand framing that Silicon and Stone is published from Sanday because the view from the edge of Europe is structurally clearer than the view from any of its centres.
+- **The Edge Position** — The deliberate brand framing that Silicon and Stone is published from Sanday because the edge is where you see what the centre misses.
 
 #### Personas (article-level CMS slugs)
 

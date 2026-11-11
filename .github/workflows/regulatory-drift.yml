@@ -32,6 +32,81 @@ jobs:
           cache: 'npm'
       - run: npm ci
 
+      # The early warning for reg:check's hard stop. reg:check fails every build
+      # the day after an instrument's reviewBy date; without this, a run could be
+      # green every Monday and the build still break mid-week with no notice.
+      # No network, so it cannot be the step that flakes. Exit 2 = something is
+      # due (stdout is the issue body); anything else non-zero = the check
+      # itself broke, which fails the run at the end rather than reading as
+      # "nothing due".
+      - id: review
+        run: |
+          set +e
+          npm run --silent reg:review-due > review.md
+          status=$?
+          cat review.md
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+
+      - name: Open or update the review-due issue
+        if: steps.review.outputs.status == '2'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs')
+            const body = fs.readFileSync('review.md', 'utf8')
+            // Its own label, so the drift step below never comments on it and
+            // it never absorbs a drift report.
+            const label = 'regulatory-review-due'
+            const open = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: label,
+            })
+            if (open.data.length > 0) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: open.data[0].number,
+                body,
+              })
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: 'Regulatory corpus: review due before the build gate lapses',
+                body,
+                labels: [label],
+              })
+            }
+
+      - name: Close the review-due issue once nothing is due
+        if: steps.review.outputs.status == '0'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const open = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'regulatory-review-due',
+            })
+            for (const issue of open.data) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: '`npm run reg:review-due` now reports nothing within the warning window. Closing.',
+              })
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                state: 'closed',
+                state_reason: 'completed',
+              })
+            }
+
       - id: drift
         run: |
           set +e
@@ -93,3 +168,9 @@ jobs:
       - name: Fail the run so the schedule surfaces it
         if: steps.drift.outputs.status != '0'
         run: exit 1
+
+      - name: Fail the run if the review-due check itself broke
+        if: steps.review.outputs.status != '0' && steps.review.outputs.status != '2'
+        run: |
+          echo "reg:review-due exited ${{ steps.review.outputs.status }} — the watcher is broken, not the corpus."
+          exit 1

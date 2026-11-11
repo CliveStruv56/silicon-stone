@@ -196,9 +196,11 @@ commercial site carries the
 EUR-Lex "consolidated text, no legal value, only the OJ is authentic" notice and
 the EU source acknowledgement; that is not decoration.
 
-Corpus coverage is partial: **27 Articles plus Annex III**. Annex III arrived
+Corpus coverage is partial: **30 Articles plus Annex III**. Annex III arrived
 2026-08-18; Articles 10, 14, 15, 16 and 43 on 2026-08-19 in pack `2026-08-19`;
-Articles 4, 27 and 86 the same day in pack `2026-08-19b`. All from the same CELEX
+Articles 4, 27 and 86 the same day in pack `2026-08-19b`; Articles 2, 25 and 40
+on 2026-10-29 in pack `2026-10-29`, for the explainers below; pack `2026-11-07` is the same
+plus a corrected timeline (the penalties chapter has applied since 2025, not 2 August 2026). All from the same CELEX
 and with `corpusCutOff` unmoved at `2026-07-27` — the same consolidation, just
 more of it read out of it. **The `b` suffix is deliberate**: two packs were cut
 on 2026-08-19, and dating the second `2026-08-20` would put a false date on the
@@ -219,6 +221,41 @@ order rather than an error, so annexes are sorted separately and appended.
 The report generator only supplies Articles the pack covers, so an `uncovered`
 verdict means the model cited outside its evidence, not merely that coverage is
 thin.
+
+## AI Act explainers: the FAQ and the ISO/IEC 42001 crosswalk
+
+`/tools/compliance-checker/faq` and `/tools/compliance-checker/iso-42001` are
+server pages over `src/lib/ai-act-explainers/`. They are authored explanation,
+not engine output, but they quote statute on public pages, so they keep the
+Checker's rule: **no quotation reaches a screen unverified.** Every
+`StatuteCitation` is string-matched against the pinned corpus by
+`explainers.test.ts`, and `StatuteQuote` verifies again at render and shows a
+note in place of any extract that fails. Four things not to undo:
+
+- **No date is typed into an answer.** Dates come from `packDate()`; the test
+  fails on any date in the prose that is in neither the pack timeline nor
+  `HARMONISED_STANDARDS`. It cannot catch a *real* pack date attached to the
+  wrong duty (mutation-tested: "high-risk from 2 August 2026" passes, because
+  that is Article 50's date), so the high-risk dates answer is pinned
+  separately and the rest is a reviewer's job.
+- **ISO/IEC 42001 is named, never quoted.** It is copyright ISO/IEC. Rows cite
+  clauses and Annex A *areas* by number with our own labels; control-level
+  numbering is the part summaries most often get wrong. `fit` is a judgement
+  and the page says so.
+- **Nothing says 42001 gives a presumption of conformity.** Only a harmonised
+  standard cited in the Official Journal does (Article 40). The first,
+  EN 18286:2026 (quality management, including post-market monitoring), was
+  cited by Implementing Decision (EU) 2026/2274 on 14 October 2026.
+  `harmonised-standards.ts` holds that list by hand with a `checkedAt` date,
+  because it is outside the pack and cannot be corpus-verified. When the next
+  decision lands, add it, re-read the crosswalk rows it touches, and move
+  `checkedAt` — never move the date without re-reading.
+- **Pack `2026-10-29` was sliced, not fetched.** The session that cut it had no
+  route to Cellar. Articles 2, 25 and 40 were sliced from the regulatory lane's
+  committed `source.txt` with the fetch script's own slice rule, after showing
+  that rule reproduces all nine previously fetched Articles byte for byte. The
+  manifest changelog records it and gives the one-line command that confirms it
+  from a machine that can reach Cellar.
 
 ## Compliance Checker v2 (in build, behind a flag)
 
@@ -475,6 +512,19 @@ remains `reviewBy` in `reg:check`, which fails the **build** 90 days after each
 instrument's last review — automation can break silently, `prebuild` cannot. The
 watcher exists to make that review a two-minute "nothing changed, restamp"
 rather than a research task, which is what makes six instruments sustainable.
+
+**The cliff now has three weeks' notice** (since 2026-10-30). Before that, a
+green watcher every Monday said nothing about an approaching `reviewBy`, and all
+six instruments came within 12 days of failing every build before anyone
+noticed. `src/lib/regulatory/review-due.ts` is the single definition of *due*
+(`REVIEW_WARNING_DAYS = 21`) and *lapsed*; `reg:check` warns from it and still
+fails only on lapse, and the weekly workflow runs `npm run reg:review-due`,
+which opens or updates an issue labelled `regulatory-review-due` (its own label,
+so it never absorbs a drift report) and closes it once nothing is due. Its exit
+codes are a contract: 0 nothing due, 2 due, anything else fails the run — a
+broken watcher must never read as "nothing due". `reg:hash` keeps an existing
+`reviewBy`, so restamping is a hand edit plus a changelog line saying what was
+checked.
 
 A new **AI Act** consolidation is not a simple re-fetch: `reg:check` asserts its
 `consolidatedAs` equals the rule pack's `corpusCutOff`, so the pack version must
@@ -886,6 +936,74 @@ read an engagement's source read the whole route directory. The Chips Act
 article numbers on the
 manufacturing page (23, 25, 26(4), Annex IV) are read from the pinned corpus
 under `corpus/regulatory/eu-chips-act/` — verify there before changing one.
+
+## Site search (`/search`)
+
+Keyword search covers four sources, shown in this order: **Tools & pages**
+(the hand-built page registry `src/lib/search/site-pages.ts`, plus Sanity
+`product` docs and authors), **Analysis** (series, then articles), **Glossary**.
+
+- **The registry never writes copy.** Each `description` is copied verbatim
+  from its page's metadata or on-page text, and `site-pages.test.ts` fails if
+  it cannot find the sentence in that route's source. When a page's copy
+  changes, the test goes red: update the registry from the page, never the
+  other way round. Every path must also be a real `page.tsx`, not redirect, and
+  be in `sitemap.ts` STATIC_ROUTES. A new public page belongs in all three.
+- **Matching is explainable on purpose** (`src/lib/search/keyword.ts`): every
+  word must match (prefix, or a plural ending), title beats keyword beats
+  description. Long questions match nothing here; that is what search by
+  meaning is for.
+- **Zero-result log** (`src/lib/search/zero-results.ts`, shown on
+  `/analytics`): normalised query text, a count and a last-searched time, in the
+  rate limiter's Upstash. No IP, no user agent, nothing about the reader;
+  queries with an `@` or a run of six or more digits are never written; the log
+  keeps at most 1,000 queries and accepts at most 500 new writes a day
+  (`searchZeroLog`, keyed on the constant `'all'`). Do not add request data to it.
+- **Only settled searches are logged.** The box searches as you type, so every
+  prefix used to land in the log. `ZeroResultReporter` reports a zero-result
+  query only after it has stayed on screen for 3 seconds (`settle.ts`), through
+  the `reportZeroResult` server action. Never log from the page render again.
+
+**Search by meaning** (`/api/search/related`, rendered client-side as "Related
+by meaning" below the keyword results; it can only add to the page).
+
+- **Public search reads two namespaces of the article index and no others**:
+  the default (published articles) and `site-pages` (registry pages and
+  published glossary terms). The same index also holds **`ideas`**, written by
+  the external story-idea agent: it must never be readable from public search.
+  `PUBLIC_NAMESPACES` in `src/lib/search/site-index.ts` is the whole list, and
+  `semantic.test.ts` fails on any other namespace, a bare `index.query()` or a
+  `searchSimilar` call in the public path. Every article and glossary hit is
+  re-checked against Sanity's published perspective before it is returned.
+- `site-pages` is rebuilt by `npm run search:index-pages` (complete and
+  reconciling on every run; it writes to `site-pages` only). **Run it after
+  any change to `src/lib/search/site-pages.ts` is merged to main, and after
+  glossary terms are published, edited or deleted in Studio.** Nothing
+  re-indexes automatically yet, so until it is run, search by meaning serves
+  the old text (stale pages and unpublished terms are still filtered out).
+- `SEMANTIC_SCORE_FLOOR = 0.40`, measured with `npm run search:probe`.
+  Re-measure as the catalogue grows, as with the prior-coverage floor.
+- Cost controls: query capped at 100 characters, personal-looking queries never
+  embedded, `publicSearch` per IP (40 / 10 min), a CDN cache on successful
+  answers, and `publicSearchDaily` (5,000 a day, global). Every Pinecone lane
+  shares one monthly read-unit allowance, so the daily ceiling is what keeps
+  public search from starving `/create`, related articles and the admin search.
+  On Vercel the route declines when that ceiling cannot be read from Upstash.
+  Upstash rate-limit analytics is off for **every** limiter (owner decision,
+  2026-11-07): it wrote each IP into `<prefix>:events:<hour>` buckets that
+  are never expired. It is hard-coded off in `durable-rate-limit.ts` and
+  `rate-limit-analytics.test.ts` fails if it comes back. The privacy page says
+  the IP-keyed counters are short-lived; keep the two in step.
+- **Old analytics buckets are deleted once, by hand.** Analytics written
+  before the switch-off (`sas:<limiter>:events:<hour ms>`, IPs as members, no
+  expiry) stay in Upstash until removed. Clive approved deleting them after
+  PR #22 is deployed to production (2026-11-08). Run
+  `npm run ratelimit:cleanup-analytics` with production Upstash credentials:
+  it is a dry run by default (counts per prefix, oldest and newest hour, sample
+  key names; members are never read). Then, **only with Clive's go-ahead**,
+  `npm run ratelimit:cleanup-analytics -- --delete --expect <dry-run count>`,
+  which aborts if the count differs. Selection rules and their tests are in
+  `src/lib/ratelimit-analytics-cleanup.ts`; never replace it with KEYS or DEL.
 
 ## Publication dates (load-bearing — do not break)
 

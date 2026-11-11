@@ -428,6 +428,22 @@ export default function ComplianceCheckerPage() {
                 A first-pass classification, the obligations that follow from it, and the evidence
                 to ask your vendor for — kept as an AI system record you can file.
               </p>
+              <nav aria-label="Related guides" className="mt-5 grid max-w-3xl gap-3 sm:grid-cols-2">
+                <Link
+                  href="/tools/compliance-checker/faq"
+                  className="rounded-lg border border-stone-teal/50 bg-stone-charcoal/60 p-4 transition-colors hover:border-stone-teal"
+                >
+                  <span className="block text-sm font-semibold text-text-primary">EU AI Act FAQ →</span>
+                  <span className="mt-1 block text-xs text-text-muted">Common questions, answered with the statute quoted.</span>
+                </Link>
+                <Link
+                  href="/tools/compliance-checker/iso-42001"
+                  className="rounded-lg border border-stone-teal/50 bg-stone-charcoal/60 p-4 transition-colors hover:border-stone-teal"
+                >
+                  <span className="block text-sm font-semibold text-text-primary">ISO 42001 crosswalk →</span>
+                  <span className="mt-1 block text-xs text-text-muted">What ISO/IEC 42001 work carries over to the Act, and what the Act adds.</span>
+                </Link>
+              </nav>
               {/* Counts and dates are read from the catalogue, the pack manifest
                   and the pinned timeline, never typed: a question added to the
                   walk or a date moved by a later pack must not leave this
@@ -450,10 +466,26 @@ export default function ComplianceCheckerPage() {
                 </Link>{' '}
                 is readable here in the pinned text.
               </p>
+              <p className="mt-4 max-w-3xl leading-relaxed text-text-muted">
+                Questions before you start?{' '}
+                <Link href="/tools/compliance-checker/faq" className="text-stone-teal underline underline-offset-4">
+                  Read the answers, with the statute quoted
+                </Link>
+                . Already certified to ISO/IEC 42001?{' '}
+                <Link href="/tools/compliance-checker/iso-42001" className="text-stone-teal underline underline-offset-4">
+                  See what carries over to the Act
+                </Link>
+                .
+              </p>
               {GENERAL_APPLICATION && NEXT_DATED_STEP && (
                 <p className="mt-4 max-w-3xl leading-relaxed text-text-muted">
-                  The Article 50 transparency duties and the penalty regime have applied since{' '}
-                  {GENERAL_APPLICATION.date}. The next dated step is {NEXT_DATED_STEP.date}:{' '}
+                  {/* Not "the penalty regime": Chapter XII has applied since
+                      2 August 2025 (Article 113, third paragraph, point (b)).
+                      What this date added is Article 101, the Commission's
+                      fines on GPAI providers, which that point excepts. */}
+                  The Article 50 transparency duties have applied since{' '}
+                  {GENERAL_APPLICATION.date}, and with them the Commission’s power to fine
+                  providers of general-purpose AI models. The next dated step is {NEXT_DATED_STEP.date}:{' '}
                   {NEXT_DATED_STEP.label.charAt(0).toLowerCase() + NEXT_DATED_STEP.label.slice(1)}.
                   The result tells you which line your system sits on.
                 </p>
@@ -988,7 +1020,7 @@ export default function ComplianceCheckerPage() {
                                 : 'w-fit border-stone-teal text-stone-teal'
                             }
                           >
-                            {entry.status === 'in-force' ? `In force — ${entry.date}` : entry.date}
+                            {entry.status === 'in-force' ? `Applies since ${entry.date}` : entry.date}
                           </Badge>
                         </div>
                         <p className="mt-2 text-sm text-text-muted">{entry.detail}</p>

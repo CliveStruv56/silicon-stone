@@ -31,7 +31,7 @@ export function CredibilityBlock() {
                 The View from the Edge
               </h2>
               <p className="font-mono text-xs uppercase tracking-[0.10em] text-silicon-amber-strong">
-                Clearer than the view from any centre.
+                The edge is where you see what the centre misses.
               </p>
             </div>
           </StaggerItem>
@@ -90,8 +90,7 @@ export function CredibilityBlock() {
                       Beyond the Mainland
                     </div>
                     <p className="text-xs text-text-muted leading-relaxed mt-2">
-                      The view from the edge is structurally clearer than the
-                      view from any centre.
+                      Written from Sanday, in the Orkney Islands.
                     </p>
                   </div>
                   <div className="h-px bg-border-subtle" />

@@ -219,18 +219,19 @@ export default function AtlanticDriftPage() {
               <Clock className="h-4 w-4" /> The moving timeline
             </div>
             <h2 className="mb-4 text-2xl font-semibold text-text-primary">
-              Operative now, versus adopted-but-pending
+              Applying now, versus applying later
             </h2>
             <p className="mb-4 leading-relaxed text-text-muted">
-              <strong className="text-text-primary">In force since 2 August 2026:</strong>{' '}
-              the Article 50 transparency duties and the penalty and governance regime that
-              gives the Act teeth. This is the part that binds first.
+              <strong className="text-text-primary">Applies since 2 August 2026:</strong>{' '}
+              the Article 50 transparency duties and enforcement against providers of
+              general-purpose AI models, including the Commission’s power to fine them.
+              The rest of the penalties chapter (Chapter XII) has applied since 2 August 2025.
             </p>
             <p className="leading-relaxed text-text-muted">
-              <strong className="text-text-primary">Adopted but pending:</strong> the heavy
+              <strong className="text-text-primary">In law, applying later:</strong> the heavy
               high-risk obligations were re-timed, not removed — standalone high-risk
               (Annex III) on 2 December 2027, embedded high-risk (Annex I) on 2 August 2028.
-              The re-timing is adopted, not yet settled law until publication, so treat the
+              The re-timing is law, in force since 27 July 2026, so treat the
               later dates as a planning horizon, not a reprieve. The work that actually takes
               time — the inventory, the vendor evidence — is not gated by any of these dates.
             </p>

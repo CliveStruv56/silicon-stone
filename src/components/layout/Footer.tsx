@@ -21,6 +21,8 @@ const footerNavigation = {
     { name: 'Products', href: '/products' },
     { name: 'Pricing', href: '/pricing' },
     { name: 'How it fits together', href: '/how-it-fits-together' },
+    { name: 'AI Act FAQ', href: '/tools/compliance-checker/faq' },
+    { name: 'ISO 42001 crosswalk', href: '/tools/compliance-checker/iso-42001' },
     { name: 'Glossary', href: '/glossary' },
     { name: 'Methodology', href: '/methodology' },
     { name: 'About', href: '/about' },
