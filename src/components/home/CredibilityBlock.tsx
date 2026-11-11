@@ -90,7 +90,7 @@ export function CredibilityBlock() {
                       Beyond the Mainland
                     </div>
                     <p className="text-xs text-text-muted leading-relaxed mt-2">
-                      Written from Sanday, in the Orkney Islands.
+                      Written from an island in Orkney.
                     </p>
                   </div>
                   <div className="h-px bg-border-subtle" />
