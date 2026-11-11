@@ -148,7 +148,7 @@ She has to keep up with regulatory changes across multiple jurisdictions, in pol
 ### What a piece tagged for Sofia looks like
 
 - The Stone Truth is about jurisdictional dynamics, strategic autonomy, or the divergence between regulatory intent and enforcement reality
-- The Methodology Audit usually lights `policy-long-memory-filter` (she likes the 30-year cycle pattern matching) and `policy-scenario-modelling`
+- The Methodology Audit usually lights `policy-long-memory-filter` (she likes the 40-year cycle pattern matching) and `policy-scenario-modelling`
 - The piece often references historical regulatory precedents — the 1986 Semiconductor Agreement, the GDPR rollout pattern, Schrems II
 - The piece often closes with a link to `/tools/policy-stress-test`
 

@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 
 const aboutDescription =
-  'Analysis from the Edge: 30 years of technology industry experience, delivered from Scotland\'s Atlantic coast.'
+  'Analysis from the Edge: forty years of technology industry experience, delivered from an island in Orkney, sixty miles north of the Scottish mainland.'
 
 export const metadata: Metadata = {
   title: 'About | Silicon and Stone',
@@ -20,6 +20,11 @@ export const metadata: Metadata = {
 }
 
 const credentials = [
+  {
+    period: '1980s',
+    title: 'The Foundations',
+    description: 'A Master\'s in Digital Systems and Computer Science in 1984: automation and the basics of AI.',
+  },
   {
     period: '1990s',
     title: 'The First Wave',
@@ -124,8 +129,8 @@ export default function AboutPage() {
                   Analysis from the Edge
                 </h1>
                 <p className="text-xl text-text-muted leading-relaxed mb-6">
-                  Thirty years in technology. Now watching the industry from Scotland&apos;s Atlantic coast,
-                  where the perspective is longer and the noise is quieter.
+                  Forty years in technology. Now watching the industry from an island in Orkney, sixty miles north of the Scottish mainland.
+                  Here the perspective is longer and the noise is quieter.
                 </p>
                 <p className="text-text-muted leading-relaxed">
                   Silicon and Stone combines deep technology industry experience with the clarity
@@ -189,7 +194,7 @@ export default function AboutPage() {
                 from the same sources.
               </p>
               <p className="text-text-muted leading-relaxed mb-4">
-                From Scotland&apos;s Atlantic coast, the signal-to-noise ratio is different. The hype
+                From an island in Orkney, the signal-to-noise ratio is different. The hype
                 cycles are visible but distant. The long-term patterns become clearer when you&apos;re
                 not caught up in the daily churn. And there&apos;s time to actually read the regulations,
                 trace the supply chains, and think through the second-order effects.
@@ -207,15 +212,22 @@ export default function AboutPage() {
         {/* The Long View - Timeline */}
         <section id="long-view" className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12">
           <h2 className="text-2xl font-semibold text-text-primary mb-8">
-            The Long View: 30 Years of Perspective
+            The Long View: Forty Years of Perspective
           </h2>
           <p className="text-text-muted mb-8 max-w-3xl">
-            Technology moves fast, but patterns repeat. Three decades of watching the industry
+            Technology moves fast, but patterns repeat. Forty years of watching the industry
             provides calibration that no amount of real-time data can replace.
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {credentials.map((cred) => (
-              <Card key={cred.period} className="bg-stone-charcoal border-border-subtle">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+            {credentials.map((cred, i) => (
+              <Card
+                key={cred.period}
+                className={`bg-stone-charcoal border-border-subtle${
+                  i === credentials.length - 1 && credentials.length % 2 === 1
+                    ? ' md:col-span-2 lg:col-span-1'
+                    : ''
+                }`}
+              >
                 <CardContent className="p-6">
                   <div className="text-silicon-amber-strong font-mono font-bold text-lg mb-2">
                     {cred.period}

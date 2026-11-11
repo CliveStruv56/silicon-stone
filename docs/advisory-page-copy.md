@@ -73,7 +73,7 @@ The Drift Retainer is the relationship behind the analysis: a senior, independen
 - A monthly briefing call — what just shifted, and what it means for you specifically
 - Ad-hoc interpretation between calls when something breaks — a short, calibrated read rather than a panic
 - A quarterly written exposure review, drawing on the same 3×2 method and tools the public analysis uses
-- A standing line to thirty years inside the industry, on call rather than on retainer-search
+- A standing line to forty years inside the industry, on call rather than on retainer-search
 
 **From £3,500/month · three-month minimum · scope set with you**
 
@@ -128,7 +128,7 @@ The standing relationship. Monthly briefing call, ad-hoc interpretation between 
 - Monthly briefing call, calibrated to your exposure
 - Ad-hoc reads when something breaks
 - Quarterly written exposure review
-- Direct line to thirty years inside the industry
+- Direct line to forty years inside the industry
 - Follow-on modules folded in as needed (manufacturing exposure, scenario impact, regulatory friction)
 
 [Start a conversation](#contact)

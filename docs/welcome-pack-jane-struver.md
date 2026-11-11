@@ -48,7 +48,7 @@ Senior professionals today have more technology-policy news than any generation 
 
 Most coverage of these events is either too political (think tank position papers), too technical (industry analysts), or too superficial (general news). What's missing is rigorous, practitioner-grade analysis written by someone who has actually built and managed in the systems being discussed — and who explains it in language a senior person can use to make a decision.
 
-That's what Clive's thirty years gives us. The framework — Forensic Technopolitics — gives the work structure. The combination is the moat.
+That's what Clive's forty years gives us. The framework — Forensic Technopolitics — gives the work structure. The combination is the moat.
 
 #### Where we are today — the honest version
 
@@ -113,7 +113,7 @@ This is the analytical framework Clive has built. Every piece of content Silicon
 
 Three layers of technology power that get analysed:
 
-- **Supply Chain Forensics** — the physical layer. Where are the chokepoints? Who controls them? What does substitution actually cost? This is where Clive's thirty years on the inside pays off — he can read a supply chain the way a doctor reads a chest X-ray.
+- **Supply Chain Forensics** — the physical layer. Where are the chokepoints? Who controls them? What does substitution actually cost? This is where Clive's forty years on the inside pays off — he can read a supply chain the way a doctor reads a chest X-ray.
 - **Policy Stress-Testing** — the regulatory layer. What does this rule actually do when enforced? Who complies, who pays, who evades? Different from reading the legislation.
 - **Talent & Capability Flow** — the human layer. Where are the people moving? Which capabilities are accumulating in a region, and which are hollowing out? This is the connection point between the macro story and individual professional reality. It's also the most underserved domain in existing technology-policy commentary.
 
@@ -122,7 +122,7 @@ Three layers of technology power that get analysed:
 Applied to all three domains:
 
 - **Scenario-Based Modelling** — instead of a single confident forecast, every analysis runs three scenarios (low / medium / high friction) so the decision-maker has a structured menu of preparation moves.
-- **Long-Memory Filter (30-Year Cycle Benchmark)** — pattern-matching the current event against the last thirty years of industrial cycles. The 1986 US-Japan Semiconductor Agreement, the 1990s offshoring wave, the 2000s globalisation consensus. History rhymes; the framework formalises that pattern recognition.
+- **Long-Memory Filter (40-Year Cycle Benchmark)** — pattern-matching the current event against the last forty years of industrial cycles. The 1986 US-Japan Semiconductor Agreement, the 1990s offshoring wave, the 2000s globalisation consensus. History rhymes; the framework formalises that pattern recognition.
 
 ##### The matrix
 

@@ -98,11 +98,11 @@ We use **Value at Stake** methodology to quantify the impact: how many billions 
 
 The output is not a prediction. It is a stress test. The point is to make the operating environment legible enough that a decision-maker can prepare for more than one version of it.
 
-#### B. Long-Memory Filter (the 30-Year Cycle Benchmark)
+#### B. Long-Memory Filter (the 40-Year Cycle Benchmark)
 
-Pattern-matching the current event against the last thirty years of industrial cycles. The 1986 US-Japan Semiconductor Agreement. The 1990s offshoring wave. The early-2000s globalisation consensus. The 2008 financial crisis and its impact on capital allocation in tech. The 2018 trade-war pivot.
+Pattern-matching the current event against the last forty years of industrial cycles. The 1986 US-Japan Semiconductor Agreement. The 1990s offshoring wave. The early-2000s globalisation consensus. The 2008 financial crisis and its impact on capital allocation in tech. The 2018 trade-war pivot.
 
-History rhymes; the framework formalises that pattern recognition. If we have seen a pattern fail three times in thirty years, we tell you why the fourth time is no different — and where the genuine novelty is, when there is one.
+History rhymes; the framework formalises that pattern recognition. If we have seen a pattern fail three times in forty years, we tell you why the fourth time is no different — and where the genuine novelty is, when there is one.
 
 This is also the lens that separates **Silicon Hype** (temporary noise, indistinguishable from cycles past) from **Stone Truth** (structural change that the prior cycles did not produce).
 

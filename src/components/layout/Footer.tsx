@@ -75,7 +75,7 @@ export function Footer() {
             </Link>
             <p className="text-sm text-text-muted max-w-xs">
               Forensic Technopolitics for the senior leaders defining the AI power shift.
-              Published from Sanday, Orkney.
+              Published from an island in Orkney.
             </p>
             <a
               href={LINKEDIN_URL}

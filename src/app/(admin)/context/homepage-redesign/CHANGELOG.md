@@ -895,3 +895,13 @@ When sections ship, log them here in this format:
 - One shared component, so all four surfaces changed together — which is why it
   was worth asking before doing it.
 - Lint, suite (1,562), build (125 pages), test:manual, test:security.
+
+## 2026-11-05 — "Forty years" replaces "thirty years" site-wide
+
+Clive decided his experience is "forty years inside the technology industry" (Master's 1984, about 42 years). Updated About, homepage (hero, CredibilityBlock stat 30 to 40), Methodology Long-Memory Filter copy, Drift Retainer, layout metadata, llms.txt and the Standard Hook prompt. The "30-year cycle benchmark" method label is unchanged and flagged for decision.
+
+Follow-up, 6 Nov (Clive): the Long-Memory Filter is now "the 40-year cycle benchmark" (methodology page tagline and the three domain lines, article MethodologyChecklist, business-overview.json, brand-voice skill and internal docs). The About page location changed from "Scotland's Atlantic coast" to "an island in Orkney, sixty miles north of the Scottish mainland" (metadata description, hero paragraph and the Edge section). The earlier entries above are left as the record of what was.
+
+Follow-up 2, 6 Nov (fact-check and brand-voice round): About timeline gains a 1980s "The Foundations" card (Master's, 1984) and a five-column grid; About hero reworded ("...Scottish mainland. Here the perspective is longer..."); homepage hero says "inside the technology industry"; the Standard Hook prompt drops "cut through the tech noise" and "actionable intelligence".
+
+Follow-up 3, 6 Nov (fix round 2): footer now reads "Published from an island in Orkney." (it was the one public "Sanday" left, missed by §E); About timeline's odd last card spans the full row at md only (`md:col-span-2 lg:col-span-1`) so the 2020s card no longer sits alone at tablet width.

@@ -45,7 +45,7 @@ The PDF should work for an Ian first. The other personas pick up adjacent value.
 ### Front matter (1 page)
 
 - **How to read this briefing** — 4-line note explaining the Methodology Audit, the Stone Truths inside, and the structure of each chokepoint section
-- **About Silicon and Stone** — 3-line credibility note (Clive's 30 years, the Sanday vantage, the Forensic Technopolitics framework)
+- **About Silicon and Stone** — 3-line credibility note (Clive's 40 years, the Sanday vantage, the Forensic Technopolitics framework)
 - **About this PDF** — what's free, what's in the Intelligence Series, link to subscribe
 
 ### Executive summary (1 page)

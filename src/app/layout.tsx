@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Silicon and Stone | Forensic Technopolitics",
     description:
-      "AI regulation, semiconductor supply chains, and digital sovereignty. Analysis for European decision-makers from 30 years at the edge.",
+      "AI regulation, semiconductor supply chains, and digital sovereignty. Analysis for European decision-makers from 40 years at the edge.",
     images: [
       {
         url: "/homepage-redesign-2026/the-watcher.png",

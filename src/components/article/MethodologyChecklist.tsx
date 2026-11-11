@@ -41,7 +41,7 @@ const CELL_DATA: Record<MatrixCell, CellMeta> = {
     label: 'Supply Chain × Long-Memory Filter',
     domain: 'Supply Chain',
     method: 'Long-Memory Filter',
-    description: '30-year cycle pattern-match on the physical layer',
+    description: '40-year cycle pattern-match on the physical layer',
     anchor: 'supply-chain-forensics',
   },
   'policy-scenario-modelling': {
@@ -55,7 +55,7 @@ const CELL_DATA: Record<MatrixCell, CellMeta> = {
     label: 'Policy × Long-Memory Filter',
     domain: 'Policy',
     method: 'Long-Memory Filter',
-    description: '30-year regulatory precedent and enforcement drift',
+    description: '40-year regulatory precedent and enforcement drift',
     anchor: 'policy-stress-testing',
   },
   'talent-scenario-modelling': {
@@ -69,7 +69,7 @@ const CELL_DATA: Record<MatrixCell, CellMeta> = {
     label: 'Talent × Long-Memory Filter',
     domain: 'Talent',
     method: 'Long-Memory Filter',
-    description: '30-year skill-density and migration cycles',
+    description: '40-year skill-density and migration cycles',
     anchor: 'talent-capability-flow',
   },
 }
