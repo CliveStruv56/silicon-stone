@@ -29,17 +29,28 @@ export const metadata: Metadata = {
 }
 
 // Organization `sameAs` — entity-authority signal for the homepage JSON-LD (F9).
+// Only profiles that ARE the brand belong here (schema.org: sameAs is a URL of
+// a reference page that unambiguously indicates the item's identity). Clive's
+// personal LinkedIn is a Person profile, so it sits on the founder Person node
+// below, not on the Organization.
 // [AUTHOR: confirm exact profile URLs.] Add the live Substack and X profile
 // URLs here; the array is omitted from the schema while empty.
-// YouTube is the channel-ID URL and LinkedIn is Clive's profile (Clive, 4
-// November 2026). Never use the @siliconandstone YouTube handle: it belongs to
-// an unrelated channel.
+// YouTube is the channel-ID URL (Clive, 4 November 2026). Never use the
+// @siliconandstone YouTube handle: it belongs to an unrelated channel.
 const ORG_SAME_AS: string[] = [
   'https://www.youtube.com/channel/UCblY0ToXY73DxCIgoLsOkXw',
-  'https://www.linkedin.com/in/clivestruver/',
   // 'https://siliconandstone.substack.com',
   // 'https://x.com/…',
 ]
+
+// The founder is the same entity as the Person on /authors/clive-struver
+// (buildPersonProfileSchema, whose @id is `<profile url>#person`) and the
+// author of every article. Sharing that @id lets crawlers merge the nodes
+// instead of seeing three Cliveses. His sameAs list is held in Sanity (author
+// document) for the profile and article nodes; this is the homepage's copy.
+const FOUNDER_PROFILE_URL = absoluteUrl('/authors/clive-struver')
+const FOUNDER_ID = `${FOUNDER_PROFILE_URL}#person`
+const FOUNDER_SAME_AS: string[] = ['https://www.linkedin.com/in/clivestruver/']
 
 export default async function Home() {
   const [settingsRes, pulseRes, briefingRes, auditRes, series] = await Promise.all([
@@ -81,11 +92,7 @@ export default async function Home() {
           width: 1104,
           height: 960,
         },
-        founder: {
-          '@type': 'Person',
-          name: 'Clive Struver',
-          url: absoluteUrl('/authors/clive-struver'),
-        },
+        founder: { '@id': FOUNDER_ID },
         description:
           'Forensic Technopolitics intelligence service for senior decision-makers in European industry. Calibrated, decision-grade analysis from forty years inside the technology industry. Published from the edge of Europe.',
         foundingDate: '2024',
@@ -99,6 +106,15 @@ export default async function Home() {
           'The Atlantic Drift',
         ],
         ...(ORG_SAME_AS.length > 0 ? { sameAs: ORG_SAME_AS } : {}),
+      },
+      {
+        '@type': 'Person',
+        '@id': FOUNDER_ID,
+        name: 'Clive Struver',
+        url: FOUNDER_PROFILE_URL,
+        jobTitle: 'Founder & Editor',
+        worksFor: { '@id': `${SITE_URL}/#organization` },
+        sameAs: FOUNDER_SAME_AS,
       },
       {
         '@type': 'WebPage',
