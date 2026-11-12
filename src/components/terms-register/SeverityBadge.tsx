@@ -1,4 +1,4 @@
-import { TERMS_SEVERITY_LABELS, type TermsSeverity } from '@/lib/terms-watch'
+import { TERMS_SEVERITY_LABELS, type TermsSeverity } from '@/lib/terms-register'
 
 const TONE: Record<TermsSeverity, string> = {
   high: 'border-alert-red/50 text-alert-red',

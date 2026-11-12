@@ -3,10 +3,10 @@ import { SubscribeCTA } from '@/components/home/SubscribeCTA'
 import {
   formatTermsDate,
   TERMS_USE_LABELS,
-  termsWatchProviderName,
+  termsRegisterProviderName,
   type TermsChange,
-} from '@/lib/terms-watch'
-import { TermsWatchDisclaimer } from './TermsWatchDisclaimer'
+} from '@/lib/terms-register'
+import { TermsRegisterDisclaimer } from './TermsRegisterDisclaimer'
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -30,7 +30,7 @@ function List({ items }: { items?: string[] | null }) {
 
 /** The body of one item's page: summary, who it affects, actions, labelled facts and inferences, quotes, source. */
 export function TermsChangeArticle({ change }: { change: TermsChange }) {
-  const name = termsWatchProviderName(change.provider)
+  const name = termsRegisterProviderName(change.provider)
   return (
     <article className="mx-auto max-w-3xl px-6 py-10 lg:py-14">
       <p className="border-l-2 border-stone-teal pl-6 text-xl leading-relaxed text-text-primary">{change.whatChanged}</p>
@@ -91,9 +91,9 @@ export function TermsChangeArticle({ change }: { change: TermsChange }) {
         {change.detectedAt && <span>Change detected {formatTermsDate(change.detectedAt)}</span>}
       </div>
 
-      <TermsWatchDisclaimer className="mt-10" />
+      <TermsRegisterDisclaimer className="mt-10" />
       <div className="mt-10">
-        <SubscribeCTA sourceTag="source-terms-watch" briefingOnly showSchedule={false} />
+        <SubscribeCTA sourceTag="source-terms-register" briefingOnly showSchedule={false} />
       </div>
     </article>
   )

@@ -1,15 +1,15 @@
 /**
- * AI Terms Watch: the shared vocabulary of the `termsChange` documents the
+ * The Terms Register: the shared vocabulary of the `termsChange` documents the
  * tracker publishes. Pure, so the schema, the pages and the tests read one list.
  *
  * Provider ids must match `PROVIDERS` in the tracker's `src/register.ts`; the
  * tracker writes them and these pages route on them.
  */
 
-/** The public display name. Routes, the `termsChange` type and the `source-terms-watch` tag do not change with it. */
-export const TERMS_WATCH_NAME = 'AI Terms Watch'
+/** The public display name. The `termsChange` type is the contract with the publisher and does not change with it. */
+export const TERMS_REGISTER_NAME = 'The Terms Register'
 
-export const TERMS_WATCH_PROVIDERS = [
+export const TERMS_REGISTER_PROVIDERS = [
   { id: 'anthropic', name: 'Anthropic' },
   { id: 'openai', name: 'OpenAI' },
   { id: 'google', name: 'Google' },
@@ -19,18 +19,18 @@ export const TERMS_WATCH_PROVIDERS = [
 ] as const
 
 /** "Anthropic, OpenAI, Google, Microsoft, SpaceXSI (xAI) and Mistral", as the provider nav names them. */
-export const TERMS_WATCH_PROVIDER_LIST = `${TERMS_WATCH_PROVIDERS.slice(0, -1)
+export const TERMS_REGISTER_PROVIDER_LIST = `${TERMS_REGISTER_PROVIDERS.slice(0, -1)
   .map((p) => p.name)
-  .join(', ')} and ${TERMS_WATCH_PROVIDERS[TERMS_WATCH_PROVIDERS.length - 1].name}`
+  .join(', ')} and ${TERMS_REGISTER_PROVIDERS[TERMS_REGISTER_PROVIDERS.length - 1].name}`
 
-export type TermsWatchProviderId = (typeof TERMS_WATCH_PROVIDERS)[number]['id']
+export type TermsRegisterProviderId = (typeof TERMS_REGISTER_PROVIDERS)[number]['id']
 
-export function isTermsWatchProvider(id: string): id is TermsWatchProviderId {
-  return TERMS_WATCH_PROVIDERS.some((provider) => provider.id === id)
+export function isTermsRegisterProvider(id: string): id is TermsRegisterProviderId {
+  return TERMS_REGISTER_PROVIDERS.some((provider) => provider.id === id)
 }
 
-export function termsWatchProviderName(id: string): string {
-  return TERMS_WATCH_PROVIDERS.find((provider) => provider.id === id)?.name ?? id
+export function termsRegisterProviderName(id: string): string {
+  return TERMS_REGISTER_PROVIDERS.find((provider) => provider.id === id)?.name ?? id
 }
 
 export const TERMS_SEVERITIES = ['high', 'medium', 'low'] as const
@@ -68,12 +68,12 @@ export const TERMS_USE_LABELS: Record<TermsUseScope, string> = {
  * Shown on every item, on the archive and in the email section. Must stay in
  * step with `DISCLAIMER` in the tracker's `src/publish/compose.ts`.
  */
-export const TERMS_WATCH_DISCLAIMER =
+export const TERMS_REGISTER_DISCLAIMER =
   'Silicon & Stone summarises published provider terms for information. It is not legal advice. ' +
   'Check the provider’s current terms and any agreement you have signed, and take advice before acting.'
 
 export function termsChangePath(provider: string, slug: string): string {
-  return `/terms-watch/${provider}/${slug}`
+  return `/terms-register/${provider}/${slug}`
 }
 
 export type TermsChange = {

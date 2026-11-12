@@ -1,29 +1,29 @@
 import type { Metadata } from 'next'
 import { Footer, Header } from '@/components/layout'
 import { SubscribeCTA } from '@/components/home/SubscribeCTA'
-import { ProviderNav, TermsChangeList, TermsWatchDisclaimer, WhatSubscribersGet } from '@/components/terms-watch'
-import { TERMS_WATCH_NAME, TERMS_WATCH_PROVIDER_LIST, type TermsChange } from '@/lib/terms-watch'
+import { ProviderNav, TermsChangeList, TermsRegisterDisclaimer, WhatSubscribersGet } from '@/components/terms-register'
+import { TERMS_REGISTER_NAME, TERMS_REGISTER_PROVIDER_LIST, type TermsChange } from '@/lib/terms-register'
 import { sanityFetch } from '@/sanity/lib/live'
 import { TERMS_CHANGES_QUERY } from '@/sanity/lib/queries'
 
 /**
- * AI Terms Watch: every reviewed change to the AI providers' terms, newest
+ * The Terms Register: every reviewed change to the AI providers' terms, newest
  * first. Items arrive from the terms-tracker's publisher as `termsChange`
  * documents; `<SanityLive />` in the website layout refreshes this page when one
  * is published, so it needs nothing from `/api/on-publish`.
  */
 
-const description = `Reviewed changes to the terms of ${TERMS_WATCH_PROVIDER_LIST}: what changed, who it affects and what to do.`
+const description = `Reviewed changes to the terms of ${TERMS_REGISTER_PROVIDER_LIST}: what changed, who it affects and what to do.`
 
 export const metadata: Metadata = {
-  title: `${TERMS_WATCH_NAME} | Silicon and Stone`,
+  title: `${TERMS_REGISTER_NAME} | Silicon and Stone`,
   description,
-  alternates: { canonical: '/terms-watch' },
-  openGraph: { title: TERMS_WATCH_NAME, description, type: 'website' },
-  twitter: { card: 'summary_large_image', title: TERMS_WATCH_NAME, description },
+  alternates: { canonical: '/terms-register' },
+  openGraph: { title: TERMS_REGISTER_NAME, description, type: 'website' },
+  twitter: { card: 'summary_large_image', title: TERMS_REGISTER_NAME, description },
 }
 
-export default async function TermsWatchPage() {
+export default async function TermsRegisterPage() {
   const { data } = await sanityFetch({ query: TERMS_CHANGES_QUERY, perspective: 'published', stega: false })
   const changes = (data ?? []) as TermsChange[]
 
@@ -34,7 +34,7 @@ export default async function TermsWatchPage() {
         <header className="border-b border-border-subtle bg-surface-elevated">
           <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
             <div className="max-w-3xl">
-              <h1 className="text-4xl font-semibold text-text-primary sm:text-5xl">{TERMS_WATCH_NAME}</h1>
+              <h1 className="text-4xl font-semibold text-text-primary sm:text-5xl">{TERMS_REGISTER_NAME}</h1>
               <p className="mt-5 max-w-2xl text-lg leading-relaxed text-text-muted">
                 AI providers publish business, API and consumer terms, and those terms can change. We track them, and tell
                 you when a change matters: what changed, who it affects and what to do.
@@ -56,11 +56,11 @@ export default async function TermsWatchPage() {
                 </div>
               )}
             </div>
-            <TermsWatchDisclaimer className="mt-8" />
+            <TermsRegisterDisclaimer className="mt-8" />
           </div>
           <aside className="space-y-6">
             <WhatSubscribersGet />
-            <SubscribeCTA sourceTag="source-terms-watch" briefingOnly showSchedule={false} />
+            <SubscribeCTA sourceTag="source-terms-register" briefingOnly showSchedule={false} />
           </aside>
         </section>
       </main>

@@ -505,20 +505,12 @@ check('the Studio sidebar list matches the types Studio actually shows', () => {
 
   // Each type's Studio label comes from its own schema file, so a rename shows
   // up here rather than in a hand-kept table.
-  // The AI Terms Watch title is built from the one display-name constant
-  // (src/lib/terms-watch.ts), so resolve it from there; extract() fails loudly
-  // if either anchor moves.
-  const termsWatchName = extract(
-    'src/lib/terms-watch.ts',
-    /export const TERMS_WATCH_NAME = '([^']+)'/,
-    'the TERMS_WATCH_NAME display-name constant',
-  )
   const labels = shown.map((name) =>
     extract(
       `src/sanity/schemaTypes/${name}.ts`,
       new RegExp(`name: '${name}',\\s*\\n\\s*title: [\'\`]([^\'\`]+)[\'\`]`),
       `the Studio title of the ${name} type`,
-    ).replace('${TERMS_WATCH_NAME}', termsWatchName),
+    ),
   )
 
   // The manual writes them as a single middot-separated run, possibly wrapped

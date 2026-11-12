@@ -1,7 +1,7 @@
-import { TERMS_WATCH_NAME, TERMS_WATCH_PROVIDER_LIST } from '@/lib/terms-watch'
+import { TERMS_REGISTER_NAME, TERMS_REGISTER_PROVIDER_LIST } from '@/lib/terms-register'
 
 /**
- * What the Terms Watch gives a subscriber, as it stands. It promises only what
+ * What The Terms Register gives a subscriber, as it stands. It promises only what
  * runs today: changes carried in the Stone Briefing. Name no day or frequency
  * (briefings are not sent on a schedule). Do not add the separate weekly alert or "only your providers" here until Standfirst can send
  * them (the integration brief, section 8, step 5).
@@ -14,10 +14,10 @@ export function WhatSubscribersGet() {
       </h2>
       <ul className="mt-4 space-y-3 text-sm leading-relaxed text-text-primary">
         <li>
-          <strong className="font-semibold">{TERMS_WATCH_NAME} changes are included in the Stone Briefing.</strong>
+          <strong className="font-semibold">Changes recorded in {TERMS_REGISTER_NAME} are included in the Stone Briefing.</strong>
         </li>
         <li>
-          Coverage of {TERMS_WATCH_PROVIDER_LIST}: their business, API and consumer terms, usage policies, data processing
+          Coverage of {TERMS_REGISTER_PROVIDER_LIST}: their business, API and consumer terms, usage policies, data processing
           terms and privacy policies, checked regularly.
         </li>
         <li>

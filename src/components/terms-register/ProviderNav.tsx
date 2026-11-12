@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { TERMS_WATCH_PROVIDERS } from '@/lib/terms-watch'
+import { TERMS_REGISTER_PROVIDERS } from '@/lib/terms-register'
 
 /** All providers, then one per provider. `current` is the provider id, or null for all. */
 export function ProviderNav({ current }: { current: string | null }) {
@@ -11,13 +11,13 @@ export function ProviderNav({ current }: { current: string | null }) {
     <nav aria-label="Filter by provider">
       <ul className="flex flex-wrap gap-2">
         <li>
-          <Link href="/terms-watch" className={pill(current === null)} aria-current={current === null ? 'page' : undefined}>
+          <Link href="/terms-register" className={pill(current === null)} aria-current={current === null ? 'page' : undefined}>
             All providers
           </Link>
         </li>
-        {TERMS_WATCH_PROVIDERS.map(({ id, name }) => (
+        {TERMS_REGISTER_PROVIDERS.map(({ id, name }) => (
           <li key={id}>
-            <Link href={`/terms-watch/${id}`} className={pill(current === id)} aria-current={current === id ? 'page' : undefined}>
+            <Link href={`/terms-register/${id}`} className={pill(current === id)} aria-current={current === id ? 'page' : undefined}>
               {name}
             </Link>
           </li>

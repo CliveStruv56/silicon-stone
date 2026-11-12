@@ -697,7 +697,7 @@ export const BRIEFINGS_QUERY = defineQuery(`
   }
 `)
 
-// AI Terms Watch — `termsChange` documents written by the terms-tracker's
+// The Terms Register — `termsChange` documents written by the terms-tracker's
 // publisher. The archive, provider and item queries share one projection; change
 // all three together so the surfaces cannot show different summaries.
 export const TERMS_CHANGES_QUERY = defineQuery(`

@@ -6,9 +6,8 @@ import {
   TERMS_SEVERITY_LABELS,
   TERMS_USE_LABELS,
   TERMS_USE_SCOPES,
-  TERMS_WATCH_NAME,
-  TERMS_WATCH_PROVIDERS,
-} from '@/lib/terms-watch'
+  TERMS_REGISTER_PROVIDERS,
+} from '@/lib/terms-register'
 
 /**
  * One reviewed change to an AI provider's terms, written by the terms-tracker's
@@ -24,7 +23,7 @@ import {
  */
 export const termsChange = defineType({
   name: 'termsChange',
-  title: `${TERMS_WATCH_NAME} item`,
+  title: 'Terms Register item',
   type: 'document',
   icon: DocumentsIcon,
   groups: [
@@ -47,7 +46,7 @@ export const termsChange = defineType({
       title: 'Provider',
       type: 'string',
       group: 'summary',
-      options: { list: TERMS_WATCH_PROVIDERS.map(({ id, name }) => ({ value: id, title: name })) },
+      options: { list: TERMS_REGISTER_PROVIDERS.map(({ id, name }) => ({ value: id, title: name })) },
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -125,7 +124,7 @@ export const termsChange = defineType({
   preview: {
     select: { title: 'title', provider: 'provider', severity: 'severity', week: 'briefingWeek' },
     prepare({ title, provider, severity, week }) {
-      const name = TERMS_WATCH_PROVIDERS.find((p) => p.id === provider)?.name ?? provider
+      const name = TERMS_REGISTER_PROVIDERS.find((p) => p.id === provider)?.name ?? provider
       return { title, subtitle: [name, severity, week && `briefing ${week}`].filter(Boolean).join(' · ') }
     },
   },

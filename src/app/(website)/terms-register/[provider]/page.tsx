@@ -2,14 +2,14 @@ import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { Footer, Header } from '@/components/layout'
 import { SubscribeCTA } from '@/components/home/SubscribeCTA'
-import { ProviderNav, TermsChangeList, TermsWatchDisclaimer, WhatSubscribersGet } from '@/components/terms-watch'
+import { ProviderNav, TermsChangeList, TermsRegisterDisclaimer, WhatSubscribersGet } from '@/components/terms-register'
 import {
-  isTermsWatchProvider,
-  TERMS_WATCH_PROVIDERS,
-  TERMS_WATCH_NAME,
-  termsWatchProviderName,
+  isTermsRegisterProvider,
+  TERMS_REGISTER_PROVIDERS,
+  TERMS_REGISTER_NAME,
+  termsRegisterProviderName,
   type TermsChange,
-} from '@/lib/terms-watch'
+} from '@/lib/terms-register'
 import { sanityFetch } from '@/sanity/lib/live'
 import { TERMS_CHANGES_BY_PROVIDER_QUERY } from '@/sanity/lib/queries'
 
@@ -18,28 +18,28 @@ import { TERMS_CHANGES_BY_PROVIDER_QUERY } from '@/sanity/lib/queries'
 type Props = { params: Promise<{ provider: string }> }
 
 export function generateStaticParams() {
-  return TERMS_WATCH_PROVIDERS.map(({ id }) => ({ provider: id }))
+  return TERMS_REGISTER_PROVIDERS.map(({ id }) => ({ provider: id }))
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { provider } = await params
-  if (!isTermsWatchProvider(provider)) return { title: 'Not found', robots: { index: false } }
-  const name = termsWatchProviderName(provider)
-  const title = `${name} terms changes | ${TERMS_WATCH_NAME}`
+  if (!isTermsRegisterProvider(provider)) return { title: 'Not found', robots: { index: false } }
+  const name = termsRegisterProviderName(provider)
+  const title = `${name} terms changes | ${TERMS_REGISTER_NAME}`
   const description = `Reviewed changes to ${name}’s published terms and policies, with what changed, who it affects and what to do.`
   return {
     title,
     description,
-    alternates: { canonical: `/terms-watch/${provider}` },
+    alternates: { canonical: `/terms-register/${provider}` },
     openGraph: { title, description, type: 'website' },
     twitter: { card: 'summary', title, description },
   }
 }
 
-export default async function TermsWatchProviderPage({ params }: Props) {
+export default async function TermsRegisterProviderPage({ params }: Props) {
   const { provider } = await params
-  if (!isTermsWatchProvider(provider)) notFound()
-  const name = termsWatchProviderName(provider)
+  if (!isTermsRegisterProvider(provider)) notFound()
+  const name = termsRegisterProviderName(provider)
 
   const { data } = await sanityFetch({
     query: TERMS_CHANGES_BY_PROVIDER_QUERY,
@@ -55,7 +55,7 @@ export default async function TermsWatchProviderPage({ params }: Props) {
       <main>
         <header className="border-b border-border-subtle bg-surface-elevated">
           <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
-            <div className="mb-4 font-mono text-xs font-semibold uppercase tracking-[0.16em] text-stone-teal">{TERMS_WATCH_NAME}</div>
+            <div className="mb-4 font-mono text-xs font-semibold uppercase tracking-[0.16em] text-stone-teal">{TERMS_REGISTER_NAME}</div>
             <h1 className="text-4xl font-semibold text-text-primary sm:text-5xl">{name}</h1>
             <p className="mt-5 max-w-2xl text-lg leading-relaxed text-text-muted">
               Reviewed changes to {name}’s published terms and policies, newest first.
@@ -75,11 +75,11 @@ export default async function TermsWatchProviderPage({ params }: Props) {
                 </div>
               )}
             </div>
-            <TermsWatchDisclaimer className="mt-8" />
+            <TermsRegisterDisclaimer className="mt-8" />
           </div>
           <aside className="space-y-6">
             <WhatSubscribersGet />
-            <SubscribeCTA sourceTag="source-terms-watch" briefingOnly showSchedule={false} />
+            <SubscribeCTA sourceTag="source-terms-register" briefingOnly showSchedule={false} />
           </aside>
         </section>
       </main>

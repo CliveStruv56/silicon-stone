@@ -3,9 +3,9 @@ import { cleanDescription } from '@/lib/seo'
 import {
   formatTermsDate,
   termsChangePath,
-  termsWatchProviderName,
+  termsRegisterProviderName,
   type TermsChange,
-} from '@/lib/terms-watch'
+} from '@/lib/terms-register'
 import { SeverityBadge } from './SeverityBadge'
 
 /** Newest first. `showProvider` is off on a provider's own page, where it would repeat. */
@@ -16,7 +16,7 @@ export function TermsChangeList({ changes, showProvider = true }: { changes: Ter
         <li key={change._id}>
           <Link href={termsChangePath(change.provider, change.slug)} className="group block py-6">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-[11px] uppercase tracking-[0.08em] text-text-muted">
-              {showProvider && <span className="font-semibold text-stone-teal">{termsWatchProviderName(change.provider)}</span>}
+              {showProvider && <span className="font-semibold text-stone-teal">{termsRegisterProviderName(change.provider)}</span>}
               <span>{formatTermsDate(change.publishedAt)}</span>
               <SeverityBadge severity={change.severity} />
             </div>

@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { TermsChangeArticle } from './TermsChangeArticle'
 import { TermsChangeList } from './TermsChangeList'
-import { termsChangePath, type TermsChange } from '@/lib/terms-watch'
+import { termsChangePath, type TermsChange } from '@/lib/terms-register'
 
 // Mock termsChange documents in the shape TERMS_CHANGES_QUERY returns. Nothing here touches Sanity.
 const full: TermsChange = {
@@ -40,7 +40,7 @@ const sparse: TermsChange = {
   publishedAt: '2026-11-03T09:00:00Z',
 }
 
-describe('AI Terms Watch with documents present', () => {
+describe('The Terms Register with documents present', () => {
   it('renders the list with links, provider names, dates and severity', () => {
     const html = renderToStaticMarkup(createElement(TermsChangeList, { changes: [full, sparse] }))
     expect(html).toContain(`href="${termsChangePath('anthropic', 'consumer-training-default')}"`)

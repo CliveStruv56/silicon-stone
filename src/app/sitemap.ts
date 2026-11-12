@@ -12,7 +12,7 @@ import { absoluteUrl } from '@/lib/site'
 import { RULE_PACK } from '@/lib/rulepack'
 import { getSectorReports } from '@/lib/sector-reports-server'
 import { sectorReportPath } from '@/lib/sector-reports'
-import { isTermsWatchProvider, TERMS_WATCH_PROVIDERS, termsChangePath } from '@/lib/terms-watch'
+import { isTermsRegisterProvider, TERMS_REGISTER_PROVIDERS, termsChangePath } from '@/lib/terms-register'
 
 /**
  * Dynamic sitemap.xml — enumerates the public site for crawlers and AI engines.
@@ -37,8 +37,8 @@ const STATIC_ROUTES: Array<{
   // The offerings map — one page spanning tools, products and advisory.
   { path: '/how-it-fits-together', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/glossary', changeFrequency: 'weekly', priority: 0.7 },
-  // AI Terms Watch. The six provider pages and every item are enumerated below.
-  { path: '/terms-watch', changeFrequency: 'daily', priority: 0.7 },
+  // The Terms Register. The six provider pages and every item are enumerated below.
+  { path: '/terms-register', changeFrequency: 'daily', priority: 0.7 },
   { path: '/advisory', changeFrequency: 'monthly', priority: 0.6 },
   // All four advisory engagements own a page rather than an anchor. Each is
   // high-value and searched for by name, so they rank alongside /advisory
@@ -191,14 +191,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5,
   }))
 
-  const termsWatchEntries: MetadataRoute.Sitemap = [
-    ...TERMS_WATCH_PROVIDERS.map(({ id }) => ({
-      url: absoluteUrl(`/terms-watch/${id}`),
+  const termsRegisterEntries: MetadataRoute.Sitemap = [
+    ...TERMS_REGISTER_PROVIDERS.map(({ id }) => ({
+      url: absoluteUrl(`/terms-register/${id}`),
       changeFrequency: 'weekly' as const,
       priority: 0.5,
     })),
     ...((termsChanges ?? []) as Array<{ provider: string; slug: string; _updatedAt?: string | null }>)
-      .filter((change) => isTermsWatchProvider(change.provider))
+      .filter((change) => isTermsRegisterProvider(change.provider))
       .map((change) => ({
         url: absoluteUrl(termsChangePath(change.provider, change.slug)),
         lastModified: change._updatedAt || undefined,
@@ -220,6 +220,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...categoryEntries,
     ...authorEntries,
     ...glossaryEntries,
-    ...termsWatchEntries,
+    ...termsRegisterEntries,
   ]
 }
