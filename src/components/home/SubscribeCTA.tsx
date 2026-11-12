@@ -67,7 +67,7 @@ export function SubscribeCTA({
           variant="outline"
           className="self-start border-silicon-amber/60 text-silicon-amber-strong font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
         >
-          Newsletter
+          {briefingOnly ? 'Stone Briefing' : 'Newsletter'}
         </Badge>
         <CardTitle
           className="font-bold text-text-primary"
@@ -166,7 +166,7 @@ export function SubscribeCTA({
         )}
 
         <p className="text-xs text-text-muted mt-3">
-          Free. Unsubscribe anytime.
+          Free. Unsubscribe at any time.
         </p>
       </CardContent>
     </Card>

@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { provider, slug } = await params
   const change = await fetchChange(provider, slug)
   if (!change) return { title: 'Not found', robots: { index: false } }
-  const title = `${termsRegisterProviderName(change.provider)}: ${change.title} | ${TERMS_REGISTER_NAME}`
+  const title = `${termsRegisterProviderName(change.provider)}: ${change.title} | Silicon and Stone`
   const description = cleanDescription(change.whatChanged, 160)
   return {
     title,
@@ -76,7 +76,7 @@ export default async function TermsChangePage({ params }: Props) {
             <h1 className="mt-8 text-3xl font-semibold text-text-primary sm:text-4xl">{change.title}</h1>
             <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-text-muted">
               <SeverityBadge severity={change.severity} />
-              {change.category && <span>{change.category}</span>}
+              {change.category && <span>{change.category.charAt(0).toUpperCase() + change.category.slice(1)}</span>}
               <span>Published {formatTermsDate(change.publishedAt)}</span>
               {change.statedEffectiveDate && <span>Date on {name}’s page: {formatTermsDate(change.statedEffectiveDate)}</span>}
             </div>

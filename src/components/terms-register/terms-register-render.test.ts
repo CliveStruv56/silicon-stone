@@ -58,7 +58,7 @@ describe('The Terms Register with documents present', () => {
 
   it('renders a full detail page body, with the disclaimer and signup', () => {
     const html = renderToStaticMarkup(createElement(TermsChangeArticle, { change: full }))
-    for (const text of ['Who is affected', 'What to do', 'Fact', 'Inference', 'Stone Truth', 'Applies to: Personal accounts, API', 'Change detected 9 November 2026']) {
+    for (const text of ['Who is affected', 'What to do', 'Facts', 'Inferences', 'Stone Truth', 'Applies to: Personal accounts, API', 'Change detected 9 November 2026']) {
       expect(html).toContain(text)
     }
     expect(html).toContain('rel="noopener noreferrer"')
@@ -69,6 +69,6 @@ describe('The Terms Register with documents present', () => {
   it('renders a sparse item without empty sections', () => {
     const html = renderToStaticMarkup(createElement(TermsChangeArticle, { change: sparse }))
     expect(html).toContain('Who is affected')
-    for (const text of ['What to do', 'Inference', 'Stone Truth', 'Applies to']) expect(html).not.toContain(text)
+    for (const text of ['What to do', 'Inferences', 'Stone Truth', 'Applies to']) expect(html).not.toContain(text)
   })
 })

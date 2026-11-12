@@ -51,12 +51,12 @@ export function TermsChangeArticle({ change }: { change: TermsChange }) {
       )}
 
       {change.facts && change.facts.length > 0 && (
-        <Section title="Fact">
+        <Section title="Facts">
           <List items={change.facts} />
         </Section>
       )}
       {change.inferences && change.inferences.length > 0 && (
-        <Section title="Inference">
+        <Section title="Inferences">
           <List items={change.inferences} />
         </Section>
       )}

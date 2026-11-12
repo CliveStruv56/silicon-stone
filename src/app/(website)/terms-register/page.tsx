@@ -13,7 +13,7 @@ import { TERMS_CHANGES_QUERY } from '@/sanity/lib/queries'
  * is published, so it needs nothing from `/api/on-publish`.
  */
 
-const description = `Reviewed changes to the terms of ${TERMS_REGISTER_PROVIDER_LIST}: what changed, who it affects and, where we suggest one, what to do.`
+const description = `Reviewed changes to the terms of ${TERMS_REGISTER_PROVIDER_LIST}: what changed, who it affects and, where we have a suggestion, what to do.`
 
 export const metadata: Metadata = {
   title: `${TERMS_REGISTER_NAME} | Silicon and Stone`,
@@ -36,7 +36,7 @@ export default async function TermsRegisterPage() {
             <div className="max-w-3xl">
               <h1 className="text-4xl font-semibold text-text-primary sm:text-5xl">{TERMS_REGISTER_NAME}</h1>
               <p className="mt-5 max-w-2xl text-lg leading-relaxed text-text-muted">
-                AI providers publish business, API and consumer terms, and those terms can change. We track them, and when a change matters we publish a note on it here: what changed, who it affects and, where we suggest one, what to do.
+                AI providers publish business, API and consumer terms, and those terms can change. We track them, and when a change matters we publish an entry on it here: what changed, who it affects and, where we have a suggestion, what to do.
               </p>
             </div>
           </div>

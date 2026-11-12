@@ -25,8 +25,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { provider } = await params
   if (!isTermsRegisterProvider(provider)) return { title: 'Not found', robots: { index: false } }
   const name = termsRegisterProviderName(provider)
-  const title = `${name} terms changes | ${TERMS_REGISTER_NAME}`
-  const description = `Reviewed changes to ${name}’s published terms and policies, with what changed, who it affects and, where we suggest one, what to do.`
+  const title = `Changes to ${name}’s terms | ${TERMS_REGISTER_NAME} | Silicon and Stone`
+  const description = `Reviewed changes to ${name}’s published terms and policies, with what changed, who it affects and, where we have a suggestion, what to do.`
   return {
     title,
     description,
@@ -71,7 +71,7 @@ export default async function TermsRegisterProviderPage({ params }: Props) {
               ) : (
                 <div className="rounded-lg border border-dashed border-border-subtle bg-stone-charcoal/50 px-6 py-16 text-center">
                   <h2 className="font-statement text-xl font-semibold text-text-primary">No changes published for {name} yet</h2>
-                  <p className="mt-2 text-text-muted">Reviewed changes to its terms will appear here.</p>
+                  <p className="mt-2 text-text-muted">Any reviewed change to its terms will appear here.</p>
                 </div>
               )}
             </div>

@@ -19,9 +19,9 @@ export function AboutTheRegister() {
           terms and privacy policies, checked regularly.
         </li>
         <li>
-          For each change: what changed, who it affects, a link to the provider’s own text and, where we suggest one, what to do about it.
+          For each change: what changed, who it affects, a link to the provider’s own text and, where we have a suggestion, what to do about it.
         </li>
-        <li>Every item is checked and approved by Silicon &amp; Stone before it is published.</li>
+        <li>Every entry is checked and approved by Silicon &amp; Stone before it is published.</li>
       </ul>
       <p className="mt-4 text-xs text-text-muted">Free to read. No sign-up needed.</p>
     </div>
