@@ -300,9 +300,9 @@ export default function MethodologyPage() {
               </h1>
               <p className="text-xl text-text-muted leading-relaxed">
                 Three forensic domains stress-tested by two analytical methods. A
-                3&nbsp;×&nbsp;2 matrix, applied to every published piece, with a
-                visible audit so the reader can see which moves we ran and which we
-                didn&apos;t.
+                3&nbsp;×&nbsp;2 matrix, with a visible audit on each piece that
+                carries one, so the reader can see which moves we ran and which we
+                didn&rsquo;t.
               </p>
             </div>
           </div>
@@ -401,8 +401,8 @@ export default function MethodologyPage() {
               The 3 × 2 Matrix
             </h2>
             <p className="text-text-muted leading-relaxed mb-3">
-              Three domains × two methods = six analytical moves. Every Stone Briefing
-              applies between two and four cells. Every Deep Dive is eligible for all
+              Three domains × two methods = six analytical moves. Most Stone Briefings
+              apply between two and four cells. Every Deep Dive is eligible for all
               six, but the Methodology Audit only claims the cells the body visibly
               applies.
             </p>
