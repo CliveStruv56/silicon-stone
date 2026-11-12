@@ -71,7 +71,7 @@ export default async function TermsRegisterProviderPage({ params }: Props) {
               ) : (
                 <div className="rounded-lg border border-dashed border-border-subtle bg-stone-charcoal/50 px-6 py-16 text-center">
                   <h2 className="font-statement text-xl font-semibold text-text-primary">No changes published for {name} yet</h2>
-                  <p className="mt-2 text-text-muted">Any reviewed change to its terms will appear here.</p>
+                  <p className="mt-2 text-text-muted">When we publish a change to its terms, it will appear here.</p>
                 </div>
               )}
             </div>
