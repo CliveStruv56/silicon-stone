@@ -508,7 +508,7 @@ check('the Studio sidebar list matches the types Studio actually shows', () => {
   const labels = shown.map((name) =>
     extract(
       `src/sanity/schemaTypes/${name}.ts`,
-      new RegExp(`name: '${name}',\\s*\\n\\s*title: '([^']+)'`),
+      new RegExp(`name: '${name}',\\s*\\n\\s*title: [\'\`]([^\'\`]+)[\'\`]`),
       `the Studio title of the ${name} type`,
     ),
   )

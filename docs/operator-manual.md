@@ -745,12 +745,27 @@ Under **Content**, in order:
 2. **Image Library** — browse by collection, all images, manage collections
 3. **Knowledge** — see §11
 4. **Article · Series · Author · Category · Product · Sector report · Sector report edition ·
-   Persona · YouTube Script · Glossary Term**
+   Persona · YouTube Script · Glossary Term · Terms Register item**
 
 **Series** sits directly under Article because that is the order the types are
 registered in, not because anyone placed it there — the sidebar renders the
 remainder of the types in registration order. See §10 for what a series is and
 how to build one.
+
+### Terms Register items
+
+A **Terms Register item** (`termsChange`) is written by the terms-tracker's
+publisher when you set a row in the Notion "Terms changes" queue to Approved;
+you do not create them by hand. Each one appears at `/terms-register`. The link
+into the Tuesday Stone Briefing (the Standfirst projection) is not built yet, so
+items do not reach the Briefing, and the public pages make no promise that they
+will. Once it is built, **Stone Briefing issue** (`briefingWeek`) chooses the
+Tuesday issue an item goes into. Never paste full terms text into one: quotes are limited to three of
+30 words each, and the full text stays in the tracker's own database.
+
+The public name is **The Terms Register**. "Terms Watch" was the project's
+working name and survives only as an internal code name; do not use it on the
+site, in emails or in anything a reader sees.
 
 ### Monthly sector report previews
 

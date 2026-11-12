@@ -8,7 +8,17 @@ import { submitWithOfflineQueue } from '@/lib/offline/submit'
 
 type List = 'briefing' | 'newsletter'
 
-export function SubscribeCTA() {
+/**
+ * `sourceTag` must be in PUBLIC_TAGS (src/lib/standfirst-signups.ts) or the
+ * route drops it. `briefingOnly` hides the list choice where the page is about
+ * something only the Stone Briefing carries. `showSchedule` (default on) is the
+ * Tuesday/Wednesday/Friday text; pages that are not about the schedule turn it off.
+ */
+export function SubscribeCTA({
+  sourceTag = 'source-home',
+  briefingOnly = false,
+  showSchedule = true,
+}: { sourceTag?: string; briefingOnly?: boolean; showSchedule?: boolean } = {}) {
   const [email, setEmail] = useState('')
   const [list, setList] = useState<List>('briefing')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'queued' | 'error'>('idle')
@@ -24,7 +34,7 @@ export function SubscribeCTA() {
       const result = await submitWithOfflineQueue('/api/subscribe', {
         email,
         signup: list,
-        tags: ['source-home'],
+        tags: [sourceTag],
       })
       if (result.queued) {
         setStatus('queued')
@@ -57,7 +67,7 @@ export function SubscribeCTA() {
           variant="outline"
           className="self-start border-silicon-amber/60 text-silicon-amber-strong font-mono text-[12.5px] tracking-[0.10em] uppercase bg-silicon-amber/5"
         >
-          Newsletter
+          {briefingOnly ? 'Stone Briefing' : 'Newsletter'}
         </Badge>
         <CardTitle
           className="font-bold text-text-primary"
@@ -71,6 +81,7 @@ export function SubscribeCTA() {
         </CardTitle>
       </CardHeader>
       <CardContent>
+        {showSchedule && (
         <p className="text-sm text-text-muted mb-5 leading-relaxed">
           <strong className="text-silicon-amber-strong font-medium">Tuesday:</strong>
           {' '}the Stone Briefing — structural analysis of the AI power shift.
@@ -81,6 +92,7 @@ export function SubscribeCTA() {
           <strong className="text-silicon-amber-strong font-medium">Friday:</strong>
           {' '}the Practical Move — what to do about it.
         </p>
+        )}
 
         <div className="my-8 max-w-xl mx-auto text-center">
           <hr className="border-border-subtle mb-6 w-24 mx-auto" />
@@ -104,6 +116,7 @@ export function SubscribeCTA() {
               <span aria-hidden="true">○</span>
               Get the briefing
             </div>
+            {!briefingOnly && (
             <fieldset className="mb-3 flex flex-col gap-1 text-sm text-text-muted sm:flex-row sm:gap-5">
               <legend className="sr-only">Choose what to receive</legend>
               <label className="flex items-center gap-2">
@@ -125,6 +138,7 @@ export function SubscribeCTA() {
                 The AI View
               </label>
             </fieldset>
+            )}
             <form onSubmit={handleSubmit} className="flex gap-2">
               <input
                 type="email"
@@ -152,7 +166,7 @@ export function SubscribeCTA() {
         )}
 
         <p className="text-xs text-text-muted mt-3">
-          Free. Unsubscribe anytime.
+          Free. Unsubscribe at any time.
         </p>
       </CardContent>
     </Card>

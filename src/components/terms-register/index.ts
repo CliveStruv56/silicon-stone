@@ -1,0 +1,6 @@
+export { ProviderNav } from './ProviderNav'
+export { SeverityBadge } from './SeverityBadge'
+export { TermsChangeList } from './TermsChangeList'
+export { TermsRegisterDisclaimer } from './TermsRegisterDisclaimer'
+export { AboutTheRegister } from './AboutTheRegister'
+export { TermsChangeArticle } from './TermsChangeArticle'

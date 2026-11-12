@@ -696,3 +696,91 @@ export const BRIEFINGS_QUERY = defineQuery(`
     }
   }
 `)
+
+// The Terms Register — `termsChange` documents written by the terms-tracker's
+// publisher. The archive, provider and item queries share one projection; change
+// all three together so the surfaces cannot show different summaries.
+export const TERMS_CHANGES_QUERY = defineQuery(`
+  *[_type == "termsChange" && defined(slug.current) && !(_id in path("drafts.**"))]
+  | order(coalesce(publishedAt, _updatedAt) desc) [0...100] {
+    _id,
+    title,
+    "slug": slug.current,
+    provider,
+    documentTitle,
+    sourceUrl,
+    region,
+    category,
+    severity,
+    useScopes,
+    detectedAt,
+    statedEffectiveDate,
+    whatChanged,
+    whoIsAffected,
+    facts,
+    inferences,
+    suggestedActions,
+    quotes,
+    stoneTruth,
+    publishedAt
+  }
+`)
+
+export const TERMS_CHANGES_BY_PROVIDER_QUERY = defineQuery(`
+  *[_type == "termsChange" && provider == $provider && defined(slug.current) && !(_id in path("drafts.**"))]
+  | order(coalesce(publishedAt, _updatedAt) desc) {
+    _id,
+    title,
+    "slug": slug.current,
+    provider,
+    documentTitle,
+    sourceUrl,
+    region,
+    category,
+    severity,
+    useScopes,
+    detectedAt,
+    statedEffectiveDate,
+    whatChanged,
+    whoIsAffected,
+    facts,
+    inferences,
+    suggestedActions,
+    quotes,
+    stoneTruth,
+    publishedAt
+  }
+`)
+
+export const TERMS_CHANGE_QUERY = defineQuery(`
+  *[_type == "termsChange" && provider == $provider && slug.current == $slug && !(_id in path("drafts.**"))][0] {
+    _id,
+    title,
+    "slug": slug.current,
+    provider,
+    documentTitle,
+    sourceUrl,
+    region,
+    category,
+    severity,
+    useScopes,
+    detectedAt,
+    statedEffectiveDate,
+    whatChanged,
+    whoIsAffected,
+    facts,
+    inferences,
+    suggestedActions,
+    quotes,
+    stoneTruth,
+    publishedAt
+  }
+`)
+
+export const TERMS_CHANGE_SLUGS_QUERY = defineQuery(`
+  *[_type == "termsChange" && defined(slug.current) && !(_id in path("drafts.**"))] {
+    provider,
+    "slug": slug.current,
+    _updatedAt
+  }
+`)
