@@ -756,10 +756,11 @@ how to build one.
 
 A **Terms Register item** (`termsChange`) is written by the terms-tracker's
 publisher when you set a row in the Notion "Terms changes" queue to Approved;
-you do not create them by hand. Each one appears at `/terms-register` and in the
-next Tuesday Stone Briefing, through the Standfirst projection. To move an item
-to a different issue, change **Stone Briefing issue** (`briefingWeek`) to that
-Tuesday. Never paste full terms text into one: quotes are limited to three of
+you do not create them by hand. Each one appears at `/terms-register`. The link
+into the Tuesday Stone Briefing (the Standfirst projection) is not built yet, so
+items do not reach the Briefing, and the public pages make no promise that they
+will. Once it is built, **Stone Briefing issue** (`briefingWeek`) chooses the
+Tuesday issue an item goes into. Never paste full terms text into one: quotes are limited to three of
 30 words each, and the full text stays in the tracker's own database.
 
 The public name is **The Terms Register**. "Terms Watch" was the project's

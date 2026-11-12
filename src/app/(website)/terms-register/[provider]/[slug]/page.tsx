@@ -78,7 +78,7 @@ export default async function TermsChangePage({ params }: Props) {
               <SeverityBadge severity={change.severity} />
               {change.category && <span>{change.category}</span>}
               <span>Published {formatTermsDate(change.publishedAt)}</span>
-              {change.statedEffectiveDate && <span>Effective {formatTermsDate(change.statedEffectiveDate)}</span>}
+              {change.statedEffectiveDate && <span>Date on {name}’s page: {formatTermsDate(change.statedEffectiveDate)}</span>}
             </div>
           </div>
         </header>

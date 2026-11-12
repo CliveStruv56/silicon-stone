@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!isTermsRegisterProvider(provider)) return { title: 'Not found', robots: { index: false } }
   const name = termsRegisterProviderName(provider)
   const title = `${name} terms changes | ${TERMS_REGISTER_NAME}`
-  const description = `Reviewed changes to ${name}’s published terms and policies, with what changed, who it affects and what to do.`
+  const description = `Reviewed changes to ${name}’s published terms and policies, with what changed, who it affects and, where we suggest one, what to do.`
   return {
     title,
     description,
