@@ -146,6 +146,56 @@ const matrixCells = [
   { domain: 'Talent', method: 'Long-Memory Filter', slug: 'talent-long-memory-filter', description: '40-year skill-density and migration cycles' },
 ]
 
+// Copy for "From Evidence to Publication": approved wording, do not edit without a fresh fact-check.
+const checkingSteps = [
+  {
+    number: '01',
+    title: 'The Claim Ledger',
+    tagline: 'The research layer: one claim per line',
+    body: [
+      'The research behind a piece is logged claim by claim. Each line records the claim, the exact passage it rests on, the source, the publisher, the date of the source and the date of the event it describes. Research normally starts from what our own archive of verified findings already holds.',
+      'Primary sources come first: legislation, regulators, official statistics, company filings and original papers. Search results are never a source. News coverage is used to look for the original document behind it. Each claim is labelled as established fact, reported but unconfirmed, or our inference, and graded by its evidence. A claim the piece depends on needs two independent sources, at least one of them primary; otherwise it is written as “X reports that…”, not as fact. Capacity claims about GPUs, data centres or megawatts say whether the capacity is announced, shipped or powered. Our own calculations are labelled as ours, never as an official figure.',
+      'We size the research to the piece: about eight claims for a short note, up to about fifteen for a Briefing, and as many as a Deep Dive needs. Fewer, fully checked claims beat more, partly checked ones.',
+    ],
+  },
+  {
+    number: '02',
+    title: 'The Second Check',
+    tagline: 'Checked again, separately',
+    body: [
+      'The ledger then goes through a separate check. Nothing is marked as verified by the work that produced it. The check covers every claim in the ledger, not a sample. Each source is opened and read again, and the claim is tested against the exact passage: the numbers, the units, the dates and who said it. A claim whose source cannot be opened is not marked as verified. Derived figures are recalculated. Dates are checked twice, for the source and for the event, to catch old reports presented as new. Each claim comes back Verified, Wrong, Unverifiable or Outdated.',
+    ],
+  },
+  {
+    number: '03',
+    title: 'Trying to Break It',
+    tagline: 'The challenge pass on the claims that matter most',
+    body: [
+      'For the three claims a piece depends on most, the check switches sides and tries to disprove them. It looks for contradicting primary sources, later corrections and retractions, missing denominators (“the largest” compared with what?), reliance on a single source or a press release, and other explanations. A headline claim that survives stays. One that doesn’t is downgraded or removed.',
+    ],
+  },
+  {
+    number: '04',
+    title: 'When a Claim Fails',
+    tagline: 'What happens to the claims that don’t survive',
+    body: [
+      'Research passes only when every claim the findings use is verified. A claim that fails is corrected, carried only as attributed reporting where the attribution itself is the point, moved to open questions, or left out. Corrected claims are checked again, with their sources reopened, before the research can be used. A failed check is a good outcome: it stopped something wrong or unsupported from reaching you.',
+    ],
+  },
+  {
+    number: '05',
+    title: 'Publication and Sign-Off',
+    tagline: 'The last checks before anything goes out',
+    body: [
+      'The draft’s facts must come from verified claims. Before publication it is checked again in its final wording: every factual sentence must trace to a verified claim, quotations are checked word for word, and the source’s qualifiers survive the writing, so no “will” where the source says “may”. Each article made under this process must carry a Methodology Audit showing which of the six analytical moves it applied and which it did not.',
+      'Nothing is published until Clive Struver has given his explicit yes for that piece. A review stamp in his name appears only on a page he has read and approved.',
+    ],
+  },
+]
+
+const checkingIntro =
+  'The framework above decides which questions we ask. This section sets out how we check that the answers hold: how the evidence is gathered, how each claim is checked, and what happens when one fails. Accuracy comes before speed. When the two pull apart, we publish less, or later. We introduced this process in late October 2026; articles published before then predate it.'
+
 function MethodologyCard({
   entry,
   index,
@@ -388,6 +438,46 @@ export default function MethodologyPage() {
                 ))}
               </tbody>
             </table>
+          </div>
+        </section>
+
+        <Separator className="mx-auto max-w-7xl bg-border-subtle" />
+
+        {/* From Evidence to Publication: how research is gathered and fact-checked */}
+        <section
+          id="how-we-check"
+          className="mx-auto max-w-7xl px-6 py-10 lg:px-8 lg:py-12 scroll-mt-24"
+        >
+          <div className="max-w-3xl mb-8">
+            <div className="font-mono text-[12.5px] tracking-[0.10em] uppercase text-silicon-amber-strong mb-3">
+              How we check our work
+            </div>
+            <h2 className="text-2xl font-semibold text-text-primary mb-3">
+              From Evidence to Publication
+            </h2>
+            <p className="text-text-muted leading-relaxed">{checkingIntro}</p>
+          </div>
+          <div className="space-y-12">
+            {checkingSteps.map((step) => (
+              <Card key={step.number} className="bg-stone-charcoal border-border-subtle overflow-hidden">
+                <CardHeader className="pb-4">
+                  <span className="text-sm font-mono text-silicon-amber-strong mb-1">
+                    {step.number}
+                  </span>
+                  <CardTitle className="text-xl font-semibold text-text-primary">
+                    {step.title}
+                  </CardTitle>
+                  <p className="text-stone-teal font-medium mt-1">{step.tagline}</p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {step.body.map((paragraph) => (
+                    <p key={paragraph} className="text-text-muted leading-relaxed">
+                      {paragraph}
+                    </p>
+                  ))}
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </section>
 
