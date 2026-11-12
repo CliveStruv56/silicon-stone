@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Footer, Header } from '@/components/layout'
 import { SubscribeCTA } from '@/components/home/SubscribeCTA'
-import { ProviderNav, TermsChangeList, TermsRegisterDisclaimer, WhatSubscribersGet } from '@/components/terms-register'
+import { ProviderNav, TermsChangeList, TermsRegisterDisclaimer, AboutTheRegister } from '@/components/terms-register'
 import { TERMS_REGISTER_NAME, TERMS_REGISTER_PROVIDER_LIST, type TermsChange } from '@/lib/terms-register'
 import { sanityFetch } from '@/sanity/lib/live'
 import { TERMS_CHANGES_QUERY } from '@/sanity/lib/queries'
@@ -36,8 +36,7 @@ export default async function TermsRegisterPage() {
             <div className="max-w-3xl">
               <h1 className="text-4xl font-semibold text-text-primary sm:text-5xl">{TERMS_REGISTER_NAME}</h1>
               <p className="mt-5 max-w-2xl text-lg leading-relaxed text-text-muted">
-                AI providers publish business, API and consumer terms, and those terms can change. We track them, and tell
-                you when a change matters: what changed, who it affects and, where we suggest one, what to do.
+                AI providers publish business, API and consumer terms, and those terms can change. We track them, and when a change matters we publish a note on it here: what changed, who it affects and, where we suggest one, what to do.
               </p>
             </div>
           </div>
@@ -59,7 +58,7 @@ export default async function TermsRegisterPage() {
             <TermsRegisterDisclaimer className="mt-8" />
           </div>
           <aside className="space-y-6">
-            <WhatSubscribersGet />
+            <AboutTheRegister />
             <SubscribeCTA sourceTag="source-terms-register" briefingOnly showSchedule={false} />
           </aside>
         </section>

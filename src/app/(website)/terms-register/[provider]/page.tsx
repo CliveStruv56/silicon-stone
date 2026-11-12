@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { Footer, Header } from '@/components/layout'
 import { SubscribeCTA } from '@/components/home/SubscribeCTA'
-import { ProviderNav, TermsChangeList, TermsRegisterDisclaimer, WhatSubscribersGet } from '@/components/terms-register'
+import { ProviderNav, TermsChangeList, TermsRegisterDisclaimer, AboutTheRegister } from '@/components/terms-register'
 import {
   isTermsRegisterProvider,
   TERMS_REGISTER_PROVIDERS,
@@ -78,7 +78,7 @@ export default async function TermsRegisterProviderPage({ params }: Props) {
             <TermsRegisterDisclaimer className="mt-8" />
           </div>
           <aside className="space-y-6">
-            <WhatSubscribersGet />
+            <AboutTheRegister />
             <SubscribeCTA sourceTag="source-terms-register" briefingOnly showSchedule={false} />
           </aside>
         </section>
