@@ -6,6 +6,9 @@
  * tracker writes them and these pages route on them.
  */
 
+/** The public display name. Routes, the `termsChange` type and the `source-terms-watch` tag do not change with it. */
+export const TERMS_WATCH_NAME = 'AI Terms Watch'
+
 export const TERMS_WATCH_PROVIDERS = [
   { id: 'anthropic', name: 'Anthropic' },
   { id: 'openai', name: 'OpenAI' },
@@ -14,6 +17,11 @@ export const TERMS_WATCH_PROVIDERS = [
   { id: 'spacexsi', name: 'SpaceXSI (xAI)' },
   { id: 'mistral', name: 'Mistral' },
 ] as const
+
+/** "Anthropic, OpenAI, Google, Microsoft, SpaceXSI (xAI) and Mistral", as the provider nav names them. */
+export const TERMS_WATCH_PROVIDER_LIST = `${TERMS_WATCH_PROVIDERS.slice(0, -1)
+  .map((p) => p.name)
+  .join(', ')} and ${TERMS_WATCH_PROVIDERS[TERMS_WATCH_PROVIDERS.length - 1].name}`
 
 export type TermsWatchProviderId = (typeof TERMS_WATCH_PROVIDERS)[number]['id']
 

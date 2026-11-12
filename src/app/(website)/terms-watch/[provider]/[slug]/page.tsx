@@ -8,6 +8,7 @@ import { cleanDescription } from '@/lib/seo'
 import {
   formatTermsDate,
   isTermsWatchProvider,
+  TERMS_WATCH_NAME,
   termsWatchProviderName,
   type TermsChange,
 } from '@/lib/terms-watch'
@@ -43,7 +44,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { provider, slug } = await params
   const change = await fetchChange(provider, slug)
   if (!change) return { title: 'Not found', robots: { index: false } }
-  const title = `${termsWatchProviderName(change.provider)}: ${change.title} | AI Terms Watch`
+  const title = `${termsWatchProviderName(change.provider)}: ${change.title} | ${TERMS_WATCH_NAME}`
   const description = cleanDescription(change.whatChanged, 160)
   return {
     title,
@@ -70,7 +71,7 @@ export default async function TermsChangePage({ params }: Props) {
               href={`/terms-watch/${change.provider}`}
               className="inline-flex items-center gap-1.5 font-mono text-xs font-semibold uppercase tracking-[0.12em] text-stone-teal hover:text-silicon-amber-strong"
             >
-              <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" /> {name} · AI Terms Watch
+              <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" /> {name} · {TERMS_WATCH_NAME}
             </Link>
             <h1 className="mt-8 text-3xl font-semibold text-text-primary sm:text-4xl">{change.title}</h1>
             <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-text-muted">

@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Footer, Header } from '@/components/layout'
 import { SubscribeCTA } from '@/components/home/SubscribeCTA'
 import { ProviderNav, TermsChangeList, TermsWatchDisclaimer, WhatSubscribersGet } from '@/components/terms-watch'
-import type { TermsChange } from '@/lib/terms-watch'
+import { TERMS_WATCH_NAME, TERMS_WATCH_PROVIDER_LIST, type TermsChange } from '@/lib/terms-watch'
 import { sanityFetch } from '@/sanity/lib/live'
 import { TERMS_CHANGES_QUERY } from '@/sanity/lib/queries'
 
@@ -13,15 +13,14 @@ import { TERMS_CHANGES_QUERY } from '@/sanity/lib/queries'
  * is published, so it needs nothing from `/api/on-publish`.
  */
 
-const description =
-  'Reviewed changes to the terms of Anthropic, OpenAI, Google, Microsoft, SpaceXSI and Mistral: what changed, who it affects and what to do.'
+const description = `Reviewed changes to the terms of ${TERMS_WATCH_PROVIDER_LIST}: what changed, who it affects and what to do.`
 
 export const metadata: Metadata = {
-  title: 'AI Terms Watch | Silicon and Stone',
+  title: `${TERMS_WATCH_NAME} | Silicon and Stone`,
   description,
   alternates: { canonical: '/terms-watch' },
-  openGraph: { title: 'AI Terms Watch', description, type: 'website' },
-  twitter: { card: 'summary_large_image', title: 'AI Terms Watch', description },
+  openGraph: { title: TERMS_WATCH_NAME, description, type: 'website' },
+  twitter: { card: 'summary_large_image', title: TERMS_WATCH_NAME, description },
 }
 
 export default async function TermsWatchPage() {
@@ -35,13 +34,10 @@ export default async function TermsWatchPage() {
         <header className="border-b border-border-subtle bg-surface-elevated">
           <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
             <div className="max-w-3xl">
-              <div className="mb-4 font-mono text-xs font-semibold uppercase tracking-[0.16em] text-stone-teal">
-                For subscribers
-              </div>
-              <h1 className="text-4xl font-semibold text-text-primary sm:text-5xl">AI Terms Watch</h1>
+              <h1 className="text-4xl font-semibold text-text-primary sm:text-5xl">{TERMS_WATCH_NAME}</h1>
               <p className="mt-5 max-w-2xl text-lg leading-relaxed text-text-muted">
-                The AI providers rewrite their terms often, and rarely say so. We check their business, API and consumer
-                terms every day, and tell you when a change matters: what changed, who it affects and what to do.
+                AI providers publish business, API and consumer terms, and those terms can change. We track them, and tell
+                you when a change matters: what changed, who it affects and what to do.
               </p>
             </div>
           </div>
@@ -64,7 +60,7 @@ export default async function TermsWatchPage() {
           </div>
           <aside className="space-y-6">
             <WhatSubscribersGet />
-            <SubscribeCTA sourceTag="source-terms-watch" briefingOnly />
+            <SubscribeCTA sourceTag="source-terms-watch" briefingOnly showSchedule={false} />
           </aside>
         </section>
       </main>

@@ -6,6 +6,7 @@ import { ProviderNav, TermsChangeList, TermsWatchDisclaimer, WhatSubscribersGet 
 import {
   isTermsWatchProvider,
   TERMS_WATCH_PROVIDERS,
+  TERMS_WATCH_NAME,
   termsWatchProviderName,
   type TermsChange,
 } from '@/lib/terms-watch'
@@ -24,8 +25,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { provider } = await params
   if (!isTermsWatchProvider(provider)) return { title: 'Not found', robots: { index: false } }
   const name = termsWatchProviderName(provider)
-  const title = `${name} terms changes | AI Terms Watch`
-  const description = `Every reviewed change to ${name}’s published terms and policies, with what changed, who it affects and what to do.`
+  const title = `${name} terms changes | ${TERMS_WATCH_NAME}`
+  const description = `Reviewed changes to ${name}’s published terms and policies, with what changed, who it affects and what to do.`
   return {
     title,
     description,
@@ -54,7 +55,7 @@ export default async function TermsWatchProviderPage({ params }: Props) {
       <main>
         <header className="border-b border-border-subtle bg-surface-elevated">
           <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
-            <div className="mb-4 font-mono text-xs font-semibold uppercase tracking-[0.16em] text-stone-teal">AI Terms Watch</div>
+            <div className="mb-4 font-mono text-xs font-semibold uppercase tracking-[0.16em] text-stone-teal">{TERMS_WATCH_NAME}</div>
             <h1 className="text-4xl font-semibold text-text-primary sm:text-5xl">{name}</h1>
             <p className="mt-5 max-w-2xl text-lg leading-relaxed text-text-muted">
               Reviewed changes to {name}’s published terms and policies, newest first.
@@ -70,7 +71,7 @@ export default async function TermsWatchProviderPage({ params }: Props) {
               ) : (
                 <div className="rounded-lg border border-dashed border-border-subtle bg-stone-charcoal/50 px-6 py-16 text-center">
                   <h2 className="font-statement text-xl font-semibold text-text-primary">No changes published for {name} yet</h2>
-                  <p className="mt-2 text-text-muted">Its terms are checked every day; reviewed changes will appear here.</p>
+                  <p className="mt-2 text-text-muted">Reviewed changes to its terms will appear here.</p>
                 </div>
               )}
             </div>
@@ -78,7 +79,7 @@ export default async function TermsWatchProviderPage({ params }: Props) {
           </div>
           <aside className="space-y-6">
             <WhatSubscribersGet />
-            <SubscribeCTA sourceTag="source-terms-watch" briefingOnly />
+            <SubscribeCTA sourceTag="source-terms-watch" briefingOnly showSchedule={false} />
           </aside>
         </section>
       </main>

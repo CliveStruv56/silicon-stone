@@ -93,7 +93,7 @@ export function TermsChangeArticle({ change }: { change: TermsChange }) {
 
       <TermsWatchDisclaimer className="mt-10" />
       <div className="mt-10">
-        <SubscribeCTA sourceTag="source-terms-watch" briefingOnly />
+        <SubscribeCTA sourceTag="source-terms-watch" briefingOnly showSchedule={false} />
       </div>
     </article>
   )

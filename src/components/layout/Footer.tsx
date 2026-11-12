@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Linkedin } from 'lucide-react'
 
 import { ENGAGEMENTS } from '@/lib/offering'
+import { TERMS_WATCH_NAME } from '@/lib/terms-watch'
 
 // Clive's profile (4 November 2026). NEXT_PUBLIC_LINKEDIN_URL overrides it, for
 // example with a company page later.
@@ -15,7 +16,7 @@ const footerNavigation = {
     { name: 'Atlantic Drift', href: '/analysis/category/atlantic-drift' },
     { name: 'AI Act & Compliance', href: '/analysis/category/ai-act' },
     { name: 'Semiconductors', href: '/analysis/category/semiconductors' },
-    { name: 'AI Terms Watch', href: '/terms-watch' },
+    { name: TERMS_WATCH_NAME, href: '/terms-watch' },
   ],
   engage: [
     { name: 'Tools', href: '/tools' },

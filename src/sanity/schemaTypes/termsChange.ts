@@ -6,6 +6,7 @@ import {
   TERMS_SEVERITY_LABELS,
   TERMS_USE_LABELS,
   TERMS_USE_SCOPES,
+  TERMS_WATCH_NAME,
   TERMS_WATCH_PROVIDERS,
 } from '@/lib/terms-watch'
 
@@ -23,7 +24,7 @@ import {
  */
 export const termsChange = defineType({
   name: 'termsChange',
-  title: 'AI Terms Watch item',
+  title: `${TERMS_WATCH_NAME} item`,
   type: 'document',
   icon: DocumentsIcon,
   groups: [

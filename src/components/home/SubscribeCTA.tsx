@@ -11,12 +11,14 @@ type List = 'briefing' | 'newsletter'
 /**
  * `sourceTag` must be in PUBLIC_TAGS (src/lib/standfirst-signups.ts) or the
  * route drops it. `briefingOnly` hides the list choice where the page is about
- * something only the Stone Briefing carries.
+ * something only the Stone Briefing carries. `showSchedule` (default on) is the
+ * Tuesday/Wednesday/Friday text; pages that are not about the schedule turn it off.
  */
 export function SubscribeCTA({
   sourceTag = 'source-home',
   briefingOnly = false,
-}: { sourceTag?: string; briefingOnly?: boolean } = {}) {
+  showSchedule = true,
+}: { sourceTag?: string; briefingOnly?: boolean; showSchedule?: boolean } = {}) {
   const [email, setEmail] = useState('')
   const [list, setList] = useState<List>('briefing')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'queued' | 'error'>('idle')
@@ -79,6 +81,7 @@ export function SubscribeCTA({
         </CardTitle>
       </CardHeader>
       <CardContent>
+        {showSchedule && (
         <p className="text-sm text-text-muted mb-5 leading-relaxed">
           <strong className="text-silicon-amber-strong font-medium">Tuesday:</strong>
           {' '}the Stone Briefing — structural analysis of the AI power shift.
@@ -89,6 +92,7 @@ export function SubscribeCTA({
           <strong className="text-silicon-amber-strong font-medium">Friday:</strong>
           {' '}the Practical Move — what to do about it.
         </p>
+        )}
 
         <div className="my-8 max-w-xl mx-auto text-center">
           <hr className="border-border-subtle mb-6 w-24 mx-auto" />
