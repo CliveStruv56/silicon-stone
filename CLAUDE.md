@@ -1017,16 +1017,25 @@ not to undo:
   categorical. A test fails on `%` or "score" in any result string.
 - **"Not sure" is a finding, never a "no".** Every unknown becomes a "Things to
   find out" item saying how it moves confidence; an area that would apply on a
-  "yes" stays in view (the authorised representative). "None of these" with an
-  unknown establishment is held at "cannot yet tell", not out of scope.
-- **Only `in_scope` shows a flat duty.** "Likely" keeps everything conditional.
+  "yes" stays in view (the authorised representative).
+- **"Does not apply" only when no answer implies an EU link.** "None of these"
+  alongside an unknown or multi-country establishment, or an import or
+  distribution activity, is held at "cannot yet tell". A test enumerates every
+  establishment, connection and activity combination.
+- **Only `in_scope` with a provider or deployer activity shows a flat duty**
+  (Article 4 binds those two roles only). A test holds every flat duty to a
+  role its article binds.
 - **Templated sentences are conditional on the data they claim.** "You told
-  us …", "owed since …", "including UK law" and the Diagnostic reason each
+  us …", "has applied since …", "including UK law" and the Diagnostic reason each
   appear only beside the answer they quote; `engine.test.ts` walks every
   single-answer variation across five bases to hold that.
 - **Every extract is verbatim from the pinned pack** (`extracts.test.ts`), and
   every date in a result string is a pack timeline date. Article 22 is in the
   pack from `2026-11-16` for this tool.
+
+**Released ahead of counsel review** (owner decision, 16 Nov 2026): what that
+covers, and the four points left for counsel with the v2 review, are in
+`docs/tools-specialist-advisory-plan.md`. It does not unblock Checker v2.
 
 `src/components/tools/results/ResultsLayout.tsx` (sticky contents, "start
 here" marker) is generic; the other tools can adopt it.

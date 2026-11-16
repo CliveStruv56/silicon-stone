@@ -8,7 +8,7 @@ import { ExposureCheck } from '@/components/tools/exposure/ExposureCheck'
 import { EXPOSURE_QUESTIONS } from '@/lib/exposure/questions'
 import { RULE_PACK } from '@/lib/rulepack'
 
-const title = 'Does the EU AI Act Apply to Your Company? Free Exposure Check'
+const title = 'Does the EU AI Act apply to your company? Free Exposure Check'
 // The count word is asserted against EXPOSURE_QUESTIONS.length in
 // exposure-page.test.ts; it is a literal so site search can quote it verbatim.
 const OG_IMAGE = '/homepage-redesign-2026/the-watcher.png'
@@ -34,9 +34,15 @@ export const metadata: Metadata = {
   twitter: { card: 'summary_large_image', title, description, images: [OG_IMAGE] },
 }
 
+// The house form is the word for numbers under ten; the count is still read from the catalogue.
+const COUNT_WORD =
+  ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'][EXPOSURE_QUESTIONS.length] ??
+  String(EXPOSURE_QUESTIONS.length)
+const COUNT_WORD_CAPITAL = COUNT_WORD.charAt(0).toUpperCase() + COUNT_WORD.slice(1)
+
 const HOW_IT_WORKS = [
-  { title: 'Answer for the whole organisation', body: `${EXPOSURE_QUESTIONS.length} questions, no free text. “Not sure” is a real answer, and the result tells you what to find out.` },
-  { title: 'Get a scope verdict', body: 'Whether the Act applies, stated first, with how confident the answers let us be and what the verdict does not say.' },
+  { title: 'Answer for the whole organisation', body: `${COUNT_WORD_CAPITAL} questions, no free text. “Not sure” is a real answer, and the result tells you what to find out.` },
+  { title: 'Get a scope verdict', body: 'Whether the Act applies, with how confident the answers let us be and what the verdict does not say.' },
   { title: 'See where it reaches you', body: 'Each area with the date it runs from and the words of the Act it rests on.' },
   { title: 'Check one system at a time', body: 'Take each flagged system to the Compliance Checker for a first-pass classification.' },
 ]
@@ -55,7 +61,7 @@ export default function ExposureCheckPage() {
               </Badge>
               <h1 className="text-4xl font-bold tracking-tight text-text-primary sm:text-5xl">Does the EU AI Act apply to your company?</h1>
               <p className="mt-6 max-w-3xl text-lg leading-relaxed text-text-muted">
-                Answer {EXPOSURE_QUESTIONS.length} questions about your organisation as a whole. You get a scope verdict, the areas of the Act that reach you with their dates, the things you still need to find out, and which systems to check in detail.
+                Answer {COUNT_WORD} questions about your organisation as a whole. You get a scope verdict, the areas of the Act that reach you with their dates, the things you still need to find out, and which systems to check in detail.
               </p>
               <p className="mt-4 max-w-3xl text-sm leading-relaxed text-text-muted">
                 For a single AI system, use the <Link href="/tools/compliance-checker" className="text-stone-teal underline underline-offset-4">Compliance Checker</Link> instead.
@@ -74,7 +80,7 @@ export default function ExposureCheckPage() {
                   ['No score', 'Whether a law applies is a yes, a no or not yet known. It is never a percentage.'],
                   ['Rules, not a model', 'The verdict comes from fixed rules. No language model decides it.'],
                   ['Pinned statute', `Rule pack ${RULE_PACK.manifest.version}, built from CELEX ${RULE_PACK.manifest.provenance.celex}.`],
-                  ['Nothing stored', 'No email before the result, and your answers are not saved. Copy or download it as Markdown.'],
+                  ['Nothing stored', 'No email before the result, and your answers are not stored. Copy or download the result as Markdown.'],
                 ].map(([heading, copy]) => (
                   <div key={heading} className="rounded-lg border border-border-subtle bg-stone-charcoal/60 p-4">
                     <div className="text-sm font-semibold text-text-primary">{heading}</div>

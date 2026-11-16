@@ -2,7 +2,7 @@ import type { AnswerRecordV2 } from '@/lib/compliance-v2/types'
 import type { RulePack } from '@/lib/rulepack'
 import { EXPOSURE_QUESTIONS } from './questions'
 import { EXTRACTS } from './extracts'
-import { VERDICT, PROVIDER_ACTIVITIES, type AreaKind, type ExposureArea, type ExposureResult } from './engine'
+import { VERDICT, OUTSIDE_EU, PROVIDER_ACTIVITIES, packDateInWords, type AreaKind, type ExposureArea, type ExposureResult } from './engine'
 
 /**
  * Everything the results page and the Markdown export say, built once from the
@@ -18,6 +18,25 @@ export const KIND_LABEL: Record<AreaKind, string> = {
 }
 
 export const CONFIDENCE_LABEL = { high: 'High', medium: 'Medium', low: 'Low' } as const
+
+/** Said once under the confidence label, so a reader does not take it for a grade. */
+export const CONFIDENCE_NOTE = 'This is how far your answers settle the verdict, not a rating of your organisation.'
+
+export const PLAYBACK_NOTE = 'The verdict below follows from these answers, the dated text of the Act and the date you run it.'
+
+/** The areas heading: "would" until scope is settled, so it never contradicts the verdict. */
+export function areasHeading(result: ExposureResult): string {
+  return result.scope.outcome === 'in_scope' ? 'Where the Act reaches you' : 'Where the Act would reach you'
+}
+
+/**
+ * The footer, on the page and in the export. Dates come from the pack manifest,
+ * never typed. The first sentence states the review status plainly; it is not a
+ * review stamp and names nobody.
+ */
+export function footerText(pack: RulePack): string {
+  return `This check has not been reviewed by a lawyer. It is a first-pass triage against the text of the Act, not legal advice. Rule pack ${pack.manifest.version}, last reviewed ${packDateInWords(pack.manifest.lastReviewed)}, built from the consolidated text of ${packDateInWords(pack.manifest.corpusCutOff)} (CELEX ${pack.manifest.provenance.celex}). No language model decides this result, and your answers are not stored.`
+}
 
 export interface PlaybackRow {
   id: string
@@ -47,11 +66,15 @@ export function familyLabel(family: string): string {
   return EXPOSURE_QUESTIONS.find((q) => q.id === 'intended_use_family')?.options?.find((o) => o.value === family)?.label ?? family
 }
 
-/** The Article 2 extracts shown under the verdict: only to an in-scope reader established outside the EU. */
+/**
+ * The Article 2 extracts shown under the verdict: for any result other than out
+ * of scope, to a reader who answered UK, US, Canada or somewhere else. Not for
+ * "More than one of these", which may include an EU entity.
+ */
 export function scopeExtracts(result: ExposureResult, answers: AnswerRecordV2): Array<keyof typeof EXTRACTS> {
   if (result.scope.outcome === 'out_of_scope') return []
   const establishment = answers.organisation_establishment
-  const outside = establishment?.state === 'answered' && establishment.value !== 'eu_eea'
+  const outside = establishment?.state === 'answered' && OUTSIDE_EU.includes(String(establishment.value))
   if (!outside) return []
   const activity = answers.organisation_activity
   const provides =
@@ -63,7 +86,7 @@ export function scopeExtracts(result: ExposureResult, answers: AnswerRecordV2): 
 
 export function milestoneLine(area: ExposureArea): string | null {
   if (!area.milestone) return null
-  return `${area.milestoneStatus === 'in-force' ? 'In force since' : 'Applies from'} ${area.milestone.date}`
+  return `${area.milestoneStatus === 'in-force' ? 'Has applied since' : 'Applies from'} ${area.milestone.date}`
 }
 
 const quote = (id: keyof typeof EXTRACTS) => `> “${EXTRACTS[id].text}” (${EXTRACTS[id].citation})`
@@ -73,15 +96,15 @@ export function exposureMarkdown(result: ExposureResult, answers: AnswerRecordV2
   const lines: string[] = []
   const add = (...items: string[]) => lines.push(...items)
 
-  add('# EU AI Act Exposure Check', '', `Run on ${today.toISOString().slice(0, 10)} · siliconandstone.com/tools/exposure-check`, '')
+  add('# EU AI Act Exposure Check', '', `Generated ${today.toISOString().slice(0, 10)} · siliconandstone.com/tools/exposure-check`, '')
 
   add('## What you told us', '')
   for (const row of playback(answers)) add(`- **${row.question}:** ${row.answer}`)
-  add('')
+  add('', PLAYBACK_NOTE, '')
 
   add('## Verdict', '', `**${VERDICT[result.scope.outcome]}.**`, '', result.scope.explanation, '')
   for (const id of scopeExtracts(result, answers)) add(quote(id), '')
-  add(result.meaning, '', `**Confidence: ${CONFIDENCE_LABEL[result.confidence]}.**`, '')
+  add(result.meaning, '', `**Confidence: ${CONFIDENCE_LABEL[result.confidence]}.** ${CONFIDENCE_NOTE}`, '')
   for (const reason of result.confidenceReasons) add(`- ${reason}`)
   add('', `*What this does not say:* ${result.limits}`, '')
 
@@ -96,14 +119,14 @@ export function exposureMarkdown(result: ExposureResult, answers: AnswerRecordV2
       result.focus.target === 'find-out'
         ? 'Things to find out'
         : result.focus.target === 'verdict'
-          ? 'the verdict'
+          ? 'Verdict'
           : result.areas.find((area) => area.id === result.focus?.target)?.title
     add(`**Start here: ${target}.** ${result.focus.reason}`, '')
   }
 
   const findOutBlock = () => {
     if (!result.findOut.length) return
-    add('## Things to find out', '', 'You answered "not sure" to these. That is a finding, not a failure: here is what to ask, whom to ask, and how each one changes the result.', '')
+    add('## Things to find out', '', 'You answered “not sure” to these. That is a finding, not a failure: here is what to ask, whom to ask, and how each one changes the result.', '')
     for (const item of result.findOut) {
       add(`- **${item.ask}** Ask: ${item.whom} How it changes the result: ${item.effect}`)
     }
@@ -113,7 +136,7 @@ export function exposureMarkdown(result: ExposureResult, answers: AnswerRecordV2
   if (decisiveUnknown) findOutBlock()
 
   if (result.areas.length) {
-    add('## Where the Act reaches you', '')
+    add(`## ${areasHeading(result)}`, '')
     for (const area of result.areas) {
       add(`### ${area.title}`, '', `*${KIND_LABEL[area.kind]}${milestoneLine(area) ? ` · ${milestoneLine(area)}` : ''}*`, '', area.summary, '')
       for (const id of area.extracts ?? []) add(quote(id), '')
@@ -137,7 +160,7 @@ export function exposureMarkdown(result: ExposureResult, answers: AnswerRecordV2
   add(
     '---',
     '',
-    `A first-pass triage against the text of the Act, not legal advice. Rule pack ${pack.manifest.version}, consolidated text CELEX ${pack.manifest.provenance.celex}. No language model decides this result, and your answers are not stored.`,
+    footerText(pack),
     '',
   )
   return lines.join('\n')

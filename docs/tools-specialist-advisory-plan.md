@@ -45,6 +45,33 @@ what AI it has or has many systems. It sits first in the Tools navigation and
 the Tools page. Release still waits on the independent fact-check and
 brand-voice check of its legal content and the owner's review of the preview.
 
+### Released ahead of counsel review (owner decision, 16 November 2026)
+
+The owner decided to release the Exposure Check ahead of counsel review. What
+that means:
+
+- The tool reuses the scope and organisation-size logic and five questions from
+  Compliance Checker v2. v2's statements of law remain marked "Not reviewed by
+  counsel" (`docs/compliance-checker-v2-state.md` §22.4), and v2's own release
+  stays blocked on that review. **This decision covers the Exposure Check only;
+  it does not unblock Checker v2.**
+- The Exposure Check's release rests on the automated rule-pack checks (the
+  pinned-corpus extract test, the timeline-date test and the build gates) and on
+  the independent publication fact-check, check ID
+  `fc-2026-11-16-exposure-check`. That check failed first time, including on two
+  false "does not apply" results (an importer, and a group established in more
+  than one place); both were fixed in the second round on 16 November 2026, and
+  the check must pass on re-check before merge.
+- The page and the Markdown export say "This check has not been reviewed by a
+  lawyer."
+- Four points the fact-checker says only counsel can settle remain open:
+  (a) whether a non-EU developer whose system reaches the EU only through
+  resellers or integrators is "placing on the market"; (b) whether the
+  four-connection test is an acceptable organisation-level stand-in for
+  Article 2(1); (c) the mapping from activities to roles; (d) the reused v2
+  propositions and scope reading. These should go to counsel together with the
+  v2 review.
+
 ## Boundaries
 
 No new products, prices, checkout, document uploads, automatic transfer of

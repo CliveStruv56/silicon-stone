@@ -9,7 +9,7 @@ import { TOOL_JOURNEYS } from '@/lib/tool-journeys'
 import { evaluateExposure } from './engine'
 import { EXTRACTS } from './extracts'
 import { EXPOSURE_QUESTIONS } from './questions'
-import { exposureMarkdown, playback, scopeExtracts } from './report'
+import { exposureMarkdown, footerText, playback, scopeExtracts } from './report'
 
 const pack = getRulePack('2026-11-16')
 const today = new Date('2026-11-16T12:00:00Z')
@@ -72,10 +72,23 @@ describe('Markdown export', () => {
     for (const item of result.areas) for (const id of item.extracts ?? []) expect(md).toContain(EXTRACTS[id].text)
   })
 
+  it('says plainly that no lawyer has reviewed it, with the pack dates in words', () => {
+    expect(md).toContain('This check has not been reviewed by a lawyer.')
+    expect(md).toContain('last reviewed 16 November 2026, built from the consolidated text of 27 July 2026')
+    expect(md).toContain('Generated 2026-11-16')
+    expect(md).not.toMatch(/In force since/)
+  })
+
   it('states the pack and that nothing is stored, and never a percentage', () => {
     expect(md).toContain(`Rule pack ${pack.manifest.version}`)
     expect(md).toContain('your answers are not stored')
     expect(md).not.toMatch(/%/)
+  })
+})
+
+describe('footer', () => {
+  it('reads both dates from the manifest', () => {
+    expect(footerText(pack)).toContain(`Rule pack ${pack.manifest.version}, last reviewed`)
   })
 })
 

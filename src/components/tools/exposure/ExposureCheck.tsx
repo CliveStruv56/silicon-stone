@@ -32,6 +32,10 @@ import { evaluateExposure, VERDICT, VERDICT_EVENT, type ExposureArea, type Expos
 import { EXTRACTS, type ExtractId } from '@/lib/exposure/extracts'
 import {
   CONFIDENCE_LABEL,
+  CONFIDENCE_NOTE,
+  PLAYBACK_NOTE,
+  areasHeading,
+  footerText,
   KIND_LABEL,
   exposureMarkdown,
   familyLabel,
@@ -75,11 +79,11 @@ function Playback({ answers }: { answers: AnswerRecordV2 }) {
         {rows.map((row) => (
           <div key={row.id}>
             <dt className="font-mono text-xs uppercase tracking-wider text-text-muted">{row.question}</dt>
-            <dd className={`mt-0.5 text-sm ${row.unknown ? 'text-silicon-amber-strong' : 'text-text-primary'}`}>{row.answer}</dd>
+            <dd className={`mt-0.5 text-sm ${row.unknown ? 'italic text-text-muted' : 'text-text-primary'}`}>{row.answer}</dd>
           </div>
         ))}
       </dl>
-      <p className="mt-2 text-xs text-text-muted">The verdict below follows from these answers and nothing else.</p>
+      <p className="mt-2 text-xs text-text-muted">{PLAYBACK_NOTE}</p>
     </div>
   )
 }
@@ -102,6 +106,7 @@ function Verdict({ result, answers }: { result: ExposureResult; answers: AnswerR
 
       <div className="mt-5 border-t border-border-subtle pt-4">
         <p className="text-sm font-medium text-text-primary">Confidence: {CONFIDENCE_LABEL[result.confidence]}</p>
+        <p className="mt-1 text-xs text-text-muted">{CONFIDENCE_NOTE}</p>
         <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-relaxed text-text-muted">
           {result.confidenceReasons.map((reason) => <li key={reason}>{reason}</li>)}
         </ul>
@@ -138,12 +143,21 @@ function AreaCard({ area, startHere }: { area: ExposureArea; startHere?: string 
       {area.extracts?.map((id) => <Extract key={id} id={id} />)}
       <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm">
         {area.article && (
-          <Link href={`/tools/compliance-checker/provisions/${area.article}`} className={linkClass}>
+          <Link
+            href={`/tools/compliance-checker/provisions/${area.article}`}
+            className={linkClass}
+            aria-label={`Read Article ${area.article}, for ${area.title}`}
+          >
             Read Article {area.article}
           </Link>
         )}
         {area.checkFamilies?.map((family) => (
-          <Link key={family} href="/tools/compliance-checker" className={linkClass}>
+          <Link
+            key={family}
+            href="/tools/compliance-checker"
+            className={linkClass}
+            aria-label={`Check a system in the Compliance Checker: ${familyLabel(family)}`}
+          >
             Check a system: {familyLabel(family)}
           </Link>
         ))}
@@ -185,7 +199,7 @@ function buildSections(result: ExposureResult, answers: AnswerRecordV2): Results
           </p>
           <ol className="space-y-3">
             {result.findOut.map((item) => (
-              <li key={item.questionId} className="rounded-lg border border-silicon-amber/40 bg-silicon-amber/5 p-5">
+              <li key={item.questionId} className="rounded-lg border border-border-subtle bg-stone-charcoal p-5">
                 <p className="font-medium leading-relaxed text-text-primary">{item.ask}</p>
                 <p className="mt-2 text-sm text-text-muted"><span className="text-text-primary">Ask: </span>{item.whom}</p>
                 <p className="mt-1 text-sm text-text-muted"><span className="text-text-primary">How it changes the result: </span>{item.effect}</p>
@@ -201,11 +215,11 @@ function buildSections(result: ExposureResult, answers: AnswerRecordV2): Results
   if (result.areas.length) {
     sections.push({
       id: 'areas',
-      label: 'Where the Act reaches you',
+      label: areasHeading(result),
       containsStartHere: Boolean(areaFocus),
       content: (
         <div>
-          <SectionHeading>Where the Act reaches you</SectionHeading>
+          <SectionHeading>{areasHeading(result)}</SectionHeading>
           <div className="space-y-4">
             {result.areas.map((area) => (
               <AreaCard key={area.id} area={area} startHere={areaFocus?.target === area.id ? areaFocus.reason : undefined} />
@@ -337,7 +351,7 @@ export function ExposureCheck() {
         <div className="lg:ml-[15.5rem]">
           <ToolSubscribeCard tool={TOOL} />
           <p className="mt-6 text-xs leading-relaxed text-text-muted">
-            A first-pass triage against the text of the Act, not legal advice. Rule pack {RULE_PACK.manifest.version}, consolidated text CELEX {RULE_PACK.manifest.provenance.celex}. No language model decides this result, and your answers are not stored.
+            {footerText(RULE_PACK)}
           </p>
         </div>
         </div>
@@ -349,7 +363,7 @@ export function ExposureCheck() {
               eyebrow="Take your result further"
               intro={TOOL_JOURNEYS[TOOL].intro}
               ctaLabel={`Explore the ${briefing.name}`}
-              note="Includes preparation from your Exposure Check result."
+              note="Bring the Markdown copy of your result; preparation from it is included."
             />
             {result.diagnosticReason && (
               <FollowOnOffering

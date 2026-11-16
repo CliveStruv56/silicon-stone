@@ -149,7 +149,11 @@ Open (spec §22, two remaining) — **do not guess these**:
    resolved by lengthening the 24-hour session: recovery is a feature to decide
    on, not a side effect of a retention number.
 2. Whether and when external EU AI Act counsel reviews the decision matrix, and
-   the final editorial wording of the disclaimer and privacy notice.
+   the final editorial wording of the disclaimer and privacy notice. When it
+   does, take the EU AI Act Exposure Check's four open points with it: it reuses
+   v2's scope and size logic and five questions, and was released ahead of
+   counsel review on 16 Nov 2026 (owner decision, Exposure Check only; v2 stays
+   blocked). The points are listed in `docs/tools-specialist-advisory-plan.md`.
 
 ## One unexplained observation
 

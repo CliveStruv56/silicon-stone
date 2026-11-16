@@ -5,7 +5,8 @@ import { makeAnswer } from '@/lib/compliance-v2/flow'
 import { CORE_QUESTIONS, validateCatalogue } from '@/lib/compliance-v2/questions'
 import { getRulePack, RULE_PACK } from '@/lib/rulepack'
 import { parsePackDate } from '@/lib/ai-act-deadlines'
-import { DECISIVE_IDS, evaluateExposure, milestone, VERDICT_EVENT, type ExposureResult } from './engine'
+import { DECISIVE_IDS, OUTSIDE_EU, PROVIDER_OR_DEPLOYER, evaluateExposure, milestone, packDateInWords, VERDICT_EVENT, type ExposureResult } from './engine'
+import { milestoneLine } from './report'
 import { EXPOSURE_QUESTIONS } from './questions'
 import { EXTRACTS } from './extracts'
 
@@ -118,7 +119,8 @@ describe('golden scenarios', () => {
     const rep = area(result, 'authorised-representative')
     expect(rep?.kind).toBe('conditional')
     expect(rep?.extracts).toEqual(['article-22-1'])
-    expect(rep?.becauseUnknown).toBeUndefined()
+    expect(rep?.becauseOpen).toBeUndefined()
+    expect(rep?.summary).toMatch(/and you make it available on the EU market\.$/)
     expect(rep?.summary).not.toMatch(/Section B/)
     expect(result.roles[0]).toMatch(/^Provider/)
   })
@@ -196,7 +198,9 @@ describe('"not sure" is a finding, never a "no"', () => {
     for (const id of DECISIVE_IDS) {
       const result = run({ ...base, [id]: unknown })
       expect(result.confidence).toBe('low')
-      expect(result.confidenceReasons.some((reason) => reason.startsWith('Confidence is low'))).toBe(true)
+      expect(result.findOut[0].effect.startsWith('Confidence is low')).toBe(true)
+      // Under "Confidence: Low" the reasons do not repeat the label.
+      expect(result.confidenceReasons.some((reason) => reason.startsWith('Confidence is'))).toBe(false)
       expect(result.focus?.target).toBe('find-out')
     }
   })
@@ -211,7 +215,7 @@ describe('"not sure" is a finding, never a "no"', () => {
     const result = run({ ...base, ai_market_connection: unknown })
     expect(result.scope.outcome).toBe('scope_uncertain')
     expect(result.areas.some((item) => item.kind === 'duty')).toBe(false)
-    expect(area(result, 'ai-literacy')?.summary).toMatch(/^If the Act applies to you/)
+    expect(area(result, 'ai-literacy')?.summary).toMatch(/^If the Act applies to you and you provide or use any AI system, Article 4 applies to you\./)
   })
 
   it('EU-established with an unknown connection: likely, but still nothing shown as owed', () => {
@@ -238,8 +242,8 @@ describe('"not sure" is a finding, never a "no"', () => {
     for (const id of ['organisation_establishment', 'organisation_activity', 'intended_use_family']) {
       const rep = area(run({ ...provider, [id]: unknown }), 'authorised-representative')
       expect(rep?.kind).toBe('conditional')
-      expect(rep?.becauseUnknown).toEqual([id])
-      expect(rep?.summary).toMatch(/not sure/)
+      expect(rep?.becauseOpen).toEqual([id])
+      expect(rep?.summary).toMatch(/leave at least one of those facts open/)
     }
   })
 
@@ -259,7 +263,7 @@ describe('"not sure" is a finding, never a "no"', () => {
     const result = run({ ...base, ai_inventory: unknown, ai_literacy_measures: unknown })
     expect(result.readiness.some((step) => /You told us/.test(step))).toBe(false)
     expect(findOutIds(result)).toEqual(['ai_inventory', 'ai_literacy_measures'])
-    expect(result.diagnosticReason).toMatch(/not sure/)
+    expect(result.diagnosticReason).toMatch(/^Knowing which AI systems you have is the first job/)
   })
 })
 
@@ -272,14 +276,17 @@ describe('every templated sentence holds only when its data does', () => {
     expect(run({ ...base, ai_inventory: 'yes', ai_literacy_measures: 'no' }).readiness[0]).toMatch(/have not had training/)
   })
 
-  it('"owed since" is said only when the scope is settled and the date has passed', () => {
+  it('"has applied since" is said only when the scope is settled, a provider or deployer, and the date has passed', () => {
     const literacyDate = milestone(pack, /literacy/i).date
-    expect(run({ ...base, ai_inventory: 'yes' }).readiness[0]).toContain(`owed since ${literacyDate}`)
+    expect(run({ ...base, ai_inventory: 'yes' }).readiness[0]).toContain(`has applied since ${literacyDate}`)
+    expect(run({ ...base, ai_inventory: 'yes', organisation_activity: ['distributed_or_resold'] }).readiness[0]).toMatch(
+      /If you provide or use any AI system, Article 4 on AI literacy already applies to you/,
+    )
     const unsettled = run({ ...base, ai_inventory: 'yes', ai_market_connection: unknown }).readiness[0]
-    expect(unsettled).not.toContain('owed since')
+    expect(unsettled).not.toContain('has applied since')
     expect(unsettled).toMatch(/^You told us .* If the Act applies to you/)
     const beforeDate = evaluateExposure(answers({ ...base, ai_inventory: 'yes' }), pack, new Date('2025-01-01T00:00:00Z'))
-    expect(beforeDate.readiness[0]).not.toContain('owed since')
+    expect(beforeDate.readiness[0]).not.toContain('has applied since')
   })
 
   it('the transparency summary describes only the kinds of system ticked', () => {
@@ -407,7 +414,7 @@ describe('invariants across every combination of answers', () => {
         expect(ids(result)).toContain('authorised-representative')
       }
       const rep = area(result, 'authorised-representative')
-      if (rep?.becauseUnknown?.some((id) => DECISIVE_IDS.includes(id))) expect(says).toBe(true)
+      if (rep?.becauseOpen?.some((id) => DECISIVE_IDS.includes(id) && result.findOut.some((item) => item.questionId === id))) expect(says).toBe(true)
     }
     expect(mentioned).toBeGreaterThan(0)
   })
@@ -439,8 +446,9 @@ describe('invariants across every combination of answers', () => {
     }
   })
 
-  it('every date a string states is a date in the pack, or the one Article 111(3) quotes', () => {
-    const packDates = new Set(pack.timeline.map((entry) => entry.date))
+  it('every date a string states is a pack timeline date or the pack consolidation date', () => {
+    // The timeline's dates, plus the consolidation date the literacy card names (from the manifest).
+    const packDates = new Set([...pack.timeline.map((entry) => entry.date), packDateInWords(pack.manifest.corpusCutOff)])
     for (const { result } of results) {
       for (const text of strings(result)) {
         for (const date of text.match(/\b\d{1,2} (January|February|March|April|May|June|July|August|September|October|November|December) \d{4}\b/g) ?? []) {
@@ -453,6 +461,154 @@ describe('invariants across every combination of answers', () => {
   it('sends only the coarse verdict to analytics', () => {
     for (const { result } of results) {
       expect(['in-scope', 'likely-in-scope', 'uncertain', 'out-of-scope']).toContain(VERDICT_EVENT[result.scope.outcome])
+    }
+  })
+})
+
+describe('16 Nov 2026 fact-check fixes', () => {
+  it('W1: importing into the EU contradicts "none of these" and never gives "does not apply"', () => {
+    const result = run({ ...base, ai_market_connection: ['none'], organisation_activity: ['imported_into_eu'] })
+    expect(result.scope.outcome).toBe('scope_uncertain')
+    expect(result.confidence).toBe('low')
+    expect(result.scope.explanation).toMatch(/^You said you import an AI system into the EU/)
+  })
+
+  it('W1: so does distributing or reselling', () => {
+    const result = run({ ...base, ai_market_connection: ['none'], organisation_activity: ['distributed_or_resold'] })
+    expect(result.scope.outcome).toBe('scope_uncertain')
+    expect(result.scope.explanation).toMatch(/distribute or resell/)
+  })
+
+  it('W1: the out-of-scope triggers include importing, distributing or reselling', () => {
+    expect(run({ ...base, ai_market_connection: ['none'] }).revisitIf).toContain(
+      'You, or a customer or reseller, start importing, distributing or reselling one of your AI systems or models in the EU.',
+    )
+  })
+
+  it('W2: "more than one of these" with "none of these" is held at "cannot yet tell"', () => {
+    const result = run({ ...base, organisation_establishment: 'multiple', ai_market_connection: ['none'] })
+    expect(result.scope.outcome).toBe('scope_uncertain')
+    expect(result.scope.explanation).toMatch(/established in more than one place/)
+    expect(result.focus?.target).toBe('verdict')
+  })
+
+  it('W3: literacy is owed only when a provider or deployer activity was ticked', () => {
+    expect(area(run({ ...base, organisation_activity: unknown }), 'ai-literacy')?.kind).toBe('conditional')
+    const distributor = run({ ...base, organisation_activity: ['distributed_or_resold'] })
+    expect(area(distributor, 'ai-literacy')?.kind).toBe('conditional')
+    expect(area(distributor, 'ai-literacy')?.summary).toMatch(/^If you provide or use any AI system, Article 4 applies to you\./)
+    expect(distributor.focus?.reason ?? '').not.toMatch(/the one duty here/)
+  })
+
+  it('A3: the literacy card dates the quoted wording to the consolidated text', () => {
+    expect(area(run(base), 'ai-literacy')?.summary).toContain(
+      `The words quoted are Article 4 as it reads in the consolidated text of ${packDateInWords(pack.manifest.corpusCutOff)}`,
+    )
+  })
+
+  it('W4: a group in several places is not told it is established outside the EU', () => {
+    const group = run({
+      ...base,
+      organisation_establishment: 'multiple',
+      ai_market_connection: ['placed_on_eu_market'],
+      organisation_activity: ['supplied_under_own_name'],
+      intended_use_family: ['employment', 'regulated_product'],
+    })
+    expect(group.scope.explanation).not.toMatch(/outside the EU/)
+    expect(area(group, 'authorised-representative')?.becauseOpen).toEqual(['organisation_establishment'])
+    for (const establishment of OUTSIDE_EU) {
+      expect(run({ ...base, organisation_establishment: establishment }).scope.explanation).toMatch(/outside the EU does not change that/)
+    }
+  })
+
+  it('W6: transparency is not the start-here for a chatbot user who provides nothing', () => {
+    const result = run({ ...base, ai_literacy_measures: 'yes' })
+    expect(result.focus?.target).not.toBe('transparency')
+    const provider = run({ ...base, ai_literacy_measures: 'yes', organisation_activity: ['supplied_under_own_name'] })
+    expect(provider.focus?.target).toBe('transparency')
+    expect(provider.focus?.reason).toMatch(/Check whether they fall to you as provider or as user\.$/)
+  })
+
+  it('W8: application dates are "has applied since", never "in force"', () => {
+    for (const item of run({ ...base, intended_use_family: ['employment', 'synthetic_content', 'gpai_model'] }).areas) {
+      expect(milestoneLine(item) ?? '').not.toMatch(/in force/i)
+    }
+    expect(milestoneLine(area(run(base), 'ai-literacy')!)).toMatch(/^Has applied since /)
+  })
+
+  it('A6: a reader outside the EU is not labelled "Importer"', () => {
+    const result = run({ ...base, organisation_activity: ['imported_into_eu'] })
+    expect(result.roles).not.toContain('Importer')
+    expect(result.roles[0]).toMatch(/Article 3\(6\)/)
+    expect(run({ ...base, organisation_establishment: 'eu_eea', organisation_activity: ['imported_into_eu'] }).roles).toContain('Importer')
+  })
+})
+
+describe('"does not apply" is reachable only when no answer implies an EU link', () => {
+  const establishments: Array<AnswerValue | { state: AnswerState }> = [
+    ...EXPOSURE_QUESTIONS.find((q) => q.id === 'organisation_establishment')!.options!.map((o) => o.value),
+    unknown,
+  ]
+  const positive = ['placed_on_eu_market', 'put_into_service_eu', 'output_used_in_eu', 'used_from_eu_establishment']
+  const subsets = <T,>(items: T[]): T[][] => items.reduce<T[][]>((all, item) => all.concat(all.map((set) => [...set, item])), [[]])
+  const connections: Array<AnswerValue | { state: AnswerState }> = [
+    ['none'],
+    unknown,
+    ...subsets(positive).filter((set) => set.length > 0),
+  ]
+  const activityValues = EXPOSURE_QUESTIONS.find((q) => q.id === 'organisation_activity')!.options!.map((o) => o.value)
+  const activities: Array<AnswerValue | { state: AnswerState }> = [
+    unknown,
+    ...subsets(activityValues).filter((set) => set.length > 0),
+  ]
+
+  it('across every establishment, connection and activity combination', () => {
+    let runs = 0
+    let outOfScope = 0
+    for (const organisation_establishment of establishments) {
+      for (const ai_market_connection of connections) {
+        for (const organisation_activity of activities) {
+          runs += 1
+          const result = run({ ...base, organisation_establishment, ai_market_connection, organisation_activity })
+          const noEuLink =
+            Array.isArray(ai_market_connection) &&
+            ai_market_connection.length === 1 &&
+            ai_market_connection[0] === 'none' &&
+            typeof organisation_establishment === 'string' &&
+            OUTSIDE_EU.includes(organisation_establishment) &&
+            (Array.isArray(organisation_activity)
+              ? !organisation_activity.some((value) => value === 'imported_into_eu' || value === 'distributed_or_resold')
+              : true)
+          if (result.scope.outcome === 'out_of_scope') {
+            outOfScope += 1
+            expect({ organisation_establishment, ai_market_connection, organisation_activity, noEuLink }).toMatchObject({ noEuLink: true })
+          }
+        }
+      }
+    }
+    expect(runs).toBeGreaterThan(7000)
+    expect(outOfScope).toBeGreaterThan(0)
+  })
+})
+
+describe('no area is flatly "Owed" unless a ticked activity is a role its article binds', () => {
+  // The only flat duty the engine can show is Article 4, which binds providers and deployers.
+  const BINDS: Record<string, string[]> = { '4': PROVIDER_OR_DEPLOYER }
+  const activityValues = EXPOSURE_QUESTIONS.find((q) => q.id === 'organisation_activity')!.options!.map((o) => o.value)
+  const specs: Spec[] = [
+    ...activityValues.map((value) => ({ ...base, organisation_activity: [value] })),
+    { ...base, organisation_activity: unknown },
+    { ...base, organisation_activity: ['imported_into_eu', 'distributed_or_resold'] },
+    ...activityValues.map((value) => ({ ...base, organisation_establishment: 'eu_eea', ai_market_connection: ['used_from_eu_establishment'], organisation_activity: [value] })),
+  ]
+  it('holds for every single activity, the importer-distributor pair and "not sure"', () => {
+    for (const spec of specs) {
+      const record = answers(spec)
+      const ticked = record.organisation_activity?.state === 'answered' ? (record.organisation_activity.value as string[]) : []
+      for (const item of run(spec).areas.filter((a) => a.kind === 'duty')) {
+        expect(BINDS[item.article ?? '']).toBeDefined()
+        expect(ticked.some((value) => BINDS[item.article!].includes(value))).toBe(true)
+      }
     }
   })
 })
