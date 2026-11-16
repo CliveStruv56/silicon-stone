@@ -1019,12 +1019,18 @@ not to undo:
   find out" item saying how it moves confidence; an area that would apply on a
   "yes" stays in view (the authorised representative).
 - **"Does not apply" only when no answer implies an EU link.** "None of these"
-  alongside an unknown or multi-country establishment, or an import or
-  distribution activity, is held at "cannot yet tell". A test enumerates every
-  establishment, connection and activity combination.
-- **Only `in_scope` with a provider or deployer activity shows a flat duty**
-  (Article 4 binds those two roles only). A test holds every flat duty to a
-  role its article binds.
+  alongside an unknown or multi-country establishment, an unknown activity, or
+  an import or distribution activity, is held at "cannot yet tell". The
+  connection question covers general-purpose AI models too (Art 2(1)(a)). A
+  38,080-combination test (establishment × connection × activity × use) holds
+  it, and a second test holds that "not sure" is never firmer than any concrete
+  answer in the same slot (one named exception: EU-established + "None of
+  these", a contradiction).
+- **A flat duty needs the Act to reach the reader in a role the article binds.**
+  Literacy is "Owed" only when `reachedAsProviderOrDeployer()` holds (Art 2(1):
+  a provider via any connection; a deployer only if EU-established or via a
+  connection other than "placed on the EU market"). A test checks this with an
+  independent statement of the same rule across every combination.
 - **Templated sentences are conditional on the data they claim.** "You told
   us …", "has applied since …", "including UK law" and the Diagnostic reason each
   appear only beside the answer they quote; `engine.test.ts` walks every
@@ -1034,7 +1040,7 @@ not to undo:
   pack from `2026-11-16` for this tool.
 
 **Released ahead of counsel review** (owner decision, 16 Nov 2026): what that
-covers, and the four points left for counsel with the v2 review, are in
+covers, and the six points left for counsel with the v2 review, are in
 `docs/tools-specialist-advisory-plan.md`. It does not unblock Checker v2.
 
 `src/components/tools/results/ResultsLayout.tsx` (sticky contents, "start

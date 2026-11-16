@@ -22,7 +22,10 @@ export const CONFIDENCE_LABEL = { high: 'High', medium: 'Medium', low: 'Low' } a
 /** Said once under the confidence label, so a reader does not take it for a grade. */
 export const CONFIDENCE_NOTE = 'This is how far your answers settle the verdict, not a rating of your organisation.'
 
-export const PLAYBACK_NOTE = 'The verdict below follows from these answers, the dated text of the Act and the date you run it.'
+/** Names the consolidation the verdict rests on, read from the pack manifest. */
+export function playbackNote(pack: RulePack): string {
+  return `The verdict below follows from these answers, the text of the Act as consolidated on ${packDateInWords(pack.manifest.corpusCutOff)}, and the date you run this check.`
+}
 
 /** The areas heading: "would" until scope is settled, so it never contradicts the verdict. */
 export function areasHeading(result: ExposureResult): string {
@@ -35,7 +38,7 @@ export function areasHeading(result: ExposureResult): string {
  * review stamp and names nobody.
  */
 export function footerText(pack: RulePack): string {
-  return `This check has not been reviewed by a lawyer. It is a first-pass triage against the text of the Act, not legal advice. Rule pack ${pack.manifest.version}, last reviewed ${packDateInWords(pack.manifest.lastReviewed)}, built from the consolidated text of ${packDateInWords(pack.manifest.corpusCutOff)} (CELEX ${pack.manifest.provenance.celex}). No language model decides this result, and your answers are not stored.`
+  return `This check has not been reviewed by a lawyer. It is a first-pass triage against the text of the Act, not legal advice. Rule pack version ${pack.manifest.version}, built from the consolidated text of ${packDateInWords(pack.manifest.corpusCutOff)} (CELEX ${pack.manifest.provenance.celex}), which was the current consolidated text when we last checked it on ${packDateInWords(pack.manifest.lastReviewed)}. No language model decides this result, and your answers are not stored.`
 }
 
 export interface PlaybackRow {
@@ -100,7 +103,7 @@ export function exposureMarkdown(result: ExposureResult, answers: AnswerRecordV2
 
   add('## What you told us', '')
   for (const row of playback(answers)) add(`- **${row.question}:** ${row.answer}`)
-  add('', PLAYBACK_NOTE, '')
+  add('', playbackNote(pack), '')
 
   add('## Verdict', '', `**${VERDICT[result.scope.outcome]}.**`, '', result.scope.explanation, '')
   for (const id of scopeExtracts(result, answers)) add(quote(id), '')

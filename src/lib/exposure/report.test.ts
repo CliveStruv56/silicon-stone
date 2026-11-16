@@ -74,13 +74,13 @@ describe('Markdown export', () => {
 
   it('says plainly that no lawyer has reviewed it, with the pack dates in words', () => {
     expect(md).toContain('This check has not been reviewed by a lawyer.')
-    expect(md).toContain('last reviewed 16 November 2026, built from the consolidated text of 27 July 2026')
+    expect(md).toContain('Rule pack version 2026-11-16, built from the consolidated text of 27 July 2026 (CELEX 02024R1689-20260727), which was the current consolidated text when we last checked it on 16 November 2026.')
     expect(md).toContain('Generated 2026-11-16')
     expect(md).not.toMatch(/In force since/)
   })
 
   it('states the pack and that nothing is stored, and never a percentage', () => {
-    expect(md).toContain(`Rule pack ${pack.manifest.version}`)
+    expect(md).toContain(`Rule pack version ${pack.manifest.version}`)
     expect(md).toContain('your answers are not stored')
     expect(md).not.toMatch(/%/)
   })
@@ -88,7 +88,7 @@ describe('Markdown export', () => {
 
 describe('footer', () => {
   it('reads both dates from the manifest', () => {
-    expect(footerText(pack)).toContain(`Rule pack ${pack.manifest.version}, last reviewed`)
+    expect(footerText(pack)).toContain(`Rule pack version ${pack.manifest.version}, built from`)
   })
 })
 

@@ -33,7 +33,7 @@ import { EXTRACTS, type ExtractId } from '@/lib/exposure/extracts'
 import {
   CONFIDENCE_LABEL,
   CONFIDENCE_NOTE,
-  PLAYBACK_NOTE,
+  playbackNote,
   areasHeading,
   footerText,
   KIND_LABEL,
@@ -83,7 +83,7 @@ function Playback({ answers }: { answers: AnswerRecordV2 }) {
           </div>
         ))}
       </dl>
-      <p className="mt-2 text-xs text-text-muted">{PLAYBACK_NOTE}</p>
+      <p className="mt-2 text-xs text-text-muted">{playbackNote(RULE_PACK)}</p>
     </div>
   )
 }

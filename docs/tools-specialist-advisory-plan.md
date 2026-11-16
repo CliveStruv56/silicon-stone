@@ -60,17 +60,26 @@ that means:
   the independent publication fact-check, check ID
   `fc-2026-11-16-exposure-check`. That check failed first time, including on two
   false "does not apply" results (an importer, and a group established in more
-  than one place); both were fixed in the second round on 16 November 2026, and
-  the check must pass on re-check before merge.
+  than one place); both were fixed in the second round on 16 November 2026. The
+  re-check (`fc-2026-11-16-exposure-check-r2`) failed a second time on narrower
+  false "does not apply" routes (a "not sure" on the activity question, and a
+  provider of a general-purpose AI model, which the EU connection question did
+  not ask about), plus wording that overstated whom Article 4 binds; all were
+  fixed in the third round the same day. The check must pass on re-check before
+  merge.
 - The page and the Markdown export say "This check has not been reviewed by a
   lawyer."
-- Four points the fact-checker says only counsel can settle remain open:
+- Six points the fact-checkers say only counsel can settle remain open:
   (a) whether a non-EU developer whose system reaches the EU only through
   resellers or integrators is "placing on the market"; (b) whether the
   four-connection test is an acceptable organisation-level stand-in for
   Article 2(1); (c) the mapping from activities to roles; (d) the reused v2
-  propositions and scope reading. These should go to counsel together with the
-  v2 review.
+  propositions and scope reading; (e) an organisation that is a provider of one
+  system and connected to the EU only through another (the tool reads activities
+  and connections across the organisation, not system by system); (f) whether
+  "Part of a product covered by EU product-safety law" with "None of these"
+  should hold the verdict open rather than give "does not apply". These should
+  go to counsel together with the v2 review.
 
 ## Boundaries
 

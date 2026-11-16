@@ -42,11 +42,11 @@ export const EXPOSURE_QUESTIONS: AssessmentQuestionV2[] = [
   },
   {
     ...connection,
-    prompt: 'Do any of your AI systems have one of these connections to the EU?',
+    prompt: 'Do any of your AI systems or general-purpose AI models have one of these connections to the EU?',
     help:
-      'Think across every AI system or tool you build, sell or use. Choose every connection that applies to at least one of them. If none do, say so: that is an answer.',
+      'Think across every AI system or tool you build, sell or use, and any general-purpose AI model you provide to others. Choose every connection that applies to at least one of them. If none do, say so: that is an answer.',
     whyAsked:
-      'Establishment alone does not decide whether the Act applies. This is the question that does, and a company outside the EU is not outside the Act simply because it is outside the EU.',
+      'Establishment alone does not decide whether the Act applies. This is the question that does, and an organisation outside the EU is not outside the Act simply because it is established outside the EU.',
     options: relabel(connection, {
       placed_on_eu_market: 'At least one is placed on, or offered in, the EU market',
       put_into_service_eu: 'At least one is put into service in the EU',
@@ -127,7 +127,7 @@ export const EXPOSURE_QUESTIONS: AssessmentQuestionV2[] = [
     prompt: 'Have staff who use or run AI systems had training or guidance on them?',
     shortPrompt: 'AI literacy',
     help:
-      'AI literacy here means staff understanding enough about the systems they use to use them sensibly. Anything from a short briefing to a formal course counts, as long as it covers the systems people actually use.',
+      'AI literacy here means staff having the knowledge to use the AI systems they work with in an informed way, including their risks and possible harms. For this question, anything from a short briefing to a formal course counts, as long as it covers the systems people actually use.',
     whyAsked:
       'Article 4 of the Act sets this duty for providers and deployers, whatever the risk level of the system. The result gives the date it applied from.',
     answerType: 'single',

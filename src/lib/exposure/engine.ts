@@ -187,17 +187,17 @@ export const SCOPE_TEXT: Record<EvaluatedScope['outcome'], { explanation: string
   },
   out_of_scope: {
     explanation:
-      'On these answers, none of your AI systems has a connection to the EU, so we found no route by which the EU AI Act applies to them.',
+      'None of your AI systems or general-purpose AI models has a connection to the EU, so we found no route by which the EU AI Act applies to them.',
     meaning:
-      'On these answers, nothing here points to a duty under the EU AI Act today. Law where you operate may still apply, and the triggers below say what would change the answer.',
+      'Nothing here points to a duty under the EU AI Act today. Law where you operate may still apply, and the triggers below say what would change the answer.',
   },
 }
 
 export const LIMITS =
-  'This is a first pass across the whole organisation, from eight answers you gave, against the text of the Act. It does not classify any AI system, and it does not test the exclusions in Article 2, such as AI developed and put into service solely for scientific research and development (Article 2(6)) or AI released under free and open-source licences, with the exceptions Article 2(12) sets out. It is not legal advice.'
+  'This is a first pass across the whole organisation, from eight answers you gave, against the text of the Act. It does not classify any AI system. It does not test the exclusions in Article 2, such as AI developed and put into service solely for scientific research and development (Article 2(6)), or AI systems released under free and open-source licences, subject to the exceptions Article 2(12) sets out. It is not legal advice.'
 
 export const OUT_OF_SCOPE_TRIGGERS = [
-  'You start offering or selling an AI system to customers in the EU.',
+  'You start offering or selling an AI system or general-purpose AI model to customers in the EU.',
   'The output of an AI system you build or use starts being used in the EU, for example about EU customers, staff or job applicants.',
   'You open an office, branch or subsidiary in the EU that uses AI systems.',
   'You, or a customer or reseller, start importing, distributing or reselling one of your AI systems or models in the EU.',
@@ -217,27 +217,68 @@ const NONE_CONTRADICTIONS: Array<{ id: string; holds: (answers: AnswerRecordV2) 
     id: 'organisation_activity',
     holds: (answers) => valuesOf(answers, 'organisation_activity').includes('imported_into_eu'),
     explanation:
-      'You said you import an AI system into the EU, but also that none of your AI systems has a connection to the EU. Importing an AI system into the EU places it on the EU market, so we have not concluded that the Act does not apply.',
+      'You said you import an AI system into the EU, but also that none of your AI systems or general-purpose AI models has a connection to the EU. Importing an AI system into the EU places it on the EU market, so we have not concluded that the Act does not apply.',
   },
   {
     id: 'organisation_activity',
     holds: (answers) => valuesOf(answers, 'organisation_activity').includes('distributed_or_resold'),
     explanation:
-      'You said you distribute or resell an AI system, but also that none of your AI systems has a connection to the EU. Distributing or reselling it in the EU makes it available on the EU market, so we have not concluded that the Act does not apply.',
+      'You said you distribute or resell an AI system, and that none of your AI systems or general-purpose AI models has a connection to the EU. If you distribute or resell it in the EU, that makes it available on the EU market, so we have not concluded that the Act does not apply.',
+  },
+  {
+    id: 'organisation_activity',
+    holds: (answers) => saidUnknown(answers, 'organisation_activity'),
+    explanation:
+      'You said none of your AI systems or general-purpose AI models has a connection to the EU, but you were not sure what your organisation does with them. If you import one into the EU, or distribute or resell one there, that places it on or makes it available on the EU market, so we have not concluded that the Act does not apply.',
   },
   {
     id: 'organisation_establishment',
     holds: (answers) => valueOf(answers, 'organisation_establishment') === 'multiple',
     explanation:
-      'You said none of your AI systems has a connection to the EU, but your organisation is established in more than one place. If any of those entities is in the EU and uses an AI system, that use is itself one of those connections, so we have not concluded that the Act does not apply.',
+      'You said none of your AI systems or general-purpose AI models has a connection to the EU, but your organisation is established in more than one place. If any of those entities is in the EU and uses an AI system, that use is itself one of those connections, so we have not concluded that the Act does not apply.',
   },
   {
     id: 'organisation_establishment',
     holds: (answers) => saidUnknown(answers, 'organisation_establishment'),
     explanation:
-      'You said none of your AI systems has a connection to the EU, but you were not sure where your organisation is established. If it is established in the EU, using an AI system there is itself one of those connections, so we have not concluded that the Act does not apply.',
+      'You said none of your AI systems or general-purpose AI models has a connection to the EU, but you were not sure where your organisation is established. If it is established in the EU, using an AI system there is itself one of those connections, so we have not concluded that the Act does not apply.',
   },
 ]
+
+const CONTRADICT_REASON = 'Two of your answers contradict each other on whether you have a connection to the EU.'
+const OPEN_REASON = 'Your answers leave open whether you have a connection to the EU.'
+
+/** Both conditional AI literacy texts (r2 fact-check, R2-4): Article 4 read with Article 2's reach. */
+const LITERACY_CONDITIONAL =
+  'If the Act reaches you as a provider or deployer of an AI system, Article 4 applies to you. It applies to providers and deployers of AI systems, with no limit to particular kinds of system.'
+
+/**
+ * Entry into force of Regulation (EU) 2026/1744, which replaced Article 4 with no
+ * deferred application date (its Art 4; OJ L of 24.7.2026). Not in the pinned
+ * corpus: confirmed against EUR-Lex in fact-check fc-2026-11-16-exposure-check-r2.
+ * It equals the pack's corpusCutOff, but it is a different fact, so it is typed
+ * here rather than read from that field.
+ */
+export const OMNIBUS_IN_FORCE = '27 July 2026'
+
+/**
+ * Does the Act reach the reader as a provider or deployer, on these answers?
+ * Article 2(1): a provider is reached through any EU connection; a deployer only
+ * where it is established or located in the Union (b), or the output is used
+ * there (c). "Placed on the EU market" alone is someone else's act for a
+ * deployer (r2 fact-check, R2-5). Residual for counsel: a provider of one
+ * system connected to the EU only through another.
+ */
+export function reachedAsProviderOrDeployer(answers: AnswerRecordV2): boolean {
+  const activities = valuesOf(answers, 'organisation_activity')
+  const connected = valuesOf(answers, 'ai_market_connection').filter((value) => value !== 'none')
+  const establishment = valueOf(answers, 'organisation_establishment')
+  return (
+    (activities.some((value) => PROVIDER_ACTIVITIES.includes(value)) && connected.length > 0) ||
+    (activities.some((value) => DEPLOYER_ACTIVITIES.includes(value)) &&
+      (establishment === 'eu_eea' || connected.some((value) => value !== 'placed_on_eu_market')))
+  )
+}
 
 /** v2's contradiction text (EU established, "none of these"), in this tool's terms. */
 const EU_NONE_EXPLANATION =
@@ -253,7 +294,7 @@ export function evaluateScope(answers: AnswerRecordV2): EvaluatedScope {
         outcome: 'scope_uncertain',
         explanation: conflicts[0].explanation,
         triggeringAnswerIds: ['ai_market_connection', ...new Set(conflicts.map((item) => item.id))],
-        missingAnswerIds: saidUnknown(answers, 'organisation_establishment') ? ['organisation_establishment'] : [],
+        missingAnswerIds: ['organisation_establishment', 'organisation_activity'].filter((id) => saidUnknown(answers, id)),
       }
     }
     return { ...scope, explanation: SCOPE_TEXT.out_of_scope.explanation }
@@ -282,12 +323,19 @@ export function evaluateExposure(answers: AnswerRecordV2, pack: RulePack, today:
   const roles = ROLE_LABELS.filter(([values]) => activities.some((value) => values.includes(value))).map(([values, label]) =>
     // Article 3(6): an importer is located or established in the Union.
     values.includes('imported_into_eu') && (establishedAs === undefined || OUTSIDE_EU.includes(establishedAs))
-      ? 'Importing into the EU: the Act’s importer is located or established in the Union (Article 3(6)), so check whether that role sits with an EU entity or customer rather than with you'
+      ? 'Importing into the EU: under Article 3(6) an importer is located or established in the Union, so check whether that role sits with an EU entity or customer rather than with you'
       : label,
   )
 
   // --- Confidence, and the reasons for it --------------------------------
   const decisiveUnknown = DECISIVE_IDS.filter(unknown)
+  // Only two pairs truly cannot both be true with "None of these": an EU
+  // establishment (which is itself a connection) and importing into the EU
+  // (which places on the EU market). Every other "cannot yet tell" leaves the
+  // question open rather than contradicting it (r2 fact-check, R2-3).
+  const saysNone = valuesOf(answers, 'ai_market_connection').includes('none')
+  const contradictory =
+    saysNone && (establishedAs === 'eu_eea' || activities.includes('imported_into_eu'))
   const confidence: Confidence =
     decisiveUnknown.length > 0 || scope.outcome === 'scope_uncertain'
       ? 'low'
@@ -299,7 +347,7 @@ export function evaluateExposure(answers: AnswerRecordV2, pack: RulePack, today:
   const findOut = buildFindOut(answers, scope, representative.show)
   const confidenceReasons: string[] = []
   if (scope.outcome === 'scope_uncertain' && decisiveUnknown.length === 0) {
-    confidenceReasons.push('Two of your answers contradict each other on whether you have a connection to the EU.')
+    confidenceReasons.push(contradictory ? CONTRADICT_REASON : OPEN_REASON)
   }
   for (const item of findOut) {
     if (item.decisive || item.questionId === 'intended_use_family') {
@@ -336,7 +384,7 @@ export function evaluateExposure(answers: AnswerRecordV2, pack: RulePack, today:
 
   const settled = scope.outcome === 'in_scope'
   // Article 4 binds providers and deployers only; a flat duty needs one of those activities ticked.
-  const providesOrDeploys = activities.some((value) => PROVIDER_OR_DEPLOYER.includes(value))
+  const providesOrDeploys = reachedAsProviderOrDeployer(answers)
   const day = today.getTime()
   const status = (entry: TimelineEntry) => (parsePackDate(entry.date).getTime() <= day ? 'in-force' : 'upcoming')
   const at = (entry: TimelineEntry) => ({ milestone: entry, milestoneStatus: status(entry) as 'in-force' | 'upcoming' })
@@ -352,7 +400,7 @@ export function evaluateExposure(answers: AnswerRecordV2, pack: RulePack, today:
   const areas: ExposureArea[] = []
 
   const literacyKind: AreaKind = settled && providesOrDeploys ? 'duty' : 'conditional'
-  const literacyWording = `The words quoted are Article 4 as it reads in the consolidated text of ${packDateInWords(pack.manifest.corpusCutOff)}, which includes the amendments made by Regulation (EU) 2026/1744. The duty has applied since ${literacy.date}.`
+  const literacyWording = `The words quoted are Article 4 as it reads in the consolidated text of ${packDateInWords(pack.manifest.corpusCutOff)}, which includes the amendments made by Regulation (EU) 2026/1744. Article 4 was replaced by that Regulation from ${OMNIBUS_IN_FORCE}; before then it required providers and deployers to take measures to ensure, to their best extent, a sufficient level of AI literacy. An AI literacy duty has applied since ${literacy.date}.`
   areas.push({
     id: 'ai-literacy',
     title: 'AI literacy',
@@ -360,9 +408,7 @@ export function evaluateExposure(answers: AnswerRecordV2, pack: RulePack, today:
     summary: [
       literacyKind === 'duty'
         ? 'Article 4 applies to providers and deployers of AI systems, with no limit to particular kinds of system. It asks for measures, not a guaranteed level of literacy for any individual.'
-        : settled
-          ? 'If you provide or use any AI system, Article 4 applies to you. It applies to providers and deployers of AI systems, with no limit to particular kinds of system.'
-          : 'If the Act applies to you and you provide or use any AI system, Article 4 applies to you. It applies to providers and deployers of AI systems, with no limit to particular kinds of system.',
+        : LITERACY_CONDITIONAL,
       literacyWording,
     ].join(' '),
     extracts: ['article-4-1'],
@@ -421,7 +467,7 @@ export function evaluateExposure(answers: AnswerRecordV2, pack: RulePack, today:
         chats &&
           'Providers must design systems that interact directly with people so that those people are told they are dealing with an AI system, unless that is obvious from the context.',
         generates &&
-          `Providers of systems that generate synthetic audio, image, video or text must mark the output in a machine-readable format, and deployers must disclose deep fakes. Providers whose generative systems were placed on the market before ${transparency.date} have until ${newProhibitions.date} for the marking (Article 111(4)).`,
+          `Providers of systems that generate synthetic audio, image, video or text must mark the output in a machine-readable format, and deployers must disclose deep fakes, and AI-generated or manipulated text published to inform the public on matters of public interest unless it has had human review or editorial control (Article 50(4)). Providers whose generative systems were placed on the market before ${transparency.date} have until ${newProhibitions.date} for the marking (Article 111(4)).`,
         chats && generates
           ? 'Which of these is yours depends on whether you provide the system or use it.'
           : 'Whether this is yours depends on whether you provide the system or use it.',
@@ -508,9 +554,7 @@ export function evaluateExposure(answers: AnswerRecordV2, pack: RulePack, today:
         : 'You told us only some staff, or some systems, are covered by training or guidance.'
     const when = literacyOwedNow
       ? `Article 4 on AI literacy has applied since ${literacy.date}.`
-      : settled
-        ? 'If you provide or use any AI system, Article 4 on AI literacy already applies to you.'
-        : 'If the Act applies to you and you provide or use any AI system, Article 4 on AI literacy already applies to you.'
+      : 'If the Act reaches you as a provider or deployer of an AI system, Article 4 on AI literacy already applies to you.'
     readiness.push(
       `${lead} ${when} Short, system-specific guidance for the people who use each tool is a reasonable first measure.`,
     )
@@ -531,6 +575,7 @@ export function evaluateExposure(answers: AnswerRecordV2, pack: RulePack, today:
     // W6: transparency is a start-here only where a duty in it can be the reader's:
     // a provider (Art 50(1), (2)) or a deployer of generated content (Art 50(4)).
     transparencyCouldBeYours: activities.some((value) => PROVIDER_ACTIVITIES.includes(value)) || generates,
+    contradictory,
   })
 
   const count = valueOf(answers, 'system_count')
@@ -570,6 +615,7 @@ function chooseFocus({
   literacyOwedNow,
   literacy,
   transparencyCouldBeYours,
+  contradictory,
 }: {
   scope: EvaluatedScope
   areas: ExposureArea[]
@@ -578,6 +624,7 @@ function chooseFocus({
   literacyOwedNow: boolean
   literacy: TimelineEntry
   transparencyCouldBeYours: boolean
+  contradictory: boolean
 }): Focus | null {
   const decisive = findOut.some((item) => item.decisive)
   if (decisive) {
@@ -589,7 +636,7 @@ function chooseFocus({
   if (scope.outcome === 'scope_uncertain') {
     return {
       target: 'verdict',
-      reason: 'Two of your answers contradict each other on whether you have a connection to the EU. Settle that before planning anything else.',
+      reason: `${contradictory ? CONTRADICT_REASON : OPEN_REASON} Settle that before planning anything else.`,
     }
   }
   const area = (id: string) => areas.find((item) => item.id === id)
@@ -615,7 +662,7 @@ function chooseFocus({
   if (transparencyCouldBeYours && transparencyArea?.milestoneStatus === 'in-force' && transparencyArea.milestone) {
     return {
       target: 'transparency',
-      reason: `Since ${transparencyArea.milestone.date}, the Act has set transparency duties for the kinds of system you told us you have. Check whether they fall to you as provider or as user.`,
+      reason: `Since ${transparencyArea.milestone.date}, the Act has set transparency duties for the kinds of system you told us you have. Check whether they fall to you as provider or as deployer.`,
     }
   }
   // Only a flat duty can be the fallback: Article 4 binds providers and deployers alone (W3).
@@ -738,7 +785,7 @@ export function buildFindOut(answers: AnswerRecordV2, scope: EvaluatedScope, rep
       ask: 'Have the people who use or run each AI system had training or guidance on it?',
       whom: 'HR or learning and development, and the managers of teams that use AI.',
       effect:
-        scope.outcome === 'in_scope' && valuesOf(answers, 'organisation_activity').some((value) => PROVIDER_OR_DEPLOYER.includes(value))
+        scope.outcome === 'in_scope' && reachedAsProviderOrDeployer(answers)
           ? 'No effect on the verdict. Article 4 on AI literacy applies to you either way; this tells you how much of it is already done.'
           : 'No effect on the verdict. If Article 4 on AI literacy applies to you, this tells you how much of it is already done.',
       decisive: false,
