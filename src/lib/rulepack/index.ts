@@ -28,6 +28,11 @@ import sources2026_11_07 from '../../../rulepack/versions/2026-11-07/sources.jso
 import timeline2026_11_07 from '../../../rulepack/versions/2026-11-07/timeline.json'
 import penalties2026_11_07 from '../../../rulepack/versions/2026-11-07/penalties.json'
 import rules2026_11_07 from '../../../rulepack/versions/2026-11-07/rules.json'
+import manifest2026_11_16 from '../../../rulepack/versions/2026-11-16/manifest.json'
+import sources2026_11_16 from '../../../rulepack/versions/2026-11-16/sources.json'
+import timeline2026_11_16 from '../../../rulepack/versions/2026-11-16/timeline.json'
+import penalties2026_11_16 from '../../../rulepack/versions/2026-11-16/penalties.json'
+import rules2026_11_16 from '../../../rulepack/versions/2026-11-16/rules.json'
 
 /**
  * The versioned rule pack: the legal payload behind the AI Act triage engine,
@@ -218,12 +223,28 @@ const PACKS: Record<string, RulePack> = {
     prohibitedPractices: rules2026_11_07.prohibitedPractices as PackProhibitedPractice[],
     ruleAnchors: rules2026_11_07.ruleAnchors as Record<string, PackRuleAnchor>,
   },
+  /**
+   * Adds Article 22 (authorised representatives of providers of high-risk AI
+   * systems) for the Exposure Check, which quotes Article 22(1) to an
+   * organisation outside the Union that supplies AI in an area the Act lists as
+   * potentially high-risk. Fetched from Cellar against the same CELEX by
+   * scripts/rulepack-fetch-article.ts. Nothing in the Compliance Checker engine
+   * reads it; every other file is byte-identical to 2026-11-07.
+   */
+  '2026-11-16': {
+    manifest: manifest2026_11_16 as PackManifest,
+    sources: sources2026_11_16 as Record<string, PackSource>,
+    timeline: timeline2026_11_16 as PackTimelineEntry[],
+    penalties: penalties2026_11_16 as PackPenaltyTier[],
+    prohibitedPractices: rules2026_11_16.prohibitedPractices as PackProhibitedPractice[],
+    ruleAnchors: rules2026_11_16.ruleAnchors as Record<string, PackRuleAnchor>,
+  },
 }
 
 export const AVAILABLE_RULE_PACK_VERSIONS = Object.keys(PACKS).sort()
 
 /** The version served when nothing is pinned. Never "latest" — see below. */
-const DEFAULT_RULE_PACK_VERSION = '2026-11-07'
+const DEFAULT_RULE_PACK_VERSION = '2026-11-16'
 
 /**
  * The pinned version. Deliberately an explicit version string, never a

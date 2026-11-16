@@ -42,6 +42,7 @@ const primaryNavigation: NavItem[] = [
     name: 'Tools',
     href: '/tools',
     children: [
+      { name: 'Exposure Check', href: '/tools/exposure-check' },
       { name: 'Compliance Checker', href: '/tools/compliance-checker' },
       { name: 'AI Act FAQ', href: '/tools/compliance-checker/faq' },
       { name: 'ISO 42001 crosswalk', href: '/tools/compliance-checker/iso-42001' },

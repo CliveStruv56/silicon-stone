@@ -170,9 +170,9 @@ fixed; it is only instrumented.
 regression — it is the signal that v2 fixed something, and the test must be moved
 into the v2 suite with its assertion inverted rather than deleted.
 
-The second most likely: **the rule pack is `2026-11-07` now** (`2026-10-29` is kept as cut; only the timeline differs) (it adds Articles
-2, 25 and 40 for the FAQ and ISO/IEC 42001 crosswalk; the engine does not read
-them), and every pack change is a version bump. `2026-08-10`, `2026-08-18`,
+The second most likely: **the rule pack is `2026-11-16` now** (it is `2026-11-07` plus Article 22, for the Exposure Check; `2026-11-07` corrected the timeline of `2026-10-29`, which is kept as cut, and `2026-10-29` added Articles
+2, 25 and 40 for the FAQ and ISO/IEC 42001 crosswalk; the engine reads none of
+the four), and every pack change is a version bump. `2026-08-10`, `2026-08-18`,
 `2026-08-19` and `2026-08-19b` are still
 there and still resolvable by `NEXT_PUBLIC_RULEPACK_VERSION`; do not edit any of
 them in place. The `b` suffix is because two packs were cut on the same day —

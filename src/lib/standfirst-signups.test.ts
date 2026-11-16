@@ -52,7 +52,7 @@ describe('the public allow-list', () => {
   })
 
   it('covers every tool that captures an address', () => {
-    for (const tool of ['compliance-checker', 'supply-chain-mapper', 'scenario-modeler', 'policy-stress-test']) {
+    for (const tool of ['exposure-check', 'compliance-checker', 'supply-chain-mapper', 'scenario-modeler', 'policy-stress-test']) {
       expect(PUBLIC_TAGS).toContain(toolSourceTag(tool))
     }
   })

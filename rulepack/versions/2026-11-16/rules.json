@@ -1,0 +1,106 @@
+{
+  "prohibitedPractices": [
+    {
+      "point": "a",
+      "summary": "subliminal, purposefully manipulative, or deceptive techniques that materially distort behaviour",
+      "source": "article5",
+      "appliesFrom": "2 February 2025"
+    },
+    {
+      "point": "b",
+      "summary": "exploitation of vulnerabilities of age, disability, or a specific social or economic situation",
+      "source": "article5",
+      "appliesFrom": "2 February 2025"
+    },
+    {
+      "point": "ba",
+      "summary": "generating or manipulating non-consensual intimate imagery of an identifiable person",
+      "source": "omnibus",
+      "appliesFrom": "2 December 2026",
+      "futureDated": true
+    },
+    {
+      "point": "bb",
+      "summary": "generating or manipulating child sexual abuse material",
+      "source": "omnibus",
+      "appliesFrom": "2 December 2026",
+      "futureDated": true
+    },
+    {
+      "point": "c",
+      "summary": "social scoring leading to detrimental or disproportionate treatment",
+      "source": "article5",
+      "appliesFrom": "2 February 2025"
+    },
+    {
+      "point": "e",
+      "summary": "untargeted scraping of facial images to build or expand recognition databases",
+      "source": "article5",
+      "appliesFrom": "2 February 2025"
+    },
+    {
+      "point": "f",
+      "summary": "inferring emotions in the workplace or in educational institutions",
+      "source": "article5",
+      "appliesFrom": "2 February 2025"
+    },
+    {
+      "point": "g",
+      "summary": "biometric categorisation deducing protected characteristics",
+      "source": "article5",
+      "appliesFrom": "2 February 2025"
+    },
+    {
+      "point": "d",
+      "summary": "predicting criminal offences based solely on profiling or personality traits",
+      "source": "article5",
+      "appliesFrom": "2 February 2025"
+    },
+    {
+      "point": "h",
+      "summary": "“real-time” remote biometric identification in publicly accessible spaces for law enforcement",
+      "source": "article5",
+      "appliesFrom": "2 February 2025"
+    }
+  ],
+  "ruleAnchors": {
+    "scope-no-eu-connection": { "source": "article2" },
+    "scope-uncertain": { "source": "article2" },
+    "role-third-party-deployer": { "source": "article26" },
+    "role-integrated-third-party": { "source": "article26" },
+    "role-provider-own-product": { "source": "overview" },
+    "role-modified-resold": { "source": "overview" },
+    "role-unclear": { "source": "overview" },
+    "prohibited-uncertain": { "source": "article5" },
+    "annex-iii-sensitive-domain": { "source": "annex3" },
+    "annex-iii-primary-use": { "source": "annex3" },
+    "annex-iii-profiling-override": { "source": "article6", "article": "Article 6(3)" },
+    "annex-iii-exemption-duties": { "source": "article49", "article": "Articles 6(4) and 49(2)" },
+    "high-risk-log-retention": { "source": "article26", "article": "Articles 19(1) and 26(6)" },
+    "high-impact-decision": { "source": "article6" },
+    "decision-support": { "source": "article6" },
+    "weak-human-oversight": { "source": "article26" },
+    "human-oversight-uncertain": { "source": "article26" },
+    "article-50-chatbot": { "source": "article50" },
+    "article-50-synthetic-media": { "source": "article50" },
+    "article-50-published-text": { "source": "article50" },
+    "article-50-emotion-biometric": { "source": "article50" },
+    "article-50-customer-service": { "source": "article50" },
+    "gpai-product-route": { "source": "article51" },
+    "vendor-classification-missing": { "source": "article6", "article": "Article 6(3)" },
+    "vendor-instructions-missing": { "source": "article13" },
+    "vendor-risk-management-missing": { "source": "article9" },
+    "vendor-registration-missing": { "source": "article49" },
+    "vendor-dpa-missing": { "source": "gdpr" },
+    "vendor-logs-missing": { "source": "article12", "article": "Articles 12 and 26(6)" },
+    "vendor-change-policy-missing": { "source": "article72" },
+    "vendor-docs-none-or-unknown": { "source": "article26" },
+    "sme-proportionate-relief": { "source": "article11", "article": "Articles 11, 17, 57 and 99(6)" },
+    "smc-proportionate-relief": { "source": "article99", "article": "Article 99(6a)" },
+    "gdpr-personal-data": { "source": "gdpr" },
+    "gdpr-sensitive-data": { "source": "gdpr" },
+    "sector-vendor-contract-risk": { "source": "gdpr" },
+    "system-record-obligation": { "source": "overview" },
+    "ongoing-review-triggers": { "source": "overview" }
+  }
+}
