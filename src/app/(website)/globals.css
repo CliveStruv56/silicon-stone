@@ -455,3 +455,77 @@ html.dark {
   }
 }
 
+
+/* ===== Print: the Compliance Checker's PDF (added 2026-11-16) =====
+   "Download PDF" is the browser's own Save as PDF over a print stylesheet,
+   chosen over server-side PDF generation because the site has no headless
+   browser or PDF library and Vercel functions should not grow one for this.
+   Rules: print the light theme whatever the screen theme is; hide everything
+   marked data-print-hide (site chrome, buttons, the live page's interactive
+   result); show the print-only copy; keep cards whole across page breaks. */
+@media print {
+  @page {
+    size: A4;
+    margin: 16mm 14mm;
+  }
+
+  :root,
+  .dark {
+    --slate-deep: #ffffff;
+    --stone-charcoal: #ffffff;
+    --surface-elevated: #f7f6f2;
+    --text-primary: #14181f;
+    --text-muted: #4a5163;
+    --border-subtle: #cfc6b2;
+    --stone-teal: #16615f;
+    --silicon-amber: #b5651d;
+    --silicon-amber-strong: #8f4e17;
+    --alert-red: #b03a0a;
+    --background: #ffffff;
+    --foreground: #14181f;
+    --card: #ffffff;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+    color: #14181f !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  header:not(.checker-result-document header),
+  footer:not(.checker-result-document footer),
+  nav,
+  [data-print-hide] {
+    display: none !important;
+  }
+
+  [data-print-only] {
+    display: block !important;
+  }
+
+  .checker-result-document [data-slot='card'] {
+    box-shadow: none !important;
+  }
+
+  .print-avoid-break,
+  .checker-result-document details,
+  .checker-result-document li {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .checker-result-document h2,
+  .checker-result-document h3 {
+    break-after: avoid;
+  }
+
+  .print-only-url {
+    display: inline !important;
+  }
+
+  .checker-result-document details > summary {
+    list-style: none;
+  }
+}

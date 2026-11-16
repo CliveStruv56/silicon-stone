@@ -414,7 +414,32 @@ blocking the AI Act result — and a "See the result" button that *replaces*
 trailing question unreachable. A browser walk-through is what caught it; no unit
 test on the flow functions would have.
 
-## Regulatory retrieval corpus (editorial only — do not blur)
+## Saved Checker results and the PDF (added 2026-11-16, draft for owner review)
+
+`/tools/compliance-checker/result/[id]?token=…` is a saved v1 Checker result,
+created only when the reader presses "Save and get a link". Four things not to
+undo:
+
+- **The record is a snapshot, not a pointer.** `src/lib/saved-result/record.ts`
+  stores the computed result, the answer transcript in the day's wording and the
+  pack's timeline and penalties, and `CheckerResultDocument` renders only from
+  that. `saved-result.test.ts` bumps the live pack and asserts the HTML is
+  byte-identical; a document that reads `RULE_PACK` makes it fail (mutation-tested).
+- **The free text is opt-in.** `tool_name` is dropped before the engine runs
+  unless the reader ticks the (unticked) box, so it cannot leak through the
+  summary sentence either. The intake description is never stored at all.
+- **Retention is one constant**, `SAVED_RESULT_RETENTION_DAYS` (30, pending the
+  owner's decision). The TTL, the expiry date, the save-panel text and a test
+  on the `tools` offering's terms all follow it.
+- **Tokens are scoped.** `src/lib/capability-token.ts` signs `<scope>:<id>`;
+  the report keeps scope `report` (every issued link still verifies), saved
+  results use `checker-result`, and neither opens the other.
+
+"Download PDF" is the browser's Save as PDF over the `@media print` block in
+`globals.css`, not server-side generation: the stack has no PDF library or
+headless browser and a Vercel function should not grow one for this.
+
+
 
 `corpus/regulatory/`, `src/lib/regulatory/` and the Pinecone index named by
 `PINECONE_REGULATORY_INDEX_NAME` give the drafting model at `/create` primary

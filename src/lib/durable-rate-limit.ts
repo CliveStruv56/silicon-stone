@@ -60,6 +60,10 @@ const configs = {
   // than intake by an order of magnitude, deliberately: nobody legitimately
   // needs three reports an hour, and the ceiling is the cost control.
   checkerReport: { limit: 3, window: '1 h', prefix: 'sas:checker-report' },
+  // Saving a Checker result writes a ~50 kB record that lives for 30 days, and
+  // deleting one is the same capability. Well above anyone saving their own
+  // assessments, far below a loop filling the store.
+  checkerSavedResult: { limit: 20, window: '1 h', prefix: 'sas:checker-saved' },
   // External knowledge capture, keyed on IP and checked BEFORE the bearer token
   // is verified. Comfortably above a person pasting conversation extracts all
   // day, far below a loop — and it is the only thing standing between a leaked

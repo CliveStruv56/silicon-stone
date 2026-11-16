@@ -43,6 +43,10 @@ import { TOOL_JOURNEYS } from '@/lib/tool-journeys'
 import { AMOUNTS, DERIVED, gbp, offeringById } from '@/lib/offering'
 import { TOOLKIT_TERMS } from '@/lib/toolkit'
 import { trackToolComplete, trackToolStart } from '@/lib/tool-analytics'
+import { CheckerResultDocument, resultTone } from '@/components/tools/CheckerResultDocument'
+import { PdfDownloadButton } from '@/components/tools/PdfDownloadButton'
+import { SaveResultPanel } from '@/components/tools/SaveResultPanel'
+import { buildSavedResult, CHECKER_DISCLAIMER, pdfFileName, SAVED_RESULT_RETENTION_DAYS } from '@/lib/saved-result/record'
 
 const briefing = offeringById('advisory-briefing')
 const toolkit = offeringById('ai-act-toolkit')
@@ -50,44 +54,6 @@ const toolkit = offeringById('ai-act-toolkit')
 function values(value: AssessmentValue | undefined): string[] {
   if (!value) return []
   return Array.isArray(value) ? value : [value]
-}
-
-function resultTone(classification: string) {
-  if (classification === 'Prohibited practice') {
-    return {
-      border: 'border-alert-red/40',
-      bg: 'bg-alert-red/10',
-      text: 'text-alert-red',
-      badge: 'border-alert-red text-alert-red',
-    }
-  }
-
-  // Future-dated prohibition reads amber, not red: it is a dated hard stop to
-  // plan against, not a practice to halt today.
-  if (classification === 'Likely high-risk' || classification === 'Uncertain' || classification === 'Prohibited from 2 December 2026') {
-    return {
-      border: 'border-silicon-amber/40',
-      bg: 'bg-silicon-amber/10',
-      text: 'text-silicon-amber-strong',
-      badge: 'border-silicon-amber text-silicon-amber-strong',
-    }
-  }
-
-  if (classification === 'Out of EU scope') {
-    return {
-      border: 'border-text-muted/40',
-      bg: 'bg-text-muted/10',
-      text: 'text-text-primary',
-      badge: 'border-text-muted text-text-muted',
-    }
-  }
-
-  return {
-    border: 'border-stone-teal/40',
-    bg: 'bg-stone-teal/10',
-    text: 'text-stone-teal',
-    badge: 'border-stone-teal text-stone-teal',
-  }
 }
 
 function optionIsSelected(question: AssessmentQuestion, answers: AssessmentAnswers, value: string) {
@@ -247,6 +213,7 @@ const RESULT_SECTIONS: Array<[id: string, label: string]> = [
   ['obligations', 'Obligations'],
   ['vendor-questions', 'Vendor questions'],
   ['adjacent', 'GDPR signals'],
+  ['save', 'Save or share'],
   ['report', 'Report'],
   ['next-step', 'Next step'],
   ['timing', 'Timing'],
@@ -325,6 +292,12 @@ export default function ComplianceCheckerPage() {
   const visibleQuestions = useMemo(() => getVisibleQuestions(answers), [answers])
   const currentQuestion = visibleQuestions[currentIndex] ?? visibleQuestions[visibleQuestions.length - 1]
   const result = useMemo(() => evaluateAssessment(answers), [answers])
+  // The PDF copy: the same builder and the same document as a saved link, with
+  // the system name kept — it is the reader's own file.
+  const printSnapshot = useMemo(
+    () => (showResult ? buildSavedResult({ id: 'print', answers, includeFreeText: true }) : null),
+    [answers, showResult],
+  )
   const tone = resultTone(result.classification)
   const cta = resultCta(result.classification, result.role)
   const progress = Math.round(((currentIndex + 1) / visibleQuestions.length) * 100)
@@ -420,7 +393,15 @@ export default function ComplianceCheckerPage() {
       <Header />
 
       <main className="flex-1 bg-background">
-        <section className="bg-slate-deep border-b border-border-subtle py-10 lg:py-12">
+        {/* Print-only: what "Download PDF" saves. Everything else on the page is
+            marked data-print-hide, so the PDF is the result document alone. */}
+        {printSnapshot && !v2Active && (
+          <div className="hidden print:block">
+            {/* No expiry line: this copy is the reader's file, not a saved link. */}
+            <CheckerResultDocument snapshot={{ ...printSnapshot, expiresAt: undefined }} />
+          </div>
+        )}
+        <section data-print-hide className="bg-slate-deep border-b border-border-subtle py-10 lg:py-12">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="max-w-4xl">
               <Badge variant="outline" className="mb-4 border-stone-teal text-stone-teal">
@@ -511,7 +492,7 @@ export default function ComplianceCheckerPage() {
                   ['About five minutes', `${assessmentQuestions.length} questions; a description in your own words fills most of them.`],
                   ['Rules, not a model', 'The tier comes from versioned rules. No language model decides it.'],
                   ['Pinned statute', `Rule pack ${RULE_PACK.manifest.version}, built from CELEX ${RULE_PACK.manifest.provenance.celex}.`],
-                  ['Yours to keep', 'Copy or download the whole record as Markdown. Nothing is gated before the result.'],
+                  ['Yours to keep', `Save it as a PDF, keep a private link for ${SAVED_RESULT_RETENTION_DAYS} days, or copy it as Markdown. No email needed for any of them.`],
                 ].map(([title, copy]) => (
                   <div key={title} className="border border-border-subtle bg-stone-charcoal/60 rounded-lg p-4">
                     <div className="text-sm font-semibold text-text-primary">{title}</div>
@@ -520,8 +501,7 @@ export default function ComplianceCheckerPage() {
                 ))}
               </div>
               <p className="text-sm text-text-muted mt-5 opacity-80">
-                This is a first-pass triage against the text of the Act, not legal advice. A high-risk
-                or prohibited result is a reason to take advice, not a finding against you.
+                {CHECKER_DISCLAIMER}
               </p>
               {COMPLIANCE_CHECKER_V2 && !v2Active && (
                 <p className="mt-4 text-sm text-text-muted">
@@ -536,7 +516,7 @@ export default function ComplianceCheckerPage() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-5xl px-6 py-10">
+        <section data-print-hide className="mx-auto max-w-5xl px-6 py-10">
           {resumed && !v2Active && (
             <div className="mb-6 flex flex-col gap-3 rounded-lg border border-stone-teal/40 bg-stone-teal/10 p-4 text-sm sm:flex-row sm:items-center sm:justify-between">
               <p className="text-text-primary">
@@ -849,7 +829,13 @@ export default function ComplianceCheckerPage() {
                       and the ways to move around it sit at the top, not only at
                       the foot where they used to be alone. */}
                   <div className="mt-5 flex flex-col gap-4 border-t border-border-subtle pt-4 lg:flex-row lg:items-start lg:justify-between">
-                    <div className="shrink-0">
+                    <div className="flex shrink-0 flex-wrap gap-2">
+                      {printSnapshot && (
+                        <PdfDownloadButton
+                          fileName={pdfFileName(result.classification, printSnapshot.savedAt)}
+                          tool="compliance-checker"
+                        />
+                      )}
                       <CopyMarkdownButton
                         toolName="Compliance Checker"
                         filename={`ai-act-assessment-${new Date().toISOString().slice(0, 10)}.md`}
@@ -921,6 +907,10 @@ export default function ComplianceCheckerPage() {
                 front of it. Everything above this line is what the tool gave
                 away before the report existed, and still does.
               */}
+              <div id="save" className="scroll-mt-24">
+                <SaveResultPanel answers={answers} />
+              </div>
+
               <div id="report" className="scroll-mt-24">
                 <ReportGate answers={answers} />
               </div>
@@ -1163,6 +1153,7 @@ export default function ComplianceCheckerPage() {
             same amber treatment the other tool pages use for their stacked
             follow-ons. Checker only — the Toolkit is an AI Act product and the
             other three tools are not about the Act. */}
+        <div data-print-hide>
         <FollowOnOffering
           offering={toolkit}
           priceLabel={`From ${gbp(AMOUNTS.toolkitStandard)}`}
@@ -1179,6 +1170,7 @@ export default function ComplianceCheckerPage() {
           ctaLabel="Explore the Advisory Briefing"
           note="Includes preparation from your Checker result. Document review is scoped separately."
         />
+        </div>
       </main>
 
       <Footer />
