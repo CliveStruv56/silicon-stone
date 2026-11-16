@@ -45,7 +45,7 @@ what AI it has or has many systems. It sits first in the Tools navigation and
 the Tools page. Release still waits on the independent fact-check and
 brand-voice check of its legal content and the owner's review of the preview.
 
-### Released ahead of counsel review (owner decision, 16 November 2026)
+### Released ahead of counsel review (owner decision, 16 November 2026) (superseded by the parking decision below)
 
 The owner decided to release the Exposure Check ahead of counsel review. What
 that means:
@@ -92,9 +92,35 @@ that means:
   resellers an EU establishment would bring them within the Act. This was the
   last round Clive approved: if round 5 fails, the tool is parked. The check
   must pass on re-check before merge.
+- Round 5 (publication fact-check of `8a9640bb`, `fc-2026-11-16-exposure-check-r5`)
+  failed on 16 November 2026. Report: BusinessManager
+  `shared/drafts/2026-11-16-ss-exposure-check-publication-factcheck-r5.md`. All
+  four round-four fixes were confirmed in place, and there is still no false
+  "does not apply". Three unsupported "applies" classes remain:
+  - R5-1: an EU-based provider whose only connection is "output used in the EU"
+    is told the Act applies. Article 2(1)(c) reaches only providers in third
+    countries.
+  - R5-2: general-purpose AI models. A model's provider is reached only by
+    placing the model on the market (Article 2(1)(a)). Article 4 binds providers
+    and deployers of AI systems, not models, but the engine and its test oracle
+    assume otherwise.
+  - R5-3: "We built at least one" is treated as provider status, but Article
+    3(3) requires placing on the market or putting into service under the
+    organisation's own name.
+  Scale, per the checker: 2,428 of 60,928 answer combinations show an
+  unsupported "applies", and 2,484 an unsupported AI literacy "Owed".
+- Status, from the owner's decision of 16 November 2026: **Parked for counsel.**
+  One final round was approved on the condition that the tool is parked if it
+  failed, and round 5 failed. PR #27 stays unmerged. There are no further fix
+  rounds without the owner's say-so.
+- The round-five checker left a prototype fix, described in the round-five
+  report and not applied: one function in `engine.ts` for R5-1 and R5-2, and a
+  reworded "built" option label for R5-3: "We built at least one, or had one
+  built for us, and offer it under our own name or use it ourselves". The label
+  would need a brand-voice check before use.
 - The page and the Markdown export say "This check has not been reviewed by a
   lawyer."
-- Nine points the fact-checkers say only counsel can settle remain open:
+- Ten points the fact-checkers say only counsel can settle remain open:
   (a) whether a non-EU developer whose system reaches the EU only through
   resellers or integrators is "placing on the market"; (b) whether the
   four-connection test is an acceptable organisation-level stand-in for
@@ -109,10 +135,16 @@ that means:
   in the EU" as their own use; (j) whether an organisation established in the
   EU that provides a system whose only connection is that its output is used in
   the EU is reached through Article 2(1)(c), which names providers in third
-  countries (the tool shows that provider a flat AI literacy duty). Item (c)
+  countries (the tool shows that provider a flat AI literacy duty). Round 5
+  confirmed this as fault R5-1. Item (c)
   also covers whether "We import at least one into the EU", ticked by an
   organisation outside the EU, is its own placing on the market (the tool treats
-  it as bringing the organisation within the Act). Since round 5, item (g) can
+  it as bringing the organisation within the Act). It also covers the Article
+  3(3) reading behind R5-3: whether "We built at least one" makes an
+  organisation a provider when Article 3(3) requires placing on the market or
+  putting into service under its own name. (k) whether a general-purpose AI
+  model's provider can be reached other than by placing the model on the market,
+  and whether Article 4 reaches model providers at all (R5-2). Since round 5, item (g) can
   only affect a "cannot yet tell" result, never a flat duty. These should go to
   counsel together with the v2 review. Former item (e), an organisation that is a provider of one system and
   connected to the EU only through another, is moot for the flat AI literacy

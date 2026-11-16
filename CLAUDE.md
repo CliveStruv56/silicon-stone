@@ -1049,7 +1049,7 @@ not to undo:
   pack from `2026-11-16` for this tool.
 
 **Released ahead of counsel review** (owner decision, 16 Nov 2026): what that
-covers, and the nine points left for counsel with the v2 review, are in
+covers, and the ten points left for counsel with the v2 review, are in
 `docs/tools-specialist-advisory-plan.md`. It does not unblock Checker v2.
 
 `src/components/tools/results/ResultsLayout.tsx` (sticky contents, "start
