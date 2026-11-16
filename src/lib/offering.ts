@@ -139,11 +139,18 @@ export const FREE_OFFERINGS: Offering[] = [
     id: 'tools',
     name: 'The four interactive tools',
     price: 'Free',
-    priceNote: 'email required for results',
+    // Every live tool shows its full result without an email address. Email is
+    // asked for only for an extra: the Checker's written AI report and the
+    // Mapper's and Stress-Test's printable brief. Was "email required for
+    // results", which was untrue of all four (corrected 2026-11-16).
+    priceNote: 'results free · email only for the written report or printable brief',
     summary:
       'Compliance Checker, Supply Chain Mapper, Scenario Modeler and Policy Stress-Test — the analysis turned into a result about you.',
     href: '/tools',
-    terms: ['No tool input leaves your browser — only your email address is sent.'],
+    terms: [
+      'Every result is shown in full without an email address.',
+      'The Supply Chain Mapper, Scenario Modeler and Policy Stress-Test work in your browser. The Compliance Checker saves your answers on our servers for 24 hours so a refresh does not lose them, and for 30 days only if you save a result link. Its optional description reader and written report send your description or answers to a language model provider (Anthropic) to process.',
+    ],
   },
   {
     id: 'us-executive-guide',
