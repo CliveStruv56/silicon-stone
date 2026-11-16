@@ -10,6 +10,8 @@ import { Header, Footer } from '@/components/layout'
 import { FollowOnModule } from '@/components/advisory/FollowOnModule'
 import { FollowOnBriefing } from '@/components/advisory/FollowOnBriefing'
 import { EmailGateOverlay } from '@/components/tools/EmailGateOverlay'
+import { trackToolComplete, trackToolStart } from '@/lib/tool-analytics'
+import { useSeenOnce } from '@/components/tools/useSeenOnce'
 import { usePrintGate } from '@/components/tools/usePrintGate'
 import { CopyMarkdownButton } from '@/components/tools/CopyMarkdownButton'
 import { ToolSubscribeCard } from '@/components/tools/ToolSubscribeCard'
@@ -111,17 +113,43 @@ const HOW_IT_WORKS = [
 ]
 
 export default function SupplyChainMapperPage() {
-  const [selectedNode, setSelectedNode] = useState<SupplyChainNode | null>(null)
+  const [selectedNode, setSelectedNodeState] = useState<SupplyChainNode | null>(null)
   // Email gate is now triggered only by the "Email me the brief" export action.
   // The interactive map and node detail are free to use.
   const { showGate, requestBrief, unlock, dismiss } = usePrintGate()
-  const [selectedScenarioId, setSelectedScenarioId] = useState<ScenarioId>('baseline')
-  const [exposureProfile, setExposureProfile] = useState<ExposureProfile>({
+  const [selectedScenarioId, setSelectedScenarioIdState] = useState<ScenarioId>('baseline')
+  const [exposureProfile, setExposureProfileState] = useState<ExposureProfile>({
     industry: 'industrial-manufacturing',
     chipExposure: 'ai-accelerators',
     sourcingFlexibility: 'single-source',
     geography: 'europe',
   })
+
+  /*
+   * Funnel analytics. The map and snapshot are on screen from the first paint,
+   * so a page load is not a result: Start is the first change of context,
+   * stress scenario or node, and Complete is the reader then reaching the
+   * Exposure Report Snapshot. Map filters are view controls and do not count.
+   */
+  const [started, setStarted] = useState(false)
+  const markStarted = useCallback(() => {
+    trackToolStart('supply-chain-mapper')
+    setStarted(true)
+  }, [])
+  const setSelectedScenarioId = (id: ScenarioId) => {
+    markStarted()
+    setSelectedScenarioIdState(id)
+  }
+  const setExposureProfile: typeof setExposureProfileState = (next) => {
+    markStarted()
+    setExposureProfileState(next)
+  }
+  const setSelectedNode = useCallback((node: SupplyChainNode | null) => {
+    if (node) markStarted()
+    setSelectedNodeState(node)
+  }, [markStarted])
+  // The stress scenario id in force when the snapshot comes into view.
+  const snapshotRef = useSeenOnce(started, () => trackToolComplete('supply-chain-mapper', selectedScenarioId))
 
   /* The node detail opens under the map, full width, so a click on the map or
      the Top Exposure list can land the panel below the fold. `nearest` scrolls
@@ -133,7 +161,7 @@ export default function SupplyChainMapperPage() {
 
   const handleSelectNode = useCallback((node: SupplyChainNode) => {
     setSelectedNode(node)
-  }, [])
+  }, [setSelectedNode])
 
   const [activeNodeTypes, setActiveNodeTypes] = useState<NodeType[]>(
     NODE_TYPE_OPTIONS.map(opt => opt.value)
@@ -818,7 +846,7 @@ export default function SupplyChainMapperPage() {
             </AnimatePresence>
           </div>
 
-          <Card className="mt-6 bg-stone-charcoal border-border-subtle">
+          <Card ref={snapshotRef} className="mt-6 bg-stone-charcoal border-border-subtle">
             <CardHeader>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight, Check, RefreshCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -24,6 +24,7 @@ import {
 } from '@/lib/compliance-v2/flow'
 import type { AssessmentAnswerV2 } from '@/lib/compliance-v2/types'
 import { evaluateAssessmentV2 } from '@/lib/compliance-v2/engine/assemble'
+import { trackToolComplete, trackToolStart } from '@/lib/tool-analytics'
 
 /**
  * The v2 questionnaire (Phase 4).
@@ -64,6 +65,8 @@ export function ComplianceCheckerV2({ exitHref }: { exitHref: string }) {
 
   const onAnswer = (answer: AssessmentAnswerV2) => {
     if (!question) return
+    // Its own slug while v2 is a flagged preview, so its funnel never dilutes v1's.
+    trackToolStart('compliance-checker-v2')
     setFlow((state) => applyAnswer(state, question.id, answer))
   }
 
@@ -92,6 +95,12 @@ export function ComplianceCheckerV2({ exitHref }: { exitHref: string }) {
     () => (showResult ? evaluateAssessmentV2(flow.answers, assessedAt) : null),
     [flow.answers, showResult, assessedAt]
   )
+
+  // The classification enum only (seven fixed values), never an answer.
+  const shownClassification = result?.classification
+  useEffect(() => {
+    if (shownClassification) trackToolComplete('compliance-checker-v2', shownClassification)
+  }, [shownClassification])
 
   if (showResult && result) {
     return (
