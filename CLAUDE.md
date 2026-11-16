@@ -1023,8 +1023,11 @@ not to undo:
   an import or distribution activity, is held at "cannot yet tell". The
   connection question covers general-purpose AI models too (Art 2(1)(a)). A
   153,216-combination test (establishment × connection × activity × use) holds
-  it in both directions: "applies" needs the reader's own act or establishment
-  (placing on the market alone is the supplier's act), and "likely" needs an
+  it in both directions: "applies" needs `reachedWhicheverSystem()` (the answers
+  describe all systems together, so a connection must reach the reader whichever
+  ticked activity its system falls under; placing on the market and putting into
+  service are the supplier's acts), checked against an oracle that enumerates
+  every assignment of connections to activities; "likely" needs an
   EU-established deployer. A second test holds that "not sure" is never firmer
   than any concrete answer in the same slot (one named exception: an
   EU-established deployer answering "None of these", a contradiction).
@@ -1046,7 +1049,7 @@ not to undo:
   pack from `2026-11-16` for this tool.
 
 **Released ahead of counsel review** (owner decision, 16 Nov 2026): what that
-covers, and the eight points left for counsel with the v2 review, are in
+covers, and the nine points left for counsel with the v2 review, are in
 `docs/tools-specialist-advisory-plan.md`. It does not unblock Checker v2.
 
 `src/components/tools/results/ResultsLayout.tsx` (sticky contents, "start

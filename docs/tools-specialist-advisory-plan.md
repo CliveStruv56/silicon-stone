@@ -73,11 +73,28 @@ that means:
   on which system each connection belonged to, "contradict" and "likely" shown
   to EU organisations whose answers did not support them, an Article 50(4)
   exception missing one of its two conditions, and two date-dependent sentences
-  that would go stale. All were fixed in the fourth round the same day. The
-  check must pass on re-check before merge.
+  that would go stale. All were fixed in the fourth round the same day.
+  Round 4 (`fc-2026-11-16-exposure-check-r4`) again found no false "does not
+  apply", but failed because round 3's rule for when "applies" is supported was
+  itself wrong: the answers describe all of an organisation's systems together,
+  so a connection may belong to a system the Act does not reach the reader
+  through (for example a vendor's assistant the reader only uses), and "put into
+  service in the EU" is the supplier's act, not a deployer's. Round 5 states one
+  rule, `reachedWhicheverSystem()`: "applies" needs the reader's own use from an
+  EU establishment, its own import, an EU-established deployer, or a connection
+  that reaches the reader whichever ticked activity its system falls under; the
+  AI literacy duty uses the role-specific part of the same rule. Where it does
+  not hold, the verdict is "cannot yet tell" (4,633 of 38,080 combinations moved
+  from "applies"; nothing else moved). Three wording faults were fixed with it:
+  a reason that said "leave open whether you have a connection" beside a ticked
+  connection, a contradiction claimed with no contradiction named (EU, "None of
+  these", import), and an establishment "not sure" line that told builders and
+  resellers an EU establishment would bring them within the Act. This was the
+  last round Clive approved: if round 5 fails, the tool is parked. The check
+  must pass on re-check before merge.
 - The page and the Markdown export say "This check has not been reviewed by a
   lawyer."
-- Eight points the fact-checkers say only counsel can settle remain open:
+- Nine points the fact-checkers say only counsel can settle remain open:
   (a) whether a non-EU developer whose system reaches the EU only through
   resellers or integrators is "placing on the market"; (b) whether the
   four-connection test is an acceptable organisation-level stand-in for
@@ -89,8 +106,15 @@ that means:
   whether a non-EU provider of a general-purpose AI model whose model reaches
   the EU only inside a downstream provider's system has placed it on the Union
   market; (i) whether deployers will read "The output of at least one is used
-  in the EU" as their own use. These should go to counsel together with the v2
-  review. Former item (e), an organisation that is a provider of one system and
+  in the EU" as their own use; (j) whether an organisation established in the
+  EU that provides a system whose only connection is that its output is used in
+  the EU is reached through Article 2(1)(c), which names providers in third
+  countries (the tool shows that provider a flat AI literacy duty). Item (c)
+  also covers whether "We import at least one into the EU", ticked by an
+  organisation outside the EU, is its own placing on the market (the tool treats
+  it as bringing the organisation within the Act). Since round 5, item (g) can
+  only affect a "cannot yet tell" result, never a flat duty. These should go to
+  counsel together with the v2 review. Former item (e), an organisation that is a provider of one system and
   connected to the EU only through another, is moot for the flat AI literacy
   duty since round 4: the tool now shows that duty as flat only where some
   connection reaches the reader whichever of its activities that system falls

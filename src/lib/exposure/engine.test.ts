@@ -577,9 +577,10 @@ const ACT = {
   deployer: new Set(['used_internally_or_for_customers', 'integrated_or_configured']),
   // Article 2(1)(a), (c): a provider's system placed on the market, put into service, or whose output is used, in the Union.
   reachesProvider: new Set(['placed_on_eu_market', 'put_into_service_eu', 'output_used_in_eu', 'used_from_eu_establishment']),
-  // Article 2(1)(b), (c): a deployer located in the Union, or whose system's output is used there.
-  // ("Put into service in the EU" is read as located there; counsel item g.) Placing on the market is the supplier's act.
-  reachesDeployer: new Set(['put_into_service_eu', 'output_used_in_eu', 'used_from_eu_establishment']),
+  // Article 2(1)(b), (c): a deployer located in the Union (its own use from an EU establishment), or whose
+  // system's output is used there. Placing on the market (Art 3(9)) and putting into service (Art 3(11), "the
+  // supply of an AI system for first use") are the supplier's acts, so neither reaches a deployer (r4, R4-1).
+  reachesDeployer: new Set(['output_used_in_eu', 'used_from_eu_establishment']),
 }
 
 function article4ReachesInEveryAssignment(establishment: Value, connection: Value, activity: Value): boolean {
@@ -595,16 +596,35 @@ function article4ReachesInEveryAssignment(establishment: Value, connection: Valu
   )
 }
 
-/** Does some answer show that the reader's own act or establishment brings it within Article 2(1)? */
-function ownActBringsWithin(establishment: Value, connection: Value, activity: Value, use: Value): boolean {
-  const connected = asList(connection).filter((c) => c !== 'none')
+/**
+ * Does the Act reach the reader, whichever thing each connection answer is about? Written
+ * from Article 2(1) and 3, not from the engine. The "things" are the ticked activities and,
+ * if ticked, a general-purpose AI model the reader provides. A connection about a model can
+ * only be its placing on the market (Art 2(1)(a); putting into service and output use are
+ * defined for AI systems only, Art 3(11), 2(1)(c)). Two answers pin themselves to the reader
+ * whatever the assignment: "We use at least one from an EU establishment" is its own use in
+ * the Union (Art 2(1)(b)), and "We import at least one into the EU" is its own placing (Art
+ * 3(6)). An EU-established deployer is reached by Art 2(1)(b). A distributor is never reached
+ * by a connection answer: Art 3(7) needs its own making available, which none of them shows.
+ */
+function bringsWithinInEveryAssignment(establishment: Value, connection: Value, activity: Value, use: Value): boolean {
   const acts = asList(activity)
-  const ownPlacing = acts.some((a) => ACT.provider.has(a)) || acts.includes('imported_into_eu') || asList(use).includes('gpai_model')
-  return (
-    connected.some((c) => c !== 'placed_on_eu_market') || // put into service, output used, or used from an EU establishment
-    (connected.includes('placed_on_eu_market') && ownPlacing) || // its own placing (Art 2(1)(a), 3(6))
-    (establishment === 'eu_eea' && connected.length > 0) // established in the Union with a connection (Art 2(1)(b))
-  )
+  const connected = asList(connection).filter((c) => c !== 'none')
+  if (connected.includes('used_from_eu_establishment')) return true
+  if (acts.includes('imported_into_eu')) return true
+  if (establishment === 'eu_eea' && acts.some((a) => ACT.deployer.has(a))) return true
+  const things = [...acts, ...(asList(use).includes('gpai_model') ? ['a general-purpose AI model'] : [])]
+  if (!things.length || !connected.length) return false
+  const reached = (thing: string, c: string) =>
+    thing === 'a general-purpose AI model'
+      ? c === 'placed_on_eu_market'
+      : (ACT.provider.has(thing) && ACT.reachesProvider.has(c)) || (ACT.deployer.has(thing) && ACT.reachesDeployer.has(c))
+  const possible = (thing: string, c: string) => thing !== 'a general-purpose AI model' || c === 'placed_on_eu_market'
+  let assignments: string[][] = [[]]
+  for (const c of connected) assignments = assignments.flatMap((prefix) => things.filter((t) => possible(t, c)).map((t) => [...prefix, t]))
+  // No possible assignment means a connection fits nothing ticked: nothing shows reach.
+  if (!assignments.length) return false
+  return assignments.every((assigned) => connected.some((c, i) => reached(assigned[i], c)))
 }
 
 describe('scope in both directions (153,216 combinations)', () => {
@@ -637,13 +657,19 @@ describe('scope in both directions (153,216 combinations)', () => {
             }
             if (result.scope.outcome === 'in_scope') {
               counts.inScope += 1
-              if (!ownActBringsWithin(organisation_establishment, ai_market_connection, organisation_activity, intended_use_family)) bad.push(where)
+              if (!bringsWithinInEveryAssignment(organisation_establishment, ai_market_connection, organisation_activity, intended_use_family)) bad.push(where)
             }
             if (result.scope.outcome === 'likely_in_scope') {
               counts.likely += 1
               // "Likely" rests on Art 2(1)(b): EU-established, a deployer activity ticked, connection not settled.
               if (!(organisation_establishment === 'eu_eea' && acts.some((a) => ACT.deployer.has(a)) && isUnknown(ai_market_connection))) bad.push(where)
             }
+            // Wording on "cannot yet tell" (R4-2, R4-3): a contradiction is claimed only where the
+            // explanation names one, and "leave open whether you have a connection" never sits beside
+            // a ticked connection.
+            const reasons = [...result.confidenceReasons, result.focus?.reason ?? '']
+            if (reasons.some((r) => /contradict/.test(r)) && !/import|do not sit together/.test(result.scope.explanation)) bad.push({ ...where, why: 'contradiction not named' })
+            if (reasons.some((r) => /leave open whether you have a connection/.test(r)) && asList(ai_market_connection).some((c) => c !== 'none')) bad.push({ ...where, why: 'leave open beside a ticked connection' })
             if (result.confidence === 'high') {
               const open = [organisation_establishment, ai_market_connection, organisation_activity, intended_use_family].some(isUnknown)
               if (open || result.scope.outcome === 'scope_uncertain') bad.push({ ...where, why: 'High with an open fact' })
@@ -816,7 +842,9 @@ describe('16 Nov 2026 fact-check r3 fixes', () => {
       expect(result.scope.outcome).toBe('scope_uncertain')
       expect(result.scope.explanation).toMatch(/^You told us at least one of your AI systems is placed on, or offered in, the EU market/)
     }
-    expect(run({ ...base, ai_market_connection: ['placed_on_eu_market'], organisation_activity: ['used_internally_or_for_customers'], intended_use_family: ['gpai_model'] }).scope.outcome).toBe('in_scope')
+    // Round 4 (R4-1b): with "use" also ticked, "placed" may be the vendor's system, so a GPAI model no longer settles it.
+    expect(run({ ...base, ai_market_connection: ['placed_on_eu_market'], organisation_activity: ['used_internally_or_for_customers'], intended_use_family: ['gpai_model'] }).scope.outcome).toBe('scope_uncertain')
+    expect(run({ ...base, ai_market_connection: ['placed_on_eu_market'], organisation_activity: ['built_or_commissioned'], intended_use_family: ['gpai_model'] }).scope.outcome).toBe('in_scope')
     expect(run({ ...base, ai_market_connection: ['placed_on_eu_market'], organisation_activity: ['built_or_commissioned'] }).scope.outcome).toBe('in_scope')
     expect(run({ ...base, organisation_establishment: 'eu_eea', ai_market_connection: ['placed_on_eu_market'], organisation_activity: ['used_internally_or_for_customers'] }).scope.outcome).toBe('in_scope')
   })
@@ -882,6 +910,77 @@ describe('16 Nov 2026 fact-check r3 fixes', () => {
       for (const item of at(before(entry.date)).areas.filter((a) => a.milestone === entry)) expect(milestoneLine(item)).toMatch(/^Applies from /)
       for (const item of at(on(entry.date)).areas.filter((a) => a.milestone === entry)) expect(milestoneLine(item)).toMatch(/^Has applied since /)
     }
+  })
+})
+
+describe('16 Nov 2026 fact-check r4 fixes', () => {
+  const Z: Record<string, Spec> = {
+    Z1: { ...base, ai_market_connection: ['placed_on_eu_market'], organisation_activity: ['built_or_commissioned', 'used_internally_or_for_customers'] },
+    Z2: { ...base, ai_market_connection: ['placed_on_eu_market'], organisation_activity: ['used_internally_or_for_customers'], intended_use_family: ['gpai_model', 'chatbot_interaction'] },
+    Z3: { ...base, ai_market_connection: ['output_used_in_eu'], organisation_activity: ['distributed_or_resold'] },
+    Z4: { ...base, ai_market_connection: ['placed_on_eu_market', 'output_used_in_eu'], organisation_activity: ['distributed_or_resold', 'used_internally_or_for_customers'] },
+    Z5: { ...base, organisation_establishment: 'eu_eea', ai_market_connection: ['placed_on_eu_market'], organisation_activity: ['distributed_or_resold'] },
+    Z6: { ...base, ai_market_connection: ['output_used_in_eu'], organisation_activity: unknown },
+    Z7: { ...base, ai_market_connection: ['put_into_service_eu'], organisation_activity: ['used_internally_or_for_customers'] },
+    Z17: { ...base, ai_market_connection: ['output_used_in_eu'], organisation_activity: ['built_or_commissioned', 'distributed_or_resold'] },
+    Z18: { ...base, organisation_establishment: 'canada', ai_market_connection: ['placed_on_eu_market', 'put_into_service_eu'] },
+    Z22: { ...base, organisation_establishment: 'eu_eea', ai_market_connection: ['placed_on_eu_market'], organisation_activity: unknown },
+    Z23: { ...base, ai_market_connection: ['placed_on_eu_market'], organisation_activity: ['built_or_commissioned', 'used_internally_or_for_customers'], ai_literacy_measures: unknown },
+  }
+  it('R4-1: "applies" only where a connection reaches the reader whichever system it is about', () => {
+    for (const [name, spec] of Object.entries(Z)) {
+      const result = run(spec)
+      expect({ name, outcome: result.scope.outcome }).toEqual({ name, outcome: 'scope_uncertain' })
+      expect(result.areas.some((a) => a.kind === 'duty')).toBe(false)
+    }
+    expect(run(Z.Z1).scope.explanation).toMatch(/^You told us at least one of your AI systems or general-purpose AI models has a connection to the EU, but your answers cover all of them together/)
+    expect(run(Z.Z7).scope.explanation).toMatch(/your answers cover all of them together/)
+  })
+
+  it('R4-1: still in scope where the reader\'s own act or establishment shows it', () => {
+    const keep: Record<string, Spec> = {
+      P6: { ...base, organisation_establishment: 'us', ai_market_connection: ['output_used_in_eu'], organisation_activity: ['built_or_commissioned'], intended_use_family: ['employment'] },
+      P9: { ...base, organisation_establishment: 'us', ai_market_connection: ['placed_on_eu_market'], organisation_activity: ['built_or_commissioned'], intended_use_family: ['regulated_product', 'gpai_model', 'synthetic_content'] },
+      X10: { ...base, ai_market_connection: ['used_from_eu_establishment'], organisation_activity: ['used_internally_or_for_customers'], intended_use_family: ['synthetic_content'] },
+      Z8: { ...base, ai_market_connection: ['used_from_eu_establishment'], organisation_activity: ['distributed_or_resold'] },
+      Z15: { ...base, ai_market_connection: ['placed_on_eu_market'], organisation_activity: ['supplied_under_own_name', 'imported_into_eu'] },
+      Z20: { ...base, organisation_establishment: 'other', ai_market_connection: ['output_used_in_eu'], organisation_activity: ['integrated_or_configured'], intended_use_family: ['gpai_model'] },
+      base,
+    }
+    for (const [name, spec] of Object.entries(keep)) expect({ name, outcome: run(spec).scope.outcome }).toEqual({ name, outcome: 'in_scope' })
+  })
+
+  it('R4-1c: "put into service in the EU" alone never gives a deployer a flat literacy duty', () => {
+    expect(area(run(Z.Z7), 'ai-literacy')?.kind).toBe('conditional')
+    expect(area(run(Z.Z18), 'ai-literacy')?.kind).toBe('conditional')
+  })
+
+  it('R4-2: beside a ticked connection the reason is about reach, not about whether there is a connection', () => {
+    const reach = 'Your answers do not show whether your connection to the EU brings your organisation within the Act.'
+    for (const spec of [Z.Z1, Z.Z3, { ...base, ai_market_connection: ['placed_on_eu_market'], organisation_activity: ['distributed_or_resold'] }, { ...base, organisation_establishment: 'multiple', ai_market_connection: ['placed_on_eu_market'] }]) {
+      const result = run(spec)
+      expect(result.confidenceReasons[0]).toBe(reach)
+      expect(result.focus?.reason).toBe(`${reach} Settle that before planning anything else.`)
+    }
+    expect(run({ ...base, organisation_establishment: 'multiple', ai_market_connection: ['none'] }).confidenceReasons[0]).toBe('Your answers leave open whether you have a connection to the EU.')
+  })
+
+  it('R4-3: where a contradiction is claimed for EU + None + import, the explanation names the import', () => {
+    for (const organisation_activity of [['imported_into_eu'], ['imported_into_eu', 'distributed_or_resold'], ['imported_into_eu', 'built_or_commissioned']]) {
+      const result = run({ ...base, organisation_establishment: 'eu_eea', ai_market_connection: ['none'], organisation_activity })
+      expect(result.confidenceReasons[0]).toMatch(/contradict/)
+      expect(result.scope.explanation).toMatch(/^You said you import an AI system into the EU/)
+    }
+    const user = run({ ...base, organisation_establishment: 'eu_eea', ai_market_connection: ['none'], organisation_activity: ['imported_into_eu', 'used_internally_or_for_customers'] })
+    expect(user.scope.explanation).toMatch(/^These two answers do not sit together/)
+  })
+
+  it('R4-4: the establishment "not sure" effect states Art 2(1)(b) as law, not as a claim about the reader', () => {
+    const result = run({ ...base, organisation_establishment: unknown, ai_market_connection: ['none'], organisation_activity: ['built_or_commissioned'] })
+    expect(result.findOut[0].effect).toBe(
+      'Confidence is low. An organisation established in the EU that uses an AI system is within the Act on that ground alone, so we could not conclude that it does not apply.',
+    )
+    expect(result.findOut[0].effect).not.toMatch(/An EU establishment would bring you within the Act/)
   })
 })
 

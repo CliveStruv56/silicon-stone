@@ -280,9 +280,31 @@ export function reachedAsProviderOrDeployer(answers: AnswerRecordV2): boolean {
   // (r3 fact-check, R3-4).
   const reaches = (activity: string, connection: string) =>
     PROVIDER_ACTIVITIES.includes(activity) ||
-    (DEPLOYER_ACTIVITIES.includes(activity) && connection !== 'placed_on_eu_market')
+    (DEPLOYER_ACTIVITIES.includes(activity) && (connection === 'output_used_in_eu' || connection === 'used_from_eu_establishment'))
   return activities.length > 0 && connected.some((connection) => activities.every((activity) => reaches(activity, connection)))
 }
+
+/**
+ * Does some answer bring the reader within Article 2(1) whichever of its systems a
+ * connection belongs to? The answers cover every system together, so "applies" needs
+ * the reader's own use from an EU establishment (Article 2(1)(b)), its own import
+ * (Article 3(6)), or Article 4's test above: an EU-established deployer, or one
+ * connection that reaches every activity ticked. A distributor is reached only by
+ * making a system available on the EU market (Article 3(7)), which no connection
+ * answer shows (r4 fact-check, R4-1).
+ */
+export function reachedWhicheverSystem(answers: AnswerRecordV2): boolean {
+  if (valuesOf(answers, 'ai_market_connection').includes('used_from_eu_establishment')) return true
+  if (valuesOf(answers, 'organisation_activity').includes('imported_into_eu')) return true
+  return reachedAsProviderOrDeployer(answers)
+}
+
+/** In scope on v2's test, but no connection is shown to reach the reader in a role it applies to (R4-1). */
+const UNATTRIBUTED_EXPLANATION =
+  'You told us at least one of your AI systems or general-purpose AI models has a connection to the EU, but your answers cover all of them together, so they do not show whether that connection belongs to one that brings your organisation within the Act. The Act reaches a provider whose AI system it places on the market or puts into service in the EU, or whose general-purpose AI model it places on the market there, and a provider established outside the EU whose system’s output is used in the EU (Article 2(1)(a) and (c)); a deployer only where it is established or located in the EU, or the output of the system it uses is used in the EU (Article 2(1)(b) and (c)); and a distributor only where it makes a system available on the EU market (Article 3(7)). So we have not concluded that the Act applies to your organisation.'
+
+/** The confidence reason and Start-here line for that case (R4-1). */
+export const REACH_REASON = 'Your answers do not show whether your connection to the EU brings your organisation within the Act.'
 
 /** EU-established + "None of these" without "We use someone else's system": open, not a contradiction (R3-2). */
 const EU_NONE_OPEN_EXPLANATION =
@@ -322,7 +344,11 @@ export function evaluateScope(answers: AnswerRecordV2): EvaluatedScope {
     // A true contradiction only for an organisation that uses an AI system (R3-2).
     return {
       ...scope,
-      explanation: activities.includes('used_internally_or_for_customers') ? EU_NONE_EXPLANATION : EU_NONE_OPEN_EXPLANATION,
+      explanation: activities.includes('used_internally_or_for_customers')
+        ? EU_NONE_EXPLANATION
+        : activities.includes('imported_into_eu')
+          ? NONE_CONTRADICTIONS[0].explanation
+          : EU_NONE_OPEN_EXPLANATION,
     }
   }
   const establishment = valueOf(answers, 'organisation_establishment')
@@ -344,10 +370,11 @@ export function evaluateScope(answers: AnswerRecordV2): EvaluatedScope {
     (activities.length > 0 && activities.every((value) => DEPLOYER_ACTIVITIES.includes(value) || value === 'distributed_or_resold'))
   // A provider of a general-purpose AI model is reached by placing it on the EU market (Article 2(1)(a)).
   const providesModel = valuesOf(answers, 'intended_use_family').includes('gpai_model')
-  if (scope.outcome === 'in_scope' && onlyPlaced && noOwnPlacing && !providesModel && establishment !== 'eu_eea') {
+  if (scope.outcome === 'in_scope' && !reachedWhicheverSystem(answers)) {
     return {
       outcome: 'scope_uncertain',
-      explanation: PLACED_ONLY_EXPLANATION,
+      explanation:
+        onlyPlaced && noOwnPlacing && !providesModel && establishment !== 'eu_eea' ? PLACED_ONLY_EXPLANATION : UNATTRIBUTED_EXPLANATION,
       triggeringAnswerIds: ['ai_market_connection', 'organisation_activity'],
       missingAnswerIds: ['organisation_establishment', 'organisation_activity'].filter((id) => saidUnknown(answers, id)),
     }
@@ -383,6 +410,7 @@ export function evaluateExposure(answers: AnswerRecordV2, pack: RulePack, today:
   // (which places on the EU market). Every other "cannot yet tell" leaves the
   // question open rather than contradicting it (r2 fact-check, R2-3).
   const saysNone = valuesOf(answers, 'ai_market_connection').includes('none')
+  const connectionTicked = valuesOf(answers, 'ai_market_connection').some((value) => value !== 'none')
   const contradictory =
     saysNone &&
     (activities.includes('imported_into_eu') ||
@@ -398,7 +426,7 @@ export function evaluateExposure(answers: AnswerRecordV2, pack: RulePack, today:
   const findOut = buildFindOut(answers, scope, representative.show)
   const confidenceReasons: string[] = []
   if (scope.outcome === 'scope_uncertain' && decisiveUnknown.length === 0) {
-    confidenceReasons.push(contradictory ? CONTRADICT_REASON : OPEN_REASON)
+    confidenceReasons.push(contradictory ? CONTRADICT_REASON : connectionTicked ? REACH_REASON : OPEN_REASON)
   }
   for (const item of findOut) {
     if (item.decisive || item.questionId === 'intended_use_family') {
@@ -627,6 +655,7 @@ export function evaluateExposure(answers: AnswerRecordV2, pack: RulePack, today:
     // a provider (Art 50(1), (2)) or a deployer of generated content (Art 50(4)).
     transparencyCouldBeYours: activities.some((value) => PROVIDER_ACTIVITIES.includes(value)) || generates,
     contradictory,
+    connectionTicked,
   })
 
   const count = valueOf(answers, 'system_count')
@@ -667,6 +696,7 @@ function chooseFocus({
   literacy,
   transparencyCouldBeYours,
   contradictory,
+  connectionTicked,
 }: {
   scope: EvaluatedScope
   areas: ExposureArea[]
@@ -676,6 +706,7 @@ function chooseFocus({
   literacy: TimelineEntry
   transparencyCouldBeYours: boolean
   contradictory: boolean
+  connectionTicked: boolean
 }): Focus | null {
   const decisive = findOut.some((item) => item.decisive)
   if (decisive) {
@@ -687,7 +718,7 @@ function chooseFocus({
   if (scope.outcome === 'scope_uncertain') {
     return {
       target: 'verdict',
-      reason: `${contradictory ? CONTRADICT_REASON : OPEN_REASON} Settle that before planning anything else.`,
+      reason: `${contradictory ? CONTRADICT_REASON : connectionTicked ? REACH_REASON : OPEN_REASON} Settle that before planning anything else.`,
     }
   }
   const area = (id: string) => areas.find((item) => item.id === id)
@@ -765,7 +796,7 @@ export function buildFindOut(answers: AnswerRecordV2, scope: EvaluatedScope, rep
       whom: 'Your company secretary, finance director or legal team.',
       effect:
         scope.outcome === 'scope_uncertain'
-          ? `Confidence is low. An EU establishment would bring you within the Act on its own, so we could not conclude that it does not apply.${repNote}`
+          ? `Confidence is low. An organisation established in the EU that uses an AI system is within the Act on that ground alone, so we could not conclude that it does not apply.${repNote}`
           : `Confidence is low. We could not test the route for organisations established in the EU.${repNote}`,
       decisive: true,
     })
