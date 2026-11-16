@@ -545,8 +545,9 @@ describe('16 Nov 2026 fact-check fixes', () => {
 })
 
 // ---------------------------------------------------------------------------
-// Sweeps rebuilt after fact-check r2. Each was run against the engine at
-// fe51d989 and failed there (R2-1, R2-2, R2-5) before the fix made it pass.
+// Sweeps rebuilt after fact-checks r2 and r3. Each new or changed sweep was run
+// against the engine at d6b74d4d and failed there (R3-1, R3-3, R3-4) before the
+// fix made it pass; the r2 sweeps also failed at fe51d989 (R2-1, R2-2, R2-5).
 // ---------------------------------------------------------------------------
 
 type Value = AnswerValue | { state: AnswerState }
@@ -554,60 +555,107 @@ const subsets = <T,>(items: T[]): T[][] => items.reduce<T[][]>((all, item) => al
 const optionValues = (id: string) => EXPOSURE_QUESTIONS.find((q) => q.id === id)!.options!.map((o) => o.value)
 const POSITIVE = ['placed_on_eu_market', 'put_into_service_eu', 'output_used_in_eu', 'used_from_eu_establishment']
 const ESTABLISHMENTS: Value[] = [...optionValues('organisation_establishment'), unknown]
-const CONNECTIONS: Value[] = [['none'], unknown, ...subsets(POSITIVE).filter((set) => set.length > 0)]
+// 19: None, "not sure", the 15 positive sets, and None plus a positive (the UI forbids it; kept to match the checker)
+const CONNECTIONS: Value[] = [['none'], unknown, ...subsets(POSITIVE).filter((set) => set.length > 0), ['none', 'placed_on_eu_market'], ['none', 'output_used_in_eu']]
 const ACTIVITIES: Value[] = [unknown, ...subsets(optionValues('organisation_activity')).filter((set) => set.length > 0)]
-const USES: Value[] = [['something_else'], ['gpai_model'], ['regulated_product'], ['chatbot_interaction'], unknown]
+// 18: "not sure", every single use, and two combinations
+const USES_WIDE: Value[] = [unknown, ...optionValues('intended_use_family').map((value) => [value]), ['employment', 'gpai_model'], ['regulated_product', 'synthetic_content']]
 const isUnknown = (value: Value) => typeof value === 'object' && value !== null && !Array.isArray(value) && 'state' in value
 const asList = (value: Value) => (Array.isArray(value) ? (value as string[]) : [])
 
-/** Independent statement of Article 2(1) reach for providers and deployers, written apart from the engine's. */
-function reachesProviderOrDeployer(establishment: Value, connection: Value, activity: Value): boolean {
-  const connected = asList(connection).filter((value) => value !== 'none')
+/*
+ * Independent statements of the law, written from the Act's structure and not
+ * from the engine's code. The flat-duty rule enumerates every way the reader's
+ * connections could belong to its ticked activities (the answers do not say
+ * which system each connection belongs to) and requires Article 4's addressees
+ * to be reached in all of them.
+ */
+const ACT = {
+  // Article 3(3): builds, or has built, and places on the market or puts into service under its own name.
+  provider: new Set(['built_or_commissioned', 'supplied_under_own_name']),
+  // Article 3(4): uses an AI system under its authority.
+  deployer: new Set(['used_internally_or_for_customers', 'integrated_or_configured']),
+  // Article 2(1)(a), (c): a provider's system placed on the market, put into service, or whose output is used, in the Union.
+  reachesProvider: new Set(['placed_on_eu_market', 'put_into_service_eu', 'output_used_in_eu', 'used_from_eu_establishment']),
+  // Article 2(1)(b), (c): a deployer located in the Union, or whose system's output is used there.
+  // ("Put into service in the EU" is read as located there; counsel item g.) Placing on the market is the supplier's act.
+  reachesDeployer: new Set(['put_into_service_eu', 'output_used_in_eu', 'used_from_eu_establishment']),
+}
+
+function article4ReachesInEveryAssignment(establishment: Value, connection: Value, activity: Value): boolean {
   const acts = asList(activity)
-  const provider = acts.includes('built_or_commissioned') || acts.includes('supplied_under_own_name')
-  const deployer = acts.includes('used_internally_or_for_customers') || acts.includes('integrated_or_configured')
-  return (
-    (provider && connected.length > 0) ||
-    (deployer && (establishment === 'eu_eea' || connected.some((value) => value !== 'placed_on_eu_market')))
+  if (establishment === 'eu_eea' && acts.some((a) => ACT.deployer.has(a))) return true // Article 2(1)(b)
+  const connected = asList(connection).filter((c) => c !== 'none')
+  if (!acts.length || !connected.length) return false
+  // Every assignment of a ticked activity to each connection.
+  let assignments: string[][] = [[]]
+  for (let i = 0; i < connected.length; i++) assignments = assignments.flatMap((prefix) => acts.map((a) => [...prefix, a]))
+  return assignments.every((assigned) =>
+    connected.some((c, i) => (ACT.provider.has(assigned[i]) && ACT.reachesProvider.has(c)) || (ACT.deployer.has(assigned[i]) && ACT.reachesDeployer.has(c))),
   )
 }
 
-describe('"does not apply" only when no answer implies or leaves open an EU link (38,080 combinations)', () => {
-  it('across every establishment, connection set, activity set and use answer', () => {
+/** Does some answer show that the reader's own act or establishment brings it within Article 2(1)? */
+function ownActBringsWithin(establishment: Value, connection: Value, activity: Value, use: Value): boolean {
+  const connected = asList(connection).filter((c) => c !== 'none')
+  const acts = asList(activity)
+  const ownPlacing = acts.some((a) => ACT.provider.has(a)) || acts.includes('imported_into_eu') || asList(use).includes('gpai_model')
+  return (
+    connected.some((c) => c !== 'placed_on_eu_market') || // put into service, output used, or used from an EU establishment
+    (connected.includes('placed_on_eu_market') && ownPlacing) || // its own placing (Art 2(1)(a), 3(6))
+    (establishment === 'eu_eea' && connected.length > 0) // established in the Union with a connection (Art 2(1)(b))
+  )
+}
+
+describe('scope in both directions (153,216 combinations)', () => {
+  it('"does not apply" only when nothing implies or leaves open an EU link; "applies" only when the reader\'s own act or establishment brings it within Art 2(1); High only with no open fact', () => {
     let runs = 0
-    let outOfScope = 0
+    const counts = { out: 0, inScope: 0, likely: 0 }
     const bad: unknown[] = []
     const connectionQuestion = EXPOSURE_QUESTIONS.find((q) => q.id === 'ai_market_connection')!
     for (const organisation_establishment of ESTABLISHMENTS) {
       for (const ai_market_connection of CONNECTIONS) {
         for (const organisation_activity of ACTIVITIES) {
-          for (const intended_use_family of USES) {
+          for (const intended_use_family of USES_WIDE) {
             runs += 1
             const result = run({ ...base, organisation_establishment, ai_market_connection, organisation_activity, intended_use_family })
-            if (result.scope.outcome !== 'out_of_scope') continue
-            outOfScope += 1
             const acts = asList(organisation_activity)
-            const allowed =
-              asList(ai_market_connection).length === 1 &&
-              asList(ai_market_connection)[0] === 'none' &&
-              typeof organisation_establishment === 'string' &&
-              OUTSIDE_EU.includes(organisation_establishment) &&
-              !isUnknown(organisation_activity) &&
-              !acts.includes('imported_into_eu') &&
-              !acts.includes('distributed_or_resold')
-            // A provider of a GPAI model (or "not sure" what the AI is) can be out of
-            // scope only because the connection question asked about models too (R2-2).
-            const modelsCovered =
-              /general-purpose AI models/.test(result.scope.explanation) && /general-purpose AI models/.test(connectionQuestion.prompt)
-            if (!allowed || !modelsCovered) {
-              bad.push({ organisation_establishment, ai_market_connection, organisation_activity, intended_use_family })
+            const where = { organisation_establishment, ai_market_connection, organisation_activity, intended_use_family, outcome: result.scope.outcome, confidence: result.confidence }
+            if (result.scope.outcome === 'out_of_scope') {
+              counts.out += 1
+              const allowed =
+                asList(ai_market_connection).length === 1 &&
+                asList(ai_market_connection)[0] === 'none' &&
+                typeof organisation_establishment === 'string' &&
+                OUTSIDE_EU.includes(organisation_establishment) &&
+                !isUnknown(organisation_activity) &&
+                !acts.includes('imported_into_eu') &&
+                !acts.includes('distributed_or_resold')
+              const modelsCovered =
+                /general-purpose AI models/.test(result.scope.explanation) && /general-purpose AI models/.test(connectionQuestion.prompt)
+              if (!allowed || !modelsCovered) bad.push(where)
+            }
+            if (result.scope.outcome === 'in_scope') {
+              counts.inScope += 1
+              if (!ownActBringsWithin(organisation_establishment, ai_market_connection, organisation_activity, intended_use_family)) bad.push(where)
+            }
+            if (result.scope.outcome === 'likely_in_scope') {
+              counts.likely += 1
+              // "Likely" rests on Art 2(1)(b): EU-established, a deployer activity ticked, connection not settled.
+              if (!(organisation_establishment === 'eu_eea' && acts.some((a) => ACT.deployer.has(a)) && isUnknown(ai_market_connection))) bad.push(where)
+            }
+            if (result.confidence === 'high') {
+              const open = [organisation_establishment, ai_market_connection, organisation_activity, intended_use_family].some(isUnknown)
+              if (open || result.scope.outcome === 'scope_uncertain') bad.push({ ...where, why: 'High with an open fact' })
             }
           }
         }
       }
     }
-    expect(runs).toBe(38080)
-    expect(outOfScope).toBeGreaterThan(0)
+    expect(runs).toBe(153216)
+    expect(counts.out).toBeGreaterThan(0)
+    expect(counts.inScope).toBeGreaterThan(0)
+    expect(counts.likely).toBeGreaterThan(0)
     expect(bad.slice(0, 5)).toEqual([])
   })
 })
@@ -615,41 +663,54 @@ describe('"does not apply" only when no answer implies or leaves open an EU link
 describe('"not sure" is never firmer than a concrete answer in the same slot', () => {
   const rank = { scope_uncertain: 0, likely_in_scope: 1, in_scope: 2, out_of_scope: 2 } as const
   const confidenceRank = { low: 0, medium: 1, high: 2 } as const
+  const oneOrTwo = (values: string[]) => subsets(values).filter((set) => set.length === 1 || set.length === 2)
   const slots: Array<[string, Value[]]> = [
     ['organisation_establishment', optionValues('organisation_establishment')],
-    ['ai_market_connection', [['none'], ...POSITIVE.map((value) => [value])]],
-    ['organisation_activity', optionValues('organisation_activity').map((value) => [value])],
-    ['intended_use_family', optionValues('intended_use_family').map((value) => [value])],
+    ['ai_market_connection', oneOrTwo(optionValues('ai_market_connection'))],
+    ['organisation_activity', oneOrTwo(optionValues('organisation_activity'))],
+    ['intended_use_family', oneOrTwo(optionValues('intended_use_family'))],
     ['employee_band', optionValues('employee_band')],
     ['system_count', optionValues('system_count')],
     ['ai_inventory', optionValues('ai_inventory')],
     ['ai_literacy_measures', optionValues('ai_literacy_measures')],
   ]
+  // 4,032 bases: 7 establishments × 6 connection answers × 8 activity answers × 6 uses × 2 literacy answers.
   const bases: Spec[] = []
-  for (const organisation_establishment of optionValues('organisation_establishment')) {
-    for (const ai_market_connection of [['none'], ...POSITIVE.map((value) => [value])]) {
-      for (const organisation_activity of optionValues('organisation_activity').map((value) => [value])) {
-        for (const intended_use_family of [['something_else'], ['gpai_model'], ['employment']]) {
-          bases.push({ ...base, organisation_establishment, ai_market_connection, organisation_activity, intended_use_family })
+  for (const organisation_establishment of ESTABLISHMENTS) {
+    for (const ai_market_connection of [['none'], unknown, ...POSITIVE.map((value) => [value])] as Value[]) {
+      for (const organisation_activity of [unknown, ...optionValues('organisation_activity').map((value) => [value]), ['distributed_or_resold', 'used_internally_or_for_customers']] as Value[]) {
+        for (const intended_use_family of [unknown, ['something_else'], ['gpai_model'], ['employment'], ['regulated_product'], ['chatbot_interaction']] as Value[]) {
+          for (const ai_literacy_measures of ['no', unknown] as Value[]) {
+            bases.push({ ...base, organisation_establishment, ai_market_connection, organisation_activity, intended_use_family, ai_literacy_measures })
+          }
         }
       }
     }
   }
 
   it('across every base and every slot: verdict no firmer, opposite verdict never, confidence no higher', () => {
+    expect(bases).toHaveLength(4032)
     const bad: unknown[] = []
     let checks = 0
+    let excepted = 0
     for (const spec of bases) {
       for (const [id, concretes] of slots) {
         const withUnknown = run({ ...spec, [id]: unknown })
         for (const concrete of concretes) {
+          // The one named exception (ruled in fact-check r3, §4): EU-established, a deployer
+          // activity ticked, "None of these". That pair cannot both be true, so it gives
+          // "cannot yet tell"; "not sure" leaves Art 2(1)(b) standing and gives "likely".
+          if (
+            id === 'ai_market_connection' &&
+            spec.organisation_establishment === 'eu_eea' &&
+            asList(concrete as Value).length === 1 &&
+            asList(concrete as Value)[0] === 'none' &&
+            asList(spec.organisation_activity as Value).some((a) => ACT.deployer.has(a))
+          ) {
+            excepted += 1
+            continue
+          }
           checks += 1
-          // The one named exception: EU-established + "None of these" cannot both be true
-          // (an EU establishment using AI is itself a connection), so that concrete pair
-          // yields "cannot yet tell" as a contradiction, not as a firmer reading. "Not sure"
-          // there gives "likely" on the establishment alone (Art 2(1)(b)), which round 1 and
-          // round 2 of the fact-check verified. Any other case fails.
-          if (id === 'ai_market_connection' && spec.organisation_establishment === 'eu_eea' && Array.isArray(concrete) && concrete[0] === 'none') continue
           const withConcrete = run({ ...spec, [id]: concrete })
           const u = withUnknown.scope.outcome
           const c = withConcrete.scope.outcome
@@ -659,14 +720,14 @@ describe('"not sure" is never firmer than a concrete answer in the same slot', (
         }
       }
     }
-    expect(checks).toBeGreaterThan(25000)
+    expect(checks).toBeGreaterThan(400000)
+    expect(excepted).toBeGreaterThan(0)
     expect(bad.slice(0, 5)).toEqual([])
-  })
+  }, 120_000)
 })
 
 describe('every flat duty requires that the Act reaches the reader in a role the cited article binds', () => {
-  // Article 4 binds providers and deployers; the Act reaches them per Article 2(1).
-  const BINDS: Record<string, (e: Value, c: Value, a: Value) => boolean> = { '4': reachesProviderOrDeployer }
+  const BINDS: Record<string, (e: Value, c: Value, a: Value) => boolean> = { '4': article4ReachesInEveryAssignment }
   it('across every establishment, connection set (including "placed on the EU market" alone) and activity set', () => {
     const bad: unknown[] = []
     let duties = 0
@@ -681,10 +742,12 @@ describe('every flat duty requires that the Act reaches the reader in a role the
               bad.push({ area: item.id, organisation_establishment, ai_market_connection, organisation_activity })
             }
           }
-          // The literacy find-out and first-step lines follow the same predicate.
           const literacyDuty = result.areas.some((a) => a.id === 'ai-literacy' && a.kind === 'duty')
           if (result.readiness.some((step) => /Article 4 on AI literacy has applied since/.test(step)) && !literacyDuty) {
             bad.push({ readiness: 'flat literacy line without a flat duty', organisation_establishment, ai_market_connection, organisation_activity })
+          }
+          if (result.focus?.target === 'ai-literacy' && !literacyDuty) {
+            bad.push({ focus: 'literacy start-here without a flat duty', organisation_establishment, ai_market_connection, organisation_activity })
           }
         }
       }
@@ -694,12 +757,130 @@ describe('every flat duty requires that the Act reaches the reader in a role the
   })
 
   it('the literacy find-out says "applies to you either way" only when the Act reaches a provider or deployer', () => {
-    for (const ai_market_connection of [['placed_on_eu_market'], ['output_used_in_eu']]) {
-      for (const organisation_activity of optionValues('organisation_activity').map((value) => [value])) {
+    for (const ai_market_connection of [['placed_on_eu_market'], ['output_used_in_eu'], ['placed_on_eu_market', 'output_used_in_eu']]) {
+      for (const organisation_activity of subsets(optionValues('organisation_activity')).filter((set) => set.length > 0 && set.length <= 2)) {
         const result = run({ ...base, ai_market_connection, organisation_activity, ai_literacy_measures: unknown })
         const says = result.findOut.some((item) => /applies to you either way/.test(item.effect))
-        expect(says).toBe(reachesProviderOrDeployer('uk', ai_market_connection, organisation_activity))
+        expect(says).toBe(result.scope.outcome === 'in_scope' && article4ReachesInEveryAssignment('uk', ai_market_connection, organisation_activity))
       }
+    }
+  })
+})
+
+describe('readiness lines show only under their own answers (13,440 combinations)', () => {
+  it('inventory, literacy, count and size lines', () => {
+    const scopeBases: Spec[] = [
+      base,
+      { ...base, ai_market_connection: ['none'] },
+      { ...base, ai_market_connection: unknown },
+      { ...base, organisation_establishment: 'eu_eea', ai_market_connection: ['used_from_eu_establishment'] },
+      { ...base, ai_market_connection: ['placed_on_eu_market'] },
+      { ...base, organisation_establishment: 'multiple', ai_market_connection: ['none'] },
+    ]
+    const activities: Value[] = [['used_internally_or_for_customers'], ['built_or_commissioned'], ['distributed_or_resold'], unknown]
+    const bands: Value[] = [...optionValues('employee_band'), unknown, { state: 'declined' }]
+    const counts: Value[] = [...optionValues('system_count'), unknown]
+    const inventories: Value[] = [...optionValues('ai_inventory'), unknown]
+    const literacies: Value[] = [...optionValues('ai_literacy_measures'), unknown]
+    let n = 0
+    const bad: unknown[] = []
+    for (const spec of scopeBases) for (const organisation_activity of activities) for (const employee_band of bands) for (const system_count of counts) for (const ai_inventory of inventories) for (const ai_literacy_measures of literacies) {
+      n += 1
+      const result = run({ ...spec, organisation_activity, employee_band, system_count, ai_inventory, ai_literacy_measures })
+      const lines = [...result.readiness, result.diagnosticReason ?? '', result.focus?.reason ?? '']
+      const check = (re: RegExp, ok: boolean, what: string) => {
+        if (lines.some((line) => re.test(line)) && !ok) bad.push({ what, spec: { ...spec, organisation_activity, employee_band, system_count, ai_inventory, ai_literacy_measures } })
+      }
+      check(/do not keep a list/, ai_inventory === 'no', 'inventory no')
+      check(/partial or out of date/, ai_inventory === 'partly', 'inventory partly')
+      check(/have not had training|not in place/, ai_literacy_measures === 'no', 'literacy no')
+      check(/only some staff|only partly in place/, ai_literacy_measures === 'partly', 'literacy partly')
+      check(/more than 20 AI systems/, system_count === '20_plus', 'count 20+')
+      check(/between 6 and 20/, system_count === '6_20', 'count 6-20')
+      check(/Knowing which AI systems you have is the first job/, isUnknown(ai_inventory) || isUnknown(system_count), 'diagnostic unknown')
+      const size = result.areas.find((a) => a.id === 'size-relief')
+      if (size && !['1_9', '10_49', '50_249', '250_749'].includes(String(employee_band))) bad.push({ what: 'size card without a small band', employee_band })
+      if (size?.extracts?.includes('article-99-6a') && employee_band !== '250_749') bad.push({ what: 'SMC line without 250-749', employee_band })
+      if (result.readiness.some((l) => /has applied since/.test(l)) && !result.areas.some((a) => a.id === 'ai-literacy' && a.kind === 'duty')) bad.push({ what: 'flat literacy line without duty' })
+    }
+    expect(n).toBe(13440)
+    expect(bad.slice(0, 5)).toEqual([])
+  })
+})
+
+describe('16 Nov 2026 fact-check r3 fixes', () => {
+  it('R3-1: a non-EU deployer or distributor whose only connection is the supplier\'s placing is not told the Act applies', () => {
+    const others = [...subsets(['used_internally_or_for_customers', 'integrated_or_configured', 'distributed_or_resold']).filter((set) => set.length > 0), unknown]
+    for (const organisation_activity of others as Value[]) {
+      const result = run({ ...base, ai_market_connection: ['placed_on_eu_market'], organisation_activity })
+      expect(result.scope.outcome).toBe('scope_uncertain')
+      expect(result.scope.explanation).toMatch(/^You told us at least one of your AI systems is placed on, or offered in, the EU market/)
+    }
+    expect(run({ ...base, ai_market_connection: ['placed_on_eu_market'], organisation_activity: ['used_internally_or_for_customers'], intended_use_family: ['gpai_model'] }).scope.outcome).toBe('in_scope')
+    expect(run({ ...base, ai_market_connection: ['placed_on_eu_market'], organisation_activity: ['built_or_commissioned'] }).scope.outcome).toBe('in_scope')
+    expect(run({ ...base, organisation_establishment: 'eu_eea', ai_market_connection: ['placed_on_eu_market'], organisation_activity: ['used_internally_or_for_customers'] }).scope.outcome).toBe('in_scope')
+  })
+
+  it('R3-2: "contradict" only where the answers cannot both be true', () => {
+    const builder = run({ ...base, organisation_establishment: 'eu_eea', ai_market_connection: ['none'], organisation_activity: ['built_or_commissioned'] })
+    expect(builder.scope.explanation).toMatch(/^You said your organisation is established in the EU/)
+    expect(builder.confidenceReasons[0]).toBe('Your answers leave open whether you have a connection to the EU.')
+    const user = run({ ...base, organisation_establishment: 'eu_eea', ai_market_connection: ['none'], organisation_activity: ['used_internally_or_for_customers'] })
+    expect(user.scope.explanation).toMatch(/^These two answers do not sit together/)
+    expect(user.confidenceReasons[0]).toMatch(/contradict/)
+  })
+
+  it('R3-3: "likely" only for an EU-established deployer', () => {
+    const builder = run({ ...base, organisation_establishment: 'eu_eea', ai_market_connection: unknown, organisation_activity: ['built_or_commissioned'] })
+    expect(builder.scope.outcome).toBe('scope_uncertain')
+    expect(builder.scope.explanation).toMatch(/You have not told us that you use or configure an AI system/)
+    expect(builder.findOut[0].effect).toMatch(/verdict stays “cannot yet tell”/)
+    const user = run({ ...base, organisation_establishment: 'eu_eea', ai_market_connection: unknown, organisation_activity: ['used_internally_or_for_customers'] })
+    expect(user.scope.outcome).toBe('likely_in_scope')
+    expect(user.findOut[0].effect).toMatch(/we say the Act likely applies/)
+  })
+
+  it('R3-4: flat literacy only when some connection reaches every ticked activity', () => {
+    const reseller = run({ ...base, organisation_activity: ['distributed_or_resold', 'used_internally_or_for_customers'] })
+    expect(area(reseller, 'ai-literacy')?.kind).toBe('conditional')
+    const builderUser = run({ ...base, ai_market_connection: ['placed_on_eu_market'], organisation_activity: ['built_or_commissioned', 'used_internally_or_for_customers'] })
+    expect(area(builderUser, 'ai-literacy')?.kind).toBe('conditional')
+    expect(area(run(base), 'ai-literacy')?.kind).toBe('duty')
+  })
+
+  it('R3-5: the Art 50(4) exception carries both of its conditions', () => {
+    expect(area(run({ ...base, intended_use_family: ['synthetic_content'] }), 'transparency')?.summary).toContain(
+      'unless it has had human review or editorial control and a natural or legal person holds editorial responsibility for its publication (Article 50(4))',
+    )
+  })
+
+  it('R3-6: an out-of-scope page does not point at an areas section', () => {
+    const result = run({ ...base, ai_market_connection: ['none'], intended_use_family: unknown })
+    expect(result.scope.outcome).toBe('out_of_scope')
+    expect(result.findOut[0].effect).toBe('Confidence is medium at most. It does not change this verdict, but it decides which areas would apply if your connection to the EU changes.')
+  })
+
+  it('R3-7: every date-bearing sentence follows the date it is run on, before and after each milestone', () => {
+    const spec = { ...base, organisation_activity: ['supplied_under_own_name'], intended_use_family: ['synthetic_content', 'gpai_model'] }
+    const at = (iso: string) => evaluateExposure(answers(spec), pack, new Date(`${iso}T12:00:00Z`))
+    const text = (r: ExposureResult) => r.areas.map((a) => a.summary).join(' ')
+    const before = (d: string) => new Date(parsePackDate(d).getTime() - 86_400_000).toISOString().slice(0, 10)
+    const on = (d: string) => parsePackDate(d).toISOString().slice(0, 10)
+    const marking = milestone(pack, /^New prohibitions/i).date
+    expect(text(at(before(marking)))).toContain(`have until ${marking}`)
+    expect(text(at(before(marking)))).toContain(`apply from ${marking}`)
+    expect(text(at(on(marking)))).toContain(`had until ${marking}`)
+    expect(text(at(on(marking)))).toContain(`have applied since ${marking}`)
+    const gpaiDate = milestone(pack, /^GPAI/).date
+    expect(text(at(before(gpaiDate)))).toContain(`models apply from ${gpaiDate}`)
+    expect(text(at(on(gpaiDate)))).toContain(`models have applied since ${gpaiDate}`)
+    const literacyDate = milestone(pack, /literacy/i).date
+    expect(text(at(before(literacyDate)))).toContain(`An AI literacy duty applies from ${literacyDate}`)
+    expect(text(at(on(literacyDate)))).toContain(`An AI literacy duty has applied since ${literacyDate}`)
+    // Every milestone line flips on its own date.
+    for (const entry of pack.timeline) {
+      for (const item of at(before(entry.date)).areas.filter((a) => a.milestone === entry)) expect(milestoneLine(item)).toMatch(/^Applies from /)
+      for (const item of at(on(entry.date)).areas.filter((a) => a.milestone === entry)) expect(milestoneLine(item)).toMatch(/^Has applied since /)
     }
   })
 })

@@ -1022,15 +1022,21 @@ not to undo:
   alongside an unknown or multi-country establishment, an unknown activity, or
   an import or distribution activity, is held at "cannot yet tell". The
   connection question covers general-purpose AI models too (Art 2(1)(a)). A
-  38,080-combination test (establishment × connection × activity × use) holds
-  it, and a second test holds that "not sure" is never firmer than any concrete
-  answer in the same slot (one named exception: EU-established + "None of
-  these", a contradiction).
+  153,216-combination test (establishment × connection × activity × use) holds
+  it in both directions: "applies" needs the reader's own act or establishment
+  (placing on the market alone is the supplier's act), and "likely" needs an
+  EU-established deployer. A second test holds that "not sure" is never firmer
+  than any concrete answer in the same slot (one named exception: an
+  EU-established deployer answering "None of these", a contradiction).
 - **A flat duty needs the Act to reach the reader in a role the article binds.**
-  Literacy is "Owed" only when `reachedAsProviderOrDeployer()` holds (Art 2(1):
-  a provider via any connection; a deployer only if EU-established or via a
-  connection other than "placed on the EU market"). A test checks this with an
-  independent statement of the same rule across every combination.
+  Literacy is "Owed" only when `reachedAsProviderOrDeployer()` holds: an
+  EU-established deployer, or some connection that reaches the reader whichever
+  ticked activity its system falls under (the answers do not say which system
+  each connection belongs to). The test checks it by enumerating every such
+  assignment, written apart from the engine.
+- **Tense follows the date.** Every sentence whose tense depends on a milestone
+  ("apply from" / "have applied since", "have until" / "had until") is driven by
+  the day it runs; a test runs the engine either side of each milestone.
 - **Templated sentences are conditional on the data they claim.** "You told
   us …", "has applied since …", "including UK law" and the Diagnostic reason each
   appear only beside the answer they quote; `engine.test.ts` walks every
@@ -1040,7 +1046,7 @@ not to undo:
   pack from `2026-11-16` for this tool.
 
 **Released ahead of counsel review** (owner decision, 16 Nov 2026): what that
-covers, and the six points left for counsel with the v2 review, are in
+covers, and the eight points left for counsel with the v2 review, are in
 `docs/tools-specialist-advisory-plan.md`. It does not unblock Checker v2.
 
 `src/components/tools/results/ResultsLayout.tsx` (sticky contents, "start

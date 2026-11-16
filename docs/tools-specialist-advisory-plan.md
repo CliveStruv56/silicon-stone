@@ -65,21 +65,39 @@ that means:
   false "does not apply" routes (a "not sure" on the activity question, and a
   provider of a general-purpose AI model, which the EU connection question did
   not ask about), plus wording that overstated whom Article 4 binds; all were
-  fixed in the third round the same day. The check must pass on re-check before
-  merge.
+  fixed in the third round the same day. Round 3
+  (`fc-2026-11-16-exposure-check-r3`) found no false "does not apply" in
+  153,216 combinations, but failed on over-inclusive results running the other
+  way: "applies" at High for a non-EU organisation whose only EU connection was
+  its supplier's placing on the market, a flat AI literacy "Owed" that depended
+  on which system each connection belonged to, "contradict" and "likely" shown
+  to EU organisations whose answers did not support them, an Article 50(4)
+  exception missing one of its two conditions, and two date-dependent sentences
+  that would go stale. All were fixed in the fourth round the same day. The
+  check must pass on re-check before merge.
 - The page and the Markdown export say "This check has not been reviewed by a
   lawyer."
-- Six points the fact-checkers say only counsel can settle remain open:
+- Eight points the fact-checkers say only counsel can settle remain open:
   (a) whether a non-EU developer whose system reaches the EU only through
   resellers or integrators is "placing on the market"; (b) whether the
   four-connection test is an acceptable organisation-level stand-in for
   Article 2(1); (c) the mapping from activities to roles; (d) the reused v2
-  propositions and scope reading; (e) an organisation that is a provider of one
-  system and connected to the EU only through another (the tool reads activities
-  and connections across the organisation, not system by system); (f) whether
-  "Part of a product covered by EU product-safety law" with "None of these"
-  should hold the verdict open rather than give "does not apply". These should
-  go to counsel together with the v2 review.
+  propositions and scope reading; (f) whether "Part of a product covered by EU
+  product-safety law" with "None of these" should hold the verdict open rather
+  than give "does not apply"; (g) whether "put into service in the EU" reaches a
+  deployer established outside the EU, as one "located" in the Union; (h)
+  whether a non-EU provider of a general-purpose AI model whose model reaches
+  the EU only inside a downstream provider's system has placed it on the Union
+  market; (i) whether deployers will read "The output of at least one is used
+  in the EU" as their own use. These should go to counsel together with the v2
+  review. Former item (e), an organisation that is a provider of one system and
+  connected to the EU only through another, is moot for the flat AI literacy
+  duty since round 4: the tool now shows that duty as flat only where some
+  connection reaches the reader whichever of its activities that system falls
+  under, and shows the conditional text otherwise.
+- Owner rulings, 16 November 2026: the question-form page title, H1 and Tools
+  card title stay; the name "Exposure Check" stays; the footer line "This check
+  has not been reviewed by a lawyer." stays.
 
 ## Boundaries
 
