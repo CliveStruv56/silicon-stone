@@ -9,6 +9,11 @@ import { getPersonaParam, getTierParam, getTopicParam } from './filters'
 // /analysis/* links) in the SSR HTML makes the hub crawlable and link-bearing
 // to bots and no-JS visitors, instead of an empty "Loading intelligence…" shell.
 //
+// Ordering and cap: the query returns the newest 60 and src/lib/intelligence-ranking.ts
+// does the ranking (featured = newest; panels = impact, with an age deduction).
+// It used to order by impact and keep 20, which would have dropped a fresh
+// low-impact article before the feed ever saw it. Keep all four copies in step.
+//
 // It does NOT require `defined(intelligenceTier)`. It did until 2026-08-21, and
 // because nothing on the hand-made Studio path sets a tier, an article could
 // publish cleanly, go live at /analysis/<slug>, reach the sitemap and the RSS
@@ -18,7 +23,7 @@ import { getPersonaParam, getTierParam, getTopicParam } from './filters'
 // one now raises a preflight warning instead; see src/lib/publish-preflight.ts.
 const BRIEFINGS_QUERY = `
   *[_type == "article" && !(_id in path("drafts.**")) && defined(slug.current)]
-  | order(coalesce(impactScore, 5) desc, coalesce(publishedAt, _updatedAt) desc) [0...20] {
+  | order(coalesce(publishedAt, _updatedAt) desc) [0...60] {
     _id,
     title,
     "slug": slug.current,
@@ -78,6 +83,7 @@ export default async function IntelligencePage({
   return (
     <IntelligenceFeed
       initialArticles={initialArticles}
+      renderedAt={new Date().toISOString()}
       series={series}
       initialFilters={{
         persona: getPersonaParam(first(params.persona)),

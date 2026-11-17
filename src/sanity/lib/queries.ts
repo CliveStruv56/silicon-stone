@@ -677,7 +677,7 @@ export const ARTICLES_BY_TIER_QUERY = defineQuery(`
 // and api/briefings/route.ts); change all three together.
 export const BRIEFINGS_QUERY = defineQuery(`
   *[_type == "article" && !(_id in path("drafts.**")) && defined(slug.current)]
-  | order(coalesce(impactScore, 5) desc, coalesce(publishedAt, _updatedAt) desc) {
+  | order(coalesce(publishedAt, _updatedAt) desc) {
     _id,
     title,
     "slug": slug.current,
