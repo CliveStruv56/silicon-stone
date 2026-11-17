@@ -15,10 +15,16 @@ function main() {
   assert.match(guardrail, /game-changer/, 'guardrail should ban the house hype words')
   assert.match(guardrail, /\[AUTHOR:/, 'guardrail should mandate [AUTHOR: …] placeholders over fabrication')
 
+  assert.match(guardrail, /first use in the article body/, 'guardrail should scope the first-use acronym rule to the article body')
+  assert.match(guardrail, /immediately followed by the acronym in parentheses/, 'guardrail should require Full Name (ACRONYM) on first use')
+
   const houseStyle = getHouseStyleRules()
   assert.ok(houseStyle.length > 500, 'house-style rules should be bundled and non-empty')
   assert.match(houseStyle, /UK English/, 'house-style should contain its UK English rule')
   assert.match(houseStyle, /Banned Words/i, 'house-style should contain the banned-words section')
+
+  assert.match(houseStyle, /Abbreviations \(Clive, 17 November 2026\)/, 'house-style should carry the abbreviation first-use rule')
+  assert.match(houseStyle, /full term followed by the abbreviation in round brackets/, 'house-style abbreviation rule should state the Full term (ABBR) form')
 
   const aiTells = getAITells()
   assert.ok(aiTells.length > 500, 'ai-tells reference should be bundled and non-empty')
