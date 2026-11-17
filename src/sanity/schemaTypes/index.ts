@@ -17,6 +17,7 @@ import { knowledgeItem } from './knowledgeItem'
 import { knowledgeTopic } from './knowledgeTopic'
 import { researchRun } from './researchRun'
 import { glossaryTerm } from './glossaryTerm'
+import { termsChange } from './termsChange'
 
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
@@ -39,5 +40,6 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     // Legacy. Nothing new writes one; the migration reads them.
     knowledgeCandidate,
     glossaryTerm,
+    termsChange,
   ],
 }
