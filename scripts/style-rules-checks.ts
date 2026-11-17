@@ -26,6 +26,8 @@ function main() {
   assert.match(houseStyle, /Abbreviations \(Clive, 17 November 2026\)/, 'house-style should carry the abbreviation first-use rule')
   assert.match(houseStyle, /full term followed by the abbreviation in round brackets/, 'house-style abbreviation rule should state the Full term (ABBR) form')
 
+  assert.match(houseStyle, /Only AI, EU, UK and US may appear unexpanded/, 'house-style abbreviation rule should exempt only AI, EU, UK and US')
+
   const aiTells = getAITells()
   assert.ok(aiTells.length > 500, 'ai-tells reference should be bundled and non-empty')
   assert.match(aiTells, /tapestry/, 'ai-tells should list the grand-register vocabulary')
