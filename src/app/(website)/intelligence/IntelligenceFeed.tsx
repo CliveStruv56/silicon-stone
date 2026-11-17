@@ -7,6 +7,7 @@ import { SlidersHorizontal } from 'lucide-react'
 import { Header, Footer } from '@/components/layout'
 import { Badge } from '@/components/ui/badge'
 import { BottomSheet } from '@/components/ui/BottomSheet'
+import { rankIntelligence } from '@/lib/intelligence-ranking'
 import { PersonaFilter } from '@/components/briefings/PersonaFilter'
 import { SeriesPromo } from '@/components/series/SeriesPromo'
 import type { SeriesPromoItem } from '@/lib/series'
@@ -368,12 +369,18 @@ export function IntelligenceFeed({
   initialArticles,
   series,
   initialFilters,
+  renderedAt,
 }: {
   initialArticles: Article[]
   series?: SeriesPromoItem[]
   initialFilters?: FeedFilters
+  /** When the server rendered, so the first client render ranks with the same clock. */
+  renderedAt?: string
 }) {
   const [articles, setArticles] = useState<Article[]>(initialArticles)
+  // "Now" for the two-month age rule. Seeded from the server so hydration
+  // matches; refreshed when the live list arrives (see fetchArticles).
+  const [now, setNow] = useState(() => (renderedAt ? new Date(renderedAt) : new Date()))
   const [loading, setLoading] = useState(initialArticles.length === 0)
   // Seeded from the URL server-side so filtered deep links SSR filtered (P1-5).
   const [selectedPersona, setSelectedPersona] = useState<string | null>(initialFilters?.persona ?? null)
@@ -408,6 +415,7 @@ export function IntelligenceFeed({
       try {
         const data = await fetchBriefings(briefingsUrl, controller.signal)
         const nextArticles = getBriefingArticles(data)
+        setNow(new Date())
 
         if (nextArticles?.length) {
           setArticles(nextArticles)
@@ -512,9 +520,15 @@ export function IntelligenceFeed({
 
   const activeFilterCount = [selectedTopic, selectedTier, selectedPersona].filter(Boolean).length
 
-  // Get featured article (highest impact or most recent)
-  const featuredArticle = filteredArticles[0]
-  const remainingArticles = filteredArticles.slice(1)
+  // Featured is the most recently published article; the panels beneath rank
+  // by impact score (3 off anything over two months old), then by date. See
+  // src/lib/intelligence-ranking.ts. Ranked here, after filtering, so the
+  // featured slot is the newest article that matches the active filters, and
+  // so the order holds whichever source (SSR, API route, backend) supplied the list.
+  const { featured: featuredArticle, panels: remainingArticles } = rankIntelligence(
+    filteredArticles,
+    now,
+  )
 
   // Calculate persona counts
   const personaCounts: Record<string, number> = {
