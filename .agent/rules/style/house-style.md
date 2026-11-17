@@ -2,7 +2,7 @@
 type: style
 scope: global
 canonical: true
-updated: 2026-06-08
+updated: 2026-11-17
 ---
 
 # House Style (canonical)
@@ -24,6 +24,7 @@ updated: 2026-06-08
 - **Headings & Rhythm**: Periods between short noun phrases in headlines (e.g., `AI. Policy. Power. Leadership.`). No rhetorical questions in headlines or subheads.
 - **Sentence & Paragraph Length**: Short, punchy, declarative sentences. Keep paragraphs concise and focused.
 - **Oxford Comma & Numerals**: [TODO — Oxford comma stance and numeral rules if you have preferences].
+- **Abbreviations (Clive, 17 November 2026)**: The first time an abbreviation is used in the body of an article, write the full term followed by the abbreviation in round brackets, e.g. "high-bandwidth memory (HBM)". After that, the abbreviation alone may be used for the rest of the article. Only AI, EU, UK and US may appear unexpanded. Headlines, titles, slugs and SEO metadata may use the abbreviation alone.
 - **Links & Citations**: Substantiate claims by linking to primary sources where possible. Cite retrieved work explicitly (e.g., note the source article when pulling from Pinecone). A claim with no source is an `[AUTHOR: source needed]` placeholder — never invent the figure, name, or quote.
 - **Formatting**:
   - Main markdown file layout requires: `# Title of the Article`, followed by `**Subject Line:**`, `**Preview Text:**`, then `## Article` for the body.
