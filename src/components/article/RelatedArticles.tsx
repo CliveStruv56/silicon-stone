@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
-import { CONTENT_TYPE_LABELS } from '@/lib/content-types'
+import { LABELS_WITH_YOUTUBE } from '@/lib/content-types'
 
 type Props = {
   articles?: Array<{
@@ -36,7 +36,7 @@ export function RelatedArticles({ articles }: Props) {
                   variant="outline"
                   className="text-xs text-text-muted border-text-muted/30"
                 >
-                  {CONTENT_TYPE_LABELS[article.contentType] ?? article.contentType}
+                  {LABELS_WITH_YOUTUBE[article.contentType] ?? article.contentType}
                 </Badge>
               )}
             </div>

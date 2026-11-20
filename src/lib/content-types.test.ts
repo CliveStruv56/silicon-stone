@@ -1,7 +1,13 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { CONTENT_TYPE_LABELS, PRACTICAL_MOVE_CONTENT_TYPE, contentTypeLabel } from './content-types'
+import {
+  CONTENT_TYPE_LABELS,
+  LABELS_WITH_YOUTUBE,
+  PRACTICAL_MOVE_CONTENT_TYPE,
+  badgeLabel,
+  contentTypeLabel,
+} from './content-types'
 import { contentTypeLabel as searchLabel } from './search/labels'
 
 describe('content type labels', () => {
@@ -12,7 +18,25 @@ describe('content type labels', () => {
   it('leaves the other types as they were', () => {
     expect(contentTypeLabel('signal')).toBe('Signal')
     expect(contentTypeLabel('deepdive')).toBe('Deep Dive')
-    expect(contentTypeLabel('youtube')).toBe('YouTube Script')
+  })
+  /**
+   * Pins what readers saw before the rename, for every type except guide.
+   * Search: no badge for youtube. Article page and cards: "Guide" for any
+   * stored type that is not signal, deepdive (or the renamed guide).
+   * Related list and admin: youtube named, unknown shows the raw value.
+   */
+  it('changes no reader-facing label for a non-guide type', () => {
+    expect(contentTypeLabel('youtube')).toBeNull()
+    expect(contentTypeLabel('mystery')).toBeNull()
+    expect(badgeLabel('signal')).toBe('Signal')
+    expect(badgeLabel('deepdive')).toBe('Deep Dive')
+    expect(badgeLabel('youtube')).toBe('Guide')
+    expect(badgeLabel('mystery')).toBe('Guide')
+    expect(badgeLabel(null)).toBeNull()
+    expect(LABELS_WITH_YOUTUBE.youtube).toBe('YouTube Script')
+    expect(LABELS_WITH_YOUTUBE.signal).toBe('Signal')
+    expect(LABELS_WITH_YOUTUBE.deepdive).toBe('Deep Dive')
+    expect(LABELS_WITH_YOUTUBE.mystery).toBeUndefined()
   })
   it('shows no badge for a missing or unknown type', () => {
     expect(contentTypeLabel(undefined)).toBeNull()
@@ -71,6 +95,6 @@ describe('no stray guide-label mapping', () => {
   })
 
   it('has the label table in one place', () => {
-    expect(Object.keys(CONTENT_TYPE_LABELS).sort()).toEqual(['deepdive', 'guide', 'signal', 'youtube'])
+    expect(Object.keys(CONTENT_TYPE_LABELS).sort()).toEqual(['deepdive', 'guide', 'signal'])
   })
 })

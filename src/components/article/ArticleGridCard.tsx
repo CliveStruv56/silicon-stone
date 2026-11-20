@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { urlFor } from '@/sanity/lib/image'
 import { formatDate } from '@/lib/format'
-import { contentTypeLabel } from '@/lib/content-types'
+import { badgeLabel } from '@/lib/content-types'
 
 export interface ArticleCardData {
   _id: string
@@ -63,12 +63,12 @@ export function ArticleGridCard({
               {category.title}
             </Badge>
           ))}
-          {contentTypeLabel(article.contentType) && (
+          {badgeLabel(article.contentType) && (
             <Badge
               variant="outline"
               className="text-text-muted border-text-muted/30 text-xs"
             >
-              {contentTypeLabel(article.contentType)}
+              {badgeLabel(article.contentType)}
             </Badge>
           )}
         </div>

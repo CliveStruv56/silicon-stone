@@ -2,7 +2,7 @@ import { defineType, defineField, defineArrayMember } from 'sanity'
 import { DocumentTextIcon } from '@sanity/icons'
 import { slugify } from '@/lib/utils'
 import { parseYouTubeId } from '@/lib/youtube'
-import { CONTENT_TYPE_LABELS } from '@/lib/content-types'
+import { badgeLabel } from '@/lib/content-types'
 import { COVERAGE_PLACEMENTS } from '@/lib/advisory/coverage-placement'
 import { ClaimCheckInput } from '../components/ClaimCheckInput'
 import { ImagePromptsInput } from '../components/ImagePromptsInput'
@@ -101,8 +101,14 @@ export const article = defineType({
         defineField({
           name: 'uploadedAt',
           title: 'Uploaded on YouTube',
-          description: 'Leave blank to use the article publish date.',
+          description:
+            'Required when a video is attached: the date it went up on YouTube. Search engines are told this date, so it is never guessed from the article date.',
           type: 'datetime',
+          validation: (rule) =>
+            rule.custom((value, context) => {
+              const url = (context.parent as { url?: string } | undefined)?.url
+              return url && !value ? 'Say when the video was uploaded to YouTube.' : true
+            }),
         }),
         defineField({
           name: 'durationSeconds',
@@ -845,7 +851,7 @@ export const article = defineType({
     },
     prepare(selection) {
       const { title, author, media, contentType, intelligenceTier, impactScore } = selection
-      const typeLabel = contentType === 'youtube' ? 'YouTube' : CONTENT_TYPE_LABELS[contentType] ?? 'Article'
+      const typeLabel = contentType === 'youtube' ? 'YouTube' : badgeLabel(contentType)
       const tierLabel = intelligenceTier ? ` [${intelligenceTier.toUpperCase()}]` : ''
       const scoreLabel = impactScore ? ` Impact: ${impactScore}/10` : ''
       return {

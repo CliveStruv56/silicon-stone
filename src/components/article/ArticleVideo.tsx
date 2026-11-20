@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { Play } from 'lucide-react'
 import { youTubeEmbedUrl, youTubeWatchUrl } from '@/lib/youtube'
@@ -19,18 +19,29 @@ export function ArticleVideo({
   videoId,
   title,
   posterUrl,
+  posterAlt = '',
 }: {
   videoId: string
   title: string
   posterUrl?: string | null
+  /** Alt text for the poster image. */
+  posterAlt?: string
 }) {
   const [playing, setPlaying] = useState(false)
+  const frameRef = useRef<HTMLIFrameElement>(null)
+
+  // The play button disappears when the player replaces it, so move focus to
+  // the player or keyboard and screen-reader users are dropped back on the page.
+  useEffect(() => {
+    if (playing) frameRef.current?.focus()
+  }, [playing])
 
   return (
     <figure className="mb-10" data-testid="article-video">
       <div className="relative aspect-video overflow-hidden rounded-lg bg-stone-charcoal">
         {playing ? (
           <iframe
+            ref={frameRef}
             className="absolute inset-0 h-full w-full"
             src={youTubeEmbedUrl(videoId, true)}
             title={title}
@@ -43,7 +54,7 @@ export function ArticleVideo({
             {posterUrl && (
               <Image
                 src={posterUrl}
-                alt=""
+                alt={posterAlt}
                 fill
                 priority
                 sizes="(min-width: 896px) 896px, 100vw"

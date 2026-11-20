@@ -29,6 +29,12 @@ describe('ArticleVideo before the reader presses play', () => {
     expect(html).toContain('aria-label="Play video: A video"')
     expect(html).toContain('Playing loads the video from YouTube')
   })
+  it('keeps the poster alt text', () => {
+    const withAlt = renderToStaticMarkup(
+      createElement(ArticleVideo, { videoId: 'dQw4w9WgXcQ', title: 'A video', posterUrl: 'https://cdn.sanity.io/images/3q59mpd7/production/p.jpg', posterAlt: 'A rack of chips' }),
+    )
+    expect(withAlt).toContain('alt="A rack of chips"')
+  })
   it('renders without a poster image too', () => {
     const bare = renderToStaticMarkup(createElement(ArticleVideo, { videoId: 'dQw4w9WgXcQ', title: 'A video' }))
     expect(bare).toContain('Play video')

@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { buildVideoSchema } from './seo'
 
@@ -8,6 +10,15 @@ const base = {
   uploadDate: '2026-11-20T09:00:00Z',
   pageUrl: 'https://www.siliconandstone.com/analysis/x',
 }
+
+describe('upload date', () => {
+  it('is never guessed from the article date on the page', () => {
+    const page = readFileSync(path.resolve(__dirname, '../app/(website)/analysis/[slug]/page.tsx'), 'utf8')
+    expect(page).toContain('uploadDate: article.video?.uploadedAt,')
+    expect(page).toContain('videoId && article.video?.uploadedAt')
+    expect(page).not.toMatch(/uploadDate:[^\n]*publishedAt/)
+  })
+})
 
 describe('buildVideoSchema', () => {
   it('carries every field Google requires for a VideoObject', () => {

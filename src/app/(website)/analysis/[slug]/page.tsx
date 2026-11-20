@@ -37,7 +37,7 @@ import {
   type GateProduct,
 } from '@/lib/gate'
 import { formatDate } from '@/lib/format'
-import { contentTypeLabel } from '@/lib/content-types'
+import { badgeLabel } from '@/lib/content-types'
 import { parseYouTubeId } from '@/lib/youtube'
 import { ArticleVideo } from '@/components/article/ArticleVideo'
 import {
@@ -412,7 +412,10 @@ export default async function ArticlePage({ params }: Props) {
   // YouTube video renders nothing and emits no structured data.
   const videoId = parseYouTubeId(article.video?.url)
   const videoTitle = article.video?.title || article.title
-  const videoSchema = videoId
+  // VideoObject only when the editor has said when the video was uploaded:
+  // guessing from the article date would tell search engines something false
+  // when a video is added to an older piece.
+  const videoSchema = videoId && article.video?.uploadedAt
     ? buildVideoSchema({
         videoId,
         name: videoTitle,
@@ -420,7 +423,7 @@ export default async function ArticlePage({ params }: Props) {
           article.video?.description ||
           cleanDescription(article.seo?.metaDescription || article.stoneTruth || article.excerpt) ||
           article.title,
-        uploadDate: article.video?.uploadedAt || article.publishedAt || article._updatedAt,
+        uploadDate: article.video?.uploadedAt,
         durationSeconds: article.video?.durationSeconds,
         thumbnailUrl: article.mainImage?.asset
           ? urlFor(article.mainImage).width(1200).height(675).url()
@@ -487,9 +490,9 @@ export default async function ArticlePage({ params }: Props) {
                 </Badge>
               </Link>
             ))}
-            {contentTypeLabel(article.contentType) && (
+            {badgeLabel(article.contentType) && (
               <Badge variant="outline" className="text-text-muted border-text-muted/30">
-                {contentTypeLabel(article.contentType)}
+                {badgeLabel(article.contentType)}
               </Badge>
             )}
           </div>
@@ -578,6 +581,7 @@ export default async function ArticlePage({ params }: Props) {
             <ArticleVideo
               videoId={videoId}
               title={videoTitle}
+              posterAlt={article.mainImage?.alt || article.title}
               posterUrl={
                 article.mainImage?.asset
                   ? urlFor(article.mainImage).width(1200).height(675).url()

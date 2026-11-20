@@ -46,7 +46,7 @@ const contentSecurityPolicy = [
   "font-src 'self' data:",
   // The article video slot embeds from YouTube's privacy-enhanced origin, and
   // only after the reader presses play (src/components/article/ArticleVideo.tsx).
-  "frame-src https://www.youtube-nocookie.com",
+  "frame-src 'self' https://www.youtube-nocookie.com",
   `connect-src ${connectSrc}`,
   "worker-src 'self' blob:",
   "upgrade-insecure-requests",

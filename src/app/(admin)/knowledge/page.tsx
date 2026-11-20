@@ -6,7 +6,7 @@ import { Search, ExternalLink, FileText, Video, BookOpen, Zap, Plus, RefreshCw }
 import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
 import { formatDate } from '@/lib/format'
-import { CONTENT_TYPE_LABELS } from '@/lib/content-types'
+import { LABELS_WITH_YOUTUBE } from '@/lib/content-types'
 
 type SemanticResult = {
   id: string
@@ -422,7 +422,7 @@ export default function KnowledgePage() {
                       <div className="flex items-center gap-2 mb-2 flex-wrap">
                         <Badge variant="secondary" className="flex items-center gap-1 text-xs">
                           <Icon className="w-3 h-3" />
-                          {CONTENT_TYPE_LABELS[result.contentType] ?? result.contentType}
+                          {LABELS_WITH_YOUTUBE[result.contentType] ?? result.contentType}
                         </Badge>
                         {result.intelligenceTier && <Badge variant="outline" className="text-xs">{result.intelligenceTier}</Badge>}
                         {result.impactScore > 0 && <span className="text-xs text-muted-foreground">Impact: {result.impactScore}/10</span>}

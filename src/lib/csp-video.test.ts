@@ -9,7 +9,8 @@ describe('Content-Security-Policy and the article video', () => {
   it('allows frames from the privacy-enhanced YouTube origin only', () => {
     const m = config.match(/"frame-src ([^"]+)"/)
     expect(m, 'frame-src directive not found').not.toBeNull()
-    expect(m![1].trim()).toBe('https://www.youtube-nocookie.com')
+    // 'self' keeps same-origin frames, which default-src allowed before.
+    expect(m![1].trim().split(/\s+/).sort()).toEqual(["'self'", 'https://www.youtube-nocookie.com'])
   })
   it('still forbids framing the site itself', () => {
     expect(config).toContain(`"frame-ancestors 'none'"`)
