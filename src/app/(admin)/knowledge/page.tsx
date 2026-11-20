@@ -6,6 +6,7 @@ import { Search, ExternalLink, FileText, Video, BookOpen, Zap, Plus, RefreshCw }
 import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
 import { formatDate } from '@/lib/format'
+import { CONTENT_TYPE_LABELS } from '@/lib/content-types'
 
 type SemanticResult = {
   id: string
@@ -58,12 +59,6 @@ type KnowledgeCandidate = {
   status: 'pending' | 'filed' | 'rejected'
 }
 
-const CONTENT_TYPE_LABELS: Record<string, string> = {
-  signal: 'Signal',
-  deepdive: 'Deep Dive',
-  guide: 'Guide',
-  youtube: 'YouTube Script',
-}
 
 const CONTENT_TYPE_ICONS: Record<string, React.ElementType> = {
   signal: Zap,

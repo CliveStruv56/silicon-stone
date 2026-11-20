@@ -44,6 +44,9 @@ const contentSecurityPolicy = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://cdn.sanity.io https://*.basemaps.cartocdn.com",
   "font-src 'self' data:",
+  // The article video slot embeds from YouTube's privacy-enhanced origin, and
+  // only after the reader presses play (src/components/article/ArticleVideo.tsx).
+  "frame-src https://www.youtube-nocookie.com",
   `connect-src ${connectSrc}`,
   "worker-src 'self' blob:",
   "upgrade-insecure-requests",

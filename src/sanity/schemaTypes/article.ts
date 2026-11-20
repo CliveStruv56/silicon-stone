@@ -1,6 +1,8 @@
 import { defineType, defineField, defineArrayMember } from 'sanity'
 import { DocumentTextIcon } from '@sanity/icons'
 import { slugify } from '@/lib/utils'
+import { parseYouTubeId } from '@/lib/youtube'
+import { CONTENT_TYPE_LABELS } from '@/lib/content-types'
 import { COVERAGE_PLACEMENTS } from '@/lib/advisory/coverage-placement'
 import { ClaimCheckInput } from '../components/ClaimCheckInput'
 import { ImagePromptsInput } from '../components/ImagePromptsInput'
@@ -66,6 +68,53 @@ export const article = defineType({
     }),
     defineField({
       group: 'content',
+      name: 'video',
+      title: 'YouTube video',
+      description:
+        'Optional. Shown above the article body, for any article type. Nothing is loaded from YouTube until the reader presses play, and a plain "Watch on YouTube" link is always shown. The fields below feed the page\'s VideoObject structured data.',
+      type: 'object',
+      fields: [
+        defineField({
+          name: 'url',
+          title: 'YouTube URL',
+          description: 'A youtube.com or youtu.be link to the video, for example https://www.youtube.com/watch?v=abcdefghijk',
+          type: 'url',
+          validation: (rule) =>
+            rule.custom((value) => {
+              if (!value) return true
+              return parseYouTubeId(value) ? true : 'Not a YouTube video link (watch, youtu.be, shorts, live or embed).'
+            }),
+        }),
+        defineField({
+          name: 'title',
+          title: 'Video title',
+          description: 'Leave blank to use the article title.',
+          type: 'string',
+        }),
+        defineField({
+          name: 'description',
+          title: 'Video description',
+          description: 'One or two sentences for search engines. Leave blank to use the article summary.',
+          type: 'text',
+          rows: 2,
+        }),
+        defineField({
+          name: 'uploadedAt',
+          title: 'Uploaded on YouTube',
+          description: 'Leave blank to use the article publish date.',
+          type: 'datetime',
+        }),
+        defineField({
+          name: 'durationSeconds',
+          title: 'Length (seconds)',
+          description: 'Optional, for example 245 for 4:05.',
+          type: 'number',
+          validation: (rule) => rule.integer().min(1),
+        }),
+      ],
+    }),
+    defineField({
+      group: 'content',
       name: 'imagePrompts',
       title: 'Image generation prompts',
       description:
@@ -123,7 +172,7 @@ export const article = defineType({
         list: [
           { title: 'Signal (Breaking Analysis)', value: 'signal' },
           { title: 'Deep Dive (Long-form)', value: 'deepdive' },
-          { title: 'Tool Guide', value: 'guide' },
+          { title: 'Practical Move (Friday action piece)', value: 'guide' },
           { title: 'YouTube Script', value: 'youtube' },
         ],
         layout: 'radio',
@@ -796,7 +845,7 @@ export const article = defineType({
     },
     prepare(selection) {
       const { title, author, media, contentType, intelligenceTier, impactScore } = selection
-      const typeLabel = contentType === 'deepdive' ? 'Deep Dive' : contentType === 'signal' ? 'Signal' : contentType === 'youtube' ? 'YouTube' : 'Guide'
+      const typeLabel = contentType === 'youtube' ? 'YouTube' : CONTENT_TYPE_LABELS[contentType] ?? 'Article'
       const tierLabel = intelligenceTier ? ` [${intelligenceTier.toUpperCase()}]` : ''
       const scoreLabel = impactScore ? ` Impact: ${impactScore}/10` : ''
       return {

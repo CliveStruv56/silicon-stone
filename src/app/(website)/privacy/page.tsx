@@ -182,6 +182,13 @@ export default function PrivacyPage() {
                 authentication for the admin area). We do not use tracking cookies, advertising
                 cookies, or third-party cookies for analytics.
               </p>
+              <p className="text-text-muted leading-relaxed mt-3">
+                Some articles carry a YouTube video. Nothing is requested from YouTube or Google
+                until you press play. If you do, the video loads from YouTube&apos;s
+                privacy-enhanced domain (youtube-nocookie.com) and YouTube may set cookies or
+                collect data under its own policy. Each video also has a plain link to watch it on
+                YouTube instead.
+              </p>
             </div>
 
             <div>

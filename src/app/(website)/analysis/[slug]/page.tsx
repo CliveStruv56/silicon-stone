@@ -37,6 +37,9 @@ import {
   type GateProduct,
 } from '@/lib/gate'
 import { formatDate } from '@/lib/format'
+import { contentTypeLabel } from '@/lib/content-types'
+import { parseYouTubeId } from '@/lib/youtube'
+import { ArticleVideo } from '@/components/article/ArticleVideo'
 import {
   neighboursFor,
   partNumberFor,
@@ -52,6 +55,7 @@ import { SectorReportPromotion } from '@/components/products/SectorReportPromoti
 import {
   buildArticleSchema,
   buildBreadcrumbSchema,
+  buildVideoSchema,
   cleanDescription,
   completeSentence,
 } from '@/lib/seo'
@@ -404,13 +408,38 @@ export default async function ArticlePage({ params }: Props) {
     series: series ? { title: series.title, slug: series.slug } : null,
   }
 
+  // Optional YouTube video (any article type). A URL that does not parse as a
+  // YouTube video renders nothing and emits no structured data.
+  const videoId = parseYouTubeId(article.video?.url)
+  const videoTitle = article.video?.title || article.title
+  const videoSchema = videoId
+    ? buildVideoSchema({
+        videoId,
+        name: videoTitle,
+        description:
+          article.video?.description ||
+          cleanDescription(article.seo?.metaDescription || article.stoneTruth || article.excerpt) ||
+          article.title,
+        uploadDate: article.video?.uploadedAt || article.publishedAt || article._updatedAt,
+        durationSeconds: article.video?.durationSeconds,
+        thumbnailUrl: article.mainImage?.asset
+          ? urlFor(article.mainImage).width(1200).height(675).url()
+          : null,
+        pageUrl: absoluteUrl(`/analysis/${article.slug}`),
+      })
+    : null
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
       <ReadingProgress />
 
       <JsonLd
-        data={[buildArticleSchema(schemaInput), buildBreadcrumbSchema(schemaInput)]}
+        data={[
+          buildArticleSchema(schemaInput),
+          buildBreadcrumbSchema(schemaInput),
+          ...(videoSchema ? [videoSchema] : []),
+        ]}
       />
 
       <main className="flex-1">
@@ -458,10 +487,9 @@ export default async function ArticlePage({ params }: Props) {
                 </Badge>
               </Link>
             ))}
-            {article.contentType && (
+            {contentTypeLabel(article.contentType) && (
               <Badge variant="outline" className="text-text-muted border-text-muted/30">
-                {article.contentType === 'deepdive' ? 'Deep Dive' :
-                 article.contentType === 'signal' ? 'Signal' : 'Guide'}
+                {contentTypeLabel(article.contentType)}
               </Badge>
             )}
           </div>
@@ -530,8 +558,9 @@ export default async function ArticlePage({ params }: Props) {
             )}
           </div>
 
-          {/* Main Image */}
-          {article.mainImage?.asset && (
+          {/* Main Image. With a video, the same image becomes its poster below
+              rather than showing twice. */}
+          {article.mainImage?.asset && !videoId && (
             <div className="relative aspect-[16/9] rounded-lg overflow-hidden mb-10 bg-stone-charcoal">
               <Image
                 src={urlFor(article.mainImage).width(1200).height(675).url()}
@@ -541,6 +570,20 @@ export default async function ArticlePage({ params }: Props) {
                 className="object-cover"
               />
             </div>
+          )}
+
+          {/* Video — optional, any article type; sits where the main image would. Click-to-load: nothing is
+              requested from YouTube until the reader presses play. */}
+          {videoId && (
+            <ArticleVideo
+              videoId={videoId}
+              title={videoTitle}
+              posterUrl={
+                article.mainImage?.asset
+                  ? urlFor(article.mainImage).width(1200).height(675).url()
+                  : null
+              }
+            />
           )}
 
           {/* Excerpt — always rendered as a complete sentence, never mid-word. */}

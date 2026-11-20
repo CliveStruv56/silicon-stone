@@ -20,12 +20,4 @@ export type ResultLabelKind = keyof typeof RESULT_LABELS
  * ("signal", "deepdive"); a key with no entry here renders no badge rather
  * than the raw value.
  */
-export const CONTENT_TYPE_LABELS: Record<string, string> = {
-  signal: 'Signal',
-  deepdive: 'Deep Dive',
-  guide: 'Guide',
-}
-
-export function contentTypeLabel(contentType: string | null | undefined): string | null {
-  return (contentType && CONTENT_TYPE_LABELS[contentType]) || null
-}
+export { CONTENT_TYPE_LABELS, contentTypeLabel } from '@/lib/content-types'

@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { urlFor } from '@/sanity/lib/image'
 import { formatDate } from '@/lib/format'
+import { contentTypeLabel } from '@/lib/content-types'
 
 export interface ArticleCardData {
   _id: string
@@ -17,9 +18,6 @@ export interface ArticleCardData {
   author?: { name: string; image?: unknown }
 }
 
-function contentTypeLabel(type: string): string {
-  return type === 'deepdive' ? 'Deep Dive' : type === 'signal' ? 'Signal' : 'Guide'
-}
 
 /**
  * The image-topped article card used by the Analysis index and category pages
@@ -65,7 +63,7 @@ export function ArticleGridCard({
               {category.title}
             </Badge>
           ))}
-          {article.contentType && (
+          {contentTypeLabel(article.contentType) && (
             <Badge
               variant="outline"
               className="text-text-muted border-text-muted/30 text-xs"

@@ -256,7 +256,8 @@ export function HeroSection({ settings }: HeroSectionProps) {
                             className="mt-10 font-mono text-xs uppercase tracking-[0.10em] text-white/65 flex items-center gap-2"
                         >
                             <span className="text-[#8fcbc4]" aria-hidden="true">●</span>
-                            Two briefings a week · Tuesday Stone Briefing · Friday Practical Move
+                            Two briefings a week · Tuesday Stone Briefing · Friday{' '}
+                            <Link href="/practical-move" className="underline underline-offset-4 hover:text-silicon-amber-strong">Practical Move</Link>
                         </motion.p>
                     </div>
                 </div>

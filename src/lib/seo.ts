@@ -1,6 +1,7 @@
 import { SITE_URL, absoluteUrl } from '@/lib/site'
 import type { GlossaryTerm } from '@/lib/glossary'
 import { gbp, type Offering } from '@/lib/offering'
+import { isoDuration, youTubeEmbedUrl, youTubeThumbnailUrl, youTubeWatchUrl } from '@/lib/youtube'
 
 /**
  * Schema.org builders for article pages. Pure functions over the article query
@@ -455,4 +456,40 @@ export function buildGlossaryTermBreadcrumbSchema(term: { name: string; slug: st
     { name: 'Glossary', path: '/glossary' },
     { name: term.name, path: `/glossary/${term.slug}` },
   ])
+}
+
+export type SchemaVideo = {
+  videoId: string
+  name: string
+  description: string
+  uploadDate?: string | null
+  durationSeconds?: number | null
+  /** An image of ours (Sanity) when there is one; the YouTube thumbnail is always added. */
+  thumbnailUrl?: string | null
+  /** The article page the video appears on. */
+  pageUrl: string
+}
+
+/**
+ * VideoObject for the article video slot. embedUrl is the privacy-enhanced
+ * embed; contentUrl is the public watch page. thumbnailUrl is structured data
+ * only (crawlers fetch it) -- the page itself never loads a YouTube image.
+ * Google requires name, description, thumbnailUrl and uploadDate, so each is
+ * always present.
+ */
+export function buildVideoSchema(v: SchemaVideo) {
+  const duration = isoDuration(v.durationSeconds)
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'VideoObject',
+    name: v.name,
+    description: v.description,
+    thumbnailUrl: [...(v.thumbnailUrl ? [v.thumbnailUrl] : []), youTubeThumbnailUrl(v.videoId)],
+    ...(v.uploadDate ? { uploadDate: v.uploadDate } : {}),
+    ...(duration ? { duration } : {}),
+    contentUrl: youTubeWatchUrl(v.videoId),
+    embedUrl: youTubeEmbedUrl(v.videoId),
+    mainEntityOfPage: { '@type': 'WebPage', '@id': v.pageUrl },
+    publisher: { '@id': `${SITE_URL}/#organization` },
+  }
 }

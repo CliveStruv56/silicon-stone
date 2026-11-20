@@ -281,7 +281,7 @@ export default function AtlanticDriftPage() {
               </p>
               <p className="mb-6 max-w-2xl leading-relaxed text-text-muted">
                 Tuesday: the Stone Briefing — structural analysis of the AI power shift.
-                Friday: the Practical Move — what to do about it. Unsubscribe at any
+                Friday: the <Link href="/practical-move" className="underline underline-offset-4 hover:text-silicon-amber-strong">Practical Move</Link> — what to do about it. Unsubscribe at any
                 time.
               </p>
 

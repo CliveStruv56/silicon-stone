@@ -27,7 +27,7 @@ export interface ContentStats {
 export const CONTENT_TYPE_LABELS: Record<string, string> = {
     signal: "Signals",
     deepdive: "Deep Dives",
-    guide: "Tool Guides",
+    guide: "Practical Moves",
     youtube: "YouTube (article)",
 };
 
