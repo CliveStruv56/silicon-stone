@@ -22,6 +22,25 @@ interface IntelligenceTiersProps {
   auditArticle: Article | null
 }
 
+/** Renders tier copy with the name "Practical Move" linked to its index. */
+function withPracticalMoveLink(text: string) {
+  const parts = text.split('Practical Move')
+  return parts.flatMap((part, i) =>
+    i === 0
+      ? [part]
+      : [
+          <Link
+            key={i}
+            href="/practical-move"
+            className="underline underline-offset-4 hover:text-silicon-amber-strong"
+          >
+            Practical Move
+          </Link>,
+          part,
+        ],
+  )
+}
+
 type TierKey = 'pulse' | 'briefing' | 'audit'
 
 interface Tier {
@@ -161,7 +180,7 @@ export function IntelligenceTiers({
                     </h3>
 
                     <p className="text-sm text-text-muted leading-relaxed mb-6">
-                      {tier.description}
+                      {withPracticalMoveLink(tier.description)}
                     </p>
 
                     <div className="border-t border-border-subtle pt-4 mt-auto">

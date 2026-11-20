@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
+import { LABELS_WITH_YOUTUBE } from '@/lib/content-types'
 
 type Props = {
   articles?: Array<{
@@ -11,12 +12,6 @@ type Props = {
   }> | null
 }
 
-const CONTENT_TYPE_LABELS: Record<string, string> = {
-  signal: 'Signal',
-  deepdive: 'Deep Dive',
-  guide: 'Guide',
-  youtube: 'YouTube Script',
-}
 
 export function RelatedArticles({ articles }: Props) {
   const topThree = (articles ?? []).filter((article) => article.slug && article.title).slice(0, 3)
@@ -41,7 +36,7 @@ export function RelatedArticles({ articles }: Props) {
                   variant="outline"
                   className="text-xs text-text-muted border-text-muted/30"
                 >
-                  {CONTENT_TYPE_LABELS[article.contentType] ?? article.contentType}
+                  {LABELS_WITH_YOUTUBE[article.contentType] ?? article.contentType}
                 </Badge>
               )}
             </div>

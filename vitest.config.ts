@@ -7,6 +7,8 @@ export default defineConfig({
       '@': path.resolve(__dirname, 'src'),
     },
   },
+  // Lets component tests render .tsx without a Next build.
+  esbuild: { jsx: 'automatic' },
   test: {
     include: ['src/**/*.test.ts'],
     environment: 'node',

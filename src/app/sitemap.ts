@@ -30,6 +30,8 @@ const STATIC_ROUTES: Array<{
   { path: '/intelligence', changeFrequency: 'daily', priority: 0.9 },
   // The series library. Individual series are enumerated below, like articles.
   { path: '/intelligence/series', changeFrequency: 'weekly', priority: 0.7 },
+  // The Friday Practical Move index (articles with contentType "guide").
+  { path: '/practical-move', changeFrequency: 'weekly', priority: 0.7 },
   { path: '/about', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/methodology', changeFrequency: 'monthly', priority: 0.7 },
   // The offerings map — one page spanning tools, products and advisory.

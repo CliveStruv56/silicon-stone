@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -79,7 +80,7 @@ export function SubscribeCTA() {
           {' '}The AI View, a separate newsletter.
           <br />
           <strong className="text-silicon-amber-strong font-medium">Friday:</strong>
-          {' '}the Practical Move — what to do about it.
+          {' '}the <Link href="/practical-move" className="underline underline-offset-4 hover:text-silicon-amber-strong">Practical Move</Link> — what to do about it.
         </p>
 
         <div className="my-8 max-w-xl mx-auto text-center">

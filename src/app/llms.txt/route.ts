@@ -29,6 +29,7 @@ const CORE_PAGES: Array<{ title: string; path: string; note: string }> = [
   // The one surface that carries reading ORDER rather than facets, which is
   // exactly what a citing engine cannot infer from the archive on its own.
   { title: 'Series', path: '/intelligence/series', note: 'Ordered reading paths — the analysis in the sequence the argument was built, not by date or impact.' },
+  { title: 'Practical Move', path: '/practical-move', note: 'The Friday action piece: what to do about it. Newest first.' },
   { title: 'Glossary', path: '/glossary', note: 'Defined terms across AI regulation, semiconductor supply chains and digital sovereignty.' },
   { title: 'Interactive tools', path: '/tools', note: 'AI Act compliance checker, supply-chain mapper, policy stress-test, scenario modeler.' },
   { title: 'EU AI Act FAQ', path: '/tools/compliance-checker/faq', note: 'Scope for non-EU companies, provider or deployer, post-Omnibus high-risk dates, penalties — each answer quotes the consolidated statute verbatim.' },

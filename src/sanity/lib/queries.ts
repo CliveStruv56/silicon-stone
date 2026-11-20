@@ -29,6 +29,31 @@ export const ARTICLES_QUERY = defineQuery(`
   }
 `)
 
+// The Practical Move index: published articles stored as contentType "guide",
+// newest first. `guide` is the stored value; readers see "Practical Move"
+// (src/lib/content-types.ts).
+export const PRACTICAL_MOVES_QUERY = defineQuery(`
+  *[_type == "article" && contentType == "guide" && defined(slug.current) && !(_id in path("drafts.**"))]
+  | order(coalesce(publishedAt, _updatedAt) desc) [0...100] {
+    _id,
+    title,
+    "slug": slug.current,
+    excerpt,
+    publishedAt,
+    contentType,
+    mainImage,
+    categories[]->{
+      _id,
+      title,
+      "slug": slug.current
+    },
+    author->{
+      name,
+      image
+    }
+  }
+`)
+
 export const FEATURED_ARTICLES_QUERY = defineQuery(`
   *[_type == "article" && defined(slug.current)] | order(coalesce(publishedAt, _updatedAt) desc) [0...7] {
     _id,
@@ -67,6 +92,7 @@ export const ARTICLE_QUERY = defineQuery(`
     methodologyPillars,
     actionableInsights,
     mainImage,
+    video{ url, title, description, uploadedAt, durationSeconds },
     body[]{
       ...,
       markDefs[]{
