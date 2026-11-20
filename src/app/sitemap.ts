@@ -59,6 +59,7 @@ const STATIC_ROUTES: Array<{
   { path: '/products/ai-act-toolkit', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/products/sector-reports', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/tools', changeFrequency: 'monthly', priority: 0.6 },
+  { path: '/tools/exposure-check', changeFrequency: 'monthly', priority: 0.5 },
   { path: '/tools/compliance-checker', changeFrequency: 'monthly', priority: 0.5 },
   // Index of the pinned AI Act provisions. The 19 Article pages beneath it are
   // generated below from the pack manifest rather than listed here.

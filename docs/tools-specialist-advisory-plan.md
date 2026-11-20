@@ -30,6 +30,131 @@ Further investigation is optional and separately scoped.
 5. Run catalogue/advisory checks, lint and typecheck, then verify desktop/mobile
    presentation and the local Tools → Checker → Briefing enquiry journey.
 
+## Decision, 16 November 2026: a fifth tool
+
+The owner decided to release the EU AI Act Exposure Check at
+`/tools/exposure-check` as a fifth free tool. This sets aside "Keep four tools"
+in step 2 above, for this tool only; the rest of that step and the boundaries
+below are unchanged. The reasoning: the Exposure Check answers the
+organisation-level question ("does the Act reach us at all?") before the
+Compliance Checker's per-system one, so it feeds the first commercial focus
+(Checker → Advisory Briefing) rather than competing with it. Its follow-on is
+the Advisory Briefing, through `TOOL_JOURNEYS`, with the Exposure Diagnostic
+offered beneath it only when the answers show the organisation does not know
+what AI it has or has many systems. It sits first in the Tools navigation and
+the Tools page. Release still waits on the independent fact-check and
+brand-voice check of its legal content and the owner's review of the preview.
+
+### Released ahead of counsel review (owner decision, 16 November 2026) (superseded by the parking decision below)
+
+The owner decided to release the Exposure Check ahead of counsel review. What
+that means:
+
+- The tool reuses the scope and organisation-size logic and five questions from
+  Compliance Checker v2. v2's statements of law remain marked "Not reviewed by
+  counsel" (`docs/compliance-checker-v2-state.md` §22.4), and v2's own release
+  stays blocked on that review. **This decision covers the Exposure Check only;
+  it does not unblock Checker v2.**
+- The Exposure Check's release rests on the automated rule-pack checks (the
+  pinned-corpus extract test, the timeline-date test and the build gates) and on
+  the independent publication fact-check, check ID
+  `fc-2026-11-16-exposure-check`. That check failed first time, including on two
+  false "does not apply" results (an importer, and a group established in more
+  than one place); both were fixed in the second round on 16 November 2026. The
+  re-check (`fc-2026-11-16-exposure-check-r2`) failed a second time on narrower
+  false "does not apply" routes (a "not sure" on the activity question, and a
+  provider of a general-purpose AI model, which the EU connection question did
+  not ask about), plus wording that overstated whom Article 4 binds; all were
+  fixed in the third round the same day. Round 3
+  (`fc-2026-11-16-exposure-check-r3`) found no false "does not apply" in
+  153,216 combinations, but failed on over-inclusive results running the other
+  way: "applies" at High for a non-EU organisation whose only EU connection was
+  its supplier's placing on the market, a flat AI literacy "Owed" that depended
+  on which system each connection belonged to, "contradict" and "likely" shown
+  to EU organisations whose answers did not support them, an Article 50(4)
+  exception missing one of its two conditions, and two date-dependent sentences
+  that would go stale. All were fixed in the fourth round the same day.
+  Round 4 (`fc-2026-11-16-exposure-check-r4`) again found no false "does not
+  apply", but failed because round 3's rule for when "applies" is supported was
+  itself wrong: the answers describe all of an organisation's systems together,
+  so a connection may belong to a system the Act does not reach the reader
+  through (for example a vendor's assistant the reader only uses), and "put into
+  service in the EU" is the supplier's act, not a deployer's. Round 5 states one
+  rule, `reachedWhicheverSystem()`: "applies" needs the reader's own use from an
+  EU establishment, its own import, an EU-established deployer, or a connection
+  that reaches the reader whichever ticked activity its system falls under; the
+  AI literacy duty uses the role-specific part of the same rule. Where it does
+  not hold, the verdict is "cannot yet tell" (4,633 of 38,080 combinations moved
+  from "applies"; nothing else moved). Three wording faults were fixed with it:
+  a reason that said "leave open whether you have a connection" beside a ticked
+  connection, a contradiction claimed with no contradiction named (EU, "None of
+  these", import), and an establishment "not sure" line that told builders and
+  resellers an EU establishment would bring them within the Act. This was the
+  last round Clive approved: if round 5 fails, the tool is parked. The check
+  must pass on re-check before merge.
+- Round 5 (publication fact-check of `8a9640bb`, `fc-2026-11-16-exposure-check-r5`)
+  failed on 16 November 2026. Report: BusinessManager
+  `shared/drafts/2026-11-16-ss-exposure-check-publication-factcheck-r5.md`. All
+  four round-four fixes were confirmed in place, and there is still no false
+  "does not apply". Three unsupported "applies" classes remain:
+  - R5-1: an EU-based provider whose only connection is "output used in the EU"
+    is told the Act applies. Article 2(1)(c) reaches only providers in third
+    countries.
+  - R5-2: general-purpose AI models. A model's provider is reached only by
+    placing the model on the market (Article 2(1)(a)). Article 4 binds providers
+    and deployers of AI systems, not models, but the engine and its test oracle
+    assume otherwise.
+  - R5-3: "We built at least one" is treated as provider status, but Article
+    3(3) requires placing on the market or putting into service under the
+    organisation's own name.
+  Scale, per the checker: 2,428 of 60,928 answer combinations show an
+  unsupported "applies", and 2,484 an unsupported AI literacy "Owed".
+- Status, from the owner's decision of 16 November 2026: **Parked for counsel.**
+  One final round was approved on the condition that the tool is parked if it
+  failed, and round 5 failed. PR #27 stays unmerged. There are no further fix
+  rounds without the owner's say-so.
+- The round-five checker left a prototype fix, described in the round-five
+  report and not applied: one function in `engine.ts` for R5-1 and R5-2, and a
+  reworded "built" option label for R5-3: "We built at least one, or had one
+  built for us, and offer it under our own name or use it ourselves". The label
+  would need a brand-voice check before use.
+- The page and the Markdown export say "This check has not been reviewed by a
+  lawyer."
+- Ten points the fact-checkers say only counsel can settle remain open:
+  (a) whether a non-EU developer whose system reaches the EU only through
+  resellers or integrators is "placing on the market"; (b) whether the
+  four-connection test is an acceptable organisation-level stand-in for
+  Article 2(1); (c) the mapping from activities to roles; (d) the reused v2
+  propositions and scope reading; (f) whether "Part of a product covered by EU
+  product-safety law" with "None of these" should hold the verdict open rather
+  than give "does not apply"; (g) whether "put into service in the EU" reaches a
+  deployer established outside the EU, as one "located" in the Union; (h)
+  whether a non-EU provider of a general-purpose AI model whose model reaches
+  the EU only inside a downstream provider's system has placed it on the Union
+  market; (i) whether deployers will read "The output of at least one is used
+  in the EU" as their own use; (j) whether an organisation established in the
+  EU that provides a system whose only connection is that its output is used in
+  the EU is reached through Article 2(1)(c), which names providers in third
+  countries (the tool shows that provider a flat AI literacy duty). Round 5
+  confirmed this as fault R5-1. Item (c)
+  also covers whether "We import at least one into the EU", ticked by an
+  organisation outside the EU, is its own placing on the market (the tool treats
+  it as bringing the organisation within the Act). It also covers the Article
+  3(3) reading behind R5-3: whether "We built at least one" makes an
+  organisation a provider when Article 3(3) requires placing on the market or
+  putting into service under its own name. (k) whether a general-purpose AI
+  model's provider can be reached other than by placing the model on the market,
+  and whether Article 4 reaches model providers at all (R5-2). Since round 5, item (g) can
+  only affect a "cannot yet tell" result, never a flat duty. These should go to
+  counsel together with the v2 review. Former item (e), an organisation that is a provider of one system and
+  connected to the EU only through another, is moot for the flat AI literacy
+  duty since round 4: the tool now shows that duty as flat only where some
+  connection reaches the reader whichever of its activities that system falls
+  under, and shows the conditional text otherwise.
+- Owner rulings, 16 November 2026: the question-form page title, H1 and Tools
+  card title stay; the name "Exposure Check" stays; the footer line "This check
+  has not been reviewed by a lawyer." stays.
+
 ## Boundaries
 
 No new products, prices, checkout, document uploads, automatic transfer of
