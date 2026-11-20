@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Header, Footer } from '@/components/layout'
@@ -29,6 +29,8 @@ import {
 } from '@/lib/scenario-data'
 import { scenarioModelerMarkdown, scenarioCompareMarkdown } from '@/lib/tools-markdown'
 import { offeringById } from '@/lib/offering'
+import { trackToolComplete, trackToolStart } from '@/lib/tool-analytics'
+import { useSeenOnce } from '@/components/tools/useSeenOnce'
 import type { ExposureProfile, Scenario, SectorImpact } from '@/types/scenario'
 import {
   AlertTriangle,
@@ -293,14 +295,41 @@ function useScenarioDerived(scenarioId: string | null, profile: ExposureProfile)
 }
 
 export default function ScenarioModelerPage() {
-  const [selectedScenarioId, setSelectedScenarioId] = useState(SCENARIOS[0].id)
-  const [compareScenarioId, setCompareScenarioId] = useState<string | null>(null)
-  const [exposureProfile, setExposureProfile] = useState<ExposureProfile>(DEFAULT_EXPOSURE_PROFILE)
+  const [selectedScenarioId, setSelectedScenarioIdState] = useState(SCENARIOS[0].id)
+  const [compareScenarioId, setCompareScenarioIdState] = useState<string | null>(null)
+  const [exposureProfile, setExposureProfileState] = useState<ExposureProfile>(DEFAULT_EXPOSURE_PROFILE)
+
+  /*
+   * Funnel analytics. The result is on screen from the first paint, so a page
+   * load is not a result: Start is the first change of scenario, comparison,
+   * lens or preset, and Complete is the reader then reaching the board brief.
+   * Every input setter goes through `markStarted`, so a new control cannot be
+   * added without it unless someone bypasses these three wrappers.
+   */
+  const [started, setStarted] = useState(false)
+  const markStarted = () => {
+    trackToolStart('scenario-modeler')
+    setStarted(true)
+  }
+  const setSelectedScenarioId = (id: string) => {
+    markStarted()
+    setSelectedScenarioIdState(id)
+  }
+  const setCompareScenarioId = (id: string | null) => {
+    markStarted()
+    setCompareScenarioIdState(id)
+  }
+  const setExposureProfile: typeof setExposureProfileState = (next) => {
+    markStarted()
+    setExposureProfileState(next)
+  }
 
   const primary = useScenarioDerived(selectedScenarioId, exposureProfile)
   const secondary = useScenarioDerived(compareScenarioId, exposureProfile)
 
   const selectedScenario = primary.scenario ?? SCENARIOS[0]
+  // The scenario id the reader is looking at when the brief comes into view.
+  const briefRef = useSeenOnce(started, () => trackToolComplete('scenario-modeler', selectedScenario.id))
   const exposureMultiplier = primary.exposureMultiplier
   const exposureBand = primary.exposureBand
   const adjustedImpacts = primary.adjustedImpacts
@@ -739,7 +768,7 @@ export default function ScenarioModelerPage() {
               </div>
 
               {/* Board Brief */}
-              <Card id="brief" className="scroll-mt-24 bg-stone-charcoal border-border-subtle">
+              <Card id="brief" ref={briefRef} className="scroll-mt-24 bg-stone-charcoal border-border-subtle">
                 <CardHeader>
                   <CardTitle className="text-lg text-text-primary flex items-center gap-2">
                     <BriefcaseBusiness className="w-5 h-5 text-silicon-amber-strong" />

@@ -539,3 +539,25 @@ pages on 2026-08-11. It was stale (four pages said 30 June, `/eu-exposure` said
 `Early Access Request` · `Tool Results Subscribe` · `EU Exposure Signup`
 (existing goals unchanged; create these in Plausible if you want them tracked —
 names are exact, with spaces).
+
+**Tool funnel goals (added 2026-11-16, `src/lib/tool-analytics.ts`).** Create
+these four Custom Event goals, names exact with spaces, then add `tool` and
+`result` as custom properties so the breakdown shows them:
+
+- `Tool Start` — props `tool` (slug: `compliance-checker`,
+  `compliance-checker-v2`, `supply-chain-mapper`, `scenario-modeler`,
+  `policy-stress-test`, `exposure-check`). Once per browser session per tool,
+  on the first answer or input change, never on page load.
+- `Tool Complete` — props `tool`, `result` (the Checker's risk tier, the v2
+  classification enum, the Stress-Test's friction band, the Modeler's and
+  Mapper's scenario id). Once per session per tool. For the Modeler and Mapper,
+  whose result is on screen from the first paint, it fires when a reader who
+  has changed an input scrolls to the board brief / Exposure Report Snapshot.
+- `Tool Result Saved` — props `tool`. Every saved Checker result link.
+- `Tool PDF Download` — props `tool`. Every PDF download from the Checker.
+
+Completion rate is unique visitors on `Tool Complete` over `Tool Start`,
+filtered by `tool`. Existing tool goals are unchanged, and note their `tool`
+prop is not uniform: `Tool Results Subscribe` sends the slug, while
+`Tool Email Gate`, `Tool Copy Markdown` and `Tool Download Markdown` send the
+display name ("Compliance Checker").
