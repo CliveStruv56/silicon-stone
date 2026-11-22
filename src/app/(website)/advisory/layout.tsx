@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 // Leads with the Advisory Briefing because the hub's hero does: a searcher
 // promised one product must not land on a page whose callout names another.
 const description =
-  'Independent AI and technopolitical advisory: an Advisory Briefing, broader assessments, an ongoing retainer and five standalone specialist projects. Agree the scope after a free conversation.'
+  'Independent AI and technopolitical advisory: an Advisory Briefing, broader assessments, an ongoing retainer and four standalone specialist projects. Agree the scope after a free conversation.'
 
 export const metadata: Metadata = {
   title: 'Independent AI & Technopolitical Advisory | Silicon and Stone',
