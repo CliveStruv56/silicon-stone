@@ -26,6 +26,7 @@ import {
 } from '@/lib/policy-data'
 import { policyStressTestMarkdown } from '@/lib/tools-markdown'
 import { offeringById } from '@/lib/offering'
+import { trackToolComplete, trackToolStart } from '@/lib/tool-analytics'
 import type { Policy, Jurisdiction, IndustryImpact } from '@/types/policy'
 import {
   Scale,
@@ -401,6 +402,7 @@ export default function PolicyStressTestPage() {
   )
 
   const loadExample = (example: (typeof EXAMPLE_PAIRS)[number]) => {
+    trackToolStart('policy-stress-test')
     setSelectedIndustry(example.industry)
     setSelectedEuPolicy(example.eu)
     setSelectedUsPolicy(example.us)
@@ -414,6 +416,12 @@ export default function PolicyStressTestPage() {
   useEffect(() => {
     if (showResults) resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }, [showResults])
+
+  // The band label only (four fixed values), the first time a brief is shown.
+  const shownBand = showResults && selectedIndustry ? frictionBand.label : null
+  useEffect(() => {
+    if (shownBand) trackToolComplete('policy-stress-test', shownBand)
+  }, [shownBand])
 
   const handleAnalyze = () => {
     if (selectedIndustry) {
@@ -559,6 +567,7 @@ export default function PolicyStressTestPage() {
                   <select
                     value={selectedIndustry}
                     onChange={(e) => {
+                      trackToolStart('policy-stress-test')
                       setSelectedIndustry(e.target.value)
                       setShowResults(false)
                     }}
@@ -586,6 +595,7 @@ export default function PolicyStressTestPage() {
                       <button
                         key={policy.id}
                         onClick={() => {
+                          trackToolStart('policy-stress-test')
                           setSelectedEuPolicy(policy.id)
                           setShowResults(false)
                         }}
@@ -620,6 +630,7 @@ export default function PolicyStressTestPage() {
                       <button
                         key={policy.id}
                         onClick={() => {
+                          trackToolStart('policy-stress-test')
                           setSelectedUsPolicy(policy.id)
                           setShowResults(false)
                         }}
@@ -659,7 +670,10 @@ export default function PolicyStressTestPage() {
                   {COMPANY_SIZES.map(size => (
                     <button
                       key={size.value}
-                      onClick={() => setSelectedSize(size.value)}
+                      onClick={() => {
+                        trackToolStart('policy-stress-test')
+                        setSelectedSize(size.value)
+                      }}
                       className={`px-4 py-2 rounded-lg border text-sm transition-all ${
                         selectedSize === size.value
                           ? 'bg-stone-teal/20 border-stone-teal/40 text-stone-teal'

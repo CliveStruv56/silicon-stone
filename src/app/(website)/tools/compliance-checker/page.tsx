@@ -42,6 +42,7 @@ import { FollowOnOffering } from '@/components/advisory/FollowOnOffering'
 import { TOOL_JOURNEYS } from '@/lib/tool-journeys'
 import { AMOUNTS, DERIVED, gbp, offeringById } from '@/lib/offering'
 import { TOOLKIT_TERMS } from '@/lib/toolkit'
+import { trackToolComplete, trackToolStart } from '@/lib/tool-analytics'
 
 const briefing = offeringById('advisory-briefing')
 const toolkit = offeringById('ai-act-toolkit')
@@ -337,6 +338,7 @@ export default function ComplianceCheckerPage() {
   const currentSectionIndex = currentQuestion ? sections.indexOf(currentQuestion.section) : 0
 
   const setAnswer = (question: AssessmentQuestion, value: AssessmentValue) => {
+    trackToolStart('compliance-checker')
     setAnswers((prev) => ({ ...prev, [question.id]: value }))
   }
 
@@ -356,6 +358,8 @@ export default function ComplianceCheckerPage() {
   const goNext = () => {
     if (!canContinue) return
     if (currentIndex >= visibleQuestions.length - 1) {
+      // The tier only, never the answers: it is a closed list of eight labels.
+      trackToolComplete('compliance-checker', result.classification)
       setShowResult(true)
       return
     }
@@ -378,6 +382,7 @@ export default function ComplianceCheckerPage() {
    * and every unanswered required question still gates Continue.
    */
   const applyIntake = (proposed: AssessmentAnswers) => {
+    trackToolStart('compliance-checker')
     setAnswers(proposed)
     setShowIntake(false)
     const visible = getVisibleQuestions(proposed)
