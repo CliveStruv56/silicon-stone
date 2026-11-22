@@ -136,7 +136,7 @@ export const SITE_PAGES: readonly SitePage[] = [
     title: 'Advisory',
     kind: 'advisory',
     description:
-      'Independent AI and technopolitical advisory: an Advisory Briefing, broader assessments, an ongoing retainer and five standalone specialist projects. Agree the scope after a free conversation.',
+      'Independent AI and technopolitical advisory: an Advisory Briefing, broader assessments, an ongoing retainer and four standalone specialist projects. Agree the scope after a free conversation.',
     keywords: ['advisory', 'advice', 'adviser', 'advisor', 'consulting', 'consultant', 'consultancy', 'help', 'hire', 'engagement', 'board', 'boards', 'directors', 'decision-makers', 'ai risk', 'risk', 'governance', 'independent expert', 'who can help', 'help my board understand ai risk', 'brief the board'],
   },
   {
