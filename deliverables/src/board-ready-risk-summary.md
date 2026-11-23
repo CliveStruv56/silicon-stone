@@ -30,7 +30,7 @@ Replace every **[bracketed prompt]** with your own figures from the *AI Systems 
 | Prohibited (must stop) | [n] |
 | High-risk — standalone, Annex III (due 2 Dec 2027) | [n] |
 | High-risk — embedded, Annex I (due 2 Aug 2028) | [n] |
-| Limited risk — transparency only (due 2 Aug 2026) | [n] |
+| Limited risk — transparency only (applies since 2 Aug 2026) | [n] |
 | Minimal risk | [n] |
 
 ### 3. Top compliance gaps

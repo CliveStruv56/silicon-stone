@@ -67,7 +67,7 @@ The practical traps are everyday ones. Fine-tuning a bought-in model on your own
 
 Run the tiers as an ordered sequence of gates. Test the system against each gate in turn and stop at the first that catches it. Prohibited beats high-risk; high-risk beats limited; everything else is minimal. Always start at Gate 1, because a prohibited practice is prohibited no matter how useful or well-intentioned.
 
-**Gate 1 — Prohibited (Art 5).** A short list of practices is banned outright; these have been unenforceable in the EU since **2 February 2025**. If your system does any of the following, it cannot be deployed at all — there is no conformity assessment that rescues it:
+**Gate 1 — Prohibited (Art 5).** A short list of practices is banned outright; these prohibitions have applied in the EU since **2 February 2025**, and the penalty provisions for breaching them since **2 August 2025**. If your system does any of the following, it cannot be deployed at all — there is no conformity assessment that rescues it:
 
 - **Subliminal, manipulative or deceptive techniques** that materially distort behaviour and cause, or are likely to cause, significant harm.
 - **Exploiting vulnerabilities** of a person or group owing to age, disability, or a specific social or economic situation, to distort behaviour and cause significant harm.
@@ -101,7 +101,7 @@ The deadlines differ by route, and this is where the staged timeline matters mos
 - **Annex III standalone** high-risk obligations apply from **2 December 2027**.
 - **Annex I embedded** high-risk obligations apply from **2 August 2028**.
 
-Note carefully: **high-risk duties do not bite in August 2026.** What arrives on 2 August 2026 is the transparency regime (Art 50) and the Commission's power to fine providers of general-purpose AI models (Article 101) — not the high-risk obligations. Anyone planning to a single "August 2026 cliff" for high-risk systems is working from the superseded timeline.
+Note carefully: **high-risk duties do not bite in August 2026.** What arrives on 2 August 2026 includes the transparency regime (Art 50), the Commission's power to fine providers of general-purpose AI models (Article 101) and the AI Office's power to fine operators of AI systems who fall within its exclusive competence under Article 75(1) (Article 75c) — but not the high-risk obligations.
 
 **Gate 3 — Limited Risk (Art 50 transparency).** If the system is neither prohibited nor high-risk, test it against the transparency triggers. These attach regardless of tier, but for an otherwise-unremarkable system they are the only AI Act duties that apply:
 

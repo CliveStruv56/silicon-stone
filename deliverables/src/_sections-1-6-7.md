@@ -20,11 +20,12 @@ Much early commentary described a single "August 2026 cliff" on which the AI Act
 | :---- | :---- |
 | **2 February 2025** | Prohibited practices (Art 5) banned; AI-literacy duty (Art 4) applies |
 | **2 August 2025** | General-purpose AI (GPAI) model rules, the governance framework and the penalties chapter (Chapter XII, except Article 101) apply |
-| **2 August 2026** | Transparency duties (Art 50); Article 101, the Commission's power to fine providers of general-purpose AI models |
+| **2 August 2026** | Transparency duties (Art 50); Article 101, the Commission's power to fine providers of general-purpose AI models; Article 75c, the AI Office's power to fine operators of AI systems who fall within its exclusive competence under Article 75(1) |
+| **2 December 2026** | New prohibitions on AI systems generating non-consensual sexual deepfakes and child sexual abuse material (Art 5(1)(ba), (bb)); Art 50(2) marking deadline for generative systems placed on the market before 2 August 2026 |
 | **2 December 2027** | Standalone high-risk systems (Annex III) — full obligations apply |
 | **2 August 2028** | Embedded / product-safety high-risk systems (Annex I) — full obligations apply |
 
-The practical reading is precise and matters for how you spend the next two years. The obligations already applying or imminent — confirming nothing prohibited is running, training staff to a baseline, and disclosing AI interactions by August 2026 — are cheap and frequently overlooked. The expensive high-risk obligations do not bite until December 2027 at the earliest, which is runway to build the evidence properly rather than reason to defer starting.
+The practical reading is precise and matters for how you spend the next two years. The obligations already applying — confirming nothing prohibited is running, supporting staff AI literacy, and disclosing AI interactions, due since August 2026 — are cheap and frequently overlooked. The expensive high-risk obligations do not bite until December 2027 at the earliest, which is runway to build the evidence properly rather than reason to defer starting.
 
 > The August 2026 date is real, but it is a transparency date, not a high-risk date. Your first compliance task is more likely a disclosure line on a chatbot than a conformity assessment.
 
@@ -64,8 +65,8 @@ The 2026 Digital Omnibus replaced the original single deadline with a phased sch
 | Date | Milestone | What it means operationally |
 | :---- | :---- | :---- |
 | **2 Feb 2025** | Prohibited practices banned; AI-literacy duty live | Screen every system against Art 5 now; train staff to a baseline. Already enforceable. |
-| **2 Aug 2025** | GPAI model rules; governance framework; penalties (Chapter XII, except Art 101) | Relevant if you build or substantially fine-tune a general-purpose model. The penalty regime has been live since this date. |
-| **2 Aug 2026** | Transparency (Art 50); Art 101 (Commission fines on GPAI model providers) | Disclose AI interactions; label synthetic content; have an accountable owner. |
+| **2 Aug 2025** | GPAI model rules; governance framework; penalties (Chapter XII, except Art 101) | GPAI model rules: relevant if you build or substantially fine-tune a general-purpose model. Chapter XII penalties, except Article 101, have applied since this date. |
+| **2 Aug 2026** | Transparency (Art 50); Art 101 (Commission fines on GPAI model providers); Art 75c (AI Office fines on operators of AI systems who fall within its exclusive competence under Art 75(1)) | Disclose AI interactions; label synthetic content; have an accountable owner. |
 | **2 Dec 2027** | Standalone high-risk (Annex III) | Full provider/deployer obligations for hiring, credit, education, biometrics and the rest. |
 | **2 Aug 2028** | Embedded high-risk (Annex I) | Full obligations for AI that is a safety component of a regulated product. |
 
@@ -103,7 +104,7 @@ For an organisation beginning today with no formal AI governance. The aim of the
 
 Beyond the first quarter, fix these as standing checkpoints:
 
-- **Before 2 Aug 2026:** transparency disclosures live; governance owner and policy in place; literacy programme running.
+- **Now (due since 2 Aug 2026):** transparency disclosures live; governance owner and policy in place; literacy programme running.
 - **Through 2026–2027:** high-risk evidence base under construction — risk-management files, data-governance records, technical documentation, instructions for use.
 - **Before 2 Dec 2027:** standalone high-risk systems conformity-assessed, registered, and operating under documented human oversight; deployer FRIAs completed where required.
 - **Before 2 Aug 2028:** embedded high-risk (product-safety) systems brought into the same state.
@@ -120,7 +121,7 @@ Each checkpoint is a register query, not a memory test — which is the point of
 
 **AI Office.** The European Commission body overseeing implementation of the Act, particularly for general-purpose AI, and coordinating with national authorities.
 
-**AI literacy (Art 4).** The duty on providers and deployers to ensure staff operating AI have a sufficient understanding of it, proportionate to their role. Applied since 2 February 2025, regardless of risk tier.
+**AI literacy (Art 4).** The duty on providers and deployers to take measures to support the development of AI literacy of their staff and others operating AI systems on their behalf, taking into account their knowledge, experience and the context of use. It does not require any specific level of literacy in any individual. An AI-literacy duty has applied since 2 February 2025, regardless of risk tier; Regulation (EU) 2026/1744, in force since 27 July 2026, replaced the original wording, which required measures to ensure, to their best extent, a sufficient level of AI literacy.
 
 **Annex I.** The list of EU product-safety laws (machinery, medical devices, vehicles, lifts, toys, and more). AI that is a safety component of, or is itself, such a regulated product is **embedded high-risk** — obligations apply from 2 August 2028.
 

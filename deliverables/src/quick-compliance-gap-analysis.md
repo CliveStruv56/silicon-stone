@@ -20,7 +20,7 @@ The questions are grouped into five short sections that mirror how the Act actua
 | :---- | :---- |
 | 2 February 2025 | Prohibited practices banned; AI-literacy duty (Art 4) |
 | 2 August 2025 | General-purpose AI model rules; governance framework; penalties (Chapter XII, except Article 101) |
-| 2 August 2026 | Transparency duties (Art 50); Article 101, the Commission's power to fine providers of general-purpose AI models |
+| 2 August 2026 | Transparency duties (Art 50); Article 101, the Commission's power to fine providers of general-purpose AI models; Article 75c, the AI Office's power to fine operators of AI systems who fall within its exclusive competence under Article 75(1) |
 | 2 December 2027 | Standalone high-risk systems (Annex III) |
 | 2 August 2028 | Embedded / product-safety high-risk systems (Annex I) |
 
@@ -84,7 +84,7 @@ Yes / No / Unsure
 **16. Is there a named owner accountable for AI governance in your organisation?**
 Yes / No / Unsure
 
-**17. Do staff who operate AI systems have a baseline of AI literacy appropriate to their role (an Article 4 duty that already applies)?**
+**17. Do you take measures to support the AI literacy of staff who operate AI systems, suited to their role (an Article 4 duty that already applies)?**
 Yes / No / Unsure
 
 **18. Do you keep a written record (a register) of your AI systems, their vendors, and where their data is stored?**
