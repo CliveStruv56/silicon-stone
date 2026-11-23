@@ -1,5 +1,6 @@
 import {
   AI_LITERACY_APPLIES,
+  NEW_PROHIBITIONS_APPLY,
   ANNEX_I_APPLIES,
   ANNEX_III_APPLIES,
   GENERAL_APPLICATION_APPLIES,
@@ -380,11 +381,11 @@ export const ISO_42001_CROSSWALK: CrosswalkRow[] = [
       quote: 'The following AI practices shall be prohibited:',
     },
     roles: ['provider', 'deployer'],
-    appliesFrom: [AI_LITERACY_APPLIES],
+    appliesFrom: [AI_LITERACY_APPLIES, NEW_PROHIBITIONS_APPLY],
     fit: 'none',
     reuse: 'An impact assessment may surface a prohibited use, but the standard does not name any.',
     adds:
-      'The Act prohibits named practices, including manipulative techniques, social scoring and, save narrow exceptions, real-time remote biometric identification in publicly accessible spaces for law enforcement, and carries the highest penalty tier. Screen every system against the list.',
+      'The Act prohibits named practices, including subliminal, purposefully manipulative or deceptive techniques that materially distort behaviour in a way that causes, or is reasonably likely to cause, significant harm; social scoring that leads to detrimental or unfavourable treatment in an unrelated social context, or to such treatment that is unjustified or disproportionate to the behaviour; and, save narrow exceptions, real-time remote biometric identification in publicly accessible spaces for law enforcement. Breaching a prohibition carries the highest penalty tier. Screen every system against the list.',
   },
   {
     id: 'transparency-to-people',

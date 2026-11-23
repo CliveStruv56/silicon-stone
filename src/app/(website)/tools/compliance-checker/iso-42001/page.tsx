@@ -15,6 +15,7 @@ import { HARMONISED_STANDARDS } from '@/lib/ai-act-explainers/harmonised-standar
 import {
   ANNEX_I_APPLIES,
   ANNEX_III_APPLIES,
+  NEW_PROHIBITIONS_APPLY,
   packDate,
 } from '@/lib/compliance-v2/engine/dates'
 import { RULE_PACK } from '@/lib/rulepack'
@@ -44,6 +45,7 @@ const briefing = offeringById('advisory-briefing')
 const ROUTE_NAMES: Record<string, string> = {
   [ANNEX_III_APPLIES]: 'Annex III systems',
   [ANNEX_I_APPLIES]: 'Annex I products',
+  [NEW_PROHIBITIONS_APPLY]: 'Article 5(1)(ba) and (bb)',
 }
 
 const FIT_STYLES: Record<CrosswalkFit, string> = {

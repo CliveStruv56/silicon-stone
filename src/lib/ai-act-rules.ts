@@ -1852,7 +1852,7 @@ function futureProhibitedFinding(practice: Art5Practice): Omit<RuleFinding, 'id'
         article: `Article 5(1)(${practice.point})`,
         corpusArticle: '5',
         basis: [
-          `Inserted by Regulation (EU) 2026/1744 and prohibited from ${practice.appliesFrom}. The point is not prohibited today, which is why this is a date to finish work against rather than an instruction to stop now — but a prohibition admits no compliance route.`,
+          `Inserted by Regulation (EU) 2026/1744 and prohibited from ${practice.appliesFrom}. The point does not apply today, which is why this is a date to finish work against rather than an instruction to stop now — but a prohibition admits no compliance route.`,
           ART5_POINT_LIMITS[practice.point],
         ]
           .filter(Boolean)
@@ -1868,7 +1868,7 @@ function futureProhibitedFinding(practice: Art5Practice): Omit<RuleFinding, 'id'
         question: `What technical safety measures prevent this system being used for ${label}, and will you attest to compliance before ${practice.appliesFrom}?`,
         article: `Article 5(1)(${practice.point})`,
         corpusArticle: '5',
-        why: `The practice is prohibited from ${practice.appliesFrom}. Article 5(1a) decides when the prohibition reaches a general-purpose system, and it turns on whether the system’s design and capabilities make that use a reasonably foreseeable and reproducible outcome absent reasonable and adequate technical safety measures — so the safeguards, and evidence that they were tested, are what keep the system outside it.`,
+        why: `Article 5(1)(${practice.point}) applies from ${practice.appliesFrom}. Article 5(1a) decides when the prohibition reaches a general-purpose system, and it turns on whether the system’s design and capabilities make that use a reasonably foreseeable and reproducible outcome absent reasonable and adequate technical safety measures — so the safeguards, and evidence that they were tested, are what keep the system outside it.`,
       },
     ],
     adjacentRisks: [

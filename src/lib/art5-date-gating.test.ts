@@ -6,6 +6,8 @@ import { dayAfterPhaseOn, nextMilestoneOn, nowMoment, packDateToIso, phaseOn, ti
 import { RULE_PACK } from './rulepack'
 import { runShadowComparison } from './compliance-v2/release/shadow'
 import { evaluateAssessmentV2 } from './compliance-v2/engine/assemble'
+import { ISO_42001_CROSSWALK } from './ai-act-explainers/iso-42001'
+import { AI_LITERACY_APPLIES, NEW_PROHIBITIONS_APPLY, packDate } from './compliance-v2/engine/dates'
 import { markingVerb } from '@/components/home/DeadlineCountdown'
 import { momentDay } from './ai-act-dates'
 import { PROHIBITED_QUESTIONS } from './compliance-v2/questions/prohibited'
@@ -414,7 +416,29 @@ describe('round-4 wording', () => {
       'Read the whole list, including anything that sounds unlike your system. These are the practices Article 5 prohibits, some subject to exceptions or limits the Article states, and two, added by the Digital Omnibus, only from the date shown beside them. A prohibition has no compliance route.',
     )
     const iso = readFileSync('src/lib/ai-act-explainers/iso-42001.ts', 'utf8')
-    expect(iso).toContain('The Act prohibits named practices, including manipulative techniques')
+    expect(iso).toContain(
+      'The Act prohibits named practices, including subliminal, purposefully manipulative or deceptive techniques that materially distort behaviour in a way that causes, or is reasonably likely to cause, significant harm; social scoring that leads to detrimental or unfavourable treatment in an unrelated social context, or to such treatment that is unjustified or disproportionate to the behaviour; and, save narrow exceptions, real-time remote biometric identification in publicly accessible spaces for law enforcement. Breaching a prohibition carries the highest penalty tier. Screen every system against the list.',
+    )
     expect(iso).not.toContain('bans named practices outright')
+  })
+})
+
+describe('the ISO 42001 card dates the new prohibitions', () => {
+  it('the prohibited-practices row applies from 2 February 2025 and, for (ba) and (bb), 2 December 2026', () => {
+    const row = ISO_42001_CROSSWALK.find((item) => item.appliesFrom.includes(NEW_PROHIBITIONS_APPLY))
+    expect(row?.appliesFrom).toEqual([AI_LITERACY_APPLIES, NEW_PROHIBITIONS_APPLY])
+    const page = readFileSync('src/app/(website)/tools/compliance-checker/iso-42001/page.tsx', 'utf8')
+    expect(page).toContain("[NEW_PROHIBITIONS_APPLY]: 'Article 5(1)(ba) and (bb)',")
+    expect(page).not.toContain('[AI_LITERACY_APPLIES]:')
+    // The page prints "Applies from <date>" per label, adding "for <route>" where one is named.
+    const line = (row?.appliesFrom ?? [])
+      .map((label) => {
+        const date = packDate(label)
+        return label === NEW_PROHIBITIONS_APPLY
+          ? `Applies from ${date.display} for Article 5(1)(ba) and (bb)`
+          : `Applies from ${date.display}`
+      })
+      .join(' · ')
+    expect(line).toBe('Applies from 2 February 2025 · Applies from 2 December 2026 for Article 5(1)(ba) and (bb)')
   })
 })
