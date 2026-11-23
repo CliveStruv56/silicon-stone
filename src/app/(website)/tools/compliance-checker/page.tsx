@@ -225,9 +225,9 @@ const GENERAL_APPLICATION = AI_ACT_TIMELINE.find(
 /**
  * A milestone's status on the reader's day. Before the browser has supplied the
  * date (`today` is null: prerender and hydration) only what is certain is
- * asserted: a date already in force when the pack was cut stays in force, and
- * everything else is shown as a bare date rather than as "upcoming" or "in
- * force", so a page built before a date passes never says the wrong thing after.
+ * asserted: a date that had already applied when the pack was cut still applies,
+ * and everything else is shown as a bare date rather than as upcoming or
+ * applying, so a page built before a date passes never says the wrong thing after.
  */
 function timelineStatus(entry: TimelineEntry, today: string | null): 'in-force' | 'upcoming' {
   return today ? timelineStatusOn(entry, today) : entry.status === 'in-force' ? 'in-force' : 'upcoming'

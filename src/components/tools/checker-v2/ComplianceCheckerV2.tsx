@@ -1,5 +1,6 @@
 'use client'
 
+import { todayIso } from '@/lib/ai-act-dates'
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight, Check, RefreshCcw } from 'lucide-react'
@@ -51,7 +52,7 @@ export function ComplianceCheckerV2({ exitHref }: { exitHref: string }) {
   const [showResult, setShowResult] = useState(false)
   // Captured once, when the component mounts, so the result carries the date it
   // was actually made on and does not move under a re-render.
-  const [assessedAt] = useState(() => new Date().toISOString().slice(0, 10))
+  const [assessedAt] = useState(() => todayIso())
 
   const question = currentQuestion(flow)
   const sections = flowSections(flow)

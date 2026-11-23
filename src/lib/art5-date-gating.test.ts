@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { assessmentQuestions, evaluateAssessment, type AssessmentAnswers } from './ai-act-assessment'
 import { evaluateRuleLibrary } from './ai-act-rules'
-import { inForceOn, nextMilestoneOn, packDateToIso, timelineStatusOn } from './ai-act-dates'
+import { inForceOn, nextMilestoneOn, packDateToIso, timelineStatusOn, todayIso } from './ai-act-dates'
 import { RULE_PACK } from './rulepack'
 import { runShadowComparison } from './compliance-v2/release/shadow'
 import { evaluateAssessmentV2 } from './compliance-v2/engine/assemble'
@@ -44,7 +44,7 @@ describe('date helpers', () => {
     expect(() => packDateToIso('December 2026')).toThrow(/not in the form/)
   })
 
-  it('a date is in force from its own day, not the day before', () => {
+  it('a date applies from its own day, not the day before', () => {
     expect(inForceOn('2 December 2026', DAY_BEFORE)).toBe(false)
     expect(inForceOn('2 December 2026', DAY_OF)).toBe(true)
     expect(inForceOn('2 December 2026', DAY_AFTER)).toBe(true)
@@ -122,8 +122,10 @@ describe('v1: Article 5(1)(ba) and (bb) across 2 December 2026', () => {
     const md = (asOf: string) =>
       complianceCheckerMarkdown(evaluateAssessment(answers, asOf), answers, assessmentQuestions, asOf)
     const line = (text: string) => text.split('\n').find((row) => row.includes('**2 December 2026**')) ?? ''
-    expect(line(md(DAY_BEFORE))).not.toContain('(in force)')
-    expect(line(md(DAY_OF))).toContain('(in force)')
+    expect(line(md(DAY_BEFORE))).not.toContain('(applies)')
+    expect(line(md(DAY_OF))).toContain('(applies)')
+    const timing = md(DAY_OF).split('## Timing')[1].split('## Penalty')[0]
+    expect(timing).not.toMatch(/in force/i)
   })
 
   it('no worked example on the checker page selects a future-dated practice', () => {
@@ -135,6 +137,47 @@ describe('v1: Article 5(1)(ba) and (bb) across 2 December 2026', () => {
     )
     const examples = source.slice(source.indexOf('EXAMPLE_SYSTEMS'), source.indexOf('EXAMPLE_RESULTS ='))
     expect(examples).not.toMatch(/art5-b[ab]/)
+  })
+})
+
+describe('the calendar day follows the reader’s time zone', () => {
+  // 22:30 UTC on 1 December is already 2 December at UTC+2 (Athens, in winter).
+  const instant = new Date('2026-12-01T22:30:00Z')
+  const answers = { ...base, prohibited_screen: ['art5-ba'] }
+
+  it('names the local calendar day for a zone', () => {
+    expect(todayIso(instant, 'Europe/Athens')).toBe('2026-12-02')
+    expect(todayIso(instant, 'UTC')).toBe('2026-12-01')
+    expect(todayIso(instant, 'Europe/Brussels')).toBe('2026-12-01')
+    expect(todayIso(new Date('2026-12-01T23:00:00Z'), 'Europe/Brussels')).toBe('2026-12-02')
+  })
+
+  it('the same instant is prohibited at UTC+2 and not yet at UTC+0', () => {
+    expect(evaluateRuleLibrary(answers, todayIso(instant, 'Europe/Athens')).classification).toBe('Prohibited practice')
+    expect(evaluateRuleLibrary(answers, todayIso(instant, 'UTC')).classification).toBe('Prohibited from 2 December 2026')
+  })
+
+  it('v2 follows the same day', () => {
+    const v2 = scenario('article5DeepfakeNoSafeguards')
+    const item = (zone: string) =>
+      evaluateAssessmentV2(v2, todayIso(instant, zone)).legalFindings.find((entry) => entry.id === 'article-5-ba')
+    expect(item('Europe/Athens')?.effectiveFrom).toBeUndefined()
+    expect(item('UTC')?.effectiveFrom).toBe('2 December 2026')
+  })
+
+  it('the timeline status and next step follow it too', () => {
+    const entry = RULE_PACK.timeline.find((item) => item.date === '2 December 2026')!
+    expect(timelineStatusOn(entry, todayIso(instant, 'Europe/Athens'))).toBe('in-force')
+    expect(timelineStatusOn(entry, todayIso(instant, 'UTC'))).toBe('upcoming')
+    expect(nextMilestoneOn(RULE_PACK.timeline, todayIso(instant, 'Europe/Athens'))?.date).toBe('2 August 2027')
+  })
+})
+
+describe('wording that must not imply Article 50(2) starts on 2 December 2026', () => {
+  it('the FAQ gives 2 December as a deadline for systems already on the market', () => {
+    const source = readFileSync('src/lib/ai-act-explainers/faq.ts', 'utf8')
+    expect(source).toContain('have until ${newProhibitions} to meet the Article 50(2) duty')
+    expect(source).not.toContain('apply, and generative systems already on the market')
   })
 })
 

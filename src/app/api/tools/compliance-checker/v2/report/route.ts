@@ -15,6 +15,7 @@ import { buildConsent, DELIVERY_WORDING, MARKETING_WORDING } from '@/lib/complia
 import { proseGenerationConfigured, proseModel, proseModelName } from '@/lib/compliance-v2/report/model'
 import { readReportV2, writeReportV2 } from '@/lib/compliance-v2/report/store'
 import type { ReportRecordV2 } from '@/lib/compliance-v2/report/record'
+import { SERVER_TIME_ZONE, todayIso } from '@/lib/ai-act-dates'
 
 /**
  * Start a v2 report generation.
@@ -141,7 +142,8 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  const assessedAt = new Date().toISOString().slice(0, 10)
+  // No browser here, so the EU calendar day; see SERVER_TIME_ZONE.
+  const assessedAt = todayIso(undefined, SERVER_TIME_ZONE)
   const result = evaluateAssessmentV2(validated.answers, assessedAt)
 
   const toolName =

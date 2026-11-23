@@ -144,7 +144,7 @@ ${bullets(result.adjacentRisks, 'No adjacent risks flagged by these answers.')}
 ${bullets(result.reviewTriggers)}
 
 ## Timing
-${AI_ACT_TIMELINE.map((entry) => `- **${entry.date}** — ${entry.label}${timelineStatusOn(entry, asOf) === 'in-force' ? ' _(in force)_' : ''}. ${entry.detail}`).join('\n')}
+${AI_ACT_TIMELINE.map((entry) => `- **${entry.date}** — ${entry.label}${timelineStatusOn(entry, asOf) === 'in-force' ? ' _(applies)_' : ''}. ${entry.detail}`).join('\n')}
 
 ## Penalty ceilings
 | Infringement | Ceiling | Basis |

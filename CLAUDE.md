@@ -166,6 +166,14 @@ copy must be true on both sides of a date (say "applies from", not "since" or
 "will"). Tests inject the day and never read the clock; run the suite under a fake
 clock after 2 December to catch anything that did.
 
+A date applies from the start of that calendar day **in the reader's own time
+zone**, so `asOf` is the reader's local calendar date, not the UTC date
+(`todayIso()` with no zone reads the browser's). Server routes have no browser
+zone and pass `SERVER_TIME_ZONE` (`Europe/Brussels`): `todayIso(undefined,
+SERVER_TIME_ZONE)`. A server caller must never rely on the default, which is the
+server's own zone (UTC on Vercel). Describe dates as "applies from" / "applied
+since"; "in force" is only for the entry-into-force milestone.
+
 Three consequences of that shape worth not undoing:
 
 - **The Article anchor is a field, not prose.** `article` and `corpusArticle` are
