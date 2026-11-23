@@ -346,7 +346,7 @@ export const SCENARIOS: Scenario[] = [
     name: 'AI Act Enforcement & Digital Simplification',
     shortName: 'AI Act',
     frictionLevel: 'medium',
-    triggerEvent: 'Transparency obligations applied since 2 August 2026 while the Digital Omnibus moves high-risk obligations to 2 December 2027 (Annex III) and 2 August 2028 (Annex I)',
+    triggerEvent: 'Transparency obligations have applied since 2 August 2026 while the Digital Omnibus moves high-risk obligations to 2 December 2027 (Annex III) and 2 August 2028 (Annex I)',
     timeframe: '2026-2027',
     probability: '80-90%',
     confidence: 'High',

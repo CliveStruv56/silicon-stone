@@ -2,8 +2,8 @@
 title: "Quick Compliance Gap Analysis"
 subtitle: "A twenty-question self-assessment against the EU AI Act, reconciled to the post-Omnibus staged timeline. Twenty minutes to a defensible picture of where you stand."
 author: "Silicon and Stone"
-date: "2026-06-26"
-version: "Gateway Pack · v1"
+date: "2026-11-23"
+version: "Gateway Pack · v2"
 ---
 
 ## How to use this
@@ -120,4 +120,4 @@ Score each answer: **Yes = 2 · Unsure = 1 · No = 0.** Add them up — maximum 
 
 ---
 
-*Silicon and Stone — Forensic Technopolitics. This document is an operational aid reconciled to the EU AI Act as amended by the 2026 Digital Omnibus. It is not legal advice; obtain qualified counsel for decisions on specific systems. Regulatory content last reviewed 26 June 2026.*
+*Silicon and Stone — Forensic Technopolitics. This document is an operational aid reconciled to the EU AI Act as amended by the 2026 Digital Omnibus. It is not legal advice; obtain qualified counsel for decisions on specific systems. Regulatory content last updated 23 November 2026.*

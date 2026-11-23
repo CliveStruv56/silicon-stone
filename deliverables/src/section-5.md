@@ -126,7 +126,7 @@ Where a system is classified High-Risk, a competent person must be able to under
 
 **8. AI literacy and training (Art 4)**
 
-[organisation] ensures that staff who operate or rely on AI systems have a sufficient understanding of how those systems work, what they can and cannot do, and the risks they carry, proportionate to their role. We deliver [describe, e.g. "a baseline AI-literacy module to all staff on induction and annually, with role-specific training for system owners and for staff operating high-risk systems"]. Completion is tracked by [role] and recorded against the relevant departments in the Register. This obligation has applied since 2 February 2025.
+[organisation] ensures that staff who operate or rely on AI systems have a sufficient understanding of how those systems work, what they can and cannot do, and the risks they carry, proportionate to their role. We deliver [describe, e.g. "a baseline AI-literacy module to all staff on induction and annually, with role-specific training for system owners and for staff operating high-risk systems"]. Completion is tracked by [role] and recorded against the relevant departments in the Register. Article 4 has required providers and deployers to take AI-literacy measures since 2 February 2025; it does not require them to guarantee any specific level of AI literacy of any individual, so the standard above is our own.
 
 **9. Incident handling**
 
@@ -134,7 +134,7 @@ An AI incident is any event in which an AI system behaves in a way that causes, 
 
 **10. Review cadence**
 
-This policy is reviewed at least [annually] and whenever the regulatory position materially changes — including at each staged AI Act milestone that affects our systems (notably the 2 August 2026 transparency and governance provisions, the 2 December 2027 standalone high-risk provisions, and the 2 August 2028 embedded high-risk provisions). The AI Governance Owner reports on AI risk to [the board] at least [quarterly].
+This policy is reviewed at least [annually] and whenever the regulatory position materially changes — including at each staged AI Act milestone that affects our systems (notably the 2 August 2026 transparency provisions, the 2 December 2027 standalone high-risk provisions, and the 2 August 2028 embedded high-risk provisions). The AI Governance Owner reports on AI risk to [the board] at least [quarterly].
 
 ---
 

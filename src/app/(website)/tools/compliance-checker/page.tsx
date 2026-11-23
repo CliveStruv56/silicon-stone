@@ -1035,7 +1035,7 @@ export default function ComplianceCheckerPage() {
                   <CardTitle className="text-lg text-text-primary">Penalty ceilings</CardTitle>
                   <CardDescription>
                     Ceilings, not expected fines. Each is the higher of the fixed amount and the percentage
-                    of total worldwide annual turnover. For the Article 99(3), (4) and (5) tiers, SMEs, including start-ups,
+                    of total worldwide annual turnover. For the Article 99(3), (4) and (5) tiers, SMEs (including start-ups)
                     take the lower of the two (Article 99(6)). Small mid-caps take the lower only for the Article 99(4)
                     and (5) tiers (Article 99(6a)); for a prohibited-practice fine under Article 99(3), their ceiling
                     stays the higher of the two.

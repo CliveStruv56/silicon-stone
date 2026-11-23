@@ -364,7 +364,7 @@ function buildTracker() {
 
   // Reconciled deadlines: governance 2 Aug 2025; transparency 2 Aug 2026; standalone HR 2 Dec 2027; embedded HR 2 Aug 2028.
   const reqs = [
-    ['REQ-01', 'Art 4 — AI literacy: take measures to support staff AI literacy (no specific level required)', 'Provider & Deployer', 'All', new Date('2025-02-02')],
+    ['REQ-01', 'Art 4 — AI literacy: take measures to support staff AI literacy (no specific level of literacy need be guaranteed)', 'Provider & Deployer', 'All', new Date('2025-02-02')],
     ['REQ-02', 'Art 5 — Confirm no prohibited practices in use (e.g. workplace emotion inference, social scoring)', 'Provider & Deployer', 'All', new Date('2025-02-02')],
     ['REQ-03', 'Art 50 — Transparency: disclose AI interaction; label synthetic/generated content', 'Provider & Deployer', 'Limited Risk', new Date('2026-08-02')],
     ['REQ-04', 'Governance (Chapter VII) and Chapter XII penalties apply (since 2 Aug 2025; Art 101 and Art 75c fines since 2 Aug 2026); designate internal AI accountability owner', 'Provider & Deployer', 'All', new Date('2025-08-02')],
