@@ -1852,7 +1852,7 @@ function futureProhibitedFinding(practice: Art5Practice): Omit<RuleFinding, 'id'
         article: `Article 5(1)(${practice.point})`,
         corpusArticle: '5',
         basis: [
-          `Inserted by Regulation (EU) 2026/1744 and prohibited from ${practice.appliesFrom}. It is not prohibited today, which is why this is a date to finish work against rather than an instruction to stop now — but a prohibition admits no compliance route.`,
+          `Inserted by Regulation (EU) 2026/1744 and prohibited from ${practice.appliesFrom}. The point is not prohibited today, which is why this is a date to finish work against rather than an instruction to stop now — but a prohibition admits no compliance route.`,
           ART5_POINT_LIMITS[practice.point],
         ]
           .filter(Boolean)

@@ -338,9 +338,9 @@ describe('round-3 wording', () => {
 
   it('findings name the subject in the date suffix', () => {
     const between = evaluateAssessmentV2(scenario('article5DeepfakeNoSafeguards'), DAY_BEFORE, '2026-12-01T22:00:00Z')
-    expect(JSON.stringify(between.legalFindings)).toContain(' The practice is prohibited from 2 December 2026.')
+    expect(JSON.stringify(between.legalFindings)).toContain(' Article 5(1)(ba) applies from 2 December 2026.')
     const notYet = evaluateAssessmentV2(scenario('article5DeepfakeNoSafeguards'), DAY_BEFORE)
-    expect(JSON.stringify(notYet.legalFindings)).toContain(' The practice becomes prohibited on 2 December 2026, not today.')
+    expect(JSON.stringify(notYet.legalFindings)).toContain(' Article 5(1)(ba) applies from 2 December 2026, not today.')
   })
 
   it('v1 between summary and basis follow the ruled wording', () => {
@@ -395,12 +395,26 @@ describe('v2 reads the moment when the result is requested', () => {
     expect(phaseOn('2 December 2026', started)).toBe('not-yet')
     expect(phaseOn('2 December 2026', requested)).toBe('between')
     const item = evaluateAssessmentV2(v2, momentDay(requested), requested).legalFindings.find((entry) => entry.id === 'article-5-ba')
-    expect(JSON.stringify(item)).toContain('The practice is prohibited from 2 December 2026.')
+    expect(JSON.stringify(item)).toContain('Article 5(1)(ba) applies from 2 December 2026.')
   })
 
   it('the component takes the moment in the request handler, not on mount', () => {
     const source = readFileSync('src/components/tools/checker-v2/ComplianceCheckerV2.tsx', 'utf8')
     expect(source).toContain('setMoment(nowMoment())')
     expect(source).not.toMatch(/useState\(\(\) => nowMoment\(\)\)/)
+  })
+})
+
+describe('round-4 wording', () => {
+  it('the Article 4 FAQ sentence, the Article 5 screen help and the ISO line carry the ruled text', () => {
+    const faq = readFileSync('src/lib/ai-act-explainers/faq.ts', 'utf8')
+    expect(faq).toContain('has owed the Article 4 duty of AI literacy. Since Regulation (EU) 2026/1744 replaced Article 4, that duty has been to take measures to support the development of AI literacy among the people who operate and use AI on your behalf')
+    const screen = PROHIBITED_QUESTIONS.find((question) => question.id === 'prohibited_screen')
+    expect(screen?.help).toBe(
+      'Read the whole list, including anything that sounds unlike your system. These are the practices Article 5 prohibits, some subject to exceptions or limits the Article states, and two, added by the Digital Omnibus, only from the date shown beside them. A prohibition has no compliance route.',
+    )
+    const iso = readFileSync('src/lib/ai-act-explainers/iso-42001.ts', 'utf8')
+    expect(iso).toContain('The Act prohibits named practices, including manipulative techniques')
+    expect(iso).not.toContain('bans named practices outright')
   })
 })

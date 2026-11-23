@@ -384,7 +384,7 @@ export const ISO_42001_CROSSWALK: CrosswalkRow[] = [
     fit: 'none',
     reuse: 'An impact assessment may surface a prohibited use, but the standard does not name any.',
     adds:
-      'The Act bans named practices outright, including manipulative techniques, social scoring and, save narrow exceptions, real-time remote biometric identification in publicly accessible spaces for law enforcement, and carries the highest penalty tier. Screen every system against the list.',
+      'The Act prohibits named practices, including manipulative techniques, social scoring and, save narrow exceptions, real-time remote biometric identification in publicly accessible spaces for law enforcement, and carries the highest penalty tier. Screen every system against the list.',
   },
   {
     id: 'transparency-to-people',

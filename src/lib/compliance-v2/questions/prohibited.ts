@@ -46,7 +46,7 @@ export const PROHIBITED_QUESTIONS: AssessmentQuestionV2[] = [
     prompt: 'Does the system do any of these?',
     shortPrompt: 'Article 5 screen',
     help:
-      'Read the whole list, including anything that sounds unlike your system. These are the practices the Regulation bans outright, and a ban has no compliance route — there is nothing to build towards except stopping.',
+      'Read the whole list, including anything that sounds unlike your system. These are the practices Article 5 prohibits, some subject to exceptions or limits the Article states, and two, added by the Digital Omnibus, only from the date shown beside them. A prohibition has no compliance route.',
     whyAsked:
       'This is the only part of the assessment where the answer could mean stopping rather than documenting. We ask everyone, whatever their sector, because a prohibition attaches to the practice and not to the industry.',
     answerType: 'multi',
