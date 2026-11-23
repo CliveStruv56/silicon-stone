@@ -23,8 +23,8 @@ ships it.
 
 ## C2 — Adopted vs in force (P1)
 **Abstract:** The Digital Omnibus deferring high-risk is adopted, not enacted;
-until OJ publication 2 Aug 2026 governs, and transparency + penalties stay there
-regardless. The house thesis made concrete.
+until OJ publication 2 Aug 2026 governs, and transparency stays there
+regardless (the penalties chapter has applied since 2 Aug 2025). The house thesis made concrete.
 **Sources:** S&S Watch Brief; EP release 16 Jun 2026.
 
 ## C3 — EU–Japan data bridge (P1)

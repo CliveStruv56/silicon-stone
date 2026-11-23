@@ -509,7 +509,7 @@ export const LEGAL_PROPOSITIONS: LegalProposition[] = [
     plainEnglishSummary:
       'Providers and deployers take measures so the people operating and using their AI systems understand them well enough for the job.',
     practicalMeaning:
-      'This applies whatever the risk tier, and it has been in force since February 2025 — it is the one duty here that does not wait for anything. What it asks is proportionate rather than fixed: it is measured against your staff\u2019s existing knowledge and the context the system is used in. It expressly does not require you to guarantee any particular level of literacy in any individual.',
+      'This applies whatever the risk tier, and it has applied since February 2025 — it is the one duty here that does not wait for anything. What it asks is proportionate rather than fixed: it is measured against your staff\u2019s existing knowledge and the context the system is used in. It expressly does not require you to guarantee any particular level of literacy in any individual.',
     shortExtract:
       'Providers and deployers of AI systems shall take measures to support the development of AI literacy of their staff and other persons dealing with the operation and use of AI systems on their behalf, taking into account their technical knowledge, experience, education and training and the context the AI systems are to be used in, and considering the persons or groups of persons on whom the AI systems are to be used. This obligation does not require providers or deployers to guarantee any specific level of AI literacy of any individual.',
     officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-4',

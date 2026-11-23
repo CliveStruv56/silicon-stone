@@ -59,6 +59,6 @@ Replace every **[bracketed prompt]** with your own figures from the *AI Systems 
 
 ---
 
-*Timeline note for the footnote-minded: the 2026 Digital Omnibus replaced the single August 2026 deadline with a staged schedule — transparency and penalties from 2 August 2026, standalone high-risk from 2 December 2027, embedded high-risk from 2 August 2028. Plan against the date that matches each system, not the headline.*
+*Timeline note for the footnote-minded: the 2026 Digital Omnibus replaced the single August 2026 deadline with a staged schedule — transparency from 2 August 2026, standalone high-risk from 2 December 2027, embedded high-risk from 2 August 2028. Plan against the date that matches each system, not the headline.*
 
 *Silicon and Stone — Forensic Technopolitics. Template provided as an operational aid, not legal advice. Last reviewed 26 June 2026.*

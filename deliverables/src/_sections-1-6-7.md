@@ -18,19 +18,19 @@ Much early commentary described a single "August 2026 cliff" on which the AI Act
 
 | Date | What applies |
 | :---- | :---- |
-| **2 February 2025** | Prohibited practices (Art 5) banned; AI-literacy duty (Art 4) in force |
-| **2 August 2025** | General-purpose AI (GPAI) model rules apply |
-| **2 August 2026** | Transparency duties (Art 50); penalties and governance framework operational |
+| **2 February 2025** | Prohibited practices (Art 5) banned; AI-literacy duty (Art 4) applies |
+| **2 August 2025** | General-purpose AI (GPAI) model rules, the governance framework and the penalties chapter (Chapter XII, except Article 101) apply |
+| **2 August 2026** | Transparency duties (Art 50); Article 101, the Commission's power to fine providers of general-purpose AI models |
 | **2 December 2027** | Standalone high-risk systems (Annex III) — full obligations apply |
 | **2 August 2028** | Embedded / product-safety high-risk systems (Annex I) — full obligations apply |
 
-The practical reading is precise and matters for how you spend the next two years. The obligations already in force or imminent — confirming nothing prohibited is running, training staff to a baseline, and disclosing AI interactions by August 2026 — are cheap and frequently overlooked. The expensive high-risk obligations do not bite until December 2027 at the earliest, which is runway to build the evidence properly rather than reason to defer starting.
+The practical reading is precise and matters for how you spend the next two years. The obligations already applying or imminent — confirming nothing prohibited is running, training staff to a baseline, and disclosing AI interactions by August 2026 — are cheap and frequently overlooked. The expensive high-risk obligations do not bite until December 2027 at the earliest, which is runway to build the evidence properly rather than reason to defer starting.
 
-> The August 2026 date is real, but it is a transparency-and-penalties date, not a high-risk date. Your first compliance task is more likely a disclosure line on a chatbot than a conformity assessment.
+> The August 2026 date is real, but it is a transparency date, not a high-risk date. Your first compliance task is more likely a disclosure line on a chatbot than a conformity assessment.
 
 ### What non-compliance costs
 
-The penalty ceilings are deliberately severe. Breaching the Article 5 prohibitions can attract fines of up to €35 million or 7% of total worldwide annual turnover, whichever is greater. Most other breaches of the high-risk and transparency obligations carry ceilings of up to €15 million or 3% of turnover, and supplying incorrect information to authorities up to €7.5 million or 1%. The proportionality provisions temper how these apply to smaller companies, but the direction is clear: this is a regime with enforcement teeth, supervised by national market-surveillance authorities and the European AI Office.
+The penalty ceilings are deliberately severe. Breaching the Article 5 prohibitions can attract fines of up to €35 million or 7% of total worldwide annual turnover, whichever is greater. Most other breaches of the high-risk and transparency obligations carry ceilings of up to €15 million or 3% of turnover, and supplying incorrect information to authorities up to €7.5 million or 1%. The proportionality provisions temper how these apply to smaller companies, but the direction is clear: this is a regime with enforcement teeth, supervised by national market-surveillance authorities and the European AI Office. Chapter XII of the AI Act (Penalties) has applied since 2 August 2025, except Article 101, the Commission's power to fine providers of general-purpose AI models, which has applied since 2 August 2026. The AI Office's power to fine operators of AI systems who fall within its exclusive competence under Article 75(1) has also applied since 2 August 2026 (Article 75c, inserted by Regulation (EU) 2026/1744).
 
 ### How to use this toolkit
 
@@ -64,8 +64,8 @@ The 2026 Digital Omnibus replaced the original single deadline with a phased sch
 | Date | Milestone | What it means operationally |
 | :---- | :---- | :---- |
 | **2 Feb 2025** | Prohibited practices banned; AI-literacy duty live | Screen every system against Art 5 now; train staff to a baseline. Already enforceable. |
-| **2 Aug 2025** | GPAI model rules apply | Relevant if you build or substantially fine-tune a general-purpose model. |
-| **2 Aug 2026** | Transparency (Art 50); penalties & governance framework | Disclose AI interactions; label synthetic content; have an accountable owner and the penalty regime live. |
+| **2 Aug 2025** | GPAI model rules; governance framework; penalties (Chapter XII, except Art 101) | Relevant if you build or substantially fine-tune a general-purpose model. The penalty regime has been live since this date. |
+| **2 Aug 2026** | Transparency (Art 50); Art 101 (Commission fines on GPAI model providers) | Disclose AI interactions; label synthetic content; have an accountable owner. |
 | **2 Dec 2027** | Standalone high-risk (Annex III) | Full provider/deployer obligations for hiring, credit, education, biometrics and the rest. |
 | **2 Aug 2028** | Embedded high-risk (Annex I) | Full obligations for AI that is a safety component of a regulated product. |
 
@@ -120,7 +120,7 @@ Each checkpoint is a register query, not a memory test — which is the point of
 
 **AI Office.** The European Commission body overseeing implementation of the Act, particularly for general-purpose AI, and coordinating with national authorities.
 
-**AI literacy (Art 4).** The duty on providers and deployers to ensure staff operating AI have a sufficient understanding of it, proportionate to their role. In force since 2 February 2025, regardless of risk tier.
+**AI literacy (Art 4).** The duty on providers and deployers to ensure staff operating AI have a sufficient understanding of it, proportionate to their role. Applied since 2 February 2025, regardless of risk tier.
 
 **Annex I.** The list of EU product-safety laws (machinery, medical devices, vehicles, lifts, toys, and more). AI that is a safety component of, or is itself, such a regulated product is **embedded high-risk** — obligations apply from 2 August 2028.
 

@@ -171,7 +171,7 @@ frameworks to actually do something about it.
 
 This is your flagship digital product and should be one of the first
 things you build, ideally before or alongside your YouTube launch. The
-AI Act enforcement deadline in August 2026 creates genuine urgency.
+AI Act date of 2 August 2026 creates genuine urgency. The Commission's timeline dates the start of enforcement at national and EU level to 2 August 2026.
 Every European business using AI needs to understand their obligations,
 and most have not started.
 
