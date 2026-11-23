@@ -1100,7 +1100,7 @@ export const LEGAL_PROPOSITIONS: LegalProposition[] = [
     ],
     effectiveFrom: '2025-02-02',
     plainEnglishSummary:
-      'Predicting who will commit a criminal offence, based solely on profiling or personality, is prohibited outright.',
+      'Predicting who will commit a criminal offence, based solely on profiling or personality, is prohibited, except for systems that support a human assessment of a person’s involvement in a criminal activity that is already based on objective and verifiable facts directly linked to it.',
     practicalMeaning:
       '"Solely" is the word doing the work, and the exception is broad in practice: a tool that helps an investigator weigh objective evidence is expressly outside it.',
     shortExtract:
@@ -1158,7 +1158,7 @@ export const LEGAL_PROPOSITIONS: LegalProposition[] = [
     ],
     effectiveFrom: '2025-02-02',
     plainEnglishSummary:
-      'Inferring emotions in the workplace or in education is prohibited outright, unless it is for medical or safety reasons.',
+      'Inferring emotions in the workplace or in education is prohibited, unless it is for medical or safety reasons.',
     practicalMeaning:
       'Both the setting and the purpose matter. Fatigue detection in a driver is a safety reason; measuring how engaged staff seem in meetings is not, however it is described internally.',
     shortExtract:
@@ -1187,7 +1187,7 @@ export const LEGAL_PROPOSITIONS: LegalProposition[] = [
     ],
     effectiveFrom: '2025-02-02',
     plainEnglishSummary:
-      'Using biometric data to deduce a person’s race, politics, union membership, beliefs or sexuality is prohibited outright.',
+      'Using biometric data to deduce a person’s race, politics, union membership, beliefs or sexuality is prohibited, except for labelling or filtering lawfully acquired biometric datasets and categorising biometric data in law enforcement.',
     practicalMeaning:
       'The list of characteristics is exhaustive, and the carve-out is stated in the provision itself rather than being a defence to be argued.',
     shortExtract:

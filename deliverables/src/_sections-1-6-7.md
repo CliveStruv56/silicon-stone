@@ -4,7 +4,7 @@ The EU Artificial Intelligence Act (Regulation (EU) 2024/1689) is the first comp
 
 ### What the Act does
 
-The Act sorts AI systems into four tiers. A small set of uses is **prohibited** outright. A defined list of consequential uses is **high-risk** and carries the bulk of the engineering and documentation burden. A further set carries **limited-risk** transparency duties — telling people when they are dealing with AI. Everything else is **minimal-risk** and unregulated beyond a baseline literacy duty. The whole of the rest of this document is, in effect, the machinery for placing each of your systems into the right tier and reading off the consequences.
+The Act sorts AI systems into four tiers. A small set of uses is **prohibited**, some subject to narrow exceptions written into Article 5 itself. A defined list of consequential uses is **high-risk** and carries the bulk of the engineering and documentation burden. A further set carries **limited-risk** transparency duties — telling people when they are dealing with AI. Everything else is **minimal-risk** and unregulated beyond the cross-cutting AI-literacy duty (Article 4). The whole of the rest of this document is, in effect, the machinery for placing each of your systems into the right tier and reading off the consequences.
 
 Obligations also depend on your **role**. A *provider* builds a system or places it on the market under its own name and carries the heaviest duties. A *deployer* uses someone else's system in its own activities and carries a lighter, but real, set. Importers and distributors sit in between. Most organisations are deployers of bought-in tools — but a deployer that re-badges a system, or modifies it substantially, can become a provider in law without intending to. Establishing role is therefore the first move, not an afterthought.
 
@@ -147,7 +147,7 @@ Each checkpoint is a register query, not a memory test — which is the point of
 
 **Notified body.** An independent organisation designated to carry out third-party conformity assessments where the Act requires them.
 
-**Prohibited practice (Art 5).** A use banned outright — including workplace/education emotion inference, social scoring, untargeted facial scraping, and certain manipulative or biometric uses. Banned since 2 February 2025.
+**Prohibited practice (Art 5).** A use the Act prohibits, in some cases subject to narrow exceptions written into Article 5 itself — including workplace/education emotion inference (outside medical or safety reasons), social scoring, untargeted facial scraping, and certain manipulative or biometric uses. The original prohibitions have applied since 2 February 2025; two more (Art 5(1)(ba) and (bb)) apply from 2 December 2026.
 
 **Provider.** An actor that develops a system and places it on the market or puts it into service under its own name or trademark. Carries the heaviest obligations.
 

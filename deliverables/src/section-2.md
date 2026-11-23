@@ -67,7 +67,7 @@ The practical traps are everyday ones. Fine-tuning a bought-in model on your own
 
 Run the tiers as an ordered sequence of gates. Test the system against each gate in turn and stop at the first that catches it. Prohibited beats high-risk; high-risk beats limited; everything else is minimal. Always start at Gate 1, because a prohibited practice is prohibited no matter how useful or well-intentioned.
 
-**Gate 1 — Prohibited (Art 5).** A short list of practices is banned outright; these prohibitions have applied in the EU since **2 February 2025**, and the penalty provisions for breaching them since **2 August 2025**. If your system does any of the following, it cannot be deployed at all — there is no conformity assessment that rescues it:
+**Gate 1 — Prohibited (Art 5).** A short list of practices is prohibited; for some, Article 5 itself states narrow exceptions, noted below. These prohibitions have applied in the EU since **2 February 2025**, and the penalty provisions for breaching them since **2 August 2025**. If your system does any of the following, outside those exceptions, it cannot be deployed at all — there is no conformity assessment that rescues it:
 
 - **Subliminal, manipulative or deceptive techniques** that materially distort behaviour and cause, or are likely to cause, significant harm.
 - **Exploiting vulnerabilities** of a person or group owing to age, disability, or a specific social or economic situation, to distort behaviour and cause significant harm.

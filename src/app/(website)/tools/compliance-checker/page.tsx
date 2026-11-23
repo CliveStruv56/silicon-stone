@@ -451,7 +451,7 @@ export default function ComplianceCheckerPage() {
               <p className="mt-4 max-w-3xl leading-relaxed text-text-muted">
                 {assessmentQuestions.length} questions, fewer where some do not apply, on your role,
                 the EU connection, the use case, who is affected, the oversight in place and the
-                practices the Act forbids outright. You leave with a risk tier and a stated
+                practices Article 5 prohibits. You leave with a risk tier and a stated
                 confidence, your likely role under the Act, the duties that follow, the vendor
                 evidence you are missing, and the triggers that should send you back for a
                 reassessment.
