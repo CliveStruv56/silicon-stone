@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { AI_ACT_TIMELINE } from '@/lib/ai-act-timeline'
-import { packDateToIso } from '@/lib/ai-act-dates'
+import { dayAfterPhaseOn } from '@/lib/ai-act-dates'
 import { useAssessmentDate } from '@/lib/use-assessment-date'
 
 // Both dates come from the pinned rule pack, so neither is typed here.
@@ -11,12 +11,15 @@ const TRANSPARENCY_DATE = AI_ACT_TIMELINE.find((entry) => entry.basis === 'Artic
 const MARKING_DATE = AI_ACT_TIMELINE.find((entry) => entry.basis.includes('Article 111(4)'))?.date
 
 /**
- * Past tense only from the day after the date: on the day itself the transition
- * has not yet ended. Unknown date (prerender, hydration): tense-neutral.
+ * Past tense only once the day after the date has begun in every EU zone (the
+ * UTC-4 zones are last): until then the transition has not ended everywhere. In
+ * the hours when it has begun in some zones and not others, and while the
+ * moment is unknown (prerender, hydration), the tense-neutral form is used.
  */
-export function markingVerb(today: string | null): string {
-  if (!today || !MARKING_DATE) return 'runs to'
-  return today > packDateToIso(MARKING_DATE) ? 'ended on' : 'ends on'
+export function markingVerb(moment: string | null): string {
+  if (!moment || !MARKING_DATE) return 'runs to'
+  const phase = dayAfterPhaseOn(MARKING_DATE, moment)
+  return phase === 'applies' ? 'ended on' : phase === 'between' ? 'runs to' : 'ends on'
 }
 
 export function DeadlineCountdown() {

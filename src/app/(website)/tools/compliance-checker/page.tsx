@@ -28,7 +28,7 @@ import {
   getVisibleQuestions,
 } from '@/lib/ai-act-assessment'
 import { AI_ACT_TIMELINE, PENALTY_TIERS, type TimelineEntry } from '@/lib/ai-act-timeline'
-import { nextMilestoneOn, timelineStatusOn } from '@/lib/ai-act-dates'
+import { nextMilestoneOn, timelineStatusOn, type Phase } from '@/lib/ai-act-dates'
 import { useAssessmentDate } from '@/lib/use-assessment-date'
 import { RULE_PACK } from '@/lib/rulepack'
 import { ComplianceIntake } from '@/components/tools/ComplianceIntake'
@@ -223,14 +223,16 @@ const GENERAL_APPLICATION = AI_ACT_TIMELINE.find(
 )
 
 /**
- * A milestone's status on the reader's day. Before the browser has supplied the
- * date (`today` is null: prerender and hydration) only what is certain is
- * asserted: a date that had already applied when the pack was cut still applies,
- * and everything else is shown as a bare date rather than as upcoming or
- * applying, so a page built before a date passes never says the wrong thing after.
+ * A milestone's phase at the reader's moment. Dates begin at different times
+ * across the Union (see `ai-act-dates.ts`), so only `applies` is shown as
+ * applying: `not-yet` and `between` both show the bare date. Before the browser
+ * has supplied the moment (`today` is null: prerender and hydration) only what
+ * is certain is asserted: a date that had already applied when the pack was cut
+ * still applies, and everything else is shown as a bare date, so a page built
+ * before a date passes never says the wrong thing after.
  */
-function timelineStatus(entry: TimelineEntry, today: string | null): 'in-force' | 'upcoming' {
-  return today ? timelineStatusOn(entry, today) : entry.status === 'in-force' ? 'in-force' : 'upcoming'
+function timelinePhase(entry: TimelineEntry, today: string | null): Phase {
+  return today ? timelineStatusOn(entry, today) : entry.status === 'in-force' ? 'applies' : 'not-yet'
 }
 
 const HOW_IT_WORKS = [
@@ -1037,12 +1039,12 @@ export default function ComplianceCheckerPage() {
                           <Badge
                             variant="outline"
                             className={
-                              timelineStatus(entry, today) === 'in-force'
+                              timelinePhase(entry, today) === 'applies'
                                 ? 'w-fit border-alert-red text-alert-red'
                                 : 'w-fit border-stone-teal text-stone-teal'
                             }
                           >
-                            {timelineStatus(entry, today) === 'in-force' ? `Applies since ${entry.date}` : entry.date}
+                            {timelinePhase(entry, today) === 'applies' ? `Applies since ${entry.date}` : entry.date}
                           </Badge>
                         </div>
                         <p className="mt-2 text-sm text-text-muted">{entry.detail}</p>

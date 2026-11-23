@@ -36,15 +36,21 @@ const REVIEW_TRIGGERS = [
 
 export function evaluateAssessmentV2(
   answers: AnswerRecordV2,
-  assessedAt: string
+  assessedAt: string,
+  /**
+   * The assessment moment for dates that begin at different times across the
+   * Union (see `ai-act-dates.ts`). Defaults to `assessedAt`, an ISO day, which
+   * is read as the same day everywhere: tests and stored records use that.
+   */
+  moment: string = assessedAt
 ): ComplianceResultV2 {
   const stamp = checkerVersionStamp()
   const scope = evaluateTerritorialScope(answers)
   const roles = evaluateLegalRoles(answers)
   const size = evaluateOrganisationSize(answers)
-  const classification = classify(answers, scope, assessedAt)
+  const classification = classify(answers, scope, moment)
 
-  const context = { answers, scope, roles, size, classification, assessedAt }
+  const context = { answers, scope, roles, size, classification, assessedAt, moment }
 
   return {
     schemaVersion: '2',

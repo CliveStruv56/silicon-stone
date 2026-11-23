@@ -15,7 +15,7 @@ import { buildConsent, DELIVERY_WORDING, MARKETING_WORDING } from '@/lib/complia
 import { proseGenerationConfigured, proseModel, proseModelName } from '@/lib/compliance-v2/report/model'
 import { readReportV2, writeReportV2 } from '@/lib/compliance-v2/report/store'
 import type { ReportRecordV2 } from '@/lib/compliance-v2/report/record'
-import { SERVER_TIME_ZONE, todayIso } from '@/lib/ai-act-dates'
+import { momentDay, nowMoment } from '@/lib/ai-act-dates'
 
 /**
  * Start a v2 report generation.
@@ -142,9 +142,10 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // No browser here, so the EU calendar day; see SERVER_TIME_ZONE.
-  const assessedAt = todayIso(undefined, SERVER_TIME_ZONE)
-  const result = evaluateAssessmentV2(validated.answers, assessedAt)
+  // The same moment-based rule as the browser (see ai-act-dates.ts), not a zone.
+  const moment = nowMoment()
+  const assessedAt = momentDay(moment)
+  const result = evaluateAssessmentV2(validated.answers, assessedAt, moment)
 
   const toolName =
     typeof body.toolName === 'string' && body.toolName.trim()

@@ -2,10 +2,12 @@ import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { assessmentQuestions, evaluateAssessment, type AssessmentAnswers } from './ai-act-assessment'
 import { evaluateRuleLibrary } from './ai-act-rules'
-import { inForceOn, nextMilestoneOn, packDateToIso, timelineStatusOn, todayIso } from './ai-act-dates'
+import { dayAfterPhaseOn, nextMilestoneOn, nowMoment, packDateToIso, phaseOn, timelineStatusOn } from './ai-act-dates'
 import { RULE_PACK } from './rulepack'
 import { runShadowComparison } from './compliance-v2/release/shadow'
 import { evaluateAssessmentV2 } from './compliance-v2/engine/assemble'
+import { markingVerb } from '@/components/home/DeadlineCountdown'
+import { momentDay } from './ai-act-dates'
 import { PROHIBITED_QUESTIONS } from './compliance-v2/questions/prohibited'
 import { scenario } from './compliance-v2/test-fixtures/golden-scenarios'
 import { complianceCheckerMarkdown } from './tools-markdown'
@@ -44,20 +46,20 @@ describe('date helpers', () => {
     expect(() => packDateToIso('December 2026')).toThrow(/not in the form/)
   })
 
-  it('a date applies from its own day, not the day before', () => {
-    expect(inForceOn('2 December 2026', DAY_BEFORE)).toBe(false)
-    expect(inForceOn('2 December 2026', DAY_OF)).toBe(true)
-    expect(inForceOn('2 December 2026', DAY_AFTER)).toBe(true)
+  it('a day moment applies from its own day, with no in-between state', () => {
+    expect(phaseOn('2 December 2026', DAY_BEFORE)).toBe('not-yet')
+    expect(phaseOn('2 December 2026', DAY_OF)).toBe('applies')
+    expect(phaseOn('2 December 2026', DAY_AFTER)).toBe('applies')
   })
 
-  it('timeline status follows the date, not the status stored in the pack', () => {
+  it('timeline phase follows the date, not the status stored in the pack', () => {
     const entry = RULE_PACK.timeline.find((item) => item.date === '2 December 2026')!
     expect(entry.status).toBe('upcoming') // as cut: stale by design
-    expect(timelineStatusOn(entry, DAY_BEFORE)).toBe('upcoming')
-    expect(timelineStatusOn(entry, DAY_OF)).toBe('in-force')
+    expect(timelineStatusOn(entry, DAY_BEFORE)).toBe('not-yet')
+    expect(timelineStatusOn(entry, DAY_OF)).toBe('applies')
   })
 
-  it('the next milestone moves on once its date passes', () => {
+  it('the next milestone moves on once its date has begun everywhere', () => {
     expect(nextMilestoneOn(RULE_PACK.timeline, DAY_BEFORE)?.date).toBe('2 December 2026')
     expect(nextMilestoneOn(RULE_PACK.timeline, DAY_OF)?.date).toBe('2 August 2027')
     expect(nextMilestoneOn(RULE_PACK.timeline, '2031-01-01')).toBeUndefined()
@@ -140,43 +142,129 @@ describe('v1: Article 5(1)(ba) and (bb) across 2 December 2026', () => {
   })
 })
 
-describe('the calendar day follows the reader’s time zone', () => {
-  // 22:30 UTC on 1 December is already 2 December at UTC+2 (Athens, in winter).
-  const instant = new Date('2026-12-01T22:30:00Z')
-  const answers = { ...base, prohibited_screen: ['art5-ba'] }
+describe('a date begins at different times across the Union', () => {
+  // The EU spans UTC-4 (Martinique, Guadeloupe, Saint-Martin) to UTC+4 (Réunion),
+  // so 2 December begins at 20:00 UTC on 1 Dec in Réunion and at 04:00 UTC on 2 Dec
+  // in the UTC-4 zones. Between those, nothing may claim "not yet" or "since".
+  const at = (iso: string) => nowMoment(new Date(iso))
+  const answers = { ...base, tool_name: 'Studio', prohibited_screen: ['art5-ba'] }
+  const v2 = scenario('article5DeepfakeNoSafeguards')
 
-  it('names the local calendar day for a zone', () => {
-    expect(todayIso(instant, 'Europe/Athens')).toBe('2026-12-02')
-    expect(todayIso(instant, 'UTC')).toBe('2026-12-01')
-    expect(todayIso(instant, 'Europe/Brussels')).toBe('2026-12-01')
-    expect(todayIso(new Date('2026-12-01T23:00:00Z'), 'Europe/Brussels')).toBe('2026-12-02')
+  const READERS: Array<[string, string, 'not-yet' | 'between' | 'applies']> = [
+    ['Singapore (UTC+8) at 19:30 UTC on 1 Dec: 3:30 local on 2 Dec, but not begun in the EU', '2026-12-01T19:30:00Z', 'not-yet'],
+    ['Auckland (UTC+13) at 19:30 UTC on 1 Dec', '2026-12-01T19:30:00Z', 'not-yet'],
+    ['London at 23:30 UTC on 1 Dec', '2026-12-01T23:30:00Z', 'between'],
+    ['the server at 22:30 UTC on 1 Dec', '2026-12-01T22:30:00Z', 'between'],
+    ['the server at 23:30 UTC on 1 Dec', '2026-12-01T23:30:00Z', 'between'],
+    ['Auckland at 17:00 UTC on 2 Dec', '2026-12-02T17:00:00Z', 'applies'],
+    ['just before the UTC-4 zones begin 2 Dec (03:30 UTC)', '2026-12-02T03:30:00Z', 'between'],
+    ['the UTC-4 zones begin 2 Dec (04:00 UTC)', '2026-12-02T04:00:00Z', 'applies'],
+    ['just before Réunion begins 2 Dec (19:30 UTC)', '2026-12-01T19:59:00Z', 'not-yet'],
+    ['Réunion begins 2 Dec (20:00 UTC)', '2026-12-01T20:00:00Z', 'between'],
+  ]
+
+  it.each(READERS)('phase: %s', (_name, iso, phase) => {
+    expect(phaseOn('2 December 2026', at(iso))).toBe(phase)
   })
 
-  it('the same instant is prohibited at UTC+2 and not yet at UTC+0', () => {
-    expect(evaluateRuleLibrary(answers, todayIso(instant, 'Europe/Athens')).classification).toBe('Prohibited practice')
-    expect(evaluateRuleLibrary(answers, todayIso(instant, 'UTC')).classification).toBe('Prohibited from 2 December 2026')
+  it.each(READERS)('v1 verdict: %s', (_name, iso, phase) => {
+    const result = evaluateAssessment(answers, at(iso))
+    const text = JSON.stringify([result.summary, result.reasons, result.actions, result.vendorQuestions, result.firedRules.map((r) => r.explanation)])
+    if (phase === 'not-yet') {
+      expect(result.classification).toBe('Prohibited from 2 December 2026')
+      expect(text).toMatch(/not prohibited today|not a prohibited practice today/)
+    } else if (phase === 'applies') {
+      expect(result.classification).toBe('Prohibited practice')
+      expect(text).not.toMatch(NOT_YET)
+    } else {
+      // Neither a "not yet" claim nor a "since" claim.
+      expect(result.classification).toBe('Prohibited from 2 December 2026')
+      expect(text).not.toMatch(NOT_YET)
+      expect(text).not.toMatch(/has done since|Stop or pause|\bbefore 2 December|today/i)
+      expect(text).toContain('from 2 December 2026')
+    }
   })
 
-  it('v2 follows the same day', () => {
-    const v2 = scenario('article5DeepfakeNoSafeguards')
-    const item = (zone: string) =>
-      evaluateAssessmentV2(v2, todayIso(instant, zone)).legalFindings.find((entry) => entry.id === 'article-5-ba')
-    expect(item('Europe/Athens')?.effectiveFrom).toBeUndefined()
-    expect(item('UTC')?.effectiveFrom).toBe('2 December 2026')
+  it.each(READERS)('v2 finding: %s', (_name, iso, phase) => {
+    const result = evaluateAssessmentV2(v2, momentDay(at(iso)), at(iso))
+    const item = result.legalFindings.find((entry) => entry.id === 'article-5-ba')
+    const text = JSON.stringify([item, result.classificationExplanation])
+    if (phase === 'not-yet') {
+      expect(item?.effectiveFrom).toBe('2 December 2026')
+      expect(text).toMatch(/not today/)
+    } else if (phase === 'applies') {
+      expect(item?.effectiveFrom).toBeUndefined()
+      expect(text).not.toMatch(/not today|becomes prohibited|fixed future date/)
+    } else {
+      expect(item?.effectiveFrom).toBe('2 December 2026')
+      expect(text).not.toMatch(/not today|becomes prohibited|fixed future date|already apply|outright today/)
+      expect(result.classificationExplanation).toContain('prohibited from 2 December 2026.')
+    }
   })
 
-  it('the timeline status and next step follow it too', () => {
+  it.each(READERS)('timeline badge, tag and next step: %s', (_name, iso, phase) => {
     const entry = RULE_PACK.timeline.find((item) => item.date === '2 December 2026')!
-    expect(timelineStatusOn(entry, todayIso(instant, 'Europe/Athens'))).toBe('in-force')
-    expect(timelineStatusOn(entry, todayIso(instant, 'UTC'))).toBe('upcoming')
-    expect(nextMilestoneOn(RULE_PACK.timeline, todayIso(instant, 'Europe/Athens'))?.date).toBe('2 August 2027')
+    expect(timelineStatusOn(entry, at(iso))).toBe(phase)
+    const next = nextMilestoneOn(RULE_PACK.timeline, at(iso))?.date
+    if (phase === 'not-yet') expect(next).toBe('2 December 2026')
+    if (phase === 'between') expect(next).toBeUndefined()
+    if (phase === 'applies') expect(next).toBe('2 August 2027')
+    const md = complianceCheckerMarkdown(evaluateAssessment(answers, at(iso)), answers, assessmentQuestions, at(iso))
+    const line = md.split('\n').find((row) => row.includes('**2 December 2026**')) ?? ''
+    expect(line.includes('(applies)')).toBe(phase === 'applies')
+  })
+
+  it('the countdown turns past tense only once 3 Dec has begun in the UTC-4 zones', () => {
+    expect(markingVerb(at('2026-12-02T12:00:00Z'))).toBe('ends on')
+    expect(markingVerb(at('2026-12-02T19:30:00Z'))).toBe('ends on') // 3 Dec not begun anywhere
+    expect(markingVerb(at('2026-12-02T20:00:00Z'))).toBe('runs to') // 3 Dec begun in Réunion only
+    expect(markingVerb(at('2026-12-03T03:30:00Z'))).toBe('runs to')
+    expect(markingVerb(at('2026-12-03T04:00:00Z'))).toBe('ended on') // begun in every EU zone
+    expect(markingVerb(null)).toBe('runs to')
+    expect(dayAfterPhaseOn('2 December 2026', '2026-12-03')).toBe('applies')
+  })
+})
+
+describe('after the date, (ba) and (bb) carry their Article 5(1a) limits', () => {
+  const PARA_START = 'Article 5(1a) limits this point. Placing the system on the market or putting it into service is prohibited only where'
+  const PARA_END = 'Whether your system is outside the point on those terms is for the review to establish in writing. It is not a reason to continue meanwhile.'
+  const ONE_B = 'Under Article 5(1b), manipulation that does not increase the exposure of any depicted intimate parts or alter the nature of any depicted sexually explicit activities is not manipulation for this point.'
+
+  const stop = (point: string) =>
+    evaluateRuleLibrary({ ...base, prohibited_screen: [`art5-${point}`] }, DAY_AFTER).actions.find(
+      (item) => item.id === `stop-prohibited-use-${point}`,
+    )
+
+  it('(ba) carries 5(1a) and 5(1b); (bb) carries 5(1a) only; the others neither', () => {
+    expect(stop('ba')?.basis).toContain(PARA_START)
+    expect(stop('ba')?.basis).toContain(PARA_END)
+    expect(stop('ba')?.basis).toContain(ONE_B)
+    expect(stop('bb')?.basis).toContain(PARA_START)
+    expect(stop('bb')?.basis).not.toContain('Article 5(1b)')
+    expect(stop('c')?.basis).not.toContain('Article 5(1a)')
+  })
+
+  it('the 5(1a) safeguards action is kept in the post-date finding', () => {
+    for (const point of ['ba', 'bb']) {
+      const ids = evaluateRuleLibrary({ ...base, prohibited_screen: [`art5-${point}`] }, DAY_AFTER).actions.map((item) => item.id)
+      expect(ids).toContain('document-art-5-1a-safeguards')
+    }
+  })
+})
+
+describe('the FAQ separates the original eight prohibitions from the two new ones', () => {
+  it('says "the original eight" for the practices banned since 2 February 2025', () => {
+    const source = readFileSync('src/lib/ai-act-explainers/faq.ts', 'utf8')
+    expect(source).toContain('Since ${chapterI} the original eight Article 5 prohibited practices have been banned outright')
   })
 })
 
 describe('wording that must not imply Article 50(2) starts on 2 December 2026', () => {
   it('the FAQ gives 2 December as a deadline for systems already on the market', () => {
     const source = readFileSync('src/lib/ai-act-explainers/faq.ts', 'utf8')
-    expect(source).toContain('have until ${newProhibitions} to meet the Article 50(2) duty')
+    expect(source).toContain(
+      '${newProhibitions} is also the deadline for providers of generative systems already on the market before ${general} to meet the Article 50(2) duty to mark their output as artificially generated.',
+    )
     expect(source).not.toContain('apply, and generative systems already on the market')
   })
 })
@@ -203,7 +291,10 @@ describe('v2 beta: Article 5(1)(ba) across 2 December 2026', () => {
     expect(item).toBeDefined()
     expect(item?.effectiveFrom).toBeUndefined()
     expect(JSON.stringify(item)).not.toMatch(/not today|becomes prohibited/)
-    expect(result.classificationExplanation).toMatch(/prohibited outright today/)
+    expect(result.classificationExplanation).toContain(
+      'on Article 5\'s list of prohibitions that already apply.',
+    )
+    expect(result.classificationExplanation).not.toMatch(/outright today/)
     expect(result.classificationExplanation).not.toMatch(/fixed future date/)
     expect(result.statutoryRoutes.join(' ')).not.toMatch(/from 2 December 2026/)
   })

@@ -130,9 +130,9 @@ export const AI_ACT_FAQ: FaqEntry[] = [
     id: 'what-applies-now',
     question: 'With the high-risk deadlines deferred, what do we have to do already?',
     answer: [
-      `Several duties already apply. Since ${chapterI} the Article 5 prohibited practices have been banned outright, and every provider and deployer of any AI system, at any risk tier, has owed the Article 4 duty of AI literacy: measures to support the AI literacy of the people who operate and use AI on your behalf, taking into account their experience and the context the AI is used in. It does not require you to guarantee any particular level.`,
+      `Several duties already apply. Since ${chapterI} the original eight Article 5 prohibited practices have been banned outright, and every provider and deployer of any AI system, at any risk tier, has owed the Article 4 duty of AI literacy: measures to support the AI literacy of the people who operate and use AI on your behalf, taking into account their experience and the context the AI is used in. It does not require you to guarantee any particular level.`,
       `Since ${gpai}, providers of general-purpose AI models have had their own obligations. Since ${general}, the Article 50 transparency duties have applied, and the Commission can fine providers of general-purpose AI models.`,
-      `From ${newProhibitions}, two further prohibitions apply. Generative systems already on the market before ${general} have until ${newProhibitions} to meet the Article 50(2) duty to mark their output as artificially generated.`,
+      `From ${newProhibitions}, two further prohibitions apply. ${newProhibitions} is also the deadline for providers of generative systems already on the market before ${general} to meet the Article 50(2) duty to mark their output as artificially generated.`,
     ],
     citations: [
       {

@@ -4,7 +4,7 @@
 
 import type { AssessmentResult, AssessmentAnswers, AssessmentQuestion } from './ai-act-assessment'
 import { AI_ACT_TIMELINE, LEGAL_CORPUS_CUT_OFF, PENALTY_TIERS } from './ai-act-timeline'
-import { timelineStatusOn, todayIso } from './ai-act-dates'
+import { nowMoment, timelineStatusOn } from './ai-act-dates'
 import { RULE_PACK } from './rulepack'
 import { ACTION_KIND_LABEL, groupObligations } from './ai-act-obligations'
 import type { ResultItem, ResultVendorQuestion } from './ai-act-rules'
@@ -94,7 +94,7 @@ export function complianceCheckerMarkdown(
   result: AssessmentResult,
   answers: AssessmentAnswers,
   questions: AssessmentQuestion[],
-  asOf: string = todayIso(),
+  asOf: string = nowMoment(),
 ): string {
   const toolName = typeof answers.tool_name === 'string' && answers.tool_name.trim()
     ? answers.tool_name.trim()
@@ -144,7 +144,7 @@ ${bullets(result.adjacentRisks, 'No adjacent risks flagged by these answers.')}
 ${bullets(result.reviewTriggers)}
 
 ## Timing
-${AI_ACT_TIMELINE.map((entry) => `- **${entry.date}** — ${entry.label}${timelineStatusOn(entry, asOf) === 'in-force' ? ' _(applies)_' : ''}. ${entry.detail}`).join('\n')}
+${AI_ACT_TIMELINE.map((entry) => `- **${entry.date}** — ${entry.label}${timelineStatusOn(entry, asOf) === 'applies' ? ' _(applies)_' : ''}. ${entry.detail}`).join('\n')}
 
 ## Penalty ceilings
 | Infringement | Ceiling | Basis |

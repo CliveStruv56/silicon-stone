@@ -1,6 +1,6 @@
 'use client'
 
-import { todayIso } from '@/lib/ai-act-dates'
+import { momentDay, nowMoment } from '@/lib/ai-act-dates'
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight, Check, RefreshCcw } from 'lucide-react'
@@ -52,7 +52,8 @@ export function ComplianceCheckerV2({ exitHref }: { exitHref: string }) {
   const [showResult, setShowResult] = useState(false)
   // Captured once, when the component mounts, so the result carries the date it
   // was actually made on and does not move under a re-render.
-  const [assessedAt] = useState(() => todayIso())
+  const [moment] = useState(() => nowMoment())
+  const assessedAt = momentDay(moment)
 
   const question = currentQuestion(flow)
   const sections = flowSections(flow)
@@ -90,8 +91,8 @@ export function ComplianceCheckerV2({ exitHref }: { exitHref: string }) {
   }, [flow.answers])
 
   const result = useMemo(
-    () => (showResult ? evaluateAssessmentV2(flow.answers, assessedAt) : null),
-    [flow.answers, showResult, assessedAt]
+    () => (showResult ? evaluateAssessmentV2(flow.answers, assessedAt, moment) : null),
+    [flow.answers, showResult, assessedAt, moment]
   )
 
   if (showResult && result) {

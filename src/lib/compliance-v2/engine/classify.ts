@@ -51,10 +51,10 @@ const MINIMUM_DESCRIPTION = ['intended_use_family', 'individual_impact']
 export function classify(
   answers: AnswerRecordV2,
   scope: EvaluatedScope | undefined,
-  assessedAt: string,
+  moment: string,
 ): ClassificationResult {
   const territorial = scope ?? evaluateTerritorialScope(answers)
-  const article5 = evaluateArticle5(answers, assessedAt)
+  const article5 = evaluateArticle5(answers, moment)
   const annexI = evaluateAnnexI(answers)
   const annexIII = evaluateAnnexIII(answers)
   const exemption = evaluateArticle6Exemption(answers, annexIII)

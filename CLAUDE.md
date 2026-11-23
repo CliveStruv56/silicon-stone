@@ -166,12 +166,20 @@ copy must be true on both sides of a date (say "applies from", not "since" or
 "will"). Tests inject the day and never read the clock; run the suite under a fake
 clock after 2 December to catch anything that did.
 
-A date applies from the start of that calendar day **in the reader's own time
-zone**, so `asOf` is the reader's local calendar date, not the UTC date
-(`todayIso()` with no zone reads the browser's). Server routes have no browser
-zone and pass `SERVER_TIME_ZONE` (`Europe/Brussels`): `todayIso(undefined,
-SERVER_TIME_ZONE)`. A server caller must never rely on the default, which is the
-server's own zone (UTC on Vercel). Describe dates as "applies from" / "applied
+**A date does not start in one time zone.** The Regulation applies across the
+whole Union, from UTC-4 (Martinique, Guadeloupe, Saint-Martin) to UTC+4 (Réunion),
+so a date such as 2 December 2026 begins at 20:00 UTC on the day before in Réunion
+and at 04:00 UTC on the day itself in the UTC-4 zones. `src/lib/ai-act-dates.ts`
+therefore has three phases, the same on client and server: `not-yet` (not begun in
+any EU zone: "not prohibited today", a bare-date badge, the pre-date path),
+`between` (about eight hours: wording that claims neither "not yet" nor "since"),
+and `applies` (begun in every EU zone: "Prohibited practice", "has done since",
+"Applies since", stop or pause). The countdown says "ended on" only once the day
+after has begun in the UTC-4 zones. The reader's own zone never decides it, and
+neither does Brussels. A moment is an ISO instant from `nowMoment()` (truncated to
+the hour) or an ISO day, which is read as one day everywhere and has no `between`
+(tests, stored records and the legacy baseline use it). Server routes pass
+`nowMoment()` too. Describe application dates as "applies from" / "applied
 since"; "in force" is only for the entry-into-force milestone.
 
 Three consequences of that shape worth not undoing:

@@ -12,7 +12,7 @@ import { PROPOSITION_BY_ID } from '../legal-content/propositions'
 import { heldRoles } from './roles'
 import { sizeReliefIsSettled } from './organisation-size'
 import { evaluateAnnexI, evaluateAnnexIII, evaluateArticle6Exemption } from './annex-routes'
-import { evaluateArticle5 } from './article-5'
+import { evaluateArticle5, type ProhibitedPracticeFinding } from './article-5'
 import { evaluateArticle50, routesOwedBy } from './article-50'
 import { includesAny } from './read'
 import { evaluateConformityAssessment, requiresReassessment } from './article-43'
@@ -69,6 +69,8 @@ export interface FindingContext {
   size: OrganisationSizeResult
   classification: ClassificationResult
   assessedAt: string
+  /** See `evaluateAssessmentV2`: the moment Article 5's dates are read at. */
+  moment: string
 }
 
 const HIGH_RISK: Array<ClassificationResult['classification']> = [
@@ -76,8 +78,20 @@ const HIGH_RISK: Array<ClassificationResult['classification']> = [
   'possible_high_risk',
 ]
 
+/**
+ * What to say about the date for an Article 5 practice that carries one. Before
+ * it has begun anywhere, "not today"; in the hours when it has begun in some EU
+ * zones and not others, only the date; once it has begun everywhere, nothing.
+ */
+function phaseNote(practice: ProhibitedPracticeFinding): string {
+  if (!practice.appliesFrom) return ''
+  return practice.phase === 'between'
+    ? ` It is prohibited from ${practice.appliesFrom}.`
+    : ` It becomes prohibited on ${practice.appliesFrom}, not today.`
+}
+
 export function buildLegalFindings(context: FindingContext): ComplianceFindingV2[] {
-  const { answers, scope, roles, size, classification, assessedAt } = context
+  const { answers, scope, roles, size, classification, assessedAt, moment } = context
   const held = heldRoles(roles)
   const findings: ComplianceFindingV2[] = []
 
@@ -99,7 +113,7 @@ export function buildLegalFindings(context: FindingContext): ComplianceFindingV2
    * use is a medical one is *told* that Article 5(1)(f) excepts it, rather than
    * being left with an alarm and no way to clear it.
    */
-  const article5 = evaluateArticle5(answers, assessedAt)
+  const article5 = evaluateArticle5(answers, moment)
   const article5Roles = held.length ? held : (['deployer'] as LegalRole[])
 
   for (const practice of article5.engaged) {
@@ -119,7 +133,7 @@ export function buildLegalFindings(context: FindingContext): ComplianceFindingV2
       effectiveFrom: practice.appliesFrom,
       whyItApplies: complete
         ? `You selected this practice on the Article 5 screen, and your answers satisfy every limb of the definition: ${practice.satisfied.join('; ')}. No exception the provision states applies on those answers.${
-            practice.appliesFrom ? ` It becomes prohibited on ${practice.appliesFrom}, not today.` : ''
+            phaseNote(practice)
           }`
         : `You selected this practice on the Article 5 screen. ${
             practice.satisfied.length
@@ -128,7 +142,7 @@ export function buildLegalFindings(context: FindingContext): ComplianceFindingV2
           } ${
             practice.unresolved.length === 1 ? 'One limb is' : `${practice.unresolved.length} limbs are`
           } still open, so this is unresolved rather than cleared.${
-            practice.appliesFrom ? ` It becomes prohibited on ${practice.appliesFrom}, not today.` : ''
+            phaseNote(practice)
           }`,
       practicalMeaning: complete
         ? 'A prohibition has no compliance route: there is no conformity assessment that satisfies it, no documentation that cures it and no risk measure that makes it lawful. Every limb of the definition being met on your own answers is as close as this tool comes to a conclusion — and it stops there, because these are judgements about your system that a court would take evidence on.'
