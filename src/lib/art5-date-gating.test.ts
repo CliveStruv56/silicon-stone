@@ -198,7 +198,9 @@ describe('a date begins at different times across the Union', () => {
     } else {
       expect(item?.effectiveFrom).toBe('2 December 2026')
       expect(text).not.toMatch(/not today|becomes prohibited|fixed future date|already apply|outright today/)
-      expect(result.classificationExplanation).toContain('prohibited from 2 December 2026.')
+      expect(result.classificationExplanation).toContain(
+        'A practice you selected is on Article 5’s list of prohibitions that apply from 2 December 2026.',
+      )
     }
   })
 
@@ -255,7 +257,7 @@ describe('after the date, (ba) and (bb) carry their Article 5(1a) limits', () =>
 describe('the FAQ separates the original eight prohibitions from the two new ones', () => {
   it('says "the original eight" for the practices banned since 2 February 2025', () => {
     const source = readFileSync('src/lib/ai-act-explainers/faq.ts', 'utf8')
-    expect(source).toContain('Since ${chapterI} the original eight Article 5 prohibited practices have been banned outright')
+    expect(source).toContain('Since ${chapterI} the original eight Article 5 prohibitions have applied')
   })
 })
 
@@ -292,7 +294,7 @@ describe('v2 beta: Article 5(1)(ba) across 2 December 2026', () => {
     expect(item?.effectiveFrom).toBeUndefined()
     expect(JSON.stringify(item)).not.toMatch(/not today|becomes prohibited/)
     expect(result.classificationExplanation).toContain(
-      'on Article 5\'s list of prohibitions that already apply.',
+      'on Article 5’s list of prohibitions that already apply.',
     )
     expect(result.classificationExplanation).not.toMatch(/outright today/)
     expect(result.classificationExplanation).not.toMatch(/fixed future date/)
@@ -314,5 +316,91 @@ describe('shadow comparison stays consistent across the date', () => {
       const rows = runShadowComparison(day)
       expect(rows.filter((row) => row.kind === 'unexplained')).toEqual([])
     }
+  })
+})
+
+describe('round-3 wording', () => {
+  const faq = readFileSync('src/lib/ai-act-explainers/faq.ts', 'utf8')
+
+  it('the FAQ marking sentence gives 2 December as a deadline, not a start', () => {
+    expect(faq).toContain(
+      '${newProhibitions} is the deadline for providers of generative systems already on the market before ${general} to add the marking.',
+    )
+    expect(faq).not.toContain('have until ${newProhibitions} to add the marking')
+  })
+
+  it('the not-yet v2 explanation uses the list wording with a curly apostrophe', () => {
+    const result = evaluateAssessmentV2(scenario('article5DeepfakeNoSafeguards'), DAY_BEFORE)
+    expect(result.classificationExplanation).toContain(
+      'A practice you selected is on Article 5’s list of prohibitions that apply from a fixed future date, so this is',
+    )
+  })
+
+  it('findings name the subject in the date suffix', () => {
+    const between = evaluateAssessmentV2(scenario('article5DeepfakeNoSafeguards'), DAY_BEFORE, '2026-12-01T22:00:00Z')
+    expect(JSON.stringify(between.legalFindings)).toContain(' The practice is prohibited from 2 December 2026.')
+    const notYet = evaluateAssessmentV2(scenario('article5DeepfakeNoSafeguards'), DAY_BEFORE)
+    expect(JSON.stringify(notYet.legalFindings)).toContain(' The practice becomes prohibited on 2 December 2026, not today.')
+  })
+
+  it('v1 between summary and basis follow the ruled wording', () => {
+    const answers = { ...base, tool_name: 'Studio', prohibited_screen: ['art5-ba'] }
+    const mid = evaluateAssessment(answers, '2026-12-01T22:00:00Z')
+    expect(mid.summary).toBe(
+      'The selected use of Studio falls under Article 5(1)(ba) or (bb) — inserted by the Digital Omnibus — and is prohibited from 2 December 2026.',
+    )
+    const basis = mid.actions.find((item) => item.id === 'plan-withdrawal-ba')?.basis ?? ''
+    expect(basis).toContain('A prohibition admits no compliance route. Article 5(1a) limits this point.')
+    expect(basis).not.toContain('nothing to build towards')
+    expect(basis.indexOf('Article 5(1b)')).toBeGreaterThan(basis.indexOf('Article 5(1a) limits'))
+    expect(basis.endsWith('It is not a reason to continue meanwhile.')).toBe(true)
+    const before = evaluateAssessment(answers, DAY_BEFORE).actions.find((item) => item.id === 'plan-withdrawal-ba')?.basis ?? ''
+    expect(before).toContain('but a prohibition admits no compliance route.')
+    expect(before).not.toContain('nothing to build towards')
+  })
+
+  it('the applies basis ends on the review caveat, after 5(1b) for (ba)', () => {
+    for (const point of ['ba', 'bb']) {
+      const basis =
+        evaluateRuleLibrary({ ...base, prohibited_screen: [`art5-${point}`] }, DAY_AFTER).actions.find(
+          (item) => item.id === `stop-prohibited-use-${point}`,
+        )?.basis ?? ''
+      expect(basis.endsWith('It is not a reason to continue meanwhile.')).toBe(true)
+    }
+    const ba = evaluateRuleLibrary({ ...base, prohibited_screen: ['art5-ba'] }, DAY_AFTER).actions.find((item) => item.id === 'stop-prohibited-use-ba')?.basis ?? ''
+    expect(ba.indexOf('Under Article 5(1b)')).toBeLessThan(ba.indexOf('Whether your system is outside'))
+  })
+
+  it('the counsel-referral adjacent risk survives the date for (ba) and (bb)', () => {
+    const line = 'Non-consensual intimate imagery and CSAM carry criminal and platform-liability exposure independent of the AI Act; this is a matter for legal counsel.'
+    for (const point of ['ba', 'bb']) {
+      expect(evaluateRuleLibrary({ ...base, prohibited_screen: [`art5-${point}`] }, DAY_AFTER).adjacentRisks).toContain(line)
+    }
+    expect(evaluateRuleLibrary({ ...base, prohibited_screen: ['art5-c'] }, DAY_AFTER).adjacentRisks).not.toContain(line)
+  })
+
+  it('the Markdown export uses the moment it is given', () => {
+    const answers = { ...base, tool_name: 'Studio', prohibited_screen: ['art5-ba'] }
+    const at = '2026-12-01T22:00:00Z'
+    const md = complianceCheckerMarkdown(evaluateAssessment(answers, at), answers, assessmentQuestions, at)
+    expect(md).toContain('falls under Article 5(1)(ba) or (bb)')
+  })
+})
+
+describe('v2 reads the moment when the result is requested', () => {
+  it('a session started at 19:30Z on 1 Dec that asks at 20:10Z gets the between state', () => {
+    const started = nowMoment(new Date('2026-12-01T19:30:00Z'))
+    const requested = nowMoment(new Date('2026-12-01T20:10:00Z'))
+    const v2 = scenario('article5DeepfakeNoSafeguards')
+    expect(phaseOn('2 December 2026', started)).toBe('not-yet')
+    expect(phaseOn('2 December 2026', requested)).toBe('between')
+    const item = evaluateAssessmentV2(v2, momentDay(requested), requested).legalFindings.find((entry) => entry.id === 'article-5-ba')
+    expect(JSON.stringify(item)).toContain('The practice is prohibited from 2 December 2026.')
+  })
+
+  it('the component takes the moment in the request handler, not on mount', () => {
+    const source = readFileSync('src/components/tools/checker-v2/ComplianceCheckerV2.tsx', 'utf8')
+    expect(source).toContain('setMoment(nowMoment())')
+    expect(source).not.toMatch(/useState\(\(\) => nowMoment\(\)\)/)
   })
 })

@@ -872,7 +872,7 @@ export default function ComplianceCheckerPage() {
                       <CopyMarkdownButton
                         toolName="Compliance Checker"
                         filename={`ai-act-assessment-${new Date().toISOString().slice(0, 10)}.md`}
-                        getMarkdown={() => complianceCheckerMarkdown(result, answers, assessmentQuestions)}
+                        getMarkdown={() => complianceCheckerMarkdown(result, answers, assessmentQuestions, today ?? undefined)}
                       />
                     </div>
                     <nav aria-label="Sections of this result" className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
@@ -1169,7 +1169,7 @@ export default function ComplianceCheckerPage() {
                 <CopyMarkdownButton
                   toolName="Compliance Checker"
                   filename={`ai-act-assessment-${new Date().toISOString().slice(0, 10)}.md`}
-                  getMarkdown={() => complianceCheckerMarkdown(result, answers, assessmentQuestions)}
+                  getMarkdown={() => complianceCheckerMarkdown(result, answers, assessmentQuestions, today ?? undefined)}
                 />
               </div>
 

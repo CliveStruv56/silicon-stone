@@ -86,8 +86,8 @@ const HIGH_RISK: Array<ClassificationResult['classification']> = [
 function phaseNote(practice: ProhibitedPracticeFinding): string {
   if (!practice.appliesFrom) return ''
   return practice.phase === 'between'
-    ? ` It is prohibited from ${practice.appliesFrom}.`
-    : ` It becomes prohibited on ${practice.appliesFrom}, not today.`
+    ? ` The practice is prohibited from ${practice.appliesFrom}.`
+    : ` The practice becomes prohibited on ${practice.appliesFrom}, not today.`
 }
 
 export function buildLegalFindings(context: FindingContext): ComplianceFindingV2[] {

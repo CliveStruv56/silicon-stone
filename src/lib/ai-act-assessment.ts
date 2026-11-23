@@ -402,7 +402,7 @@ function futureSummary(toolName: string, asOf: string): string {
   // In the hours when the date has begun in some EU zones and not others, say
   // only the date: neither "not today" nor "since" holds across the Union.
   if (from && phaseOn(from, asOf) === 'between') {
-    return `${toolName} falls under Article 5(1)(ba) or (bb) — inserted by the Digital Omnibus — which prohibit the selected use from ${from}.`
+    return `The selected use of ${toolName} falls under Article 5(1)(ba) or (bb) — inserted by the Digital Omnibus — and is prohibited from ${from}.`
   }
   return `${toolName} is not a prohibited practice today, but the selected use falls under Article 5(1)(ba) or (bb) — inserted by the Digital Omnibus — and is prohibited from 2 December 2026. Treat that date as a hard stop and plan the redesign or withdrawal now.`
 }

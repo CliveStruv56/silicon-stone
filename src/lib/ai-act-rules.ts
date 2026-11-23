@@ -1743,13 +1743,17 @@ function art5Basis(practice: Art5Practice): string {
   const shared = `Article 5(1)(${practice.point}) prohibits this practice, and has done since ${practice.appliesFrom}. A prohibition is not a requirement you can satisfy: there is no conformity assessment route, no documentation that cures it, and no risk-management measure that makes a prohibited use lawful.`
   const base = limit ? `${shared} ${limit}` : shared
   return practice.point === 'ba' || practice.point === 'bb'
-    ? [base, ART5_1A_LIMIT, practice.point === 'ba' ? ART5_1B_LIMIT : ''].filter(Boolean).join(' ')
+    ? [base, ART5_1A_LIMIT, practice.point === 'ba' ? ART5_1B_LIMIT : '', ART5_REVIEW_CAVEAT].filter(Boolean).join(' ')
     : base
 }
 
 /** Article 5(1a), which limits points (ba) and (bb). Stated once, verbatim, for both. */
 const ART5_1A_LIMIT =
-  'Article 5(1a) limits this point. Placing the system on the market or putting it into service is prohibited only where that generation or manipulation is its intended purpose, or where its design, training, architecture, capabilities or user-facing functionalities make it a reasonably foreseeable and reproducible outcome, without requiring significant technical modification, and the system does not have reasonable and adequate technical safety measures and other safeguards to reliably prevent it, taking into account reasonably foreseeable misuse, and to correct observed or reported misuse. Use is prohibited only where the deployer uses the system for the purpose of generating or manipulating such material or performance. Whether your system is outside the point on those terms is for the review to establish in writing. It is not a reason to continue meanwhile.'
+  'Article 5(1a) limits this point. Placing the system on the market or putting it into service is prohibited only where that generation or manipulation is its intended purpose, or where its design, training, architecture, capabilities or user-facing functionalities make it a reasonably foreseeable and reproducible outcome, without requiring significant technical modification, and the system does not have reasonable and adequate technical safety measures and other safeguards to reliably prevent it, taking into account reasonably foreseeable misuse, and to correct observed or reported misuse. Use is prohibited only where the deployer uses the system for the purpose of generating or manipulating such material or performance.'
+
+/** The closing caveat of the Article 5(1a) paragraph, kept last so it also follows Article 5(1b). */
+const ART5_REVIEW_CAVEAT =
+  'Whether your system is outside the point on those terms is for the review to establish in writing. It is not a reason to continue meanwhile.'
 
 /** Article 5(1b), which narrows "manipulation" for point (ba). */
 const ART5_1B_LIMIT =
@@ -1800,7 +1804,10 @@ function prohibitedFinding(practice: Art5Practice): Omit<RuleFinding, 'id' | 'ti
         why: `Article 5(1)(${practice.point}) prohibits this practice, and has done since ${practice.appliesFrom}. A vendor’s assurance does not make a prohibited use lawful. A written answer is still the first thing your legal review will ask for, and a vendor that markets the capability has told you where the risk sits.`,
       },
     ],
-    adjacentRisks: [],
+    adjacentRisks:
+      practice.point === 'ba' || practice.point === 'bb'
+        ? ['Non-consensual intimate imagery and CSAM carry criminal and platform-liability exposure independent of the AI Act; this is a matter for legal counsel.']
+        : [],
     reviewTriggers: ['Any biometric, profiling, worker, education, public-space, or vulnerable-person use is proposed'],
     reportSections: ['Prohibited-practice screening'],
   }
@@ -1845,7 +1852,7 @@ function futureProhibitedFinding(practice: Art5Practice): Omit<RuleFinding, 'id'
         article: `Article 5(1)(${practice.point})`,
         corpusArticle: '5',
         basis: [
-          `Inserted by Regulation (EU) 2026/1744 and prohibited from ${practice.appliesFrom}. It is not prohibited today, which is why this is a date to finish work against rather than an instruction to stop now — but a prohibition admits no compliance route, so there is nothing to build towards except stopping.`,
+          `Inserted by Regulation (EU) 2026/1744 and prohibited from ${practice.appliesFrom}. It is not prohibited today, which is why this is a date to finish work against rather than an instruction to stop now — but a prohibition admits no compliance route.`,
           ART5_POINT_LIMITS[practice.point],
         ]
           .filter(Boolean)
@@ -1895,8 +1902,11 @@ function betweenProhibitedFinding(practice: Art5Practice): Omit<RuleFinding, 'id
         article: `Article 5(1)(${practice.point})`,
         corpusArticle: '5',
         basis: [
-          `Inserted by Regulation (EU) 2026/1744 and prohibited from ${practice.appliesFrom}. A prohibition admits no compliance route, so there is nothing to build towards except stopping.`,
+          `Inserted by Regulation (EU) 2026/1744 and prohibited from ${practice.appliesFrom}. A prohibition admits no compliance route.`,
           ART5_POINT_LIMITS[practice.point],
+          ART5_1A_LIMIT,
+          practice.point === 'ba' ? ART5_1B_LIMIT : '',
+          ART5_REVIEW_CAVEAT,
         ]
           .filter(Boolean)
           .join(' '),

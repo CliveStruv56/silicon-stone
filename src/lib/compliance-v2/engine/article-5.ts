@@ -509,13 +509,13 @@ export function evaluateArticle5(answers: AnswerRecordV2, moment: string): Artic
   const explanation = engaged.length
     ? [
         current.length
-          ? `${current.length === 1 ? 'A practice you selected is' : 'Practices you selected are'} on Article 5's list of prohibitions that already apply. A prohibition admits no compliance route: there is no conformity assessment that satisfies it, no documentation that cures it, and no risk measure that makes it lawful.`
+          ? `${current.length === 1 ? 'A practice you selected is' : 'Practices you selected are'} on Article 5’s list of prohibitions that already apply. A prohibition admits no compliance route: there is no conformity assessment that satisfies it, no documentation that cures it, and no risk measure that makes it lawful.`
           : '',
         notYet.length
-          ? `${notYet.length === 1 ? 'A practice you selected becomes' : 'Practices you selected become'} prohibited on a fixed future date, so this is a date to finish work against rather than an instruction to stop today.`
+          ? `${notYet.length === 1 ? 'A practice you selected is' : 'Practices you selected are'} on Article 5’s list of prohibitions that apply from a fixed future date, so this is a date to finish work against rather than an instruction to stop today.`
           : '',
         between.length
-          ? `${between.length === 1 ? 'A practice you selected is' : 'Practices you selected are'} prohibited from ${between[0].appliesFrom}.`
+          ? `${between.length === 1 ? 'A practice you selected is' : 'Practices you selected are'} on Article 5’s list of prohibitions that apply from ${between[0].appliesFrom}.`
           : '',
         complete.length
           ? `Every limb of ${complete.length === 1 ? 'that definition is' : 'those definitions are'} met on your answers, and no exception the provision states applies.`
