@@ -401,10 +401,14 @@ async function collectClaims(): Promise<Claim[]> {
   const claims = new Map<string, Claim>()
 
   for (const rule of AI_ACT_RULE_LIBRARY) {
-    for (const answers of BUILD_PROFILES) {
+    // Both sides of 2 December 2026, so the wording for a practice that has not
+    // started and for one that has are both collected and both checked.
+    for (const [answers, asOf] of BUILD_PROFILES.flatMap((profile) =>
+      ['2026-08-19', '2099-01-01'].map((day) => [profile, day] as const),
+    )) {
       let built: ReturnType<typeof rule.build>
       try {
-        built = rule.build(answers)
+        built = rule.build(answers, { asOf })
       } catch (error) {
         // A build that needs an answer this profile lacks. Another profile may
         // supply it; the coverage line below is what says whether one did.

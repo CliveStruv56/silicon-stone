@@ -6,6 +6,9 @@ import { evaluateArticle5 } from './article-5'
 import { GOLDEN_SCENARIOS, scenario } from '../test-fixtures/golden-scenarios'
 import { validateAnswers } from '../validation/answers'
 
+/** A day before 2 December 2026, so these scenarios keep the behaviour they were written for. */
+const AS_OF = '2026-11-23'
+
 /**
  * Phase 3: the classification routes.
  *
@@ -21,13 +24,13 @@ describe('Annex III routes', () => {
    * asks what the system actually does.
    */
   it('a sector alone does not create high-risk status', () => {
-    const result = classify(scenario('medicalAdminMicro'))
+    const result = classify(scenario('medicalAdminMicro'), undefined, AS_OF)
     expect(result.classification).toBe('no_specific_category_identified')
     expect(result.statutoryRoutes).toEqual([])
   })
 
   it('the listed use in the same sector does', () => {
-    const result = classify(scenario('publicBenefitsEligibility'))
+    const result = classify(scenario('publicBenefitsEligibility'), undefined, AS_OF)
     expect(result.classification).toBe('likely_high_risk')
     expect(result.statutoryRoutes).toContain('Annex III, point 5(a)')
   })
@@ -60,14 +63,14 @@ describe('Article 6(3)', () => {
     const exemption = evaluateArticle6Exemption(answers, evaluateAnnexIII(answers))
     expect(exemption.outcome).toBe('foreclosed_by_profiling')
 
-    const result = classify(answers)
+    const result = classify(answers, undefined, AS_OF)
     expect(result.classification).toBe('likely_high_risk')
     expect(result.confidence).toBe('high')
     expect(result.statutoryRoutes).toContain('Article 6(3)')
   })
 
   it('lifts the classification where both halves are met', () => {
-    const result = classify(scenario('hrNarrowTaskExemption'))
+    const result = classify(scenario('hrNarrowTaskExemption'), undefined, AS_OF)
     expect(result.classification).toBe('no_specific_category_identified')
     // The route it derogates from is still cited — a reader needs both halves
     // to check the reasoning.
@@ -88,11 +91,11 @@ describe('Article 6(3)', () => {
     }
     const exemption = evaluateArticle6Exemption(answers, evaluateAnnexIII(answers))
     expect(exemption.outcome).toBe('not_available')
-    expect(classify(answers).classification).toBe('likely_high_risk')
+    expect(classify(answers, undefined, AS_OF).classification).toBe('likely_high_risk')
   })
 
   it('holds the tier open where profiling is unresolved', () => {
-    const result = classify(scenario('hrProfilingUnresolved'))
+    const result = classify(scenario('hrProfilingUnresolved'), undefined, AS_OF)
     expect(result.classification).toBe('possible_high_risk')
     expect(result.confidence).toBe('low')
     expect(result.missingAnswerIds).toContain('performs_profiling')
@@ -101,14 +104,14 @@ describe('Article 6(3)', () => {
 
 describe('Annex I', () => {
   it('fires only where both limbs are met', () => {
-    expect(classify(scenario('regulatedProductBothLimbs')).classification).toBe('likely_high_risk')
-    expect(classify(scenario('regulatedProductBothLimbs')).statutoryRoutes).toContain(
+    expect(classify(scenario('regulatedProductBothLimbs'), undefined, AS_OF).classification).toBe('likely_high_risk')
+    expect(classify(scenario('regulatedProductBothLimbs'), undefined, AS_OF).statutoryRoutes).toContain(
       'Annex I, via Article 6(1)'
     )
   })
 
   it('is possible, not settled, on one limb alone', () => {
-    const result = classify(scenario('regulatedProductOneLimb'))
+    const result = classify(scenario('regulatedProductOneLimb'), undefined, AS_OF)
     expect(result.classification).toBe('possible_high_risk')
     expect(result.missingAnswerIds).toContain('annex_i_route')
   })
@@ -133,7 +136,7 @@ describe('Article 50', () => {
   })
 
   it('classifies a transparency-only system as such', () => {
-    const result = classify(scenario('chatbotNotObvious'))
+    const result = classify(scenario('chatbotNotObvious'), undefined, AS_OF)
     expect(result.classification).toBe('specific_transparency_duties')
     expect(result.statutoryRoutes).toContain('Article 50(1)')
   })
@@ -163,11 +166,11 @@ describe('Article 5', () => {
   /** §7.6: the output stays "potentially prohibited" until the path is complete. */
   it('never concludes prohibited outright', () => {
     const answers = scenario('prohibitedScreenPositive')
-    const article5 = evaluateArticle5(answers)
+    const article5 = evaluateArticle5(answers, AS_OF)
     expect(article5.engaged).toHaveLength(1)
     expect(article5.engaged[0].unresolved.length).toBeGreaterThan(0)
 
-    const result = classify(answers)
+    const result = classify(answers, undefined, AS_OF)
     expect(result.classification).toBe('potentially_prohibited')
     expect(result.confidence).toBe('low')
     expect(result.explanation).toMatch(/potentially prohibited/)
@@ -183,11 +186,11 @@ describe('Article 5', () => {
         source: 'manual' as const,
       },
     }
-    expect(classify(answers).classification).toBe('potentially_prohibited')
+    expect(classify(answers, undefined, AS_OF).classification).toBe('potentially_prohibited')
   })
 
   it('a cleared screen is a real answer, not an absence', () => {
-    const article5 = evaluateArticle5(scenario('medicalAdminMicro'))
+    const article5 = evaluateArticle5(scenario('medicalAdminMicro'), AS_OF)
     expect(article5.engaged).toEqual([])
     expect(article5.uncertain).toBe(false)
     expect(article5.triggeringAnswerIds).toContain('prohibited_screen')
@@ -196,7 +199,7 @@ describe('Article 5', () => {
 
 describe('scope suppression', () => {
   it('an out-of-scope result carries no classification route at all', () => {
-    const result = classify(scenario('outOfScope'))
+    const result = classify(scenario('outOfScope'), undefined, AS_OF)
     expect(result.classification).toBe('out_of_scope')
     expect(result.statutoryRoutes).toEqual([])
   })
@@ -206,7 +209,7 @@ describe('Phase 3 exit criteria', () => {
   /** 1. Every high-risk outcome contains a statutory route. */
   it('no high-risk outcome exists without a route to cite', () => {
     for (const item of GOLDEN_SCENARIOS) {
-      const result = classify(item.answers)
+      const result = classify(item.answers, undefined, AS_OF)
       expect(hasStatutoryRoute(result), `${item.id}: ${result.classification} with no route`).toBe(
         true
       )
@@ -249,7 +252,7 @@ describe('Phase 3 exit criteria', () => {
       }
       delete (answers as Record<string, unknown>).annex_iii_essential_services_use
 
-      const result = classify(answers)
+      const result = classify(answers, undefined, AS_OF)
       expect(result.classification, family).not.toBe('likely_high_risk')
       expect(evaluateAnnexIII(answers).routes, family).toEqual([])
     }
@@ -267,7 +270,7 @@ describe('Phase 3 exit criteria', () => {
 
   /** 4. The known regression scenarios pass — v1 defects 2, 3 and 6. */
   it('v1 defect 2: operational impact without a route is not high-risk', () => {
-    const result = classify(scenario('highImpactNoRoute'))
+    const result = classify(scenario('highImpactNoRoute'), undefined, AS_OF)
     expect(result.classification).toBe('no_specific_category_identified')
     expect(result.statutoryRoutes).toEqual([])
   })
@@ -280,6 +283,6 @@ describe('Phase 3 exit criteria', () => {
 
   /** §9.5, and the thing v1 had no notion of: confidence from completeness. */
   it('an unresolved classification-decisive answer keeps confidence off high', () => {
-    expect(classify(scenario('hrProfilingUnresolved')).confidence).not.toBe('high')
+    expect(classify(scenario('hrProfilingUnresolved'), undefined, AS_OF).confidence).not.toBe('high')
   })
 })

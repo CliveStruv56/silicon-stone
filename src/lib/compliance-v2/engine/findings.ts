@@ -99,7 +99,7 @@ export function buildLegalFindings(context: FindingContext): ComplianceFindingV2
    * use is a medical one is *told* that Article 5(1)(f) excepts it, rather than
    * being left with an alarm and no way to clear it.
    */
-  const article5 = evaluateArticle5(answers)
+  const article5 = evaluateArticle5(answers, assessedAt)
   const article5Roles = held.length ? held : (['deployer'] as LegalRole[])
 
   for (const practice of article5.engaged) {

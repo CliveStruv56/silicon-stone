@@ -1,4 +1,5 @@
 import { RULE_PACK } from '@/lib/rulepack'
+import { inForceOn } from '@/lib/ai-act-dates'
 import type { AnswerRecordV2 } from '../types'
 import { includesAny, isNo, isYes, saidUnknown, valueOf, valuesOf } from './read'
 
@@ -417,10 +418,13 @@ const PRACTICE_BY_VALUE = new Map(
   RULE_PACK.prohibitedPractices.map((practice) => [`art5_${practice.point}`, practice])
 )
 
-function evaluatePractice(value: string, answers: AnswerRecordV2): ProhibitedPracticeFinding {
+function evaluatePractice(value: string, answers: AnswerRecordV2, assessedAt: string): ProhibitedPracticeFinding {
   const practice = PRACTICE_BY_VALUE.get(value)
   const point = practice?.point ?? value.replace(/^art5_/, '')
-  const futureDated = Boolean(practice?.futureDated)
+  // Future-dated only while the assessment date is before the practice's own
+  // application date. From that date the point is prohibited like any other,
+  // so it carries no `appliesFrom` and is not described as "not today".
+  const futureDated = Boolean(practice?.futureDated) && !inForceOn(practice!.appliesFrom, assessedAt)
   const limbs = limbsFor(point, answers)
 
   const failed = limbs.find((limb) => limb.state === 'failed')
@@ -453,7 +457,11 @@ function evaluatePractice(value: string, answers: AnswerRecordV2): ProhibitedPra
   }
 }
 
-export function evaluateArticle5(answers: AnswerRecordV2): Article5Evaluation {
+/**
+ * `assessedAt` is an ISO day and is required: whether a point is prohibited yet
+ * depends on it, and a default would read the clock without the caller knowing.
+ */
+export function evaluateArticle5(answers: AnswerRecordV2, assessedAt: string): Article5Evaluation {
   if (saidUnknown(answers, 'prohibited_screen')) {
     return {
       engaged: [],
@@ -479,7 +487,7 @@ export function evaluateArticle5(answers: AnswerRecordV2): Article5Evaluation {
     }
   }
 
-  const evaluated = selected.map((value) => evaluatePractice(value, answers))
+  const evaluated = selected.map((value) => evaluatePractice(value, answers, assessedAt))
   const engaged = evaluated.filter((item) => item.outcome !== 'not_engaged')
   const cleared = evaluated.filter((item) => item.outcome === 'not_engaged')
 

@@ -155,6 +155,17 @@ Four invariants the tool promises on screen and must keep:
   anchor" badge — a blank where every neighbour shows a citation reads as an
   omission rather than a decision.
 
+**Dates are worked out from the assessment date, never from the pack's `status`
+field or `futureDated` flag alone** (since 2026-11-23). Article 5(1)(ba) and (bb)
+apply from 2 December 2026: `evaluateRuleLibrary(answers, asOf)` and v2's
+`evaluateArticle5(answers, assessedAt)` treat a future-dated practice as
+prohibited once `asOf` reaches its `appliesFrom`, using `src/lib/ai-act-dates.ts`.
+The date is read in the browser (`useAssessmentDate`, null on the server and while
+hydrating), so a prerendered page never freezes the build's date; prerendered
+copy must be true on both sides of a date (say "applies from", not "since" or
+"will"). Tests inject the day and never read the clock; run the suite under a fake
+clock after 2 December to catch anything that did.
+
 Three consequences of that shape worth not undoing:
 
 - **The Article anchor is a field, not prose.** `article` and `corpusArticle` are

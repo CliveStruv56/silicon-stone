@@ -1013,7 +1013,7 @@ export const LEGAL_PROPOSITIONS: LegalProposition[] = [
     ],
     effectiveFrom: '2026-12-02',
     plainEnglishSummary:
-      'Generating or manipulating non-consensual intimate imagery of an identifiable person becomes prohibited on 2 December 2026.',
+      'Generating or manipulating non-consensual intimate imagery of an identifiable person is prohibited from 2 December 2026.',
     practicalMeaning:
       'Consent is the defining absence, and it has to be consent to this generation or manipulation specifically. Article 5(1a) then narrows who is caught: a deployer only where they use the system for that purpose.',
     shortExtract:
@@ -1042,7 +1042,7 @@ export const LEGAL_PROPOSITIONS: LegalProposition[] = [
     ],
     effectiveFrom: '2026-12-02',
     plainEnglishSummary:
-      'Generating or manipulating child sexual abuse material becomes prohibited on 2 December 2026.',
+      'Generating or manipulating child sexual abuse material is prohibited from 2 December 2026.',
     practicalMeaning:
       'The only exception the provision states is a "without right" defence under national law, which is a question of the national law that applies to you rather than of the Regulation.',
     shortExtract:

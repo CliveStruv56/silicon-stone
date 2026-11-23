@@ -42,7 +42,7 @@ export function evaluateAssessmentV2(
   const scope = evaluateTerritorialScope(answers)
   const roles = evaluateLegalRoles(answers)
   const size = evaluateOrganisationSize(answers)
-  const classification = classify(answers, scope)
+  const classification = classify(answers, scope, assessedAt)
 
   const context = { answers, scope, roles, size, classification, assessedAt }
 

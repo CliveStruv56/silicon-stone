@@ -27,7 +27,9 @@ import {
   evaluateAssessment,
   getVisibleQuestions,
 } from '@/lib/ai-act-assessment'
-import { AI_ACT_TIMELINE, PENALTY_TIERS } from '@/lib/ai-act-timeline'
+import { AI_ACT_TIMELINE, PENALTY_TIERS, type TimelineEntry } from '@/lib/ai-act-timeline'
+import { nextMilestoneOn, timelineStatusOn } from '@/lib/ai-act-dates'
+import { useAssessmentDate } from '@/lib/use-assessment-date'
 import { RULE_PACK } from '@/lib/rulepack'
 import { ComplianceIntake } from '@/components/tools/ComplianceIntake'
 import { ObligationList } from '@/components/tools/ObligationList'
@@ -219,7 +221,17 @@ const CORPUS_CUT_OFF = new Date(`${RULE_PACK.manifest.corpusCutOff}T00:00:00Z`).
 const GENERAL_APPLICATION = AI_ACT_TIMELINE.find(
   (entry) => entry.basis === 'Article 113, second paragraph',
 )
-const NEXT_DATED_STEP = AI_ACT_TIMELINE.find((entry) => entry.status === 'upcoming')
+
+/**
+ * A milestone's status on the reader's day. Before the browser has supplied the
+ * date (`today` is null: prerender and hydration) only what is certain is
+ * asserted: a date already in force when the pack was cut stays in force, and
+ * everything else is shown as a bare date rather than as "upcoming" or "in
+ * force", so a page built before a date passes never says the wrong thing after.
+ */
+function timelineStatus(entry: TimelineEntry, today: string | null): 'in-force' | 'upcoming' {
+  return today ? timelineStatusOn(entry, today) : entry.status === 'in-force' ? 'in-force' : 'upcoming'
+}
 
 const HOW_IT_WORKS = [
   {
@@ -323,7 +335,12 @@ export default function ComplianceCheckerPage() {
 
   const visibleQuestions = useMemo(() => getVisibleQuestions(answers), [answers])
   const currentQuestion = visibleQuestions[currentIndex] ?? visibleQuestions[visibleQuestions.length - 1]
-  const result = useMemo(() => evaluateAssessment(answers), [answers])
+  // Read in the browser: null on the server and while hydrating, so a prerendered
+  // page never freezes the build's date. The engine falls back to today, which
+  // is the same day, for the first client render.
+  const today = useAssessmentDate()
+  const result = useMemo(() => evaluateAssessment(answers, today ?? undefined), [answers, today])
+  const nextDatedStep = today ? nextMilestoneOn(AI_ACT_TIMELINE, today) : undefined
   const tone = resultTone(result.classification)
   const cta = resultCta(result.classification, result.role)
   const progress = Math.round(((currentIndex + 1) / visibleQuestions.length) * 100)
@@ -477,7 +494,7 @@ export default function ComplianceCheckerPage() {
                 </Link>
                 .
               </p>
-              {GENERAL_APPLICATION && NEXT_DATED_STEP && (
+              {GENERAL_APPLICATION && (
                 <p className="mt-4 max-w-3xl leading-relaxed text-text-muted">
                   {/* Not "the penalty regime": Chapter XII has applied since
                       2 August 2025 (Article 113, third paragraph, point (b)).
@@ -485,9 +502,14 @@ export default function ComplianceCheckerPage() {
                       fines on GPAI providers, which that point excepts. */}
                   The Article 50 transparency duties have applied since{' '}
                   {GENERAL_APPLICATION.date}, and with them the Commission’s power to fine
-                  providers of general-purpose AI models. The next dated step is {NEXT_DATED_STEP.date}:{' '}
-                  {NEXT_DATED_STEP.label.charAt(0).toLowerCase() + NEXT_DATED_STEP.label.slice(1)}.
-                  The result tells you which line your system sits on.
+                  providers of general-purpose AI models.
+                  {nextDatedStep && (
+                    <>
+                      {' '}The next dated step is {nextDatedStep.date}:{' '}
+                      {nextDatedStep.label.charAt(0).toLowerCase() + nextDatedStep.label.slice(1)}.
+                    </>
+                  )}
+                  {' '}The result tells you which line your system sits on.
                 </p>
               )}
 
@@ -1015,12 +1037,12 @@ export default function ComplianceCheckerPage() {
                           <Badge
                             variant="outline"
                             className={
-                              entry.status === 'in-force'
+                              timelineStatus(entry, today) === 'in-force'
                                 ? 'w-fit border-alert-red text-alert-red'
                                 : 'w-fit border-stone-teal text-stone-teal'
                             }
                           >
-                            {entry.status === 'in-force' ? `Applies since ${entry.date}` : entry.date}
+                            {timelineStatus(entry, today) === 'in-force' ? `Applies since ${entry.date}` : entry.date}
                           </Badge>
                         </div>
                         <p className="mt-2 text-sm text-text-muted">{entry.detail}</p>

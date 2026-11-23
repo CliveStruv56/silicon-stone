@@ -48,9 +48,13 @@ export interface ClassificationResult {
 /** The questions without which no route can be evaluated at all. */
 const MINIMUM_DESCRIPTION = ['intended_use_family', 'individual_impact']
 
-export function classify(answers: AnswerRecordV2, scope?: EvaluatedScope): ClassificationResult {
+export function classify(
+  answers: AnswerRecordV2,
+  scope: EvaluatedScope | undefined,
+  assessedAt: string,
+): ClassificationResult {
   const territorial = scope ?? evaluateTerritorialScope(answers)
-  const article5 = evaluateArticle5(answers)
+  const article5 = evaluateArticle5(answers, assessedAt)
   const annexI = evaluateAnnexI(answers)
   const annexIII = evaluateAnnexIII(answers)
   const exemption = evaluateArticle6Exemption(answers, annexIII)

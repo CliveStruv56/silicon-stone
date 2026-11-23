@@ -31,7 +31,9 @@ import type { AssessmentQuestionV2 } from '../types'
 const PRACTICE_OPTIONS = RULE_PACK.prohibitedPractices.map((practice) => ({
   value: `art5_${practice.point}`,
   label: practice.summary,
-  help: practice.futureDated ? `Prohibited from ${practice.appliesFrom}, not today.` : undefined,
+  // Neutral about the date: this catalogue is built once and must read
+  // correctly on both sides of `appliesFrom`.
+  help: practice.futureDated ? `Prohibited from ${practice.appliesFrom}.` : undefined,
 }))
 
 /** The screen values that came from the pack, for the engine to map back. */

@@ -84,6 +84,9 @@ describe('territorial scope (Article 2)', () => {
   })
 })
 
+/** The day before the two Omnibus prohibitions apply. */
+const DAY_BEFORE = '2026-12-01'
+
 describe('prohibited practices (Article 5)', () => {
   // The eight points that have applied since 2 February 2025.
   const presentTense = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
@@ -97,8 +100,8 @@ describe('prohibited practices (Article 5)', () => {
     expect(text(result.actions)).toMatch(/Stop or pause/i)
   })
 
-  it.each(futureDated)('point (%s) classifies as prohibited from 2 December 2026, not today', (point) => {
-    const result = evaluateRuleLibrary({ ...inScopeBase, prohibited_screen: [`art5-${point}`] })
+  it.each(futureDated)('point (%s) classifies as prohibited from 2 December 2026, not today, the day before', (point) => {
+    const result = evaluateRuleLibrary({ ...inScopeBase, prohibited_screen: [`art5-${point}`] }, DAY_BEFORE)
     expect(result.classification).toBe('Prohibited from 2 December 2026')
     expect(result.firedRules.map((rule) => rule.id)).toContain(`prohibited-art5-${point}`)
     // Must not order an immediate halt over a prohibition that does not yet exist.
@@ -107,7 +110,7 @@ describe('prohibited practices (Article 5)', () => {
   })
 
   it.each(futureDated)('point (%s) cites the amending Regulation, not the Service Desk', (point) => {
-    const result = evaluateRuleLibrary({ ...inScopeBase, prohibited_screen: [`art5-${point}`] })
+    const result = evaluateRuleLibrary({ ...inScopeBase, prohibited_screen: [`art5-${point}`] }, DAY_BEFORE)
     const fired = result.firedRules.find((rule) => rule.id === `prohibited-art5-${point}`)
     expect(fired?.source.url).toContain('2026/1744')
     expect(fired?.source.article).toBe(`Article 5(1)(${point})`)
@@ -125,7 +128,7 @@ describe('prohibited practices (Article 5)', () => {
     const result = evaluateRuleLibrary({
       ...inScopeBase,
       prohibited_screen: ['art5-ba', 'art5-c'],
-    })
+    }, DAY_BEFORE)
     expect(result.classification).toBe('Prohibited practice')
   })
 
@@ -143,7 +146,7 @@ describe('prohibited practices (Article 5)', () => {
       ...inScopeBase,
       prohibited_screen: ['art5-ba'],
       sensitive_domains: ['employment'],
-    })
+    }, DAY_BEFORE)
     expect(result.classification).toBe('Prohibited from 2 December 2026')
   })
 })
@@ -975,7 +978,14 @@ describe('Article 5(1) carve-outs are stated, point by point', () => {
 
   it('never calls a prohibition "outright", and says what (h) actually says', () => {
     const screen = RULE_PACK.prohibitedPractices.map((p) => `art5-${p.point}`)
-    const result = evaluateRuleLibrary({ eu_scope: ['eu-org'], origin: 'third-party', prohibited_screen: screen })
+    const answers = { eu_scope: ['eu-org'], origin: 'third-party', prohibited_screen: screen }
+    // After 2 December 2026 every point is in force and takes the "stop" path;
+    // before it, (ba) and (bb) take the "plan withdrawal" path. Both are held.
+    const result = evaluateRuleLibrary(answers, '2026-12-01')
+    const after = evaluateRuleLibrary(answers, '2026-12-02')
+    expect(
+      after.actions.find((item) => item.id === 'stop-prohibited-use-bb')?.basis,
+    ).toContain(ART5_POINT_LIMITS.bb)
     const prose = [
       ...result.actions.map((item) => item.basis),
       ...result.vendorQuestions.map((item) => item.why),

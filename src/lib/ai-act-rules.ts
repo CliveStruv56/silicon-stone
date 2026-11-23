@@ -5,6 +5,7 @@ import type {
   UserRole,
 } from './ai-act-assessment'
 import { RULE_PACK, type PackProhibitedPractice } from './rulepack'
+import { inForceOn, todayIso } from './ai-act-dates'
 
 export type LegalStatus = 'current-law' | 'official-guidance' | 'operational-risk' | 'adjacent-risk'
 
@@ -151,6 +152,15 @@ export interface RuleFinding {
   reportSections: string[]
 }
 
+/**
+ * What a rule may know besides the answers. `asOf` is the assessment date, an
+ * ISO day, read in the browser when the user gets their answer (see
+ * `useAssessmentDate`) and never at build time.
+ */
+export interface RuleContext {
+  asOf: string
+}
+
 export interface AssessmentRule {
   id: string
   title: string
@@ -161,7 +171,7 @@ export interface AssessmentRule {
   source: RuleSource
   priority: number
   when: (answers: AssessmentAnswers) => boolean
-  build: (answers: AssessmentAnswers) => Omit<
+  build: (answers: AssessmentAnswers, context: RuleContext) => Omit<
     RuleFinding,
     'id' | 'title' | 'category' | 'version' | 'lastReviewed' | 'legalStatus' | 'source'
   >
@@ -370,6 +380,8 @@ function selected(answers: AssessmentAnswers, id: string): string {
  * the two points inserted by Regulation (EU) 2026/1744, which apply from
  * 2 December 2026 rather than 2 February 2025 — telling someone to "stop now"
  * over a prohibition that does not yet exist would be as wrong as missing it.
+ * It is not a permanent state: once the assessment date reaches `appliesFrom`
+ * the practice takes the same path as any other prohibition.
  */
 type Art5Practice = PackProhibitedPractice
 
@@ -753,8 +765,13 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
       source: art5Source(practice),
       priority: 100 + index,
       when: (answers) => has(answers, 'prohibited_screen', `art5-${practice.point}`),
-      build: () =>
-        practice.futureDated ? futureProhibitedFinding(practice) : prohibitedFinding(practice),
+      // Dated by the assessment date, not by the pack's flag alone: `futureDated`
+      // says the point was inserted with a later application date, and from that
+      // date the practice is prohibited exactly as the original eight are.
+      build: (_answers, { asOf }) =>
+        practice.futureDated && !inForceOn(practice.appliesFrom, asOf)
+          ? futureProhibitedFinding(practice)
+          : prohibitedFinding(practice),
     })
   ),
   rule({
@@ -1908,7 +1925,7 @@ function reviewTriggerLabel(value: string): string {
   return labels[value] ?? value
 }
 
-export function evaluateRuleLibrary(answers: AssessmentAnswers): RuleEvaluation {
+export function evaluateRuleLibrary(answers: AssessmentAnswers, asOf: string = todayIso()): RuleEvaluation {
   const firedRules = AI_ACT_RULE_LIBRARY
     .filter((item) => item.when(answers))
     .sort((a, b) => a.priority - b.priority)
@@ -1920,7 +1937,7 @@ export function evaluateRuleLibrary(answers: AssessmentAnswers): RuleEvaluation 
       lastReviewed: item.lastReviewed,
       legalStatus: item.legalStatus,
       source: item.source,
-      ...item.build(answers),
+      ...item.build(answers, { asOf }),
     }))
 
   const score = firedRules.reduce((total, item) => total + item.scoreDelta, 0)

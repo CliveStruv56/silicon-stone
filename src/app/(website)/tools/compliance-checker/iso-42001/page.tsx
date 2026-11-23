@@ -56,7 +56,9 @@ function appliesLine(row: CrosswalkRow): string {
   return row.appliesFrom
     .map((label) => {
       const date = packDate(label)
-      const verb = date.inForce ? 'Applies since' : 'Applies from'
+      // "Applies from" is true on both sides of the date, which a prerendered
+      // page needs: "since" would be wrong the day before and "will apply" the day after.
+      const verb = 'Applies from'
       const route = ROUTE_NAMES[label]
       return route ? `${verb} ${date.display} for ${route}` : `${verb} ${date.display}`
     })

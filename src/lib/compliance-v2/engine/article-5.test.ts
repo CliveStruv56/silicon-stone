@@ -8,6 +8,9 @@ import { ARTICLE_5_CONDITION_QUESTIONS } from '../questions/article-5-conditions
 import { LEGAL_PROPOSITIONS } from '../legal-content/propositions'
 import { GOLDEN_SCENARIOS, record, scenario, unknown } from '../test-fixtures/golden-scenarios'
 
+/** A day before 2 December 2026, so these scenarios keep the behaviour they were written for. */
+const AS_OF = '2026-11-23'
+
 /**
  * §7.6 — the per-practice condition trees.
  *
@@ -19,7 +22,7 @@ import { GOLDEN_SCENARIOS, record, scenario, unknown } from '../test-fixtures/go
  */
 
 const ASSESSED_AT = '2026-08-19'
-const evaluate = (id: string) => evaluateArticle5(scenario(id))
+const evaluate = (id: string) => evaluateArticle5(scenario(id), AS_OF)
 
 describe('a limb failing clears the practice', () => {
   it('emotion inference outside a workplace or school is not Article 5(1)(f)', () => {
@@ -37,7 +40,7 @@ describe('a limb failing clears the practice', () => {
   })
 
   it('and the classification comes back off the prohibition entirely', () => {
-    const result = classify(scenario('article5ManipulationNoHarm'))
+    const result = classify(scenario('article5ManipulationNoHarm'), undefined, AS_OF)
     expect(result.classification).not.toBe('potentially_prohibited')
     expect(result.explanation).not.toMatch(/potentially prohibited/)
   })
@@ -102,7 +105,7 @@ describe('a complete path says so, and still says "potentially"', () => {
 
   /** §7.6's user-facing rule, on the path where it is most tempting to break. */
   it('does not conclude "prohibited", even with every limb met', () => {
-    const result = classify(scenario('article5ManipulationAllLimbsMet'))
+    const result = classify(scenario('article5ManipulationAllLimbsMet'), undefined, AS_OF)
     expect(result.classification).toBe('potentially_prohibited')
     expect(result.explanation).toMatch(/potentially prohibited/)
   })
@@ -149,8 +152,7 @@ describe('an unknown limb never clears anything', () => {
 
   it('an unknown screen is still an unresolved screen', () => {
     const result = evaluateArticle5(
-      record(unknown('prohibited_screen'))
-    )
+      record(unknown('prohibited_screen')), AS_OF)
     expect(result.uncertain).toBe(true)
     expect(result.engaged).toEqual([])
     expect(result.cleared).toEqual([])

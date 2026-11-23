@@ -1,4 +1,5 @@
 import { RULE_PACK } from '@/lib/rulepack'
+import { packDateToIso } from '@/lib/ai-act-dates'
 
 /**
  * Application dates, read from the pinned pack rather than written here.
@@ -14,24 +15,11 @@ import { RULE_PACK } from '@/lib/rulepack'
  * and a finding with no date is exactly the one that gets read as "now".
  */
 
-const MONTHS: Record<string, number> = {
-  January: 0, February: 1, March: 2, April: 3, May: 4, June: 5,
-  July: 6, August: 7, September: 8, October: 9, November: 10, December: 11,
-}
-
 export interface ApplicationDate {
   /** As the pack writes it, for display: "2 December 2027". */
   display: string
   /** ISO, for comparison against the assessment date. */
   iso: string
-  inForce: boolean
-}
-
-function parse(display: string): string {
-  const [day, month, year] = display.split(' ')
-  const monthIndex = MONTHS[month]
-  if (monthIndex === undefined) throw new Error(`Unparseable pack date "${display}"`)
-  return `${year}-${String(monthIndex + 1).padStart(2, '0')}-${day.padStart(2, '0')}`
 }
 
 export function packDate(label: string): ApplicationDate {
@@ -42,7 +30,7 @@ export function packDate(label: string): ApplicationDate {
         `A finding without its date reads as "now", so this fails rather than degrades.`,
     )
   }
-  return { display: entry.date, iso: parse(entry.date), inForce: entry.status === 'in-force' }
+  return { display: entry.date, iso: packDateToIso(entry.date) }
 }
 
 /** The labels the engine depends on. Named so a pack rename fails in one place. */
