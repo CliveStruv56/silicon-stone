@@ -3,18 +3,26 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { AI_ACT_TIMELINE } from '@/lib/ai-act-timeline'
-import { inForceOn } from '@/lib/ai-act-dates'
+import { packDateToIso } from '@/lib/ai-act-dates'
 import { useAssessmentDate } from '@/lib/use-assessment-date'
 
 // Both dates come from the pinned rule pack, so neither is typed here.
 const TRANSPARENCY_DATE = AI_ACT_TIMELINE.find((entry) => entry.basis === 'Article 113, second paragraph')?.date
 const MARKING_DATE = AI_ACT_TIMELINE.find((entry) => entry.basis.includes('Article 111(4)'))?.date
 
+/**
+ * Past tense only from the day after the date: on the day itself the transition
+ * has not yet ended. Unknown date (prerender, hydration): tense-neutral.
+ */
+export function markingVerb(today: string | null): string {
+  if (!today || !MARKING_DATE) return 'runs to'
+  return today > packDateToIso(MARKING_DATE) ? 'ended on' : 'ends on'
+}
+
 export function DeadlineCountdown() {
   // Null until the browser supplies the date, so the prerendered page never
   // asserts whether the marking date has passed.
   const today = useAssessmentDate()
-  const markingVerb = today && MARKING_DATE ? (inForceOn(MARKING_DATE, today) ? 'ended on' : 'ends on') : 'is set for'
   return (
     <div className="w-full bg-stone-charcoal border-none px-6 py-3">
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between md:gap-6">
@@ -30,7 +38,7 @@ export function DeadlineCountdown() {
         <p className="text-xs leading-relaxed text-text-muted md:max-w-2xl">
           Catalogue your systems. Clarify your role. Capture vendor evidence. Set review triggers.
           Article 50 transparency obligations apply from {TRANSPARENCY_DATE}; the marking
-          transition for certain systems marketed before that date {markingVerb} {MARKING_DATE}.{' '}
+          transition for certain systems marketed before that date {markingVerb(today)} {MARKING_DATE}.{' '}
           <Link href="/digital-omnibus#timeline" className="text-stone-teal underline underline-offset-4">
             Digital Omnibus timeline
           </Link>

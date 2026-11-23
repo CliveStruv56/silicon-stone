@@ -260,7 +260,7 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     id: 'prohibited_screen',
     section: 'Risk Signals',
     text: 'Does the use involve any of these red-flag practices?',
-    help: 'These are the ten practices prohibited by Article 5(1). Two of them — the intimate-imagery and CSAM points inserted by the Digital Omnibus — apply from 2 December 2026.',
+    help: 'These are the ten practices listed in Article 5(1). Two of them — the intimate-imagery and CSAM points inserted by the Digital Omnibus — apply from 2 December 2026.',
     type: 'multi',
     options: [
       {
@@ -409,7 +409,9 @@ export function evaluateAssessment(answers: AssessmentAnswers, asOf?: string): A
     ? `${toolName} appears to be outside EU AI Act territorial scope on this first-pass assessment. Document the reasoning and re-check if EU users, customers, or outputs are added.`
     : ruleEvaluation.classification === 'Prohibited from 2 December 2026'
       ? `${toolName} is not a prohibited practice today, but the selected use falls under Article 5(1)(ba) or (bb) — inserted by the Digital Omnibus — and is prohibited from 2 December 2026. Treat that date as a hard stop and plan the redesign or withdrawal now.`
-      : `${toolName} is classified as ${ruleEvaluation.classification.toLowerCase()} on this first-pass assessment. The result should be treated as an AI system record and reviewed when the use case, vendor, data, or level of automation changes.`
+      : ruleEvaluation.classification === 'Prohibited practice'
+        ? `${toolName} is classified as a prohibited practice on this first-pass assessment. Stop or pause the use until the position is reviewed.`
+        : `${toolName} is classified as ${ruleEvaluation.classification.toLowerCase()} on this first-pass assessment. The result should be treated as an AI system record and reviewed when the use case, vendor, data, or level of automation changes.`
 
   return {
     classification: ruleEvaluation.classification,

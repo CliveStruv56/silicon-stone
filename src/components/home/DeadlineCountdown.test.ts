@@ -1,7 +1,7 @@
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import { DeadlineCountdown } from './DeadlineCountdown'
+import { DeadlineCountdown, markingVerb } from './DeadlineCountdown'
 
 describe('DeadlineCountdown prerender', () => {
   // On the server the browser date is unknown (null), so the prerendered page
@@ -14,7 +14,14 @@ describe('DeadlineCountdown prerender', () => {
   })
 
   it('uses tense-neutral wording until the browser supplies the date', () => {
-    expect(html).toContain('is set for 2 December 2026')
+    expect(html).toContain('runs to 2 December 2026')
     expect(html).not.toMatch(/ends on|ended on|have applied since/)
+  })
+
+  it('is past tense only from the day after 2 December 2026', () => {
+    expect(markingVerb(null)).toBe('runs to')
+    expect(markingVerb('2026-12-01')).toBe('ends on')
+    expect(markingVerb('2026-12-02')).toBe('ends on')
+    expect(markingVerb('2026-12-03')).toBe('ended on')
   })
 })

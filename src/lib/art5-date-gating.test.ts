@@ -105,6 +105,10 @@ describe('v1: Article 5(1)(ba) and (bb) across 2 December 2026', () => {
     const after = evaluateAssessment(answers, DAY_AFTER)
     expect(after.classification).toBe('Prohibited practice')
     expect(after.summary).not.toMatch(NOT_YET)
+    expect(after.summary).toBe(
+      'Studio is classified as a prohibited practice on this first-pass assessment. Stop or pause the use until the position is reviewed.',
+    )
+    expect(after.summary).not.toMatch(/classified as prohibited practice/)
   })
 
   it('a present-tense and a newly applying practice together keep the present-tense headline', () => {
