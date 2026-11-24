@@ -686,8 +686,8 @@ export const article = defineType({
       description:
         'Machine-generated verification report from the "Run fact-check" document action. ' +
         'Each claim is checked against fresh web searches of primary sources. Advisory only — ' +
-        'never blocks publishing. Edit a Suggested Revision if needed, then use ' +
-        '"Insert into article" on the claim to apply it to the body.',
+        'never blocks publishing. A Suggested Revision is the checker\'s wording, not ' +
+        'publishable prose: read the evidence, then write any fix in the body yourself.',
       type: 'object',
       options: { collapsible: true, collapsed: false },
       fields: [
@@ -765,7 +765,7 @@ export const article = defineType({
                   name: 'originalText',
                   title: 'Original Text',
                   description:
-                    'The exact passage from the article this claim came from — used by "Insert into article" to find and replace it.',
+                    'The exact passage from the article this claim came from, so you can find it in the body.',
                   type: 'text',
                   rows: 3,
                   readOnly: true,
@@ -802,16 +802,17 @@ export const article = defineType({
                 }),
                 defineField({
                   name: 'suggestedRevision',
-                  title: 'Suggested Revision',
+                  title: 'Suggested Revision (checker wording, not for publication)',
                   description:
-                    'Proposed corrected wording. Edit it here if needed, then click "Insert into article" below to replace the original passage in the body.',
+                    'The checker\'s proposed wording, for reference only. Studio cannot insert it into the article: write your own sentence in the body.',
                   type: 'text',
                   rows: 3,
+                  readOnly: true,
                 }),
                 defineField({
                   name: 'applied',
                   title: 'Applied',
-                  description: 'Set automatically when the revision is inserted into the body.',
+                  description: 'Legacy flag from the retired "Insert into article" button. Nothing sets it now.',
                   type: 'boolean',
                   readOnly: true,
                 }),

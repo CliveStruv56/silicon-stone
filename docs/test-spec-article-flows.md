@@ -159,16 +159,13 @@ Same as Task 3, format **Signal**. Prefix the title `TEST — `.
 
 **Then test the claim controls:**
 1. Open a claim with a suggested revision.
-2. Edit the revision text.
-3. Press **"Insert into article"**. Confirm the body changes and the claim is
-   marked applied.
-4. If the paragraph had a link or bold text, confirm you get the warning that
-   formatting was simplified — and check that paragraph. The link is flattened,
-   not restyled.
-5. **Watch the badge count down** (since 21 August 2026). It reads
-   *major issues (N to address)* and drops a grade as you apply the inaccurate
-   ones. With every flagged claim addressed it reads **"N revisions applied"** —
-   deliberately not *clean*, because inserting a revision verifies nothing.
+2. Confirm the Suggested Revision field is read-only and labelled as checker
+   wording, and that there is **no** "Insert into article" or "Copy revision"
+   button under the claim (removed 24 November 2026 after checker wording reached
+   a live Briefing).
+3. Confirm the note under the claim tells you to write the sentence yourself, and
+   says whether the original passage is still in the body.
+4. Edit the paragraph by hand and confirm the body changes only by what you typed.
 
 **Watch for:** the badge stuck on *Fact-check running*. Recovery is time-based —
 wait 10 minutes, then run it again from the document menu.
