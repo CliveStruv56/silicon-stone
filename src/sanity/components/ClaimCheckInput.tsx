@@ -50,9 +50,10 @@ export function ClaimCheckInput(props: ObjectInputProps) {
               : 'No suggested revision for this claim.'}
           </Text>
           <Text size={1} muted>
-            Studio cannot put it into the article. Read the evidence and the source links, then
-            write the sentence in the body yourself, in the house voice. Nothing is published until
-            you press Publish.
+            {hasRevision
+              ? 'Studio cannot put it into the article. Read the evidence and the source links, then write the sentence in the body yourself, in the house voice.'
+              : 'Read the evidence and the source links. If the article needs a fix, write it in the body yourself, in the house voice.'}{' '}
+            Nothing is published until you press Publish.
           </Text>
           {canLocate && (
             <Text size={1} muted>

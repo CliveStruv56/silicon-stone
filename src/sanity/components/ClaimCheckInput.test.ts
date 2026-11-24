@@ -63,6 +63,13 @@ describe('claim-check panel', () => {
     expect(html).toMatch(/write the sentence in the body yourself/i)
   })
 
+  it('does not talk about a revision when the claim has none', async () => {
+    const html = await render({ originalText: FLAGGED.originalText, verdict: 'accurate' })
+    expect(html).toMatch(/no suggested revision for this claim/i)
+    expect(html).not.toMatch(/cannot put it into the article/i)
+    expect(html).not.toMatch(/<button/i)
+  })
+
   it('still says whether the original passage is in the body', async () => {
     expect(await render(FLAGGED)).toMatch(/still in the body/)
     expect(await render({ ...FLAGGED, originalText: 'A sentence that was rewritten.' })).toMatch(
