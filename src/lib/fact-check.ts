@@ -4,7 +4,7 @@ import { callClaude, CLAUDE_MODEL } from './anthropic';
 import { searchExa } from './exa';
 import { extractArticleText } from './embeddings';
 import { writeClient } from './sanity';
-import { buildCitationMembers, type CitationMember } from './citations';
+import { normalizeUrl, publisherFromUrl } from './citations';
 import { verdictFor, type FactCheckVerdict } from './fact-check-verdict';
 
 /**
@@ -14,8 +14,12 @@ import { verdictFor, type FactCheckVerdict } from './fact-check-verdict';
  * Extracts discrete checkable claims from an article with Claude, verifies
  * each against fresh Exa web searches of primary sources, and patches a
  * structured report onto the document's `factCheck` field. Advisory only —
- * it never edits the body. As a side effect it appends any newly discovered
- * primary-source citations to `citations[]` (deduplicated by URL).
+ * it never edits the body, and it never writes the reader-facing Sources list
+ * (`citations`). Sources the verifier proposes are kept in the report, per
+ * claim, as `suggestedSources`, and reach the Sources list only if an editor
+ * adds them there by hand (Clive, 24 Nov 2026: a checker-supplied source
+ * appears to readers only once a person has chosen that one source).
+ * `src/lib/fact-check-citations.test.ts` holds this property.
  */
 
 const VERDICTS = ['accurate', 'inaccurate', 'outdated', 'needs-context', 'unverifiable'] as const;
@@ -70,6 +74,8 @@ interface ClaimResult {
   sourceUrls: string[];
   suggestedRevision?: string;
   suggestedCitations: SuggestedCitation[];
+  /** URLs of the search results this claim was actually judged against. */
+  evidenceUrls: string[];
 }
 
 interface FactCheckArticle {
@@ -96,8 +102,9 @@ const ARTICLE_PROJECTION = `{
 /**
  * Resolve which document variant a fact-check should run against. If a draft
  * exists we check and patch the draft (the editor sees it where they work);
- * otherwise we patch the published doc directly — the report and citations
- * are metadata, so this never republishes prose.
+ * otherwise we patch the published doc directly. Only the `factCheck` report
+ * is written, which no reader-facing page renders, so this never republishes
+ * prose or sources.
  */
 export async function resolveFactCheckTarget(
   documentId: string,
@@ -119,10 +126,9 @@ function newKey(): string {
   return crypto.randomUUID().slice(0, 8);
 }
 
-// normalizeUrl and the citation-member shaping moved to src/lib/citations.ts.
-// Three writers now touch the Sources list at different times and they must
-// agree on when two URLs are the same source, or this pass will duplicate a
-// source an editor already promoted from the research snapshots.
+// normalizeUrl lives in src/lib/citations.ts, the one rule for when two URLs
+// are the same source. It is used here only to compare suggestions with the
+// evidence and with the Sources list; this module never writes that list.
 
 /** Small concurrency pool — keeps Exa/Claude fan-out bounded without a dependency. */
 async function mapWithConcurrency<T, R>(
@@ -287,6 +293,7 @@ function unverifiableResult(claim: ExtractedClaim, reason: string): ClaimResult 
     evidence: reason,
     sourceUrls: [],
     suggestedCitations: [],
+    evidenceUrls: [],
   };
 }
 
@@ -333,7 +340,7 @@ CITATION: ONLY when the verdict is "accurate", and only PRIMARY sources (officia
     throw new Error('Verification returned no readable results.');
   }
 
-  return batch.map(({ claim }, i) => {
+  return batch.map(({ claim, evidence }, i) => {
     const row = rows.find((r) => r.index === i);
     if (!row) return unverifiableResult(claim, 'The verifier returned no result for this claim.');
     return {
@@ -346,6 +353,7 @@ CITATION: ONLY when the verdict is "accurate", and only PRIMARY sources (officia
       sourceUrls: row.sourceUrls.slice(0, 5),
       suggestedRevision: row.suggestedRevision,
       suggestedCitations: row.suggestedCitations,
+      evidenceUrls: evidence.map((e) => e.url).filter(Boolean),
     };
   });
 }
@@ -418,23 +426,53 @@ function buildSummary(results: ClaimResult[], verdict: string): string {
   return `${parts.join(', ')}. ${action}`;
 }
 
+/** A checker-suggested source, as stored in the report (never in `citations`). */
+interface SuggestedSourceMember {
+  _type: 'suggestedSource';
+  _key: string;
+  title: string;
+  url: string;
+  publisher?: string;
+}
+
 /**
- * Collect citation suggestions across claims, dedupe by normalized URL —
- * internally and against the document's current citations — and shape them
- * as `citation` array members ready to append. Only claims that verified
- * ACCURATE contribute: appending sources that refuted a claim would put the
- * refuting evidence on the live Sources list while the wrong claim still
- * stands in the body. Editors can pull URLs for flagged claims from each
- * claim's sourceUrls when applying the suggested revision.
+ * The sources the verifier proposed for one claim, for an editor to consider.
+ *
+ * Kept only when the claim verified ACCURATE (a source that refuted a claim is
+ * no support for it) and only when the URL is one of the search results this
+ * claim was judged against: the verifier writes CITATION lines freely, and a
+ * URL that was in no search result is a URL the model made up. Sources already
+ * on the article's Sources list are left out, so the editor sees what is new.
+ *
+ * These go into `factCheck.claims[].suggestedSources` and nowhere else. They
+ * reach readers only if an editor checks one and adds it to Sources by hand.
  */
-function buildNewCitations(
-  results: ClaimResult[],
+export function suggestedSourcesFor(
+  result: Pick<ClaimResult, 'verdict' | 'suggestedCitations' | 'evidenceUrls'>,
   existing: { url?: string }[],
-): CitationMember[] {
-  const candidates = results
-    .filter((r) => r.verdict === 'accurate')
-    .flatMap((r) => r.suggestedCitations);
-  return buildCitationMembers(candidates, existing, newKey);
+): SuggestedSourceMember[] {
+  if (result.verdict !== 'accurate') return [];
+  const retrieved = new Set(
+    result.evidenceUrls.map((u) => normalizeUrl(u)).filter((u): u is string => !!u),
+  );
+  const seen = new Set(
+    existing.map((c) => (c.url ? normalizeUrl(c.url) : null)).filter((u): u is string => !!u),
+  );
+  const out: SuggestedSourceMember[] = [];
+  for (const candidate of result.suggestedCitations) {
+    const normalized = normalizeUrl(candidate.url);
+    if (!normalized || !retrieved.has(normalized) || seen.has(normalized)) continue;
+    seen.add(normalized);
+    const publisher = candidate.publisher?.trim() || undefined;
+    out.push({
+      _type: 'suggestedSource',
+      _key: newKey(),
+      title: candidate.title.trim() || publisherFromUrl(candidate.url) || candidate.url,
+      url: candidate.url,
+      ...(publisher ? { publisher } : {}),
+    });
+  }
+  return out;
 }
 
 /**
@@ -510,34 +548,27 @@ export async function runFactCheck(targetId: string, requestedAt: string): Promi
         needsContext: count('needs-context'),
         unverifiable: count('unverifiable'),
       },
-      claims: results.map((r) => ({
-        _type: 'claimCheck',
-        _key: newKey(),
-        claim: r.claim,
-        locationHint: r.locationHint,
-        ...(r.originalText ? { originalText: r.originalText } : {}),
-        verdict: r.verdict,
-        confidence: r.confidence,
-        evidence: r.evidence,
-        sourceUrls: r.sourceUrls,
-        ...(r.suggestedRevision ? { suggestedRevision: r.suggestedRevision } : {}),
-      })),
+      claims: results.map((r) => {
+        const suggestedSources = suggestedSourcesFor(r, article.citations ?? []);
+        return {
+          _type: 'claimCheck',
+          _key: newKey(),
+          claim: r.claim,
+          locationHint: r.locationHint,
+          ...(r.originalText ? { originalText: r.originalText } : {}),
+          verdict: r.verdict,
+          confidence: r.confidence,
+          evidence: r.evidence,
+          sourceUrls: r.sourceUrls,
+          ...(r.suggestedRevision ? { suggestedRevision: r.suggestedRevision } : {}),
+          ...(suggestedSources.length ? { suggestedSources } : {}),
+        };
+      }),
     };
 
-    // Re-fetch citations right before patching to shrink the window where a
-    // concurrent manual citation edit could be double-added.
-    const current: { citations?: { url?: string }[] } | null = await writeClient.fetch(
-      `*[_id == $id][0]{ citations }`,
-      { id: targetId },
-      { perspective: 'raw' },
-    );
-    const newCitations = buildNewCitations(results, current?.citations ?? []);
-
-    let patch = writeClient.patch(targetId).set({ factCheck: report });
-    if (newCitations.length) {
-      patch = patch.setIfMissing({ citations: [] }).append('citations', newCitations);
-    }
-    await patch.commit();
+    // The report is the only thing this run writes. Never add `citations`
+    // here: see suggestedSourcesFor and fact-check-citations.test.ts.
+    await writeClient.patch(targetId).set({ factCheck: report }).commit();
   } catch (error) {
     console.error('Fact-check run failed:', error);
     const message = error instanceof Error ? error.message : 'Unknown error';

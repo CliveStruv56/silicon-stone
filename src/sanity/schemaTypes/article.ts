@@ -794,6 +794,32 @@ export const article = defineType({
                 }),
                 defineField({ name: 'evidence', title: 'Evidence', type: 'text', rows: 3, readOnly: true }),
                 defineField({
+                  // Written by the fact-check run instead of the Sources list,
+                  // which it no longer touches (Clive, 24 Nov 2026). Read-only,
+                  // with no add button: an editor who wants one types it into
+                  // Sources / Citations after checking it.
+                  name: 'suggestedSources',
+                  title: 'Checker-suggested sources (not on the Sources list)',
+                  description:
+                    'Sources the checker proposed for this claim, taken from the search results it was given. ' +
+                    'Nobody has checked them and readers do not see them. To cite one, open it, confirm it ' +
+                    'supports the sentence, then add it to Sources / Citations yourself.',
+                  type: 'array',
+                  readOnly: true,
+                  of: [
+                    defineArrayMember({
+                      type: 'object',
+                      name: 'suggestedSource',
+                      fields: [
+                        defineField({ name: 'title', title: 'Title', type: 'string' }),
+                        defineField({ name: 'url', title: 'URL', type: 'url' }),
+                        defineField({ name: 'publisher', title: 'Publisher', type: 'string' }),
+                      ],
+                      preview: { select: { title: 'title', subtitle: 'url' } },
+                    }),
+                  ],
+                }),
+                defineField({
                   name: 'sourceUrls',
                   title: 'Source URLs',
                   type: 'array',

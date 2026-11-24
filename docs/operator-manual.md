@@ -646,9 +646,16 @@ an overall verdict (clean / minor issues / major issues / unverifiable), a summa
 counts, and a per-claim breakdown with evidence, source URLs and a **suggested
 revision**.
 
-**A useful side effect:** newly discovered primary sources are appended to the
-article's citations, de-duplicated by URL. This is currently the main way a
-generated article acquires citations at all.
+**It never touches the Sources list** (since 24 November 2026). Until then it
+appended the primary sources it named to the article's citations, with no one
+approving them; with no draft open that put them on the live page at once, and
+a URL the model invented went on as readily as one it had read. Now each claim
+that verified accurate carries **"Checker-suggested sources (not on the Sources
+list)"**: read-only, and only URLs that were among the search results the
+checker was given, minus any already on your list. Nobody has checked them. To
+cite one, open it, confirm it supports the sentence, and type it into
+**Sources / Citations** yourself. There is deliberately no "add" button.
+`src/lib/fact-check-citations.test.ts` fails if a run ever writes `citations`.
 
 **Limits:** 10 runs per hour. Only one at a time per article. It is **advisory** —
 it never blocks anything.
@@ -710,9 +717,10 @@ a placeholder even if bold formatting splits it across several spans.
 
 **"No sources listed" fires until you populate the list.** The reader-facing
 Sources list is authored by hand, so a freshly generated article starts empty.
-Three ways to fill it: press **"Add N from research"** on the Sources field,
-which brings in what the draft was written from (§8); run a fact-check, which
-appends the primary sources it verified; or type them.
+Two ways to fill it: press **"Add N from research"** on the Sources field,
+which brings in what the draft was written from (§8); or type them, including
+any of the fact-check's suggested sources you have opened and checked (§7c).
+A fact-check run never adds to it.
 
 Until 20 August 2026 the research sources were not saved anywhere, so this
 warning fired on every single generated article — which is how a warning trains
@@ -842,8 +850,8 @@ you decide which is which. Nothing reaches the Sources list without passing
 through you.
 
 They are deduplicated against what is already there, using the same URL rule the
-fact-check uses, so promoting a source and then running a fact-check does not
-list the same page twice under different tracking parameters.
+fact-check uses to leave listed sources out of its suggestions, so the same page
+under different tracking parameters is treated as one source on both sides.
 
 ### The fact-check controls
 
@@ -1320,8 +1328,9 @@ Common causes: the Exa key is missing or out of quota; you hit the deep-research
 rate limit; the research backend is unreachable.
 
 ### Every draft warns "No sources listed"
-Expected. `/create` does not save the Source Index. Add citations by hand or run a
-fact-check to have primary sources appended. See §7c.
+Expected. `/create` does not save the Source Index. Add citations by hand, from
+"Add N from research", or from the fact-check's suggested sources once you have
+checked them; the fact-check itself never adds any. See §7c.
 
 ### I captured something and cannot find it
 Follow the "Review it here" link the capture returned — it opens the record in

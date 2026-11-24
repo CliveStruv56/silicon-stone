@@ -2,13 +2,15 @@
  * The one place that decides when two URLs are the same source, and the one
  * place that shapes a `citation` array member.
  *
- * Three writers now touch an article's Sources list, at different times:
- *   - the fact-check, appending primary sources it verified (src/lib/fact-check.ts);
- *   - the Studio "Add from research" control, promoting provenance snapshots;
- *   - anything future.
- * They must agree on what counts as the same URL, or a fact-check will duplicate
- * a source the editor already promoted — same page, different tracking
- * parameters, two rows on the reader's Sources list.
+ * Only people write an article's Sources list (`citations`):
+ *   - an editor typing entries into the Sources / Citations field;
+ *   - the Studio "Add from research" control, which an editor presses to bring
+ *     in the provenance snapshots the draft was written from.
+ * The fact-check no longer writes it (24 Nov 2026). It uses normalizeUrl to
+ * leave out of its per-claim suggestions any source already on the list, so
+ * both sides must agree on what counts as the same URL — same page, different
+ * tracking parameters. `src/lib/fact-check-citations.test.ts` fails if checker
+ * output finds a way back into `citations`.
  *
  * Deliberately pure: no imports, no `server-only`, no crypto. It runs in the
  * Studio browser bundle and on the server, and that is the point.
