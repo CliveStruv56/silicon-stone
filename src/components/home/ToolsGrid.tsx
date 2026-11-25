@@ -74,9 +74,43 @@ const tools = [
   },
 ]
 
+/* The Exposure Check is the front door to the Compliance Checker, so it leads
+ * the grid at full width. It has no preview art yet; a full-width text card
+ * keeps the two-column rows of illustrated tools even beneath it. */
+const exposureCheck = TOOL_JOURNEYS['exposure-check']
+
 export function ToolsGrid() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <Card className="sm:col-span-2 flex flex-col bg-stone-charcoal border-stone-teal/60">
+        <Link href="/tools/exposure-check" className="block flex-1 rounded-t-xl transition-colors hover:bg-surface-elevated/40">
+          <CardHeader className="pb-2">
+            <p className="text-xs font-mono uppercase tracking-wider text-stone-teal">Start here · about two minutes</p>
+            <CardTitle className="mt-2 text-xl font-medium text-text-primary">
+              Exposure Check: does the EU AI Act apply to your company?
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="max-w-3xl text-sm text-text-muted">
+              Eight questions about your organisation as a whole. Get a scope verdict, the areas of the Act that reach you with their dates, and which systems to check in the Compliance Checker.
+            </p>
+            <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-stone-teal">
+              Use the free tool <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </span>
+          </CardContent>
+        </Link>
+        <div className="mx-6 border-t border-border-subtle py-4">
+          <Link href={exposureCheck.offering.href} className="group block rounded-sm">
+            <span className="flex items-center gap-2 text-sm font-medium text-silicon-amber-strong group-hover:underline">
+              {exposureCheck.actionLabel}
+              <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
+            </span>
+            <span className="mt-1.5 block text-xs text-text-muted">
+              {exposureCheck.offering.name} · {exposureCheck.offering.price}
+            </span>
+          </Link>
+        </div>
+      </Card>
       {tools.map((tool) => (
         <Card key={tool.name} className="h-full flex flex-col bg-stone-charcoal border-border-subtle">
           <Link href={tool.href} className="block flex-1 rounded-t-xl transition-colors hover:bg-surface-elevated/40">

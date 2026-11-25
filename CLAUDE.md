@@ -223,11 +223,12 @@ commercial site carries the
 EUR-Lex "consolidated text, no legal value, only the OJ is authentic" notice and
 the EU source acknowledgement; that is not decoration.
 
-Corpus coverage is partial: **30 Articles plus Annex III**. Annex III arrived
+Corpus coverage is partial: **31 Articles plus Annex III**. Annex III arrived
 2026-08-18; Articles 10, 14, 15, 16 and 43 on 2026-08-19 in pack `2026-08-19`;
 Articles 4, 27 and 86 the same day in pack `2026-08-19b`; Articles 2, 25 and 40
 on 2026-10-29 in pack `2026-10-29`, for the explainers below; pack `2026-11-07` is the same
-plus a corrected timeline (the penalties chapter has applied since 2025, not 2 August 2026). All from the same CELEX
+plus a corrected timeline (the penalties chapter has applied since 2025, not 2 August 2026); Article 22 on
+2026-11-16 in pack `2026-11-16`, for the Exposure Check's authorised-representative extract. All from the same CELEX
 and with `corpusCutOff` unmoved at `2026-07-27` — the same consolidation, just
 more of it read out of it. **The `b` suffix is deliberate**: two packs were cut
 on 2026-08-19, and dating the second `2026-08-20` would put a false date on the
@@ -1031,6 +1032,55 @@ by meaning" below the keyword results; it can only add to the page).
   `npm run ratelimit:cleanup-analytics -- --delete --expect <dry-run count>`,
   which aborts if the count differs. Selection rules and their tests are in
   `src/lib/ratelimit-analytics-cleanup.ts`; never replace it with KEYS or DEL.
+
+## EU AI Act Exposure Check (`/tools/exposure-check`, the fifth tool)
+
+Organisation-level front door to the Checker: eight questions, rule-based, no
+model, nothing stored. Engine `src/lib/exposure/engine.ts`; every string the
+page or the Markdown export shows comes from it or `report.ts`. Five things
+not to undo:
+
+- **No score.** Scope is in, likely, cannot-yet-tell or out; confidence is
+  categorical. A test fails on `%` or "score" in any result string.
+- **"Not sure" is a finding, never a "no".** Every unknown becomes a "Things to
+  find out" item saying how it moves confidence; an area that would apply on a
+  "yes" stays in view (the authorised representative).
+- **"Does not apply" only when no answer implies an EU link.** "None of these"
+  alongside an unknown or multi-country establishment, an unknown activity, or
+  an import or distribution activity, is held at "cannot yet tell". The
+  connection question covers general-purpose AI models too (Art 2(1)(a)). A
+  153,216-combination test (establishment × connection × activity × use) holds
+  it in both directions: "applies" needs `reachedWhicheverSystem()` (the answers
+  describe all systems together, so a connection must reach the reader whichever
+  ticked activity its system falls under; placing on the market and putting into
+  service are the supplier's acts), checked against an oracle that enumerates
+  every assignment of connections to activities; "likely" needs an
+  EU-established deployer. A second test holds that "not sure" is never firmer
+  than any concrete answer in the same slot (one named exception: an
+  EU-established deployer answering "None of these", a contradiction).
+- **A flat duty needs the Act to reach the reader in a role the article binds.**
+  Literacy is "Owed" only when `reachedAsProviderOrDeployer()` holds: an
+  EU-established deployer, or some connection that reaches the reader whichever
+  ticked activity its system falls under (the answers do not say which system
+  each connection belongs to). The test checks it by enumerating every such
+  assignment, written apart from the engine.
+- **Tense follows the date.** Every sentence whose tense depends on a milestone
+  ("apply from" / "have applied since", "have until" / "had until") is driven by
+  the day it runs; a test runs the engine either side of each milestone.
+- **Templated sentences are conditional on the data they claim.** "You told
+  us …", "has applied since …", "including UK law" and the Diagnostic reason each
+  appear only beside the answer they quote; `engine.test.ts` walks every
+  single-answer variation across five bases to hold that.
+- **Every extract is verbatim from the pinned pack** (`extracts.test.ts`), and
+  every date in a result string is a pack timeline date. Article 22 is in the
+  pack from `2026-11-16` for this tool.
+
+**Released ahead of counsel review** (owner decision, 16 Nov 2026): what that
+covers, and the ten points left for counsel with the v2 review, are in
+`docs/tools-specialist-advisory-plan.md`. It does not unblock Checker v2.
+
+`src/components/tools/results/ResultsLayout.tsx` (sticky contents, "start
+here" marker) is generic; the other tools can adopt it.
 
 ## Publication dates (load-bearing — do not break)
 

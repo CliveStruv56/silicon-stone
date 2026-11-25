@@ -40,6 +40,7 @@ export const PUBLIC_TAGS: readonly string[] = [
   'source-article-inread',
   'source-article-cta',
   'source-us-executive-guide',
+  'source-tool-exposure-check',
   'source-tool-compliance-checker',
   'source-tool-supply-chain-mapper',
   'source-tool-scenario-modeler',

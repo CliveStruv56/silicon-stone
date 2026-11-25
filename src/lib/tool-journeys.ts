@@ -2,6 +2,12 @@ import { offeringById } from './offering'
 
 /** The paid route from each free tool, shared by discovery and follow-on links. */
 export const TOOL_JOURNEYS = {
+  // First on purpose: the organisation-level front door, before the per-system Checker.
+  'exposure-check': {
+    offering: offeringById('advisory-briefing'),
+    actionLabel: 'Talk through your exposure',
+    intro: 'Which of these areas reach your systems, your role and your suppliers, and what should you do first? Work through your result with an independent adviser.',
+  },
   'compliance-checker': {
     offering: offeringById('advisory-briefing'),
     actionLabel: 'Understand your Checker result',

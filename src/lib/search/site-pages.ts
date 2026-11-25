@@ -41,6 +41,14 @@ const scenarioModelerDescription = `${SCENARIOS.length} geopolitical scenarios �
 export const SITE_PAGES: readonly SitePage[] = [
   // ── Tools ────────────────────────────────────────────────────────────────
   {
+    path: '/tools/exposure-check',
+    title: 'EU AI Act Exposure Check',
+    kind: 'tool',
+    description:
+      'Eight questions about your organisation as a whole: whether the EU AI Act reaches your UK, US or EU organisation, which areas apply, and the dates that follow. Rule-based, quoting the text of the Act.',
+    keywords: ['exposure', 'does the ai act apply', 'scope', 'applies', 'uk', 'us', 'outside the eu', 'ai act', 'eu ai act', 'authorised representative', 'ai literacy'],
+  },
+  {
     path: '/tools/compliance-checker',
     title: 'AI Act Compliance Checker',
     kind: 'tool',

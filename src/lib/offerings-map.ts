@@ -70,6 +70,7 @@ export const READ: MapBox[] = [
 /* ---------- Stage 2 · Use (free tools, self-serve products) ---------- */
 
 const TOOL_NOTES: Record<keyof typeof TOOL_JOURNEYS, string> = {
+  'exposure-check': 'whether the AI Act reaches you at all',
   'compliance-checker': 'where the AI Act reaches your system',
   'supply-chain-mapper': 'where your dependencies concentrate',
   'scenario-modeler': 'what a geopolitical shock does to you',
@@ -82,6 +83,7 @@ function toolName(slug: string): string {
   const named = MODULES.find((m) => m.fromTool?.href === href)?.fromTool?.name
   if (named) return named
   if (slug === 'compliance-checker') return 'Compliance Checker'
+  if (slug === 'exposure-check') return 'Exposure Check'
   throw new Error(`offerings-map: no display name for tool "${slug}"`)
 }
 
