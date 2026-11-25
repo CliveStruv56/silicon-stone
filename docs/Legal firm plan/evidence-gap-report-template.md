@@ -116,8 +116,8 @@ below if there are many. Status: 🟢 evidenced · 🟠 partial · 🔴 absent �
 
 *(Verify article references and dates against the current consolidated AI Act text before
 issuing — implementation timing has moved more than once; confirm the live position with
-counsel. Indicative staged timeline used here: prohibited practices already in force;
-transparency obligations and penalties around **2 Aug 2026**; high-risk obligations phasing to
+counsel. Indicative staged timeline used here: prohibited practices already applying;
+penalties (Chapter XII, except Article 101) since **2 Aug 2025**; transparency obligations around **2 Aug 2026**; high-risk obligations phasing to
 **2 Dec 2027** (standalone) / **2 Aug 2028** (embedded in regulated products).)*
 
 | If preliminary category is… | Typical evidence the law calls for |

@@ -45,7 +45,7 @@ export const SITE_PAGES: readonly SitePage[] = [
     title: 'AI Act Compliance Checker',
     kind: 'tool',
     description:
-      'Classify an AI system under the EU AI Act: a rule-based risk tier, the obligations that follow, the vendor evidence to ask for, and the transparency rules in force since August 2026.',
+      'Classify an AI system under the EU AI Act: a rule-based risk tier, the obligations that follow, the vendor evidence to ask for, and the transparency rules that have applied since August 2026.',
     keywords: ['checker', 'check', 'assessment', 'self-assessment', 'classifier', 'classification', 'risk tier', 'high-risk', 'eu ai act', 'ai act', 'compliance', 'obligations', 'does the ai act apply'],
   },
   {

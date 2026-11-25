@@ -2,8 +2,8 @@
 title: "Quick Compliance Gap Analysis"
 subtitle: "A twenty-question self-assessment against the EU AI Act, reconciled to the post-Omnibus staged timeline. Twenty minutes to a defensible picture of where you stand."
 author: "Silicon and Stone"
-date: "2026-06-26"
-version: "Gateway Pack · v1"
+date: "2026-11-23"
+version: "Gateway Pack · v2"
 ---
 
 ## How to use this
@@ -19,8 +19,8 @@ The questions are grouped into five short sections that mirror how the Act actua
 | Date | What goes live |
 | :---- | :---- |
 | 2 February 2025 | Prohibited practices banned; AI-literacy duty (Art 4) |
-| 2 August 2025 | General-purpose AI model rules |
-| 2 August 2026 | Transparency duties (Art 50); penalties and governance framework |
+| 2 August 2025 | General-purpose AI model rules; governance framework; penalties (Chapter XII, except Article 101) |
+| 2 August 2026 | Transparency duties (Art 50); Article 101, the Commission's power to fine providers of general-purpose AI models; Article 75c, the AI Office's power to fine operators of AI systems who fall within its exclusive competence under Article 75(1) |
 | 2 December 2027 | Standalone high-risk systems (Annex III) |
 | 2 August 2028 | Embedded / product-safety high-risk systems (Annex I) |
 
@@ -40,7 +40,7 @@ Yes / No / Unsure
 **4. Have you identified any system where you have modified a third party's AI or put your own name on it (which would make you a Provider)?**
 Yes / No / Unsure
 
-## Section B — Prohibited practices (Article 5, in force since Feb 2025)
+## Section B — Prohibited practices (Article 5, applied since Feb 2025)
 
 **5. Have you confirmed that no system you use infers emotions of staff in the workplace or students in education (outside narrow safety or medical exceptions)?**
 Yes / No / Unsure
@@ -84,7 +84,7 @@ Yes / No / Unsure
 **16. Is there a named owner accountable for AI governance in your organisation?**
 Yes / No / Unsure
 
-**17. Do staff who operate AI systems have a baseline of AI literacy appropriate to their role (an Article 4 duty already in force)?**
+**17. Do you take measures to support the AI literacy of staff who operate AI systems, suited to their role (an Article 4 duty that already applies)?**
 Yes / No / Unsure
 
 **18. Do you keep a written record (a register) of your AI systems, their vendors, and where their data is stored?**
@@ -120,4 +120,4 @@ Score each answer: **Yes = 2 · Unsure = 1 · No = 0.** Add them up — maximum 
 
 ---
 
-*Silicon and Stone — Forensic Technopolitics. This document is an operational aid reconciled to the EU AI Act as amended by the 2026 Digital Omnibus. It is not legal advice; obtain qualified counsel for decisions on specific systems. Regulatory content last reviewed 26 June 2026.*
+*Silicon and Stone — Forensic Technopolitics. This document is an operational aid reconciled to the EU AI Act as amended by the 2026 Digital Omnibus. It is not legal advice; obtain qualified counsel for decisions on specific systems. Regulatory content last updated 23 November 2026.*

@@ -14,7 +14,8 @@
  *     - Compliance Tracker.xlsx
  *
  * Regulatory content reconciled to the post-Omnibus staged timeline:
- *   2 Aug 2026  transparency (Art 50) + penalties/governance only
+ *   2 Aug 2025  GPAI rules, governance and penalties (Chapter XII except Art 101)
+ *   2 Aug 2026  transparency (Art 50) + Art 101 + Art 75c (AI Office fines)
  *   2 Dec 2027  standalone high-risk (Annex III)
  *   2 Aug 2028  embedded high-risk (Annex I)
  * No "August 2026 cliff". Methodology framing: 3 × 2 (three domains × two methods).
@@ -361,12 +362,12 @@ function buildTracker() {
   ws.columns = widths.map((w) => ({ width: w }))
   headerRow(ws, 3, headers)
 
-  // Reconciled deadlines: governance/transparency 2 Aug 2026; standalone HR 2 Dec 2027; embedded HR 2 Aug 2028.
+  // Reconciled deadlines: governance 2 Aug 2025; transparency 2 Aug 2026; standalone HR 2 Dec 2027; embedded HR 2 Aug 2028.
   const reqs = [
-    ['REQ-01', 'Art 4 — AI literacy: ensure staff operating AI have sufficient understanding', 'Provider & Deployer', 'All', new Date('2025-02-02')],
+    ['REQ-01', 'Art 4 — AI literacy: take measures to support staff AI literacy (no specific level of literacy need be guaranteed)', 'Provider & Deployer', 'All', new Date('2025-02-02')],
     ['REQ-02', 'Art 5 — Confirm no prohibited practices in use (e.g. workplace emotion inference, social scoring)', 'Provider & Deployer', 'All', new Date('2025-02-02')],
     ['REQ-03', 'Art 50 — Transparency: disclose AI interaction; label synthetic/generated content', 'Provider & Deployer', 'Limited Risk', new Date('2026-08-02')],
-    ['REQ-04', 'Governance & penalties framework operational; designate internal AI accountability owner', 'Provider & Deployer', 'All', new Date('2026-08-02')],
+    ['REQ-04', 'Governance (Chapter VII) and Chapter XII penalties apply (since 2 Aug 2025; Art 101 and Art 75c fines since 2 Aug 2026); designate internal AI accountability owner', 'Provider & Deployer', 'All', new Date('2025-08-02')],
     ['REQ-05', 'Art 9 — Risk management system established and maintained', 'Provider', 'High-Risk', new Date('2027-12-02')],
     ['REQ-06', 'Art 10 — Data governance: training/validation data quality and bias controls', 'Provider', 'High-Risk', new Date('2027-12-02')],
     ['REQ-07', 'Art 11 + Annex IV — Technical documentation compiled and kept current', 'Provider', 'High-Risk', new Date('2027-12-02')],
@@ -403,7 +404,7 @@ function buildTracker() {
   }
   const lastReq = r - 1
   statusColours(ws, 'F', 4, lastReq)
-  note(ws, lastReq + 2, headers.length, 'Deadlines reflect the post-Omnibus staged timeline: AI literacy & prohibitions live since Feb 2025; transparency, governance and penalties from 2 Aug 2026; standalone high-risk (Annex III) from 2 Dec 2027; embedded high-risk (Annex I) from 2 Aug 2028. Adjust Owner, Status and Evidence as you progress. Operational aid, not legal advice.')
+  note(ws, lastReq + 2, headers.length, 'Deadlines reflect the post-Omnibus staged timeline: AI literacy & prohibitions live since Feb 2025; governance, GPAI rules and Chapter XII penalties (except Art 101) from 2 Aug 2025; transparency (Art 50), Art 101 and Art 75c fines from 2 Aug 2026; standalone high-risk (Annex III) from 2 Dec 2027; embedded high-risk (Annex I) from 2 Aug 2028. Adjust Owner, Status and Evidence as you progress. Operational aid, not legal advice.')
 
   // Dashboard sheet
   const db = wb.addWorksheet('Dashboard', { properties: { defaultColWidth: 22 } })

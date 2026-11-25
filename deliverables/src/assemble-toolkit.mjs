@@ -22,8 +22,8 @@ const FRONTMATTER = `---
 title: "The AI Act Compliance Toolkit"
 subtitle: "A practical operating manual for the EU AI Act, reconciled to the 2026 Digital Omnibus staged timeline — risk classification, obligations by category, a working checklist, ready-to-adapt templates, and a 90-day action plan."
 author: "Silicon and Stone"
-date: "2026-06-26"
-version: "v1 · reconciled to the post-Omnibus staged timeline"
+date: "2026-11-23"
+version: "v2 · reconciled to the post-Omnibus staged timeline"
 ---
 `
 

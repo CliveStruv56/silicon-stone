@@ -4,7 +4,7 @@ The EU Artificial Intelligence Act (Regulation (EU) 2024/1689) is the first comp
 
 ### What the Act does
 
-The Act sorts AI systems into four tiers. A small set of uses is **prohibited** outright. A defined list of consequential uses is **high-risk** and carries the bulk of the engineering and documentation burden. A further set carries **limited-risk** transparency duties — telling people when they are dealing with AI. Everything else is **minimal-risk** and unregulated beyond a baseline literacy duty. The whole of the rest of this document is, in effect, the machinery for placing each of your systems into the right tier and reading off the consequences.
+The Act sorts AI systems into four tiers. A small set of uses is **prohibited**, some subject to narrow exceptions written into Article 5 itself. A defined list of consequential uses is **high-risk** and carries the bulk of the engineering and documentation burden. A further set carries **limited-risk** transparency duties — telling people when they are dealing with AI. Everything else is **minimal-risk** and unregulated beyond the cross-cutting AI-literacy duty (Article 4). The whole of the rest of this document is, in effect, the machinery for placing each of your systems into the right tier and reading off the consequences.
 
 Obligations also depend on your **role**. A *provider* builds a system or places it on the market under its own name and carries the heaviest duties. A *deployer* uses someone else's system in its own activities and carries a lighter, but real, set. Importers and distributors sit in between. Most organisations are deployers of bought-in tools — but a deployer that re-badges a system, or modifies it substantially, can become a provider in law without intending to. Establishing role is therefore the first move, not an afterthought.
 
@@ -18,19 +18,20 @@ Much early commentary described a single "August 2026 cliff" on which the AI Act
 
 | Date | What applies |
 | :---- | :---- |
-| **2 February 2025** | Prohibited practices (Art 5) banned; AI-literacy duty (Art 4) in force |
-| **2 August 2025** | General-purpose AI (GPAI) model rules apply |
-| **2 August 2026** | Transparency duties (Art 50); penalties and governance framework operational |
+| **2 February 2025** | Prohibited practices (Art 5) banned; AI-literacy duty (Art 4) applies |
+| **2 August 2025** | General-purpose AI (GPAI) model rules, the governance framework and the penalties chapter (Chapter XII, except Article 101) apply |
+| **2 August 2026** | Transparency duties (Art 50); Article 101, the Commission's power to fine providers of general-purpose AI models; Article 75c, the AI Office's power to fine operators of AI systems who fall within its exclusive competence under Article 75(1) |
+| **2 December 2026** | New prohibitions on AI systems generating non-consensual sexual deepfakes and child sexual abuse material (Art 5(1)(ba), (bb), within the limits set by Art 5(1a) and (1b)); Art 50(2) marking deadline for generative systems placed on the market before 2 August 2026 |
 | **2 December 2027** | Standalone high-risk systems (Annex III) — full obligations apply |
 | **2 August 2028** | Embedded / product-safety high-risk systems (Annex I) — full obligations apply |
 
-The practical reading is precise and matters for how you spend the next two years. The obligations already in force or imminent — confirming nothing prohibited is running, training staff to a baseline, and disclosing AI interactions by August 2026 — are cheap and frequently overlooked. The expensive high-risk obligations do not bite until December 2027 at the earliest, which is runway to build the evidence properly rather than reason to defer starting.
+The practical reading is precise and matters for how you spend the next two years. The obligations already applying — confirming nothing prohibited is running, supporting AI literacy among staff, and disclosing AI interactions (due since August 2026) — are cheap and frequently overlooked. The expensive high-risk obligations do not bite until December 2027 at the earliest, which is runway to build the evidence properly rather than reason to defer starting.
 
-> The August 2026 date is real, but it is a transparency-and-penalties date, not a high-risk date. Your first compliance task is more likely a disclosure line on a chatbot than a conformity assessment.
+> The August 2026 date is real, but it is a transparency date, not a high-risk date. Your first compliance task is more likely a disclosure line on a chatbot than a conformity assessment.
 
 ### What non-compliance costs
 
-The penalty ceilings are deliberately severe. Breaching the Article 5 prohibitions can attract fines of up to €35 million or 7% of total worldwide annual turnover, whichever is greater. Most other breaches of the high-risk and transparency obligations carry ceilings of up to €15 million or 3% of turnover, and supplying incorrect information to authorities up to €7.5 million or 1%. The proportionality provisions temper how these apply to smaller companies, but the direction is clear: this is a regime with enforcement teeth, supervised by national market-surveillance authorities and the European AI Office.
+The penalty ceilings are deliberately severe. Breaching the Article 5 prohibitions can attract fines of up to €35 million or 7% of total worldwide annual turnover, whichever is greater. Most other breaches of the high-risk and transparency obligations carry ceilings of up to €15 million or 3% of turnover, and supplying incorrect information to authorities up to €7.5 million or 1%. The proportionality provisions temper how these apply to smaller companies, but the direction is clear: this is a regime with enforcement teeth, supervised by national market-surveillance authorities and the European AI Office. Chapter XII of the AI Act (Penalties) has applied since 2 August 2025, except Article 101, the Commission's power to fine providers of general-purpose AI models, which has applied since 2 August 2026. The AI Office's power to fine operators of AI systems who fall within its exclusive competence under Article 75(1) has also applied since 2 August 2026 (Article 75c, inserted by Regulation (EU) 2026/1744).
 
 ### How to use this toolkit
 
@@ -63,9 +64,9 @@ The 2026 Digital Omnibus replaced the original single deadline with a phased sch
 
 | Date | Milestone | What it means operationally |
 | :---- | :---- | :---- |
-| **2 Feb 2025** | Prohibited practices banned; AI-literacy duty live | Screen every system against Art 5 now; train staff to a baseline. Already enforceable. |
-| **2 Aug 2025** | GPAI model rules apply | Relevant if you build or substantially fine-tune a general-purpose model. |
-| **2 Aug 2026** | Transparency (Art 50); penalties & governance framework | Disclose AI interactions; label synthetic content; have an accountable owner and the penalty regime live. |
+| **2 Feb 2025** | Prohibited practices banned; AI-literacy duty live | Screen every system against Art 5 now; support staff AI literacy. Already enforceable. |
+| **2 Aug 2025** | GPAI model rules; governance framework; penalties (Chapter XII, except Art 101) | GPAI model rules: relevant if you build or substantially fine-tune a general-purpose model. Chapter XII penalties, except Article 101, have applied since this date. |
+| **2 Aug 2026** | Transparency (Art 50); Art 101 (Commission fines on GPAI model providers); Art 75c (AI Office fines on operators of AI systems who fall within its exclusive competence under Art 75(1)) | Disclose AI interactions; label synthetic content; have an accountable owner. |
 | **2 Dec 2027** | Standalone high-risk (Annex III) | Full provider/deployer obligations for hiring, credit, education, biometrics and the rest. |
 | **2 Aug 2028** | Embedded high-risk (Annex I) | Full obligations for AI that is a safety component of a regulated product. |
 
@@ -103,7 +104,7 @@ For an organisation beginning today with no formal AI governance. The aim of the
 
 Beyond the first quarter, fix these as standing checkpoints:
 
-- **Before 2 Aug 2026:** transparency disclosures live; governance owner and policy in place; literacy programme running.
+- **Now (due since 2 Aug 2026):** transparency disclosures live; governance owner and policy in place; literacy programme running.
 - **Through 2026–2027:** high-risk evidence base under construction — risk-management files, data-governance records, technical documentation, instructions for use.
 - **Before 2 Dec 2027:** standalone high-risk systems conformity-assessed, registered, and operating under documented human oversight; deployer FRIAs completed where required.
 - **Before 2 Aug 2028:** embedded high-risk (product-safety) systems brought into the same state.
@@ -120,7 +121,7 @@ Each checkpoint is a register query, not a memory test — which is the point of
 
 **AI Office.** The European Commission body overseeing implementation of the Act, particularly for general-purpose AI, and coordinating with national authorities.
 
-**AI literacy (Art 4).** The duty on providers and deployers to ensure staff operating AI have a sufficient understanding of it, proportionate to their role. In force since 2 February 2025, regardless of risk tier.
+**AI literacy (Art 4).** The duty on providers and deployers to take measures to support the development of AI literacy of their staff and others operating AI systems on their behalf, taking into account their knowledge, experience and the context of use. It does not require providers or deployers to guarantee any specific level of AI literacy of any individual. An AI-literacy duty has applied since 2 February 2025, regardless of risk tier; Regulation (EU) 2026/1744, in force since 27 July 2026, replaced the original wording, which required measures to ensure, to their best extent, a sufficient level of AI literacy.
 
 **Annex I.** The list of EU product-safety laws (machinery, medical devices, vehicles, lifts, toys, and more). AI that is a safety component of, or is itself, such a regulated product is **embedded high-risk** — obligations apply from 2 August 2028.
 
@@ -146,7 +147,7 @@ Each checkpoint is a register query, not a memory test — which is the point of
 
 **Notified body.** An independent organisation designated to carry out third-party conformity assessments where the Act requires them.
 
-**Prohibited practice (Art 5).** A use banned outright — including workplace/education emotion inference, social scoring, untargeted facial scraping, and certain manipulative or biometric uses. Banned since 2 February 2025.
+**Prohibited practice (Art 5).** A use the Act prohibits, in some cases subject to narrow exceptions written into Article 5 itself — including workplace/education emotion inference (outside medical or safety reasons), social scoring, untargeted facial scraping, and certain manipulative or biometric uses. The original prohibitions have applied since 2 February 2025; two more (Art 5(1)(ba) and (bb)) apply from 2 December 2026.
 
 **Provider.** An actor that develops a system and places it on the market or puts it into service under its own name or trademark. Carries the heaviest obligations.
 
@@ -165,6 +166,6 @@ Each checkpoint is a register query, not a memory test — which is the point of
 
 ---
 
-*This toolkit is an operational aid reconciled to the EU AI Act as amended by the 2026 Digital Omnibus, and reflects the staged timeline current at the date of publication. It is not legal advice, and it does not create a lawyer–client relationship. The Act's obligations turn on the specific facts of each system; obtain qualified legal counsel before making decisions on individual systems or relying on any classification in this document. Regulatory content last reviewed 26 June 2026.*
+*This toolkit is an operational aid reconciled to the EU AI Act as amended by the 2026 Digital Omnibus, and reflects the staged timeline current at the date of publication. It is not legal advice, and it does not create a lawyer–client relationship. The Act's obligations turn on the specific facts of each system; obtain qualified legal counsel before making decisions on individual systems or relying on any classification in this document. Regulatory content last updated 23 November 2026.*
 
 *Silicon and Stone — Forensic Technopolitics. siliconandstone.com*

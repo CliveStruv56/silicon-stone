@@ -470,7 +470,7 @@ export default function ComplianceCheckerPage() {
               <p className="mt-4 max-w-3xl leading-relaxed text-text-muted">
                 {assessmentQuestions.length} questions, fewer where some do not apply, on your role,
                 the EU connection, the use case, who is affected, the oversight in place and the
-                practices the Act forbids outright. You leave with a risk tier and a stated
+                practices Article 5 prohibits. You leave with a risk tier and a stated
                 confidence, your likely role under the Act, the duties that follow, the vendor
                 evidence you are missing, and the triggers that should send you back for a
                 reassessment.
@@ -1059,7 +1059,10 @@ export default function ComplianceCheckerPage() {
                   <CardTitle className="text-lg text-text-primary">Penalty ceilings</CardTitle>
                   <CardDescription>
                     Ceilings, not expected fines. Each is the higher of the fixed amount and the percentage
-                    of total worldwide annual turnover — except for SMEs and small mid-caps, which take the lower.
+                    of total worldwide annual turnover. For the Article 99(3), (4) and (5) tiers, SMEs (including start-ups)
+                    take the lower of the two (Article 99(6)). Small mid-caps take the lower only for the Article 99(4)
+                    and (5) tiers (Article 99(6a)); for a prohibited-practice fine under Article 99(3), their ceiling
+                    stays the higher of the two.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>

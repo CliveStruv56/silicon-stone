@@ -2,8 +2,8 @@
 title: "Board-Ready AI Risk Summary"
 subtitle: "A one-page template for putting AI Act exposure in front of leadership — systems, classification, gaps, vendor risk, and the next ninety days. Fill the bracketed fields and delete this line."
 author: "Silicon and Stone"
-date: "2026-06-26"
-version: "Gateway Pack · v1 — template"
+date: "2026-11-23"
+version: "Gateway Pack · v2 — template"
 ---
 
 ## How to use this template
@@ -30,7 +30,7 @@ Replace every **[bracketed prompt]** with your own figures from the *AI Systems 
 | Prohibited (must stop) | [n] |
 | High-risk — standalone, Annex III (due 2 Dec 2027) | [n] |
 | High-risk — embedded, Annex I (due 2 Aug 2028) | [n] |
-| Limited risk — transparency only (due 2 Aug 2026) | [n] |
+| Limited risk — transparency only (applies since 2 Aug 2026) | [n] |
 | Minimal risk | [n] |
 
 ### 3. Top compliance gaps
@@ -59,6 +59,6 @@ Replace every **[bracketed prompt]** with your own figures from the *AI Systems 
 
 ---
 
-*Timeline note for the footnote-minded: the 2026 Digital Omnibus replaced the single August 2026 deadline with a staged schedule — transparency and penalties from 2 August 2026, standalone high-risk from 2 December 2027, embedded high-risk from 2 August 2028. Plan against the date that matches each system, not the headline.*
+*Timeline note for the footnote-minded: the 2026 Digital Omnibus replaced the single August 2026 deadline with a staged schedule — transparency from 2 August 2026, standalone high-risk from 2 December 2027, embedded high-risk from 2 August 2028. Plan against the date that matches each system, not the headline.*
 
-*Silicon and Stone — Forensic Technopolitics. Template provided as an operational aid, not legal advice. Last reviewed 26 June 2026.*
+*Silicon and Stone — Forensic Technopolitics. Template provided as an operational aid, not legal advice. Last updated 23 November 2026.*

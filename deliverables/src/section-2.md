@@ -67,7 +67,7 @@ The practical traps are everyday ones. Fine-tuning a bought-in model on your own
 
 Run the tiers as an ordered sequence of gates. Test the system against each gate in turn and stop at the first that catches it. Prohibited beats high-risk; high-risk beats limited; everything else is minimal. Always start at Gate 1, because a prohibited practice is prohibited no matter how useful or well-intentioned.
 
-**Gate 1 — Prohibited (Art 5).** A short list of practices is banned outright; these have been unenforceable in the EU since **2 February 2025**. If your system does any of the following, it cannot be deployed at all — there is no conformity assessment that rescues it:
+**Gate 1 — Prohibited (Art 5).** A short list of practices is prohibited; for some, Article 5 itself states narrow exceptions, noted below. These prohibitions have applied in the EU since **2 February 2025**, and the penalty provisions for breaching them since **2 August 2025**. If your system does any of the following, outside those exceptions, it cannot be deployed at all — there is no conformity assessment that rescues it:
 
 - **Subliminal, manipulative or deceptive techniques** that materially distort behaviour and cause, or are likely to cause, significant harm.
 - **Exploiting vulnerabilities** of a person or group owing to age, disability, or a specific social or economic situation, to distort behaviour and cause significant harm.
@@ -101,7 +101,7 @@ The deadlines differ by route, and this is where the staged timeline matters mos
 - **Annex III standalone** high-risk obligations apply from **2 December 2027**.
 - **Annex I embedded** high-risk obligations apply from **2 August 2028**.
 
-Note carefully: **high-risk duties do not bite in August 2026.** What arrives on 2 August 2026 is the transparency regime (Art 50), the penalties, and the governance framework — not the high-risk obligations. Anyone planning to a single "August 2026 cliff" for high-risk systems is working from the superseded timeline.
+Note carefully: **high-risk duties do not bite in August 2026.** What arrives on 2 August 2026 includes the transparency regime (Art 50), the Commission's power to fine providers of general-purpose AI models (Article 101) and the AI Office's power to fine operators of AI systems who fall within its exclusive competence under Article 75(1) (Article 75c) — but not the high-risk obligations.
 
 **Gate 3 — Limited Risk (Art 50 transparency).** If the system is neither prohibited nor high-risk, test it against the transparency triggers. These attach regardless of tier, but for an otherwise-unremarkable system they are the only AI Act duties that apply:
 
@@ -112,7 +112,7 @@ Note carefully: **high-risk duties do not bite in August 2026.** What arrives on
 
 The Art 50 transparency duties apply from **2 August 2026**.
 
-**Gate 4 — Minimal.** Everything that clears all three gates is minimal risk. The Act imposes no mandatory obligations on these systems beyond the cross-cutting AI-literacy duty (Art 4, in force since 2 February 2025) and good practice. Most enterprise AI — demand forecasting, spam filtering, route optimisation, document classification — lives here. Record it as minimal and move on; do not gold-plate it.
+**Gate 4 — Minimal.** Everything that clears all three gates is minimal risk. The Act imposes no mandatory obligations on these systems beyond the cross-cutting AI-literacy duty (Art 4, applying since 2 February 2025) and good practice. Most enterprise AI — demand forecasting, spam filtering, route optimisation, document classification — lives here. Record it as minimal and move on; do not gold-plate it.
 
 ### The decision flow, in plain steps
 
@@ -176,7 +176,7 @@ Indicative only. The tier turns on the specific intended purpose and how the sys
 - *Stage 1:* The system infers emotional state — an AI system. Agents are in the EU. In scope.
 - *Stage 2:* The operator would be the **Deployer** — but the role question is moot, because the practice itself is banned.
 - *Stage 3:* Gate 1 — Art 5 prohibits inferring emotions of people in the workplace, outside narrow medical or safety purposes. Engagement-scoring is neither. **Prohibited.**
-- *Obligations & date:* There is no compliant way to deploy this. The ban has been in force since **2 February 2025**. The correct outcome is not to procure it; if already in use, it must be withdrawn. Record the decision and the Art 5 basis.
+- *Obligations & date:* There is no compliant way to deploy this. The ban has applied since **2 February 2025**. The correct outcome is not to procure it; if already in use, it must be withdrawn. Record the decision and the Art 5 basis.
 
 ### Where this feeds
 

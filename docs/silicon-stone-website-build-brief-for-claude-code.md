@@ -85,7 +85,7 @@ Specs only — title, route, tier, abstract, sources.
 
 **C1 — CRA Briefing (P1):** "The security deadline that lands before the AI one" · `/analysis/[slug]` · Briefing. The CRA's reporting duties apply 11 Sept 2026 — ahead of most AI Act high-risk obligations — and reach products already on the market. Why an AI feature can't be decoupled from the secure-software duties of the product that ships it. *Sources:* Commission CRA summary; Reg (EU) 2024/2847.
 
-**C2 — Adopted vs in force (P1):** "Adopted is not in force: reading the AI Act's moving deadline" · Briefing. The Digital Omnibus deferring high-risk is adopted, not enacted; until OJ publication 2 Aug 2026 governs, and transparency + penalties stay there regardless. The house thesis made concrete. *Sources:* S&S Watch Brief; EP release 16 Jun 2026.
+**C2 — Adopted vs in force (P1):** "Adopted is not in force: reading the AI Act's moving deadline" · Briefing. The Digital Omnibus deferring high-risk is adopted, not enacted; until OJ publication 2 Aug 2026 governs, and transparency stays there regardless (the penalties chapter, except Article 101, has applied since 2 Aug 2025). The house thesis made concrete. *Sources:* S&S Watch Brief; EP release 16 Jun 2026.
 
 **C3 — EU-Japan data bridge (P1):** "The calmer channel: the EU-Japan data bridge and DFFT" · Briefing/Audit. Unlike EU-US, no CLOUD-Act-style conflict: mutual adequacy, DFFT, the Hiroshima AI Process, a digital-identity pilot. Establishes the fourth-leg positioning (D2). *Sources:* Commission EU-Japan Digital Partnership; 9th Dialogue (25 Mar 2026).
 

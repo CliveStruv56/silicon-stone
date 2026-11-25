@@ -507,9 +507,9 @@ export const LEGAL_PROPOSITIONS: LegalProposition[] = [
     exceptions: [],
     effectiveFrom: '2025-02-02',
     plainEnglishSummary:
-      'Providers and deployers take measures so the people operating and using their AI systems understand them well enough for the job.',
+      'Providers and deployers take measures to support the AI literacy of their staff and others who operate or use their AI systems on their behalf.',
     practicalMeaning:
-      'This applies whatever the risk tier, and it has been in force since February 2025 — it is the one duty here that does not wait for anything. What it asks is proportionate rather than fixed: it is measured against your staff\u2019s existing knowledge and the context the system is used in. It expressly does not require you to guarantee any particular level of literacy in any individual.',
+      'This applies whatever the risk tier, and it has applied since February 2025 (in this wording since Regulation (EU) 2026/1744 replaced Article 4) — it is the one duty here that does not wait for anything. What it asks is proportionate rather than fixed: it is measured against your staff\u2019s existing knowledge and the context the system is used in. It expressly does not require you to guarantee any particular level of literacy in any individual.',
     shortExtract:
       'Providers and deployers of AI systems shall take measures to support the development of AI literacy of their staff and other persons dealing with the operation and use of AI systems on their behalf, taking into account their technical knowledge, experience, education and training and the context the AI systems are to be used in, and considering the persons or groups of persons on whom the AI systems are to be used. This obligation does not require providers or deployers to guarantee any specific level of AI literacy of any individual.',
     officialUrl: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-4',
@@ -1100,7 +1100,7 @@ export const LEGAL_PROPOSITIONS: LegalProposition[] = [
     ],
     effectiveFrom: '2025-02-02',
     plainEnglishSummary:
-      'Predicting who will commit a criminal offence, based solely on profiling or personality, is prohibited outright.',
+      'Predicting who will commit a criminal offence, based solely on profiling or personality, is prohibited, except for systems that support a human assessment of a person’s involvement in a criminal activity that is already based on objective and verifiable facts directly linked to it.',
     practicalMeaning:
       '"Solely" is the word doing the work, and the exception is broad in practice: a tool that helps an investigator weigh objective evidence is expressly outside it.',
     shortExtract:
@@ -1158,7 +1158,7 @@ export const LEGAL_PROPOSITIONS: LegalProposition[] = [
     ],
     effectiveFrom: '2025-02-02',
     plainEnglishSummary:
-      'Inferring emotions in the workplace or in education is prohibited outright, unless it is for medical or safety reasons.',
+      'Inferring emotions in the workplace or in education is prohibited, unless it is for medical or safety reasons.',
     practicalMeaning:
       'Both the setting and the purpose matter. Fatigue detection in a driver is a safety reason; measuring how engaged staff seem in meetings is not, however it is described internally.',
     shortExtract:
@@ -1187,7 +1187,7 @@ export const LEGAL_PROPOSITIONS: LegalProposition[] = [
     ],
     effectiveFrom: '2025-02-02',
     plainEnglishSummary:
-      'Using biometric data to deduce a person’s race, politics, union membership, beliefs or sexuality is prohibited outright.',
+      'Using biometric data to deduce a person’s race, politics, union membership, beliefs or sexuality is prohibited, except for labelling or filtering lawfully acquired biometric datasets and categorising biometric data in law enforcement.',
     practicalMeaning:
       'The list of characteristics is exhaustive, and the carve-out is stated in the provision itself rather than being a defence to be argued.',
     shortExtract:
