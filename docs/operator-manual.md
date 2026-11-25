@@ -863,20 +863,17 @@ list the same page twice under different tracking parameters.
   > clear it short of paying for another run.
 - **"Run fact-check"** — the action described in §7b. It disables itself and reads
   *"Fact-check running…"* while one is in flight.
-- **"Insert into article"** — on each claim in the report. Edit the suggested
-  revision if you want, then insert it; it replaces the original passage in the
-  body and marks the claim as applied. Nothing is published until you press Publish.
+- **The Suggested Revision on a claim is checker wording, not copy.** There is no
+  "Insert into article" or "Copy revision" button any more (removed 24 November
+  2026). On 16 November the checker's phrase "...are not confirmed by the
+  supplied evidence." was inserted into a live Briefing in one click. The field is
+  read-only and a note under each claim says so. To act on a flagged claim, read
+  its evidence and source links, find the passage in the body (the *Original Text*
+  field shows it), and write the corrected sentence yourself. Nothing is published
+  until you press Publish.
 
-  > If the paragraph had inline formatting — links or bold — inserting rebuilds it
-  > as plain text and warns you. Give those a quick check: the link is gone, not
-  > just restyled.
-
-  **If the button is greyed out**, the original passage could not be found in the
-  body — normally because you have since edited that paragraph. Use *Copy
-  revision* and apply it by hand. Until 21 August 2026 this also happened on any
-  paragraph containing a link, for a reason that had nothing to do with editing:
-  the fact-check reads a text view that inserts a space at every span boundary,
-  and the match demanded a space the body did not have.
+  > The count-down badge ("N revisions applied") no longer moves, because nothing
+  > sets the *Applied* flag now. A flagged claim stays flagged until a fresh run.
 
 ---
 
