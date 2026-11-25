@@ -37,8 +37,9 @@ export function CitationsInput(props: ArrayOfObjectsInputProps) {
     [props.value],
   )
 
-  // Only the snapshots not already on the list, deduped by the shared URL rule
-  // so this agrees with what the fact-check appends.
+  // Only the snapshots not already on the list, deduped by the shared URL rule.
+  // Research snapshots only: never feed fact-check output into this control
+  // (fact-check-citations.test.ts checks this file for it).
   const candidates = useMemo(() => {
     if (!Array.isArray(snapshots) || snapshots.length === 0) return []
     return buildCitationMembers(

@@ -155,7 +155,9 @@ Same as Task 3, format **Signal**. Prefix the title `TEST — `.
 - **A fact-check starts by itself.** Within a few minutes the document badge
   reads *Fact-check running*, then a verdict.
 - The **Fact Check** tab fills with a summary, counts and per-claim rows.
-- **Citations may appear**: the fact-check appends primary sources it verified.
+- **The Sources list does not change.** Claims that verified accurate may show
+  **"Checker-suggested sources (not on the Sources list)"**, read-only, with no
+  add button. Confirm Sources / Citations holds exactly what it held before.
 
 **Then test the claim controls:**
 1. Open a claim with a suggested revision.
