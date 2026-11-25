@@ -27,7 +27,9 @@ import {
   evaluateAssessment,
   getVisibleQuestions,
 } from '@/lib/ai-act-assessment'
-import { AI_ACT_TIMELINE, PENALTY_TIERS } from '@/lib/ai-act-timeline'
+import { AI_ACT_TIMELINE, PENALTY_TIERS, type TimelineEntry } from '@/lib/ai-act-timeline'
+import { nextMilestoneOn, timelineStatusOn, type Phase } from '@/lib/ai-act-dates'
+import { useAssessmentDate } from '@/lib/use-assessment-date'
 import { RULE_PACK } from '@/lib/rulepack'
 import { ComplianceIntake } from '@/components/tools/ComplianceIntake'
 import { ObligationList } from '@/components/tools/ObligationList'
@@ -219,7 +221,19 @@ const CORPUS_CUT_OFF = new Date(`${RULE_PACK.manifest.corpusCutOff}T00:00:00Z`).
 const GENERAL_APPLICATION = AI_ACT_TIMELINE.find(
   (entry) => entry.basis === 'Article 113, second paragraph',
 )
-const NEXT_DATED_STEP = AI_ACT_TIMELINE.find((entry) => entry.status === 'upcoming')
+
+/**
+ * A milestone's phase at the reader's moment. Dates begin at different times
+ * across the Union (see `ai-act-dates.ts`), so only `applies` is shown as
+ * applying: `not-yet` and `between` both show the bare date. Before the browser
+ * has supplied the moment (`today` is null: prerender and hydration) only what
+ * is certain is asserted: a date that had already applied when the pack was cut
+ * still applies, and everything else is shown as a bare date, so a page built
+ * before a date passes never says the wrong thing after.
+ */
+function timelinePhase(entry: TimelineEntry, today: string | null): Phase {
+  return today ? timelineStatusOn(entry, today) : entry.status === 'in-force' ? 'applies' : 'not-yet'
+}
 
 const HOW_IT_WORKS = [
   {
@@ -323,7 +337,12 @@ export default function ComplianceCheckerPage() {
 
   const visibleQuestions = useMemo(() => getVisibleQuestions(answers), [answers])
   const currentQuestion = visibleQuestions[currentIndex] ?? visibleQuestions[visibleQuestions.length - 1]
-  const result = useMemo(() => evaluateAssessment(answers), [answers])
+  // Read in the browser: null on the server and while hydrating, so a prerendered
+  // page never freezes the build's date. The engine falls back to today, which
+  // is the same day, for the first client render.
+  const today = useAssessmentDate()
+  const result = useMemo(() => evaluateAssessment(answers, today ?? undefined), [answers, today])
+  const nextDatedStep = today ? nextMilestoneOn(AI_ACT_TIMELINE, today) : undefined
   const tone = resultTone(result.classification)
   const cta = resultCta(result.classification, result.role)
   const progress = Math.round(((currentIndex + 1) / visibleQuestions.length) * 100)
@@ -477,7 +496,7 @@ export default function ComplianceCheckerPage() {
                 </Link>
                 .
               </p>
-              {GENERAL_APPLICATION && NEXT_DATED_STEP && (
+              {GENERAL_APPLICATION && (
                 <p className="mt-4 max-w-3xl leading-relaxed text-text-muted">
                   {/* Not "the penalty regime": Chapter XII has applied since
                       2 August 2025 (Article 113, third paragraph, point (b)).
@@ -485,9 +504,14 @@ export default function ComplianceCheckerPage() {
                       fines on GPAI providers, which that point excepts. */}
                   The Article 50 transparency duties have applied since{' '}
                   {GENERAL_APPLICATION.date}, and with them the Commission’s power to fine
-                  providers of general-purpose AI models. The next dated step is {NEXT_DATED_STEP.date}:{' '}
-                  {NEXT_DATED_STEP.label.charAt(0).toLowerCase() + NEXT_DATED_STEP.label.slice(1)}.
-                  The result tells you which line your system sits on.
+                  providers of general-purpose AI models.
+                  {nextDatedStep && (
+                    <>
+                      {' '}The next dated step is {nextDatedStep.date}:{' '}
+                      {nextDatedStep.label.charAt(0).toLowerCase() + nextDatedStep.label.slice(1)}.
+                    </>
+                  )}
+                  {' '}The result tells you which line your system sits on.
                 </p>
               )}
 
@@ -848,7 +872,7 @@ export default function ComplianceCheckerPage() {
                       <CopyMarkdownButton
                         toolName="Compliance Checker"
                         filename={`ai-act-assessment-${new Date().toISOString().slice(0, 10)}.md`}
-                        getMarkdown={() => complianceCheckerMarkdown(result, answers, assessmentQuestions)}
+                        getMarkdown={() => complianceCheckerMarkdown(result, answers, assessmentQuestions, today ?? undefined)}
                       />
                     </div>
                     <nav aria-label="Sections of this result" className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
@@ -1015,12 +1039,12 @@ export default function ComplianceCheckerPage() {
                           <Badge
                             variant="outline"
                             className={
-                              entry.status === 'in-force'
+                              timelinePhase(entry, today) === 'applies'
                                 ? 'w-fit border-alert-red text-alert-red'
                                 : 'w-fit border-stone-teal text-stone-teal'
                             }
                           >
-                            {entry.status === 'in-force' ? `Applies since ${entry.date}` : entry.date}
+                            {timelinePhase(entry, today) === 'applies' ? `Applies since ${entry.date}` : entry.date}
                           </Badge>
                         </div>
                         <p className="mt-2 text-sm text-text-muted">{entry.detail}</p>
@@ -1145,7 +1169,7 @@ export default function ComplianceCheckerPage() {
                 <CopyMarkdownButton
                   toolName="Compliance Checker"
                   filename={`ai-act-assessment-${new Date().toISOString().slice(0, 10)}.md`}
-                  getMarkdown={() => complianceCheckerMarkdown(result, answers, assessmentQuestions)}
+                  getMarkdown={() => complianceCheckerMarkdown(result, answers, assessmentQuestions, today ?? undefined)}
                 />
               </div>
 

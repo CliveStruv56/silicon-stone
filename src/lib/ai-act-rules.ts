@@ -5,6 +5,7 @@ import type {
   UserRole,
 } from './ai-act-assessment'
 import { RULE_PACK, type PackProhibitedPractice } from './rulepack'
+import { nowMoment, phaseOn } from './ai-act-dates'
 
 export type LegalStatus = 'current-law' | 'official-guidance' | 'operational-risk' | 'adjacent-risk'
 
@@ -151,6 +152,15 @@ export interface RuleFinding {
   reportSections: string[]
 }
 
+/**
+ * What a rule may know besides the answers. `asOf` is the assessment moment (see
+ * `ai-act-dates.ts`: an ISO day, or an ISO instant from `nowMoment`), read when
+ * the user gets their answer and never at build time.
+ */
+export interface RuleContext {
+  asOf: string
+}
+
 export interface AssessmentRule {
   id: string
   title: string
@@ -161,7 +171,7 @@ export interface AssessmentRule {
   source: RuleSource
   priority: number
   when: (answers: AssessmentAnswers) => boolean
-  build: (answers: AssessmentAnswers) => Omit<
+  build: (answers: AssessmentAnswers, context: RuleContext) => Omit<
     RuleFinding,
     'id' | 'title' | 'category' | 'version' | 'lastReviewed' | 'legalStatus' | 'source'
   >
@@ -370,6 +380,8 @@ function selected(answers: AssessmentAnswers, id: string): string {
  * the two points inserted by Regulation (EU) 2026/1744, which apply from
  * 2 December 2026 rather than 2 February 2025 — telling someone to "stop now"
  * over a prohibition that does not yet exist would be as wrong as missing it.
+ * It is not a permanent state: once the assessment date reaches `appliesFrom`
+ * the practice takes the same path as any other prohibition.
  */
 type Art5Practice = PackProhibitedPractice
 
@@ -753,8 +765,20 @@ export const AI_ACT_RULE_LIBRARY: AssessmentRule[] = [
       source: art5Source(practice),
       priority: 100 + index,
       when: (answers) => has(answers, 'prohibited_screen', `art5-${practice.point}`),
-      build: () =>
-        practice.futureDated ? futureProhibitedFinding(practice) : prohibitedFinding(practice),
+      // Dated by the assessment moment, not by the pack's flag alone: `futureDated`
+      // says the point was inserted with a later application date. Before the
+      // date has begun anywhere in the Union it is "not yet"; once it has begun
+      // everywhere the practice is prohibited as the original eight are; in the
+      // hours between, the wording makes neither claim.
+      build: (_answers, { asOf }) => {
+        if (!practice.futureDated) return prohibitedFinding(practice)
+        const phase = phaseOn(practice.appliesFrom, asOf)
+        return phase === 'not-yet'
+          ? futureProhibitedFinding(practice)
+          : phase === 'between'
+            ? betweenProhibitedFinding(practice)
+            : prohibitedFinding(practice)
+      },
     })
   ),
   rule({
@@ -1717,8 +1741,23 @@ function art5Basis(practice: Art5Practice): string {
     return `Article 5(1)(h) prohibits this use, and has done since ${practice.appliesFrom}, ${limit}`
   }
   const shared = `Article 5(1)(${practice.point}) prohibits this practice, and has done since ${practice.appliesFrom}. A prohibition is not a requirement you can satisfy: there is no conformity assessment route, no documentation that cures it, and no risk-management measure that makes a prohibited use lawful.`
-  return limit ? `${shared} ${limit}` : shared
+  const base = limit ? `${shared} ${limit}` : shared
+  return practice.point === 'ba' || practice.point === 'bb'
+    ? [base, ART5_1A_LIMIT, practice.point === 'ba' ? ART5_1B_LIMIT : '', ART5_REVIEW_CAVEAT].filter(Boolean).join(' ')
+    : base
 }
+
+/** Article 5(1a), which limits points (ba) and (bb). Stated once, verbatim, for both. */
+const ART5_1A_LIMIT =
+  'Article 5(1a) limits this point. Placing the system on the market or putting it into service is prohibited only where that generation or manipulation is its intended purpose, or where its design, training, architecture, capabilities or user-facing functionalities make it a reasonably foreseeable and reproducible outcome, without requiring significant technical modification, and the system does not have reasonable and adequate technical safety measures and other safeguards to reliably prevent it, taking into account reasonably foreseeable misuse, and to correct observed or reported misuse. Use is prohibited only where the deployer uses the system for the purpose of generating or manipulating such material or performance.'
+
+/** The closing caveat of the Article 5(1a) paragraph, kept last so it also follows Article 5(1b). */
+const ART5_REVIEW_CAVEAT =
+  'Whether your system is outside the point on those terms is for the review to establish in writing. It is not a reason to continue meanwhile.'
+
+/** Article 5(1b), which narrows "manipulation" for point (ba). */
+const ART5_1B_LIMIT =
+  'Under Article 5(1b), manipulation that does not increase the exposure of any depicted intimate parts or alter the nature of any depicted sexually explicit activities is not manipulation for this point.'
 
 /**
  * The practice is passed whole rather than as a label so each item can carry its
@@ -1754,6 +1793,7 @@ function prohibitedFinding(practice: Art5Practice): Omit<RuleFinding, 'id' | 'ti
         basis:
           'Not a requirement of the Regulation — it is what your own legal review will ask for first. Pausing a use without recording why tends to mean the same use returns in six months under a different name.',
       },
+      ...(practice.point === 'ba' || practice.point === 'bb' ? [ART5_1A_SAFEGUARDS_ACTION] : []),
     ],
     vendorQuestions: [
       {
@@ -1764,10 +1804,26 @@ function prohibitedFinding(practice: Art5Practice): Omit<RuleFinding, 'id' | 'ti
         why: `Article 5(1)(${practice.point}) prohibits this practice, and has done since ${practice.appliesFrom}. A vendor’s assurance does not make a prohibited use lawful. A written answer is still the first thing your legal review will ask for, and a vendor that markets the capability has told you where the risk sits.`,
       },
     ],
-    adjacentRisks: [],
+    adjacentRisks:
+      practice.point === 'ba' || practice.point === 'bb'
+        ? ['Non-consensual intimate imagery and CSAM carry criminal and platform-liability exposure independent of the AI Act; this is a matter for legal counsel.']
+        : [],
     reviewTriggers: ['Any biometric, profiling, worker, education, public-space, or vulnerable-person use is proposed'],
     reportSections: ['Prohibited-practice screening'],
   }
+}
+
+/** Shared by the pre-date, between and post-date findings for points (ba) and (bb). */
+const ART5_1A_SAFEGUARDS_ACTION: RuleItem = {
+  id: 'document-art-5-1a-safeguards',
+  text: 'Document the intended purpose and the technical safeguards that prevent this output.',
+  kind: 'good-practice',
+  article: 'Article 5(1a)',
+  corpusArticle: '5',
+  basis:
+    'Article 5(1a) decides when these two prohibitions bite, and it reaches further than intended purpose: the practice is caught where generation or manipulation is the intended purpose, or else where the system’s “design, training, architecture, capabilities or user-facing functionalities make that generation or manipulation a reasonably foreseeable and reproducible outcome, without requiring significant technical modification, and the system does not have reasonable and adequate technical safety measures”. The safeguards are what keep a general-purpose system outside the prohibition; the documentation is what shows they were there.',
+  inPractice:
+    'Record what the safeguards are and when you tested them. "Reasonably foreseeable and reproducible" is a question about capability, not about what anyone intended.',
 }
 
 /**
@@ -1796,7 +1852,7 @@ function futureProhibitedFinding(practice: Art5Practice): Omit<RuleFinding, 'id'
         article: `Article 5(1)(${practice.point})`,
         corpusArticle: '5',
         basis: [
-          `Inserted by Regulation (EU) 2026/1744 and prohibited from ${practice.appliesFrom}. It is not prohibited today, which is why this is a date to finish work against rather than an instruction to stop now — but a prohibition admits no compliance route, so there is nothing to build towards except stopping.`,
+          `Inserted by Regulation (EU) 2026/1744 and prohibited from ${practice.appliesFrom}. The point does not apply today, which is why this is a date to finish work against rather than an instruction to stop now — but a prohibition admits no compliance route.`,
           ART5_POINT_LIMITS[practice.point],
         ]
           .filter(Boolean)
@@ -1804,17 +1860,7 @@ function futureProhibitedFinding(practice: Art5Practice): Omit<RuleFinding, 'id'
         inPractice:
           'Work back from the date. A redesign that lands the week before leaves no room for the safeguards below to be tested.',
       },
-      {
-        id: 'document-art-5-1a-safeguards',
-        text: 'Document the intended purpose and the technical safeguards that prevent this output.',
-        kind: 'good-practice',
-        article: 'Article 5(1a)',
-        corpusArticle: '5',
-        basis:
-          'Article 5(1a) decides when these two prohibitions bite, and it reaches further than intended purpose: the practice is caught where generation or manipulation is the intended purpose, or else where the system’s “design, training, architecture, capabilities or user-facing functionalities make that generation or manipulation a reasonably foreseeable and reproducible outcome, without requiring significant technical modification, and the system does not have reasonable and adequate technical safety measures”. The safeguards are what keep a general-purpose system outside the prohibition; the documentation is what shows they were there.',
-        inPractice:
-          'Record what the safeguards are and when you tested them. "Reasonably foreseeable and reproducible" is a question about capability, not about what anyone intended.',
-      },
+      ART5_1A_SAFEGUARDS_ACTION,
     ],
     vendorQuestions: [
       {
@@ -1822,7 +1868,7 @@ function futureProhibitedFinding(practice: Art5Practice): Omit<RuleFinding, 'id'
         question: `What technical safety measures prevent this system being used for ${label}, and will you attest to compliance before ${practice.appliesFrom}?`,
         article: `Article 5(1)(${practice.point})`,
         corpusArticle: '5',
-        why: `The practice is prohibited from ${practice.appliesFrom}. Article 5(1a) decides when the prohibition reaches a general-purpose system, and it turns on whether the system’s design and capabilities make that use a reasonably foreseeable and reproducible outcome absent reasonable and adequate technical safety measures — so the safeguards, and evidence that they were tested, are what keep the system outside it.`,
+        why: `Article 5(1)(${practice.point}) applies from ${practice.appliesFrom}. Article 5(1a) decides when the prohibition reaches a general-purpose system, and it turns on whether the system’s design and capabilities make that use a reasonably foreseeable and reproducible outcome absent reasonable and adequate technical safety measures — so the safeguards, and evidence that they were tested, are what keep the system outside it.`,
       },
     ],
     adjacentRisks: [
@@ -1833,6 +1879,48 @@ function futureProhibitedFinding(practice: Art5Practice): Omit<RuleFinding, 'id'
       'Any change to model capability, safety filters, or output restrictions',
     ],
     reportSections: ['Prohibited-practice screening'],
+  }
+}
+
+/**
+ * For the hours when 2 December 2026 has begun in some EU zones and not yet in
+ * others. It makes neither claim: nothing says "not today" and nothing says
+ * "since". It is the future finding with the date-relative wording removed.
+ */
+function betweenProhibitedFinding(practice: Art5Practice): Omit<RuleFinding, 'id' | 'title' | 'category' | 'version' | 'lastReviewed' | 'legalStatus' | 'source'> {
+  const future = futureProhibitedFinding(practice)
+  const label = practice.summary
+  return {
+    ...future,
+    explanation: `The selected use involves ${label}, which is a prohibited practice from ${practice.appliesFrom} under Article 5(1)(ba)–(bb), inserted by Regulation (EU) 2026/1744.`,
+    reasons: [`A selected practice is prohibited from ${practice.appliesFrom} under the Digital Omnibus amendments.`],
+    actions: [
+      {
+        id: `plan-withdrawal-${practice.point}`,
+        text: `Review this use — ${label} — against Article 5(1)(${practice.point}), which prohibits it from ${practice.appliesFrom}.`,
+        kind: 'duty',
+        article: `Article 5(1)(${practice.point})`,
+        corpusArticle: '5',
+        basis: [
+          `Inserted by Regulation (EU) 2026/1744 and prohibited from ${practice.appliesFrom}. A prohibition admits no compliance route.`,
+          ART5_POINT_LIMITS[practice.point],
+          ART5_1A_LIMIT,
+          practice.point === 'ba' ? ART5_1B_LIMIT : '',
+          ART5_REVIEW_CAVEAT,
+        ]
+          .filter(Boolean)
+          .join(' '),
+      },
+      ART5_1A_SAFEGUARDS_ACTION,
+    ],
+    vendorQuestions: future.vendorQuestions.map((item) => ({
+      ...item,
+      question: `What technical safety measures prevent this system being used for ${label}?`,
+    })),
+    adjacentRisks: [
+      'Non-consensual intimate imagery and CSAM carry criminal and platform-liability exposure independent of the AI Act; this is a matter for legal counsel.',
+    ],
+    reviewTriggers: [future.reviewTriggers[1]],
   }
 }
 
@@ -1908,7 +1996,7 @@ function reviewTriggerLabel(value: string): string {
   return labels[value] ?? value
 }
 
-export function evaluateRuleLibrary(answers: AssessmentAnswers): RuleEvaluation {
+export function evaluateRuleLibrary(answers: AssessmentAnswers, asOf: string = nowMoment()): RuleEvaluation {
   const firedRules = AI_ACT_RULE_LIBRARY
     .filter((item) => item.when(answers))
     .sort((a, b) => a.priority - b.priority)
@@ -1920,7 +2008,7 @@ export function evaluateRuleLibrary(answers: AssessmentAnswers): RuleEvaluation 
       lastReviewed: item.lastReviewed,
       legalStatus: item.legalStatus,
       source: item.source,
-      ...item.build(answers),
+      ...item.build(answers, { asOf }),
     }))
 
   const score = firedRules.reduce((total, item) => total + item.scoreDelta, 0)

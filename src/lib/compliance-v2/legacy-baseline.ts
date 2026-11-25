@@ -255,6 +255,12 @@ export interface LegacyOutcome {
 }
 
 /**
+ * The recorded outcomes were taken on this day, so they are replayed on it: the
+ * baseline pins what v1 said then, and must not move because the clock did.
+ */
+export const LEGACY_BASELINE_AS_OF = '2026-08-19'
+
+/**
  * The comparable part of a v1 result.
  *
  * Prose is deliberately excluded. Wording changes are editorial and frequent;
@@ -262,8 +268,8 @@ export interface LegacyOutcome {
  * the typed items they produced are the load-bearing output, and those are what
  * a v1 refactor must not move by accident.
  */
-export function summariseV1(answers: AssessmentAnswers): LegacyOutcome {
-  const result = evaluateAssessment(answers)
+export function summariseV1(answers: AssessmentAnswers, asOf: string = LEGACY_BASELINE_AS_OF): LegacyOutcome {
+  const result = evaluateAssessment(answers, asOf)
   return {
     classification: result.classification,
     role: result.role,

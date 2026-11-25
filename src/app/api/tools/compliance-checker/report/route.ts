@@ -11,6 +11,7 @@ import { generateReport, reportGenerationConfigured, toFixedFacts } from '@/lib/
 import { readReport, writeReport } from '@/lib/report/store'
 import { reportSigningConfigured, signReportId } from '@/lib/report/token'
 import type { ReportRecord } from '@/lib/report/record'
+import { nowMoment } from '@/lib/ai-act-dates'
 
 /**
  * Start a report generation.
@@ -94,7 +95,8 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const result = evaluateAssessment(answers)
+  // The same moment-based rule as the browser (see ai-act-dates.ts), not a zone.
+  const result = evaluateAssessment(answers, nowMoment())
   const toolName =
     typeof answers.tool_name === 'string' && answers.tool_name.trim()
       ? answers.tool_name.trim()

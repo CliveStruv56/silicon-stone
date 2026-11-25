@@ -5,6 +5,8 @@ import {
   type ResultVendorQuestion,
   type RuleFinding,
 } from './ai-act-rules'
+import { nowMoment, phaseOn } from './ai-act-dates'
+import { RULE_PACK } from './rulepack'
 
 export type AssessmentValue = string | string[]
 
@@ -260,7 +262,7 @@ export const assessmentQuestions: AssessmentQuestion[] = [
     id: 'prohibited_screen',
     section: 'Risk Signals',
     text: 'Does the use involve any of these red-flag practices?',
-    help: 'These are the ten practices prohibited by Article 5(1). Two of them — the intimate-imagery and CSAM points inserted by the Digital Omnibus — do not bite until 2 December 2026.',
+    help: 'These are the ten practices listed in Article 5(1). Two of them — the intimate-imagery and CSAM points inserted by the Digital Omnibus — apply from 2 December 2026.',
     type: 'multi',
     options: [
       {
@@ -389,20 +391,41 @@ export function getVisibleQuestions(answers: AssessmentAnswers): AssessmentQuest
   return assessmentQuestions.filter((question) => !question.showIf || question.showIf(answers))
 }
 
-export function evaluateAssessment(answers: AssessmentAnswers): AssessmentResult {
-  const ruleEvaluation = evaluateRuleLibrary(answers)
+/**
+ * `asOf` is the assessment moment: an ISO day, or an ISO instant from
+ * `nowMoment` (see `ai-act-dates.ts`). It defaults to now, which is right for a
+ * caller running at the moment the user asks; a caller that must reproduce a
+ * result (a test, a stored record, the shadow comparison) passes it.
+ */
+function futureSummary(toolName: string, asOf: string): string {
+  const from = RULE_PACK.prohibitedPractices.find((practice) => practice.futureDated)?.appliesFrom
+  // In the hours when the date has begun in some EU zones and not others, say
+  // only the date: neither "not today" nor "since" holds across the Union.
+  if (from && phaseOn(from, asOf) === 'between') {
+    return `The selected use of ${toolName} falls under Article 5(1)(ba) or (bb) — inserted by the Digital Omnibus — and is prohibited from ${from}.`
+  }
+  return `${toolName} is not a prohibited practice today, but the selected use falls under Article 5(1)(ba) or (bb) — inserted by the Digital Omnibus — and is prohibited from 2 December 2026. Treat that date as a hard stop and plan the redesign or withdrawal now.`
+}
+
+export function evaluateAssessment(answers: AssessmentAnswers, asOf?: string): AssessmentResult {
+  const moment = asOf ?? nowMoment()
+  const ruleEvaluation = evaluateRuleLibrary(answers, moment)
   const toolName = typeof answers.tool_name === 'string' && answers.tool_name.trim()
     ? answers.tool_name.trim()
     : 'this AI system'
 
-  // The future-dated prohibition needs its own sentence: lower-casing the tier
-  // label would read "prohibited from 2 december 2026", and more importantly the
-  // generic copy would imply a present-tense ban that does not yet exist.
+  // The label for a prohibition that has not yet started needs its own
+  // sentence: lower-casing it would read "prohibited from 2 december 2026", and
+  // the generic copy would imply a present-tense ban that does not yet exist.
+  // From the date the same practice is classed 'Prohibited practice' instead
+  // (see the Article 5 rule), so this branch only ever reads before it.
   const summary = ruleEvaluation.classification === 'Out of EU scope'
     ? `${toolName} appears to be outside EU AI Act territorial scope on this first-pass assessment. Document the reasoning and re-check if EU users, customers, or outputs are added.`
     : ruleEvaluation.classification === 'Prohibited from 2 December 2026'
-      ? `${toolName} is not a prohibited practice today, but the selected use falls under Article 5(1)(ba) or (bb) — inserted by the Digital Omnibus — and is prohibited from 2 December 2026. Treat that date as a hard stop and plan the redesign or withdrawal now.`
-      : `${toolName} is classified as ${ruleEvaluation.classification.toLowerCase()} on this first-pass assessment. The result should be treated as an AI system record and reviewed when the use case, vendor, data, or level of automation changes.`
+      ? futureSummary(toolName, moment)
+      : ruleEvaluation.classification === 'Prohibited practice'
+        ? `${toolName} is classified as a prohibited practice on this first-pass assessment. Stop or pause the use until the position is reviewed.`
+        : `${toolName} is classified as ${ruleEvaluation.classification.toLowerCase()} on this first-pass assessment. The result should be treated as an AI system record and reviewed when the use case, vendor, data, or level of automation changes.`
 
   return {
     classification: ruleEvaluation.classification,

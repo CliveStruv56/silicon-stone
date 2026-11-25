@@ -1,5 +1,6 @@
 'use client'
 
+import { momentDay, nowMoment } from '@/lib/ai-act-dates'
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight, Check, RefreshCcw } from 'lucide-react'
@@ -49,9 +50,16 @@ import { evaluateAssessmentV2 } from '@/lib/compliance-v2/engine/assemble'
 export function ComplianceCheckerV2({ exitHref }: { exitHref: string }) {
   const [flow, setFlow] = useState<FlowState>(EMPTY_FLOW)
   const [showResult, setShowResult] = useState(false)
-  // Captured once, when the component mounts, so the result carries the date it
-  // was actually made on and does not move under a re-render.
-  const [assessedAt] = useState(() => new Date().toISOString().slice(0, 10))
+  // Read when the result is requested, not when the page loads: a session that
+  // starts before a date begins and asks for its result after it has begun must
+  // get the later state. Then kept fixed, so the result does not move under a
+  // re-render. Asking again (after going back) reads a fresh moment.
+  const [moment, setMoment] = useState<string | null>(null)
+  const assessedAt = moment ? momentDay(moment) : ''
+  const requestResult = () => {
+    setMoment(nowMoment())
+    setShowResult(true)
+  }
 
   const question = currentQuestion(flow)
   const sections = flowSections(flow)
@@ -89,8 +97,8 @@ export function ComplianceCheckerV2({ exitHref }: { exitHref: string }) {
   }, [flow.answers])
 
   const result = useMemo(
-    () => (showResult ? evaluateAssessmentV2(flow.answers, assessedAt) : null),
-    [flow.answers, showResult, assessedAt]
+    () => (showResult && moment ? evaluateAssessmentV2(flow.answers, assessedAt, moment) : null),
+    [flow.answers, showResult, assessedAt, moment]
   )
 
   if (showResult && result) {
@@ -221,7 +229,7 @@ export function ComplianceCheckerV2({ exitHref }: { exitHref: string }) {
               )}
               {finished && (
                 <Button
-                  onClick={() => setShowResult(true)}
+                  onClick={requestResult}
                   className="bg-accent-fill text-ink-on-accent hover:bg-accent-fill/90"
                 >
                   See the result

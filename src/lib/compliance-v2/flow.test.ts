@@ -18,6 +18,9 @@ import { QUESTION_CATALOGUE, visibleQuestions } from './questions'
 import { validateAnswers } from './validation/answers'
 import { classify } from './engine/classify'
 
+/** A day before 2 December 2026, so these scenarios keep the behaviour they were written for. */
+const AS_OF = '2026-11-23'
+
 /**
  * Phase 4's rules, tested where they live. The component renders what these
  * return, so a change to navigation or to answer invalidation fails here rather
@@ -66,7 +69,7 @@ describe('answer invalidation', () => {
     expect(state.historical.annex_iii_employment_use?.value).toEqual(['recruitment_selection'])
 
     // And the engine never sees it.
-    expect(classify(state.answers).statutoryRoutes).not.toContain('Annex III, point 4(a)')
+    expect(classify(state.answers, undefined, AS_OF).statutoryRoutes).not.toContain('Annex III, point 4(a)')
   })
 
   it('restores a stranded answer when the branch reopens', () => {
@@ -204,7 +207,7 @@ describe('no dead end from an unknown answer', () => {
     expect(isFinished(state)).toBe(true)
     expect(validateAnswers(state.answers).errors).toEqual([])
     // And it produces a result rather than an error.
-    expect(classify(state.answers).classification).toBeTruthy()
+    expect(classify(state.answers, undefined, AS_OF).classification).toBeTruthy()
   })
 
   it('every path through the catalogue terminates', () => {

@@ -1,4 +1,5 @@
 import { RULE_PACK } from '@/lib/rulepack'
+import { phaseOn, type Phase } from '@/lib/ai-act-dates'
 import type { AnswerRecordV2 } from '../types'
 import { includesAny, isNo, isYes, saidUnknown, valueOf, valuesOf } from './read'
 
@@ -387,9 +388,15 @@ export type PracticeOutcome = 'all_limbs_met' | 'unresolved' | 'not_engaged'
 export interface ProhibitedPracticeFinding {
   point: string
   summary: string
-  /** Undefined where the practice is already prohibited. */
+  /** Undefined where the practice is already prohibited everywhere in the Union. */
   appliesFrom?: string
+  /** True until the application date has begun in every EU zone. */
   futureDated: boolean
+  /**
+   * Where the application date stands at the assessment moment: `not-yet` (not
+   * begun in any EU zone), `between` (begun in some, not all) or `applies`.
+   */
+  phase: Phase
   outcome: PracticeOutcome
   /** Limbs established on these answers. */
   satisfied: string[]
@@ -417,10 +424,14 @@ const PRACTICE_BY_VALUE = new Map(
   RULE_PACK.prohibitedPractices.map((practice) => [`art5_${practice.point}`, practice])
 )
 
-function evaluatePractice(value: string, answers: AnswerRecordV2): ProhibitedPracticeFinding {
+function evaluatePractice(value: string, answers: AnswerRecordV2, moment: string): ProhibitedPracticeFinding {
   const practice = PRACTICE_BY_VALUE.get(value)
   const point = practice?.point ?? value.replace(/^art5_/, '')
-  const futureDated = Boolean(practice?.futureDated)
+  // Dated by the assessment moment. Only a point inserted with a later date is
+  // ever not yet in application; from the moment the date has begun in every EU
+  // zone it is prohibited like any other and carries no `appliesFrom`.
+  const phase: Phase = practice?.futureDated ? phaseOn(practice.appliesFrom, moment) : 'applies'
+  const futureDated = phase !== 'applies'
   const limbs = limbsFor(point, answers)
 
   const failed = limbs.find((limb) => limb.state === 'failed')
@@ -437,6 +448,7 @@ function evaluatePractice(value: string, answers: AnswerRecordV2): ProhibitedPra
     summary: practice?.summary ?? value,
     appliesFrom: futureDated ? practice?.appliesFrom : undefined,
     futureDated,
+    phase,
     outcome,
     satisfied: limbs.filter((limb) => limb.state === 'satisfied').map((limb) => limb.label),
     unresolved: outstanding.map((limb) => limb.label),
@@ -453,7 +465,12 @@ function evaluatePractice(value: string, answers: AnswerRecordV2): ProhibitedPra
   }
 }
 
-export function evaluateArticle5(answers: AnswerRecordV2): Article5Evaluation {
+/**
+ * `moment` is the assessment moment (an ISO day, or an ISO instant; see
+ * `ai-act-dates.ts`) and is required: whether a point is prohibited yet depends
+ * on it, and a default would read the clock without the caller knowing.
+ */
+export function evaluateArticle5(answers: AnswerRecordV2, moment: string): Article5Evaluation {
   if (saidUnknown(answers, 'prohibited_screen')) {
     return {
       engaged: [],
@@ -479,22 +496,26 @@ export function evaluateArticle5(answers: AnswerRecordV2): Article5Evaluation {
     }
   }
 
-  const evaluated = selected.map((value) => evaluatePractice(value, answers))
+  const evaluated = selected.map((value) => evaluatePractice(value, answers, moment))
   const engaged = evaluated.filter((item) => item.outcome !== 'not_engaged')
   const cleared = evaluated.filter((item) => item.outcome === 'not_engaged')
 
   const complete = engaged.filter((item) => item.outcome === 'all_limbs_met')
   const outstanding = engaged.filter((item) => item.outcome === 'unresolved')
-  const future = engaged.filter((item) => item.futureDated)
-  const current = engaged.filter((item) => !item.futureDated)
+  const notYet = engaged.filter((item) => item.phase === 'not-yet')
+  const between = engaged.filter((item) => item.phase === 'between')
+  const current = engaged.filter((item) => item.phase === 'applies')
 
   const explanation = engaged.length
     ? [
         current.length
-          ? `${current.length === 1 ? 'A practice you selected is' : 'Practices you selected are'} prohibited outright today. A prohibition admits no compliance route: there is no conformity assessment that satisfies it, no documentation that cures it, and no risk measure that makes it lawful.`
+          ? `${current.length === 1 ? 'A practice you selected is' : 'Practices you selected are'} on Article 5’s list of prohibitions that already apply. A prohibition admits no compliance route: there is no conformity assessment that satisfies it, no documentation that cures it, and no risk measure that makes it lawful.`
           : '',
-        future.length
-          ? `${future.length === 1 ? 'A practice you selected becomes' : 'Practices you selected become'} prohibited on a fixed future date, so this is a date to finish work against rather than an instruction to stop today.`
+        notYet.length
+          ? `${notYet.length === 1 ? 'A practice you selected is' : 'Practices you selected are'} on Article 5’s list of prohibitions that apply from a fixed future date, so this is a date to finish work against rather than an instruction to stop today.`
+          : '',
+        between.length
+          ? `${between.length === 1 ? 'A practice you selected is' : 'Practices you selected are'} on Article 5’s list of prohibitions that apply from ${between[0].appliesFrom}.`
           : '',
         complete.length
           ? `Every limb of ${complete.length === 1 ? 'that definition is' : 'those definitions are'} met on your answers, and no exception the provision states applies.`
@@ -540,7 +561,7 @@ export function article5Engaged(evaluation: Article5Evaluation): boolean {
 
 /** Whether any engaged practice is prohibited *today* rather than from a date. */
 export function article5EngagedNow(evaluation: Article5Evaluation): boolean {
-  return evaluation.engaged.some((item) => !item.futureDated)
+  return evaluation.engaged.some((item) => item.phase === 'applies')
 }
 
 export { PRACTICE_BY_VALUE }

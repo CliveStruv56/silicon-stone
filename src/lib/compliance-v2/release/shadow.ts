@@ -140,7 +140,7 @@ export function runShadowComparison(assessedAt = '2026-08-19'): ShadowComparison
     if (!legacyScenario) throw new Error(`no legacy scenario ${pair.legacy}`)
     if (!v2Scenario) throw new Error(`no v2 scenario ${pair.v2}`)
 
-    const legacy = evaluateAssessment(legacyScenario.answers)
+    const legacy = evaluateAssessment(legacyScenario.answers, assessedAt)
     const v2 = evaluateAssessmentV2(v2Scenario.answers, assessedAt)
 
     const agrees = comparable(legacy.classification, v2.classification)
