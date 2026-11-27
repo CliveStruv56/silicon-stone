@@ -139,11 +139,11 @@ export const FREE_OFFERINGS: Offering[] = [
     id: 'tools',
     name: 'The four interactive tools',
     price: 'Free',
-    priceNote: 'email required for results',
+    priceNote: 'no email needed to see results',
     summary:
       'Compliance Checker, Supply Chain Mapper, Scenario Modeler and Policy Stress-Test — the analysis turned into a result about you.',
     href: '/tools',
-    terms: ['No tool input leaves your browser — only your email address is sent.'],
+    terms: ['Results appear on screen with no email. Email is asked for only if you want the Compliance Checker’s written report, or a printable brief from the Supply Chain Mapper or Policy Stress-Test.'],
   },
   {
     id: 'us-executive-guide',
